@@ -1,8 +1,4 @@
-const COMMAND_BYTES = {
-  'FADER_INPUT': [127, 1, 28, 0], 
-  'MUTE_INPUT':  [127, 1, 26, 0],
-  'SOLO_INPUT':  [13, 3, 46, 0] 
-};
+const { COMMAND_BYTES } = require('./dictionary');
 
 const CONVERTERS = {
   faderToBytes: (value) => [0, 0, (value >> 7) & 0x07, value & 0x7F],
@@ -48,8 +44,8 @@ function parseIncoming(message) {
   const channel = message[8];
 
   if (message[4] === 127 && message[5] === 1) {
-      if (element === 28) return { type: 'FADER_INPUT', channel, value: CONVERTERS.bytesToFader(dataBytes) };
-      if (element === 26) return { type: 'MUTE_INPUT', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+      if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
+      if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
   }
   
   if (message[4] === 13) {
@@ -61,7 +57,7 @@ function parseIncoming(message) {
       
       // Lê o Solo
       if (message[5] === 3 && element === 46) {
-          return { type: 'SOLO_INPUT', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+          return { type: 'kSetupSoloChOn/kSoloChOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
       }
   }
 

@@ -1,9 +1,9 @@
 socket.on('update', (d) => {
     if (d.channel < NUM_CHANNELS) {
         const isTrue = (d.value === 1 || d.value === true);
-        if (d.type === 'FADER_INPUT') updateUI(d.channel, d.value, undefined, undefined);
-        if (d.type === 'MUTE_INPUT') updateUI(d.channel, undefined, isTrue, undefined);
-        if (d.type === 'SOLO_INPUT') updateUI(d.channel, undefined, undefined, isTrue);
+        if (d.type === 'kInputFader/kFader') updateUI(d.channel, d.value, undefined, undefined);
+        if (d.type === 'kInputChannelOn/kChannelOn') updateUI(d.channel, undefined, isTrue, undefined);
+        if (d.type === 'kSetupSoloChOn/kSoloChOn') updateUI(d.channel, undefined, undefined, isTrue);
     }
 });
 

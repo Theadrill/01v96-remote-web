@@ -13,10 +13,10 @@ function openChannelConfig(e, ch) {
 
 function toggleState(type, ch) {
     let val = false;
-    if (type === 'MUTE_INPUT') { 
+    if (type === 'kInputChannelOn/kChannelOn') { 
         val = !channelStates[ch].on; 
         updateUI(ch, undefined, val, undefined); 
-    } else if (type === 'SOLO_INPUT') { 
+    } else if (type === 'kSetupSoloChOn/kSoloChOn') { 
         val = !channelStates[ch].solo; 
         updateUI(ch, undefined, undefined, val); 
     }
@@ -52,12 +52,12 @@ function nudgeFader(ch, dir) {
     if (nRaw === channelStates[ch].value) nRaw = channelStates[ch].value + dir;
     if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
     updateUI(ch, nRaw, undefined, undefined);
-    socket.emit('control', { type: 'FADER_INPUT', channel: ch, value: nRaw });
+    socket.emit('control', { type: 'kInputFader/kFader', channel: ch, value: nRaw });
 }
 
 function faderInput(e, ch) {
     if (!e.isTrusted) return;
     const v = parseInt(e.target.value);
     updateUI(ch, v, undefined, undefined);
-    socket.emit('control', { type: 'FADER_INPUT', channel: ch, value: v });
+    socket.emit('control', { type: 'kInputFader/kFader', channel: ch, value: v });
 }

@@ -226,9 +226,9 @@ function executarConexao(inIdx, outIdx) {
 async function triggerSync() {
     console.log("🔄 Sincronizando faders e botões vitais...");
     for (let i = 0; i < 32; i++) {
-        const fReq = protocol.buildRequest('FADER_INPUT', i);
-        const mReq = protocol.buildRequest('MUTE_INPUT', i);
-        const sReq = protocol.buildRequest('SOLO_INPUT', i);
+        const fReq = protocol.buildRequest('kInputFader/kFader', i);
+        const mReq = protocol.buildRequest('kInputChannelOn/kChannelOn', i);
+        const sReq = protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i);
         
         if (fReq) midiEngine.send(fReq); await new Promise(r => setTimeout(r, 10)); 
         if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, 10)); 
@@ -267,10 +267,15 @@ io.on('connection', (socket) => {
     socket.on('forceSync', () => triggerSync());
 
     socket.on('control', (data) => {
-        const isBinary = (data.type === 'MUTE_INPUT' || data.type === 'SOLO_INPUT');
+        const isBinary = (data.type === 'kInputChannelOn/kChannelOn' || data.type === 'kSetupSoloChOn/kSoloChOn');
         const converter = isBinary ? protocol.CONVERTERS.onToBytes : protocol.CONVERTERS.faderToBytes;
         const sysex = protocol.buildChange(data.type, data.channel, data.value, converter);
+        
         if (sysex) {
+            // Log do comando para debug (converte array de bytes em string HEX para melhor leitura)
+            const hexArr = sysex.map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
+            console.log(`📤 Enviando: [${data.type}] Canal: ${data.channel + 1} Valor: ${data.value} -> SYSEX: ${hexArr}`);
+            
             midiEngine.send(sysex);
             socket.broadcast.emit('update', data);
         }
