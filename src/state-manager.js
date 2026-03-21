@@ -1,72 +1,45 @@
-/**
- * O State Manager funciona como o "Single Source of Truth" (Fonte Única da Verdade).
- * Ele armazena o estado atual de cada fader e parâmetro da mesa.
- */
-
 const state = {
-    // Nome da cena (armazenado como array de 16 caracteres para facilitar atualização individual)
-    sceneName: new Array(16).fill(' '),
-    
-    // Canais de entrada (1 a 32). Usamos um objeto onde a chave é o índice (0-31)
-    channels: {},
-    
-    // Auxiliares (1 a 8)
-    aux: {},
+    sceneChars: Array(16).fill(' '),
+    sceneName: "01V96",
+    channels: {}
 };
 
-// Inicializa os canais com valores padrão para evitar erros de 'undefined'
+// Inicia os 32 canais vazios
 for (let i = 0; i < 32; i++) {
     state.channels[i] = {
         value: 0,
-        on: true,
-        name: `CH ${i + 1}`
+        on: false,
+        solo: false,
+        nameChars: Array(16).fill(' '), // 16 espaços para as letras
+        name: `CH ${i+1}`
     };
 }
 
-/**
- * Atualiza um valor no estado global
- * @param {string} type - Tipo de parâmetro (FADER_INPUT, MUTE_INPUT, etc)
- * @param {number} channel - Índice do canal
- * @param {any} value - Novo valor
- */
 function updateState(type, channel, value) {
-    if (type === 'FADER_INPUT') {
-        if (state.channels[channel]) state.channels[channel].value = value;
-    } 
-    else if (type === 'MUTE_INPUT') {
-        if (state.channels[channel]) state.channels[channel].on = value;
-    }
+    if (!state.channels[channel]) return;
+    if (type === 'FADER_INPUT') state.channels[channel].value = value;
+    if (type === 'MUTE_INPUT') state.channels[channel].on = value;
+    if (type === 'SOLO_INPUT') state.channels[channel].solo = value;
 }
 
-/**
- * Atualiza uma letra específica do nome da cena
- * @param {number} index - Posição (0-15)
- * @param {string} char - Caractere ASCII
- */
+// Junta a letrinha nova com as outras e forma o nome do Canal
+function updateChannelNameChar(channel, charIndex, char) {
+    if (!state.channels[channel]) return;
+    state.channels[channel].nameChars[charIndex] = char;
+    state.channels[channel].name = state.channels[channel].nameChars.join('').trim();
+}
+
 function updateSceneChar(index, char) {
-    state.sceneName[index] = char;
+    state.sceneChars[index] = char;
+    state.sceneName = state.sceneChars.join('').trim();
 }
 
-/**
- * Retorna o nome da cena como uma string limpa
- */
 function getFullSceneName() {
-    return state.sceneName.join('').trim();
+    return state.sceneName;
 }
 
-/**
- * Retorna todo o estado para sincronizar novos clientes
- */
 function getState() {
-    return {
-        sceneName: getFullSceneName(),
-        channels: state.channels
-    };
+    return state;
 }
 
-module.exports = {
-    updateState,
-    updateSceneChar,
-    getState,
-    getFullSceneName
-};
+module.exports = { updateState, updateChannelNameChar, updateSceneChar, getFullSceneName, getState };

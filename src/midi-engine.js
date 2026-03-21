@@ -1,58 +1,80 @@
 const midi = require('midi');
 const protocol = require('./protocol');
 
-const input = new midi.Input();
-const output = new midi.Output();
+// Deixamos as variáveis globais, mas sem instanciar o 'new' ainda
+let input = null;
+let output = null;
 
-function initMIDI(onMessageCallback) {
-    let inputPort = -1;
-    let outputPort = -1;
-
-    // Busca automática por nome para garantir
-    for (let i = 0; i < input.getPortCount(); i++) {
-        if (input.getPortName(i).includes('01V96')) {
-            inputPort = i;
-            break;
-        }
-    }
-
-    for (let i = 0; i < output.getPortCount(); i++) {
-        if (output.getPortName(i).includes('01V96')) {
-            outputPort = i;
-            break; 
-        }
-    }
-
-    // PRIORIDADE: Se não achou por nome, usa os índices 0 e 1 que você mencionou
-    if (inputPort === -1) inputPort = 0;
-    if (outputPort === -1) outputPort = 1;
-
+function getAvailablePorts() {
+    const inputs = [];
+    const outputs = [];
     try {
-        input.openPort(inputPort);
-        output.openPort(outputPort);
+        const tempIn = new midi.Input();
+        const tempOut = new midi.Output();
         
-        // Habilita SysEx, Timing e Active Sensing
+        for (let i = 0; i < tempIn.getPortCount(); i++) {
+            inputs.push({ id: i, name: tempIn.getPortName(i) });
+        }
+        
+        for (let i = 0; i < tempOut.getPortCount(); i++) {
+            outputs.push({ id: i, name: tempOut.getPortName(i) });
+        }
+        
+        // Importante: destruir os temporários para libertar o driver do Windows
+        tempIn.closePort(); 
+        tempOut.closePort();
+    } catch (e) {
+        console.error("Erro ao listar portas:", e);
+    }
+    return { inputs, outputs };
+}
+
+function connectPorts(inputIdx, outputIdx, onMessageCallback) {
+    try {
+        // Se já existirem instâncias abertas, limpamos tudo primeiro
+        if (input) { try { input.closePort(); } catch(e){} }
+        if (output) { try { output.closePort(); } catch(e){} }
+
+        // Criamos as instâncias NO MOMENTO exato da conexão
+        input = new midi.Input();
+        output = new midi.Output();
+
+        // Abre as portas que o usuário escolheu no frontend
+        input.openPort(parseInt(inputIdx));
+        output.openPort(parseInt(outputIdx));
+        
+        // Habilita SysEx IMEDIATAMENTE após abrir a porta (Essencial para a Yamaha)
         input.ignoreTypes(false, false, false);
 
-        console.log(`✅ Entrada MIDI: ${input.getPortName(inputPort)} (Porta ${inputPort})`);
-        console.log(`✅ Saída MIDI: ${output.getPortName(outputPort)} (Porta ${outputPort})`);
-
+        // Escuta as mensagens vindas da mesa física
         input.on('message', (delta, message) => {
+            // Log de emergência: se a mesa mandar QUALQUER coisa, vai aparecer no terminal
+            // console.log('📥 MIDI Bruto recebido:', Buffer.from(message).toString('hex').toUpperCase());
+            
+            // Passa para o tradutor (protocol.js) ver se é algo útil
             const translated = protocol.parseIncoming(message);
-            if (translated) onMessageCallback(translated);
+            if (translated) {
+                onMessageCallback(translated);
+            }
         });
 
-        return true;
+        console.log(`✅ Portas MIDI Vinculadas com Sucesso.`);
+        return { success: true, inName: input.getPortName(parseInt(inputIdx)) };
     } catch (err) {
-        console.error('❌ Erro ao abrir portas MIDI:', err.message);
-        return false;
+        console.error("Erro fatal ao conectar MIDI:", err);
+        return { success: false, error: err.message };
     }
 }
 
 function send(msg) {
-    if (msg) {
-        output.sendMessage(msg);
+    // Só envia se a porta de saída existir e estiver aberta
+    if (output && msg) {
+        try {
+            output.sendMessage(msg);
+        } catch (e) {
+            console.error("Erro ao enviar MIDI:", e.message);
+        }
     }
 }
 
-module.exports = { initMIDI, send };
+module.exports = { getAvailablePorts, connectPorts, send };

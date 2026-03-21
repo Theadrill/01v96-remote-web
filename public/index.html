@@ -1,51 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TESTE 01V96</title>
-    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>01V96 - LIVE SAFE</title>
+    <script src="/socket.io/socket.io.js"></script>
     <style>
-        body { background: #000; color: #0f0; font-family: monospace; text-align: center; }
-        input[type=range] { width: 80%; height: 50px; margin: 50px 0; }
-        #status { color: yellow; margin-top: 20px; }
+        body { background: #111; color: #eee; font-family: sans-serif; text-align: center; padding: 0; margin: 0; display: flex; height: 100dvh; overflow: hidden; }
+        
+        /* Área dos faders com rolagem lateral fluida */
+        .faders-area { flex: 1; display: flex; padding: 10px; overflow-x: auto; align-items: center; justify-content: flex-start; gap: 10px; scroll-behavior: smooth; }
+        
+        .fader-card { background: #222; padding: 12px 10px; border-radius: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 98%; min-width: 110px; box-sizing: border-box; }
+        .ch-name { background: #000; color: #0f0; padding: 4px; border-radius: 4px; font-size: 12px; margin: 5px 0; text-transform: uppercase; font-weight: bold; border: 1px solid #333; width: 92%; text-align: center; overflow:hidden; white-space:nowrap;}
+        .btn-state { width: 85%; padding: 10px 0; margin-bottom: 6px; border-radius: 5px; font-size: 12px; font-weight: bold; border: 1px solid #444; background: #333; color: #666; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .solo-active { background: #28a745 !important; color: white !important; border-color: #34ce57; }
+        .on-active { background: #ffc107 !important; color: black !important; border-color: #ffdb6e; }
+        .btn-nudge { width: 42px; height: 42px; border-radius: 50%; background: #333; color: #fff; font-size: 22px; font-weight: bold; border: 2px solid #555; display: flex; justify-content: center; align-items: center; margin: 5px 0; }
+        input[type=range] { -webkit-appearance: slider-vertical; appearance: slider-vertical; width: 50px; flex-grow: 1; margin: 8px 0; outline: none; }
+        
+        .sidebar { width: 100px; background: #222; border-left: 1px solid #444; padding: 15px 10px; box-sizing: border-box; flex-shrink: 0; }
+        .side-btn { width: 100%; padding: 15px 5px; margin-bottom: 10px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>CONTROLE DIRETO CH 1</h1>
-    <div id="status">Desconectado do Servidor</div>
-    
-    <input type="range" id="fader" min="0" max="1023" value="0">
-    <h2 id="val">0</h2>
+
+    <div class="faders-area" id="faders-container"></div>
+
+    <div class="sidebar">
+        <div id="scn" style="color:#0f0; font-size:13px; font-weight:bold; margin-bottom:20px;">01V96</div>
+        <button class="side-btn" style="background:#444; color:white;" onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
+        <button class="side-btn" style="background:#007bff; color:white;" onclick="forceSync()">SYNC</button> 
+    </div>
+
+    <div id="configModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; justify-content:center; align-items:center;">
+        <div style="background:#222; padding:20px; border-radius:15px; width:80%;">
+            <select id="sin" style="width:100%; padding:10px; margin-bottom:10px;"></select>
+            <select id="sout" style="width:100%; padding:10px; margin-bottom:10px;"></select>
+            <button onclick="conn()" style="width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px;">CONECTAR</button>
+        </div>
+    </div>
 
     <script>
         const socket = io();
-        const fader = document.getElementById('fader');
-        const status = document.getElementById('status');
-        const valTxt = document.getElementById('val');
+        
+        // ==========================================
+        // VARIAVEL MESTRE: QUANTOS CANAIS MOSTRAR?
+        // ==========================================
+        const NUM_CHANNELS = 32; // Começamos com 4. Aumente aqui depois!
+        
+        let channelStates = [];
+        const container = document.getElementById('faders-container');
 
-        socket.on('connect', () => {
-            status.innerText = "✅ CONECTADO AO NODE";
-            status.style.color = "lime";
-        });
+        // GERAÇÃO AUTOMÁTICA DOS CANAIS NA TELA
+        for (let i = 0; i < NUM_CHANNELS; i++) {
+            channelStates.push({ value: 0, on: false, solo: false });
+            
+            container.innerHTML += `
+                <div class="fader-card">
+                    <h2 style="font-size:17px; margin:0; color:#aaa;">CH ${i + 1}</h2>
+                    <div id="name${i}" class="ch-name">...</div>
+                    <button style="background:transparent; border:none; font-size:22px; cursor:pointer;">⚙️</button>
+                    
+                    <button id="solo${i}" class="btn-state" onclick="toggleState('SOLO_INPUT', ${i})">Solo</button>
+                    <button id="on${i}" class="btn-state" onclick="toggleState('MUTE_INPUT', ${i})">On</button>
+                    
+                    <button class="btn-nudge" onclick="nudgeFader(${i}, 1)">+</button>
+                    <input type="range" id="f${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${i})">
+                    <button class="btn-nudge" onclick="nudgeFader(${i}, -1)">-</button>
+                    
+                    <h1 id="v${i}" style="font-size:22px; margin:5px 0 0 0; color:#007bff; font-family:monospace;">-∞</h1>
+                </div>
+            `;
+        }
 
-        socket.on('disconnect', () => {
-            status.innerText = "❌ CONEXÃO PERDIDA";
-            status.style.color = "red";
-        });
+        const curve = [{r:1,d:-138},{r:50,d:-74.6},{r:75,d:-69.6},{r:100,d:-64.6},{r:200,d:-44.6},{r:403,d:-22},{r:423,d:-20},{r:523,d:-15},{r:603,d:-11},{r:723,d:-5},{r:823,d:0},{r:1023,d:10}];
+        function rawToDb(v){ if(v==0)return "-∞"; for(let i=1;i<curve.length;i++){ let p1=curve[i-1],p2=curve[i]; if(v>=p1.r && v<=p2.r) return (p1.d+(v-p1.r)*((p2.d-p1.d)/(p2.r-p1.r))).toFixed(2)+" dB"; } return "0.00 dB"; }
+        function dbToRaw(db){ if(db<=-138)return 0; if(db>=10)return 1023; for(let i=1;i<curve.length;i++){ let p1=curve[i-1],p2=curve[i]; if(db>=p1.d && db<=p2.d) return Math.round(p1.r+(db-p1.d)*((p2.r-p1.r)/(p2.d-p1.d))); } return 0; }
 
-        fader.addEventListener('input', (e) => {
+        function updateUI(ch, val, onState, soloState) {
+            if (ch >= NUM_CHANNELS) return; // Ignora se a mesa mandar info de um canal que não está na tela
+
+            if (val !== undefined && val !== null) {
+                document.getElementById(`f${ch}`).value = val;
+                document.getElementById(`v${ch}`).innerText = rawToDb(val);
+                channelStates[ch].value = val;
+            }
+            if (onState !== undefined && onState !== null) {
+                channelStates[ch].on = onState;
+                document.getElementById(`on${ch}`).classList.toggle('on-active', onState);
+            }
+            if (soloState !== undefined && soloState !== null) {
+                channelStates[ch].solo = soloState;
+                document.getElementById(`solo${ch}`).classList.toggle('solo-active', soloState);
+            }
+        }
+
+        function toggleState(type, ch) {
+            let val = false;
+            if (type === 'MUTE_INPUT') { val = !channelStates[ch].on; updateUI(ch, undefined, val, undefined); } 
+            else if (type === 'SOLO_INPUT') { val = !channelStates[ch].solo; updateUI(ch, undefined, undefined, val); }
+            socket.emit('control', { type, channel: ch, value: val ? 1 : 0 });
+        }
+
+        function nudgeFader(ch, dir) {
+            let db = (channelStates[ch].value === 0) ? -138.0 : parseFloat(rawToDb(channelStates[ch].value));
+            let nRaw = dbToRaw(db + (0.10 * dir));
+            if (nRaw === channelStates[ch].value) nRaw = channelStates[ch].value + dir;
+            if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
+            updateUI(ch, nRaw, undefined, undefined);
+            socket.emit('control', { type: 'FADER_INPUT', channel: ch, value: nRaw });
+        }
+
+        function faderInput(e, ch) {
+            if (!e.isTrusted) return;
             const v = parseInt(e.target.value);
-            valTxt.innerText = v;
-            socket.emit('control', { type: 'FADER_INPUT', channel: 0, value: v });
-        });
+            updateUI(ch, v, undefined, undefined);
+            socket.emit('control', { type: 'FADER_INPUT', channel: ch, value: v });
+        }
 
-        socket.on('update', (data) => {
-            if (data.channel === 0) {
-                fader.value = data.value;
-                valTxt.innerText = data.value;
+        socket.on('update', (d) => {
+            if (d.channel < NUM_CHANNELS) {
+                const isTrue = (d.value === 1 || d.value === true);
+                if (d.type === 'FADER_INPUT') updateUI(d.channel, d.value, undefined, undefined);
+                if (d.type === 'MUTE_INPUT') updateUI(d.channel, undefined, isTrue, undefined);
+                if (d.type === 'SOLO_INPUT') updateUI(d.channel, undefined, undefined, isTrue);
             }
         });
+
+        socket.on('updateName', (d) => {
+            if (d.channel < NUM_CHANNELS) {
+                document.getElementById(`name${d.channel}`).innerText = d.name || `CH ${d.channel + 1}`;
+            }
+        });
+
+        socket.on('sync', (s) => {
+            if (s.channels) {
+                for (let i = 0; i < NUM_CHANNELS; i++) {
+                    if (s.channels[i]) {
+                        updateUI(i, s.channels[i].value, s.channels[i].on, s.channels[i].solo);
+                        document.getElementById(`name${i}`).innerText = s.channels[i].name || `CH ${i + 1}`;
+                    }
+                }
+            }
+        });
+
+        socket.on('portsList', (data) => {
+            document.getElementById('sin').innerHTML = data.available.inputs.map(p => `<option value="${p.id}">IN: ${p.name}</option>`).join('');
+            document.getElementById('sout').innerHTML = data.available.outputs.map(p => `<option value="${p.id}">OUT: ${p.name}</option>`).join('');
+            
+            if (data.savedConfig && data.savedConfig.inIdx !== null && data.savedConfig.outIdx !== null) {
+                document.getElementById('sin').value = String(data.savedConfig.inIdx);
+                document.getElementById('sout').value = String(data.savedConfig.outIdx);
+                conn(); 
+            } else { document.getElementById('configModal').style.display='flex'; }
+        });
+
+        function conn() { 
+            socket.emit('requestConnect', { 
+                inIdx: parseInt(document.getElementById('sin').value, 10), 
+                outIdx: parseInt(document.getElementById('sout').value, 10) 
+            }); 
+            document.getElementById('configModal').style.display='none'; 
+        }
+        
+        function forceSync() { socket.emit('forceSync'); }
     </script>
 </body>
 </html>
