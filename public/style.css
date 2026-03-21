@@ -59,3 +59,24 @@ input[type=range]::-moz-range-thumb { pointer-events: auto; }
     #scn { margin-bottom: 5px !important; font-size: 10px !important; }
     .side-btn { padding: 8px 2px; margin-bottom: 5px; font-size: 10px; }
 }
+
+/* Configuração do Modal (Idêntico à Faders-Area) */
+.ch-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 100px; height: 100%; background: #111; z-index: 2000; flex-direction: column; border-right: 1px solid #333; }
+.ch-modal-body { flex: 1; display: flex; padding: 10px; overflow-x: auto; align-items: center; justify-content: flex-start; gap: 10px; scrollbar-width: none; }
+.ch-modal-body::-webkit-scrollbar { display: none; }
+
+/* Botão de Sair Vermelho na Sidebar */
+.btn-close-side { background: #dc3545; color: white; border: none; font-size: 11px; padding: 12px 0; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+.btn-tab { background: #333; color: #888; border: 1px solid #444; font-size: 11px; }
+.active-tab { background: #007bff !important; color: white !important; border-color: #00a2ff !important; box-shadow: 0 0 10px rgba(0,123,255,0.4); }
+
+/* Estilo Específico para as Strips dos Auxiliares no Modal (Respeitando padrões) */
+.aux-card { min-width: 90px !important; }
+.aux-card .card-title { font-size: 11px !important; margin-bottom: 5px; }
+
+.mb-10 { margin-bottom: 10px; }
+
+/* Ajuste do modal para Mobile Landscape */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .ch-modal-overlay { right: 85px; }
+}

@@ -267,7 +267,7 @@ io.on('connection', (socket) => {
     socket.on('forceSync', () => triggerSync());
 
     socket.on('control', (data) => {
-        const isBinary = (data.type === 'kInputChannelOn/kChannelOn' || data.type === 'kSetupSoloChOn/kSoloChOn');
+        const isBinary = data.type.includes('On') || data.type.includes('Solo');
         const converter = isBinary ? protocol.CONVERTERS.onToBytes : protocol.CONVERTERS.faderToBytes;
         const sysex = protocol.buildChange(data.type, data.channel, data.value, converter);
         

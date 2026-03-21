@@ -4,6 +4,11 @@ socket.on('update', (d) => {
         if (d.type === 'kInputFader/kFader') updateUI(d.channel, d.value, undefined, undefined);
         if (d.type === 'kInputChannelOn/kChannelOn') updateUI(d.channel, undefined, isTrue, undefined);
         if (d.type === 'kSetupSoloChOn/kSoloChOn') updateUI(d.channel, undefined, undefined, isTrue);
+        
+        // Suporte a Auxiliares
+        if (d.type.includes('kInputAUX/kAUX')) {
+            updateAuxFromSocket(d.channel, d.type, d.value);
+        }
     }
 });
 

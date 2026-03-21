@@ -46,6 +46,14 @@ function parseIncoming(message) {
   if (message[4] === 127 && message[5] === 1) {
       if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
       if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+
+      // Aux Sends (Element 35)
+      if (element === 35) {
+          const auxIdx = Math.floor(parameter / 3) + 1;
+          const offset = parameter % 3;
+          if (offset === 0) return { type: `kInputAUX/kAUX${auxIdx}On`, channel, value: CONVERTERS.bytesToOn(dataBytes) };
+          if (offset === 2) return { type: `kInputAUX/kAUX${auxIdx}Level`, channel, value: CONVERTERS.bytesToFader(dataBytes) };
+      }
   }
   
   if (message[4] === 13) {

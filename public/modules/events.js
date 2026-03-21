@@ -1,14 +1,31 @@
 function openChannelConfig(e, ch) {
     if (['INPUT', 'BUTTON', 'SELECT'].includes(e.target.tagName) || e.target.closest('.nudge-zone')) return;
     
-    document.querySelectorAll('.fader-card').forEach(c => c.style.background = '#222');
+    activeConfigChannel = ch;
     
-    if (activeConfigChannel === ch) {
-        activeConfigChannel = null;
-    } else {
-        activeConfigChannel = ch;
-        e.currentTarget.style.background = '#15304d'; // Azul escuro moderno e sutil
-    }
+    // Atualiza o nome do canal na SIDEBAR
+    const chName = document.getElementById(`name${ch}`).innerText;
+    document.getElementById('chSideName').innerText = chName === '...' ? `CH ${ch + 1}` : chName;
+    
+    // Mostra o modal e troca botões da sidebar para modo contexto
+    document.getElementById('chConfigModal').style.display = 'flex';
+    document.getElementById('mainNav').style.display = 'none';
+    document.getElementById('chNav').style.display = 'flex';
+    document.getElementById('chContext').style.display = 'flex';
+    
+    // Força a aba inicial do canal ser sempre EQ
+    switchTab('eq');
+    
+    // Mantém o feedback visual de seleção no fundo
+    document.querySelectorAll('.fader-card').forEach(c => c.style.background = '#222');
+    e.currentTarget.style.background = '#15304d'; 
+}
+
+function closeChannelConfig() {
+    document.getElementById('chConfigModal').style.display = 'none';
+    document.getElementById('mainNav').style.display = 'flex';
+    document.getElementById('chNav').style.display = 'none';
+    document.getElementById('chContext').style.display = 'none';
 }
 
 function toggleState(type, ch) {

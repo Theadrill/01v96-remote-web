@@ -13,9 +13,27 @@
 
     <div class="sidebar">
         <div id="scn" class="color-green font-13-bold mb-20">01V96</div>
-        <button class="side-btn btn-config" onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
-        <button class="side-btn btn-sync" onclick="forceSync()">SYNC</button> 
-        <button class="side-btn fs-btn fs-icon-btn" onclick="toggleFullScreen()">
+        
+        <!-- Navegação Principal (Config/Sync) -->
+        <div id="mainNav" style="display: flex; flex-direction: column; width: 100%; align-items: center;">
+            <button class="side-btn btn-config" onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
+            <button class="side-btn btn-sync" onclick="forceSync()">SYNC</button> 
+        </div>
+
+        <!-- Navegação de Configuração do Canal (Abas) -->
+        <div id="chNav" style="display: none; flex-direction: column; width: 100%; align-items: center;">
+            <button class="side-btn btn-tab active-tab" onclick="switchTab('eq')">EQ</button>
+            <button class="side-btn btn-tab" onclick="switchTab('dyn')">DYN</button>
+            <button class="side-btn btn-tab" onclick="switchTab('aux')">AUXS</button>
+        </div>
+
+        <!-- Área de Contexto do Canal (Aparece ao abrir) -->
+        <div id="chContext" style="display: none; flex-direction: column; width: 100%; align-items: center; margin-top: auto; border-top: 1px solid #444; padding-top: 10px;">
+            <div id="chSideName" class="color-green font-13-bold mb-10" style="text-align: center; word-break: break-all;">CH 1</div>
+            <button class="side-btn btn-close-side" onclick="closeChannelConfig()">SAIR</button>
+        </div>
+
+        <button class="side-btn fs-btn fs-icon-btn" onclick="toggleFullScreen()" style="margin-top: 10px;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
             </svg>
@@ -33,8 +51,18 @@
         </div>
     </div>
 
+    <!-- Modal de Configuração de Canal (Sem Header para ganhar espaço) -->
+    <div id="chConfigModal" class="ch-modal-overlay">
+        <div class="ch-modal-body">
+            Área Reservada...
+        </div>
+    </div>
+
     <script src="modules/globals.js"></script>
     <script src="modules/channel_strip.js"></script>
+    <script src="modules/eq.js"></script>
+    <script src="modules/dynamics.js"></script>
+    <script src="modules/auxs_sends.js"></script>
     <script src="modules/events.js"></script>
     <script src="modules/socket.js"></script>
     <script src="modules/sidebar.js"></script>

@@ -20,3 +20,22 @@ function toggleFullScreen() {
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
+
+function switchTab(tabId) {
+    // Muda visual dos botões na sidebar
+    document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active-tab'));
+    
+    // Se a função foi chamada por um evento, destaca o botão clicado. 
+    // Caso contrário (chamada automática ao abrir), destaca o primeiro por padrão.
+    if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('side-btn')) {
+        window.event.currentTarget.classList.add('active-tab');
+    } else {
+        const btn = document.querySelector(`#chNav .side-btn:nth-child(${tabId === 'eq' ? 1 : (tabId === 'dyn' ? 2 : 3)})`);
+        if (btn) btn.classList.add('active-tab');
+    }
+    
+    // Altera o conteúdo do corpo do modal delegando para os novos módulos
+    if (tabId === 'eq') renderEQ(activeConfigChannel);
+    if (tabId === 'dyn') renderDynamics(activeConfigChannel);
+    if (tabId === 'aux') renderAuxs(activeConfigChannel);
+}
