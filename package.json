@@ -1,0 +1,26 @@
+{
+  "name": "01v96-remote-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sniffer.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Theadrill/01v96-remote-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Theadrill/01v96-remote-web/issues"
+  },
+  "homepage": "https://github.com/Theadrill/01v96-remote-web#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "midi": "^2.0.0",
+    "socket.io": "^4.8.3"
+  }
+}

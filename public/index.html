@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TESTE 01V96</title>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; text-align: center; }
+        input[type=range] { width: 80%; height: 50px; margin: 50px 0; }
+        #status { color: yellow; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>CONTROLE DIRETO CH 1</h1>
+    <div id="status">Desconectado do Servidor</div>
+    
+    <input type="range" id="fader" min="0" max="1023" value="0">
+    <h2 id="val">0</h2>
+
+    <script>
+        const socket = io();
+        const fader = document.getElementById('fader');
+        const status = document.getElementById('status');
+        const valTxt = document.getElementById('val');
+
+        socket.on('connect', () => {
+            status.innerText = "✅ CONECTADO AO NODE";
+            status.style.color = "lime";
+        });
+
+        socket.on('disconnect', () => {
+            status.innerText = "❌ CONEXÃO PERDIDA";
+            status.style.color = "red";
+        });
+
+        fader.addEventListener('input', (e) => {
+            const v = parseInt(e.target.value);
+            valTxt.innerText = v;
+            socket.emit('control', { type: 'FADER_INPUT', channel: 0, value: v });
+        });
+
+        socket.on('update', (data) => {
+            if (data.channel === 0) {
+                fader.value = data.value;
+                valTxt.innerText = data.value;
+            }
+        });
+    </script>
+</body>
+</html>
