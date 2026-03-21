@@ -21,6 +21,21 @@ function toggleFullScreen() {
     }
 }
 
+function setOrientation(o) {
+    appOrientation = o;
+    localStorage.setItem('mixer_orientation', o);
+    if (o === 'horizontal') {
+        document.body.classList.add('layout-horizontal');
+    } else {
+        document.body.classList.remove('layout-horizontal');
+    }
+    document.getElementById('configModal').style.display = 'none';
+}
+
+// Carregar orientação salva
+const savedOrientation = localStorage.getItem('mixer_orientation');
+if (savedOrientation) setOrientation(savedOrientation);
+
 function switchTab(tabId) {
     // Muda visual dos botões na sidebar
     document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active-tab'));

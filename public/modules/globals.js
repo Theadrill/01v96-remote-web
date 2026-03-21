@@ -5,6 +5,7 @@ for (let i = 0; i < NUM_CHANNELS; i++) {
     channelStates.push({ value: 0, on: false, solo: false });
 }
 let activeConfigChannel = null;
+let appOrientation = 'vertical';
 
 const container = document.getElementById('faders-container');
 

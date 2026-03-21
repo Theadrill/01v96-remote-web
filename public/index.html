@@ -27,23 +27,34 @@
             <button class="side-btn btn-tab" onclick="switchTab('aux')">AUXS</button>
         </div>
 
-        <!-- Área de Contexto do Canal (Aparece ao abrir) -->
-        <div id="chContext" style="display: none; flex-direction: column; width: 100%; align-items: center; margin-top: auto; border-top: 1px solid #444; padding-top: 10px;">
-            <div id="chSideName" class="color-green font-13-bold mb-10" style="text-align: center; word-break: break-all;">CH 1</div>
-            <button class="side-btn btn-close-side" onclick="closeChannelConfig()">SAIR</button>
-        </div>
+        <div id="sideFooter" style="margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <!-- Área de Contexto do Canal (Aparece ao abrir) -->
+            <div id="chContext" style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
+                <div id="chSideName" class="color-green font-13-bold mb-10" style="text-align: center; word-break: break-all;">CH 1</div>
+                <button class="side-btn btn-close-side" onclick="closeChannelConfig()">SAIR</button>
+            </div>
 
-        <button class="side-btn fs-btn fs-icon-btn" onclick="toggleFullScreen()" style="margin-top: 10px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-            </svg>
-        </button>
+            <button class="side-btn fs-btn fs-icon-btn" onclick="toggleFullScreen()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <div id="configModal" class="modal-overlay">
         <div class="modal-content">
             <select id="sin" class="modal-select"></select>
             <select id="sout" class="modal-select"></select>
+            
+            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
+                <p style="font-size: 12px; color: #888; margin-bottom: 10px;">ORIENTAÇÃO</p>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="setOrientation('vertical')" class="btn-connect" style="background:#555;">VERTICAL</button>
+                    <button onclick="setOrientation('horizontal')" class="btn-connect" style="background:#555;">HORIZONTAL</button>
+                </div>
+            </div>
+
             <div class="modal-actions">
                 <button onclick="conn()" class="btn-connect">CONECTAR</button>
                 <button onclick="document.getElementById('configModal').style.display='none'" class="btn-close">FECHAR</button>
