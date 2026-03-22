@@ -16,11 +16,10 @@ function sysexToVal(bytes) {
 // Conversores: 01V96 - Fader (0-1023) p/ Valores Reais
 function rawToFreq(raw) {
     const v = sysexToVal(raw); // Converte Sysex se necessário
-    const step = (v > 120) ? (v / 1023) * 120 : v;
-    return EQ_MIN_FREQ * Math.pow(EQ_MAX_FREQ / EQ_MIN_FREQ, step / 120);
+    return EQ_MIN_FREQ * Math.pow(EQ_MAX_FREQ / EQ_MIN_FREQ, v / 1023);
 }
 function freqToRaw(freq) {
-    return (Math.log10(freq / EQ_MIN_FREQ) / Math.log10(EQ_MAX_FREQ / EQ_MIN_FREQ)) * 120;
+    return (Math.log10(freq / EQ_MIN_FREQ) / Math.log10(EQ_MAX_FREQ / EQ_MIN_FREQ)) * 1023;
 }
 function rawToGain(raw) {
     const v = sysexToVal(raw);
@@ -31,8 +30,7 @@ function gainToRaw(gain) {
 }
 function rawToQ(raw) {
     const v = sysexToVal(raw);
-    const step = (v > 120) ? (v / 1023) * 120 : v;
-    return 0.1 * Math.pow(100, step / 120);
+    return 0.1 * Math.pow(100, v / 1023);
 }
 
 // --- ESTADO GLOBAL ---
@@ -41,7 +39,8 @@ let eqBands = [];
 let eqAnimationId = null;
 let eqCanvas = null;
 let eqCtx = null;
-let activeBandIdx = -1; 
+let activeBandIdx = -1; // Banda sendo arrastada no momento
+let selectedBandIdx = -1; // Banda focada para o ajuste de Q e visibilidade de UI
 let longPressTimeout = null;
 let longPressOccurred = false;
 let startPos = { x: 0, y: 0 };
@@ -105,7 +104,7 @@ function renderEQ(ch) {
                 
                 <!-- Controles Visíveis apenas em telas largas -->
                 <div class="hide-mobile" style="gap:15px; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:5px; background:#222; padding:3px 8px; border-radius:6px; border:1px solid #333;">
+                    <div id="headerQNudge" style="display:flex; align-items:center; gap:5px; background:#222; padding:3px 8px; border-radius:6px; border:1px solid #333;">
                         <button class="nav-btn" style="width:24px; height:24px; font-size:18px;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
                         <span style="font-size:10px; color:#888; font-weight:bold; min-width:10px; text-align:center;">Q</span>
                         <button class="nav-btn" style="width:24px; height:24px; font-size:16px;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
@@ -184,7 +183,9 @@ function onEQDown(e) {
         const by = gToY(b.filter.gain.value, rect.height);
         if (Math.hypot(bx - px, by - py) < 30) {
             activeBandIdx = i;
+            selectedBandIdx = i; // Memoriza para o Q Nudge
             eqCanvas.setPointerCapture(e.pointerId);
+            updateQControlsUI(); // Atualiza visibilidade dos botões de Q
 
             // Inicia Timer de Long Press para Bandas 1 (0) e 4 (3)
             if (i === 0 || i === 3) {
@@ -241,17 +242,26 @@ function setBandMode(bandIdx, mode) {
     if (!channelStates[activeConfigChannel].eq) channelStates[activeConfigChannel].eq = {};
     channelStates[activeConfigChannel].eq[isLow ? 'lowMode' : 'highMode'] = mode;
 
+    // Se for HPF/LPF, o ganho deve ser fixado em 0dB visualmente
+    if (isSpecial) {
+        b.filter.gain.value = 0;
+        const targetState = channelStates[activeConfigChannel]?.eq?.[isLow ? 'low' : 'high'];
+        if (targetState) targetState.g = 512; // 0dB em raw
+    }
+
     updateEQParam(hpfType, [0,0,0, isSpecial ? 1 : 0], mode);
     socket.emit('control', { type: hpfType, channel: activeConfigChannel, value: isSpecial ? 1 : 0, mode: mode });
 
     document.getElementById('eqContextMenu').style.display = 'none';
+    updateQControlsUI();
 }
 
 function onEQMove(e, ch) {
     if (activeBandIdx === -1) return;
 
-    // Se moveu muito, cancela long press
-    if (!longPressOccurred && Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y) > 10) {
+    // Se moveu, cancela long press. No touch (Android) usamos um threshold maior (25px)
+    const threshold = e.pointerType === 'touch' ? 25 : 10;
+    if (!longPressOccurred && Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y) > threshold) {
         if (longPressTimeout) clearTimeout(longPressTimeout);
     }
 
@@ -262,7 +272,12 @@ function onEQMove(e, ch) {
     
     const b = eqBands[activeBandIdx];
     const newF = xToF(px, rect.width);
-    const newG = Math.max(EQ_MIN_GAIN, Math.min(EQ_MAX_GAIN, yToG(py, rect.height)));
+    let newG = Math.max(EQ_MIN_GAIN, Math.min(EQ_MAX_GAIN, yToG(py, rect.height)));
+    
+    // HPF/LPF não possuem parâmetro de ganho; fixamos em 0dB
+    if (b.filter.type === 'highpass' || b.filter.type === 'lowpass') {
+        newG = 0;
+    }
     
     b.filter.frequency.value = newF;
     b.filter.gain.value = newG;
@@ -282,7 +297,7 @@ function onEQMove(e, ch) {
 }
 
 function onEQUp() { 
-    // Removido activeBandIdx = -1 para memorizar a última banda tocada conforme solicitado
+    activeBandIdx = -1; // Para de arrastar imediatamente ao soltar
     if (longPressTimeout) clearTimeout(longPressTimeout);
 }
 
@@ -400,13 +415,14 @@ function startEQAnimation() {
             const by = gToY(b.filter.gain.value, h);
             eqCtx.beginPath();
             eqCtx.arc(bx, by, 12, 0, Math.PI*2);
-            eqCtx.fillStyle = (i === activeBandIdx) ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)';
+            eqCtx.fillStyle = (i === selectedBandIdx) ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)';
             eqCtx.fill();
             eqCtx.beginPath();
             eqCtx.arc(bx, by, 5, 0, Math.PI*2);
             eqCtx.fillStyle = b.color;
             eqCtx.fill();
-            eqCtx.strokeStyle = '#fff';
+            eqCtx.strokeStyle = (i === selectedBandIdx) ? '#fff' : 'rgba(255,255,255,0.5)';
+            eqCtx.lineWidth = (i === selectedBandIdx) ? 2 : 1;
             eqCtx.stroke();
         });
 
@@ -459,14 +475,18 @@ window.stopQNudge = function() {
 };
 
 function nudgeQ(dir) {
-    if (activeBandIdx === -1) return;
+    if (selectedBandIdx === -1) return;
     const ch = activeConfigChannel;
-    const b = eqBands[activeBandIdx];
+    const b = eqBands[selectedBandIdx];
+    
+    // Na 01V96, apenas o modo PEAKING (Normal) permite ajuste de Q
+    if (b.filter.type !== 'peaking') return;
+    
     const chEq = channelStates[ch].eq;
     if (!chEq || !chEq[b.key]) return;
 
     let v = sysexToVal(chEq[b.key].q);
-    v += (-dir * 8); // Invertido: - estreita a banda (mais Q) e + aumenta a banda (menos Q)
+    v += (-dir * 16); // Dobrei a sensitividade (de 8 para 16) para ir mais rápido
     if (v < 0) v = 0;
     if (v > 1023) v = 1023;
     
@@ -477,4 +497,25 @@ function nudgeQ(dir) {
     chEq[b.key].q = [0, 0, (v >> 7) & 0x07, v & 0x7F];
     if (b.filter) b.filter.Q.value = rawToQ(v);
     socket.emit('control', { type: `kInputEQ/kEQ${label}Q`, channel: ch, value: v });
+}
+
+function updateQControlsUI() {
+    if (selectedBandIdx === -1) return;
+    const b = eqBands[selectedBandIdx];
+    // Apenas Peaking tem Q ajustável
+    const isFixed = b.filter.type !== 'peaking';
+    
+    // Header Q
+    const hQ = document.getElementById('headerQNudge');
+    if (hQ) {
+        hQ.style.opacity = isFixed ? '0.2' : '1';
+        hQ.style.pointerEvents = isFixed ? 'none' : 'auto';
+    }
+    
+    // Sidebar Q
+    const sQ = document.getElementById('sideQNudge');
+    if (sQ) {
+        sQ.style.opacity = isFixed ? '0.2' : '1';
+        sQ.style.pointerEvents = isFixed ? 'none' : 'auto';
+    }
 }
