@@ -41,7 +41,7 @@ function startAuxNudge(ch, auxIdx, dir) {
     
     auxNudgeTimeout = setTimeout(() => {
         auxNudgeInterval = setInterval(() => {
-            nudgeAuxLevel(ch, auxIdx, dir);
+            nudgeAuxLevel(ch, auxIdx, dir * 3);
         }, 80);
     }, 500);
 }
@@ -55,10 +55,7 @@ function stopAuxNudge() {
 
 function nudgeAuxLevel(ch, auxIdx, dir) {
     const currentRaw = (channelStates[ch] && channelStates[ch][`aux${auxIdx}`]) || 0;
-    let db = (currentRaw === 0) ? -138.0 : parseFloat(rawToDb(currentRaw));
-    let nRaw = dbToRaw(db + (nudgeStepDB * dir));
-    
-    if (nRaw === currentRaw) nRaw = currentRaw + dir;
+    let nRaw = currentRaw + dir;
     if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
     
     // Atualiza UI e Estado

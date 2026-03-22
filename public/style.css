@@ -1,4 +1,4 @@
-body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; height: 100dvh; overflow: hidden; display: flex; }
+body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; height: 100dvh; overflow: hidden; display: flex; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 body.layout-horizontal { flex-direction: column; }
 
 /* Área dos faders com rolagem lateral fluida */
@@ -6,17 +6,52 @@ body.layout-horizontal { flex-direction: column; }
 body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
 .faders-area::-webkit-scrollbar { display: none; }
 
-.fader-card { background: #222; padding: 12px 10px; border-radius: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 98%; min-width: 110px; box-sizing: border-box; cursor: pointer; }
+/* Agrupamento de 8 em 8 faders na tela principal */
+.faders-area > .fader-card:nth-child(8n) { margin-right: 55px; }
 
-body.layout-horizontal .fader-card { 
+.fader-card { background: #222; padding: 12px 10px; border-radius: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 98%; min-width: 110px; box-sizing: border-box; cursor: default; }
+
+.fader-card.has-meter {
+    background-image: linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(0,204,0,0.6) 40%, rgba(255,221,0,0.6) 80%, rgba(255,0,0,0.7) 100%);
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 100% 0%;
+    transition: background-size 0.05s linear;
+    position: relative;
+    overflow: hidden;
+}
+
+.fader-card.has-meter > * {
+    position: relative;
+    z-index: 2;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9);
+}
+
+/* Master Fader Rule */
+.master-card {
+    background: rgba(100, 0, 0, 0.9) !important;
+    border-color: #800 !important;
+    margin-left: 30px !important;
+}
+body.layout-horizontal .master-card {
+    margin-left: 0 !important;
+    margin-top: 30px !important;
+}
+
+body.layout-horizontal .fader-card {  
     display: grid !important; 
     grid-template-columns: 100px 42px minmax(0, 1fr) 42px 75px;
     grid-template-rows: 40px 40px;
     grid-column-gap: 8px; grid-row-gap: 0;
     width: 100% !important; height: 90px !important; min-height: 90px !important; 
     padding: 5px 15px !important; border-radius: 12px;
-    align-items: center; justify-items: stretch; cursor: pointer;
+    align-items: center; justify-items: stretch; cursor: default;
     box-sizing: border-box !important;
+}
+
+body.layout-horizontal .faders-area > .fader-card:nth-child(8n) { 
+    margin-right: 0 !important; 
+    margin-bottom: 45px !important; 
 }
 
 /* Coluna 1: Stack Interno Falsificado (Garante que não use grid rows p/ outros) */
@@ -58,10 +93,14 @@ body.layout-horizontal .sidebar { width: 100%; height: 80px; flex-direction: row
 body.layout-horizontal #mainNav, body.layout-horizontal #chNav, body.layout-horizontal #chContext { flex-direction: row !important; height: 100%; width: auto !important; margin: 0; gap: 5px; border: none !important; padding: 0 !important; }
 body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; font-size: 11px; }
 
+.card-title, .ch-name { cursor: pointer; }
+
 .ch-name { background: #000; color: #0f0; padding: 4px; border-radius: 4px; font-size: 16px; margin: 2px 0 5px 0; text-transform: uppercase; font-weight: bold; border: 1px solid #333; width: 92%; text-align: center; overflow:hidden; white-space:nowrap; }
 .btn-state { width: 85%; padding: 10px 0; margin-bottom: 6px; border-radius: 5px; font-size: 12px; font-weight: bold; border: 1px solid #444; background: #333; color: #666; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
 .solo-active { background: #28a745 !important; color: white !important; border-color: #34ce57; }
 .on-active { background: #ffc107 !important; color: black !important; border-color: #ffdb6e; }
+.phase-norm { background: #007bff !important; color: white !important; border-color: #00a2ff; }
+.phase-inv { background: #28a745 !important; color: white !important; border-color: #34ce57; }
 
 
 /* Botões de Nudge e Zonas de Toque */

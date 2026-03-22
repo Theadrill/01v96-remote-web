@@ -192,8 +192,23 @@ function executarConexao(inIdx, outIdx) {
     }
     // ------------------------------------------------------------------------------------------------
 
+    let meterDataBuffer = new Array(32).fill(0);
+    let lastMeterTime = 0;
+
     const result = midiEngine.connectPorts(inIdx, outIdx, (midiData) => {
         if (!midiData) return;
+
+        if (midiData.type === 'METER_BULK') {
+            for (let i = 0; i < 32; i++) {
+                meterDataBuffer[i] = midiData.levels[i];
+            }
+            const now = Date.now();
+            if (now - lastMeterTime > 50) { // Throttling: ~20 FPS max
+                io.emit('meterData', meterDataBuffer);
+                lastMeterTime = now;
+            }
+            return; // Impede spam no log
+        }
 
         if (midiData.type === 'CH_NAME_CHAR') {
             stateManager.updateChannelNameChar(midiData.channel, midiData.charIndex, midiData.char);
@@ -214,6 +229,19 @@ function executarConexao(inIdx, outIdx) {
         atualizarMenuTray();
         triggerSync();
         io.emit('connectionState', { connected: true });
+
+        // Loop contínuo de requests do Meter
+        if (global.meterInterval) clearInterval(global.meterInterval);
+        global.meterInterval = setInterval(() => {
+            if (isConnected) {
+                // Bulk Request (0x20)
+                midiEngine.send([240, 67, 32, 62, 26, 33, 4, 0, 247]);
+                midiEngine.send([240, 67, 32, 62, 26, 33, 0, 0, 247]);
+                // Parameter Request (0x30)
+                midiEngine.send([240, 67, 48, 62, 26, 33, 4, 0, 247]);
+                midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 247]);
+            }
+        }, 50); // ~20 FPS polling
     } else {
         isConnected = false;
         console.log("❌ Falha ao conectar. Retomando busca...");
@@ -225,6 +253,10 @@ function executarConexao(inIdx, outIdx) {
 
 async function triggerSync() {
     console.log("🔄 Sincronizando faders e botões vitais...");
+    // Master Fader
+    midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, 10));
+    midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, 10));
+
     for (let i = 0; i < 32; i++) {
         const fReq = protocol.buildRequest('kInputFader/kFader', i);
         const mReq = protocol.buildRequest('kInputChannelOn/kChannelOn', i);
@@ -233,6 +265,27 @@ async function triggerSync() {
         if (fReq) midiEngine.send(fReq); await new Promise(r => setTimeout(r, 10)); 
         if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, 10)); 
         if (sReq) midiEngine.send(sReq); await new Promise(r => setTimeout(r, 10)); 
+
+        // Sincroniza Phase
+        midiEngine.send(protocol.buildRequest('kInputPhase/kPhase', i)); await new Promise(r => setTimeout(r, 5));
+        
+        // Sincroniza Master EQ ON de cada canal
+        midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 5));
+        
+        // Sincroniza Frequências e Ganhos das 4 bandas (Low, LowMid, HiMid, High)
+        const bands = ['Low', 'LowMid', 'HiMid', 'High'];
+        for (const b of bands) {
+            midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 5));
+            midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 5));
+        }
+
+        // Requisita também os 8 auxiliares
+        for (let a = 1; a <= 8; a++) {
+            const auxReq = protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i);
+            const auxOnReq = protocol.buildRequest(`kInputAUX/kAUX${a}On`, i);
+            if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, 5));
+            if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, 5));
+        }
     }
 
     await new Promise(r => setTimeout(r, 600)); 

@@ -37,6 +37,9 @@ const savedOrientation = localStorage.getItem('mixer_orientation');
 if (savedOrientation) setOrientation(savedOrientation);
 
 function switchTab(tabId) {
+    // Para animações pesadas se existirem
+    if (window.stopEQAnimation) stopEQAnimation();
+
     // Muda visual dos botões na sidebar
     document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active-tab'));
     

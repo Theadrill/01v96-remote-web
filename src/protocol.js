@@ -36,16 +36,76 @@ function buildNameRequest(channelIndex, charIndex) {
 
 function parseIncoming(message) {
   if (!message || message.length < 8) return null;
+
+  const element = message[6];
+
+  // DEBUG EXTREMO: Se for Parameter Change (127 1), ignora Faders (28), ON (26) e Auxs (35)
+  if (message[4] === 127 && message[5] === 1) {
+      if (element !== 28 && element !== 26 && element !== 35) {
+          console.log(`🔍 [DEBUG PARAM] Ele|Par: ${element}|${message[7]} ->`, Buffer.from(message).toString('hex').toUpperCase());
+      }
+  } else if (message[4] !== 13 && message[4] !== 26) {
+      // Se não for Nome/Solo (13) nem Bulk que eu já leio (26), joga no log!
+      console.log('🔍 [DEBUG SYSEX DESCONHECIDO] ->', Buffer.from(message).toString('hex').toUpperCase());
+  }
+
+  // Meter Bulk Dump Detection: F0 43 1n 3E 1A 21 ...
+  if (message[4] === 26 && message[5] === 33) {
+      let levels = [];
+      const dataStart = 10;
+      
+      const dataLen = message.length - dataStart - 2; 
+      const bytesPerCh = Math.max(1, Math.floor(dataLen / 32));
+      
+      for(let i = 0; i < 32; i++) {
+          let val = 0;
+          let idx = dataStart + (i * bytesPerCh);
+          
+          let raw = 0;
+          for (let b = 0; b < bytesPerCh; b++) {
+              raw = (raw << 7) | (message[idx + b] & 0x7F);
+          }
+          
+          if (raw > 0) {
+              // Dinamicamente calc max log baseado nos bytes da mesa e gera a %
+              const maxPow = Math.log10(Math.pow(128, bytesPerCh) - 1);
+              val = (Math.log10(raw) / maxPow) * 110; // offset leve
+              if (val > 100) val = 100;
+              if (val < 0) val = 0;
+          }
+          levels.push(val);
+      }
+      return { type: 'METER_BULK', levels };
+  }
+
   if (message[4] === 13 && message[5] === 127) return null;
 
   const dataBytes = message.slice(9, -1);
-  const element = message[6];
   const parameter = message[7];
   const channel = message[8];
 
   if (message[4] === 127 && message[5] === 1) {
       if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
       if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+
+      // EQ (Element 32)
+      if (element === 32 && parameter <= 15) {
+          const eqKeys = [
+              'kEQMode', 'kEQLowQ', 'kEQLowF', 'kEQLowG', 'kEQHPFOn',
+              'kEQLowMidQ', 'kEQLowMidF', 'kEQLowMidG',
+              'kEQHiMidQ', 'kEQHiMidF', 'kEQHiMidG',
+              'kEQHiQ', 'kEQHiF', 'kEQHiG',
+              'kEQLPFOn', 'kEQOn'
+          ];
+          const key = eqKeys[parameter];
+          // EQ usa conversores de Fader para os 10 bits de resolução?
+          // Na verdade 01V96 EQ freq/gain costuma ser faderToBytes (4 bytes)
+          return { type: `kInputEQ/${key}`, channel, value: CONVERTERS.bytesToFader(dataBytes) };
+      }
+
+      // Master (Stereo) Fader e ON
+      if (element === 79 && message[7] === 0) return { type: 'kStereoFader/kFader', channel: 'master', value: CONVERTERS.bytesToFader(dataBytes) };
+      if (element === 77 && message[7] === 0) return { type: 'kStereoChannelOn/kChannelOn', channel: 'master', value: CONVERTERS.bytesToOn(dataBytes) };
 
       // Aux Sends (Element 35)
       if (element === 35) {

@@ -1,5 +1,6 @@
 function openChannelConfig(e, ch) {
-    if (['INPUT', 'BUTTON', 'SELECT'].includes(e.target.tagName) || e.target.closest('.nudge-zone')) return;
+    const isHeader = e.target.closest('.card-title') || e.target.closest('.ch-name');
+    if (!isHeader) return;
     
     activeConfigChannel = ch;
     
@@ -13,8 +14,8 @@ function openChannelConfig(e, ch) {
     document.getElementById('chNav').style.display = 'flex';
     document.getElementById('chContext').style.display = 'flex';
     
-    // Força a aba inicial do canal ser sempre EQ
-    switchTab('eq');
+    // Força a aba inicial do canal ser sempre AUX
+    switchTab('aux');
     
     // Mantém o feedback visual de seleção no fundo
     document.querySelectorAll('.fader-card').forEach(c => c.style.background = '#222');
@@ -22,6 +23,7 @@ function openChannelConfig(e, ch) {
 }
 
 function closeChannelConfig() {
+    if (window.stopEQAnimation) stopEQAnimation();
     document.getElementById('chConfigModal').style.display = 'none';
     document.getElementById('mainNav').style.display = 'flex';
     document.getElementById('chNav').style.display = 'none';
@@ -30,17 +32,20 @@ function closeChannelConfig() {
 
 function toggleState(type, ch) {
     let val = false;
-    if (type === 'kInputChannelOn/kChannelOn') { 
-        val = !channelStates[ch].on; 
+    let s = (ch === 'master') ? masterState : channelStates[ch];
+
+    if (type === 'kInputChannelOn/kChannelOn' || type === 'kStereoChannelOn/kChannelOn') { 
+        val = !s.on; 
         updateUI(ch, undefined, val, undefined); 
     } else if (type === 'kSetupSoloChOn/kSoloChOn') { 
-        val = !channelStates[ch].solo; 
+        val = !s.solo; 
         updateUI(ch, undefined, undefined, val); 
     }
-    socket.emit('control', { type, channel: ch, value: val ? 1 : 0 });
+    
+    const emitCh = (ch === 'master') ? 0 : ch;
+    socket.emit('control', { type, channel: emitCh, value: val ? 1 : 0 });
 }
 
-let nudgeStepDB = 0.50; 
 let nudgeTimeout = null;
 let nudgeInterval = null;
 
@@ -50,7 +55,7 @@ function startNudge(ch, dir) {
     
     nudgeTimeout = setTimeout(() => {
         nudgeInterval = setInterval(() => {
-            nudgeFader(ch, dir);
+            nudgeFader(ch, dir * 3);
         }, 80); 
     }, 500);
 }
@@ -63,18 +68,20 @@ function stopNudge() {
 }
 
 function nudgeFader(ch, dir) {
-    let db = (channelStates[ch].value === 0) ? -138.0 : parseFloat(rawToDb(channelStates[ch].value));
-    let nRaw = dbToRaw(db + (nudgeStepDB * dir));
-    
-    if (nRaw === channelStates[ch].value) nRaw = channelStates[ch].value + dir;
+    let s = (ch === 'master') ? masterState : channelStates[ch];
+    let nRaw = s.value + dir;
     if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
     updateUI(ch, nRaw, undefined, undefined);
-    socket.emit('control', { type: 'kInputFader/kFader', channel: ch, value: nRaw });
+    
+    const typeFader = (ch === 'master') ? 'kStereoFader/kFader' : 'kInputFader/kFader';
+    socket.emit('control', { type: typeFader, channel: (ch === 'master' ? 0 : ch), value: nRaw });
 }
 
 function faderInput(e, ch) {
     if (!e.isTrusted) return;
     const v = parseInt(e.target.value);
     updateUI(ch, v, undefined, undefined);
-    socket.emit('control', { type: 'kInputFader/kFader', channel: ch, value: v });
+    
+    const typeFader = (ch === 'master') ? 'kStereoFader/kFader' : 'kInputFader/kFader';
+    socket.emit('control', { type: typeFader, channel: (ch === 'master' ? 0 : ch), value: v });
 }
