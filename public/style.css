@@ -1,15 +1,15 @@
-body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; height: 100dvh; overflow: hidden; display: flex; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+html, body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; height: 100dvh; overflow: hidden; display: flex; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
 body.layout-horizontal { flex-direction: column; }
 
 /* Área dos faders com rolagem lateral fluida */
-.faders-area { flex: 1; display: flex; padding: 20px; overflow-x: auto; align-items: center; justify-content: flex-start; gap: 15px; order: 1; scrollbar-width: none; }
+.faders-area { flex: 1; display: flex; padding: 10px 20px; overflow-x: auto; overflow-y: hidden; align-items: center; justify-content: flex-start; gap: 15px; order: 1; scrollbar-width: none; min-height: 0; touch-action: pan-x; }
 body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
 .faders-area::-webkit-scrollbar { display: none; }
 
 /* Agrupamento de 8 em 8 faders na tela principal */
 .faders-area > .fader-card:nth-child(8n) { margin-right: 55px; }
 
-.fader-card { background: #222; padding: 12px 10px; border-radius: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 98%; min-width: 110px; box-sizing: border-box; cursor: default; }
+.fader-card { background: #222; padding: 12px 10px; border-radius: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; max-height: 100%; min-width: 110px; box-sizing: border-box; cursor: default; min-height: 0; }
 
 .fader-card.has-meter {
     background-image: linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(0,204,0,0.6) 40%, rgba(255,221,0,0.6) 80%, rgba(255,0,0,0.7) 100%);
@@ -105,10 +105,12 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
 
 /* Botões de Nudge e Zonas de Toque */
 .btn-nudge { width: 50px; height: 50px; border-radius: 50%; background: #333; color: #fff; font-size: 26px; font-weight: bold; border: 2px solid #555; display: flex; justify-content: center; align-items: center; margin: 0; touch-action: none; -webkit-touch-callout: none; }
-.nudge-zone { align-self: stretch; margin: 0 -10px; padding: 6px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; touch-action: none; -webkit-touch-callout: none; user-select: none; }
-
-/* Comportamento nativo do Input Range */
-input[type=range] { -webkit-appearance: slider-vertical; appearance: slider-vertical; width: 50px; flex-grow: 1; margin: 4px 0; outline: none; touch-action: none; pointer-events: none; }
+.nudge-zone { align-self: stretch; margin: 0; padding: 6px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; touch-action: none; -webkit-touch-callout: none; user-select: none; border-radius: 8px; position: relative; }
+.nudge-zone::after { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 100%; max-height: 80px; background: transparent; border-radius: 8px; transition: background 0.1s; pointer-events: none; z-index: 0; }
+.nudge-zone:active::after { background: rgba(255,255,255,0.15); }
+.nudge-zone .btn-nudge, .nudge-zone .fader-val { position: relative; z-index: 1; }
+.nudge-zone:active .btn-nudge { background: #444; border-color: #666; }
+input[type=range] { -webkit-appearance: slider-vertical; appearance: slider-vertical; width: 50px; flex: 1; min-height: 0; margin: 4px 0; outline: none; touch-action: none; pointer-events: none; }
 input[type=range]::-webkit-slider-thumb { pointer-events: auto; }
 input[type=range]::-moz-range-thumb { pointer-events: auto; }
 
@@ -127,6 +129,18 @@ input[type=range]::-moz-range-thumb { pointer-events: auto; }
 .font-13-bold { font-size: 13px; font-weight: bold; }
 .mb-20 { margin-bottom: 20px; }
 .fs-icon-btn { color: white; display: flex; justify-content: center; align-items: center; }
+.ch-clickable-zone { width: 100%; padding: 5px 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; border-radius: 8px; transition: background 0.1s; z-index: 5; }
+.ch-clickable-zone:active { background: transparent; } /* Removido brilho retangular redundante */
+.mt-auto { margin-top: auto; }
+.nav-btn { background: #333; color: #5cacee; border: 1px solid #444; border-radius: 4px; width: 30px; height: 30px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; user-select: none; }
+.nav-btn:active { background: #444; transform: scale(0.9); }
+.hide-mobile { display: flex !important; }
+.show-mobile { display: none !important; }
+
+@media screen and (max-width: 800px) {
+    .hide-mobile { display: none !important; }
+    .show-mobile { display: flex !important; }
+}
 
 /* Estilos do Modal */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; }
@@ -155,8 +169,9 @@ input[type=range]::-moz-range-thumb { pointer-events: auto; }
 
 /* Configuração do Modal (Idêntico à Faders-Area) */
 .ch-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 100px; height: 100%; background: #111; z-index: 2000; flex-direction: column; border-right: 1px solid #333; }
-.ch-modal-body { flex: 1; display: flex; padding: 10px; overflow-x: auto; align-items: center; justify-content: flex-start; gap: 10px; scrollbar-width: none; }
-.ch-modal-body::-webkit-scrollbar { display: none; }
+.ch-modal-body { flex: 1; display: flex; padding: 0; overflow: hidden; align-items: center; justify-content: flex-start; scrollbar-width: none; }
+.drag-scroll-area { scrollbar-width: none; }
+.drag-scroll-area::-webkit-scrollbar { display: none; }
 
 /* Botão de Sair Vermelho na Sidebar */
 .btn-close-side { background: #dc3545; color: white; border: none; font-size: 11px; padding: 12px 0; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }

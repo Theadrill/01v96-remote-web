@@ -53,7 +53,17 @@ function switchTab(tabId) {
     }
     
     // Altera o conteúdo do corpo do modal delegando para os novos módulos
-    if (tabId === 'eq') renderEQ(activeConfigChannel);
-    if (tabId === 'dyn') renderDynamics(activeConfigChannel);
-    if (tabId === 'aux') renderAuxs(activeConfigChannel);
+    const modeEl = document.getElementById('chSideMode');
+    const eqActions = document.getElementById('eqQuickActions');
+    
+    if (tabId === 'eq') { 
+        if(modeEl) modeEl.innerText = 'EQUALIZADOR'; 
+        if(eqActions) eqActions.style.display = 'flex';
+        renderEQ(activeConfigChannel); 
+    } else {
+        if(eqActions) eqActions.style.display = 'none';
+    }
+    
+    if (tabId === 'dyn') { if(modeEl) modeEl.innerText = 'DYNAMICS'; renderDynamics(activeConfigChannel); }
+    if (tabId === 'aux') { if(modeEl) modeEl.innerText = 'AUX SENDS'; renderAuxs(activeConfigChannel); }
 }

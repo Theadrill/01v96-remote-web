@@ -1,25 +1,42 @@
 function openChannelConfig(e, ch) {
-    const isHeader = e.target.closest('.card-title') || e.target.closest('.ch-name');
-    if (!isHeader) return;
+    if (e.target.closest('button') || e.target.closest('input')) return;
     
     activeConfigChannel = ch;
-    
-    // Atualiza o nome do canal na SIDEBAR
+    updateConfigUIForChannel(ch);
+    switchTab('aux');
+}
+
+function updateConfigUIForChannel(ch) {
     const chName = document.getElementById(`name${ch}`).innerText;
     document.getElementById('chSideName').innerText = chName === '...' ? `CH ${ch + 1}` : chName;
     
-    // Mostra o modal e troca botões da sidebar para modo contexto
     document.getElementById('chConfigModal').style.display = 'flex';
     document.getElementById('mainNav').style.display = 'none';
     document.getElementById('chNav').style.display = 'flex';
     document.getElementById('chContext').style.display = 'flex';
     
-    // Força a aba inicial do canal ser sempre AUX
-    switchTab('aux');
+    const cards = document.querySelectorAll('.fader-card');
+    cards.forEach(c => c.style.background = ''); 
+    if (cards[ch]) cards[ch].style.background = '#15304d';
+}
+
+function changeConfigChannel(delta) {
+    let nextCh = activeConfigChannel + delta;
+    if (nextCh < 0) nextCh = NUM_CHANNELS - 1;
+    if (nextCh >= NUM_CHANNELS) nextCh = 0;
     
-    // Mantém o feedback visual de seleção no fundo
-    document.querySelectorAll('.fader-card').forEach(c => c.style.background = '#222');
-    e.currentTarget.style.background = '#15304d'; 
+    activeConfigChannel = nextCh;
+    updateConfigUIForChannel(nextCh);
+
+    const activeTab = document.querySelector('.btn-tab.active-tab');
+    let tabId = 'aux';
+    if (activeTab) {
+        const txt = activeTab.innerText.toLowerCase();
+        if (txt.includes('eq')) tabId = 'eq';
+        else if (txt.includes('dyn')) tabId = 'dyn';
+        else tabId = 'aux';
+    }
+    switchTab(tabId);
 }
 
 function closeChannelConfig() {
@@ -28,6 +45,9 @@ function closeChannelConfig() {
     document.getElementById('mainNav').style.display = 'flex';
     document.getElementById('chNav').style.display = 'none';
     document.getElementById('chContext').style.display = 'none';
+    
+    // Reseta cores dos cards
+    document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
 }
 
 function toggleState(type, ch) {

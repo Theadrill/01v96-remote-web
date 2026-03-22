@@ -2,7 +2,12 @@ const socket = io();
 const NUM_CHANNELS = 32;
 let channelStates = [];
 for (let i = 0; i < NUM_CHANNELS; i++) {
-    channelStates.push({ value: 0, on: false, solo: false });
+    channelStates.push({ 
+        value: 0, 
+        on: false, 
+        solo: false,
+        eq: { on: false }
+    });
 }
 let masterState = { value: 0, on: false };
 let activeConfigChannel = null;

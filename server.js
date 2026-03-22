@@ -271,12 +271,16 @@ async function triggerSync() {
         
         // Sincroniza Master EQ ON de cada canal
         midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 5));
+        midiEngine.send(protocol.buildRequest('kInputEQ/kEQMode', i)); await new Promise(r => setTimeout(r, 5));
+        midiEngine.send(protocol.buildRequest('kInputEQ/kEQHPFOn', i)); await new Promise(r => setTimeout(r, 5));
+        midiEngine.send(protocol.buildRequest('kInputEQ/kEQLPFOn', i)); await new Promise(r => setTimeout(r, 5));
         
-        // Sincroniza Frequências e Ganhos das 4 bandas (Low, LowMid, HiMid, High)
+        // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, High)
         const bands = ['Low', 'LowMid', 'HiMid', 'High'];
         for (const b of bands) {
             midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 5));
             midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 5));
+            midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i)); await new Promise(r => setTimeout(r, 5));
         }
 
         // Requisita também os 8 auxiliares

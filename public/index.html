@@ -30,6 +30,18 @@
         <div id="sideFooter" style="margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center;">
             <!-- Área de Contexto do Canal (Aparece ao abrir) -->
             <div id="chContext" style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
+                <div id="eqQuickActions" style="display: none; flex-direction: column; width: 100%; gap: 10px; margin-bottom: 10px;">
+                    <div class="show-mobile" style="display: flex; flex-direction: row; width: 100%; gap: 5px;">
+                        <button id="sideBtnEQOn" class="side-btn" style="flex: 1; font-size: 10px; padding: 10px 0; margin-bottom: 0;" onclick="toggleEQ(activeConfigChannel)">EQ ON</button>
+                        <button id="sideBtnPhase" class="side-btn" style="flex: 1; font-size: 10px; padding: 10px 0; margin-bottom: 0;" onclick="togglePhase(activeConfigChannel)">PHASE</button>
+                    </div>
+                    <div class="show-mobile" style="display:flex; align-items:center; justify-content:center; gap:8px; background:#111; padding:5px; border-radius:8px; width:100%; box-sizing:border-box;">
+                        <button class="nav-btn" style="width:36px; height:36px; font-size:22px;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
+                        <span style="font-size:12px; color:#888; font-weight:bold;">Q</span>
+                        <button class="nav-btn" style="width:36px; height:36px; font-size:20px;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
+                    </div>
+                </div>
+                <div id="chSideMode" style="color: #666; font-size: 10px; text-transform: uppercase; margin-bottom: 2px;">AUX SENDS</div>
                 <div id="chSideName" class="color-green font-13-bold mb-10" style="text-align: center; word-break: break-all;">CH 1</div>
                 <button class="side-btn btn-close-side" onclick="closeChannelConfig()">SAIR</button>
             </div>

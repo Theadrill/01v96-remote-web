@@ -4,21 +4,35 @@ const EQ_MAX_FREQ = 20000;
 const EQ_MIN_GAIN = -18;
 const EQ_MAX_GAIN = 18;
 
+// Conversor de Sysex Yamaha 01V96 para Valor Numérico (10-bit Param Change)
+// Formato esperado: [0, 0, msb, lsb] (últimos 2 bytes carregam os 10 bits: MSB(0-7) e LSB(0-127))
+function sysexToVal(bytes) {
+    if (!Array.isArray(bytes)) return bytes; // Fallback se já for número
+    const len = bytes.length;
+    if (len < 2) return 0;
+    return (bytes[len - 2] << 7) | bytes[len - 1];
+}
+
 // Conversores: 01V96 - Fader (0-1023) p/ Valores Reais
 function rawToFreq(raw) {
-    if (raw === undefined || raw === null || isNaN(raw)) raw = 512;
-    // Log approximation for 01V96 (0-1023)
-    return EQ_MIN_FREQ * Math.pow(EQ_MAX_FREQ / EQ_MIN_FREQ, raw / 1023);
+    const v = sysexToVal(raw); // Converte Sysex se necessário
+    const step = (v > 120) ? (v / 1023) * 120 : v;
+    return EQ_MIN_FREQ * Math.pow(EQ_MAX_FREQ / EQ_MIN_FREQ, step / 120);
 }
 function freqToRaw(freq) {
-    return Math.log10(freq / EQ_MIN_FREQ) / Math.log10(EQ_MAX_FREQ / EQ_MIN_FREQ) * 1023;
+    return (Math.log10(freq / EQ_MIN_FREQ) / Math.log10(EQ_MAX_FREQ / EQ_MIN_FREQ)) * 120;
 }
 function rawToGain(raw) {
-    if (raw === undefined || raw === null || isNaN(raw)) raw = 512;
-    return (raw - 512) * (18 / 512); 
+    const v = sysexToVal(raw);
+    return (v - 512) * (18 / 512); 
 }
 function gainToRaw(gain) {
     return (gain * 512 / 18) + 512;
+}
+function rawToQ(raw) {
+    const v = sysexToVal(raw);
+    const step = (v > 120) ? (v / 1023) * 120 : v;
+    return 0.1 * Math.pow(100, step / 120);
 }
 
 // --- ESTADO GLOBAL ---
@@ -28,20 +42,27 @@ let eqAnimationId = null;
 let eqCanvas = null;
 let eqCtx = null;
 let activeBandIdx = -1; 
+let longPressTimeout = null;
+let longPressOccurred = false;
+let startPos = { x: 0, y: 0 };
 
 function initEQEngine(ch) {
     if (!eqContext) eqContext = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Carrega do channelStates
-    const state = channelStates[ch] || { eq: {} };
+    let state = channelStates[ch] || { eq: {} };
     const chEq = state.eq || {};
     eqBands = [];
     
+    // Configura tipos dinâmicos (Shelf vs HPF/LPF vs Peaking)
+    // Para simplificar a simulação, usaremos o state.eq.lowMode e highMode se existirem
+    const lowMode = chEq.lowMode || (sysexToVal(chEq.hpfOn) === 1 ? 'highpass' : 'lowshelf');
+    const highMode = chEq.highMode || (sysexToVal(chEq.lpfOn) === 1 ? 'lowpass' : 'highshelf');
+
     const mapping = [
-        { key: 'low', type: 'lowshelf', color: '#ff4d4d', defaultF: 236 },
-        { key: 'lowmid', type: 'peaking', color: '#ffeb3b', defaultF: 512 },
-        { key: 'himid', type: 'peaking', color: '#4caf50', defaultF: 680 },
-        { key: 'high', type: 'highshelf', color: '#2196f3', defaultF: 915 }
+        { key: 'low', type: lowMode, color: '#ff4d4d', defaultF: 20 },
+        { key: 'lowmid', type: 'peaking', color: '#ffeb3b', defaultF: 50 },
+        { key: 'himid', type: 'peaking', color: '#4caf50', defaultF: 80 },
+        { key: 'high', type: highMode, color: '#2196f3', defaultF: 110 }
     ];
 
     mapping.forEach((m, i) => {
@@ -51,7 +72,7 @@ function initEQEngine(ch) {
         filter.type = m.type;
         filter.frequency.value = rawToFreq(data.f !== undefined ? data.f : m.defaultF);
         filter.gain.value = rawToGain(data.g !== undefined ? data.g : 512);
-        filter.Q.value = 0.7; // Padrão
+        filter.Q.value = rawToQ(data.q !== undefined ? data.q : 65); // ~0.7 de Q
 
         eqBands.push({ filter, color: m.color, id: i, key: m.key });
     });
@@ -64,20 +85,51 @@ function renderEQ(ch) {
     const isPhase = !!state.phase;
 
     const body = document.querySelector('.ch-modal-body');
+    
+    // Atualiza estados nos botões da SIDEBAR
+    const sideBtnOn = document.getElementById('sideBtnEQOn');
+    if (sideBtnOn) sideBtnOn.classList.toggle('on-active', isEqOn);
+    const sideBtnPhase = document.getElementById('sideBtnPhase');
+    if (sideBtnPhase) {
+        sideBtnPhase.classList.remove('phase-inv', 'phase-norm');
+        sideBtnPhase.classList.add(isPhase ? 'phase-inv' : 'phase-norm');
+    }
     body.innerHTML = `
-        <div class="eq-container" style="display:flex; flex-direction:column; width:100%; height:100%; overflow:hidden;">
-            <div style="background:#1a1a1a; padding:10px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0; font-size:14px; color:#5cacee;">EQUALIZADOR - CH ${ch+1}</h2>
-                <div style="display:flex; gap:8px;">
-                    <button id="btnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:70px; height:32px; font-size:10px; margin:0;" onclick="toggleEQ(${ch})">EQ ON</button>
-                    <button id="btnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:70px; height:32px; font-size:10px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
+        <div class="eq-container" style="display:flex; flex-direction:column; width:100%; height:100%; overflow:hidden; touch-action:none;">
+            <div style="background:#1a1a1a; padding:10px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="nav-btn" onclick="changeConfigChannel(-1)">&lt;</button>
+                    <h2 style="margin:0; font-size:14px; color:#5cacee; min-width:140px; text-align:center;">${ch+1} - ${document.getElementById(`name${ch}`).innerText === '...' ? `CH ${ch+1}` : document.getElementById(`name${ch}`).innerText}</h2>
+                    <button class="nav-btn" onclick="changeConfigChannel(1)">&gt;</button>
+                </div>
+                
+                <!-- Controles Visíveis apenas em telas largas -->
+                <div class="hide-mobile" style="gap:15px; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:5px; background:#222; padding:3px 8px; border-radius:6px; border:1px solid #333;">
+                        <button class="nav-btn" style="width:24px; height:24px; font-size:18px;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
+                        <span style="font-size:10px; color:#888; font-weight:bold; min-width:10px; text-align:center;">Q</span>
+                        <button class="nav-btn" style="width:24px; height:24px; font-size:16px;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:70px; height:32px; font-size:10px; margin:0;" onclick="toggleEQ(${ch})">EQ ON</button>
+                        <button id="headerBtnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:70px; height:32px; font-size:10px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
+                    </div>
                 </div>
             </div>
             <div style="flex:1; background:#000; position:relative; min-height:280px;">
                 <canvas id="eqCanvas" style="display:block; width:100%; height:100%;"></canvas>
             </div>
             <div id="eqInfo" style="background:#111; color:#777; font-size:10px; padding:5px 15px; font-family:monospace; height:20px;">
-                Clique e arraste um nó para ajustar...
+                Canais 1 e 4: Pressione e segure para HPF/LPF...
+            </div>
+            <!-- Modal de Contexto para HPF/LPF -->
+            <div id="eqContextMenu" style="display:none; position:absolute; background:#222; border:1px solid #555; border-radius:10px; padding:10px; z-index:5000; box-shadow:0 8px 25px rgba(0,0,0,0.8); flex-direction:column; gap:5px;">
+                <p style="margin:0 0 5px 0; font-size:9px; color:#aaa; text-align:center; text-transform:uppercase;">Tipo de Filtro</p>
+                <div id="eqModeButtons" style="display:flex; flex-direction:column; gap:5px;">
+                    <button id="btnModeNormal" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">NORMAL</button>
+                    <button id="btnModeShelf" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">SHELF</button>
+                    <button id="btnModeSpecial" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">HPF</button>
+                </div>
             </div>
         </div>
     `;
@@ -124,18 +176,86 @@ function onEQDown(e) {
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
     activeBandIdx = -1;
+    longPressOccurred = false;
+    startPos = { x: e.clientX, y: e.clientY };
+
     eqBands.forEach((b, i) => {
         const bx = fToX(b.filter.frequency.value, rect.width);
         const by = gToY(b.filter.gain.value, rect.height);
         if (Math.hypot(bx - px, by - py) < 30) {
             activeBandIdx = i;
             eqCanvas.setPointerCapture(e.pointerId);
+
+            // Inicia Timer de Long Press para Bandas 1 (0) e 4 (3)
+            if (i === 0 || i === 3) {
+                longPressTimeout = setTimeout(() => {
+                    showEQContextMenu(e.clientX, e.clientY, i);
+                    longPressOccurred = true;
+                }, 600);
+            }
         }
     });
+
+    // Fecha menu se clicar fora
+    document.getElementById('eqContextMenu').style.display = 'none';
+}
+
+function showEQContextMenu(x, y, bandIdx) {
+    const menu = document.getElementById('eqContextMenu');
+    const b = eqBands[bandIdx];
+    const isLow = bandIdx === 0;
+
+    // Configura botões
+    const btnN = document.getElementById('btnModeNormal');
+    const btnS = document.getElementById('btnModeShelf');
+    const btnX = document.getElementById('btnModeSpecial');
+
+    btnX.innerText = isLow ? 'HPF' : 'LPF';
+
+    // Highlight atual
+    btnN.style.borderColor = (b.filter.type === 'peaking') ? '#007bff' : '#444';
+    btnS.style.borderColor = (b.filter.type === 'lowshelf' || b.filter.type === 'highshelf') ? '#007bff' : '#444';
+    btnX.style.borderColor = (b.filter.type === 'highpass' || b.filter.type === 'lowpass') ? '#007bff' : '#444';
+
+    btnN.onclick = () => setBandMode(bandIdx, 'peaking');
+    btnS.onclick = () => setBandMode(bandIdx, isLow ? 'lowshelf' : 'highshelf');
+    btnX.onclick = () => setBandMode(bandIdx, isLow ? 'highpass' : 'lowpass');
+
+    menu.style.left = `${Math.min(window.innerWidth - 130, x - 60)}px`;
+    menu.style.top = `${Math.min(window.innerHeight - 150, y - 60)}px`;
+    menu.style.display = 'flex';
+}
+
+function setBandMode(bandIdx, mode) {
+    const b = eqBands[bandIdx];
+    const isLow = bandIdx === 0;
+
+    // Atualiza Áudio Local
+    b.filter.type = mode;
+
+    // Sincroniza Flags da Mesa (HPF/LPF On/Off)
+    const hpfType = isLow ? 'kInputEQ/kEQHPFOn' : 'kInputEQ/kEQLPFOn';
+    const isSpecial = mode === 'highpass' || mode === 'lowpass';
+    
+    // Persiste no state local
+    if (!channelStates[activeConfigChannel].eq) channelStates[activeConfigChannel].eq = {};
+    channelStates[activeConfigChannel].eq[isLow ? 'lowMode' : 'highMode'] = mode;
+
+    updateEQParam(hpfType, [0,0,0, isSpecial ? 1 : 0], mode);
+    socket.emit('control', { type: hpfType, channel: activeConfigChannel, value: isSpecial ? 1 : 0, mode: mode });
+
+    document.getElementById('eqContextMenu').style.display = 'none';
 }
 
 function onEQMove(e, ch) {
     if (activeBandIdx === -1) return;
+
+    // Se moveu muito, cancela long press
+    if (!longPressOccurred && Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y) > 10) {
+        if (longPressTimeout) clearTimeout(longPressTimeout);
+    }
+
+    if (longPressOccurred) return; // Não arrasta se o menu estiver aberto
     const rect = eqCanvas.getBoundingClientRect();
     const px = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
     const py = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
@@ -147,10 +267,13 @@ function onEQMove(e, ch) {
     b.filter.frequency.value = newF;
     b.filter.gain.value = newG;
 
-    // Envio para mesa
+    // Envio para mesa - Mapeamento exato com o dicionário (Case Sensitive)
     const rawF = Math.round(freqToRaw(newF));
     const rawG = Math.round(gainToRaw(newG));
-    const label = b.key.charAt(0).toUpperCase() + b.key.slice(1);
+    
+    // Mapeamento de nomes para o dicionário (Yamaha usa 'Hi' em vez de 'High')
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const label = labelMap[b.key] || 'Low';
     
     socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: rawF });
     socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: rawG });
@@ -158,16 +281,54 @@ function onEQMove(e, ch) {
     document.getElementById('eqInfo').innerText = `${label.toUpperCase()}: ${Math.round(newF)}Hz | ${newG.toFixed(1)}dB`;
 }
 
-function onEQUp() { activeBandIdx = -1; }
+function onEQUp() { 
+    // Removido activeBandIdx = -1 para memorizar a última banda tocada conforme solicitado
+    if (longPressTimeout) clearTimeout(longPressTimeout);
+}
 
-window.updateEQParam = function(type, val) {
+window.updateEQParam = function(type, val, mode = null, ch = null) {
     if (!eqCanvas || !eqBands.length) return;
-    const m = type.match(/kInputEQ\/kEQ(Low|LowMid|HiMid|High)(F|G|Q)/);
+    const targetCh = ch !== null ? ch : activeConfigChannel;
+
+    // Sincroniza o modo se vier no pacote (exclusivo para sincronização multi-aparelho)
+    if (mode) {
+        // Detecção precisa da banda (evitando confundir Low com LowMid)
+        let bIdx = -1;
+        if (type.includes('HPF') || (type.includes('Low') && !type.includes('Mid'))) bIdx = 0;
+        if (type.includes('LPF') || (type.includes('Hi') && !type.includes('Mid'))) bIdx = 3;
+        
+        if (bIdx !== -1 && eqBands[bIdx]) {
+            eqBands[bIdx].filter.type = mode;
+            if (!channelStates[targetCh].eq) channelStates[targetCh].eq = {};
+            const key = bIdx === 0 ? 'lowMode' : 'highMode';
+            channelStates[targetCh].eq[key] = mode;
+        }
+    }
+
+    // Gatilhos para Mudança de Tipo (HPF/LPF) - Checar antes do regex de F/G/Q
+    if (type.includes('kEQHPFOn') || type.includes('kEQLPFOn')) {
+        const isHPF = type.includes('kEQHPFOn') && sysexToVal(val) === 1;
+        const isLPF = type.includes('kEQLPFOn') && sysexToVal(val) === 1;
+        
+        const stateSet = channelStates[targetCh]?.eq || {};
+
+        if (type.includes('kEQHPFOn')) {
+            eqBands[0].filter.type = isHPF ? 'highpass' : (stateSet.lowMode || 'lowshelf');
+        }
+        if (type.includes('kEQLPFOn')) {
+            eqBands[3].filter.type = isLPF ? 'lowpass' : (stateSet.highMode || 'highshelf');
+        }
+        return; // Processado
+    }
+
+    const m = type.match(/kInputEQ\/kEQ(Low|LowMid|HiMid|Hi)(F|G|Q)/);
     if (!m) return;
-    const b = eqBands.find(x => x.key === m[1].toLowerCase());
-    if (!b) return;
-    if (m[2] === 'F') b.filter.frequency.value = rawToFreq(val);
-    if (m[2] === 'G') b.filter.gain.value = rawToGain(val);
+    const b = eqBands.find(x => x.key === (m[1].toLowerCase() === 'hi' ? 'high' : m[1].toLowerCase()));
+    if (b) {
+        if (m[2] === 'F') b.filter.frequency.value = rawToFreq(val);
+        if (m[2] === 'G') b.filter.gain.value = rawToGain(val);
+        if (m[2] === 'Q') b.filter.Q.value = rawToQ(val);
+    }
 };
 
 function startEQAnimation() {
@@ -261,20 +422,59 @@ function stopEQAnimation() {
 
 function toggleEQ(ch) {
     const s = channelStates[ch].eq;
+    if (!s) return;
     s.on = !s.on;
-    document.getElementById('btnEQOn').classList.toggle('on-active', s.on);
+    const btn = document.getElementById('sideBtnEQOn');
+    if (btn) btn.classList.toggle('on-active', s.on);
+    const hBtn = document.getElementById('headerBtnEQOn');
+    if (hBtn) hBtn.classList.toggle('on-active', s.on);
     socket.emit('control', { type: 'kInputEQ/kEQOn', channel: ch, value: s.on ? 1 : 0 });
 }
 
-function togglePhase(ch) {
-    const s = channelStates[ch];
-    s.phase = s.phase ? 0 : 1;
-    updatePhaseUI(ch, s.phase);
-    socket.emit('control', { type: 'kInputPhase/kPhase', channel: ch, value: s.phase });
+function updatePhaseUI(ch, val) {
+    if (activeConfigChannel !== ch) return;
+    const sideBtn = document.getElementById('sideBtnPhase');
+    if (sideBtn) {
+        sideBtn.classList.remove('phase-inv', 'phase-norm');
+        sideBtn.classList.add(!!val ? 'phase-inv' : 'phase-norm');
+    }
+    const hBtn = document.getElementById('headerBtnPhase');
+    if (hBtn) {
+        hBtn.classList.remove('phase-inv', 'phase-norm');
+        hBtn.classList.add(!!val ? 'phase-inv' : 'phase-norm');
+    }
 }
 
-window.updatePhaseUI = function(ch, val) {
-    if (activeConfigChannel !== ch) return;
-    const btn = document.getElementById('btnPhase');
-    if (btn) btn.className = `btn-state ${!!val ? 'phase-inv' : 'phase-norm'}`;
+// Lógica de Nudge para o fator Q
+let qNudgeInterval = null;
+window.startQNudge = function(dir) {
+    stopQNudge();
+    nudgeQ(dir);
+    qNudgeInterval = setInterval(() => nudgeQ(dir), 100);
+};
+
+window.stopQNudge = function() {
+    if (qNudgeInterval) clearInterval(qNudgeInterval);
+    qNudgeInterval = null;
+};
+
+function nudgeQ(dir) {
+    if (activeBandIdx === -1) return;
+    const ch = activeConfigChannel;
+    const b = eqBands[activeBandIdx];
+    const chEq = channelStates[ch].eq;
+    if (!chEq || !chEq[b.key]) return;
+
+    let v = sysexToVal(chEq[b.key].q);
+    v += (-dir * 8); // Invertido: - estreita a banda (mais Q) e + aumenta a banda (menos Q)
+    if (v < 0) v = 0;
+    if (v > 1023) v = 1023;
+    
+    // Mapeamento de nomes para o dicionário (Yamaha usa 'HiMid' e 'Hi')
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const label = labelMap[b.key] || 'Low';
+    
+    chEq[b.key].q = [0, 0, (v >> 7) & 0x07, v & 0x7F];
+    if (b.filter) b.filter.Q.value = rawToQ(v);
+    socket.emit('control', { type: `kInputEQ/kEQ${label}Q`, channel: ch, value: v });
 }

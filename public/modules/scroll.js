@@ -1,39 +1,46 @@
-// Rolagem horizontal com a roda do mouse otimizada
-container.addEventListener('wheel', (evt) => {
-    if (evt.deltaY !== 0) {
-        evt.preventDefault();
-        // Aumentando a velocidade para eliminar a sensação de peso
-        container.scrollLeft += evt.deltaY * 3.5; 
-    }
-}, { passive: false });
-
-// Arrastar com o mouse (Click & Drag)
-let isDragging = false;
-let startX, startScrollLeft;
-
-container.addEventListener('mousedown', (e) => {
-    if (['INPUT', 'BUTTON', 'SELECT'].includes(e.target.tagName)) return;
+// Função genérica para habilitar rolagem por arrasto e roda do mouse
+function enableDragScroll(el) {
+    if (!el) return;
     
-    isDragging = true;
-    container.style.cursor = 'grabbing';
-    startX = e.pageX - container.offsetLeft;
-    startScrollLeft = container.scrollLeft;
-});
+    let isDragging = false;
+    let startX, startScrollLeft;
 
-container.addEventListener('mouseleave', () => {
-    isDragging = false;
-    container.style.cursor = '';
-});
+    // Mouse Wheel
+    el.addEventListener('wheel', (evt) => {
+        if (evt.deltaY !== 0) {
+            evt.preventDefault();
+            el.scrollLeft += evt.deltaY * 3.5;
+        }
+    }, { passive: false });
 
-container.addEventListener('mouseup', () => {
-    isDragging = false;
-    container.style.cursor = '';
-});
+    // Drag to scroll
+    el.addEventListener('mousedown', (e) => {
+        if (['INPUT', 'BUTTON', 'SELECT'].includes(e.target.tagName)) return;
+        isDragging = true;
+        el.style.cursor = 'grabbing';
+        startX = e.pageX - el.offsetLeft;
+        startScrollLeft = el.scrollLeft;
+    });
 
-container.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - container.offsetLeft;
-    const walk = (x - startX) * 1.5; 
-    container.scrollLeft = startScrollLeft - walk;
-});
+    const stopDragging = () => {
+        isDragging = false;
+        el.style.cursor = '';
+    };
+
+    el.addEventListener('mouseleave', stopDragging);
+    el.addEventListener('mouseup', stopDragging);
+
+    el.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - el.offsetLeft;
+        const walk = (x - startX) * 1.5; 
+        el.scrollLeft = startScrollLeft - walk;
+    });
+}
+
+// Inicializa no container principal (faders)
+enableDragScroll(container);
+
+// Exporta para ser usado dinamicamente em modais se necessário
+window.enableDragScroll = enableDragScroll;
