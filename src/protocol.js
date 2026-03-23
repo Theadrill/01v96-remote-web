@@ -4,8 +4,26 @@ const CONVERTERS = {
   faderToBytes: (value) => [0, 0, (value >> 7) & 0x07, value & 0x7F],
   bytesToFader: (bytes) => {
       const len = bytes.length;
-      if (len >= 2) return (bytes[len-2] << 7) + bytes[len-1];
+      if (len >= 4) return (bytes[len-4] << 21) | (bytes[len-3] << 14) | (bytes[len-2] << 7) | bytes[len-1];
+      if (len === 2) return (bytes[0] << 7) | bytes[1];
       return 0;
+  },
+  bytesToSigned: (bytes) => {
+      const len = bytes.length;
+      let val = 0;
+      if (len >= 4) val = (bytes[len-4] << 21) | (bytes[len-3] << 14) | (bytes[len-2] << 7) | bytes[len-1];
+      else if (len === 2) val = (bytes[0] << 7) | bytes[1];
+      
+      // Sign extension for 28-bit (if 4 bytes) or 14-bit (if 2 bytes)
+      const signBit = (len >= 4) ? 0x08000000 : 0x2000;
+      const mask = (len >= 4) ? 0x0FFFFFFF : 0x3FFF;
+      if (val & signBit) val -= (mask + 1);
+      return val;
+  },
+  signedToBytes: (value) => {
+      let v = Math.round(value);
+      if (v < 0) v += 0x10000000;
+      return [(v >> 21) & 0x7F, (v >> 14) & 0x7F, (v >> 7) & 0x7F, v & 0x7F];
   },
   onToBytes: (isOn) => [0, 0, 0, isOn ? 1 : 0],
   bytesToOn: (bytes) => !!bytes[bytes.length - 1],
@@ -85,6 +103,9 @@ function parseIncoming(message) {
   const channel = message[8];
 
   if (message[4] === 127 && message[5] === 1) {
+      // Attenuator (Element 29)
+      if (element === 29) return { type: 'kInputAttenuator/kAtt', channel, value: CONVERTERS.bytesToSigned(dataBytes) };
+
       if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
       if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
 
@@ -98,9 +119,9 @@ function parseIncoming(message) {
               'kEQLPFOn', 'kEQOn'
           ];
           const key = eqKeys[parameter];
-          // EQ usa conversores de Fader para os 10 bits de resolução?
-          // Na verdade 01V96 EQ freq/gain costuma ser faderToBytes (4 bytes)
-          return { type: `kInputEQ/${key}`, channel, value: CONVERTERS.bytesToFader(dataBytes) };
+          // EQ Gain (G) uses signed resolution, others use fader (unsigned)
+          const converter = (key.endsWith('G')) ? CONVERTERS.bytesToSigned : CONVERTERS.bytesToFader;
+          return { type: `kInputEQ/${key}`, channel, value: converter(dataBytes) };
       }
 
       // Master (Stereo) Fader e ON

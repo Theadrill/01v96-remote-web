@@ -23,8 +23,8 @@ socket.on('update', (d) => {
 
         // Suporte a EQ
         if (d.type.includes('kInputEQ/')) {
-            if (activeConfigChannel === d.channel && window.updateEQParam) {
-                window.updateEQParam(d.type, d.value, d.mode);
+            if (window.updateEQParam) {
+                window.updateEQParam(d.type, d.value, d.mode, d.channel);
             }
         }
     }

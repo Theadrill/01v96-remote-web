@@ -276,7 +276,7 @@ async function triggerSync() {
         midiEngine.send(protocol.buildRequest('kInputEQ/kEQLPFOn', i)); await new Promise(r => setTimeout(r, 5));
         
         // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, High)
-        const bands = ['Low', 'LowMid', 'HiMid', 'High'];
+        const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
         for (const b of bands) {
             midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 5));
             midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 5));
@@ -325,7 +325,13 @@ io.on('connection', (socket) => {
 
     socket.on('control', (data) => {
         const isBinary = data.type.includes('On') || data.type.includes('Solo');
-        const converter = isBinary ? protocol.CONVERTERS.onToBytes : protocol.CONVERTERS.faderToBytes;
+        let converter = isBinary ? protocol.CONVERTERS.onToBytes : protocol.CONVERTERS.faderToBytes;
+        
+        // Se for EQ Gain (termina em G), usa conversor de assinado
+        if (data.type.includes('kInputEQ/') && data.type.endsWith('G')) {
+            converter = protocol.CONVERTERS.signedToBytes;
+        }
+
         const sysex = protocol.buildChange(data.type, data.channel, data.value, converter);
         
         if (sysex) {

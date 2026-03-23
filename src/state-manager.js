@@ -12,14 +12,16 @@ for (let i = 0; i < 32; i++) {
         on: false,
         solo: false,
         phase: 0,
+        att: 0,
         nameChars: Array(16).fill(' '), // 16 espaços para as letras
         name: `CH ${i+1}`,
         eq: {
             on: false,
-            low: { f: 236, g: 512, q: 0 },    // ~100Hz, 0dB
+            mode: 0,
+            low: { f: 236, g: 512, q: 0, hpfOn: 0 },    // ~100Hz, 0dB
             lowmid: { f: 512, g: 512, q: 0 }, // ~1kHz, 0dB
-            himid: { f: 680, g: 512, q: 0 },  // ~3kHz, 0dB
-            high: { f: 915, g: 512, q: 0 }   // ~10kHz, 0dB
+            himid: { f: 680, g: 512, q: 0 },   // ~3kHz, 0dB
+            high: { f: 915, g: 512, q: 0, lpfOn: 0 }    // ~10kHz, 0dB
         }
     };
 }
@@ -36,6 +38,7 @@ function updateState(type, channel, value) {
     if (type === 'kInputChannelOn/kChannelOn') state.channels[channel].on = value;
     if (type === 'kSetupSoloChOn/kSoloChOn') state.channels[channel].solo = value;
     if (type === 'kInputPhase/kPhase') state.channels[channel].phase = value;
+    if (type === 'kInputAttenuator/kAtt') state.channels[channel].att = value;
 
     if (type.includes('kInputAUX/kAUX')) {
         const auxMatch = type.match(/kInputAUX\/kAUX(\d+)(Level|On)/);
@@ -53,14 +56,21 @@ function updateState(type, channel, value) {
         
         const map = {
             'kEQLowF': ['low', 'f'], 'kEQLowG': ['low', 'g'], 'kEQLowQ': ['low', 'q'],
+            'kEQHPFOn': ['low', 'hpfOn'],
             'kEQLowMidF': ['lowmid', 'f'], 'kEQLowMidG': ['lowmid', 'g'], 'kEQLowMidQ': ['lowmid', 'q'],
             'kEQHiMidF': ['himid', 'f'], 'kEQHiMidG': ['himid', 'g'], 'kEQHiMidQ': ['himid', 'q'],
-            'kEQHiF': ['high', 'f'], 'kEQHiG': ['high', 'g'], 'kEQHiQ': ['high', 'q']
+            'kEQHiF': ['high', 'f'], 'kEQHiG': ['high', 'g'], 'kEQHiQ': ['high', 'q'],
+            'kEQLPFOn': ['high', 'lpfOn'],
+            'kEQMode': ['eq', 'mode']
         };
 
         if (map[eqKey]) {
             const [band, param] = map[eqKey];
-            state.channels[channel].eq[band][param] = value;
+            if (band === 'eq') {
+                state.channels[channel].eq[param] = value;
+            } else {
+                state.channels[channel].eq[band][param] = value;
+            }
         }
     }
 }

@@ -89,7 +89,8 @@ body.layout-horizontal .nudge-zone .fader-val { display: none !important; }
 body.layout-horizontal .btn-nudge { width: 38px !important; height: 38px !important; font-size: 18px !important; }
 
 /* Sidebar Horizontal */
-body.layout-horizontal .sidebar { width: 100%; height: 80px; flex-direction: row; border: none; border-top: 2px solid #333; padding: 0 15px; order: 3; justify-content: space-around; flex-shrink: 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.7); z-index: 100; background: #1a1a1a; }
+/* Sidebar Horizontal */
+body.layout-horizontal .sidebar { width: 100%; height: 80px; flex-direction: row; border: none; border-top: 2px solid #333; padding: 0 15px; order: 3; justify-content: space-around; flex-shrink: 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.7); z-index: 100; background: #1a1a1a; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
 body.layout-horizontal #mainNav, body.layout-horizontal #chNav, body.layout-horizontal #chContext { flex-direction: row !important; height: 100%; width: auto !important; margin: 0; gap: 5px; border: none !important; padding: 0 !important; }
 body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; font-size: 11px; }
 
@@ -115,8 +116,10 @@ input[type=range]::-webkit-slider-thumb { pointer-events: auto; }
 input[type=range]::-moz-range-thumb { pointer-events: auto; }
 
 /* Sidebar e botões globais */
-.sidebar { width: 100px; background: #222; border-left: 1px solid #444; padding: 15px 10px; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; order: 2; }
-.side-btn { width: 100%; padding: 15px 5px; margin-bottom: 10px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; }
+/* Sidebar e botões globais */
+.sidebar { width: 100px; background: #222; border-left: 1px solid #444; padding: 15px 10px; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; order: 2; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.sidebar::-webkit-scrollbar { display: none; }
+.side-btn { width: 100%; padding: 15px 5px; margin-bottom: 10px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; }
 .fs-btn { background: #555; margin-top: auto; margin-bottom: 0; }
 .btn-config { background: #444; color: white; }
 .btn-sync { background: #007bff; color: white; }

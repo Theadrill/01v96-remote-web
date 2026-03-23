@@ -15,22 +15,38 @@ function sysexToVal(bytes) {
 
 // Conversores: 01V96 - Fader (0-1023) p/ Valores Reais
 function rawToFreq(raw) {
-    const v = sysexToVal(raw); // Converte Sysex se necessário
-    return EQ_MIN_FREQ * Math.pow(EQ_MAX_FREQ / EQ_MIN_FREQ, v / 1023);
+    if (raw === undefined || raw === null) return 1000;
+    const v = sysexToVal(raw); // v is 0-124
+    if (isNaN(v)) return 1000;
+    
+    // Formula exata baseada nos logs: f = 15.625 * 2^(v/12)
+    // 0 = 15.6Hz, 72 = 1000Hz, 124 = 20000Hz
+    return 15.625 * Math.pow(2, v / 12);
 }
 function freqToRaw(freq) {
-    return (Math.log10(freq / EQ_MIN_FREQ) / Math.log10(EQ_MAX_FREQ / EQ_MIN_FREQ)) * 1023;
+    if (isNaN(freq) || freq <= 0) return 72;
+    // v = 12 * log2(f / 15.625)
+    return Math.round(12 * Math.log2(freq / 15.625));
 }
 function rawToGain(raw) {
+    if (raw === undefined || raw === null) return 0;
     const v = sysexToVal(raw);
-    return (v - 512) * (18 / 512); 
+    // 01V96 EQ Gain: 0.1dB steps, signed 28-bit
+    return v / 10; 
 }
 function gainToRaw(gain) {
-    return (gain * 512 / 18) + 512;
+    return Math.round(gain * 10);
 }
 function rawToQ(raw) {
+    if (raw === undefined || raw === null) return 0.707;
     const v = sysexToVal(raw);
-    return 0.1 * Math.pow(100, v / 1023);
+    if (isNaN(v)) return 0.707;
+    
+    // Peaking range 0-40 (10.0 to 0.10)
+    if (v > 40) return 0.707;
+    
+    // Fator de escala 0.7 para "alargar" e ficar fiel ao visual da 01V96
+    return 0.7 * (0.1 * Math.pow(10, (40 - v) / 20));
 }
 
 // --- ESTADO GLOBAL ---
@@ -44,6 +60,7 @@ let selectedBandIdx = -1; // Banda focada para o ajuste de Q e visibilidade de U
 let longPressTimeout = null;
 let longPressOccurred = false;
 let startPos = { x: 0, y: 0 };
+let eqClipboard = null; // Buffer para Copiar/Colar EQ
 
 function initEQEngine(ch) {
     if (!eqContext) eqContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -52,16 +69,45 @@ function initEQEngine(ch) {
     const chEq = state.eq || {};
     eqBands = [];
     
-    // Configura tipos dinâmicos (Shelf vs HPF/LPF vs Peaking)
-    // Para simplificar a simulação, usaremos o state.eq.lowMode e highMode se existirem
-    const lowMode = chEq.lowMode || (sysexToVal(chEq.hpfOn) === 1 ? 'highpass' : 'lowshelf');
-    const highMode = chEq.highMode || (sysexToVal(chEq.lpfOn) === 1 ? 'lowpass' : 'highshelf');
+    const lowData = chEq.low || {};
+    const highData = chEq.high || chEq.hi || {};
+    
+    // Detecção de Modo baseada nos códigos de Q e as chaves HPF/LPF
+    // Na 01V96, se a chave HPF/LPF On (Par 4/14) for 0, é sempre Peaking.
+    let lowMode = 'peaking';
+    const lowQRaw = sysexToVal(lowData.q);
+    const lowHPFOn = sysexToVal(lowData.hpfOn);
+    if (lowHPFOn === 1) {
+        if (lowQRaw === 44) lowMode = 'highpass';
+        else if (lowQRaw === 41) lowMode = 'lowshelf';
+        else lowMode = 'peaking';
+    }
+    
+    let highMode = 'peaking';
+    const highQRaw = sysexToVal(highData.q);
+    const highLPFOn = sysexToVal(highData.lpfOn);
+    if (highLPFOn === 1) {
+        // Códigos para a banda High podem variar, mas seguem o padrão
+        if (highQRaw === 43 || highQRaw === 44) {
+            // Se o Q for 44 e a tela dizer Shelf, usamos shelf
+            // Pelos logs recentes, 44 na High com LPF ON resultou em H.Shelf na mesa
+            highMode = 'highshelf'; 
+        } else if (highQRaw === 42) {
+            highMode = 'highshelf';
+        } else if (highQRaw === 40) {
+            // LPF as vezes é um valor específico
+            highMode = 'lowpass';
+        }
+    }
+    
+    // Calibração Final: Se o LPF On for 1 e for o canal 24+, na HIGH, costuma ser Shelf o padrão
+    if (highLPFOn === 1 && highMode === 'peaking') highMode = 'highshelf';
 
     const mapping = [
-        { key: 'low', type: lowMode, color: '#ff4d4d', defaultF: 20 },
-        { key: 'lowmid', type: 'peaking', color: '#ffeb3b', defaultF: 50 },
-        { key: 'himid', type: 'peaking', color: '#4caf50', defaultF: 80 },
-        { key: 'high', type: highMode, color: '#2196f3', defaultF: 110 }
+        { key: 'low', type: lowMode, color: '#ff4d4d', defaultF: 22 }, // 21.2Hz
+        { key: 'lowmid', type: 'peaking', color: '#ffeb3b', defaultF: 40 }, // ~200Hz
+        { key: 'himid', type: 'peaking', color: '#4caf50', defaultF: 80 }, // ~2kHz
+        { key: 'high', type: highMode, color: '#2196f3', defaultF: 124 } // 20kHz
     ];
 
     mapping.forEach((m, i) => {
@@ -70,8 +116,14 @@ function initEQEngine(ch) {
         
         filter.type = m.type;
         filter.frequency.value = rawToFreq(data.f !== undefined ? data.f : m.defaultF);
-        filter.gain.value = rawToGain(data.g !== undefined ? data.g : 512);
-        filter.Q.value = rawToQ(data.q !== undefined ? data.q : 65); // ~0.7 de Q
+        filter.gain.value = rawToGain(data.g);
+
+        // Se estiver em modo corte (HPF/LPF), forçamos o Q a 0.707 (curva plana)
+        if (m.type.includes('pass')) {
+            filter.Q.value = 0.707;
+        } else {
+            filter.Q.value = rawToQ(data.q !== undefined ? data.q : 20);
+        }
 
         eqBands.push({ filter, color: m.color, id: i, key: m.key });
     });
@@ -90,8 +142,8 @@ function renderEQ(ch) {
     if (sideBtnOn) sideBtnOn.classList.toggle('on-active', isEqOn);
     const sideBtnPhase = document.getElementById('sideBtnPhase');
     if (sideBtnPhase) {
-        sideBtnPhase.classList.remove('phase-inv', 'phase-norm');
-        sideBtnPhase.classList.add(isPhase ? 'phase-inv' : 'phase-norm');
+        sideBtnPhase.classList.toggle('phase-inv', isPhase);
+        sideBtnPhase.classList.toggle('phase-norm', !isPhase);
     }
     body.innerHTML = `
         <div class="eq-container" style="display:flex; flex-direction:column; width:100%; height:100%; overflow:hidden; touch-action:none;">
@@ -110,8 +162,9 @@ function renderEQ(ch) {
                         <button class="nav-btn" style="width:24px; height:24px; font-size:16px;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
                     </div>
                     <div style="display:flex; gap:8px;">
-                        <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:70px; height:32px; font-size:10px; margin:0;" onclick="toggleEQ(${ch})">EQ ON</button>
-                        <button id="headerBtnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:70px; height:32px; font-size:10px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
+                        <button id="headerBtnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:70px; height:42px; font-size:10px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
+                        <button id="headerBtnFlat" class="btn-state" style="width:70px; height:42px; font-size:10px; margin:0; background:#dc3545; border-color:#dc3545; color:#fff;" onclick="flatEQ(${ch})">FLAT</button>
+                        <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:70px; height:42px; font-size:10px; margin:0; color:#fff;" onclick="toggleEQ(${ch})">EQ ON</button>
                     </div>
                 </div>
             </div>
@@ -230,27 +283,47 @@ function showEQContextMenu(x, y, bandIdx) {
 function setBandMode(bandIdx, mode) {
     const b = eqBands[bandIdx];
     const isLow = bandIdx === 0;
+    const ch = activeConfigChannel;
 
     // Atualiza Áudio Local
     b.filter.type = mode;
+    if (mode.includes('pass')) b.filter.Q.value = 0.707;
 
-    // Sincroniza Flags da Mesa (HPF/LPF On/Off)
-    const hpfType = isLow ? 'kInputEQ/kEQHPFOn' : 'kInputEQ/kEQLPFOn';
-    const isSpecial = mode === 'highpass' || mode === 'lowpass';
+    // Sincroniza com a Mesa
+    const hpfOnType = isLow ? 'kInputEQ/kEQHPFOn' : 'kInputEQ/kEQLPFOn';
+    const qType = isLow ? 'kInputEQ/kEQLowQ' : 'kInputEQ/kEQHiQ';
     
-    // Persiste no state local
-    if (!channelStates[activeConfigChannel].eq) channelStates[activeConfigChannel].eq = {};
-    channelStates[activeConfigChannel].eq[isLow ? 'lowMode' : 'highMode'] = mode;
+    let qValue = 20; // Default Padrão (Q=1.0)
+    let switchOn = 0;
 
-    // Se for HPF/LPF, o ganho deve ser fixado em 0dB visualmente
-    if (isSpecial) {
-        b.filter.gain.value = 0;
-        const targetState = channelStates[activeConfigChannel]?.eq?.[isLow ? 'low' : 'high'];
-        if (targetState) targetState.g = 512; // 0dB em raw
+    if (mode === 'peaking') {
+        switchOn = 0;
+    } else {
+        switchOn = 1;
+        if (isLow) {
+            qValue = (mode === 'highpass') ? 44 : 41;
+        } else {
+            qValue = (mode === 'lowpass') ? 43 : 42;
+        }
     }
 
-    updateEQParam(hpfType, [0,0,0, isSpecial ? 1 : 0], mode);
-    socket.emit('control', { type: hpfType, channel: activeConfigChannel, value: isSpecial ? 1 : 0, mode: mode });
+    // Persiste no state local para evitar flicker
+    if (!channelStates[ch].eq) channelStates[ch].eq = { low:{}, high:{} };
+    const bandKey = isLow ? 'low' : 'high';
+    if (!channelStates[ch].eq[bandKey]) channelStates[ch].eq[bandKey] = {};
+    channelStates[ch].eq[bandKey].q = qValue;
+    channelStates[ch].eq[bandKey][isLow ? 'hpfOn' : 'lpfOn'] = switchOn;
+
+    // Se for HPF/LPF, o ganho deve ser fixado em 0dB
+    if (mode.includes('pass')) {
+        b.filter.gain.value = 0;
+        channelStates[ch].eq[bandKey].g = 0;
+        socket.emit('control', { type: `kInputEQ/kEQ${isLow?'Low':'Hi'}G`, channel: ch, value: 0 });
+    }
+
+    // Envia os comandos para a mesa
+    socket.emit('control', { type: qType, channel: ch, value: qValue });
+    socket.emit('control', { type: hpfOnType, channel: ch, value: switchOn });
 
     document.getElementById('eqContextMenu').style.display = 'none';
     updateQControlsUI();
@@ -282,14 +355,20 @@ function onEQMove(e, ch) {
     b.filter.frequency.value = newF;
     b.filter.gain.value = newG;
 
-    // Envio para mesa - Mapeamento exato com o dicionário (Case Sensitive)
+    // Envio para mesa
     const rawF = Math.round(freqToRaw(newF));
     const rawG = Math.round(gainToRaw(newG));
     
-    // Mapeamento de nomes para o dicionário (Yamaha usa 'Hi' em vez de 'High')
     const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
     const label = labelMap[b.key] || 'Low';
     
+    // ATUALIZAÇÃO DO ESTADO LOCAL (MEMÓRIA)
+    const chState = channelStates[ch];
+    if (chState && chState.eq && chState.eq[b.key]) {
+        chState.eq[b.key].f = rawF;
+        chState.eq[b.key].g = rawG;
+    }
+
     socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: rawF });
     socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: rawG });
 
@@ -302,49 +381,91 @@ function onEQUp() {
 }
 
 window.updateEQParam = function(type, val, mode = null, ch = null) {
-    if (!eqCanvas || !eqBands.length) return;
     const targetCh = ch !== null ? ch : activeConfigChannel;
+    
+    // 1. SALVAR NO ESTADO LOCAL (MEMÓRIA) - SEMPRE, MESMO SE UI ESTIVER FECHADA
+    const chState = channelStates[targetCh];
+    if (!chState.eq) chState.eq = {};
+    if (!chState.eq.low) chState.eq.low = { f:12, g:0, q:44, hpfOn:0 };
+    if (!chState.eq.lowmid) chState.eq.lowmid = { f:49, g:0, q:35 };
+    if (!chState.eq.himid) chState.eq.himid = { f:82, g:0, q:35 };
+    if (!chState.eq.high) chState.eq.high = { f:110, g:0, q:44, lpfOn:0 };
 
-    // Sincroniza o modo se vier no pacote (exclusivo para sincronização multi-aparelho)
+    if (type.includes('kEQHPFOn')) chState.eq.low.hpfOn = val;
+    if (type.includes('kEQLPFOn')) chState.eq.high.lpfOn = val;
+    if (type.includes('kEQOn')) chState.eq.on = (val === 1 || val === true);
+    
+    const parts = type.match(/kInputEQ\/kEQ(Low|LowMid|HiMid|Hi)(F|G|Q)/);
+    if (parts) {
+        // Normaliza a chave para o estado: Hi -> high
+        const bLabel = parts[1];
+        const bandKey = (bLabel === 'Hi' ? 'high' : bLabel.toLowerCase());
+        const paramKey = parts[2].toLowerCase();
+        
+        if (!chState.eq[bandKey]) chState.eq[bandKey] = {};
+        chState.eq[bandKey][paramKey] = val;
+    }
+    
+    // ATUALIZAR UI APENAS SE O CANAL FOR O ATIVO E HOUVER CANVAS
+    if (targetCh !== activeConfigChannel || !eqCanvas || !eqBands.length) return;
+
     if (mode) {
-        // Detecção precisa da banda (evitando confundir Low com LowMid)
         let bIdx = -1;
         if (type.includes('HPF') || (type.includes('Low') && !type.includes('Mid'))) bIdx = 0;
         if (type.includes('LPF') || (type.includes('Hi') && !type.includes('Mid'))) bIdx = 3;
-        
         if (bIdx !== -1 && eqBands[bIdx]) {
             eqBands[bIdx].filter.type = mode;
-            if (!channelStates[targetCh].eq) channelStates[targetCh].eq = {};
             const key = bIdx === 0 ? 'lowMode' : 'highMode';
-            channelStates[targetCh].eq[key] = mode;
+            chState.eq[key] = mode;
         }
     }
 
-    // Gatilhos para Mudança de Tipo (HPF/LPF) - Checar antes do regex de F/G/Q
-    if (type.includes('kEQHPFOn') || type.includes('kEQLPFOn')) {
-        const isHPF = type.includes('kEQHPFOn') && sysexToVal(val) === 1;
-        const isLPF = type.includes('kEQLPFOn') && sysexToVal(val) === 1;
-        
-        const stateSet = channelStates[targetCh]?.eq || {};
-
-        if (type.includes('kEQHPFOn')) {
-            eqBands[0].filter.type = isHPF ? 'highpass' : (stateSet.lowMode || 'lowshelf');
-        }
-        if (type.includes('kEQLPFOn')) {
-            eqBands[3].filter.type = isLPF ? 'lowpass' : (stateSet.highMode || 'highshelf');
-        }
-        return; // Processado
+    const eq = chState.eq;
+    
+    // Sincroniza Tipos de Filtro na UI
+    let lMode = 'peaking';
+    if (sysexToVal(eq.low?.hpfOn) === 1) {
+        const lq = sysexToVal(eq.low?.q);
+        if (lq === 44) lMode = 'highpass';
+        else if (lq === 41) lMode = 'lowshelf';
     }
+    if (eqBands[0]) eqBands[0].filter.type = lMode;
 
-    const m = type.match(/kInputEQ\/kEQ(Low|LowMid|HiMid|Hi)(F|G|Q)/);
-    if (!m) return;
-    const b = eqBands.find(x => x.key === (m[1].toLowerCase() === 'hi' ? 'high' : m[1].toLowerCase()));
-    if (b) {
-        if (m[2] === 'F') b.filter.frequency.value = rawToFreq(val);
-        if (m[2] === 'G') b.filter.gain.value = rawToGain(val);
-        if (m[2] === 'Q') b.filter.Q.value = rawToQ(val);
+    let hMode = 'peaking';
+    if (sysexToVal(eq.high?.lpfOn) === 1) {
+        const hq = sysexToVal(eq.high?.q);
+        if (hq === 43 || hq === 44 || hq === 42) hMode = 'highshelf';
+        else if (hq === 40) hMode = 'lowpass';
     }
-};
+    if (eqBands[3]) eqBands[3].filter.type = hMode;
+
+    // Sincroniza Valores no Gráfico
+    if (parts) {
+        const b = eqBands.find(x => x.key === (parts[1].toLowerCase() === 'hi' ? 'high' : parts[1].toLowerCase()));
+        if (b) {
+            const label = parts[1].toUpperCase() === 'HI' ? 'HIGH' : parts[1].toUpperCase();
+            if (parts[2] === 'F') b.filter.frequency.value = rawToFreq(val);
+            if (parts[2] === 'G') b.filter.gain.value = (b.filter.type.includes('pass')) ? 0 : rawToGain(val);
+            if (b.filter.type.includes('pass')) b.filter.Q.value = 0.707;
+            else if (parts[2] === 'Q') b.filter.Q.value = rawToQ(val);
+
+            const info = document.getElementById('eqInfo');
+            if (info) info.innerText = `${label}: ${Math.round(b.filter.frequency.value)}Hz | ${b.filter.type.includes('pass') ? '0.0' : b.filter.gain.value.toFixed(1)}dB`;
+        }
+    }
+    // Garantia extra global anti-ombro (sempre executada)
+    if (eqBands[0] && eqBands[0].filter.type.includes('pass')) { 
+        eqBands[0].filter.Q.value = 0.707; 
+        eqBands[0].filter.gain.value = 0; 
+    }
+    if (eqBands[3] && eqBands[3].filter.type.includes('pass')) { 
+        eqBands[3].filter.Q.value = 0.707;
+        eqBands[3].filter.gain.value = 0;
+    }
+    
+    // A animação em loop iniciada no renderEQ/startEQAnimation 
+    // vai atualizar o gráfico automaticamente a 60fps refletindo os filtros novos.
+}
 
 function startEQAnimation() {
     if (eqAnimationId) cancelAnimationFrame(eqAnimationId);
@@ -393,8 +514,12 @@ function startEQAnimation() {
         eqCtx.beginPath();
         eqCtx.moveTo(0, h/2);
         for(let i=0; i<steps; i++) {
-            const db = 20 * Math.log10(Math.max(1e-6, tMag[i]));
-            eqCtx.lineTo((i/steps)*w, gToY(db, h));
+            const val = tMag[i];
+            if (isNaN(val) || val <= 0) continue;
+            const db = 20 * Math.log10(val);
+            const y = gToY(db, h);
+            if (isNaN(y)) continue;
+            eqCtx.lineTo((i/steps)*w, y);
         }
         eqCtx.lineTo(w, h/2);
         
@@ -413,14 +538,28 @@ function startEQAnimation() {
         eqBands.forEach((b, i) => {
             const bx = fToX(b.filter.frequency.value, w);
             const by = gToY(b.filter.gain.value, h);
+            
+            // Halo de seleção
             eqCtx.beginPath();
             eqCtx.arc(bx, by, 12, 0, Math.PI*2);
             eqCtx.fillStyle = (i === selectedBandIdx) ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)';
             eqCtx.fill();
+            
+            // Texto da Frequência Real-Time
+            eqCtx.fillStyle = '#fff';
+            eqCtx.font = 'bold 10px Inter, sans-serif';
+            eqCtx.textAlign = 'center';
+            const fText = b.filter.frequency.value >= 1000 
+                ? (b.filter.frequency.value/1000).toFixed(2) + 'k' 
+                : Math.round(b.filter.frequency.value) + 'Hz';
+            eqCtx.fillText(fText, bx, by - 18);
+
+            // Ponto da Banda
             eqCtx.beginPath();
             eqCtx.arc(bx, by, 5, 0, Math.PI*2);
             eqCtx.fillStyle = b.color;
             eqCtx.fill();
+            
             eqCtx.strokeStyle = (i === selectedBandIdx) ? '#fff' : 'rgba(255,255,255,0.5)';
             eqCtx.lineWidth = (i === selectedBandIdx) ? 2 : 1;
             eqCtx.stroke();
@@ -445,6 +584,45 @@ function toggleEQ(ch) {
     const hBtn = document.getElementById('headerBtnEQOn');
     if (hBtn) hBtn.classList.toggle('on-active', s.on);
     socket.emit('control', { type: 'kInputEQ/kEQOn', channel: ch, value: s.on ? 1 : 0 });
+}
+
+// Reversão: Funcionalidade de Copia e Cola removida conforme solicitado pelo usuário para restaurar a estabilidade.
+
+window.togglePhase = function(ch) {
+    const s = channelStates[ch];
+    if (!s) return;
+    s.phase = !s.phase;
+    const btn = document.getElementById('sideBtnPhase');
+    if (btn) {
+        btn.classList.toggle('phase-inv', s.phase);
+        btn.classList.toggle('phase-norm', !s.phase);
+    }
+    const hBtn = document.getElementById('headerBtnPhase');
+    if (hBtn) {
+        hBtn.classList.toggle('phase-inv', s.phase);
+        hBtn.classList.toggle('phase-norm', !s.phase);
+    }
+    socket.emit('control', { type: 'kInputPhase/kPhase', channel: ch, value: s.phase ? 1 : 0 });
+}
+
+window.flatEQ = function(ch) {
+    // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, Hi)
+    const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
+    bands.forEach(bName => {
+        const type = `kInputEQ/kEQ${bName}G`;
+        // Para a 01V96, 0.0dB é o valor central (0 assinado)
+        socket.emit('control', { type, channel: ch, value: 0 });
+        
+        // Atualiza visual local imediatamente
+        const key = bName.toLowerCase().replace('hi', 'high').replace('highmid', 'himid');
+        const band = eqBands.find(x => x.key === key);
+        if (band) band.filter.gain.value = 0;
+        
+        // Persiste no state
+        if (channelStates[ch].eq && channelStates[ch].eq[key]) {
+            channelStates[ch].eq[key].g = 0;
+        }
+    });
 }
 
 function updatePhaseUI(ch, val) {
@@ -486,15 +664,17 @@ function nudgeQ(dir) {
     if (!chEq || !chEq[b.key]) return;
 
     let v = sysexToVal(chEq[b.key].q);
-    v += (-dir * 16); // Dobrei a sensitividade (de 8 para 16) para ir mais rápido
+    // Invertido: + aumenta v (diminui Q linear = alarga), - diminui v (aumenta Q linear = afina)
+    v += (dir * 1); 
     if (v < 0) v = 0;
-    if (v > 1023) v = 1023;
+    if (v > 40) v = 40; // Limite do modo Peaking
     
-    // Mapeamento de nomes para o dicionário (Yamaha usa 'HiMid' e 'Hi')
     const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
     const label = labelMap[b.key] || 'Low';
     
-    chEq[b.key].q = [0, 0, (v >> 7) & 0x07, v & 0x7F];
+    // Salva o valor no state local (como número para consistência)
+    chEq[b.key].q = v;
+    
     if (b.filter) b.filter.Q.value = rawToQ(v);
     socket.emit('control', { type: `kInputEQ/kEQ${label}Q`, channel: ch, value: v });
 }
