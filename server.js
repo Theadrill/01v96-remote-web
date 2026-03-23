@@ -340,7 +340,7 @@ io.on('connection', (socket) => {
             console.log(`📤 Enviando: [${data.type}] Canal: ${data.channel + 1} Valor: ${data.value} -> SYSEX: ${hexArr}`);
             
             midiEngine.send(sysex);
-            socket.broadcast.emit('update', data);
+            io.emit('update', data);
         }
     });
 });
