@@ -18,10 +18,10 @@ for (let i = 0; i < 32; i++) {
         eq: {
             on: false,
             mode: 0,
-            low: { f: 236, g: 512, q: 0, hpfOn: 0 },    // ~100Hz, 0dB
-            lowmid: { f: 512, g: 512, q: 0 }, // ~1kHz, 0dB
-            himid: { f: 680, g: 512, q: 0 },   // ~3kHz, 0dB
-            high: { f: 915, g: 512, q: 0, lpfOn: 0 }    // ~10kHz, 0dB
+            low: { f: 32, g: 0, q: 20, hpfOn: 0 },    // 100Hz, 0dB
+            lowmid: { f: 60, g: 0, q: 20 },           // 500Hz, 0dB
+            himid: { f: 84, g: 0, q: 20 },            // 2kHz, 0dB
+            high: { f: 108, g: 0, q: 20, lpfOn: 0 }   // 8kHz, 0dB
         }
     };
 }

@@ -20,6 +20,7 @@ let systrayInstance = null;
 let isTrayReady = false;
 let buscaInterval = null; 
 let linhaBuscaAtiva = false; 
+let lastActivityTime = 0; // Timestamp da última mensagem recebida da mesa
 
 process.title = "01V96-BRIDGE-SERVER";
 
@@ -197,6 +198,7 @@ function executarConexao(inIdx, outIdx) {
 
     const result = midiEngine.connectPorts(inIdx, outIdx, (midiData) => {
         if (!midiData) return;
+        lastActivityTime = Date.now(); // Marca sinal de vida
 
         if (midiData.type === 'METER_BULK') {
             for (let i = 0; i < 32; i++) {
@@ -230,28 +232,54 @@ function executarConexao(inIdx, outIdx) {
         triggerSync();
         io.emit('connectionState', { connected: true });
 
-        // Loop contínuo de requests do Meter
+        // Loop contínuo de requests do Meter (Heartbeat)
         if (global.meterInterval) clearInterval(global.meterInterval);
+        lastActivityTime = Date.now();
+        
         global.meterInterval = setInterval(() => {
-            if (isConnected) {
-                // Bulk Request (0x20)
-                midiEngine.send([240, 67, 32, 62, 26, 33, 4, 0, 247]);
-                midiEngine.send([240, 67, 32, 62, 26, 33, 0, 0, 247]);
-                // Parameter Request (0x30)
-                midiEngine.send([240, 67, 48, 62, 26, 33, 4, 0, 247]);
-                midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 247]);
+            if (!isConnected) return;
+
+            // 1. Verificação de Time-out (Cabo puxado ou Mesa desligada)
+            // Se passar mais de 2 segundos sem nenhum bit da mesa, consideramos desconectado.
+            if (Date.now() - lastActivityTime > 2000) {
+                console.log("\n⚠️ Watchdog: Timeout de conexão. A mesa parou de responder.");
+                handleDisconnection();
+                return;
             }
-        }, 50); // ~20 FPS polling
+
+            // 2. Envio de solicitações de volume (Meters)
+            // Se o envio falhar (ERRO FATAL MIDI), desconectamos na hora.
+            const s1 = midiEngine.send([240, 67, 32, 62, 26, 33, 4, 0, 247]); // Bulk Request 1
+            const s2 = midiEngine.send([240, 67, 32, 62, 26, 33, 0, 0, 247]); // Bulk Request 2
+            
+            if (!s1 || !s2) {
+                console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI. Cabo removido?");
+                handleDisconnection();
+            }
+        }, 100); // Polling mais leve (10 FPS) para economizar processamento
     } else {
-        isConnected = false;
-        console.log("❌ Falha ao conectar. Retomando busca...");
-        iniciarBuscaAutomatica(); 
-        io.emit('connectionState', { connected: false });
+        handleDisconnection(false);
     }
     return result;
 }
 
+function handleDisconnection(retry = true) {
+    if (!isConnected && retry) return; // Evita duplicação se já estiver buscando
+    
+    isConnected = false;
+    if (global.meterInterval) clearInterval(global.meterInterval);
+    
+    io.emit('connectionState', { connected: false });
+    document.body?.classList.add('is-offline'); // Aplica fallback visual se body estiver disponível no contexto (embora servidor não tenha DOM, o front já trata)
+
+    if (retry) {
+        console.log("❌ Conexão perdida. Tentando reconectar automaticamente...");
+        iniciarBuscaAutomatica();
+    }
+}
+
 async function triggerSync() {
+    if (!isConnected) return;
     console.log("🔄 Sincronizando faders e botões vitais...");
     // Master Fader
     midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, 10));
@@ -322,8 +350,26 @@ io.on('connection', (socket) => {
     });
 
     socket.on('forceSync', () => triggerSync());
+    
+    socket.on('updateName', (data) => {
+        const { channel, name } = data;
+        const s = stateManager.getState();
+        if (s.channels[channel]) {
+            s.channels[channel].name = name;
+            console.log(`📝 [NAME CHANGE] Canal ${channel + 1}: "${name}" (Log apenas, MIDI ignorado)`);
+            io.emit('updateName', { channel, name });
+        }
+    });
 
     socket.on('control', (data) => {
+        // Bloqueio Total Offline: Se a mesa não estiver conectada, não processamos nada.
+        // A mesa real ditará a verdade absoluta assim que for conectada.
+        if (!isConnected) return;
+
+        // Atualiza o estado na memória do servidor
+        stateManager.updateState(data.type, data.channel, data.value);
+        io.emit('update', data);
+
         const isBinary = data.type.includes('On') || data.type.includes('Solo');
         let converter = isBinary ? protocol.CONVERTERS.onToBytes : protocol.CONVERTERS.faderToBytes;
         
@@ -333,14 +379,8 @@ io.on('connection', (socket) => {
         }
 
         const sysex = protocol.buildChange(data.type, data.channel, data.value, converter);
-        
         if (sysex) {
-            // Log do comando para debug (converte array de bytes em string HEX para melhor leitura)
-            const hexArr = sysex.map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
-            console.log(`📤 Enviando: [${data.type}] Canal: ${data.channel + 1} Valor: ${data.value} -> SYSEX: ${hexArr}`);
-            
             midiEngine.send(sysex);
-            io.emit('update', data);
         }
     });
 });

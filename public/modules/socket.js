@@ -32,7 +32,17 @@ socket.on('update', (d) => {
 
 socket.on('updateName', (d) => {
     if (d.channel < NUM_CHANNELS) {
-        document.getElementById(`name${d.channel}`).innerText = d.name || `CH ${d.channel + 1}`;
+        const newName = d.name || `CH ${d.channel + 1}`;
+        document.getElementById(`name${d.channel}`).innerText = newName;
+        
+        // Se este canal for o que está aberto na sidebar, atualiza o título lá tbm
+        if (activeConfigChannel === d.channel) {
+            const sideTitle = document.getElementById('chSideTitle');
+            if (sideTitle) {
+                sideTitle.innerText = `${d.channel + 1} - ${newName}`;
+                if (window.autoScaleTitle) autoScaleTitle();
+            }
+        }
     }
 });
 
@@ -53,6 +63,7 @@ socket.on('sync', (s) => {
 });
 
 socket.on('connectionState', (state) => {
+    document.body.classList.toggle('is-offline', !state.connected);
     const scn = document.getElementById('scn');
     if (state.connected) {
         scn.innerText = '01V96';

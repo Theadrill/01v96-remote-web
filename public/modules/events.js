@@ -8,12 +8,14 @@ function openChannelConfig(e, ch) {
 
 function updateConfigUIForChannel(ch) {
     const chName = document.getElementById(`name${ch}`).innerText;
-    document.getElementById('chSideName').innerText = chName === '...' ? `CH ${ch + 1}` : chName;
+    document.getElementById('chSideTitle').innerText = `${ch + 1} - ${chName === '...' ? `CH ${ch + 1}` : chName}`;
     
     document.getElementById('chConfigModal').style.display = 'flex';
     document.getElementById('mainNav').style.display = 'none';
     document.getElementById('chNav').style.display = 'flex';
     document.getElementById('chContext').style.display = 'flex';
+    
+    if (window.autoScaleTitle) autoScaleTitle();
     
     const cards = document.querySelectorAll('.fader-card');
     cards.forEach(c => c.style.background = ''); 

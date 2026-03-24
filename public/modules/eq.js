@@ -16,22 +16,31 @@ function sysexToVal(bytes) {
 // Conversores: 01V96 - Fader (0-1023) p/ Valores Reais
 function rawToFreq(raw) {
     if (raw === undefined || raw === null) return 1000;
-    const v = sysexToVal(raw); // v is 0-124
+    let v = sysexToVal(raw); 
     if (isNaN(v)) return 1000;
     
-    // Formula exata baseada nos logs: f = 15.625 * 2^(v/12)
-    // 0 = 15.6Hz, 72 = 1000Hz, 124 = 20000Hz
+    // Tratamento 01V96 (Original Revertido): Mesa envia índices diretamente (0-124).
+    // Clampa o índice para o range da 01V96 (0-124) para evitar erros no BiquadFilter
+    if (v > 124) v = 124;
+    if (v < 0) v = 0;
+    
+    // Formula exata baseada nos logs da 01V96: f = 15.625 * 2^(v/12)
     return 15.625 * Math.pow(2, v / 12);
 }
 function freqToRaw(freq) {
     if (isNaN(freq) || freq <= 0) return 72;
-    // v = 12 * log2(f / 15.625)
-    return Math.round(12 * Math.log2(freq / 15.625));
+    // v = index (0-124)
+    const index = Math.round(12 * Math.log2(freq / 15.625));
+    // Clampa o índice para o range da 01V96 (0-124)
+    return Math.max(0, Math.min(124, index));
 }
 function rawToGain(raw) {
     if (raw === undefined || raw === null) return 0;
-    const v = sysexToVal(raw);
-    // 01V96 EQ Gain: 0.1dB steps, signed 28-bit
+    let v = sysexToVal(raw);
+    if (isNaN(v)) return 0;
+    // Proteção básica p/ evitar ganhos fora dos 18dB
+    if (v > 180) v = 180;
+    if (v < -180) v = -180;
     return v / 10; 
 }
 function gainToRaw(gain) {
@@ -39,11 +48,11 @@ function gainToRaw(gain) {
 }
 function rawToQ(raw) {
     if (raw === undefined || raw === null) return 0.707;
-    const v = sysexToVal(raw);
+    let v = sysexToVal(raw);
     if (isNaN(v)) return 0.707;
     
-    // Peaking range 0-40 (10.0 to 0.10)
-    if (v > 40) return 0.707;
+    // Proteção: Range PEAKING da 01V96 é 0-40.
+    if (v > 120) v = 40; 
     
     // Fator de escala 0.7 para "alargar" e ficar fiel ao visual da 01V96
     return 0.7 * (0.1 * Math.pow(10, (40 - v) / 20));
@@ -61,6 +70,8 @@ let longPressTimeout = null;
 let longPressOccurred = false;
 let startPos = { x: 0, y: 0 };
 let eqClipboard = null; // Buffer para Copiar/Colar EQ
+let bubbleHideTimer = null; // Timer para ocultar o balão de Q
+let showBubbleRequest = false; // Flag de controle de visibilidade temporária do balão
 
 function initEQEngine(ch) {
     if (!eqContext) eqContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -104,10 +115,10 @@ function initEQEngine(ch) {
     if (highLPFOn === 1 && highMode === 'peaking') highMode = 'highshelf';
 
     const mapping = [
-        { key: 'low', type: lowMode, color: '#ff4d4d', defaultF: 22 }, // 21.2Hz
-        { key: 'lowmid', type: 'peaking', color: '#ffeb3b', defaultF: 40 }, // ~200Hz
-        { key: 'himid', type: 'peaking', color: '#4caf50', defaultF: 80 }, // ~2kHz
-        { key: 'high', type: highMode, color: '#2196f3', defaultF: 124 } // 20kHz
+        { key: 'low', type: lowMode, color: '#ff4d4d', defaultF: 32 }, // 100Hz
+        { key: 'lowmid', type: 'peaking', color: '#ffeb3b', defaultF: 60 }, // 500Hz
+        { key: 'himid', type: 'peaking', color: '#4caf50', defaultF: 84 }, // 2kHz
+        { key: 'high', type: highMode, color: '#2196f3', defaultF: 108 } // 8kHz
     ];
 
     mapping.forEach((m, i) => {
@@ -137,6 +148,9 @@ function renderEQ(ch) {
 
     const body = document.querySelector('.ch-modal-body');
     
+    // Impede menu de contexto em TODO o corpo do equalizador (incluindo botões e canvas)
+    body.addEventListener('contextmenu', (e) => e.preventDefault());
+    
     // Atualiza estados nos botões da SIDEBAR
     const sideBtnOn = document.getElementById('sideBtnEQOn');
     if (sideBtnOn) sideBtnOn.classList.toggle('on-active', isEqOn);
@@ -146,32 +160,25 @@ function renderEQ(ch) {
         sideBtnPhase.classList.toggle('phase-norm', !isPhase);
     }
     body.innerHTML = `
-        <div class="eq-container" style="display:flex; flex-direction:column; width:100%; height:100%; overflow:hidden; touch-action:none;">
-            <div style="background:#1a1a1a; padding:10px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <button class="nav-btn" onclick="changeConfigChannel(-1)">&lt;</button>
-                    <h2 style="margin:0; font-size:14px; color:#5cacee; min-width:140px; text-align:center;">${ch+1} - ${document.getElementById(`name${ch}`).innerText === '...' ? `CH ${ch+1}` : document.getElementById(`name${ch}`).innerText}</h2>
-                    <button class="nav-btn" onclick="changeConfigChannel(1)">&gt;</button>
-                </div>
-                
-                <!-- Controles Visíveis apenas em telas largas -->
-                <div class="hide-mobile" style="gap:15px; align-items:center;">
-                    <div id="headerQNudge" style="display:flex; align-items:center; gap:5px; background:#222; padding:3px 8px; border-radius:6px; border:1px solid #333;">
-                        <button class="nav-btn" style="width:24px; height:24px; font-size:18px;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
-                        <span style="font-size:10px; color:#888; font-weight:bold; min-width:10px; text-align:center;">Q</span>
-                        <button class="nav-btn" style="width:24px; height:24px; font-size:16px;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                        <button id="headerBtnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:70px; height:32px; font-size:10px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
-                        <button id="headerBtnFlat" class="btn-state" style="width:70px; height:32px; font-size:10px; margin:0; background:#dc3545; border-color:#dc3545; color:#fff;" onclick="flatEQ(${ch})">FLAT</button>
-                        <button id="headerBtnCopy" class="btn-state" style="width:70px; height:32px; font-size:10px; margin:0; background:#007bff; color:#fff;" onclick="copyEQ(${ch})">COPIAR</button>
-                        <button id="headerBtnPaste" class="btn-state" style="width:70px; height:32px; font-size:10px; margin:0; background:${eqClipboard ? '#fff' : '#444'}; color:${eqClipboard ? '#000' : '#fff'}; opacity:${eqClipboard ? '1' : '0.4'};" ${eqClipboard ? '' : 'disabled'} onclick="pasteEQ(${ch})">COLAR</button>
-                        <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:70px; height:32px; font-size:10px; margin:0; color:#fff;" onclick="toggleEQ(${ch})">EQ ON</button>
-                    </div>
+        <div class="eq-container" style="display:flex; flex-direction:column; width:100%; height:100%; overflow:visible; touch-action:none;">
+            <div style="background:#1a1a1a; padding:12px; display:flex; justify-content:center; align-items:center; flex-shrink:0; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                    <button id="headerBtnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:80px; height:38px; font-size:11px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
+                    <button id="headerBtnFlat" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#dc3545; border-color:#dc3545; color:#fff;" onclick="flatEQ(${ch})">FLAT</button>
+                    <button id="headerBtnCopy" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#007bff; color:#fff;" onclick="copyEQ(${ch})">COPIAR</button>
+                    <button id="headerBtnPaste" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:${eqClipboard ? '#fff' : '#444'}; color:${eqClipboard ? '#000' : '#fff'}; opacity:${eqClipboard ? '1' : '0.4'};" ${eqClipboard ? '' : 'disabled'} onclick="pasteEQ(${ch})">COLAR</button>
+                    <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:80px; height:38px; font-size:11px; margin:0; color:#fff;" onclick="toggleEQ(${ch})">EQ ON</button>
                 </div>
             </div>
-            <div style="flex:1; background:#000; position:relative; min-height:280px;">
+            <div class="eq-graph-container">
                 <canvas id="eqCanvas" style="display:block; width:100%; height:100%;"></canvas>
+                
+                <!-- Balão de ajuste de Q (Aparece ao lado da banda selecionada) -->
+                <div id="eqBubble" onpointerdown="resetBubbleTimer()" style="display:none; position:absolute; background:#222; border:1px solid #444; border-radius:12px; padding:6px; z-index:100; flex-direction:row; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.6); pointer-events:auto; transform:translate(15px, -50%);">
+                    <button class="nav-btn" style="width:34px; height:34px; font-size:22px; cursor:pointer;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
+                    <span style="font-size:12px; color:#888; font-weight:bold; margin:0 8px; font-family:sans-serif;">Q</span>
+                    <button class="nav-btn" style="width:34px; height:34px; font-size:20px; cursor:pointer;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
+                </div>
             </div>
             <div id="eqInfo" style="background:#111; color:#777; font-size:10px; padding:5px 15px; font-family:monospace; height:20px;">
                 Canais 1 e 4: Pressione e segure para HPF/LPF...
@@ -209,6 +216,9 @@ function setupCanvas(ch) {
     eqCanvas.addEventListener('pointerdown', onEQDown);
     eqCanvas.addEventListener('pointermove', (e) => onEQMove(e, ch));
     window.addEventListener('pointerup', onEQUp);
+    
+    // Impede o menu de contexto nativo do Windows/Browsers ao segurar/clicar com botão direito
+    eqCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
 // Mapas Gráficos
@@ -238,9 +248,12 @@ function onEQDown(e) {
         const by = gToY(b.filter.gain.value, rect.height);
         if (Math.hypot(bx - px, by - py) < 30) {
             activeBandIdx = i;
-            selectedBandIdx = i; // Memoriza para o Q Nudge
+            selectedBandIdx = i; 
+            resetBubbleTimer(); // Mostra o balão ao clicar na banda
             eqCanvas.setPointerCapture(e.pointerId);
-            updateQControlsUI(); // Atualiza visibilidade dos botões de Q
+            updateQControlsUI(); 
+            
+            // Inicia Timer de Long Press...
 
             // Inicia Timer de Long Press para Bandas 1 (0) e 4 (3)
             if (i === 0 || i === 3) {
@@ -251,6 +264,12 @@ function onEQDown(e) {
             }
         }
     });
+
+    // Se clicar em área vazia (fora de qualquer banda), reseta a seleção e esconde o balão
+    if (activeBandIdx === -1) {
+        selectedBandIdx = -1;
+        showBubbleRequest = false; 
+    }
 
     // Fecha menu se clicar fora
     document.getElementById('eqContextMenu').style.display = 'none';
@@ -354,6 +373,10 @@ function onEQMove(e, ch) {
         newG = 0;
     }
     
+    if (activeBandIdx !== -1) {
+        resetBubbleTimer(); // Mantém visível enquanto arrasta
+    }
+    
     b.filter.frequency.value = newF;
     b.filter.gain.value = newG;
 
@@ -387,11 +410,11 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     
     // 1. SALVAR NO ESTADO LOCAL (MEMÓRIA) - SEMPRE, MESMO SE UI ESTIVER FECHADA
     const chState = channelStates[targetCh];
-    if (!chState.eq) chState.eq = {};
-    if (!chState.eq.low) chState.eq.low = { f:12, g:0, q:44, hpfOn:0 };
-    if (!chState.eq.lowmid) chState.eq.lowmid = { f:49, g:0, q:35 };
-    if (!chState.eq.himid) chState.eq.himid = { f:82, g:0, q:35 };
-    if (!chState.eq.high) chState.eq.high = { f:110, g:0, q:44, lpfOn:0 };
+    if (!chState.eq) chState.eq = { on: false };
+    if (!chState.eq.low) chState.eq.low = { f:32, g:0, q:44, hpfOn:0 };
+    if (!chState.eq.lowmid) chState.eq.lowmid = { f:60, g:0, q:20 };
+    if (!chState.eq.himid) chState.eq.himid = { f:84, g:0, q:20 };
+    if (!chState.eq.high) chState.eq.high = { f:108, g:0, q:44, lpfOn:0 };
 
     if (type.includes('kEQHPFOn')) chState.eq.low.hpfOn = val;
     if (type.includes('kEQLPFOn')) chState.eq.high.lpfOn = val;
@@ -479,6 +502,22 @@ function startEQAnimation() {
         eqCtx.fillStyle = '#0a0a0a';
         eqCtx.fillRect(0, 0, w, h);
         
+        // --- TEXTO MODO OFFLINE (MARCA D'ÁGUA) ---
+        if (document.body.classList.contains('is-offline')) {
+            eqCtx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            eqCtx.font = 'bold 36px Inter, sans-serif';
+            eqCtx.textAlign = 'center';
+            
+            if (w < 500) {
+                // Quebra em duas linhas para telas estreitas
+                eqCtx.fillText('MESA NÃO', w / 2, h * 0.25 - 20);
+                eqCtx.fillText('CONECTADA', w / 2, h * 0.25 + 20);
+            } else {
+                // Linha única para telas largas
+                eqCtx.fillText('MESA NÃO CONECTADA', w / 2, h * 0.25);
+            }
+        }
+        
         // GRID
         eqCtx.strokeStyle = '#222';
         eqCtx.lineWidth = 1;
@@ -536,7 +575,7 @@ function startEQAnimation() {
         eqCtx.lineWidth = 2;
         eqCtx.stroke();
 
-        // HANDLES
+        const bubble = document.getElementById('eqBubble');
         eqBands.forEach((b, i) => {
             const bx = fToX(b.filter.frequency.value, w);
             const by = gToY(b.filter.gain.value, h);
@@ -565,7 +604,40 @@ function startEQAnimation() {
             eqCtx.strokeStyle = (i === selectedBandIdx) ? '#fff' : 'rgba(255,255,255,0.5)';
             eqCtx.lineWidth = (i === selectedBandIdx) ? 2 : 1;
             eqCtx.stroke();
+
+            // Sincroniza posição do Balão de Q se a banda estiver selecionada
+            if (i === selectedBandIdx && bubble) {
+                // Só exibe se houver request ativo (após toque/clique e antes de 4 segundos)
+                if (showBubbleRequest) {
+                    bubble.style.display = 'flex';
+                    bubble.style.left = `${bx}px`;
+                    bubble.style.top = `${by}px`;
+                    
+                    // Inverte posição se estiver muito na direita
+                    if (bx > w * 0.7) {
+                        bubble.style.transform = 'translate(calc(-100% - 15px), -50%)';
+                    } else {
+                        bubble.style.transform = 'translate(15px, -50%)';
+                    }
+                    
+                    // Esconder COMPLETAMENTE se o filtro for fixo (HPF/LPF/Shelf)
+                    const isFixed = b.filter.type !== 'peaking';
+                    if (isFixed) {
+                        bubble.style.display = 'none';
+                    } else {
+                        bubble.style.display = 'flex';
+                        bubble.style.opacity = '1';
+                        bubble.style.pointerEvents = 'auto';
+                    }
+                } else {
+                    bubble.style.display = 'none';
+                }
+            }
         });
+
+        if (bubble && selectedBandIdx === -1) {
+            bubble.style.display = 'none';
+        }
 
         eqAnimationId = requestAnimationFrame(run);
     };
@@ -576,6 +648,14 @@ function stopEQAnimation() {
     if (eqAnimationId) cancelAnimationFrame(eqAnimationId);
     eqAnimationId = null;
 }
+
+window.resetBubbleTimer = function() {
+    if (bubbleHideTimer) clearTimeout(bubbleHideTimer);
+    showBubbleRequest = true;
+    bubbleHideTimer = setTimeout(() => {
+        showBubbleRequest = false;
+    }, 4000); // 4 segundos de inatividade
+};
 
 function toggleEQ(ch) {
     const s = channelStates[ch].eq;
@@ -629,15 +709,10 @@ window.flatEQ = function(ch) {
 
 function updatePhaseUI(ch, val) {
     if (activeConfigChannel !== ch) return;
-    const sideBtn = document.getElementById('sideBtnPhase');
-    if (sideBtn) {
-        sideBtn.classList.remove('phase-inv', 'phase-norm');
-        sideBtn.classList.add(!!val ? 'phase-inv' : 'phase-norm');
-    }
     const hBtn = document.getElementById('headerBtnPhase');
     if (hBtn) {
-        hBtn.classList.remove('phase-inv', 'phase-norm');
-        hBtn.classList.add(!!val ? 'phase-inv' : 'phase-norm');
+        hBtn.classList.toggle('phase-inv', !!val);
+        hBtn.classList.toggle('phase-norm', !val);
     }
 }
 
@@ -682,24 +757,7 @@ function nudgeQ(dir) {
 }
 
 function updateQControlsUI() {
-    if (selectedBandIdx === -1) return;
-    const b = eqBands[selectedBandIdx];
-    // Apenas Peaking tem Q ajustável
-    const isFixed = b.filter.type !== 'peaking';
-    
-    // Header Q
-    const hQ = document.getElementById('headerQNudge');
-    if (hQ) {
-        hQ.style.opacity = isFixed ? '0.2' : '1';
-        hQ.style.pointerEvents = isFixed ? 'none' : 'auto';
-    }
-    
-    // Sidebar Q
-    const sQ = document.getElementById('sideQNudge');
-    if (sQ) {
-        sQ.style.opacity = isFixed ? '0.2' : '1';
-        sQ.style.pointerEvents = isFixed ? 'none' : 'auto';
-    }
+    // Agora o controle de Q é feito via balão contextual posicionado pelo run()
 }
 
 // Funções de Cópia e Cola
@@ -707,23 +765,16 @@ window.copyEQ = function(ch) {
     const s = channelStates[ch].eq;
     if (!s) return console.warn(`Sem dados de EQ para o canal ${ch + 1}`);
     
-    // Captura profunda (clone) para não ter referências cruzadas
     eqClipboard = JSON.parse(JSON.stringify(s));
 
-    console.log(`\n📋 [COPIAR] Dados Capturados do Canal ${ch + 1}:`);
-    console.log(JSON.stringify(eqClipboard, null, 2));
-    
-    // Habilita os botões de Colar (estilo branco com texto preto)
-    const btns = ['sideBtnPaste', 'headerBtnPaste'];
-    btns.forEach(id => {
-        const b = document.getElementById(id);
-        if (b) {
-            b.disabled = false;
-            b.style.background = '#fff';
-            b.style.color = '#000';
-            b.style.opacity = '1';
-        }
-    });
+    // Habilita o botão de Colar no header
+    const b = document.getElementById('headerBtnPaste');
+    if (b) {
+        b.disabled = false;
+        b.style.background = '#fff';
+        b.style.color = '#000';
+        b.style.opacity = '1';
+    }
 };
 
 window.showCustomConfirm = function(msg, onOk) {

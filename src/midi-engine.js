@@ -67,14 +67,16 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
 }
 
 function send(msg) {
-    // Só envia se a porta de saída existir e estiver aberta
     if (output && msg) {
         try {
             output.sendMessage(msg);
+            return true;
         } catch (e) {
-            console.error("Erro ao enviar MIDI:", e.message);
+            console.error("❌ Erro fatal ao enviar MIDI (Cabo desconectado?):", e.message);
+            return false;
         }
     }
+    return false;
 }
 
 module.exports = { getAvailablePorts, connectPorts, send };

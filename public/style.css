@@ -120,7 +120,23 @@ input[type=range]::-moz-range-thumb { pointer-events: auto; }
 .sidebar { width: 100px; background: #222; border-left: 1px solid #444; padding: 15px 10px; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; order: 2; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .sidebar::-webkit-scrollbar { display: none; }
 .side-btn { width: 100%; padding: 15px 5px; margin-bottom: 10px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; }
-.fs-btn { background: #555; margin-top: auto; margin-bottom: 0; }
+.fs-btn { 
+    background: rgba(85, 85, 85, 0.8); 
+    position: fixed; 
+    bottom: 20px; 
+    right: 120px; 
+    width: 44px; 
+    height: 44px; 
+    border-radius: 50%; 
+    z-index: 9999; 
+    cursor: move; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+    border: 1px solid #666;
+    backdrop-filter: blur(5px);
+    transition: transform 0.2s, background 0.2s;
+}
+.fs-btn:active { transform: scale(0.9); background: rgba(100, 100, 100, 0.9); }
+
 .btn-config { background: #444; color: white; }
 .btn-sync { background: #007bff; color: white; }
 
@@ -186,8 +202,55 @@ input[type=range]::-moz-range-thumb { pointer-events: auto; }
 .aux-card .card-title { font-size: 11px !important; margin-bottom: 5px; }
 
 .mb-10 { margin-bottom: 10px; }
+.ch-side-title { 
+    text-align: center; 
+    font-size: 15px; 
+    letter-spacing: 0.5px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 24px;
+    width: 100%; 
+    box-sizing: border-box; 
+    color: #0f0; 
+    font-weight: bold;
+    white-space: nowrap;
+}
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .ch-side-title { font-size: 12px; }
+}
+
 
 /* Ajuste do modal para Mobile Landscape */
 @media screen and (max-height: 600px) and (orientation: landscape) {
     .ch-modal-overlay { right: 85px; }
+}
+
+.eq-graph-container {
+    background: #000;
+    position: relative;
+    width: 100%;
+    flex: 1;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Regras para Versão Retrato (Mobile vertical) */
+body.is-portrait .eq-graph-container {
+    flex: 0 0 auto;
+    height: 40vh; 
+    max-height: 350px;
+    min-height: 220px;
+    margin: auto auto; 
+    border: 1px solid #333;
+    border-radius: 12px;
+    overflow: visible;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+/* Ajuste fino dos botões laterais em retrato */
+body.is-portrait .side-btn {
+    min-height: 40px;
+    padding: 10px 5px;
 }
