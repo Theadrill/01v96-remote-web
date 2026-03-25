@@ -21,7 +21,7 @@ function showSplashStep(step) {
 
 function checkTecnicoPass() {
     const pass = document.getElementById('tecnicoPass').value;
-    if (pass === '2107') {
+    if (pass === tecnicoPassword) {
         localStorage.setItem('01v96_role', 'technician');
         const splash = document.getElementById('splashScreen');
         splash.style.pointerEvents = 'none';

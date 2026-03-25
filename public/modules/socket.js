@@ -95,12 +95,19 @@ socket.on('connectionState', (state) => {
 });
 
 socket.on('portsList', (data) => {
-    document.getElementById('sin').innerHTML = data.available.inputs.map(p => `<option value="${p.id}">IN: ${p.name}</option>`).join('');
-    document.getElementById('sout').innerHTML = data.available.outputs.map(p => `<option value="${p.id}">OUT: ${p.name}</option>`).join('');
+    if (data.savedConfig && data.savedConfig.tecnico_pass) {
+        tecnicoPassword = data.savedConfig.tecnico_pass;
+    }
+    
+    const sinEl = document.getElementById('sin');
+    const soutEl = document.getElementById('sout');
+    if (sinEl) sinEl.innerHTML = data.available.inputs.map(p => `<option value="${p.id}" ${data.savedConfig.inIdx == p.id ? 'selected':''}>IN: ${p.name}</option>`).join('');
+    if (soutEl) soutEl.innerHTML = data.available.outputs.map(p => `<option value="${p.id}" ${data.savedConfig.outIdx == p.id ? 'selected':''}>OUT: ${p.name}</option>`).join('');
     
     if (data.savedConfig && data.savedConfig.inIdx !== null && data.savedConfig.outIdx !== null) {
-        document.getElementById('sin').value = String(data.savedConfig.inIdx);
-        document.getElementById('sout').value = String(data.savedConfig.outIdx);
+        // The 'selected' attribute above handles setting the value, so these lines are no longer strictly necessary
+        // document.getElementById('sin').value = String(data.savedConfig.inIdx);
+        // document.getElementById('sout').value = String(data.savedConfig.outIdx);
         conn(); 
     } else { 
         document.getElementById('configModal').style.display='flex'; 

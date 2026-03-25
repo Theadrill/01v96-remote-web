@@ -13,7 +13,9 @@ let masterState = { value: 0, on: false };
 let activeConfigChannel = null;
 let appOrientation = 'vertical';
 let musicianMode = false;
-let activeMix = 1; // 1-8
+let activeMix = 1;
+let tecnicoPassword = '2107'; // Fallback inicial
+ // 1-8
 
 const container = document.getElementById('faders-container');
 
