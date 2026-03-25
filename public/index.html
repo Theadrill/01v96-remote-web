@@ -118,6 +118,23 @@
                 </div>
             </div>
 
+            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px; display: flex; flex-direction: column; gap: 25px; align-items: center;">
+                <!-- Bloco Demo Centralizado -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <p style="font-size: 11px; color: #888; margin: 0; letter-spacing: 1px;">MODO DEMO</p>
+                    <button id="demoBtn" onclick="toggleDemoMode()" class="btn-connect" style="width: 120px; padding: 15px 0; font-size: 13px; font-weight: bold; background: #28a745; border-radius: 8px;">DEMO ON</button>
+                </div>
+                
+                <!-- Bloco Transparência Centralizado (50% de largura) -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 50%;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                        <p style="font-size: 11px; color: #888; margin: 0; letter-spacing: 1px;">TRANSPARÊNCIA METER</p>
+                        <span id="opacityVal" style="font-size: 12px; color: #5cacee; font-weight: bold;">50%</span>
+                    </div>
+                    <input type="range" id="meterOpacity" min="10" max="100" value="50" style="width: 100%; -webkit-appearance: none; appearance: none; background: #444; height: 6px; border-radius: 3px; cursor: pointer;" oninput="updateMeterOpacity(this.value)">
+                </div>
+            </div>
+
             <div class="modal-actions">
                 <button onclick="conn()" class="btn-connect">CONECTAR</button>
                 <button onclick="document.getElementById('configModal').style.display='none'" class="btn-close">FECHAR</button>

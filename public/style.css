@@ -12,10 +12,17 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
 .fader-card { background: #222; padding: 12px 10px; border-radius: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; max-height: 100%; min-width: 110px; box-sizing: border-box; cursor: default; min-height: 0; }
 
 .fader-card.has-meter {
-    background-image: linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(0,204,0,0.6) 40%, rgba(255,221,0,0.6) 80%, rgba(255,0,0,0.7) 100%);
+    background-image: linear-gradient(to top, 
+        rgba(0, 255, 0, var(--meter-opacity, 0.4)) 0%, 
+        rgba(100, 255, 0, var(--meter-opacity, 0.4)) 60%, 
+        rgba(255, 221, 0, var(--meter-opacity, 0.5)) 85%, 
+        rgba(255, 0, 0, var(--meter-opacity, 0.55)) 100%
+    );
     background-repeat: no-repeat;
     background-position: bottom;
     background-size: 100% 0%;
+    background-origin: border-box;
+    background-clip: border-box;
     transition: background-size 0.05s linear;
     position: relative;
     overflow: hidden;
@@ -96,7 +103,23 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
 
 .card-title, .ch-name { cursor: pointer; }
 
-.ch-name { background: #000; color: #0f0; padding: 4px; border-radius: 4px; font-size: 16px; margin: 2px 0 5px 0; text-transform: uppercase; font-weight: bold; border: 1px solid #333; width: 92%; text-align: center; overflow:hidden; white-space:nowrap; }
+.ch-name { 
+    background: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(3px);
+    color: #0f0; 
+    padding: 2px; 
+    border-radius: 4px; 
+    font-size: 16px; 
+    margin: 1px 0 4px 0; 
+    text-transform: uppercase; 
+    font-weight: bold; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    width: 95%; 
+    text-align: center; 
+    overflow: hidden; 
+    white-space: nowrap; 
+    z-index: 10;
+}
 .btn-state { width: 85%; padding: 10px 0; margin-bottom: 6px; border-radius: 5px; font-size: 12px; font-weight: bold; border: 1px solid #444; background: #333; color: #666; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
 .solo-active { background: #28a745 !important; color: white !important; border-color: #34ce57; }
 .on-active { background: #ffc107 !important; color: black !important; border-color: #ffdb6e; }
@@ -172,7 +195,7 @@ input[type=range]::-moz-range-thumb { pointer-events: auto; }
 
 /* Estilos do Modal */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; }
-.modal-content { background: #222; padding: 20px; border-radius: 15px; width: 80%; }
+.modal-content { background: #222; padding: 20px; border-radius: 15px; width: 80%; max-height: 90vh; overflow-y: auto; scrollbar-width: thin; box-sizing: border-box; }
 .modal-select { width: 100%; padding: 10px; margin-bottom: 10px; }
 .modal-actions { display: flex; gap: 10px; width: 100%; }
 .btn-connect { flex: 1; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; }

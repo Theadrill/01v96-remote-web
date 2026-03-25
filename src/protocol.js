@@ -57,43 +57,35 @@ function parseIncoming(message) {
 
   const element = message[6];
 
-  // DEBUG EXTREMO: Se for Parameter Change (127 1), ignora Faders (28), ON (26) e Auxs (35)
+  // DESBLOQUEIO DE LOGS DESCONHECIDOS (Apenas se não for meter)
+  const isMeter = (message[4] === 13 || message[4] === 26 || message[4] === 127) && message[5] === 33;
+
   if (message[4] === 127 && message[5] === 1) {
       if (element !== 28 && element !== 26 && element !== 35) {
           console.log(`🔍 [DEBUG PARAM] Ele|Par: ${element}|${message[7]} ->`, Buffer.from(message).toString('hex').toUpperCase());
       }
-  } else if (message[4] !== 13 && message[4] !== 26) {
-      // Se não for Nome/Solo (13) nem Bulk que eu já leio (26), joga no log!
+  } else if (message[4] !== 13 && message[4] !== 26 && message[4] !== 127 && !isMeter) {
       console.log('🔍 [DEBUG SYSEX DESCONHECIDO] ->', Buffer.from(message).toString('hex').toUpperCase());
   }
 
-  // Meter Bulk Dump Detection: F0 43 1n 3E 1A 21 ...
-  if (message[4] === 26 && message[5] === 33) {
+  // METER DATA: F0 43 1n 3E (0D/1A/7F) 21 ...
+  // Suporte a 0x0D (Legacy), 0x1A (i), 0x7F (Universal) no byte 4 e DataType 0x21 no byte 5
+  if ((message[4] === 13 || message[4] === 26 || message[4] === 127) && message[5] === 33) {
       let levels = [];
-      const dataStart = 10;
+      const dataStart = 9; // Dados começam no byte 9 após os cabeçalhos fixos [F0, 43, 10, 3E, ID, 21, EL, PA, CH]
       
-      const dataLen = message.length - dataStart - 2; 
-      const bytesPerCh = Math.max(1, Math.floor(dataLen / 32));
-      
-      for(let i = 0; i < 32; i++) {
-          let val = 0;
-          let idx = dataStart + (i * bytesPerCh);
+      // O projeto de referência diz que a mesa manda 2 bytes por canal, e lemos o primeiro de cada par.
+      // 32 canais = 64 bytes de dados.
+      for (let i = 0; i < 32; i++) {
+          const deviceLevel = message[dataStart + (i * 2)] || 0;
           
-          let raw = 0;
-          for (let b = 0; b < bytesPerCh; b++) {
-              raw = (raw << 7) | (message[idx + b] & 0x7F);
-          }
+          // Fórmula quadrática do projeto de referência:
+          // (level^2 / 32^2) * 115 (Escala extendida para bater no topo real)
+          let val = Math.min((Math.pow(deviceLevel, 2) / Math.pow(32, 2)) * 115, 115);
           
-          if (raw > 0) {
-              // Dinamicamente calc max log baseado nos bytes da mesa e gera a %
-              const maxPow = Math.log10(Math.pow(128, bytesPerCh) - 1);
-              val = (Math.log10(raw) / maxPow) * 110; // offset leve
-              if (val > 100) val = 100;
-              if (val < 0) val = 0;
-          }
           levels.push(val);
       }
-      return { type: 'METER_BULK', levels };
+      return { type: 'METER_DATA', levels };
   }
 
   if (message[4] === 13 && message[5] === 127) return null;

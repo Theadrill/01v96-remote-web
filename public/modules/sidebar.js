@@ -6,6 +6,24 @@ function conn() {
     document.getElementById('configModal').style.display='none'; 
 }
 
+function toggleDemoMode() {
+    const btn = document.getElementById('demoBtn');
+    const currentlyOn = btn.innerText.includes('OFF'); // Se diz OFF, é porque está ligado e quer desligar
+    
+    const nextStateOn = !currentlyOn;
+    
+    btn.innerText = nextStateOn ? 'DEMO OFF' : 'DEMO ON';
+    btn.style.background = nextStateOn ? '#dc3545' : '#28a745';
+    
+    socket.emit('toggleDemo', { enabled: nextStateOn });
+}
+
+function updateMeterOpacity(v) {
+    document.getElementById('opacityVal').innerText = v + '%';
+    document.documentElement.style.setProperty('--meter-opacity', v / 100);
+    socket.emit('updateMeterConfig', { opacity: v });
+}
+
 function forceSync() { 
     socket.emit('forceSync'); 
 }

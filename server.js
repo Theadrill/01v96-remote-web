@@ -9,6 +9,53 @@ const SysTray = require('systray2').default;
 const midiEngine = require('./src/midi-engine');
 const protocol = require('./src/protocol');
 const stateManager = require('./src/state-manager');
+const dummy = require('./src/meter_dummy');
+let dummyMeterInterval = null;
+
+let meterDataBuffer = new Array(32).fill(0);
+let lastMeterTime = 0;
+
+const handleMIDIData = (midiData) => {
+    if (!midiData) return;
+    lastActivityTime = Date.now(); 
+
+    if (midiData.type === 'METER_DATA') {
+        for (let i = 0; i < 32; i++) {
+            meterDataBuffer[i] = midiData.levels[i];
+        }
+        const now = Date.now();
+        if (now - lastMeterTime > 50) { 
+            io.emit('meterData', meterDataBuffer);
+            lastMeterTime = now;
+        }
+        return;
+    }
+
+    if (midiData.type === 'CH_NAME_CHAR') {
+        stateManager.updateChannelNameChar(midiData.channel, midiData.charIndex, midiData.char);
+        const updatedName = stateManager.getState().channels[midiData.channel].name;
+        io.emit('updateName', { channel: midiData.channel, name: updatedName });
+        return;
+    }
+
+    stateManager.updateState(midiData.type, midiData.channel, midiData.value);
+    io.emit('update', midiData);
+};
+
+function iniciarDummy() {
+    console.log("🛠️ [MODO DEMO] Ativando simulação automática de SysEx...");
+    if (dummyMeterInterval) clearInterval(dummyMeterInterval);
+    dummyMeterInterval = dummy.startMeterSimulation((sysex) => {
+        // Log para conferência técnica
+        if (Math.random() < 0.01) {
+            const hex = Buffer.from(sysex).toString('hex').toUpperCase();
+            console.log(`📥 [DUMMY MIDI] SysEx: ${hex.substring(0, 32)}...`);
+        }
+        
+        const parsed = protocol.parseIncoming(sysex);
+        if (parsed) handleMIDIData(parsed);
+    });
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -193,35 +240,7 @@ function executarConexao(inIdx, outIdx) {
     }
     // ------------------------------------------------------------------------------------------------
 
-    let meterDataBuffer = new Array(32).fill(0);
-    let lastMeterTime = 0;
-
-    const result = midiEngine.connectPorts(inIdx, outIdx, (midiData) => {
-        if (!midiData) return;
-        lastActivityTime = Date.now(); // Marca sinal de vida
-
-        if (midiData.type === 'METER_BULK') {
-            for (let i = 0; i < 32; i++) {
-                meterDataBuffer[i] = midiData.levels[i];
-            }
-            const now = Date.now();
-            if (now - lastMeterTime > 50) { // Throttling: ~20 FPS max
-                io.emit('meterData', meterDataBuffer);
-                lastMeterTime = now;
-            }
-            return; // Impede spam no log
-        }
-
-        if (midiData.type === 'CH_NAME_CHAR') {
-            stateManager.updateChannelNameChar(midiData.channel, midiData.charIndex, midiData.char);
-            const updatedName = stateManager.getState().channels[midiData.channel].name;
-            io.emit('updateName', { channel: midiData.channel, name: updatedName });
-            return;
-        }
-
-        stateManager.updateState(midiData.type, midiData.channel, midiData.value);
-        io.emit('update', midiData);
-    });
+    const result = midiEngine.connectPorts(inIdx, outIdx, handleMIDIData);
 
     if (linhaBuscaAtiva) { process.stdout.write("\n"); linhaBuscaAtiva = false; }
 
@@ -248,9 +267,10 @@ function executarConexao(inIdx, outIdx) {
             }
 
             // 2. Envio de solicitações de volume (Meters)
-            // Se o envio falhar (ERRO FATAL MIDI), desconectamos na hora.
-            const s1 = midiEngine.send([240, 67, 32, 62, 26, 33, 4, 0, 247]); // Bulk Request 1
-            const s2 = midiEngine.send([240, 67, 32, 62, 26, 33, 0, 0, 247]); // Bulk Request 2
+            // Usamos o padrão 0x30 (Request) + 0x7F (Universal) + 0x21 (Meters)
+            // O intervalo de canais é 0x00 a 0x1F (0-31)
+            const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247]); // Universal Request
+            const s2 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247]);  // 01v96i Specific Request
             
             if (!s1 || !s2) {
                 console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI. Cabo removido?");
@@ -268,6 +288,10 @@ function handleDisconnection(retry = true) {
     
     isConnected = false;
     if (global.meterInterval) clearInterval(global.meterInterval);
+    if (dummyMeterInterval) {
+        clearInterval(dummyMeterInterval);
+        dummyMeterInterval = null;
+    }
     
     io.emit('connectionState', { connected: false });
 
@@ -350,6 +374,34 @@ io.on('connection', (socket) => {
 
     socket.on('forceSync', () => triggerSync());
     
+    socket.on('toggleDemo', (data) => {
+        const config = loadConfig();
+        config.demo_mode = data.enabled;
+        saveConfig(config);
+        
+        if (data.enabled) {
+            iniciarDummy();
+        } else {
+            console.log("🛑 Parando Simulação de Meters...");
+            if (dummyMeterInterval) clearInterval(dummyMeterInterval);
+            dummyMeterInterval = null;
+            
+            // Pequeno delay para garantir que a zeragem ocorra após os últimos pulsos
+            setTimeout(() => {
+                const zeros = new Array(32).fill(0);
+                meterDataBuffer = zeros;
+                io.emit('meterData', zeros);
+                console.log("🧹 Meters zerados com sucesso.");
+            }, 100);
+        }
+    });
+
+    socket.on('updateMeterConfig', (data) => {
+        const config = loadConfig();
+        config.meter_opacity = data.opacity;
+        saveConfig(config);
+    });
+
     socket.on('updateName', (data) => {
         const { channel, name } = data;
         const s = stateManager.getState();
@@ -385,7 +437,37 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(3000, '0.0.0.0', () => {
-    console.log(`🚀 SERVIDOR ONLINE em http://${os.hostname()}.local:3000`);
-    setTimeout(() => { iniciarBuscaAutomatica(); }, 2000);
+// --- INICIALIZAÇÃO DO SERVIDOR ---
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, '0.0.0.0', () => {
+    const interfaces = os.networkInterfaces();
+    const addresses = [];
+    for (const k in interfaces) {
+        for (const k2 in interfaces[k]) {
+            const address = interfaces[k][k2];
+            if (address.family === 'IPv4' && !address.internal) addresses.push(address.address);
+        }
+    }
+
+    console.log(`\n=================================================`);
+    console.log(`🚀 SERVIDOR 01V96 BRIDGE ATIVO`);
+    console.log(`🌍 Disponível em: http://localhost:${PORT}`);
+    addresses.forEach(addr => console.log(`   - Rede: http://${addr}:${PORT}`));
+    console.log(`=================================================\n`);
+
+    const config = loadConfig();
+    if (config.demo_mode) {
+        iniciarDummy();
+    } else {
+        console.log("ℹ️ [INFO] Modo Demo desativado. Aguardando conexão física com Yamaha...");
+    }
+
+    if (config.inIdx !== null && config.outIdx !== null) {
+        setTimeout(() => {
+            console.log("🔌 Tentando reconexão automática com última porta salva...");
+            executarConexao(config.inIdx, config.outIdx);
+        }, 1000);
+    } else {
+        setTimeout(() => iniciarBuscaAutomatica(), 2000);
+    }
 });

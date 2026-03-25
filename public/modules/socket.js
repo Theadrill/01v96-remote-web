@@ -105,17 +105,33 @@ socket.on('portsList', (data) => {
     if (soutEl) soutEl.innerHTML = data.available.outputs.map(p => `<option value="${p.id}" ${data.savedConfig.outIdx == p.id ? 'selected':''}>OUT: ${p.name}</option>`).join('');
     
     if (data.savedConfig && data.savedConfig.inIdx !== null && data.savedConfig.outIdx !== null) {
-        // The 'selected' attribute above handles setting the value, so these lines are no longer strictly necessary
-        // document.getElementById('sin').value = String(data.savedConfig.inIdx);
-        // document.getElementById('sout').value = String(data.savedConfig.outIdx);
         conn(); 
     } else { 
         document.getElementById('configModal').style.display='flex'; 
+    }
+    // Sincroniza o modo demo e opacidade
+    const demoBtn = document.getElementById('demoBtn');
+    const opacitySlider = document.getElementById('meterOpacity');
+    const opacityValSpan = document.getElementById('opacityVal');
+
+    if (data.savedConfig) {
+        if (demoBtn) {
+            const isDemo = !!data.savedConfig.demo_mode;
+            demoBtn.innerText = isDemo ? 'DEMO OFF' : 'DEMO ON';
+            demoBtn.style.background = isDemo ? '#dc3545' : '#28a745';
+        }
+        if (opacitySlider) {
+            const op = data.savedConfig.meter_opacity || 50;
+            opacitySlider.value = op;
+            if (opacityValSpan) opacityValSpan.innerText = op + '%';
+            document.documentElement.style.setProperty('--meter-opacity', op / 100);
+        }
     }
 });
 
 let faderCardsCache = null;
 socket.on('meterData', (levels) => {
+    if (musicianMode) return; // Músicos não vêem volumes de entrada (referência técnica)
     if (!faderCardsCache) faderCardsCache = document.querySelectorAll('.faders-area > .fader-card');
     requestAnimationFrame(() => {
         for (let i = 0; i < Math.min(NUM_CHANNELS, faderCardsCache.length); i++) {

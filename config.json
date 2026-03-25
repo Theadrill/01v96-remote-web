@@ -1,4 +1,6 @@
 {
   "inIdx": 0,
-  "outIdx": 1
+  "outIdx": 1,
+  "demo_mode": false,
+  "meter_opacity": "11"
 }
