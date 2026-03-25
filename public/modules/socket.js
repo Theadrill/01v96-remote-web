@@ -7,8 +7,11 @@ socket.on('update', (d) => {
     }
 
     if (d.channel < NUM_CHANNELS) {
-        if (d.type === 'kInputFader/kFader') updateUI(d.channel, d.value, undefined, undefined);
-        if (d.type === 'kInputChannelOn/kChannelOn') updateUI(d.channel, undefined, isTrue, undefined);
+        // No modo músico, ignoramos updates dos faders principais para não bagunçar a visão do AUX
+        if (!musicianMode) {
+            if (d.type === 'kInputFader/kFader') updateUI(d.channel, d.value, undefined, undefined);
+            if (d.type === 'kInputChannelOn/kChannelOn') updateUI(d.channel, undefined, isTrue, undefined);
+        }
         if (d.type === 'kSetupSoloChOn/kSoloChOn') updateUI(d.channel, undefined, undefined, isTrue);
         
         if (d.type === 'kInputPhase/kPhase') {
@@ -19,6 +22,14 @@ socket.on('update', (d) => {
         // Suporte a Auxiliares
         if (d.type.includes('kInputAUX/kAUX')) {
             updateAuxFromSocket(d.channel, d.type, d.value);
+
+            // Se estivermos em modo músico e o update for pro AUX que estou mixando...
+            if (musicianMode && d.type.startsWith(`kInputAUX/kAUX${activeMix}`)) {
+                const isLevel = d.type.endsWith('Level');
+                const isOn = d.type.endsWith('On');
+                if (isLevel) updateUI(d.channel, d.value, undefined, undefined);
+                if (isOn) updateUI(d.channel, undefined, isTrue, undefined);
+            }
         }
 
         // Suporte a EQ
@@ -51,7 +62,16 @@ socket.on('sync', (s) => {
         for (let i = 0; i < NUM_CHANNELS; i++) {
             if (s.channels[i]) {
                 Object.assign(channelStates[i], s.channels[i]);
-                updateUI(i, s.channels[i].value, s.channels[i].on, s.channels[i].solo);
+                
+                let v = s.channels[i].value;
+                let o = s.channels[i].on;
+                
+                if (musicianMode) {
+                    v = s.channels[i][`aux${activeMix}`] || 0;
+                    o = s.channels[i][`aux${activeMix}On`] || false;
+                }
+                
+                updateUI(i, v, o, s.channels[i].solo);
                 document.getElementById(`name${i}`).innerText = s.channels[i].name || `CH ${i + 1}`;
             }
         }

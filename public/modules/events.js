@@ -1,4 +1,5 @@
 function openChannelConfig(e, ch) {
+    if (musicianMode) return; // Músico não abre config
     if (e.target.closest('button') || e.target.closest('input')) return;
     
     activeConfigChannel = ch;
@@ -55,17 +56,34 @@ function closeChannelConfig() {
 function toggleState(type, ch) {
     let val = false;
     let s = (ch === 'master') ? masterState : channelStates[ch];
+    let actualType = type;
 
-    if (type === 'kInputChannelOn/kChannelOn' || type === 'kStereoChannelOn/kChannelOn') { 
-        val = !s.on; 
-        updateUI(ch, undefined, val, undefined); 
-    } else if (type === 'kSetupSoloChOn/kSoloChOn') { 
-        val = !s.solo; 
-        updateUI(ch, undefined, undefined, val); 
+    // Se no modo músico, o tipo base recebido (kInputChannelOn) vira o AUX ativo
+    if (musicianMode && ch !== 'master' && type === 'kInputChannelOn/kChannelOn') {
+        actualType = `kInputAUX/kAUX${activeMix}On`;
+    }
+
+    // Lógica Genérica de Toggle para Booleanos
+    if (actualType.includes('On') || actualType.includes('Solo')) {
+        let currentOn;
+        if (musicianMode && ch !== 'master' && actualType.includes('kInputAUX/kAUX')) {
+             currentOn = s[`aux${activeMix}On`] || false;
+        } else {
+             currentOn = actualType.includes('Solo') ? s.solo : s.on;
+        }
+        
+        val = !currentOn;
+        
+        // Atualiza a visualização local
+        if (actualType.includes('Solo')) {
+            updateUI(ch, undefined, undefined, val);
+        } else {
+            updateUI(ch, undefined, val, undefined);
+        }
     }
     
     const emitCh = (ch === 'master') ? 0 : ch;
-    socket.emit('control', { type, channel: emitCh, value: val ? 1 : 0 });
+    socket.emit('control', { type: actualType, channel: emitCh, value: val ? 1 : 0 });
 }
 
 let nudgeTimeout = null;
@@ -91,11 +109,15 @@ function stopNudge() {
 
 function nudgeFader(ch, dir) {
     let s = (ch === 'master') ? masterState : channelStates[ch];
-    let nRaw = s.value + dir;
+    let currentVal = musicianMode ? (s[`aux${activeMix}`] || 0) : s.value;
+    let nRaw = currentVal + dir;
     if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
     updateUI(ch, nRaw, undefined, undefined);
     
-    const typeFader = (ch === 'master') ? 'kStereoFader/kFader' : 'kInputFader/kFader';
+    let typeFader = (ch === 'master') ? 'kStereoFader/kFader' : 'kInputFader/kFader';
+    if (musicianMode && ch !== 'master') {
+        typeFader = `kInputAUX/kAUX${activeMix}Level`;
+    }
     socket.emit('control', { type: typeFader, channel: (ch === 'master' ? 0 : ch), value: nRaw });
 }
 
@@ -104,6 +126,9 @@ function faderInput(e, ch) {
     const v = parseInt(e.target.value);
     updateUI(ch, v, undefined, undefined);
     
-    const typeFader = (ch === 'master') ? 'kStereoFader/kFader' : 'kInputFader/kFader';
+    let typeFader = (ch === 'master') ? 'kStereoFader/kFader' : 'kInputFader/kFader';
+    if (musicianMode && ch !== 'master') {
+        typeFader = `kInputAUX/kAUX${activeMix}Level`;
+    }
     socket.emit('control', { type: typeFader, channel: (ch === 'master' ? 0 : ch), value: v });
 }

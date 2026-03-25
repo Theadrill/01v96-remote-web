@@ -62,72 +62,7 @@ function switchTab(tabId) {
     if (tabId === 'dyn') { if(modeEl) modeEl.innerText = 'DYNAMICS'; renderDynamics(activeConfigChannel); }
     if (tabId === 'aux') { if(modeEl) modeEl.innerText = 'AUX SENDS'; renderAuxs(activeConfigChannel); }
 }
-function initDraggableFS() {
-    const fsBtn = document.getElementById('fsBtn');
-    if (!fsBtn) return;
 
-    let isDragging = false;
-    let startX, startY;
-    let initialRight, initialBottom;
-
-    // Carregar posição salva
-    const savedPos = JSON.parse(localStorage.getItem('fs_btn_pos')) || { bottom: 20, right: 120 };
-    fsBtn.style.bottom = `${savedPos.bottom}px`;
-    fsBtn.style.right = `${savedPos.right}px`;
-
-    fsBtn.addEventListener('pointerdown', (e) => {
-        isDragging = false;
-        startX = e.clientX;
-        startY = e.clientY;
-        const style = window.getComputedStyle(fsBtn);
-        initialRight = parseInt(style.right, 10);
-        initialBottom = parseInt(style.bottom, 10);
-        fsBtn.setPointerCapture(e.pointerId);
-    });
-
-    fsBtn.addEventListener('pointermove', (e) => {
-        if (!fsBtn.hasPointerCapture(e.pointerId)) return;
-
-        const dx = startX - e.clientX;
-        const dy = startY - e.clientY;
-
-        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-            isDragging = true;
-            const newRight = initialRight + dx;
-            const newBottom = initialBottom + dy;
-
-            // Limites da tela
-            const maxRight = window.innerWidth - fsBtn.offsetWidth - 10;
-            const maxBottom = window.innerHeight - fsBtn.offsetHeight - 10;
-
-            const finalRight = Math.max(10, Math.min(maxRight, newRight));
-            const finalBottom = Math.max(10, Math.min(maxBottom, newBottom));
-
-            fsBtn.style.right = `${finalRight}px`;
-            fsBtn.style.bottom = `${finalBottom}px`;
-        }
-    });
-
-    fsBtn.addEventListener('pointerup', (e) => {
-        if (isDragging) {
-            const pos = {
-                bottom: parseInt(fsBtn.style.bottom, 10),
-                right: parseInt(fsBtn.style.right, 10)
-            };
-            localStorage.setItem('fs_btn_pos', JSON.stringify(pos));
-        }
-        fsBtn.releasePointerCapture(e.pointerId);
-    });
-
-    fsBtn.addEventListener('click', (e) => {
-        if (isDragging) {
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-        }
-        toggleFullScreen();
-    });
-}
 
 function updateViewportInfo() {
     const w = window.innerWidth;
@@ -155,7 +90,6 @@ window.addEventListener('orientationchange', () => {
 window.addEventListener('load', updateViewportInfo);
 // Inicialização Global
 window.addEventListener('DOMContentLoaded', () => {
-    initDraggableFS();
     updateViewportInfo();
 });
 

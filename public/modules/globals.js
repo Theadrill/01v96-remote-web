@@ -12,6 +12,8 @@ for (let i = 0; i < NUM_CHANNELS; i++) {
 let masterState = { value: 0, on: false };
 let activeConfigChannel = null;
 let appOrientation = 'vertical';
+let musicianMode = false;
+let activeMix = 1; // 1-8
 
 const container = document.getElementById('faders-container');
 

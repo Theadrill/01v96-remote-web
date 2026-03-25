@@ -270,7 +270,6 @@ function handleDisconnection(retry = true) {
     if (global.meterInterval) clearInterval(global.meterInterval);
     
     io.emit('connectionState', { connected: false });
-    document.body?.classList.add('is-offline'); // Aplica fallback visual se body estiver disponível no contexto (embora servidor não tenha DOM, o front já trata)
 
     if (retry) {
         console.log("❌ Conexão perdida. Tentando reconectar automaticamente...");
@@ -362,9 +361,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('control', (data) => {
-        // Bloqueio Total Offline: Se a mesa não estiver conectada, não processamos nada.
-        // A mesa real ditará a verdade absoluta assim que for conectada.
-        if (!isConnected) return;
+        // Bloqueio Total Offline (COMENTADO PARA DEBUG)
+        // if (!isConnected) return;
 
         // Atualiza o estado na memória do servidor
         stateManager.updateState(data.type, data.channel, data.value);
@@ -380,6 +378,8 @@ io.on('connection', (socket) => {
 
         const sysex = protocol.buildChange(data.type, data.channel, data.value, converter);
         if (sysex) {
+            const hex = Buffer.from(sysex).toString('hex').toUpperCase();
+            console.log(`📤 [MIDI OUT] ${data.type} (CH ${data.channel + 1}): Val ${data.value} -> SysEx: ${hex}`);
             midiEngine.send(sysex);
         }
     });
