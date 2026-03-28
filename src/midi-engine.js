@@ -49,12 +49,25 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         // Escuta as mensagens vindas da mesa física
         input.on('message', (delta, message) => {
             // Se recebemos qualquer dado, a mesa está viva
-            onMessageCallback({ type: 'HEARTBEAT' });
-            
-            // Passa para o tradutor (protocol.js) ver se é algo útil
-            const translated = protocol.parseIncoming(message);
-            if (translated) {
-                onMessageCallback(translated);
+            if (onMessageCallback) {
+                onMessageCallback({ type: 'HEARTBEAT' });
+                
+                // Passa para o tradutor (protocol.js) ver se é algo útil
+                const translated = protocol.parseIncoming(message);
+                
+                if (translated) {
+                    onMessageCallback(translated);
+                } else {
+                    // Filtro para focarmos apenas no que NÃO catalogamos ainda
+                    // Vamos ignorar tbm os heartbeats conhecidos [F0, 43, 10, 3E, 0D, 7F, F7]
+                    const hex = Buffer.from(message).toString('hex').toUpperCase();
+                    const isHearbeat = (hex === 'F043103E0D7FF7');
+                    const isYamaha = (message[0] === 0xF0 && message[1] === 0x43);
+                    
+                    if (!isHearbeat && isYamaha) {
+                        console.log(`🔍 [MIDI RAW DESCONHECIDO] -> ${hex}`);
+                    }
+                }
             }
         });
 
