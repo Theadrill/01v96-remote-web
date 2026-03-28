@@ -57,8 +57,9 @@ function parseIncoming(message) {
 
   const element = message[6];
 
-  // METER DATA: F0 43 1n 3E (0D/1A/15/7F) (20/21/01) ...
-  const isMeter = (message[4] === 21 || message[4] === 13 || message[4] === 26 || message[4] === 127) && (message[5] === 1 || message[5] === 33 || message[5] === 32);
+  // METER DATA: F0 43 1n 3E (0D/1A/15/7F) (21/20) ...
+  // Removido message[5] === 1 pois conflita com o endereço de parâmetros [127, 1, ...]
+  const isMeter = (message[4] === 21 || message[4] === 13 || message[4] === 26 || message[4] === 127) && (message[5] === 33 || message[5] === 32);
 
   // METER DATA logic
   if (isMeter) {
