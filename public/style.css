@@ -1,3 +1,4 @@
+* { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; height: 100dvh; overflow: hidden; display: flex; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
 body.layout-horizontal { flex-direction: column; }
 
@@ -233,7 +234,7 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
     .btn-state { padding: 4px 0; margin-bottom: 2px; border-radius: 4px; font-size: 9px; width: 90%; }
     .nudge-zone { margin: 0 -4px; padding: 3px 0; }
     .btn-nudge { width: 32px; height: 32px; font-size: 18px; margin: 0; border: 1px solid #555; }
-    input[type=range] { margin: 1px 0; width: 40px; min-height: 20px; touch-action: none; pointer-events: none; }
+    input[type=range] { margin: 1px 0; width: 100%; }
     .fader-val { font-size: 12px !important; margin: 1px 0 0 0 !important; }
     
     .sidebar { width: 85px; padding: 5px; }
@@ -748,3 +749,216 @@ body.is-portrait .sidebar-musician #musicianExitBtn {
     }
 
 
+
+/* --- DYNAMICS (GATE & COMP) --- */
+.dyn-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    height: 100%;
+    align-content: flex-start;
+    overflow-y: auto;
+}
+
+/* Quando em modo retrato (is-portrait), força coluna única sem esmagar */
+body.is-portrait .dyn-container {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 5px 0;
+}
+
+.dyn-box {
+    flex: 1;
+    min-width: 320px;
+    max-width: 600px; /* Evita que fique absurdamente largo em monitores gigantes */
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+body.is-portrait .dyn-box {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 10px;
+    margin: 0;
+}
+
+.dyn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.dyn-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #888;
+    letter-spacing: 2px;
+}
+
+.dyn-on-btn {
+    width: 60px;
+    height: 35px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #333;
+    color: #666;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dyn-on-btn.active {
+    background: #ffc107 !important;
+    color: #000 !important;
+    border-color: #ffdb6e;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+}
+
+/* GR Meter */
+.dyn-meter-container {
+    background: #000;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    border: 1px solid #222;
+    position: relative; /* Para a flecha de threshold */
+}
+
+.dyn-thresh-arrow {
+    position: absolute;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+    transform: translateX(-50%);
+    transition: left 0.1s ease-out;
+    z-index: 10;
+    box-shadow: 0 0 5px rgba(255,255,255,0.5);
+}
+
+.dyn-meter-track {
+    height: 12px;
+    background: #111;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #333;
+}
+
+.dyn-meter-fill {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 0%; /* 0 a 100% de redução */
+    background: linear-gradient(to left, #f33, #fb0);
+    transition: width 0.05s linear;
+}
+
+.dyn-meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    color: #555;
+    margin-top: 5px;
+    padding: 0 2px;
+}
+
+/* Param Controls Grid - Agora em lista vertical com faders horizontais */
+.dyn-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.dyn-param {
+    display: grid;
+    grid-template-columns: 80px 1fr 65px;
+    align-items: center;
+    gap: 15px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.dyn-param label {
+    font-size: 11px;
+    color: #888;
+    font-weight: bold;
+    text-align: left;
+}
+
+.dyn-slider-wrap {
+    height: 30px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.dyn-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    outline: none;
+    margin: 0;
+    cursor: pointer;
+}
+
+.dyn-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #333; border-radius: 3px; }
+.dyn-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 32px;
+    height: 24px;
+    background: linear-gradient(to bottom, #eee 0%, #aaa 50%, #999 100%);
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: -9px; /* Centraliza o thumb */
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+}
+
+.dyn-value {
+    font-size: 14px;
+    color: #007bff;
+    font-family: monospace;
+    font-weight: bold;
+    background: rgba(0,0,0,0.2);
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-align: right;
+}
+
+/* Responsive adjustment for Mobile Vertical (já estava em coluna, apenas ajuste de proporção) */
+@media screen and (max-width: 768px) {
+    .dyn-box { min-width: 100%; }
+    .dyn-param { grid-template-columns: 55px 1fr 50px; gap: 5px; padding: 3px 0; }
+    .dyn-value { font-size: 11px; padding: 2px 4px; }
+}
+
+/* Mobile Landscape Tweak */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .dyn-container { padding: 10px; gap: 15px; }
+    .dyn-box { padding: 8px 12px; }
+    .dyn-header { margin-bottom: 5px; }
+    .dyn-param { padding: 2px 0; gap: 6px; }
+}
