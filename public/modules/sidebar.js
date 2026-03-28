@@ -28,6 +28,39 @@ function forceSync() {
     socket.emit('forceSync'); 
 }
 
+function toggleOuts() {
+    outsMode = !outsMode;
+    technicianMixMode = false; // Garante que sai do modo de edição se alternar canais
+    const btn = document.getElementById('btnOuts');
+    if (btn) {
+        btn.classList.toggle('active-tab', outsMode);
+        btn.innerText = outsMode ? 'CHANNELS' : 'OUTS';
+    }
+    initUI();
+}
+
+function enterTechnicianMixMode(mixIdx) {
+    activeMix = mixIdx + 1;
+    technicianMixMode = true;
+    outsMode = false;
+    initUI();
+}
+
+function exitTechnicianMixMode() {
+    technicianMixMode = false;
+    outsMode = true;
+    initUI();
+}
+
+function changeTechnicianMix(delta) {
+    let nextMix = activeMix + delta;
+    if (nextMix < 1) nextMix = 8;
+    if (nextMix > 8) nextMix = 1;
+    
+    activeMix = nextMix;
+    initUI();
+}
+
 function toggleFullScreen() {
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         const docElm = document.documentElement;

@@ -48,7 +48,7 @@ function buildRequest(commandName, channelIndex = 0) {
 
 function buildNameRequest(channelIndex, charIndex) {
   const parameter = 4 + charIndex;
-  // Bug arrumado: Removido o byte "17" que estava aqui quebrando a leitura da mesa
+  // Retornamos ao ID 13 (0x0D) pois é o padrão clássico da 01V96 para Nomes
   return [...HEADER, 48, MODEL_ID, 13, 2, 4, parameter, channelIndex, ...FOOTER];
 }
 
@@ -57,32 +57,20 @@ function parseIncoming(message) {
 
   const element = message[6];
 
-  // DESBLOQUEIO DE LOGS DESCONHECIDOS (Apenas se não for meter)
-  const isMeter = (message[4] === 13 || message[4] === 26 || message[4] === 127) && message[5] === 33;
+  // METER DATA: F0 43 1n 3E (0D/1A/15/7F) (20/21/01) ...
+  const isMeter = (message[4] === 21 || message[4] === 13 || message[4] === 26 || message[4] === 127) && (message[5] === 1 || message[5] === 33 || message[5] === 32);
 
-  if (message[4] === 127 && message[5] === 1) {
-      if (element !== 28 && element !== 26 && element !== 35) {
-          console.log(`🔍 [DEBUG PARAM] Ele|Par: ${element}|${message[7]} ->`, Buffer.from(message).toString('hex').toUpperCase());
-      }
-  } else if (message[4] !== 13 && message[4] !== 26 && message[4] !== 127 && !isMeter) {
-      console.log('🔍 [DEBUG SYSEX DESCONHECIDO] ->', Buffer.from(message).toString('hex').toUpperCase());
-  }
-
-  // METER DATA: F0 43 1n 3E (0D/1A/7F) 21 ...
-  // Suporte a 0x0D (Legacy), 0x1A (i), 0x7F (Universal) no byte 4 e DataType 0x21 no byte 5
-  if ((message[4] === 13 || message[4] === 26 || message[4] === 127) && message[5] === 33) {
+  // METER DATA logic
+  if (isMeter) {
       let levels = [];
-      const dataStart = 9; // Dados começam no byte 9 após os cabeçalhos fixos [F0, 43, 10, 3E, ID, 21, EL, PA, CH]
-      
-      // O projeto de referência diz que a mesa manda 2 bytes por canal, e lemos o primeiro de cada par.
-      // 32 canais = 64 bytes de dados.
-      for (let i = 0; i < 32; i++) {
-          const deviceLevel = message[dataStart + (i * 2)] || 0;
-          
-          // Fórmula quadrática do projeto de referência:
-          // (level^2 / 32^2) * 115 (Escala extendida para bater no topo real)
+      const dataStart = 9; 
+      // 01V96 envia até 70 e poucos pontos de meter. 
+      // 0-31: Canais, 32-33: Stereo, 34-41: Mixes, 42-49: Buses
+      for (let i = 0; i < 70; i++) {
+          const deviceLevel = message[dataStart + (i * 2)];
+          if (deviceLevel === undefined) break;
+          // Conversão empírica baseada no comportamento observado da 01V96 (0-32 -> 0-115%)
           let val = Math.min((Math.pow(deviceLevel, 2) / Math.pow(32, 2)) * 115, 115);
-          
           levels.push(val);
       }
       return { type: 'METER_DATA', levels };
@@ -94,15 +82,10 @@ function parseIncoming(message) {
   const parameter = message[7];
   const channel = message[8];
 
-  if (message[4] === 127 && message[5] === 1) {
-      // Attenuator (Element 29)
-      if (element === 29) return { type: 'kInputAttenuator/kAtt', channel, value: CONVERTERS.bytesToSigned(dataBytes) };
-
-      if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
-      if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
-
-      // EQ (Element 32)
-      if (element === 32 && parameter <= 15) {
+  // Param Changes support ID 13, 26, 127
+  if (message[4] === 13 || message[4] === 127 || message[4] === 26) {
+      // Input EQ (Elements 32 and 33)
+      if ((element === 32 || element === 33) && parameter <= 15) {
           const eqKeys = [
               'kEQMode', 'kEQLowQ', 'kEQLowF', 'kEQLowG', 'kEQHPFOn',
               'kEQLowMidQ', 'kEQLowMidF', 'kEQLowMidG',
@@ -111,10 +94,24 @@ function parseIncoming(message) {
               'kEQLPFOn', 'kEQOn'
           ];
           const key = eqKeys[parameter];
-          // EQ Gain (G) uses signed resolution, others use fader (unsigned)
           const converter = (key.endsWith('G')) ? CONVERTERS.bytesToSigned : CONVERTERS.bytesToFader;
+          // Channel byte usually already carries the shift if it's 0-31, but some mixers use element shift.
+          // For now, we trust the channel byte message[8].
           return { type: `kInputEQ/${key}`, channel, value: converter(dataBytes) };
       }
+
+      // Input Faders / On / Solo / Name / Attenuator etc
+      if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
+      if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+      if (element === 29) return { type: 'kInputAttenuator/kAtt', channel, value: CONVERTERS.bytesToSigned(dataBytes) };
+
+      // Mix (AUX) Master Faders / ON
+      if (element === 57) return { type: 'kAUXFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
+      if (element === 54) return { type: 'kAUXChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+
+      // Bus Master Faders / ON
+      if (element === 43) return { type: 'kBusFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
+      if (element === 41) return { type: 'kBusChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
 
       // Master (Stereo) Fader e ON
       if (element === 79 && message[7] === 0) return { type: 'kStereoFader/kFader', channel: 'master', value: CONVERTERS.bytesToFader(dataBytes) };
@@ -127,19 +124,24 @@ function parseIncoming(message) {
           if (offset === 0) return { type: `kInputAUX/kAUX${auxIdx}On`, channel, value: CONVERTERS.bytesToOn(dataBytes) };
           if (offset === 2) return { type: `kInputAUX/kAUX${auxIdx}Level`, channel, value: CONVERTERS.bytesToFader(dataBytes) };
       }
-  }
-  
-  if (message[4] === 13) {
-      // Lê as letras dos nomes
+
+      // Names
       if (message[5] === 2 && element === 4 && parameter >= 4 && parameter <= 19) {
           const charIndex = parameter - 4;
-          return { type: 'CH_NAME_CHAR', channel, charIndex, char: CONVERTERS.bytesToChar(dataBytes) };
+          const char = CONVERTERS.bytesToChar(dataBytes);
+          return { type: 'CH_NAME_CHAR', channel, charIndex, char };
       }
       
-      // Lê o Solo
+      // Solo
       if (message[5] === 3 && element === 46) {
           return { type: 'kSetupSoloChOn/kSoloChOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
       }
+  }
+
+  // Debug capture for unparsed messages (excluding meters and heartbeat)
+  if (message[2] !== 33 && message[2] !== 32 && message[2] !== 0x7F) {
+     const hex = Buffer.from(message).toString('hex').toUpperCase();
+     // console.log(`🔍 [MIDI UNPARSED] -> ${hex}`);
   }
 
   return null;

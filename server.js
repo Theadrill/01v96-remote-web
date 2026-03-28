@@ -31,10 +31,15 @@ const handleMIDIData = (midiData) => {
         return;
     }
 
+    if (midiData.type === 'HEARTBEAT') return; 
+
     if (midiData.type === 'CH_NAME_CHAR') {
         stateManager.updateChannelNameChar(midiData.channel, midiData.charIndex, midiData.char);
         const updatedName = stateManager.getState().channels[midiData.channel].name;
-        io.emit('updateName', { channel: midiData.channel, name: updatedName });
+        // Emitimos o nome apenas no último caractere (9) para evitar flicker letra-por-letra
+        if (midiData.charIndex === 9) {
+            io.emit('updateName', { channel: midiData.channel, name: updatedName });
+        }
         return;
     }
 
@@ -68,6 +73,8 @@ let isTrayReady = false;
 let buscaInterval = null; 
 let linhaBuscaAtiva = false; 
 let lastActivityTime = 0; // Timestamp da última mensagem recebida da mesa
+let isSyncing = false; // Flag para evitar múltiplas sincronias simultâneas
+let isFullySynced = false; // Flag para liberar os meters apenas após carga total
 
 process.title = "01V96-BRIDGE-SERVER";
 
@@ -121,7 +128,7 @@ try {
         } 
         else if (tituloClicado.includes("Abrir no Navegador")) {
             console.log("\n▶️ Comando Recebido: Abrindo Navegador");
-            const url = `http://${os.hostname()}.local:3000`; 
+            const url = `http://${os.hostname()}.local:4000`; 
             require('child_process').exec(`start ${url}`);
         } 
         else if (tituloClicado.includes("Sair e Encerrar")) {
@@ -215,7 +222,7 @@ function iniciarBuscaAutomatica() {
     }, 1000); 
 }
 
-function executarConexao(inIdx, outIdx) {
+function executarConexao(inIdx, outIdx, targetSocket = null) {
     // --- O PORTEIRO: Verifica se a porta solicitada (pelo radar ou pela WEB) é realmente uma Yamaha ---
     const portas = midiEngine.getAvailablePorts();
     const inputs = portas.inputs || portas; 
@@ -248,7 +255,7 @@ function executarConexao(inIdx, outIdx) {
         isConnected = true;
         console.log(`✅ Conexão MIDI estabelecida com sucesso! (${inName})`);
         atualizarMenuTray();
-        triggerSync();
+        triggerSync(targetSocket);
         io.emit('connectionState', { connected: true });
 
         // Loop contínuo de requests do Meter (Heartbeat)
@@ -259,22 +266,26 @@ function executarConexao(inIdx, outIdx) {
             if (!isConnected) return;
 
             // 1. Verificação de Time-out (Cabo puxado ou Mesa desligada)
-            // Se passar mais de 2 segundos sem nenhum bit da mesa, consideramos desconectado.
-            if (Date.now() - lastActivityTime > 2000) {
+            // Se passar mais de 5 segundos sem nenhum bit da mesa, consideramos desconectado.
+            if (Date.now() - lastActivityTime > 5000) {
                 console.log("\n⚠️ Watchdog: Timeout de conexão. A mesa parou de responder.");
                 handleDisconnection();
                 return;
             }
 
             // 2. Envio de solicitações de volume (Meters)
-            // Usamos o padrão 0x30 (Request) + 0x7F (Universal) + 0x21 (Meters)
-            // O intervalo de canais é 0x00 a 0x1F (0-31)
-            const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247]); // Universal Request
-            const s2 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247]);  // 01v96i Specific Request
-            
-            if (!s1 || !s2) {
-                console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI. Cabo removido?");
-                handleDisconnection();
+            // SÓ ENVIA SE ESTIVER TOTALMENTE SINCRONIZADA (Para evitar gargalo no Driver)
+            if (isFullySynced) {
+                const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247]); // Universal 33
+                const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247]); // Universal 32
+                const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247]);  // 01v96i
+                const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247]);  // 01v96 Original 33
+                const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247]);  // 01v96 Original 32
+                
+                if (!s1 && !s2 && !s3 && !s4 && !s5) {
+                    console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI. Cabo removido?");
+                    handleDisconnection();
+                }
             }
         }, 100); // Polling mais leve (10 FPS) para economizar processamento
     } else {
@@ -301,58 +312,98 @@ function handleDisconnection(retry = true) {
     }
 }
 
-async function triggerSync() {
-    if (!isConnected) return;
-    console.log("🔄 Sincronizando faders e botões vitais...");
-    // Master Fader
-    midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, 10));
-    midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, 10));
+async function triggerSync(targetSocket = null) {
+    if (!isConnected || isSyncing) return;
+    isSyncing = true;
+    isFullySynced = false; // Reseta a flag para pausar meters
+    console.log(`🔄 Sincronizando faders e botões vitais ${targetSocket ? '(apenas novo cliente)' : '(global)'}...`);
+    try {
+        // Master Fader
+        midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, 10));
+        midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, 10));
 
-    for (let i = 0; i < 32; i++) {
-        const fReq = protocol.buildRequest('kInputFader/kFader', i);
-        const mReq = protocol.buildRequest('kInputChannelOn/kChannelOn', i);
-        const sReq = protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i);
-        
-        if (fReq) midiEngine.send(fReq); await new Promise(r => setTimeout(r, 10)); 
-        if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, 10)); 
-        if (sReq) midiEngine.send(sReq); await new Promise(r => setTimeout(r, 10)); 
+        for (let i = 0; i < 32; i++) {
+            const fReq = protocol.buildRequest('kInputFader/kFader', i);
+            const mReq = protocol.buildRequest('kInputChannelOn/kChannelOn', i);
+            const sReq = protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i);
+            
+            if (fReq) midiEngine.send(fReq); await new Promise(r => setTimeout(r, 35)); 
+            if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, 35)); 
+            if (sReq) midiEngine.send(sReq); await new Promise(r => setTimeout(r, 35)); 
 
-        // Sincroniza Phase
-        midiEngine.send(protocol.buildRequest('kInputPhase/kPhase', i)); await new Promise(r => setTimeout(r, 5));
-        
-        // Sincroniza Master EQ ON de cada canal
-        midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 5));
-        midiEngine.send(protocol.buildRequest('kInputEQ/kEQMode', i)); await new Promise(r => setTimeout(r, 5));
-        midiEngine.send(protocol.buildRequest('kInputEQ/kEQHPFOn', i)); await new Promise(r => setTimeout(r, 5));
-        midiEngine.send(protocol.buildRequest('kInputEQ/kEQLPFOn', i)); await new Promise(r => setTimeout(r, 5));
-        
-        // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, High)
-        const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
-        for (const b of bands) {
-            midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 5));
-            midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 5));
-            midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i)); await new Promise(r => setTimeout(r, 5));
+            // Sincroniza Phase
+            midiEngine.send(protocol.buildRequest('kInputPhase/kPhase', i)); await new Promise(r => setTimeout(r, 35));
+            
+            // Sincroniza Master EQ ON de cada canal
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQMode', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQHPFOn', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQLPFOn', i)); await new Promise(r => setTimeout(r, 35));
+            
+            // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, High)
+            const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
+            for (const b of bands) {
+                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 35));
+                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 35));
+                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i)); await new Promise(r => setTimeout(r, 35));
+            }
+
+            // Requisita também os 8 auxiliares
+            for (let a = 1; a <= 8; a++) {
+                const auxReq = protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i);
+                const auxOnReq = protocol.buildRequest(`kInputAUX/kAUX${a}On`, i);
+                if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, 35));
+                if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, 35));
+            }
+
+            // Pausa estratégica a cada 8 canais para não sobrecarregar (Buffer Breath)
+            if ((i + 1) % 8 === 0) {
+                process.stdout.write("|");
+                await new Promise(r => setTimeout(r, 500));
+            }
         }
 
-        // Requisita também os 8 auxiliares
-        for (let a = 1; a <= 8; a++) {
-            const auxReq = protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i);
-            const auxOnReq = protocol.buildRequest(`kInputAUX/kAUX${a}On`, i);
-            if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, 5));
-            if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, 5));
+        // Sincroniza Mixes (1-8) e Buses (1-8)
+        console.log("🔄 Sincronizando Mixes e Buses...");
+        for (let i = 0; i < 8; i++) {
+            midiEngine.send(protocol.buildRequest('kAUXFader/kFader', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kAUXChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kBusFader/kFader', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kBusChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, 35));
         }
-    }
 
-    await new Promise(r => setTimeout(r, 600)); 
-    io.emit('sync', stateManager.getState());
-    console.log("✅ Sincronização concluída com sucesso!");
-
-    for (let i = 0; i < 32; i++) {
-        for (let c = 0; c < 16; c++) {
-            const nameReq = protocol.buildNameRequest(i, c);
-            if (nameReq) midiEngine.send(nameReq);
-            await new Promise(r => setTimeout(r, 4)); 
+        await new Promise(r => setTimeout(r, 600)); 
+        if (targetSocket) {
+            targetSocket.emit('sync', stateManager.getState());
+        } else {
+            io.emit('sync', stateManager.getState());
         }
+        console.log("✅ Sincronização de parâmetros concluída!");
+
+        console.log("📝 Iniciando busca de nomes (Processo Lento - 10 letras por CH)...");
+        await new Promise(r => setTimeout(r, 2000)); // Pausa maior antes de começar os nomes
+
+        for (let i = 0; i < 32; i++) {
+            // Buscamos apenas os primeiros 10 caracteres (a mesa exibe 8 no LCD)
+            // Aumentamos o delay para 40ms para garantir que o Driver do Windows (WinMM) não engasgue
+            for (let c = 0; c < 10; c++) {
+                const nameReq = protocol.buildNameRequest(i, c);
+                if (nameReq) midiEngine.send(nameReq);
+                await new Promise(r => setTimeout(r, 40)); 
+            }
+            
+            // Pausa estratégica a cada 2 canais para esvaziar o buffer do Driver de MIDI
+            if (i % 2 === 0) {
+                process.stdout.write(".");
+                await new Promise(r => setTimeout(r, 200)); 
+            }
+        }
+        console.log("\n✅ Carregamento de nomes concluído!");
+        isFullySynced = true; // Libera o processamento de meters
+        console.log("🚀 Meters liberados e sincronizados!");
+
+    } finally {
+        isSyncing = false;
     }
 }
 
@@ -366,13 +417,22 @@ io.on('connection', (socket) => {
     socket.emit('connectionState', { connected: isConnected });
 
     socket.on('requestConnect', async (data) => {
+        const config = loadConfig();
+        // Se já estivermos conectados na mesma porta, não precisamos disparar um triggerSync global
+        if (isConnected && config.inIdx === data.inIdx && config.outIdx === data.outIdx) {
+            console.log("🔌 Cliente reconectando, mas MIDI já está ativo nestas portas. Enviando apenas sync local...");
+            socket.emit('sync', stateManager.getState());
+            socket.emit('connectResult', { success: true });
+            return;
+        }
+
         saveConfig({ inIdx: data.inIdx, outIdx: data.outIdx });
         // Se a web pedir para conectar, passa pelo mesmo porteiro!
-        const result = executarConexao(data.inIdx, data.outIdx);
+        const result = executarConexao(data.inIdx, data.outIdx, socket);
         socket.emit('connectResult', result);
     });
 
-    socket.on('forceSync', () => triggerSync());
+    socket.on('forceSync', () => triggerSync()); // Force sync continua global
     
     socket.on('toggleDemo', (data) => {
         const config = loadConfig();
@@ -438,7 +498,7 @@ io.on('connection', (socket) => {
 });
 
 // --- INICIALIZAÇÃO DO SERVIDOR ---
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, '0.0.0.0', () => {
     const interfaces = os.networkInterfaces();
     const addresses = [];

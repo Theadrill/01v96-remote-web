@@ -9,10 +9,19 @@ for (let i = 0; i < NUM_CHANNELS; i++) {
         eq: { on: false }
     });
 }
+let mixesState = [];
+let busesState = [];
+for (let i = 0; i < 8; i++) {
+    mixesState.push({ value: 0, on: false, name: `MIX ${i+1}` });
+    busesState.push({ value: 0, on: false, name: `BUS ${i+1}` });
+}
+
 let masterState = { value: 0, on: false };
 let activeConfigChannel = null;
 let appOrientation = 'vertical';
 let musicianMode = false;
+let outsMode = false;
+let technicianMixMode = false;
 let activeMix = 1;
 let tecnicoPassword = '2107'; // Fallback inicial
  // 1-8

@@ -6,9 +6,14 @@ socket.on('update', (d) => {
         return;
     }
 
-    if (d.channel < NUM_CHANNELS) {
-        // No modo músico, ignoramos updates dos faders principais para não bagunçar a visão do AUX
-        if (!musicianMode) {
+    if (d.type === 'kAUXFader/kFader') { updateUI(`m${d.channel}`, d.value, undefined); return; }
+    if (d.type === 'kAUXChannelOn/kChannelOn') { updateUI(`m${d.channel}`, undefined, isTrue); return; }
+    if (d.type === 'kBusFader/kFader') { updateUI(`b${d.channel}`, d.value, undefined); return; }
+    if (d.type === 'kBusChannelOn/kChannelOn') { updateUI(`b${d.channel}`, undefined, isTrue); return; }
+
+    if (typeof d.channel === 'number' && d.channel < NUM_CHANNELS) {
+        // No modo músico ou técnico mix, ignoramos updates dos faders principais para não bagunçar a visão do AUX
+        if (!musicianMode && !technicianMixMode) {
             if (d.type === 'kInputFader/kFader') updateUI(d.channel, d.value, undefined, undefined);
             if (d.type === 'kInputChannelOn/kChannelOn') updateUI(d.channel, undefined, isTrue, undefined);
         }
@@ -23,8 +28,8 @@ socket.on('update', (d) => {
         if (d.type.includes('kInputAUX/kAUX')) {
             updateAuxFromSocket(d.channel, d.type, d.value);
 
-            // Se estivermos em modo músico e o update for pro AUX que estou mixando...
-            if (musicianMode && d.type.startsWith(`kInputAUX/kAUX${activeMix}`)) {
+            // Se estivermos em modo músico ou técnico mix e o update for pro AUX que estou mixando...
+            if ((musicianMode || technicianMixMode) && d.type.startsWith(`kInputAUX/kAUX${activeMix}`)) {
                 const isLevel = d.type.endsWith('Level');
                 const isOn = d.type.endsWith('On');
                 if (isLevel) updateUI(d.channel, d.value, undefined, undefined);
@@ -42,14 +47,17 @@ socket.on('update', (d) => {
 });
 
 socket.on('updateName', (d) => {
-    if (d.channel < NUM_CHANNELS) {
+    if (typeof d.channel === 'number' && d.channel < NUM_CHANNELS) {
         const newName = d.name || `CH ${d.channel + 1}`;
-        document.getElementById(`name${d.channel}`).innerText = newName;
+        const el = document.getElementById(`name${d.channel}`);
+        if(el && el.innerText !== newName) {
+            el.innerText = newName;
+        }
         
         // Se este canal for o que está aberto na sidebar, atualiza o título lá tbm
         if (activeConfigChannel === d.channel) {
             const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle) {
+            if (sideTitle && sideTitle.innerText !== `${d.channel + 1} - ${newName}`) {
                 sideTitle.innerText = `${d.channel + 1} - ${newName}`;
                 if (window.autoScaleTitle) autoScaleTitle();
             }
@@ -66,19 +74,40 @@ socket.on('sync', (s) => {
                 let v = s.channels[i].value;
                 let o = s.channels[i].on;
                 
-                if (musicianMode) {
+                if (musicianMode || technicianMixMode) {
                     v = s.channels[i][`aux${activeMix}`] || 0;
                     o = s.channels[i][`aux${activeMix}On`] || false;
                 }
                 
                 updateUI(i, v, o, s.channels[i].solo);
-                document.getElementById(`name${i}`).innerText = s.channels[i].name || `CH ${i + 1}`;
+                const elN = document.getElementById(`name${i}`);
+                const newName = s.channels[i].name || `CH ${i + 1}`;
+                if(elN && elN.innerText !== newName) {
+                    elN.innerText = newName;
+                }
             }
         }
-        if (s.master) {
-            Object.assign(masterState, s.master);
-            updateUI('master', s.master.value, s.master.on, undefined);
+    }
+    // ... rest of sync (mixes/buses)
+    if (s.mixes) {
+        for (let i = 0; i < 8; i++) {
+            if (s.mixes[i]) {
+                Object.assign(mixesState[i], s.mixes[i]);
+                updateUI(`m${i}`, s.mixes[i].value, s.mixes[i].on);
+            }
         }
+    }
+    if (s.buses) {
+        for (let i = 0; i < 8; i++) {
+            if (s.buses[i]) {
+                Object.assign(busesState[i], s.buses[i]);
+                updateUI(`b${i}`, s.buses[i].value, s.buses[i].on);
+            }
+        }
+    }
+    if (s.master) {
+        Object.assign(masterState, s.master);
+        updateUI('master', s.master.value, s.master.on, undefined);
     }
 });
 
@@ -129,15 +158,45 @@ socket.on('portsList', (data) => {
     }
 });
 
-let faderCardsCache = null;
+window.resetFaderCache = () => { faderCardsCache = null; };
+
 socket.on('meterData', (levels) => {
-    if (musicianMode) return; // Músicos não vêem volumes de entrada (referência técnica)
+    if (musicianMode) return; 
+
     if (!faderCardsCache) faderCardsCache = document.querySelectorAll('.faders-area > .fader-card');
+    
     requestAnimationFrame(() => {
-        for (let i = 0; i < Math.min(NUM_CHANNELS, faderCardsCache.length); i++) {
-            const card = faderCardsCache[i];
-            if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-            card.style.backgroundSize = `100% ${levels[i]}%`;
+        if (outsMode) {
+            // No modo OUTS, mapeamos os índices recebidos para Mix/Bus/Master
+            // 34-41: Mixes, 42-49: Buses, 32: Stereo Master L
+            for (let i = 0; i < faderCardsCache.length; i++) {
+                const card = faderCardsCache[i];
+                if (!card) continue;
+                
+                let levelIdx = -1;
+                if (i < 8) levelIdx = 34 + i;       // Mix 1-8
+                else if (i < 16) levelIdx = 42 + (i - 8); // Bus 1-8
+                else levelIdx = 32;                 // Stereo Master
+
+                if (levelIdx >= 0 && levelIdx < levels.length) {
+                    if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
+                    card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                }
+            }
+        } else {
+            // Modo normal: 0-31 Canais, e o último card é o Stereo Master se existir
+            for (let i = 0; i < faderCardsCache.length; i++) {
+                const card = faderCardsCache[i];
+                if (!card) continue;
+
+                let levelIdx = i;
+                if (i >= NUM_CHANNELS) levelIdx = 32; // Stereo Master encostado no fim
+
+                if (levelIdx >= 0 && levelIdx < levels.length) {
+                    if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
+                    card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                }
+            }
         }
     });
 });

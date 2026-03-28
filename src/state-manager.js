@@ -2,10 +2,12 @@ const state = {
     sceneChars: Array(16).fill(' '),
     sceneName: "01V96",
     channels: {},
+    mixes: {},
+    buses: {},
     master: { value: 0, on: false, name: "MASTER" }
 };
 
-// Inicia os 32 canais vazios
+// Inicia os 32 canais e 8 mixes/buses vazios
 for (let i = 0; i < 32; i++) {
     state.channels[i] = {
         value: 0,
@@ -26,10 +28,31 @@ for (let i = 0; i < 32; i++) {
     };
 }
 
+for (let i = 0; i < 8; i++) {
+    state.mixes[i] = { value: 0, on: false, name: `MIX ${i+1}` };
+    state.buses[i] = { value: 0, on: false, name: `BUS ${i+1}` };
+}
+
 function updateState(type, channel, value) {
     if (channel === 'master' || type.startsWith('kStereo')) {
         if (type === 'kStereoFader/kFader') state.master.value = value;
         if (type === 'kStereoChannelOn/kChannelOn') state.master.on = value;
+        return;
+    }
+
+    // Suporte a Mixes (AUX Master)
+    if (type.startsWith('kAUX')) {
+        if (!state.mixes[channel]) return;
+        if (type === 'kAUXFader/kFader') state.mixes[channel].value = value;
+        if (type === 'kAUXChannelOn/kChannelOn') state.mixes[channel].on = value;
+        return;
+    }
+
+    // Suporte a Buses (Bus Master)
+    if (type.startsWith('kBus')) {
+        if (!state.buses[channel]) return;
+        if (type === 'kBusFader/kFader') state.buses[channel].value = value;
+        if (type === 'kBusChannelOn/kChannelOn') state.buses[channel].on = value;
         return;
     }
 

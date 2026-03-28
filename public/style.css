@@ -40,6 +40,17 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
     border-color: #800 !important;
     margin-left: 30px !important;
 }
+
+/* Fader Groups Outline */
+.fader-group-1 {
+    border-color: rgba(0, 150, 255, 0.4) !important;
+    box-shadow: 0 0 10px rgba(0, 150, 255, 0.1) inset;
+}
+
+.fader-group-2 {
+    border-color: rgba(255, 200, 0, 0.4) !important;
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.1) inset;
+}
 body.layout-horizontal .master-card {
     margin-left: 0 !important;
     margin-top: 30px !important;
@@ -160,7 +171,19 @@ input[type=range]::-moz-range-thumb { pointer-events: auto; }
 .fs-btn:active { transform: scale(0.9); background: rgba(100, 100, 100, 0.9); }
 
 .btn-config { background: #444; color: white; }
+.btn-outs { background: #28a745; color: white; transition: 0.3s; border: 1px solid #34ce57; }
+.btn-outs.active-tab { background: #1b5e20 !important; border-color: #2e7d32 !important; box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
 .btn-sync { background: #007bff; color: white; }
+
+.fader-group-mix {
+    border-color: rgba(255, 204, 0, 0.5) !important;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.15) inset;
+}
+
+.fader-group-bus {
+    border-color: rgba(0, 255, 204, 0.5) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.15) inset;
+}
 
 /* Ajuste dinâmico para os botões de saída para não quebrar linha */
 #musicianExitBtn, #tecnicoExitBtn {

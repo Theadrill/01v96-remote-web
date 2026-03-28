@@ -48,8 +48,8 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
 
         // Escuta as mensagens vindas da mesa física
         input.on('message', (delta, message) => {
-            // Log de emergência: se a mesa mandar QUALQUER coisa, vai aparecer no terminal
-            // console.log('📥 MIDI Bruto recebido:', Buffer.from(message).toString('hex').toUpperCase());
+            // Se recebemos qualquer dado, a mesa está viva
+            onMessageCallback({ type: 'HEARTBEAT' });
             
             // Passa para o tradutor (protocol.js) ver se é algo útil
             const translated = protocol.parseIncoming(message);
