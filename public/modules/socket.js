@@ -23,6 +23,11 @@ socket.on('update', (d) => {
             channelStates[d.channel].phase = d.value;
             if (activeConfigChannel === d.channel && window.updatePhaseUI) updatePhaseUI(d.channel, d.value);
         }
+
+        if (d.type === 'kInputAttenuator/kAtt') {
+            channelStates[d.channel].att = d.value;
+            if (activeConfigChannel === d.channel && window.updateATTUI) window.updateATTUI(d.value);
+        }
         
         // Suporte a Auxiliares
         if (d.type.includes('kInputAUX/kAUX')) {

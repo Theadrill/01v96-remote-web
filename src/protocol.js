@@ -25,6 +25,11 @@ const CONVERTERS = {
       if (v < 0) v += 0x10000000;
       return [(v >> 21) & 0x7F, (v >> 14) & 0x7F, (v >> 7) & 0x7F, v & 0x7F];
   },
+  signed14ToBytes: (value) => {
+      let v = Math.round(value);
+      if (v < 0) v += 0x4000;
+      return [(v >> 7) & 0x7F, v & 0x7F];
+  },
   onToBytes: (isOn) => [0, 0, 0, isOn ? 1 : 0],
   bytesToOn: (bytes) => !!bytes[bytes.length - 1],
   bytesToChar: (bytes) => String.fromCharCode(bytes[bytes.length - 1] || 32)
@@ -84,7 +89,7 @@ function parseIncoming(message) {
   const channel = message[8];
 
   // Param Changes support ID 13, 26, 127
-  if (message[4] === 13 || message[4] === 127 || message[4] === 26) {
+  if (message[4] === 13 || message[4] === 127 || message[4] === 26 || message[4] === 1) {
       // Input EQ (Elements 32 and 33)
       if ((element === 32 || element === 33) && parameter <= 15) {
           const eqKeys = [

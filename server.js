@@ -483,8 +483,8 @@ io.on('connection', (socket) => {
         const isBinary = data.type.includes('On') || data.type.includes('Solo');
         let converter = isBinary ? protocol.CONVERTERS.onToBytes : protocol.CONVERTERS.faderToBytes;
         
-        // Se for EQ Gain (termina em G), usa conversor de assinado
-        if (data.type.includes('kInputEQ/') && data.type.endsWith('G')) {
+        // Se for EQ Gain (termina em G) ou Attenuator, usa conversor de assinado (28-bit)
+        if (data.type.toLowerCase().includes('att') || (data.type.includes('kInputEQ/') && data.type.endsWith('G'))) {
             converter = protocol.CONVERTERS.signedToBytes;
         }
 

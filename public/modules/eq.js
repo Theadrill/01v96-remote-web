@@ -168,6 +168,7 @@ function renderEQ(ch) {
                     <button id="headerBtnFlat" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#dc3545; border-color:#dc3545; color:#fff;" onclick="flatEQ(${ch})">FLAT</button>
                     <button id="headerBtnCopy" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#007bff; color:#fff;" onclick="copyEQ(${ch})">COPIAR</button>
                     <button id="headerBtnPaste" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:${eqClipboard ? '#fff' : '#444'}; color:${eqClipboard ? '#000' : '#fff'}; opacity:${eqClipboard ? '1' : '0.4'};" ${eqClipboard ? '' : 'disabled'} onclick="pasteEQ(${ch})">COLAR</button>
+                    <button id="headerBtnATT" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#444; color:#fff;" onclick="toggleATTModal(true)">EQ ATT</button>
                     <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:80px; height:38px; font-size:11px; margin:0; color:#fff;" onclick="toggleEQ(${ch})">EQ ON</button>
                 </div>
             </div>
@@ -210,6 +211,20 @@ function renderEQ(ch) {
                     <button id="btnModeShelf" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">SHELF</button>
                     <button id="btnModeSpecial" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">HPF</button>
                 </div>
+            </div>
+
+            <!-- Modal do Atenuador (EQ ATT) -->
+            <div id="eqATTModal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#181818; border:1px solid #444; border-radius:15px; padding:25px; z-index:6000; box-shadow:0 15px 50px rgba(0,0,0,0.9); flex-direction:column; align-items:center; width:85%; max-width:400px; max-height:90dvh; overflow-y:auto; gap:25px;">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center; border-bottom:1px solid #333; padding-bottom:10px;">
+                    <span style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Ganho de EQ (ATT)</span>
+                    <button onclick="toggleATTModal(false)" style="background:none; border:none; color:#777; font-size:24px; cursor:pointer; padding:0 5px;">&times;</button>
+                </div>
+                <div id="eqATTVal" style="font-size:32px; color:#5cacee; font-family:monospace; font-weight:bold;">0.0 dB</div>
+                <div style="width:100%; padding:10px 0;">
+                    <input type="range" id="eqATTInput" min="-960" max="120" step="1" value="0" style="width:100%; height:12px; -webkit-appearance:none; background:#333; border-radius:6px; outline:none; cursor:pointer;" oninput="eqATTInput(event)">
+                </div>
+                <p style="margin:0; font-size:10px; color:#666; text-align:center;">Ajuste o ganho de entrada do equalizador</p>
+                <button onclick="toggleATTModal(false)" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; margin-top:10px;">FECHAR</button>
             </div>
         </div>
     `;
@@ -994,4 +1009,51 @@ window.updateEQFadersUI = function() {
         const label = labelsLong[selectedBandIdx] || 'EQ';
         info.innerText = `${label}: ${Math.round(f)}Hz | ${g.toFixed(1)}dB`;
     }
+};
+
+window.toggleATTModal = function(show) {
+    const modal = document.getElementById('eqATTModal');
+    if (!modal) return;
+    modal.style.display = show ? 'flex' : 'none';
+    if (show) {
+        // Inicializa com o valor atual (puxado do channelStates)
+        const ch = activeConfigChannel;
+        const state = channelStates[ch] || {};
+        const att = (state.att !== undefined) ? state.att : 0;
+        
+        const input = document.getElementById('eqATTInput');
+        const valEl = document.getElementById('eqATTVal');
+        if (input && valEl) {
+            input.value = att;
+            const dbValue = att / 10;
+            valEl.innerText = (dbValue > 0 ? '+' : '') + dbValue.toFixed(1) + ' dB';
+        }
+    }
+};
+
+window.updateATTUI = function(value) {
+    const input = document.getElementById('eqATTInput');
+    const valEl = document.getElementById('eqATTVal');
+    if (input && valEl) {
+        input.value = value;
+        const dbValue = value / 10;
+        valEl.innerText = (dbValue > 0 ? '+' : '') + dbValue.toFixed(1) + ' dB';
+    }
+}
+
+window.eqATTInput = function(e) {
+    const ch = activeConfigChannel;
+    const rawVal = parseInt(e.target.value);
+    const dbValue = rawVal / 10;
+    
+    // Atualiza Texto
+    const valEl = document.getElementById('eqATTVal');
+    if (valEl) valEl.innerText = (dbValue > 0 ? '+' : '') + dbValue.toFixed(1) + ' dB';
+    
+    // Atualiza Estado Local
+    if (!channelStates[ch]) channelStates[ch] = {};
+    channelStates[ch].att = rawVal;
+    
+    // Envia para mesa
+    socket.emit('control', { type: 'kInputAttenuator/kAtt', channel: ch, value: rawVal });
 };
