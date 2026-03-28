@@ -141,6 +141,7 @@ function initEQEngine(ch) {
 }
 
 function renderEQ(ch) {
+    selectedBandIdx = -1; // Reseta seleção de banda ao abrir novo canal
     initEQEngine(ch);
     const state = channelStates[ch] || { eq: {} };
     const isEqOn = state.eq ? !!state.eq.on : false;
@@ -170,19 +171,37 @@ function renderEQ(ch) {
                     <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:80px; height:38px; font-size:11px; margin:0; color:#fff;" onclick="toggleEQ(${ch})">EQ ON</button>
                 </div>
             </div>
-            <div class="eq-graph-container">
-                <canvas id="eqCanvas" style="display:block; width:100%; height:100%;"></canvas>
-                
-                <!-- Balão de ajuste de Q (Aparece ao lado da banda selecionada) -->
-                <div id="eqBubble" onpointerdown="resetBubbleTimer()" style="display:none; position:absolute; background:#222; border:1px solid #444; border-radius:12px; padding:6px; z-index:100; flex-direction:row; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.6); pointer-events:auto; transform:translate(15px, -50%);">
-                    <button class="nav-btn" style="width:34px; height:34px; font-size:22px; cursor:pointer;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
-                    <span style="font-size:12px; color:#888; font-weight:bold; margin:0 8px; font-family:sans-serif;">Q</span>
-                    <button class="nav-btn" style="width:34px; height:34px; font-size:20px; cursor:pointer;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
+            <div class="eq-content-wrapper" style="display:flex; flex:1; width:100%; min-height:0; overflow:hidden;">
+                <div class="eq-main-area" style="flex:1; display:flex; flex-direction:column; min-width:0;">
+                    <div class="eq-graph-container">
+                        <canvas id="eqCanvas" style="display:block; width:100%; height:100%;"></canvas>
+                        
+                        <!-- Balão de ajuste de Q (Aparece ao lado da banda selecionada) -->
+                        <div id="eqBubble" onpointerdown="resetBubbleTimer()" style="display:none; position:absolute; background:#222; border:1px solid #444; border-radius:12px; padding:6px; z-index:100; flex-direction:row; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.6); pointer-events:auto; transform:translate(15px, -50%);">
+                            <button class="nav-btn" style="width:34px; height:34px; font-size:22px; cursor:pointer;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
+                            <span style="font-size:12px; color:#888; font-weight:bold; margin:0 8px; font-family:sans-serif;">Q</span>
+                            <button class="nav-btn" style="width:34px; height:34px; font-size:20px; cursor:pointer;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
+                        </div>
+                    </div>
+
+                    <!-- NOVO: Fader de Frequência Horizontal -->
+                    <div id="eqFreqFaderContainer" class="eq-freq-fader-container" style="opacity: 0.3; pointer-events: none;">
+                        <input type="range" id="eqFreqFaderInput" class="eq-freq-fader-input" min="0" max="124" step="1" value="72" orient="horizontal" oninput="eqFreqInput(event)">
+                    </div>
+
+                    <div id="eqInfo" style="background:#111; color:#777; font-size:10px; padding:5px 35px 18px 35px; font-family:monospace; height:20px; border-top: 1px solid #222;">
+                        Canais 1 e 4: Pressione e segure para HPF/LPF...
+                    </div>
+                </div>
+
+                <!-- NOVO: Fader de Ganho Lateral (Referência AirFader) -->
+                <div id="eqGainFaderContainer" class="eq-fader-container" style="opacity: 0.3; pointer-events: none;">
+                    <div id="eqFaderVal" class="eq-fader-val">+18.0</div>
+                    <input type="range" id="eqFaderInput" class="eq-fader-input" min="-180" max="180" step="1" value="0" orient="vertical" oninput="eqGainInput(event)">
+                    <div id="eqFaderLabel" class="eq-fader-label">GAIN</div>
                 </div>
             </div>
-            <div id="eqInfo" style="background:#111; color:#777; font-size:10px; padding:5px 15px; font-family:monospace; height:20px;">
-                Canais 1 e 4: Pressione e segure para HPF/LPF...
-            </div>
+
             <!-- Modal de Contexto para HPF/LPF -->
             <div id="eqContextMenu" style="display:none; position:absolute; background:#222; border:1px solid #555; border-radius:10px; padding:10px; z-index:5000; box-shadow:0 8px 25px rgba(0,0,0,0.8); flex-direction:column; gap:5px;">
                 <p style="margin:0 0 5px 0; font-size:9px; color:#aaa; text-align:center; text-transform:uppercase;">Tipo de Filtro</p>
@@ -197,6 +216,7 @@ function renderEQ(ch) {
     
     setupCanvas(ch);
     startEQAnimation();
+    updateEQFadersUI();
 }
 
 function setupCanvas(ch) {
@@ -270,6 +290,8 @@ function onEQDown(e) {
         selectedBandIdx = -1;
         showBubbleRequest = false; 
     }
+
+    updateEQFadersUI();
 
     // Fecha menu se clicar fora
     document.getElementById('eqContextMenu').style.display = 'none';
@@ -348,6 +370,7 @@ function setBandMode(bandIdx, mode) {
 
     document.getElementById('eqContextMenu').style.display = 'none';
     updateQControlsUI();
+    updateEQFadersUI();
 }
 
 function onEQMove(e, ch) {
@@ -396,6 +419,8 @@ function onEQMove(e, ch) {
 
     socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: rawF });
     socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: rawG });
+
+    updateEQFadersUI();
 
     document.getElementById('eqInfo').innerText = `${label.toUpperCase()}: ${Math.round(newF)}Hz | ${newG.toFixed(1)}dB`;
 }
@@ -490,6 +515,7 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     
     // A animação em loop iniciada no renderEQ/startEQAnimation 
     // vai atualizar o gráfico automaticamente a 60fps refletindo os filtros novos.
+    updateEQFadersUI();
 }
 
 function startEQAnimation() {
@@ -840,4 +866,132 @@ window.pasteEQ = function(ch) {
         console.log(`[PASTE] Dados enviados para a mesa. Aguardando atualização...`);
     }
     }); // Fim do callback do confirm
+};
+
+window.eqGainInput = function(e) {
+    if (selectedBandIdx === -1) return;
+    const ch = activeConfigChannel;
+    const b = eqBands[selectedBandIdx];
+    
+    // Filtros de corte (HPF/LPF) não têm ganho
+    if (b.filter.type === 'highpass' || b.filter.type === 'lowpass') return;
+
+    const rawG = parseInt(e.target.value);
+    const newG = rawG / 10;
+    
+    // Atualiza Áudio Local
+    b.filter.gain.value = newG;
+    
+    // Atualiza Estado Local
+    const chState = channelStates[ch];
+    if (chState && chState.eq && chState.eq[b.key]) {
+        chState.eq[b.key].g = rawG;
+    }
+
+    // Envia para mesa
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const label = labelMap[b.key] || 'Low';
+    socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: rawG });
+    
+    // Atualiza Texto do Valor no Fader
+    const valEl = document.getElementById('eqFaderVal');
+    if (valEl) valEl.innerText = (newG >= 0 ? '+' : '') + newG.toFixed(1);
+    
+    // Atualiza a barra de info
+    const info = document.getElementById('eqInfo');
+    if (info) info.innerText = `${label.toUpperCase()}: ${Math.round(b.filter.frequency.value)}Hz | ${newG.toFixed(1)}dB`;
+};
+
+window.eqFreqInput = function(e) {
+    if (selectedBandIdx === -1) return;
+    const ch = activeConfigChannel;
+    const b = eqBands[selectedBandIdx];
+    
+    const rawF = parseInt(e.target.value);
+    const newF = rawToFreq(rawF);
+    
+    // Atualiza Áudio Local
+    b.filter.frequency.value = newF;
+    
+    // Atualiza Estado Local
+    const chState = channelStates[ch];
+    if (chState && chState.eq && chState.eq[b.key]) {
+        chState.eq[b.key].f = rawF;
+    }
+
+    // Envia para mesa
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const label = labelMap[b.key] || 'Low';
+    socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: rawF });
+    
+    // Atualiza a barra de info
+    const info = document.getElementById('eqInfo');
+    if (info) {
+        const g = b.filter.gain.value;
+        info.innerText = `${label.toUpperCase()}: ${Math.round(newF)}Hz | ${g.toFixed(1)}dB`;
+    }
+};
+
+window.updateEQFadersUI = function() {
+    // 1. Ganho (Fader Vertical)
+    const container = document.getElementById('eqGainFaderContainer');
+    const fader = document.getElementById('eqFaderInput');
+    const valEl = document.getElementById('eqFaderVal');
+    const labelEl = document.getElementById('eqFaderLabel');
+    
+    // 2. Frequência (Fader Horizontal)
+    const freqContainer = document.getElementById('eqFreqFaderContainer');
+    const freqFader = document.getElementById('eqFreqFaderInput');
+
+    if (!container || !fader || !freqContainer || !freqFader) return;
+
+    if (selectedBandIdx === -1) {
+        // Reset Ganho
+        container.style.opacity = '0.3';
+        container.style.pointerEvents = 'none';
+        if (labelEl) labelEl.innerText = 'GAIN';
+        if (valEl) valEl.innerText = '+0.0';
+        fader.value = 0;
+
+        // Reset Frequência
+        freqContainer.style.opacity = '0.3';
+        freqContainer.style.pointerEvents = 'none';
+        freqFader.value = 72; // 1kHz default
+        return;
+    }
+
+    const b = eqBands[selectedBandIdx];
+    
+    // Ganho
+    const isFixed = b.filter.type === 'highpass' || b.filter.type === 'lowpass';
+    if (isFixed) {
+        container.style.opacity = '0.3';
+        container.style.pointerEvents = 'none';
+        if (valEl) valEl.innerText = '---';
+    } else {
+        container.style.opacity = '1';
+        container.style.pointerEvents = 'auto';
+        const g = b.filter.gain.value;
+        if (valEl) valEl.innerText = (g >= 0 ? '+' : '') + g.toFixed(1);
+        fader.value = Math.round(g * 10);
+    }
+    
+    // Frequência
+    freqContainer.style.opacity = '1';
+    freqContainer.style.pointerEvents = 'auto';
+    const f = b.filter.frequency.value;
+    freqFader.value = freqToRaw(f);
+
+    const labels = ['LOW', 'L-MID', 'H-MID', 'HIGH'];
+    if (labelEl) labelEl.innerText = labels[selectedBandIdx] || 'GAIN';
+
+    // NOVO: Atualiza a barra de informações inferior imediatamente ao selecionar
+    const info = document.getElementById('eqInfo');
+    if (info) {
+        const labelsLong = ['LOW', 'LOW-MID', 'HI-MID', 'HIGH'];
+        const f = b.filter.frequency.value;
+        const g = b.filter.type.includes('pass') ? 0 : b.filter.gain.value;
+        const label = labelsLong[selectedBandIdx] || 'EQ';
+        info.innerText = `${label}: ${Math.round(f)}Hz | ${g.toFixed(1)}dB`;
+    }
 };
