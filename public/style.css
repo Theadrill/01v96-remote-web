@@ -209,8 +209,307 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
 .mt-auto { margin-top: auto; }
 .nav-btn { background: #333; color: #5cacee; border: 1px solid #444; border-radius: 4px; width: 30px; height: 30px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; user-select: none; }
 .nav-btn:active { background: #444; transform: scale(0.9); }
-.hide-mobile { display: flex !important; }
-.show-mobile { display: none !important; }
+/* --- DESKTOP LAYOUT (AirFader Style) --- */
+body.layout-desktop .faders-area {
+    display: flex;
+    flex-direction: row;
+    overflow-x: scroll; /* Força scrollbar visível no Desktop */
+    overflow-y: hidden;
+    padding: 0;
+    gap: 0;
+    justify-content: flex-start;
+    align-items: stretch;
+    height: 100dvh;
+    order: 1;
+    cursor: grab;
+    user-select: none;
+    scrollbar-width: thin; 
+    scrollbar-color: #4a90e2 #1a1a1a;
+}
+
+body.layout-desktop .faders-area.is-grabbing {
+    cursor: grabbing;
+}
+
+/* Barra de Scroll Customizada Inferior */
+body.layout-desktop .faders-area::-webkit-scrollbar {
+    display: block !important;
+    height: 14px;
+}
+
+body.layout-desktop .faders-area::-webkit-scrollbar-track {
+    background: #111;
+    border-top: 1px solid #333;
+}
+
+body.layout-desktop .faders-area::-webkit-scrollbar-thumb {
+    background: #4a90e2; /* Azul elegante */
+    border-radius: 10px;
+    border: 3px solid #111;
+}
+
+body.layout-desktop .faders-area::-webkit-scrollbar-thumb:hover {
+    background: #357abd;
+}
+
+body.layout-desktop .sidebar {
+    width: 200px;
+    background: #1a1a1a;
+    border-left: 1px solid #444;
+    order: 10;
+    padding: 10px;
+    gap: 15px;
+}
+
+.fader-card-desktop {
+    flex: 0 0 clamp(54px, 4vw, 65px);
+    display: flex;
+    flex-direction: column;
+    background: #222;
+    border-right: 1px solid #111;
+    height: 100%;
+    box-sizing: border-box;
+    transition: background 0.4s ease;
+}
+
+.fader-card-desktop.desk-on-bg {
+    background-color: #2d2b1f; /* Amarelo extremamente sutil para canais */
+}
+
+.master-card-desktop.desk-on-bg {
+    background-color: #5d1a1a !important; /* Vermelho sutil exclusivo para o Master */
+}
+
+/* Remover gradiente do card completo no Desktop */
+.fader-card-desktop.has-meter {
+    background-image: none !important;
+}
+
+.fader-card-desktop > * {
+    position: relative;
+    z-index: 2;
+}
+
+.fader-card-desktop:nth-child(8n) {
+    border-right: 4px solid #000;
+}
+
+.master-card-desktop {
+    background: #3d1a1a;
+}
+
+.desk-label {
+    height: 35px;
+    background: #333;
+    color: #999;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #111;
+}
+
+.btn-cue {
+    height: 38px;
+    margin: 4px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #333;
+    color: #888;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+.btn-cue.solo-active {
+    background: #ffc107;
+    color: #000;
+    border-color: #fff;
+}
+
+.btn-cue-placeholder { height: 38px; margin: 4px; }
+
+.desk-ch-name-zone {
+    height: 32px;
+    background: #000;
+    margin: 2px 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #333;
+}
+
+.desk-ch-name {
+    color: #0f0;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-transform: uppercase;
+}
+
+.btn-on-desk {
+    height: 48px;
+    margin: 4px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #333;
+    color: #888;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+.btn-on-desk.on-active {
+    background: #ff4500;
+    color: #fff;
+    border-color: #ffaa80;
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
+}
+
+.desk-db-val {
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    margin: 5px 0;
+    white-space: nowrap;
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 13px;
+    letter-spacing: -1px;
+}
+
+.desk-db-val span:first-child {
+    color: #5cacee;
+    font-weight: bold;
+}
+
+.desk-unit {
+    color: #4682b4;
+    font-size: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: 1px;
+}
+
+.nudge-zone-desk {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+}
+
+.btn-nudge-desk {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #444;
+    background: #333;
+    color: #ccc;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.1s;
+    user-select: none;
+    pointer-events: none; /* Deixa o zone tratar o evento */
+}
+
+.nudge-zone-desk:active .btn-nudge-desk {
+    background: #555;
+    transform: scale(0.9);
+}
+
+.desk-fader-container {
+    flex: 1;
+    display: flex;
+    flex-direction: row; /* Para o meter ficar ao lado */
+    justify-content: center;
+    align-items: center; /* Centraliza fader e meter */
+    position: relative;
+    padding: 0 5px;
+    min-height: 100px;
+}
+
+.desk-meter-wrap {
+    width: 5px;
+    height: 92%;
+    background: #000;
+    margin-left: 2px;
+    border: 1px solid #111;
+    border-radius: 1px;
+    position: relative;
+    overflow: hidden;
+    margin-top: -10px; /* Ajuste para alinhar com o trilho do fader */
+}
+
+.desk-meter-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top, #28a745 0%, #ffc107 70%, #dc3545 100%);
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+}
+
+.desk-fader-container input[type=range] {
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
+    width: 32px;
+    height: 95%;
+    cursor: pointer;
+    outline: none;
+    background: transparent;
+}
+
+/* Fader Thumb Custom for Desktop? (Opcional, mas melhora premium) */
+.desk-fader-container input[type=range]::-webkit-slider-runnable-track { background: transparent; }
+
+.desk-footer-label {
+    height: 25px;
+    background: #111;
+    color: #555;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+body.layout-desktop .sidebar .side-btn {
+    height: 60px;
+    font-size: 14px;
+    border: 1px solid #444;
+    background: #222;
+}
+
+body.layout-desktop .sidebar .btn-config { background: #333; }
+body.layout-desktop .sidebar .btn-outs { background: #1b5e20; }
+body.layout-desktop .sidebar .btn-sync { background: #004d99; }
+
+/* Fixed Master on Desktop */
+body.layout-desktop #master-container {
+    display: flex !important;
+    background: #3d1a1a;
+    flex-shrink: 0;
+    order: 5;
+    border-left: 1px solid #000;
+}
+
+#master-container:empty {
+    display: none !important;
+}
+
+/* Garante que o modal de config de canal respeite a sidebar larga no desktop */
+body.layout-desktop .ch-modal-overlay {
+    right: 200px;
+}
 
 @media screen and (max-width: 800px) {
     .hide-mobile { display: none !important; }

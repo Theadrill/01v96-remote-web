@@ -153,9 +153,7 @@ function nudgeFader(ch, dir) {
     socket.emit('control', { type: typeFader, channel: emitCh, value: nRaw });
 }
 
-function faderInput(e, ch) {
-    if (!e.isTrusted) return;
-    const v = parseInt(e.target.value);
+function commitFaderChange(ch, v) {
     updateUI(ch, v, undefined, undefined);
     
     let typeFader = (ch === 'master') ? 'kStereoFader/kFader' : 'kInputFader/kFader';
@@ -170,3 +168,84 @@ function faderInput(e, ch) {
     const emitCh = (typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b'))) ? parseInt(ch.substring(1)) : (ch === 'master' ? 0 : ch);
     socket.emit('control', { type: typeFader, channel: emitCh, value: v });
 }
+
+function faderInput(e, ch) {
+    if (!e.isTrusted) return;
+    commitFaderChange(ch, parseInt(e.target.value));
+}
+
+function handleWheelFader(e, ch) {
+    if (layoutMode !== 'desktop') return;
+    
+    // Interromper scroll da tela
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Incremento de volume
+    const delta = e.deltaY < 0 ? 10 : -10;
+    
+    let currentVal = 0;
+    const isMaster = ch === 'master';
+    const stateRef = isMaster ? masterState : (typeof ch === 'string' ? (ch.startsWith('m') ? mixesState[ch.substring(1)] : busesState[ch.substring(1)]) : channelStates[ch]);
+    
+    if (stateRef) {
+        if ((musicianMode || technicianMixMode) && typeof ch === 'number') currentVal = stateRef[`aux${activeMix}`] || 0;
+        else currentVal = stateRef.value || 0;
+    }
+    
+    let newVal = currentVal + delta;
+    if (newVal < 0) newVal = 0;
+    if (newVal > 1023) newVal = 1023;
+    
+    commitFaderChange(ch, newVal);
+}
+
+// Bloqueio AGRESSIVO de scroll por roda do mouse no modo Desktop 
+// para priorizar controle de faders e permitir rolagem horizontal apenas por clique-arrasto ou barra
+window.addEventListener('wheel', (e) => {
+    if (layoutMode === 'desktop') {
+        const area = document.getElementById('faders-container');
+        if (area && (area === e.target || area.contains(e.target))) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+}, { passive: false });
+
+// Logica de Arrastar para Scroll (Grab to Scroll) no Desktop
+let isMouseDown = false;
+let startX;
+let scrollLeft;
+
+document.addEventListener('mousedown', (e) => {
+    if (layoutMode !== 'desktop') return;
+    const area = e.target.closest('.faders-area');
+    if (area && !e.target.closest('input') && !e.target.closest('button')) {
+        isMouseDown = true;
+        area.classList.add('is-grabbing');
+        startX = e.pageX - area.offsetLeft;
+        scrollLeft = area.scrollLeft;
+    }
+});
+
+document.addEventListener('mouseleave', () => {
+    isMouseDown = false;
+    const area = document.querySelector('.faders-area');
+    if (area) area.classList.remove('is-grabbing');
+});
+
+document.addEventListener('mouseup', () => {
+    isMouseDown = false;
+    const area = document.querySelector('.faders-area');
+    if (area) area.classList.remove('is-grabbing');
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isMouseDown) return;
+    const area = e.target.closest('.faders-area') || document.querySelector('.faders-area');
+    if (!area) return;
+    e.preventDefault();
+    const x = e.pageX - area.offsetLeft;
+    const walk = (x - startX) * 1.5; // Velocidade do scroll
+    area.scrollLeft = scrollLeft - walk;
+});

@@ -72,13 +72,32 @@ function toggleFullScreen() {
     }
 }
 
+function setLayoutMode(mode) {
+    layoutMode = mode;
+    localStorage.setItem('mixer_layout', mode);
+    document.body.classList.toggle('layout-desktop', mode === 'desktop');
+    updateLayoutButtons();
+    initUI();
+}
+
+function updateLayoutButtons() {
+    const btnMobile = document.getElementById('btnLayoutMobile');
+    const btnDesktop = document.getElementById('btnLayoutDesktop');
+    if (btnMobile && btnDesktop) {
+        btnMobile.style.background = layoutMode === 'mobile' ? '#007bff' : '#555';
+        btnDesktop.style.background = layoutMode === 'desktop' ? '#007bff' : '#555';
+    }
+}
+
 function setOrientation(o) {
     appOrientation = o;
     localStorage.setItem('mixer_orientation', o);
-    if (o === 'horizontal') {
-        document.body.classList.add('layout-horizontal');
-    } else {
-        document.body.classList.remove('layout-horizontal');
+    if (layoutMode !== 'desktop') {
+        if (o === 'horizontal') {
+            document.body.classList.add('layout-horizontal');
+        } else {
+            document.body.classList.remove('layout-horizontal');
+        }
     }
     document.getElementById('configModal').style.display = 'none';
 }
@@ -142,6 +161,7 @@ window.addEventListener('load', updateViewportInfo);
 // Inicialização Global
 window.addEventListener('DOMContentLoaded', () => {
     updateViewportInfo();
+    updateLayoutButtons();
 });
 
 // Controle de Nomes dos Canais

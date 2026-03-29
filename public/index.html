@@ -59,6 +59,7 @@
 
 
     <div class="faders-area" id="faders-container"></div>
+    <div id="master-container" style="display: flex; align-items: stretch; flex-shrink: 0;"></div>
 
     <div class="sidebar">
         <div id="scn" class="color-green font-13-bold mb-20" style="text-align: center; width: 100%; letter-spacing: 1px;">01V96</div>
@@ -132,7 +133,15 @@
             <select id="sout" class="modal-select"></select>
             
             <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
-                <p style="font-size: 12px; color: #888; margin-bottom: 10px;">ORIENTAÇÃO</p>
+                <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">MODO DE VISUALIZAÇÃO</p>
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnLayoutMobile" onclick="setLayoutMode('mobile')" class="btn-connect" style="background:#555;">MOBILE</button>
+                    <button id="btnLayoutDesktop" onclick="setLayoutMode('desktop')" class="btn-connect" style="background:#555;">DESKTOP</button>
+                </div>
+            </div>
+
+            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
+                <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">ORIENTAÇÃO (MOBILE)</p>
                 <div style="display: flex; gap: 10px;">
                     <button onclick="setOrientation('vertical')" class="btn-connect" style="background:#555;">VERTICAL</button>
                     <button onclick="setOrientation('horizontal')" class="btn-connect" style="background:#555;">HORIZONTAL</button>

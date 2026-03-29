@@ -24,7 +24,8 @@ let outsMode = false;
 let technicianMixMode = false;
 let activeMix = 1;
 let tecnicoPassword = '2107'; // Fallback inicial
- // 1-8
+let layoutMode = localStorage.getItem('mixer_layout') || 'mobile';
+document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
 
 const container = document.getElementById('faders-container');
 
@@ -35,15 +36,18 @@ const curve = [
     {r:723,d:-5},{r:823,d:0},{r:1023,d:10}
 ];
 
-function rawToDb(v) { 
-    if(v==0) return "-∞"; 
+function rawToDb(v, withUnit = true, isMaster = false) { 
+    if(v==0) return "-∞" + (withUnit ? " dB" : ""); 
     for (let i=1; i<curve.length; i++) { 
         let p1=curve[i-1], p2=curve[i]; 
         if (v>=p1.r && v<=p2.r) {
-            return (p1.d+(v-p1.r)*((p2.d-p1.d)/(p2.r-p1.r))).toFixed(2)+" dB"; 
+            let dValNum = p1.d+(v-p1.r)*((p2.d-p1.d)/(p2.r-p1.r));
+            if (isMaster) dValNum -= 10; // No MASTER, 1023 (o topo) vira 0dB
+            const dVal = dValNum.toFixed(2);
+            return withUnit ? dVal + " dB" : dVal;
         }
     } 
-    return "0.00 dB"; 
+    return withUnit ? "0.00 dB" : "0.00";
 }
 
 function dbToRaw(db) { 

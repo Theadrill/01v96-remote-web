@@ -1,6 +1,7 @@
 function updateUI(ch, val, onState, soloState) {
+    const isMaster = ch === 'master';
     let stateRef;
-    if (ch === 'master') stateRef = masterState;
+    if (isMaster) stateRef = masterState;
     else if (typeof ch === 'string' && ch.startsWith('m')) stateRef = mixesState[ch.substring(1)];
     else if (typeof ch === 'string' && ch.startsWith('b')) stateRef = busesState[ch.substring(1)];
     else stateRef = channelStates[ch];
@@ -11,7 +12,7 @@ function updateUI(ch, val, onState, soloState) {
         const elF = document.getElementById(`f${ch}`);
         if(elF) elF.value = val;
         const elV = document.getElementById(`v${ch}`);
-        if(elV) elV.innerText = rawToDb(val);
+        if(elV) elV.innerText = rawToDb(val, layoutMode !== 'desktop', isMaster);
         
         // Se no modo músico ou modo técnico editando mix, salvamos no AUX correspondente
         if ((musicianMode || technicianMixMode) && typeof ch === 'number') {
@@ -28,6 +29,10 @@ function updateUI(ch, val, onState, soloState) {
         }
         const elOn = document.getElementById(`on${ch}`);
         if(elOn) elOn.classList.toggle('on-active', onState);
+        
+        // Novo: Subtle yellow background for desktop layout when channel is ON
+        const elCard = document.getElementById(`card${ch}`);
+        if(elCard && layoutMode === 'desktop') elCard.classList.toggle('desk-on-bg', onState);
     }
     if (typeof ch === 'number' && soloState !== undefined && soloState !== null) {
         if(stateRef) stateRef.solo = soloState;
@@ -36,7 +41,61 @@ function updateUI(ch, val, onState, soloState) {
     }
 }
 
+function createDesktopChannelStrip(i, isMaster = false) {
+    const title = isMaster ? "MASTER" : `${i + 1}`;
+    const nameDiv = isMaster ? "MASTER" : "...";
+    
+    let customClass = isMaster ? "master-card-desktop" : "";
+    let onAction = isMaster ? "toggleState('kStereoChannelOn/kChannelOn', 'master')" : `toggleState('kInputChannelOn/kChannelOn', ${i})`;
+    const evtCh = isMaster ? "'master'" : i;
+
+    if ((musicianMode || technicianMixMode) && !isMaster) {
+        onAction = `toggleState('kInputAUX/kAUX${activeMix}On', ${i})`;
+    }
+
+    const configAction = (musicianMode || technicianMixMode) ? "" : `openChannelConfig(event, ${i})`;
+
+    return `
+        <div class="fader-card-desktop ${customClass}" id="card${isMaster ? 'master' : i}">
+            <div class="desk-label">${title}</div>
+            
+            ${(!isMaster && !musicianMode && !technicianMixMode) ? 
+                `<button id="solo${i}" class="btn-cue" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${i})">SOLO</button>` : 
+                `<div class="btn-cue-placeholder"></div>`}
+            
+            <div class="desk-ch-name-zone" onclick="${isMaster ? '' : configAction}">
+                <div id="name${isMaster ? 'master' : i}" class="desk-ch-name">${nameDiv}</div>
+            </div>
+
+            <button id="on${isMaster ? 'master' : i}" class="btn-on-desk" onclick="${onAction}">ON</button>
+
+            <div class="nudge-zone-desk" onpointerdown="startNudge(${evtCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" onclick="event.stopPropagation()">
+                <button class="btn-nudge-desk">+</button>
+            </div>
+
+            <div class="desk-db-val">
+                <span id="v${isMaster ? 'master' : i}">-∞</span>
+            </div>
+
+            <div class="desk-fader-container" onwheel="handleWheelFader(event, ${evtCh})">
+                <input type="range" id="f${isMaster ? 'master' : i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${evtCh})">
+                <div class="desk-meter-wrap">
+                    <div class="desk-meter-bar" id="m${isMaster ? 'master' : i}"></div>
+                </div>
+            </div>
+
+            <div class="nudge-zone-desk" onpointerdown="startNudge(${evtCh}, -1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" onclick="event.stopPropagation()">
+                <button class="btn-nudge-desk">-</button>
+            </div>
+            
+            <div class="desk-footer-label">${title}</div>
+        </div>
+    `;
+}
+
 function createChannelStrip(i, isMaster = false) {
+    if (layoutMode === 'desktop') return createDesktopChannelStrip(i, isMaster);
+
     const title = isMaster ? "STEREO" : `CH ${i + 1}`;
     const nameDiv = isMaster ? "MASTER" : "...";
     
@@ -121,7 +180,7 @@ function createOutputStrip(i, type) {
 }
 
 function initUI() {
-    if (window.resetFaderCache) window.resetFaderCache();
+    if (typeof resetFaderCache === 'function') resetFaderCache();
     let html = '';
     
     const sidebar = document.querySelector('.sidebar');
@@ -207,9 +266,19 @@ function initUI() {
         }
     }
     
-    if (!musicianMode && !technicianMixMode) html += createChannelStrip(0, true);
+    let masterHtml = '';
+    if (!musicianMode && !technicianMixMode) {
+        masterHtml = createChannelStrip(0, true);
+    }
     
-    container.innerHTML = html;
+    const masterContainer = document.getElementById('master-container');
+    if (layoutMode === 'desktop' && !musicianMode && !technicianMixMode) {
+        container.innerHTML = html;
+        if (masterContainer) masterContainer.innerHTML = masterHtml;
+    } else {
+        container.innerHTML = html + masterHtml;
+        if (masterContainer) masterContainer.innerHTML = '';
+    }
     
     // Atualiza os estados visuais
     if (outsMode && !musicianMode && !technicianMixMode) {

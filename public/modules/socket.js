@@ -241,7 +241,10 @@ window.resetFaderCache = () => { faderCardsCache = null; };
 socket.on('meterData', (levels) => {
     if (musicianMode) return; 
 
-    if (!faderCardsCache) faderCardsCache = document.querySelectorAll('.faders-area > .fader-card');
+    if (!faderCardsCache) {
+        // Seleciona cards de ambos os layouts (Mobile/Desktop) e containers (Area/Master)
+        faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container > .fader-card-desktop, #master-container > .fader-card');
+    }
     
     requestAnimationFrame(() => {
         if (outsMode) {
@@ -257,8 +260,13 @@ socket.on('meterData', (levels) => {
                 else levelIdx = 32;                 // Stereo Master
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
-                    if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-                    card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                    const meterBar = card.querySelector('.desk-meter-bar');
+                    if (meterBar) {
+                        meterBar.style.height = `${levels[levelIdx]}%`;
+                    } else {
+                        if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
+                        card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                    }
                 }
             }
         } else {
@@ -271,8 +279,13 @@ socket.on('meterData', (levels) => {
                 if (i >= NUM_CHANNELS) levelIdx = 32; // Stereo Master encostado no fim
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
-                    if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-                    card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                    const meterBar = card.querySelector('.desk-meter-bar');
+                    if (meterBar) {
+                        meterBar.style.height = `${levels[levelIdx]}%`;
+                    } else {
+                        if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
+                        card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                    }
                 }
             }
         }
