@@ -88,31 +88,35 @@ function initEQEngine(ch) {
     let lowMode = 'peaking';
     const lowQRaw = sysexToVal(lowData.q);
     const lowHPFOn = sysexToVal(lowData.hpfOn);
+    // Se q > 40 e hpfOn=0: o estado ainda tem o código de modo do HPF.
+    // Nesse caso o tipo era HPF (que tem gain=0). Replicamos esse comportamento do caminho real-time.
+    const lowWasHPFMode = (lowHPFOn !== 1 && lowQRaw > 40);
     if (lowHPFOn === 1) {
         if (lowQRaw === 44) lowMode = 'highpass';
         else if (lowQRaw === 41) lowMode = 'lowshelf';
         else lowMode = 'peaking';
     }
+    // Q seguro para peaking: códigos de modo (>=41) são ignorados quando HPF está OFF
+    const safeInitLowQ = lowWasHPFMode ? 20 : lowQRaw;
     
     let highMode = 'peaking';
     const highQRaw = sysexToVal(highData.q);
     const highLPFOn = sysexToVal(highData.lpfOn);
+    const highWasLPFMode = (highLPFOn !== 1 && highQRaw > 40);
     if (highLPFOn === 1) {
-        // Códigos para a banda High podem variar, mas seguem o padrão
-        if (highQRaw === 43 || highQRaw === 44) {
-            // Se o Q for 44 e a tela dizer Shelf, usamos shelf
-            // Pelos logs recentes, 44 na High com LPF ON resultou em H.Shelf na mesa
-            highMode = 'highshelf'; 
-        } else if (highQRaw === 42) {
-            highMode = 'highshelf';
-        } else if (highQRaw === 40) {
-            // LPF as vezes é um valor específico
+        if (highQRaw === 43) {
             highMode = 'lowpass';
+        } else if (highQRaw === 42 || highQRaw === 44) {
+            highMode = 'highshelf';
         }
     }
+    // Q seguro para peaking: códigos de modo (>=41) são ignorados quando LPF está OFF
+    const safeInitHighQ = highWasLPFMode ? 20 : highQRaw;
     
-    // Calibração Final: Se o LPF On for 1 e for o canal 24+, na HIGH, costuma ser Shelf o padrão
-    if (highLPFOn === 1 && highMode === 'peaking') highMode = 'highshelf';
+    // Calibração Final: Só força highshelf se lpfOn=1 E o Q for um código de modo (>40).
+    // Se lpfOn=1 mas Q está no range peaking normal (0-40), mantém peaking.
+    // (Evita shelf incorreto em transições de modo onde lpfOn=1 mas Q ainda é peaking)
+    if (highLPFOn === 1 && highMode === 'peaking' && highQRaw > 40) highMode = 'highshelf';
 
     const mapping = [
         { key: 'low', type: lowMode, color: '#ff4d4d', defaultF: 32 }, // 100Hz
@@ -121,19 +125,28 @@ function initEQEngine(ch) {
         { key: 'high', type: highMode, color: '#2196f3', defaultF: 108 } // 8kHz
     ];
 
+    // Usa os Q seguros (clampeados para o range peaking quando HPF/LPF está OFF)
+    const safeQMap = { low: safeInitLowQ, high: safeInitHighQ };
+    // Quando o modo era HPF/LPF mas está OFF: force gain=0 (mesmo comportamento do caminho real-time)
+    const forceZeroGain = { low: lowWasHPFMode, high: highWasLPFMode };
+
     mapping.forEach((m, i) => {
         const filter = eqContext.createBiquadFilter();
         const data = chEq[m.key] || {};
         
         filter.type = m.type;
         filter.frequency.value = rawToFreq(data.f !== undefined ? data.f : m.defaultF);
-        filter.gain.value = rawToGain(data.g);
 
-        // Se estiver em modo corte (HPF/LPF), forçamos o Q a 0.707 (curva plana)
+        // Se estiver em modo corte (HPF/LPF), forçamos o Q a 0.707 e gain a 0
         if (m.type.includes('pass')) {
+            filter.gain.value = 0;
             filter.Q.value = 0.707;
         } else {
-            filter.Q.value = rawToQ(data.q !== undefined ? data.q : 20);
+            // Para low e high usa o Q seguro (não usa código de modo >= 41 no peaking)
+            const safeQ = safeQMap[m.key] !== undefined ? safeQMap[m.key] : (data.q !== undefined ? data.q : 20);
+            filter.Q.value = rawToQ(safeQ !== undefined ? safeQ : 20);
+            // Se o modo era HPF/LPF mas está OFF: gain=0, igual ao caminho real-time (filter vinha de HPF com gain=0)
+            filter.gain.value = forceZeroGain[m.key] ? 0 : rawToGain(data.g);
         }
 
         eqBands.push({ filter, color: m.color, id: i, key: m.key });
@@ -280,7 +293,9 @@ function onEQDown(e) {
 
     eqBands.forEach((b, i) => {
         const bx = fToX(b.filter.frequency.value, rect.width);
-        const by = gToY(b.filter.gain.value, rect.height);
+        // Usa a mesma posição do ponto que o render (filtros de corte ficam em -12dB)
+        const isPassFilter = b.filter.type === 'highpass' || b.filter.type === 'lowpass';
+        const by = isPassFilter ? gToY(-12, rect.height) : gToY(b.filter.gain.value, rect.height);
         if (Math.hypot(bx - px, by - py) < 30) {
             activeBandIdx = i;
             selectedBandIdx = i; 
@@ -489,20 +504,38 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     
     // Sincroniza Tipos de Filtro na UI
     let lMode = 'peaking';
-    if (sysexToVal(eq.low?.hpfOn) === 1) {
+    const lhpfOn = sysexToVal(eq.low?.hpfOn);
+    if (lhpfOn === 1) {
         const lq = sysexToVal(eq.low?.q);
         if (lq === 44) lMode = 'highpass';
         else if (lq === 41) lMode = 'lowshelf';
     }
-    if (eqBands[0]) eqBands[0].filter.type = lMode;
+    if (eqBands[0]) {
+        eqBands[0].filter.type = lMode;
+        // Se HPF/Shelf OFF, garante Q válido para peaking (não usa código de modo >= 41)
+        if (lMode === 'peaking') {
+            const lqRaw = sysexToVal(eq.low?.q);
+            const safeLQ = (lqRaw > 40) ? 20 : (lqRaw ?? 20);
+            eqBands[0].filter.Q.value = rawToQ(safeLQ);
+        }
+    }
 
     let hMode = 'peaking';
-    if (sysexToVal(eq.high?.lpfOn) === 1) {
+    const hlpfOn = sysexToVal(eq.high?.lpfOn);
+    if (hlpfOn === 1) {
         const hq = sysexToVal(eq.high?.q);
         if (hq === 43) hMode = 'lowpass';
-        else if (hq === 42) hMode = 'highshelf';
+        else if (hq === 42 || hq === 44) hMode = 'highshelf';
     }
-    if (eqBands[3]) eqBands[3].filter.type = hMode;
+    if (eqBands[3]) {
+        eqBands[3].filter.type = hMode;
+        // Se LPF/Shelf OFF, garante Q válido para peaking (não usa código de modo >= 41)
+        if (hMode === 'peaking') {
+            const hqRaw = sysexToVal(eq.high?.q);
+            const safeHQ = (hqRaw > 40) ? 20 : (hqRaw ?? 20);
+            eqBands[3].filter.Q.value = rawToQ(safeHQ);
+        }
+    }
 
     // Sincroniza Valores no Gráfico
     if (parts) {
@@ -511,8 +544,14 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
             const label = parts[1].toUpperCase() === 'HI' ? 'HIGH' : parts[1].toUpperCase();
             if (parts[2] === 'F') b.filter.frequency.value = rawToFreq(val);
             if (parts[2] === 'G') b.filter.gain.value = (b.filter.type.includes('pass')) ? 0 : rawToGain(val);
-            if (b.filter.type.includes('pass')) b.filter.Q.value = 0.707;
-            else if (parts[2] === 'Q') b.filter.Q.value = rawToQ(val);
+            if (b.filter.type.includes('pass')) {
+                b.filter.Q.value = 0.707;
+                b.filter.gain.value = 0;
+            } else if (parts[2] === 'Q') {
+                // Só aplica Q se estiver dentro do range peaking (ignora códigos de modo)
+                const safeVal = (val > 40) ? 20 : val;
+                b.filter.Q.value = rawToQ(safeVal);
+            }
 
             const info = document.getElementById('eqInfo');
             if (info) info.innerText = `${label}: ${Math.round(b.filter.frequency.value)}Hz | ${b.filter.type.includes('pass') ? '0.0' : b.filter.gain.value.toFixed(1)}dB`;
@@ -619,7 +658,10 @@ function startEQAnimation() {
         const bubble = document.getElementById('eqBubble');
         eqBands.forEach((b, i) => {
             const bx = fToX(b.filter.frequency.value, w);
-            const by = gToY(b.filter.gain.value, h);
+            // Para filtros de corte (HPF/LPF), posiciona o ponto em -12dB na frequência de corte
+            // (visualmente sobre a curva descendente), não no centro (gain=0)
+            const isPassFilter = b.filter.type === 'highpass' || b.filter.type === 'lowpass';
+            const by = isPassFilter ? gToY(-12, h) : gToY(b.filter.gain.value, h);
             
             // Halo de seleção
             eqCtx.beginPath();

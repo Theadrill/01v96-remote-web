@@ -48,7 +48,80 @@ socket.on('update', (d) => {
                 window.updateEQParam(d.type, d.value, d.mode, d.channel);
             }
         }
+
+        // Suporte a Gate
+        if (d.type.startsWith('kInputGate/')) {
+            const key = d.type.split('/')[1];
+            if (activeConfigChannel === d.channel && typeof updateGateFromSocket === 'function') {
+                updateGateFromSocket(d.channel, key, d.value);
+            } else {
+                // Atualiza apenas o estado sem tocar na UI
+                if (!channelStates[d.channel].gate) channelStates[d.channel].gate = {};
+                const iMap = { 'kGateOn': 'on', 'kGateThreshold': 'thresh', 'kGateAttack': 'attack', 'kGateRange': 'range', 'kGateHold': 'hold', 'kGateDecay': 'decay' };
+                const ik = iMap[key];
+                if (ik) channelStates[d.channel].gate[ik] = (key === 'kGateOn' ? !!d.value : d.value);
+            }
+        }
+
+        // Suporte a Compressor
+        if (d.type.startsWith('kInputComp/')) {
+            const key = d.type.split('/')[1];
+            if (activeConfigChannel === d.channel && typeof updateCompFromSocket === 'function') {
+                updateCompFromSocket(d.channel, key, d.value);
+            } else {
+                // Atualiza apenas o estado sem tocar na UI
+                if (!channelStates[d.channel].comp) channelStates[d.channel].comp = {};
+                const iMap = { 'kCompOn': 'on', 'kCompThreshold': 'thresh', 'kCompRatio': 'ratio', 'kCompAttack': 'attack', 'kCompRelease': 'release', 'kCompGain': 'gain', 'kCompKnee': 'knee' };
+                const ik = iMap[key];
+                if (ik) channelStates[d.channel].comp[ik] = (key === 'kCompOn' ? !!d.value : d.value);
+            }
+        }
     }
+});
+
+// Recebe o estado completo do Dynamics para o canal solicitado
+socket.on('dynamicsState', (data) => {
+    const { channel, gate, comp } = data;
+
+    // Salva sempre no estado local
+    if (channelStates[channel]) {
+        if (gate) channelStates[channel].gate = { ...channelStates[channel].gate, ...gate };
+        if (comp) channelStates[channel].comp = { ...channelStates[channel].comp, ...comp };
+    }
+
+    // Só atualiza a UI se o canal ainda estiver aberto
+    if (channel !== activeConfigChannel) return;
+
+    // Atualiza Gate
+    if (gate && typeof updateGateFromSocket === 'function') {
+        const gateKeyMap = {
+            on: 'kGateOn', thresh: 'kGateThreshold', attack: 'kGateAttack',
+            range: 'kGateRange', hold: 'kGateHold', decay: 'kGateDecay'
+        };
+        for (const [stateKey, midiKey] of Object.entries(gateKeyMap)) {
+            if (gate[stateKey] !== undefined) {
+                updateGateFromSocket(channel, midiKey, gate[stateKey]);
+            }
+        }
+    }
+
+    // Atualiza Compressor
+    if (comp && typeof updateCompFromSocket === 'function') {
+        const compKeyMap = {
+            on: 'kCompOn', thresh: 'kCompThreshold', ratio: 'kCompRatio',
+            attack: 'kCompAttack', release: 'kCompRelease', gain: 'kCompGain', knee: 'kCompKnee'
+        };
+        for (const [stateKey, midiKey] of Object.entries(compKeyMap)) {
+            if (comp[stateKey] !== undefined) {
+                updateCompFromSocket(channel, midiKey, comp[stateKey]);
+            }
+        }
+    }
+});
+
+// LOGICA DE DEBUG - permanecida para compatibilidade residual
+socket.on('dynamicsDebugLog', (data) => {
+    console.log(`%c[DEBUG DYNAMICS] Resposta legada:`, 'color: gray; font-size: 11px;');
 });
 
 socket.on('updateName', (d) => {
@@ -204,4 +277,18 @@ socket.on('meterData', (levels) => {
             }
         }
     });
+
+    // --- Atualização em tempo real das meters internas de Gate/Comp se o modal estiver aberto ---
+    if (activeConfigChannel !== null && activeConfigChannel < levels.length) {
+        const inputLevel = levels[activeConfigChannel];
+        const gateMeter = document.getElementById('gateMeter');
+        const compMeter = document.getElementById('compMeter');
+        
+        if (gateMeter) {
+            gateMeter.style.width = `${inputLevel}%`;
+        }
+        if (compMeter) {
+            compMeter.style.width = `${inputLevel}%`;
+        }
+    }
 });

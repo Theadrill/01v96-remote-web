@@ -863,11 +863,11 @@ body.is-portrait .dyn-box {
 
 .dyn-meter-fill {
     position: absolute;
-    right: 0;
+    left: 0;
     top: 0;
     height: 100%;
-    width: 0%; /* 0 a 100% de redução */
-    background: linear-gradient(to left, #f33, #fb0);
+    width: 0%;
+    background: linear-gradient(to right, #28a745 0%, #ffc107 75%, #dc3545 100%);
     transition: width 0.05s linear;
 }
 

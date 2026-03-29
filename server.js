@@ -75,11 +75,13 @@ let linhaBuscaAtiva = false;
 let lastActivityTime = 0; // Timestamp da última mensagem recebida da mesa
 let isSyncing = false; // Flag para evitar múltiplas sincronias simultâneas
 let isFullySynced = false; // Flag para liberar os meters apenas após carga total
+let hasSyncedNamesThisSession = false; // Flag para garantir que o server busque na mesa pelo menos 1 vez por boot
 
 process.title = "01V96-BRIDGE-SERVER";
 
 app.use(express.static('public'));
 const configFile = path.join(__dirname, 'config.json');
+const namesFile = path.join(__dirname, 'names.json');
 
 
 // --- LÓGICA DA SYSTEM TRAY ---
@@ -155,14 +157,50 @@ function atualizarMenuTray() {
 // --- FUNÇÕES DE APOIO E BUSCA ---
 
 function loadConfig() {
+    let config = { inIdx: null, outIdx: null, "loopmidi-monitor": false };
     if (fs.existsSync(configFile)) {
-        try { return JSON.parse(fs.readFileSync(configFile, 'utf8')); } catch (err) {}
+        try { 
+            const loaded = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+            config = { ...config, ...loaded };
+        } catch (err) {}
     }
-    return { inIdx: null, outIdx: null };
+    return config;
 }
 
 function saveConfig(configData) {
     try { fs.writeFileSync(configFile, JSON.stringify(configData, null, 2)); } catch (err) {}
+}
+
+function loadNames() {
+    if (fs.existsSync(namesFile)) {
+        try {
+            const names = JSON.parse(fs.readFileSync(namesFile, 'utf8'));
+            for (let i = 0; i < 32; i++) {
+                if (names[i] !== undefined) {
+                    stateManager.setChannelName(parseInt(i), names[i]);
+                }
+            }
+            console.log("✅ [NAMES] Nomes carregados do arquivo names.json");
+            return true;
+        } catch (err) {
+            console.error("❌ [NAMES] Erro ao carregar names.json:", err);
+        }
+    }
+    return false;
+}
+
+function saveNames() {
+    const s = stateManager.getState();
+    const names = {};
+    for (let i = 0; i < 32; i++) {
+        names[i] = s.channels[i].name;
+    }
+    try {
+        fs.writeFileSync(namesFile, JSON.stringify(names, null, 2));
+        console.log("💾 [NAMES] Nomes salvos com sucesso em names.json");
+    } catch (err) {
+        console.error("❌ [NAMES] Erro ao salvar nomes:", err);
+    }
 }
 
 function iniciarBuscaAutomatica() {
@@ -183,8 +221,11 @@ function iniciarBuscaAutomatica() {
         }
 
         const horaAtual = new Date().toLocaleTimeString('pt-BR');
-        
-        process.stdout.write(`\r[${horaAtual}] 🔍 Buscando Yamaha 01V96 na porta USB... \x1b[K`);
+        const config = loadConfig();
+        const searchMonitor = config["loopmidi-monitor"];
+
+        const msg = searchMonitor ? '🔍 Buscando portas com "monitor" no nome...' : '🔍 Buscando Yamaha 01V96 na porta USB...';
+        process.stdout.write(`\r[${horaAtual}] ${msg} \x1b[K`);
         linhaBuscaAtiva = true;
 
         const portas = midiEngine.getAvailablePorts();
@@ -194,36 +235,47 @@ function iniciarBuscaAutomatica() {
         let foundInIdx = -1;
         let foundOutIdx = -1;
 
-        const hasYamaha = (port) => {
+        const matchesCriteria = (port) => {
             const name = port.name || port;
             if (!name) return false;
             const lower = String(name).toLowerCase();
-            return lower.includes('yamaha') || lower.includes('01v96') || lower.includes('01v');
+            if (searchMonitor) {
+                return lower.includes('monitor');
+            }
+            // Critério específico para Yamaha física: deve ter 'yamaha' e terminar com '-1' (ou conter '-1')
+            return lower.includes('yamaha') && lower.includes('-1');
         };
 
         for (let i = 0; i < inputs.length; i++) {
-            if (hasYamaha(inputs[i])) { foundInIdx = i; break; }
+            if (matchesCriteria(inputs[i])) { foundInIdx = i; break; }
         }
 
         for (let i = 0; i < outputs.length; i++) {
-            if (hasYamaha(outputs[i])) { foundOutIdx = i; break; }
+            if (matchesCriteria(outputs[i])) { foundOutIdx = i; break; }
         }
 
         if (foundInIdx !== -1 && foundOutIdx !== -1) {
             process.stdout.write("\n"); 
             linhaBuscaAtiva = false;
             
-            console.log(`[${horaAtual}] 🎯 Mesa encontrada! (In: ${foundInIdx}, Out: ${foundOutIdx}). Conectando...`);
+            const targetName = searchMonitor ? "loopMIDI (Monitor)" : "Yamaha 01V96";
+            console.log(`[${horaAtual}] 🎯 ${targetName} encontrada! (In: ${foundInIdx}, Out: ${foundOutIdx}). Conectando...`);
             
             clearInterval(buscaInterval); 
-            saveConfig({ inIdx: foundInIdx, outIdx: foundOutIdx });
+            // Atualizamos o config mantendo o flag de monitor
+            config.inIdx = foundInIdx;
+            config.outIdx = foundOutIdx;
+            saveConfig(config);
             executarConexao(foundInIdx, foundOutIdx);
         }
     }, 1000); 
 }
 
 function executarConexao(inIdx, outIdx, targetSocket = null) {
-    // --- O PORTEIRO: Verifica se a porta solicitada (pelo radar ou pela WEB) é realmente uma Yamaha ---
+    const config = loadConfig();
+    const searchMonitor = config["loopmidi-monitor"];
+    
+    // --- O PORTEIRO: Verifica se a porta solicitada (pelo radar ou pela WEB) corresponde ao equipamento esperado ---
     const portas = midiEngine.getAvailablePorts();
     const inputs = portas.inputs || portas; 
     const outputs = portas.outputs || portas;
@@ -234,16 +286,20 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
     if (inName && inName.name) inName = inName.name;
     if (outName && outName.name) outName = outName.name;
 
-    const hasYamaha = (name) => {
+    const matchesCriteria = (name) => {
         if (!name) return false;
         const lower = String(name).toLowerCase();
-        return lower.includes('yamaha') || lower.includes('01v96') || lower.includes('01v');
+        if (searchMonitor) {
+            return lower.includes('monitor');
+        }
+        // Critério específico para Yamaha física: deve ter 'yamaha' e terminar com '-1' (ou conter '-1')
+        return lower.includes('yamaha') && lower.includes('-1');
     };
 
-    if (!hasYamaha(inName) || !hasYamaha(outName)) {
+    if (!matchesCriteria(inName) || !matchesCriteria(outName)) {
         if (linhaBuscaAtiva) { process.stdout.write("\n"); linhaBuscaAtiva = false; }
-        console.log(`🚫 Conexão web bloqueada: A porta [${inName || 'Desconhecida'}] não é uma Yamaha.`);
-        return { success: false, error: "Equipamento não é uma Yamaha 01V96." };
+        console.log(`🚫 Conexão bloqueada: A porta [${inName || 'Desconhecida'}] não corresponde aos critérios (${searchMonitor ? 'Monitor' : 'Yamaha'}).`);
+        return { success: false, error: searchMonitor ? "A porta não contém 'monitor' no nome." : "Equipamento não é uma Yamaha 01V96." };
     }
     // ------------------------------------------------------------------------------------------------
 
@@ -312,7 +368,7 @@ function handleDisconnection(retry = true) {
     }
 }
 
-async function triggerSync(targetSocket = null) {
+async function triggerSync(targetSocket = null, forceNames = false) {
     if (!isConnected || isSyncing) return;
     isSyncing = true;
     isFullySynced = false; // Reseta a flag para pausar meters
@@ -356,6 +412,21 @@ async function triggerSync(targetSocket = null) {
                 if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, 35));
             }
 
+            // Sincroniza Dynamics (Gate e Compressor)
+            const gateParamsSync = ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'];
+            for (const p of gateParamsSync) {
+                const req = protocol.buildRequest(`kInputGate/${p}`, i);
+                if (req) midiEngine.send(req);
+                await new Promise(r => setTimeout(r, 35));
+            }
+
+            const compParamsSync = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
+            for (const p of compParamsSync) {
+                const req = protocol.buildRequest(`kInputComp/${p}`, i);
+                if (req) midiEngine.send(req);
+                await new Promise(r => setTimeout(r, 35));
+            }
+
             // Pausa estratégica a cada 8 canais para não sobrecarregar (Buffer Breath)
             if ((i + 1) % 8 === 0) {
                 process.stdout.write("|");
@@ -373,6 +444,7 @@ async function triggerSync(targetSocket = null) {
         }
 
         await new Promise(r => setTimeout(r, 600)); 
+        
         if (targetSocket) {
             targetSocket.emit('sync', stateManager.getState());
         } else {
@@ -380,26 +452,34 @@ async function triggerSync(targetSocket = null) {
         }
         console.log("✅ Sincronização de parâmetros concluída!");
 
-        console.log("📝 Iniciando busca de nomes (Processo Lento - 10 letras por CH)...");
-        await new Promise(r => setTimeout(r, 2000)); // Pausa maior antes de começar os nomes
+        // O server SEMPRE busca os nomes na mesa pelo menos uma vez por inicialização (session)
+        // para garantir que o JSON esteja atualizado com a mesa física.
+        // Os clients seguintes usarão o que já estiver na memória (atualizado pelo primeiro sync ou carregado do JSON).
+        
+        if (forceNames || !hasSyncedNamesThisSession) {
+            console.log("📝 [SYNC] Iniciando busca obrigatória de nomes na mesa (1 vez por boot)...");
+            await new Promise(r => setTimeout(r, 2000)); 
 
-        for (let i = 0; i < 32; i++) {
-            // Buscamos apenas os primeiros 10 caracteres (a mesa exibe 8 no LCD)
-            // Aumentamos o delay para 40ms para garantir que o Driver do Windows (WinMM) não engasgue
-            for (let c = 0; c < 10; c++) {
-                const nameReq = protocol.buildNameRequest(i, c);
-                if (nameReq) midiEngine.send(nameReq);
-                await new Promise(r => setTimeout(r, 40)); 
+            for (let i = 0; i < 32; i++) {
+                for (let c = 0; c < 10; c++) {
+                    const nameReq = protocol.buildNameRequest(i, c);
+                    if (nameReq) midiEngine.send(nameReq);
+                    await new Promise(r => setTimeout(r, 40)); 
+                }
+                
+                if (i % 2 === 0) {
+                    process.stdout.write(".");
+                    await new Promise(r => setTimeout(r, 200)); 
+                }
             }
-            
-            // Pausa estratégica a cada 2 canais para esvaziar o buffer do Driver de MIDI
-            if (i % 2 === 0) {
-                process.stdout.write(".");
-                await new Promise(r => setTimeout(r, 200)); 
-            }
+            console.log("\n✅ [SYNC] Carregamento de nomes via MIDI concluído!");
+            hasSyncedNamesThisSession = true; // Marca que o servidor já está atualizado com a mesa física
+            saveNames(); // Salva os novos nomes no JSON
+        } else {
+            console.log("⏭️ [SYNC] Nomes já sincronizados nesta sessão. Ignorando busca lenta via MIDI.");
         }
-        console.log("\n✅ Carregamento de nomes concluído!");
-        isFullySynced = true; // Libera o processamento de meters
+
+        isFullySynced = true; 
         console.log("🚀 Meters liberados e sincronizados!");
 
     } finally {
@@ -426,13 +506,20 @@ io.on('connection', (socket) => {
             return;
         }
 
-        saveConfig({ inIdx: data.inIdx, outIdx: data.outIdx });
+        config.inIdx = data.inIdx;
+        config.outIdx = data.outIdx;
+        saveConfig(config);
         // Se a web pedir para conectar, passa pelo mesmo porteiro!
         const result = executarConexao(data.inIdx, data.outIdx, socket);
         socket.emit('connectResult', result);
     });
 
-    socket.on('forceSync', () => triggerSync()); // Force sync continua global
+    socket.on('forceSync', () => triggerSync(null, true)); // Agora forceSync também força nomes
+    
+    socket.on('refreshNames', () => {
+        console.log("🔄 Solicitação manual de atualização de nomes...");
+        triggerSync(null, true);
+    });
     
     socket.on('toggleDemo', (data) => {
         const config = loadConfig();
@@ -472,6 +559,38 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('requestDynamics', async (data) => {
+        const { channel } = data;
+        if (channel === undefined || !isConnected) return;
+        
+        console.log(`📡 [SYNC] Requisitando Dynamics para o Canal ${channel + 1}...`);
+        
+        const gateParams = ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'];
+        for (const p of gateParams) {
+            const req = protocol.buildRequest(`kInputGate/${p}`, channel);
+            if (req) midiEngine.send(req);
+            await new Promise(r => setTimeout(r, 30));
+        }
+
+        const compParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
+        for (const p of compParams) {
+            const req = protocol.buildRequest(`kInputComp/${p}`, channel);
+            if (req) midiEngine.send(req);
+            await new Promise(r => setTimeout(r, 30));
+        }
+
+        // Aguarda a mesa devolver todas as respostas (buffer extra para MIDI serial)
+        await new Promise(r => setTimeout(r, 250));
+        
+        const currentState = stateManager.getState().channels[channel];
+        // Responde APENAS ao socket que pediu (evita race condition com outros clients)
+        socket.emit('dynamicsState', {
+            channel,
+            gate: currentState.gate,
+            comp: currentState.comp
+        });
+    });
+
     socket.on('control', (data) => {
         // Bloqueio Total Offline (COMENTADO PARA DEBUG)
         // if (!isConnected) return;
@@ -483,8 +602,12 @@ io.on('connection', (socket) => {
         const isBinary = data.type.includes('On') || data.type.includes('Solo');
         let converter = isBinary ? protocol.CONVERTERS.onToBytes : protocol.CONVERTERS.faderToBytes;
         
-        // Se for EQ Gain (termina em G) ou Attenuator, usa conversor de assinado (28-bit)
-        if (data.type.toLowerCase().includes('att') || (data.type.includes('kInputEQ/') && data.type.endsWith('G'))) {
+        // Se for EQ Gain (termina em G), Gains em geral, Attenuator ou Dynamics (Threshold/Range), usa conversor de assinado (28-bit)
+        if (data.type.toLowerCase().includes('att') || 
+            (data.type.includes('EQ/') && data.type.endsWith('G')) ||
+            data.type.includes('Gain') ||
+            data.type.includes('Threshold') ||
+            data.type.includes('Range')) {
             converter = protocol.CONVERTERS.signedToBytes;
         }
 
@@ -522,12 +645,8 @@ server.listen(PORT, '0.0.0.0', () => {
         console.log("ℹ️ [INFO] Modo Demo desativado. Aguardando conexão física com Yamaha...");
     }
 
-    if (config.inIdx !== null && config.outIdx !== null) {
-        setTimeout(() => {
-            console.log("🔌 Tentando reconexão automática com última porta salva...");
-            executarConexao(config.inIdx, config.outIdx);
-        }, 1000);
-    } else {
-        setTimeout(() => iniciarBuscaAutomatica(), 2000);
-    }
+    loadNames(); // Carrega nomes do arquivo na inicialização do servidor
+    
+    // Sempre iniciamos pela busca automática para respeitar a regra do loopmidi-monitor
+    setTimeout(() => iniciarBuscaAutomatica(), 1500);
 });

@@ -1,9 +1,28 @@
 const midi = require('midi');
+const fs = require('fs');
+const path = require('path');
 const protocol = require('./protocol');
 
 // Deixamos as variáveis globais, mas sem instanciar o 'new' ainda
 let input = null;
 let output = null;
+
+const filterFile = path.join(__dirname, '../filter.json');
+let logFilters = [];
+
+function loadFilters() {
+    try {
+        if (fs.existsSync(filterFile)) {
+            const data = JSON.parse(fs.readFileSync(filterFile, 'utf8'));
+            logFilters = data.prefixes || [];
+        }
+    } catch (e) {
+        console.error("❌ Erro ao carregar filter.json:", e.message);
+    }
+}
+
+// Carrega na primeira vez
+loadFilters();
 
 function getAvailablePorts() {
     const inputs = [];
@@ -35,6 +54,9 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         if (input) { try { input.closePort(); } catch(e){} }
         if (output) { try { output.closePort(); } catch(e){} }
 
+        // Recarrega os filtros do arquivo a cada conexão
+        loadFilters();
+
         // Criamos as instâncias NO MOMENTO exato da conexão
         input = new midi.Input();
         output = new midi.Output();
@@ -57,21 +79,33 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
                 
                 if (translated) {
                     onMessageCallback(translated);
-                } else {
-                    // Filtro para focarmos apenas no que NÃO catalogamos ainda
-                    // Vamos ignorar tbm os heartbeats conhecidos [F0, 43, 10, 3E, 0D, 7F, F7]
-                    const hex = Buffer.from(message).toString('hex').toUpperCase();
-                    const isHearbeat = (hex === 'F043103E0D7FF7');
-                    const isYamaha = (message[0] === 0xF0 && message[1] === 0x43);
-                    
-                    if (!isHearbeat && isYamaha) {
-                        console.log(`🔍 [MIDI RAW DESCONHECIDO] -> ${hex}`);
-                    }
+                }
+
+                // Log RAW para debugging solicitado pelo usuário (mostra TUDO que for Yamaha)
+                const hex = Buffer.from(message).toString('hex').toUpperCase();
+                const isHeartbeat = (hex === 'F043103E0D7FF7');
+                const isMeter = (message[4] === 0x15 || message[4] === 0x0D || message[4] === 0x1A || message[4] === 0x7F) && (message[5] === 0x21 || message[5] === 0x20);
+                
+                // Verifica na lista de filtros dinâmicos
+                const isNoise = logFilters.some(prefix => hex.startsWith(prefix));
+
+                if (!isHeartbeat && !isMeter && !isNoise) {
+                    console.log(`📥 [MIDI IN RAW] -> ${hex}`);
+                }
+                
+                // DIAGNÓSTICO: log detalhado apenas para Element 30 (Gate) e 31 (Comp)
+                const elem = message[6];
+                if (elem === 30 || elem === 31) {
+                    const param = message[7];
+                    const ch = message[8];
+                    const dataBytes = Array.from(message.slice(9, -1));
+                    const label = elem === 30 ? 'GATE' : 'COMP';
+                    console.log(`🔎 [${label}] Element=${elem} Param(idx)=${param} Ch=${ch+1} DataBytes=[${dataBytes}]`);
                 }
             }
         });
 
-        console.log(`✅ Portas MIDI Vinculadas com Sucesso.`);
+        console.log(`✅ Portas MIDI Vinculadas com Sucesso. [Filtros ativos: ${logFilters.length}]`);
         return { success: true, inName: input.getPortName(parseInt(inputIdx)) };
     } catch (err) {
         console.error("Erro fatal ao conectar MIDI:", err);

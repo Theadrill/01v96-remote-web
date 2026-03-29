@@ -1,4 +1,5 @@
 function renderDynamics(ch) {
+
     const body = document.querySelector('.ch-modal-body');
     
     // Configura o contêiner principal para Dynamics
@@ -19,5 +20,10 @@ function renderDynamics(ch) {
 
     if (typeof renderCompressor === 'function') {
         renderCompressor(container, ch);
+    }
+    
+    // LOGICA DE DEBUG RESTAURADA: Pede as dinâmicas apenas ao abrir a tela
+    if (typeof socket !== 'undefined' && socket) {
+        socket.emit('requestDynamics', { channel: ch });
     }
 }

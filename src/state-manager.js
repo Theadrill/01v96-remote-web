@@ -17,6 +17,8 @@ for (let i = 0; i < 32; i++) {
         att: 0,
         nameChars: Array(16).fill(' '), // 16 espaços para as letras
         name: `CH ${i+1}`,
+        gate: { on: false, thresh: -26, range: -60, attack: 0, hold: 20, decay: 50 },
+        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
         eq: {
             on: false,
             mode: 0,
@@ -96,6 +98,29 @@ function updateState(type, channel, value) {
             }
         }
     }
+
+    // Suporte a Gate
+    if (type.startsWith('kInputGate/')) {
+        const key = type.split('/')[1];
+        if (key === 'kGateOn') state.channels[channel].gate.on = !!value;
+        if (key === 'kGateThreshold') state.channels[channel].gate.thresh = value;
+        if (key === 'kGateAttack') state.channels[channel].gate.attack = value;
+        if (key === 'kGateRange') state.channels[channel].gate.range = value;
+        if (key === 'kGateHold') state.channels[channel].gate.hold = value;
+        if (key === 'kGateDecay') state.channels[channel].gate.decay = value;
+    }
+
+    // Suporte a Compressor
+    if (type.startsWith('kInputComp/')) {
+        const key = type.split('/')[1];
+        if (key === 'kCompOn') state.channels[channel].comp.on = !!value;
+        if (key === 'kCompThreshold') state.channels[channel].comp.thresh = value;
+        if (key === 'kCompRatio') state.channels[channel].comp.ratio = value;
+        if (key === 'kCompAttack') state.channels[channel].comp.attack = value;
+        if (key === 'kCompRelease') state.channels[channel].comp.release = value;
+        if (key === 'kCompGain') state.channels[channel].comp.gain = value;
+        if (key === 'kCompKnee') state.channels[channel].comp.knee = value;
+    }
 }
 
 // Junta a letrinha nova com as outras e forma o nome do Canal
@@ -103,6 +128,12 @@ function updateChannelNameChar(channel, charIndex, char) {
     if (!state.channels[channel]) return;
     state.channels[channel].nameChars[charIndex] = char;
     state.channels[channel].name = state.channels[channel].nameChars.join('').trim();
+}
+
+function setChannelName(channel, name) {
+    if (!state.channels[channel]) return;
+    state.channels[channel].name = name;
+    state.channels[channel].nameChars = name.padEnd(16, ' ').split('');
 }
 
 function updateSceneChar(index, char) {
@@ -118,4 +149,11 @@ function getState() {
     return state;
 }
 
-module.exports = { updateState, updateChannelNameChar, updateSceneChar, getFullSceneName, getState };
+module.exports = { 
+    updateState, 
+    updateChannelNameChar, 
+    setChannelName,
+    updateSceneChar, 
+    getFullSceneName, 
+    getState 
+};

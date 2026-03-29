@@ -3,20 +3,21 @@ const { COMMAND_BYTES } = require('./dictionary');
 const CONVERTERS = {
   faderToBytes: (value) => [0, 0, (value >> 7) & 0x07, value & 0x7F],
   bytesToFader: (bytes) => {
-      const len = bytes.length;
-      if (len >= 4) return (bytes[len-4] << 21) | (bytes[len-3] << 14) | (bytes[len-2] << 7) | bytes[len-1];
-      if (len === 2) return (bytes[0] << 7) | bytes[1];
-      return 0;
+      let val = 0;
+      for (let i = 0; i < bytes.length; i++) {
+          val = (val << 7) | bytes[i];
+      }
+      return val;
   },
   bytesToSigned: (bytes) => {
-      const len = bytes.length;
       let val = 0;
-      if (len >= 4) val = (bytes[len-4] << 21) | (bytes[len-3] << 14) | (bytes[len-2] << 7) | bytes[len-1];
-      else if (len === 2) val = (bytes[0] << 7) | bytes[1];
+      for (let i = 0; i < bytes.length; i++) {
+          val = (val << 7) | bytes[i];
+      }
       
-      // Sign extension for 28-bit (if 4 bytes) or 14-bit (if 2 bytes)
-      const signBit = (len >= 4) ? 0x08000000 : 0x2000;
-      const mask = (len >= 4) ? 0x0FFFFFFF : 0x3FFF;
+      const numBits = bytes.length * 7;
+      const signBit = 1 << (numBits - 1);
+      const mask = (1 << numBits) - 1;
       if (val & signBit) val -= (mask + 1);
       return val;
   },
@@ -30,6 +31,8 @@ const CONVERTERS = {
       if (v < 0) v += 0x4000;
       return [(v >> 7) & 0x7F, v & 0x7F];
   },
+  dynOnToBytes: (isOn) => [0, 0, 0, isOn ? 0 : 1],
+  bytesToDynOn: (bytes) => (bytes[bytes.length - 1] === 0),
   onToBytes: (isOn) => [0, 0, 0, isOn ? 1 : 0],
   bytesToOn: (bytes) => !!bytes[bytes.length - 1],
   bytesToChar: (bytes) => String.fromCharCode(bytes[bytes.length - 1] || 32)
@@ -103,8 +106,34 @@ function parseIncoming(message) {
           const converter = (key.endsWith('G')) ? CONVERTERS.bytesToSigned : CONVERTERS.bytesToFader;
           // Channel byte usually already carries the shift if it's 0-31, but some mixers use element shift.
           // For now, we trust the channel byte message[8].
-          return { type: `kInputEQ/${key}`, channel, value: converter(dataBytes) };
-      }
+        return { type: `kInputEQ/${key}`, channel, value: converter(dataBytes) };
+    }
+
+    // Input GATE (Element 30)
+    if (element === 30) {
+        const gateKeys = [
+            'kGateOn', 'kGateLink', 'kGateKeyIn', 'kGateKeyAUX', 'kGateKeyCh',
+            'kGateType', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'
+        ];
+        const key = gateKeys[parameter];
+        let converter = CONVERTERS.bytesToFader;
+        if (key === 'kGateThreshold' || key === 'kGateRange') converter = CONVERTERS.bytesToSigned;
+        if (key === 'kGateOn' || key === 'kGateLink') converter = CONVERTERS.bytesToOn;
+        return { type: `kInputGate/${key}`, channel, value: converter(dataBytes) };
+    }
+
+    // Input Comp (Element 31)
+    if (element === 31) {
+        const compKeys = [
+            'kCompLocComp', 'kCompOn', 'kCompLink', 'kCompType',
+            'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'
+        ];
+        const key = compKeys[parameter];
+        let converter = CONVERTERS.bytesToFader;
+        if (key === 'kCompThreshold') converter = CONVERTERS.bytesToSigned;
+        if (key === 'kCompOn' || key === 'kCompLink') converter = CONVERTERS.bytesToOn;
+        return { type: `kInputComp/${key}`, channel, value: converter(dataBytes) };
+    }
 
       // Input Faders / On / Solo / Name / Attenuator etc
       if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
