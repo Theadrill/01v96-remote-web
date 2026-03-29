@@ -21,7 +21,10 @@
   "dependencies": {
     "express": "^5.2.1",
     "midi": "^2.0.0",
+    "node-global-key-listener": "^0.3.0",
+    "screenshot-desktop": "^1.15.3",
     "socket.io": "^4.8.3",
-    "systray2": "^2.1.4"
+    "systray2": "^2.1.4",
+    "uiohook-napi": "^1.5.5"
   }
 }

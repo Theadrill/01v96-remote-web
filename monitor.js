@@ -149,15 +149,28 @@ function toHex(msg) {
 }
 
 function isMeterData(msg) {
-    // Meter SysEx: F0 43 10 3E xx 21 00 00/05 ...
+    // Meter RESPONSE: F0 43 10 3E xx 21 00 00/05 ...
     return msg.length >= 8 && msg[0] === 0xF0 && msg[1] === 0x43
         && msg[3] === 0x3E && msg[5] === 0x21;
+}
+
+function isMeterRequest(msg) {
+    // Meter REQUEST: F0 43 30 3E xx 20/21 00 00 00 00 1F F7
+    // Byte[2]=0x30 = request, Byte[5]=0x20 ou 0x21 = meter group
+    return msg.length >= 8 && msg[0] === 0xF0 && msg[1] === 0x43
+        && msg[2] === 0x30 && msg[3] === 0x3E
+        && (msg[5] === 0x20 || msg[5] === 0x21);
 }
 
 function isHeartbeat(msg) {
     // Heartbeat: F0 43 10 3E xx 7F F7
     return msg.length === 7 && msg[0] === 0xF0 && msg[1] === 0x43
         && msg[5] === 0x7F && msg[6] === 0xF7;
+}
+
+// Filtro geral: tudo que é "ruído" repetitivo e não precisa aparecer no log
+function isNoise(msg) {
+    return isMeterData(msg) || isMeterRequest(msg) || isHeartbeat(msg);
 }
 
 const C = {
@@ -176,9 +189,8 @@ yamahaIn.on('message', (deltaTime, message) => {
     forwardToMonitor(message);
     y2s++;
 
-    // Log: silenciar meters e heartbeats
-    if (isMeterData(message)) { meterCount++; return; }
-    if (isHeartbeat(message)) { heartbeatCount++; return; }
+    // Log: silenciar todo ruído repetitivo
+    if (isNoise(message)) { meterCount++; return; }
 
     const ts = new Date().toLocaleTimeString();
     console.log(`${C.green}[${ts}] 🎹 Y→S (${message.length}b): ${toHex(message)}${C.reset}`);
@@ -191,15 +203,18 @@ yamahaIn.on('message', (deltaTime, message) => {
 monitorIn.on('message', (deltaTime, message) => {
     if (message[0] === 0xFE) return;
 
-    // Descartar loopback (meter data e heartbeats que nós mesmos enviamos)
+    // Descartar loopback puro (meter DATA e heartbeats são ecos nossos)
     if (isMeterData(message) || isHeartbeat(message)) {
         loopbackCount++;
         return;
     }
 
-    // Se chegou aqui, é mensagem genuína do Studio Manager
+    // Mensagem genuína: encaminhar à Yamaha
     forwardToYamaha(message);
     s2y++;
+
+    // Log: silenciar meter requests (server.js polling), mostrar o resto
+    if (isMeterRequest(message)) { meterCount++; return; }
 
     const ts = new Date().toLocaleTimeString();
     console.log(`${C.blue}[${ts}] 💻 S→Y (${message.length}b): ${toHex(message)}${C.reset}`);
