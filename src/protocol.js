@@ -65,21 +65,25 @@ function parseIncoming(message) {
 
   const element = message[6];
 
-  // METER DATA: F0 43 1n 3E (0D/1A/15/7F) (21/20) ...
-  // Removido message[5] === 1 pois conflita com o endereço de parâmetros [127, 1, ...]
-  const isMeter = (message[4] === 21 || message[4] === 13 || message[4] === 26 || message[4] === 127) && (message[5] === 33 || message[5] === 32);
+  // METER DATA: F0 43 1n 3E (0D/1A/7F) (21/20) ...
+  // Removido ID 21 pois na 01V96 ele é usado para Dynamics, causando conflito no parsing
+  // Adicionado check de message.length > 20 para garantir que é uma mensagem longa de meters (maior que parâm de 14b)
+  const isMeter = message.length > 20 && (message[4] === 13 || message[4] === 26 || message[4] === 127) && (message[5] === 33 || message[5] === 32);
 
   // METER DATA logic
   if (isMeter) {
       let levels = [];
       const dataStart = 9; 
-      // 01V96 envia até 70 e poucos pontos de meter. 
-      // 0-31: Canais, 32-33: Stereo, 34-41: Mixes, 42-49: Buses
-      for (let i = 0; i < 70; i++) {
+      // 01V96 envia 32 canais + 1 master Stereo (no canal 33) no Universal 33
+      // Limitamos a 33 pontos para ser robusto e compatível com o frontend
+      for (let i = 0; i < 33; i++) {
           const deviceLevel = message[dataStart + (i * 2)];
-          if (deviceLevel === undefined) break;
-          // Conversão empírica baseada no comportamento observado da 01V96 (0-32 -> 0-115%)
-          let val = Math.min((Math.pow(deviceLevel, 2) / Math.pow(32, 2)) * 115, 115);
+          if (deviceLevel === undefined) {
+              levels.push(0);
+              continue;
+          }
+          // Conversão empírica baseada no comportamento observado da 01V96 (escala reduzida em ~15-20% no topo)
+          let val = Math.min((Math.pow(deviceLevel, 2) / Math.pow(34, 2)) * 100, 100);
           levels.push(val);
       }
       return { type: 'METER_DATA', levels };

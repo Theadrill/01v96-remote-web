@@ -440,22 +440,24 @@ body.layout-desktop .sidebar {
 .desk-meter-wrap {
     width: 5px;
     height: 92%;
-    background: #000;
+    background: linear-gradient(to top, #28a745 0%, #ffc107 70%, #dc3545 100%);
     margin-left: 2px;
     border: 1px solid #111;
     border-radius: 1px;
+    margin-top: -10px;
     position: relative;
-    overflow: hidden;
-    margin-top: -10px; /* Ajuste para alinhar com o trilho do fader */
 }
 
-.desk-meter-bar {
-    position: absolute;
-    bottom: 0;
+.desk-meter-curtain {
     width: 100%;
-    height: 0%;
-    background: linear-gradient(to top, #28a745 0%, #ffc107 70%, #dc3545 100%);
-    box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+    height: 100%;
+    background: #000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top;
+    transform: scaleY(1);
+    will-change: transform;
 }
 
 .desk-fader-container input[type=range] {

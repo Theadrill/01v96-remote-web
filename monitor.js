@@ -1,4 +1,6 @@
 const midi = require('midi');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * MONITOR.JS - MIDI Bridge com Reassembly de SysEx
@@ -15,12 +17,12 @@ const midi = require('midi');
 function findPorts() {
     const input = new midi.Input();
     const output = new midi.Output();
-    
+
     let yamahaInIdx = -1, yamahaOutIdx = -1;
     let monitorInIdx = -1, monitorOutIdx = -1;
 
     console.log('--- MAPEANDO PORTAS MIDI ---');
-    
+
     for (let i = 0; i < input.getPortCount(); i++) {
         const portName = input.getPortName(i);
         const name = portName.toLowerCase();
@@ -84,7 +86,7 @@ let y2s = 0, s2y = 0, reassembled = 0, errors = 0;
 function createSysExHandler(outputPort, direction) {
     let sysexBuffer = null;
 
-    return function(message) {
+    return function (message) {
         const startsWithF0 = message[0] === 0xF0;
         const endsWithF7 = message[message.length - 1] === 0xF7;
 
@@ -93,7 +95,7 @@ function createSysExHandler(outputPort, direction) {
             // Enviar direto (Note On, CC, Program Change, etc.)
             if (message[0] & 0x80) { // tem status byte válido
                 try { outputPort.sendMessage(message); }
-                catch(e) { errors++; }
+                catch (e) { errors++; }
             }
             return;
         }
@@ -105,7 +107,7 @@ function createSysExHandler(outputPort, direction) {
                 sysexBuffer = null;
             }
             try { outputPort.sendMessage(message); }
-            catch(e) { errors++; }
+            catch (e) { errors++; }
             return;
         }
 
@@ -126,7 +128,7 @@ function createSysExHandler(outputPort, direction) {
             if (endsWithF7) {
                 reassembled++;
                 try { outputPort.sendMessage(sysexBuffer); }
-                catch(e) { errors++; }
+                catch (e) { errors++; }
                 sysexBuffer = null;
             }
             // Se não termina com F7, continuar acumulando
@@ -149,9 +151,10 @@ function toHex(msg) {
 }
 
 function isMeterData(msg) {
-    // Meter RESPONSE: F0 43 10 3E xx 21 00 00/05 ...
+    // Meter RESPONSE: F0 43 10 3E xx (21/20) ...
+    // Importante: Checamos byte [2] === 0x10 para garantir que é uma RESPOSTA da mesa.
     return msg.length >= 8 && msg[0] === 0xF0 && msg[1] === 0x43
-        && msg[3] === 0x3E && msg[5] === 0x21;
+        && msg[2] === 0x10 && msg[3] === 0x3E && (msg[5] === 0x21 || msg[5] === 0x20);
 }
 
 function isMeterRequest(msg) {
@@ -169,15 +172,56 @@ function isHeartbeat(msg) {
 }
 
 // Filtro geral: tudo que é "ruído" repetitivo e não precisa aparecer no log
-function isNoise(msg) {
-    return isMeterData(msg) || isMeterRequest(msg) || isHeartbeat(msg);
+let customFilters = [];
+const filterFile = path.join(__dirname, 'filter.json');
+
+function loadFilters() {
+    if (fs.existsSync(filterFile)) {
+        try {
+            const data = JSON.parse(fs.readFileSync(filterFile, 'utf8'));
+            if (data.prefixes) {
+                customFilters = data.prefixes.map(pre => {
+                    const clean = pre.replace(/\s/g, '');
+                    const bytes = [];
+                    for (let i = 0; i < clean.length; i += 2) {
+                        bytes.push(parseInt(clean.substr(i, 2), 16));
+                    }
+                    return bytes;
+                });
+                console.log(`✅ [FILTER] ${customFilters.length} prefixos carregados.`);
+            }
+        } catch (e) {
+            console.error("❌ [FILTER] Erro ao carregar filter.json:", e.message);
+        }
+    }
 }
+
+function matchesCustomFilter(msg) {
+    for (const prefix of customFilters) {
+        if (msg.length < prefix.length) continue;
+        let match = true;
+        for (let i = 0; i < prefix.length; i++) {
+            if (msg[i] !== prefix[i]) { match = false; break; }
+        }
+        if (match) return true;
+    }
+    return false;
+}
+
+function isNoise(msg) {
+    return isMeterData(msg) || isMeterRequest(msg) || isHeartbeat(msg) || matchesCustomFilter(msg);
+}
+
+loadFilters();
+fs.watch(filterFile, (event) => {
+    if (event === 'change') loadFilters();
+});
 
 const C = {
     green: "\x1b[32m", blue: "\x1b[34m", dim: "\x1b[2m", reset: "\x1b[0m"
 };
 
-let meterCount = 0, heartbeatCount = 0, loopbackCount = 0;
+let meterCount = 0, heartbeatCount = 0, loopbackCount = 0, filteredCount = 0;
 
 // ============================================================
 // BRIDGE
@@ -190,7 +234,11 @@ yamahaIn.on('message', (deltaTime, message) => {
     y2s++;
 
     // Log: silenciar todo ruído repetitivo
-    if (isNoise(message)) { meterCount++; return; }
+    if (isNoise(message)) { 
+        if (matchesCustomFilter(message)) filteredCount++;
+        else meterCount++; 
+        return; 
+    }
 
     const ts = new Date().toLocaleTimeString();
     console.log(`${C.green}[${ts}] 🎹 Y→S (${message.length}b): ${toHex(message)}${C.reset}`);
@@ -203,8 +251,10 @@ yamahaIn.on('message', (deltaTime, message) => {
 monitorIn.on('message', (deltaTime, message) => {
     if (message[0] === 0xFE) return;
 
-    // Descartar loopback puro (meter DATA e heartbeats são ecos nossos)
-    if (isMeterData(message) || isHeartbeat(message)) {
+    // Descartar loopback:
+    // 1. Mensagens que sabemos que são nossas (Meter data e heartbeats)
+    // 2. Fragmentos de SysEx (qualquer msg > 3 bytes que não comece com F0)
+    if (isMeterData(message) || isHeartbeat(message) || (message.length > 3 && message[0] !== 0xF0)) {
         loopbackCount++;
         return;
     }
@@ -214,7 +264,11 @@ monitorIn.on('message', (deltaTime, message) => {
     s2y++;
 
     // Log: silenciar meter requests (server.js polling), mostrar o resto
-    if (isMeterRequest(message)) { meterCount++; return; }
+    if (isMeterRequest(message) || matchesCustomFilter(message)) { 
+        if (matchesCustomFilter(message)) filteredCount++;
+        else meterCount++; 
+        return; 
+    }
 
     const ts = new Date().toLocaleTimeString();
     console.log(`${C.blue}[${ts}] 💻 S→Y (${message.length}b): ${toHex(message)}${C.reset}`);
@@ -226,12 +280,13 @@ monitorIn.on('message', (deltaTime, message) => {
 setInterval(() => {
     const parts = [`📊 Y→S: ${y2s}`, `S→Y: ${s2y}`];
     if (meterCount > 0) parts.push(`📶 Meters: ${meterCount}`);
+    if (filteredCount > 0) parts.push(`🛡️ Filtrados: ${filteredCount}`);
     if (heartbeatCount > 0) parts.push(`💓 HB: ${heartbeatCount}`);
     if (loopbackCount > 0) parts.push(`🔁 Loopback filtrado: ${loopbackCount}`);
     if (reassembled > 0) parts.push(`🔧 Remontados: ${reassembled}`);
     if (errors > 0) parts.push(`❌ Erros: ${errors}`);
     console.log(`${C.dim}${parts.join(' | ')}${C.reset}`);
-    y2s = 0; s2y = 0; meterCount = 0; heartbeatCount = 0; loopbackCount = 0; reassembled = 0; errors = 0;
+    y2s = 0; s2y = 0; meterCount = 0; heartbeatCount = 0; loopbackCount = 0; reassembled = 0; errors = 0; filteredCount = 0;
 }, 5000);
 
 // Cleanup

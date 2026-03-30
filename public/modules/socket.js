@@ -1,3 +1,4 @@
+let faderCardsCache = null;
 socket.on('update', (d) => {
     const isTrue = (d.value === 1 || d.value === true);
     if (d.channel === 'master' || d.type.startsWith('kStereo')) {
@@ -239,8 +240,7 @@ socket.on('portsList', (data) => {
 window.resetFaderCache = () => { faderCardsCache = null; };
 
 socket.on('meterData', (levels) => {
-    if (musicianMode) return; 
-
+    // faderCardsCache é preenchido na primeira execução e invalidado quando a UI é recarregada
     if (!faderCardsCache) {
         // Seleciona cards de ambos os layouts (Mobile/Desktop) e containers (Area/Master)
         faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container > .fader-card-desktop, #master-container > .fader-card');
@@ -260,9 +260,9 @@ socket.on('meterData', (levels) => {
                 else levelIdx = 32;                 // Stereo Master
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
-                    const meterBar = card.querySelector('.desk-meter-bar');
-                    if (meterBar) {
-                        meterBar.style.height = `${levels[levelIdx]}%`;
+                    const meterCurtain = card.querySelector('.desk-meter-curtain');
+                    if (meterCurtain) {
+                        meterCurtain.style.transform = `scaleY(${1 - (levels[levelIdx] / 100)})`;
                     } else {
                         if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
                         card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
@@ -279,9 +279,9 @@ socket.on('meterData', (levels) => {
                 if (i >= NUM_CHANNELS) levelIdx = 32; // Stereo Master encostado no fim
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
-                    const meterBar = card.querySelector('.desk-meter-bar');
-                    if (meterBar) {
-                        meterBar.style.height = `${levels[levelIdx]}%`;
+                    const meterCurtain = card.querySelector('.desk-meter-curtain');
+                    if (meterCurtain) {
+                        meterCurtain.style.transform = `scaleY(${1 - (levels[levelIdx] / 100)})`;
                     } else {
                         if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
                         card.style.backgroundSize = `100% ${levels[levelIdx]}%`;

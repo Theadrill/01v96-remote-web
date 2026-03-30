@@ -80,7 +80,7 @@ function createDesktopChannelStrip(i, isMaster = false) {
             <div class="desk-fader-container" onwheel="handleWheelFader(event, ${evtCh})">
                 <input type="range" id="f${isMaster ? 'master' : i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${evtCh})">
                 <div class="desk-meter-wrap">
-                    <div class="desk-meter-bar" id="m${isMaster ? 'master' : i}"></div>
+                    <div class="desk-meter-curtain" id="m${isMaster ? 'master' : i}"></div>
                 </div>
             </div>
 
