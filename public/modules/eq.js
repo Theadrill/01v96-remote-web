@@ -155,6 +155,7 @@ function initEQEngine(ch) {
 
 function renderEQ(ch) {
     selectedBandIdx = -1; // Reseta seleção de banda ao abrir novo canal
+    socket.emit('requestEqAtt', { channel: ch }); // Reabre sync do ganho ao entrar na tela da mesa
     initEQEngine(ch);
     const state = channelStates[ch] || { eq: {} };
     const isEqOn = state.eq ? !!state.eq.on : false;

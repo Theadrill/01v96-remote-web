@@ -243,7 +243,7 @@ socket.on('meterData', (levels) => {
     // faderCardsCache é preenchido na primeira execução e invalidado quando a UI é recarregada
     if (!faderCardsCache) {
         // Seleciona cards de ambos os layouts (Mobile/Desktop) e containers (Area/Master)
-        faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container > .fader-card-desktop, #master-container > .fader-card');
+        faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
     }
     
     requestAnimationFrame(() => {
@@ -292,16 +292,15 @@ socket.on('meterData', (levels) => {
     });
 
     // --- Atualização em tempo real das meters internas de Gate/Comp se o modal estiver aberto ---
-    if (activeConfigChannel !== null && activeConfigChannel < levels.length) {
-        const inputLevel = levels[activeConfigChannel];
-        const gateMeter = document.getElementById('gateMeter');
-        const compMeter = document.getElementById('compMeter');
-        
-        if (gateMeter) {
-            gateMeter.style.width = `${inputLevel}%`;
-        }
-        if (compMeter) {
-            compMeter.style.width = `${inputLevel}%`;
+    if (activeConfigChannel !== null) {
+        const levelIdx = activeConfigChannel === 'master' ? 32 : activeConfigChannel;
+        if (levelIdx < levels.length) {
+            const inputLevel = levels[levelIdx];
+            const gateMeter = document.getElementById('gateMeter');
+            const compMeter = document.getElementById('compMeter');
+            
+            if (gateMeter) gateMeter.style.width = `${inputLevel}%`;
+            if (compMeter) compMeter.style.width = `${inputLevel}%`;
         }
     }
 });

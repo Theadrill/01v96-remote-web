@@ -84,7 +84,6 @@ let hasSyncedNamesThisSession = false; // Flag para garantir que o server busque
 
 // Fila para pedidos de Dynamics, evitando encavalamento de MIDI
 let dynamicsQueue = [];
-let isProcessingDynamics = false;
 
 process.title = "01V96-BRIDGE-SERVER";
 
@@ -338,10 +337,8 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
                 return;
             }
 
-            // 2. Envio de solicitações de volume (Meters)
-            // Aguarda os Nomes e Canais carregarem antes de poluir a linha com os meters.
-            // Além disso, PAUSA os meters temporariamente se estivermos buscando os Dynamics de um canal para não sobrecarregar
-            if (!isFullySynced || isProcessingDynamics) return; 
+            // Selain disso, PAUSA os meters temporariamente se estivermos buscando algo vital (opcional)
+            if (!isFullySynced) return; 
             
             const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247]); 
             const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247]);
@@ -384,9 +381,11 @@ async function triggerSync(targetSocket = null, forceNames = false) {
     isFullySynced = false; // Reseta a flag para pausar meters
     console.log(`🔄 Sincronizando faders e botões vitais ${targetSocket ? '(apenas novo cliente)' : '(global)'}...`);
     try {
-        // Master Fader
-        midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, 10));
-        midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, 10));
+        // Master Fader & ON
+        const mastF = protocol.buildRequest('kStereoFader/kFader', 0);
+        const mastO = protocol.buildRequest('kStereoChannelOn/kChannelOn', 0);
+        if (mastF) midiEngine.send(mastF); await new Promise(r => setTimeout(r, 35));
+        if (mastO) midiEngine.send(mastO); await new Promise(r => setTimeout(r, 35));
 
         for (let i = 0; i < 32; i++) {
             const fReq = protocol.buildRequest('kInputFader/kFader', i);
@@ -418,14 +417,29 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             for (let a = 1; a <= 8; a++) {
                 const auxReq = protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i);
                 const auxOnReq = protocol.buildRequest(`kInputAUX/kAUX${a}On`, i);
-                if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, 35));
-                if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, 35));
+                if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, 15));
+                if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, 15));
             }
 
-            // Pausa estratégica a cada 8 canais para não sobrecarregar (Buffer Breath)
-            if ((i + 1) % 8 === 0) {
+            // --- NOVO: Sincronia de Dynamics (Gate/Comp) ---
+            const gateParams = ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'];
+            for (const p of gateParams) {
+                const req = protocol.buildRequest(`kInputGate/${p}`, i);
+                if (req) midiEngine.send(req);
+                await new Promise(r => setTimeout(r, 15));
+            }
+
+            const compParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
+            for (const p of compParams) {
+                const req = protocol.buildRequest(`kInputComp/${p}`, i);
+                if (req) midiEngine.send(req);
+                await new Promise(r => setTimeout(r, 15));
+            }
+
+            // Pausa estratégica a cada 4 canais (reduzido de 8 para suportar o bulk de Dynamics)
+            if ((i + 1) % 4 === 0) {
                 process.stdout.write("|");
-                await new Promise(r => setTimeout(r, 500));
+                await new Promise(r => setTimeout(r, 600));
             }
         }
 
@@ -554,66 +568,25 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Processador em lote (Fila) para Dynamics
-    async function processDynamicsQueue() {
-        if (isProcessingDynamics) return;
-        isProcessingDynamics = true;
-
-        // PRE-DELAY VITAL: Aguarda 100ms para garantir que qualquer requisição de METER 
-        // que tenha acabado de sair da porta MIDI termine de ser processada e enviada
-        // de volta pela mesa. A 01V96 descarta requisições SysEx se estiver ativa
-        // enviando o bulk gigante de 33 canais de meters. 
-        // Com isso, evitamos perder a primeira requisição (kGateOn).
-        await new Promise(r => setTimeout(r, 100));
-
-        while (dynamicsQueue.length > 0) {
-            const task = dynamicsQueue.shift();
-            const channel = task.channel;
-            const clientSocket = task.socket;
-
-            console.log(`📡 [SYNC] Processando Dynamics para o Canal ${channel + 1}...`);
-            
-            const gateParams = ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'];
-            for (const p of gateParams) {
-                const req = protocol.buildRequest(`kInputGate/${p}`, channel);
-                if (req) midiEngine.send(req);
-                await new Promise(r => setTimeout(r, 30));
-            }
-
-            const compParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
-            for (const p of compParams) {
-                const req = protocol.buildRequest(`kInputComp/${p}`, channel);
-                if (req) midiEngine.send(req);
-                await new Promise(r => setTimeout(r, 30));
-            }
-
-            // Aguarda a mesa devolver todas as respostas (buffer extra para MIDI serial)
-            await new Promise(r => setTimeout(r, 250));
-            
-            const currentState = stateManager.getState().channels[channel];
-            // Responde APENAS ao socket que pediu
-            clientSocket.emit('dynamicsState', {
-                channel,
-                gate: currentState.gate,
-                comp: currentState.comp
-            });
-        }
-        
-        isProcessingDynamics = false;
-    }
-
     socket.on('requestDynamics', (data) => {
         const { channel } = data;
         if (channel === undefined || !isConnected) return;
         
-        // Remove requisições pendentes DO MESMO SOCKET (prioriza o último canal que o usuário selecionou rápido)
-        dynamicsQueue = dynamicsQueue.filter(q => q.socket.id !== socket.id);
+        // Como agora sincronizamos tudo no boot, apenas devolvemos o estado atual do StateManager
+        const currentState = stateManager.getState().channels[channel];
+        socket.emit('dynamicsState', {
+            channel,
+            gate: currentState.gate,
+            comp: currentState.comp
+        });
+    });
+
+    socket.on('requestEqAtt', (data) => {
+        const { channel } = data;
+        if (channel === undefined || !isConnected) return;
         
-        // Adiciona a nova requisição na fila
-        dynamicsQueue.push({ channel, socket });
-        
-        // Dispara o processamento caso esteja parado
-        processDynamicsQueue();
+        const req = protocol.buildRequest('kInputAttenuator/kAtt', channel);
+        if (req) midiEngine.send(req);
     });
 
     socket.on('control', (data) => {
