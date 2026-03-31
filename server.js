@@ -38,24 +38,15 @@ const handleMIDIData = (midiData) => {
 
     if (midiData.type === 'HEARTBEAT') return; 
 
-    if (midiData.type === 'CH_NAME_CHAR') {
-        stateManager.updateChannelNameChar(midiData.channel, midiData.charIndex, midiData.char);
-        const updatedName = stateManager.getState().channels[midiData.channel].name;
-        // Emitimos o nome apenas no último caractere (9) para evitar flicker letra-por-letra
-        if (midiData.charIndex === 9) {
-            io.emit('updateName', { channel: midiData.channel, name: updatedName });
-        }
-        return;
-    }
-
     if (midiData.type === 'kChannelInput/kChannelIn') {
         const hex = midiData.raw ? Buffer.from(midiData.raw).toString('hex').toUpperCase() : 'N/A';
         console.log(`🎯 [PATCH CHANGE] Canal ${midiData.channel + 1}: Patch = ${midiData.value} ${midiData.value === 0 ? `(DEBUG HEX: ${hex})` : ''}`);
     }
 
-    stateManager.updateState(midiData.type, midiData.channel, midiData.value);
+    // Repassa o objeto INTEIRO para o gerenciador de estado (incluindo letras de nomes)
+    stateManager.updateState(midiData);
     io.emit('update', midiData);
-};
+}
 
 function iniciarDummy() {
     console.log("🛠️ [MODO DEMO] Ativando simulação automática de SysEx...");
@@ -448,7 +439,8 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             // Sincroniza Patch
             midiEngine.send(protocol.buildRequest('kChannelInput/kChannelIn', i)); await new Promise(r => setTimeout(r, 15));
 
-            // Sincroniza Buses 1-8
+            // Sincroniza Buses 1-8 e Stereo
+            midiEngine.send(protocol.buildRequest('kInputBus/kStereo', i)); await new Promise(r => setTimeout(r, 10));
             for (let b = 1; b <= 8; b++) {
                 midiEngine.send(protocol.buildRequest(`kInputBus/kBus${b}`, i)); await new Promise(r => setTimeout(r, 10));
             }
@@ -575,13 +567,30 @@ io.on('connection', (socket) => {
         saveConfig(config);
     });
 
-    socket.on('updateName', (data) => {
+    socket.on('updateName', async (data) => {
         const { channel, name } = data;
         const s = stateManager.getState();
-        if (s.channels[channel]) {
-            s.channels[channel].name = name;
-            console.log(`📝 [NAME CHANGE] Canal ${channel + 1}: "${name}" (Log apenas, MIDI ignorado)`);
+        if (s.channels[channel] !== undefined) {
+            // Atualiza o estado no servidor (usa a função do stateManager pronta para nomes)
+            stateManager.setChannelName(channel, name);
+            
+            // Broadcast para outros clientes web
             io.emit('updateName', { channel, name });
+            
+            // --- ENVIO PARA A MESA FÍSICA ---
+            if (isConnected) {
+                console.log(`📝 Enviando nome para Canal ${channel + 1}: "${name}"`);
+                // Pad do nome para 16 caracteres (espaços ao final)
+                const paddedName = name.padEnd(16, ' ').substring(0, 16);
+                
+                for (let i = 0; i < 16; i++) {
+                    const charCode = paddedName.charCodeAt(i);
+                    const msg = protocol.buildNameChange(channel, i, charCode);
+                    if (msg) midiEngine.send(msg);
+                    // Pequeno respiro para a mesa não engasgar no buffer de nomes
+                    await new Promise(r => setTimeout(r, 5));
+                }
+            }
         }
     });
 
@@ -615,7 +624,7 @@ io.on('connection', (socket) => {
         // if (!isConnected) return;
 
         // Atualiza o estado na memória do servidor
-        stateManager.updateState(data.type, data.channel, data.value);
+        stateManager.updateState(data);
         io.emit('update', data);
 
         const isBinary = data.type.includes('On') || data.type.includes('Solo');

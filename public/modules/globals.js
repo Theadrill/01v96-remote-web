@@ -8,6 +8,7 @@ for (let i = 0; i < NUM_CHANNELS; i++) {
         solo: false,
         patch: 1, // AD1 padrão
         buses: Array(8).fill(false), // Novo: Assignments Bus 1-8
+        stereo: true, // Novo: On/Off no barramento L/R Stereo
         eq: { on: false }
     });
 }

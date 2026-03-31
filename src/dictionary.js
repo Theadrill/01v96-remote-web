@@ -99,7 +99,8 @@ const COMMAND_BYTES = {
   'kSceneOutputGroup/kOutDynamicsGroup3': [127, 1, 22, 10],
   'kSceneOutputGroup/kOutDynamicsGroup4': [127, 1, 22, 11],
 
-  // BUS ASSIGN (0x22 = 34)
+  // BUS / STEREO ASSIGN (0x22 = 34)
+  'kInputBus/kStereo': [127, 1, 34, 0],
   'kInputBus/kBus1': [127, 1, 34, 3],
   'kInputBus/kBus2': [127, 1, 34, 4],
   'kInputBus/kBus3': [127, 1, 34, 5],

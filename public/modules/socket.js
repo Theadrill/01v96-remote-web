@@ -89,13 +89,38 @@ socket.on('update', (d) => {
             }
         }
         
-        // Suporte a BUS (ETC)
-        if (d.type && d.type.startsWith('kInputBus/kBus')) {
-            const busIdx = parseInt(d.type.replace('kInputBus/kBus', '')) - 1;
-            if (!channelStates[d.channel].buses) channelStates[d.channel].buses = new Array(8).fill(false);
-            channelStates[d.channel].buses[busIdx] = !!d.value;
+        // Suporte a BUS / STEREO (ETC)
+        if (d.type && d.type.startsWith('kInputBus/k')) {
+            if (d.type === 'kInputBus/kStereo') {
+                channelStates[d.channel].stereo = !!d.value;
+            } else {
+                const busIdx = parseInt(d.type.replace('kInputBus/kBus', '')) - 1;
+                if (!channelStates[d.channel].buses) channelStates[d.channel].buses = new Array(8).fill(false);
+                channelStates[d.channel].buses[busIdx] = !!d.value;
+            }
+            
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
+            }
+        }
+    }
+});
+
+socket.on('updateName', (data) => {
+    const { channel, name } = data;
+    if (channelStates[channel]) {
+        channelStates[channel].name = name;
+        
+        // Atualiza label no fader
+        const el = document.getElementById(`name${channel}`);
+        if (el) el.innerText = name;
+        
+        // Se estiver com o modal aberto nesse canal, atualiza o título lateral
+        if (activeConfigChannel === channel) {
+            const sideTitle = document.getElementById('chSideTitle');
+            if (sideTitle) {
+                sideTitle.innerText = `${channel + 1} - ${name}`;
+                if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle();
             }
         }
     }

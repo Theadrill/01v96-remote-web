@@ -19,10 +19,10 @@ window.renderRouting = function(chIdx) {
                 </div>
             </div>
 
-            <!-- Seção de BUS (Futuro) -->
+            <!-- Seção de BUS / STEREO -->
             <div class="routing-section" style="border-top: 1px solid #333; padding-top: 20px;">
                 <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Enviar para BUS</p>
-                <div class="bus-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                <div class="bus-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px;">
                     ${Array.from({length: 8}, (_, i) => {
                         const active = chData.buses && chData.buses[i];
                         return `<button class="bus-btn" 
@@ -35,9 +35,36 @@ window.renderRouting = function(chIdx) {
                         </button>`;
                     }).join('')}
                 </div>
+
+                <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-top: 1px solid #333; padding-top: 20px;">Saída Master</p>
+                <button class="stereo-btn" 
+                    onclick="toggleStereoAssignment(${chIdx})"
+                    style="width: 100%; height: 55px; 
+                           background: ${chData.stereo ? '#dc3545' : '#333'}; 
+                           border: 1px solid ${chData.stereo ? '#ff4d4d' : '#444'}; 
+                           color: white; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;
+                           box-shadow: ${chData.stereo ? '0 0 15px rgba(220,53,69,0.4)' : 'none'};">
+                    STEREO L/R
+                </button>
             </div>
         </div>
     `;
+};
+
+window.toggleStereoAssignment = function(chIdx) {
+    const currentState = !!channelStates[chIdx].stereo;
+    const newState = !currentState;
+    
+    console.log(`[STEREO] Canal ${chIdx+1} -> MASTER = ${newState}`);
+    
+    socket.emit('control', {
+        type: `kInputBus/kStereo`,
+        channel: chIdx,
+        value: newState ? 1 : 0
+    });
+
+    channelStates[chIdx].stereo = newState;
+    renderRouting(chIdx);
 };
 
 window.toggleBusAssignment = function(chIdx, busIdx) {

@@ -21,6 +21,7 @@ for (let i = 0; i < 32; i++) {
         gate: { on: false, thresh: -26, range: -60, attack: 0, hold: 20, decay: 50 },
         comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
         buses: Array(8).fill(false), // Novo: Assignments para Bus 1-8
+        stereo: true, // Novo: On/Off no barramento L/R Stereo
         eq: {
             on: false,
             mode: 0,
@@ -37,7 +38,9 @@ for (let i = 0; i < 8; i++) {
     state.buses[i] = { value: 0, on: false, name: `BUS ${i+1}` };
 }
 
-function updateState(type, channel, value) {
+function updateState(d) {
+    if (!d) return;
+    const { type, channel, value } = d;
     if (channel === 'master' || type.startsWith('kStereo')) {
         if (type === 'kStereoFader/kFader') state.master.value = value;
         if (type === 'kStereoChannelOn/kChannelOn') state.master.on = value;
@@ -125,12 +128,21 @@ function updateState(type, channel, value) {
         if (key === 'kCompKnee') state.channels[channel].comp.knee = value;
     }
 
-    // Suporte a BUS
-    if (type.startsWith('kInputBus/kBus')) {
-        const busIdx = parseInt(type.replace('kInputBus/kBus', '')) - 1;
-        if (state.channels[channel]) {
-            state.channels[channel].buses[busIdx] = !!value;
+    // Suporte a BUS / STEREO
+    if (type.startsWith('kInputBus/k')) {
+        if (type === 'kInputBus/kStereo') {
+            if (state.channels[channel]) state.channels[channel].stereo = !!value;
+        } else {
+            const busIdx = parseInt(type.replace('kInputBus/kBus', '')) - 1;
+            if (state.channels[channel]) {
+                state.channels[channel].buses[busIdx] = !!value;
+            }
         }
+    }
+
+    // Suporte a Letras de Nomes
+    if (type === 'updateNameChar') {
+        updateChannelNameChar(d.channel, d.charIndex, d.char);
     }
 }
 

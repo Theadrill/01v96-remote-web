@@ -60,6 +60,12 @@ function buildNameRequest(channelIndex, charIndex) {
   return [...HEADER, 48, MODEL_ID, 13, 2, 4, parameter, channelIndex, ...FOOTER];
 }
 
+function buildNameChange(channelIndex, charIndex, charCode) {
+  const parameter = 4 + charIndex;
+  // F0 43 10 3E 0D 02 04 [PARAM] [CH] 00 00 00 [VAL] F7
+  return [...HEADER, 13, 2, 4, parameter, channelIndex, 0, 0, 0, charCode, ...FOOTER];
+}
+
 function parseIncoming(message) {
   if (!message || message.length < 8) return null;
 
@@ -141,8 +147,25 @@ function parseIncoming(message) {
 
     // Bus Assign (Element 34)
     if (element === 34) {
+        if (parameter === 0) {
+            return { type: 'kInputBus/kStereo', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+        }
         if (parameter >= 3 && parameter <= 10) {
             return { type: `kInputBus/kBus${parameter - 2}`, channel, value: CONVERTERS.bytesToOn(dataBytes) };
+        }
+    }
+
+    // Nomes de Canais (Element 13)
+    if (element === 13) {
+        if (parameter >= 4 && parameter <= 19) {
+            const charIndex = parameter - 4;
+            const charCode = dataBytes[dataBytes.length - 1];
+            return { 
+                type: 'updateNameChar', 
+                channel, 
+                charIndex, 
+                char: String.fromCharCode(charCode) 
+            };
         }
     }
 
@@ -198,4 +221,4 @@ function parseIncoming(message) {
   return null;
 }
 
-module.exports = { COMMAND_BYTES, CONVERTERS, buildChange, buildRequest, buildNameRequest, parseIncoming };
+module.exports = { COMMAND_BYTES, CONVERTERS, buildChange, buildRequest, buildNameRequest, buildNameChange, parseIncoming };
