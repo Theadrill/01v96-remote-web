@@ -4,7 +4,8 @@ function openChannelConfig(e, ch) {
     
     activeConfigChannel = ch;
     updateConfigUIForChannel(ch);
-    switchTab('aux');
+    activeConfigTab = 'aux'; // Sempre abre em Aux por padrão
+    switchTab(activeConfigTab);
 }
 
 function updateConfigUIForChannel(ch) {
@@ -37,15 +38,7 @@ function changeConfigChannel(delta) {
     activeConfigChannel = nextCh;
     updateConfigUIForChannel(nextCh);
 
-    const activeTab = document.querySelector('.btn-tab.active-tab');
-    let tabId = 'aux';
-    if (activeTab) {
-        const txt = activeTab.innerText.toLowerCase();
-        if (txt.includes('eq')) tabId = 'eq';
-        else if (txt.includes('dyn')) tabId = 'dyn';
-        else tabId = 'aux';
-    }
-    switchTab(tabId);
+    switchTab(activeConfigTab);
 }
 
 function closeChannelConfig() {

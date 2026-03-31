@@ -6,6 +6,8 @@ for (let i = 0; i < NUM_CHANNELS; i++) {
         value: 0, 
         on: false, 
         solo: false,
+        patch: 1, // AD1 padrão
+        buses: Array(8).fill(false), // Novo: Assignments Bus 1-8
         eq: { on: false }
     });
 }
@@ -18,6 +20,7 @@ for (let i = 0; i < 8; i++) {
 
 let masterState = { value: 0, on: false };
 let activeConfigChannel = null;
+let activeConfigTab = "aux"; // Auxiliares por padrão
 let appOrientation = 'vertical';
 let musicianMode = false;
 let outsMode = false;

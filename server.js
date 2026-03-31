@@ -48,6 +48,11 @@ const handleMIDIData = (midiData) => {
         return;
     }
 
+    if (midiData.type === 'kChannelInput/kChannelIn') {
+        const hex = midiData.raw ? Buffer.from(midiData.raw).toString('hex').toUpperCase() : 'N/A';
+        console.log(`🎯 [PATCH CHANGE] Canal ${midiData.channel + 1}: Patch = ${midiData.value} ${midiData.value === 0 ? `(DEBUG HEX: ${hex})` : ''}`);
+    }
+
     stateManager.updateState(midiData.type, midiData.channel, midiData.value);
     io.emit('update', midiData);
 };
@@ -381,11 +386,15 @@ async function triggerSync(targetSocket = null, forceNames = false) {
     isFullySynced = false; // Reseta a flag para pausar meters
     console.log(`🔄 Sincronizando faders e botões vitais ${targetSocket ? '(apenas novo cliente)' : '(global)'}...`);
     try {
+        await new Promise(r => setTimeout(r, 1000));
         // Master Fader & ON
         const mastF = protocol.buildRequest('kStereoFader/kFader', 0);
         const mastO = protocol.buildRequest('kStereoChannelOn/kChannelOn', 0);
-        if (mastF) midiEngine.send(mastF); await new Promise(r => setTimeout(r, 35));
-        if (mastO) midiEngine.send(mastO); await new Promise(r => setTimeout(r, 35));
+        if (mastF) midiEngine.send(mastF); await new Promise(r => setTimeout(r, 40));
+        if (mastO) midiEngine.send(mastO); await new Promise(r => setTimeout(r, 40));
+
+        // Pausa extra após o Master
+        await new Promise(r => setTimeout(r, 100));
 
         for (let i = 0; i < 32; i++) {
             const fReq = protocol.buildRequest('kInputFader/kFader', i);
@@ -434,6 +443,14 @@ async function triggerSync(targetSocket = null, forceNames = false) {
                 const req = protocol.buildRequest(`kInputComp/${p}`, i);
                 if (req) midiEngine.send(req);
                 await new Promise(r => setTimeout(r, 15));
+            }
+            
+            // Sincroniza Patch
+            midiEngine.send(protocol.buildRequest('kChannelInput/kChannelIn', i)); await new Promise(r => setTimeout(r, 15));
+
+            // Sincroniza Buses 1-8
+            for (let b = 1; b <= 8; b++) {
+                midiEngine.send(protocol.buildRequest(`kInputBus/kBus${b}`, i)); await new Promise(r => setTimeout(r, 10));
             }
 
             // Pausa estratégica a cada 4 canais (reduzido de 8 para suportar o bulk de Dynamics)
@@ -590,6 +607,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('control', (data) => {
+        if (data.type === 'kChannelInput/kChannelIn') {
+            console.log(`🌐 [BROWSER -> SERVER] Mudança de Patch Solicitada: Canal ${data.channel + 1} -> Patch ${data.value}`);
+        }
+
         // Bloqueio Total Offline (COMENTADO PARA DEBUG)
         // if (!isConnected) return;
 

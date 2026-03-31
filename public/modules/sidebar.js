@@ -107,6 +107,7 @@ const savedOrientation = localStorage.getItem('mixer_orientation');
 if (savedOrientation) setOrientation(savedOrientation);
 
 function switchTab(tabId) {
+    activeConfigTab = tabId; // Salva a aba atual para persistir na navegação
     // Para animações pesadas se existirem
     if (window.stopEQAnimation) stopEQAnimation();
 
@@ -118,7 +119,7 @@ function switchTab(tabId) {
     if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('side-btn')) {
         window.event.currentTarget.classList.add('active-tab');
     } else {
-        const btn = document.querySelector(`#chNav .side-btn:nth-child(${tabId === 'eq' ? 1 : (tabId === 'dyn' ? 2 : 3)})`);
+        const btn = document.querySelector(`#chNav .side-btn:nth-child(${tabId === 'eq' ? 1 : (tabId === 'dyn' ? 2 : (tabId === 'aux' ? 3 : 4))})`);
         if (btn) btn.classList.add('active-tab');
     }
     
@@ -131,6 +132,7 @@ function switchTab(tabId) {
     
     if (tabId === 'dyn') { if(modeEl) modeEl.innerText = 'DYNAMICS'; renderDynamics(activeConfigChannel); }
     if (tabId === 'aux') { if(modeEl) modeEl.innerText = 'AUX SENDS'; renderAuxs(activeConfigChannel); }
+    if (tabId === 'etc') { if(modeEl) modeEl.innerText = 'ROUTING / ETC'; renderRouting(activeConfigChannel); }
 }
 
 
@@ -214,3 +216,14 @@ window.saveChannelName = function() {
 
 // Listener imediato para capturar estado inicial antes do load completo
 updateViewportInfo();
+
+// Fechar modais ao clicar fora do conteúdo (no fundo/backdrop)
+window.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.style.display = 'none';
+    }
+    if (e.target.classList.contains('ch-modal-overlay')) {
+        if (typeof closeChannelConfig === 'function') closeChannelConfig();
+        else e.target.style.display = 'none';
+    }
+});

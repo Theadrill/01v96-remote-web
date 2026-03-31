@@ -63,6 +63,10 @@ function buildNameRequest(channelIndex, charIndex) {
 function parseIncoming(message) {
   if (!message || message.length < 8) return null;
 
+  // Ignora se não for uma mensagem de dados/mudança (0x1n). 
+  // Isso evita processar nossos próprios pedidos (Requests 0x3n) que o loopMIDI ecoa de volta.
+  if ((message[2] & 0xF0) !== 0x10) return null;
+
   const element = message[6];
 
   // METER DATA: F0 43 1n 3E (0D/1A/7F) (21/20) ...
@@ -135,6 +139,13 @@ function parseIncoming(message) {
         return { type: `kInputComp/${key}`, channel, value: converter(dataBytes) };
     }
 
+    // Bus Assign (Element 34)
+    if (element === 34) {
+        if (parameter >= 3 && parameter <= 10) {
+            return { type: `kInputBus/kBus${parameter - 2}`, channel, value: CONVERTERS.bytesToOn(dataBytes) };
+        }
+    }
+
       // Input Faders / On / Solo / Name / Attenuator etc
       if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
       if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
@@ -170,6 +181,11 @@ function parseIncoming(message) {
       // Solo
       if (message[5] === 3 && element === 46) {
           return { type: 'kSetupSoloChOn/kSoloChOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
+      }
+
+      // Input Patch (Element ID 13, Element 2, Param 1, Sub 0)
+      if (message[4] === 13 && message[5] === 2 && element === 1 && parameter === 0) {
+          return { type: 'kChannelInput/kChannelIn', channel, value: CONVERTERS.bytesToFader(dataBytes), raw: message };
       }
   }
 

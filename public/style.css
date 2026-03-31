@@ -1384,3 +1384,49 @@ body.is-portrait .dyn-box {
     .dyn-header { margin-bottom: 5px; }
     .dyn-param { padding: 2px 0; gap: 6px; }
 }
+
+/* --- ROUTING & ETC STYLES --- */
+.routing-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.patch-display-box {
+    transition: all 0.2s;
+}
+
+.patch-display-box:active {
+    background: #444 !important;
+    transform: scale(0.98);
+}
+
+.patch-opt-btn {
+    transition: transform 0.1s;
+}
+
+.patch-opt-btn:active {
+    background: #007bff !important;
+    transform: scale(0.95);
+}
+
+.bus-btn {
+    transition: background 0.2s, transform 0.1s;
+}
+
+.bus-btn:active {
+    transform: scale(0.95);
+}
+
+.patch-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.patch-grid::-webkit-scrollbar-track {
+    background: #111;
+}
+
+.patch-grid::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}

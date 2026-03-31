@@ -15,10 +15,12 @@ for (let i = 0; i < 32; i++) {
         solo: false,
         phase: 0,
         att: 0,
+        patch: 1, // AD1 default
         nameChars: Array(16).fill(' '), // 16 espaços para as letras
         name: `CH ${i+1}`,
         gate: { on: false, thresh: -26, range: -60, attack: 0, hold: 20, decay: 50 },
         comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        buses: Array(8).fill(false), // Novo: Assignments para Bus 1-8
         eq: {
             on: false,
             mode: 0,
@@ -64,6 +66,7 @@ function updateState(type, channel, value) {
     if (type === 'kSetupSoloChOn/kSoloChOn') state.channels[channel].solo = value;
     if (type === 'kInputPhase/kPhase') state.channels[channel].phase = value;
     if (type === 'kInputAttenuator/kAtt') state.channels[channel].att = value;
+    if (type === 'kChannelInput/kChannelIn') state.channels[channel].patch = value;
 
     if (type.includes('kInputAUX/kAUX')) {
         const auxMatch = type.match(/kInputAUX\/kAUX(\d+)(Level|On)/);
@@ -120,6 +123,14 @@ function updateState(type, channel, value) {
         if (key === 'kCompRelease') state.channels[channel].comp.release = value;
         if (key === 'kCompGain') state.channels[channel].comp.gain = value;
         if (key === 'kCompKnee') state.channels[channel].comp.knee = value;
+    }
+
+    // Suporte a BUS
+    if (type.startsWith('kInputBus/kBus')) {
+        const busIdx = parseInt(type.replace('kInputBus/kBus', '')) - 1;
+        if (state.channels[channel]) {
+            state.channels[channel].buses[busIdx] = !!value;
+        }
     }
 }
 

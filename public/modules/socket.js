@@ -77,6 +77,27 @@ socket.on('update', (d) => {
                 if (ik) channelStates[d.channel].comp[ik] = (key === 'kCompOn' ? !!d.value : d.value);
             }
         }
+
+        // Suporte a Patch (ETC)
+        if (d.type === 'kChannelInput/kChannelIn') {
+            channelStates[d.channel].patch = d.value;
+            if (activeConfigChannel === d.channel) {
+                const nameEl = document.getElementById('currentPatchName');
+                if (nameEl && typeof window.getPatchName === 'function') {
+                    nameEl.innerText = window.getPatchName(d.value);
+                }
+            }
+        }
+        
+        // Suporte a BUS (ETC)
+        if (d.type && d.type.startsWith('kInputBus/kBus')) {
+            const busIdx = parseInt(d.type.replace('kInputBus/kBus', '')) - 1;
+            if (!channelStates[d.channel].buses) channelStates[d.channel].buses = new Array(8).fill(false);
+            channelStates[d.channel].buses[busIdx] = !!d.value;
+            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+                renderRouting(d.channel);
+            }
+        }
     }
 });
 
