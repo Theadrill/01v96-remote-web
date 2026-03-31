@@ -239,7 +239,8 @@ socket.on('portsList', (data) => {
 
 window.resetFaderCache = () => { faderCardsCache = null; };
 
-let smoothedLevels = new Array(64).fill(0); // Buffer para suavização
+let smoothedLevels = new Array(64).fill(0);
+let lastPeakTime = new Array(64).fill(0);
 
 socket.on('meterData', (levels) => {
 
@@ -268,7 +269,7 @@ socket.on('meterData', (levels) => {
                     const finalPercent = smoothedLevels[levelIdx];
 
                     const meterCurtain = card.querySelector('.desk-meter-curtain');
-                    const peakLed = card.querySelector('.desk-peak-led');
+                    const peakLed = card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led');
                     if (meterCurtain) {
                         meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
                     } else {
@@ -276,8 +277,13 @@ socket.on('meterData', (levels) => {
                         card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
                     if (peakLed) {
-                        if (finalPercent >= 98) peakLed.classList.add('active');
-                        else peakLed.classList.remove('active');
+                        if (finalPercent >= 98) {
+                            peakLed.classList.add('active');
+                            card.classList.add('peak-glow');
+                        } else {
+                            peakLed.classList.remove('active');
+                            card.classList.remove('peak-glow');
+                        }
                     }
 
 
@@ -298,16 +304,23 @@ socket.on('meterData', (levels) => {
                     const finalPercent = smoothedLevels[levelIdx];
 
                     const meterCurtain = card.querySelector('.desk-meter-curtain');
-                    const peakLed = card.querySelector('.desk-peak-led');
+                    const peakLed = card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led');
                     if (meterCurtain) {
                         meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
                     } else {
                         if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
                         card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
-                    if (peakLed) {
-                        if (finalPercent >= 98) peakLed.classList.add('active');
-                        else peakLed.classList.remove('active');
+                    // Alerta de Peak (Glow no card sempre, LED apenas se existir)
+                    const now = Date.now();
+                    if (finalPercent >= 98) {
+                        lastPeakTime[levelIdx] = now;
+                        if (peakLed) peakLed.classList.add('active');
+                        card.classList.add('peak-glow');
+                    } else if (now - lastPeakTime[levelIdx] > 1000) {
+                        // Só limpa se passou mais de 1 segundo desde o último pico
+                        if (peakLed) peakLed.classList.remove('active');
+                        card.classList.remove('peak-glow');
                     }
 
 

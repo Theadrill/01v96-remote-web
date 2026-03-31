@@ -179,6 +179,7 @@ function createChannelStrip(i, isMaster = false) {
 
     return `
         <div class="fader-card ${customClass}">
+            ${getMobileScaleHTML()}
             <div class="ch-clickable-zone" onclick="${isMaster ? '' : configAction}">
                 <h2 class="card-title">${title}</h2>
                 <div id="name${isMaster ? 'master' : i}" class="ch-name">${nameDiv}</div>
@@ -214,6 +215,7 @@ function createOutputStrip(i, type) {
 
     return `
         <div class="fader-card ${customClass}">
+            ${getMobileScaleHTML()}
             <div class="ch-clickable-zone" onclick="${type === 'mix' ? `enterTechnicianMixMode(${i})` : ''}">
                 <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : '#00ffcc'}">${title}</h2>
                 <div id="name${prefix}${i}" class="ch-name">${title}</div>
@@ -235,6 +237,21 @@ function createOutputStrip(i, type) {
             </div>
         </div>
     `;
+}
+
+function getMobileScaleHTML() {
+    const marks = [10, 5, 0, -5, -10, -20, -30, -50];
+    let html = '<div class="mobile-db-scale-overlay">';
+    marks.forEach(db => {
+        const raw = dbToRaw(db);
+        // Inverte a lógica: o topo do card (0%) é o +10dB, a base (100%) é o -inf
+        const topPercent = 100 - ((raw / 1023) * 100);
+        html += `<div class="mobile-db-tick" style="top: ${topPercent}%"><span>${db > 0 ? '+' : ''}${db}</span></div>`;
+    });
+    // Adiciona o -inf na base (100%)
+    html += `<div class="mobile-db-tick" style="top: 100%"><span>-∞</span></div>`;
+    html += '</div>';
+    return html;
 }
 
 function initUI() {
