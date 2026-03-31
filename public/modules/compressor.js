@@ -27,12 +27,14 @@ function renderCompressor(container, ch) {
         </div>
 
         <div class="dyn-meter-container">
-            <div class="dyn-thresh-arrow" id="compThreshArrow"></div>
-            <div class="dyn-meter-track">
-                <div class="dyn-meter-fill" id="compMeter"></div>
-            </div>
-            <div class="dyn-meter-labels">
-                <span>-54</span><span>-40</span><span>-20</span><span>-10</span><span>-5</span><span>0</span>
+            <div class="dyn-meter-wrapper" style="position: relative;">
+                <div class="dyn-thresh-arrow" id="compThreshArrow"></div>
+                <div class="dyn-meter-track">
+                    <div class="dyn-meter-fill" id="compMeter"></div>
+                </div>
+                <div class="dyn-meter-labels">
+                    <span>-54</span><span>-40</span><span>-20</span><span>-10</span><span>-5</span><span>0</span>
+                </div>
             </div>
         </div>
 
@@ -106,7 +108,7 @@ function renderCompressor(container, ch) {
     const compAr = box.querySelector('#compThreshArrow');
     const updateAr = () => {
         const val = parseInt(threshSl.value);
-        const percent = ((val + 540) / 540) * 95;
+        const percent = mapDynDbToPercent(val, 'comp');
         compAr.style.left = percent + '%';
     };
     threshSl.addEventListener('input', updateAr);
@@ -172,10 +174,9 @@ function updateCompFromSocket(ch, key, value) {
             sl.value = value;
             const labelEl = sl.parentElement && sl.parentElement.nextElementSibling;
             if (labelEl) labelEl.innerText = mapping.labelFn(parseInt(value));
-            // Atualiza seta de threshold
             if (key === 'kCompThreshold') {
                 const arrow = document.getElementById('compThreshArrow');
-                if (arrow) arrow.style.left = ((parseInt(value) + 540) / 540 * 95) + '%';
+                if (arrow) arrow.style.left = mapDynDbToPercent(parseInt(value), 'comp') + '%';
             }
         }
     }

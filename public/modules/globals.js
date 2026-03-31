@@ -61,3 +61,26 @@ function dbToRaw(db) {
     } 
     return 0; 
 }
+
+// Mapeamento Piecewise Linear para Dynamics (Gate e Compressor)
+// Resolve a não-linearidade das escalas visuais e alinha com os labels.
+window.mapDynDbToPercent = function(val, type) {
+    const GATE_POINTS = [-720, -600, -400, -200, -100, 0];
+    const COMP_POINTS = [-540, -400, -200, -100, -50, 0];
+    const DYN_PERCENTS = [0, 20, 40, 60, 80, 100];
+    
+    const points = (type === 'gate' ? GATE_POINTS : COMP_POINTS);
+    const percentages = DYN_PERCENTS;
+    
+    if (val <= points[0]) return 0;
+    if (val >= points[points.length - 1]) return 100;
+    
+    for (let i = 1; i < points.length; i++) {
+        if (val <= points[i]) {
+            const dbRange = points[i] - points[i-1];
+            const pctRange = percentages[i] - percentages[i-1];
+            return percentages[i-1] + ((val - points[i-1]) / dbRange) * pctRange;
+        }
+    }
+    return 100;
+};

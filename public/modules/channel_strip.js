@@ -37,6 +37,7 @@ function getFaderScaleHTML(isMaster) {
         { d: -138, l: '-∞'}
     ];
 
+    if (musicianMode) return '';
     let html = '<div class="desk-db-scale">';
     marks.forEach(m => {
         let r;
@@ -240,6 +241,7 @@ function createOutputStrip(i, type) {
 }
 
 function getMobileScaleHTML() {
+    if (musicianMode) return '';
     const marks = [10, 5, 0, -5, -10, -20, -30, -50];
     let html = '<div class="mobile-db-scale-overlay">';
     marks.forEach(db => {

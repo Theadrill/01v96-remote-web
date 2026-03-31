@@ -40,12 +40,14 @@ function renderGate(container, ch) {
         </div>
         
         <div class="dyn-meter-container">
-            <div class="dyn-thresh-arrow" id="gateThreshArrow"></div>
-            <div class="dyn-meter-track">
-                <div class="dyn-meter-fill" id="gateMeter"></div>
-            </div>
-            <div class="dyn-meter-labels">
-                <span>-72</span><span>-60</span><span>-40</span><span>-20</span><span>-10</span><span>0</span>
+            <div class="dyn-meter-wrapper" style="position: relative;">
+                <div class="dyn-thresh-arrow" id="gateThreshArrow"></div>
+                <div class="dyn-meter-track">
+                    <div class="dyn-meter-fill" id="gateMeter"></div>
+                </div>
+                <div class="dyn-meter-labels">
+                    <span>-72</span><span>-60</span><span>-40</span><span>-20</span><span>-10</span><span>0</span>
+                </div>
             </div>
         </div>
 
@@ -112,8 +114,7 @@ function renderGate(container, ch) {
     const gateAr = box.querySelector('#gateThreshArrow');
     const updateAr = () => {
         const val = parseInt(threshSl.value);
-        // Mapeia -720..0 para 0..95%
-        const percent = ((val + 720) / 720) * 95;
+        const percent = mapDynDbToPercent(val, 'gate');
         gateAr.style.left = percent + '%';
     };
     threshSl.addEventListener('input', updateAr);
@@ -189,10 +190,9 @@ function updateGateFromSocket(ch, key, value) {
             // Atualiza o label de texto ao lado
             const labelEl = sl.parentElement && sl.parentElement.nextElementSibling;
             if (labelEl) labelEl.innerText = mapping.labelFn(parseInt(value));
-            // Atualiza a seta de threshold se necessário
             if (key === 'kGateThreshold') {
                 const arrow = document.getElementById('gateThreshArrow');
-                if (arrow) arrow.style.left = ((parseInt(value) + 720) / 720 * 95) + '%';
+                if (arrow) arrow.style.left = mapDynDbToPercent(parseInt(value), 'gate') + '%';
             }
         }
     }

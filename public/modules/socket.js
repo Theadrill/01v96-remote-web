@@ -243,6 +243,7 @@ let smoothedLevels = new Array(64).fill(0);
 let lastPeakTime = new Array(64).fill(0);
 
 socket.on('meterData', (levels) => {
+    if (musicianMode) return;
 
     // faderCardsCache é preenchido na primeira execução e invalidado quando a UI é recarregada
     if (!faderCardsCache) {
@@ -334,14 +335,13 @@ socket.on('meterData', (levels) => {
         const isMaster = activeConfigChannel === 'master';
         const levelIdx = isMaster ? 32 : activeConfigChannel;
         if (levelIdx < levels.length) {
-            const inputLevel = calibrateStep(levels[levelIdx], isMaster);
+            const dbVal = (window.meterCalibration && window.meterCalibration[levels[levelIdx]]) !== undefined ? window.meterCalibration[levels[levelIdx]] : -138;
+            
             const gateMeter = document.getElementById('gateMeter');
+            if (gateMeter) gateMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'gate')}%`;
 
             const compMeter = document.getElementById('compMeter');
-
-            
-            if (gateMeter) gateMeter.style.width = `${inputLevel}%`;
-            if (compMeter) compMeter.style.width = `${inputLevel}%`;
+            if (compMeter) compMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'comp')}%`;
         }
 
     }
