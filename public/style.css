@@ -433,14 +433,79 @@ body.layout-desktop .sidebar {
     justify-content: center;
     align-items: center; /* Centraliza fader e meter */
     position: relative;
-    padding: 0 5px;
+    padding: 0 5px 0 25px; /* Aumentado padding left para a escala */
     min-height: 100px;
+}
+
+.desk-db-scale {
+    position: absolute;
+    left: 2px;
+    top: 2.5%;
+    width: 24px;
+    height: 95%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.desk-db-item {
+    position: absolute;
+    right: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    transform: translateY(50%);
+}
+
+.desk-db-item span {
+    font-size: 8px;
+    color: #999; /* Slightly brighter */
+    font-family: 'Arial Narrow', sans-serif;
+    margin-right: 3px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.desk-db-item .tick {
+    width: 6px;
+    height: 1px;
+    background: #555; /* Slightly brighter */
+}
+
+.desk-db-item .tick-small {
+    width: 3px;
+    background: #444;
+}
+
+
+
+
+.desk-peak-led {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #252525;
+    border: 1px solid #111;
+    margin-bottom: 2px;
+    transition: background 0.05s;
+}
+
+.desk-peak-led.active {
+    background: #ff0000;
+    box-shadow: 0 0 8px #ff4444;
 }
 
 .desk-meter-wrap {
     width: 5px;
     height: 92%;
-    background: linear-gradient(to top, #28a745 0%, #ffc107 70%, #dc3545 100%);
+    background: linear-gradient(to top, 
+        #28a745 0%, 
+        #28a745 60%, 
+        #ffc107 71%, 
+        #dc3545 80.5%, 
+        #ff0000 100%
+    );
     margin-left: 2px;
     border: 1px solid #111;
     border-radius: 1px;
@@ -458,6 +523,7 @@ body.layout-desktop .sidebar {
     transform-origin: top;
     transform: scaleY(1);
     will-change: transform;
+    transition: transform 0.03s linear;
 }
 
 .desk-fader-container input[type=range] {

@@ -1,4 +1,57 @@
+function getFaderScaleHTML(isMaster) {
+    const marks = isMaster ? [
+        { d: 0, l: '0' },
+        { d: -2.5, l: '' },
+        { d: -5, l: '5' },
+        { d: -7.5, l: '' },
+        { d: -10, l: '10' },
+        { d: -12.5, l: '' },
+        { d: -15, l: '15' },
+        { d: -17.5, l: '' },
+        { d: -20, l: '20' },
+        { d: -25, l: '25' },
+        { d: -30, l: '30' },
+        { d: -40, l: '40' },
+        { d: -50, l: '50' },
+        { d: -60, l: '60' },
+        { d: -138, l: '-∞'}
+    ] : [
+        { d: 10, l: '+10' },
+        { d: 7.5, l: '' },
+        { d: 5, l: '5' },
+        { d: 2.5, l: '' },
+        { d: 0, l: '0' },
+        { d: -2.5, l: '' },
+        { d: -5, l: '5' },
+        { d: -7.5, l: '' },
+        { d: -10, l: '10' },
+        { d: -12.5, l: '' },
+        { d: -15, l: '15' },
+        { d: -17.5, l: '' },
+        { d: -20, l: '20' },
+        { d: -25, l: '' },
+        { d: -30, l: '30' },
+        { d: -40, l: '40' },
+        { d: -50, l: '50' },
+        { d: -60, l: '' },
+        { d: -138, l: '-∞'}
+    ];
+
+    let html = '<div class="desk-db-scale">';
+    marks.forEach(m => {
+        let r;
+        if (m.l === '-∞') r = 0;
+        else r = dbToRaw(isMaster ? m.d + 10 : m.d);
+        const p = (r / 1023) * 100;
+        html += `<div class="desk-db-item" style="bottom: ${p}%">${m.l ? `<span>${m.l}</span>` : ''}<div class="tick ${m.l ? '' : 'tick-small'}"></div></div>`;
+    });
+    html += '</div>';
+    return html;
+}
+
+
 function updateUI(ch, val, onState, soloState) {
+
     const isMaster = ch === 'master';
     let stateRef;
     if (isMaster) stateRef = masterState;
@@ -78,11 +131,16 @@ function createDesktopChannelStrip(i, isMaster = false) {
             </div>
 
             <div class="desk-fader-container" onwheel="handleWheelFader(event, ${evtCh})">
+                ${getFaderScaleHTML(isMaster)}
                 <input type="range" id="f${isMaster ? 'master' : i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${evtCh})">
-                <div class="desk-meter-wrap">
-                    <div class="desk-meter-curtain" id="m${isMaster ? 'master' : i}"></div>
+                <div class="desk-meter-container" style="display: flex; flex-direction: column; align-items: center; margin-left: 2px; height: 100%;">
+                    <div id="p${isMaster ? 'master' : i}" class="desk-peak-led"></div>
+                    <div class="desk-meter-wrap" style="margin-left: 0; margin-top: 5px; flex: 1; max-height: 92%;">
+                        <div class="desk-meter-curtain" id="m${isMaster ? 'master' : i}"></div>
+                    </div>
                 </div>
             </div>
+
 
             <div class="nudge-zone-desk" onpointerdown="startNudge(${evtCh}, -1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" onclick="event.stopPropagation()">
                 <button class="btn-nudge-desk">-</button>

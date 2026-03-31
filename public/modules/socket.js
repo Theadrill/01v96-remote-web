@@ -239,7 +239,10 @@ socket.on('portsList', (data) => {
 
 window.resetFaderCache = () => { faderCardsCache = null; };
 
+let smoothedLevels = new Array(64).fill(0); // Buffer para suavização
+
 socket.on('meterData', (levels) => {
+
     // faderCardsCache é preenchido na primeira execução e invalidado quando a UI é recarregada
     if (!faderCardsCache) {
         // Seleciona cards de ambos os layouts (Mobile/Desktop) e containers (Area/Master)
@@ -260,13 +263,24 @@ socket.on('meterData', (levels) => {
                 else levelIdx = 32;                 // Stereo Master
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
+                    const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
+                    smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.05) + (targetPercent * 0.95);
+                    const finalPercent = smoothedLevels[levelIdx];
+
                     const meterCurtain = card.querySelector('.desk-meter-curtain');
+                    const peakLed = card.querySelector('.desk-peak-led');
                     if (meterCurtain) {
-                        meterCurtain.style.transform = `scaleY(${1 - (levels[levelIdx] / 100)})`;
+                        meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
                     } else {
                         if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-                        card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                        card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
+                    if (peakLed) {
+                        if (finalPercent >= 98) peakLed.classList.add('active');
+                        else peakLed.classList.remove('active');
+                    }
+
+
                 }
             }
         } else {
@@ -279,13 +293,24 @@ socket.on('meterData', (levels) => {
                 if (i >= NUM_CHANNELS) levelIdx = 32; // Stereo Master encostado no fim
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
+                    const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
+                    smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.2) + (targetPercent * 0.8);
+                    const finalPercent = smoothedLevels[levelIdx];
+
                     const meterCurtain = card.querySelector('.desk-meter-curtain');
+                    const peakLed = card.querySelector('.desk-peak-led');
                     if (meterCurtain) {
-                        meterCurtain.style.transform = `scaleY(${1 - (levels[levelIdx] / 100)})`;
+                        meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
                     } else {
                         if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-                        card.style.backgroundSize = `100% ${levels[levelIdx]}%`;
+                        card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
+                    if (peakLed) {
+                        if (finalPercent >= 98) peakLed.classList.add('active');
+                        else peakLed.classList.remove('active');
+                    }
+
+
                 }
             }
         }
@@ -293,14 +318,18 @@ socket.on('meterData', (levels) => {
 
     // --- Atualização em tempo real das meters internas de Gate/Comp se o modal estiver aberto ---
     if (activeConfigChannel !== null) {
-        const levelIdx = activeConfigChannel === 'master' ? 32 : activeConfigChannel;
+        const isMaster = activeConfigChannel === 'master';
+        const levelIdx = isMaster ? 32 : activeConfigChannel;
         if (levelIdx < levels.length) {
-            const inputLevel = levels[levelIdx];
+            const inputLevel = calibrateStep(levels[levelIdx], isMaster);
             const gateMeter = document.getElementById('gateMeter');
+
             const compMeter = document.getElementById('compMeter');
+
             
             if (gateMeter) gateMeter.style.width = `${inputLevel}%`;
             if (compMeter) compMeter.style.width = `${inputLevel}%`;
         }
+
     }
 });

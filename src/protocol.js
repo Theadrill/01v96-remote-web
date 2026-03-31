@@ -78,15 +78,11 @@ function parseIncoming(message) {
       // Limitamos a 33 pontos para ser robusto e compatível com o frontend
       for (let i = 0; i < 33; i++) {
           const deviceLevel = message[dataStart + (i * 2)];
-          if (deviceLevel === undefined) {
-              levels.push(0);
-              continue;
-          }
-          // Conversão empírica baseada no comportamento observado da 01V96 (escala reduzida em ~15-20% no topo)
-          let val = Math.min((Math.pow(deviceLevel, 2) / Math.pow(34, 2)) * 100, 100);
-          levels.push(val);
+          levels.push(deviceLevel || 0);
       }
       return { type: 'METER_DATA', levels };
+
+
   }
 
   if (message[4] === 13 && message[5] === 127) return null;
