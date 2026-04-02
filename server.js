@@ -479,10 +479,10 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             await new Promise(r => setTimeout(r, 2000)); 
 
             for (let i = 0; i < 32; i++) {
-                for (let c = 0; c < 10; c++) {
+                for (let c = 0; c < 4; c++) {
                     const nameReq = protocol.buildNameRequest(i, c);
                     if (nameReq) midiEngine.send(nameReq);
-                    await new Promise(r => setTimeout(r, 40)); 
+                    await new Promise(r => setTimeout(r, 45)); 
                 }
                 
                 if (i % 2 === 0) {
@@ -571,12 +571,6 @@ io.on('connection', (socket) => {
         const { channel, name } = data;
         const s = stateManager.getState();
         if (s.channels[channel] !== undefined) {
-            // Atualiza o estado no servidor (usa a função do stateManager pronta para nomes)
-            stateManager.setChannelName(channel, name);
-            
-            // Broadcast para outros clientes web
-            io.emit('updateName', { channel, name });
-            
             // --- ENVIO PARA A MESA FÍSICA ---
             if (isConnected) {
                 console.log(`📝 Enviando nome para Canal ${channel + 1}: "${name}"`);

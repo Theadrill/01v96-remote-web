@@ -103,6 +103,29 @@ socket.on('update', (d) => {
                 renderRouting(d.channel);
             }
         }
+
+        // Suporte a Letras de Nomes (ECHO da mesa física)
+        if (d.type === 'updateNameChar') {
+            if (!channelStates[d.channel].nameChars) {
+                channelStates[d.channel].nameChars = new Array(4).fill(' ');
+            }
+            channelStates[d.channel].nameChars[d.charIndex] = d.char;
+            const newName = channelStates[d.channel].nameChars.join('').trim() || `CH ${d.channel + 1}`;
+            channelStates[d.channel].name = newName;
+
+            // Atualiza o texto visual no fader
+            const el = document.getElementById(`name${d.channel}`);
+            if (el) el.innerText = newName;
+
+            // Atualiza sidebar se necessário
+            if (activeConfigChannel === d.channel) {
+                const sideTitle = document.getElementById('chSideTitle');
+                if (sideTitle) {
+                    sideTitle.innerText = `${d.channel + 1} - ${newName}`;
+                    if (window.autoScaleTitle) autoScaleTitle();
+                }
+            }
+        }
     }
 });
 

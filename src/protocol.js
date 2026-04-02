@@ -63,7 +63,7 @@ function buildNameRequest(channelIndex, charIndex) {
 function buildNameChange(channelIndex, charIndex, charCode) {
   const parameter = 4 + charIndex;
   // F0 43 10 3E 0D 02 04 [PARAM] [CH] 00 00 00 [VAL] F7
-  return [...HEADER, 13, 2, 4, parameter, channelIndex, 0, 0, 0, charCode, ...FOOTER];
+  return [...HEADER, 16, MODEL_ID, 13, 2, 4, parameter, channelIndex, 0, 0, 0, charCode, ...FOOTER];
 }
 
 function parseIncoming(message) {
@@ -155,8 +155,8 @@ function parseIncoming(message) {
         }
     }
 
-    // Nomes de Canais (Element 13)
-    if (element === 13) {
+    // Nomes de Canais (Group 13, Element 02 04)
+    if (message[4] === 13 && message[5] === 2 && element === 4) {
         if (parameter >= 4 && parameter <= 19) {
             const charIndex = parameter - 4;
             const charCode = dataBytes[dataBytes.length - 1];
@@ -194,12 +194,6 @@ function parseIncoming(message) {
           if (offset === 2) return { type: `kInputAUX/kAUX${auxIdx}Level`, channel, value: CONVERTERS.bytesToFader(dataBytes) };
       }
 
-      // Names
-      if (message[5] === 2 && element === 4 && parameter >= 4 && parameter <= 19) {
-          const charIndex = parameter - 4;
-          const char = CONVERTERS.bytesToChar(dataBytes);
-          return { type: 'CH_NAME_CHAR', channel, charIndex, char };
-      }
       
       // Solo
       if (message[5] === 3 && element === 46) {

@@ -16,7 +16,7 @@ for (let i = 0; i < 32; i++) {
         phase: 0,
         att: 0,
         patch: 1, // AD1 default
-        nameChars: Array(16).fill(' '), // 16 espaços para as letras
+        nameChars: Array(4).fill(' '), // 4 espaços para as letras
         name: `CH ${i+1}`,
         gate: { on: false, thresh: -26, range: -60, attack: 0, hold: 20, decay: 50 },
         comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
@@ -156,7 +156,7 @@ function updateChannelNameChar(channel, charIndex, char) {
 function setChannelName(channel, name) {
     if (!state.channels[channel]) return;
     state.channels[channel].name = name;
-    state.channels[channel].nameChars = name.padEnd(16, ' ').split('');
+    state.channels[channel].nameChars = name.padEnd(4, ' ').split('');
 }
 
 function updateSceneChar(index, char) {
