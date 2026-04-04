@@ -31,9 +31,21 @@ function getAvailablePorts() {
     return { inputs, outputs };
 }
 
+let currentInIdx = -1;
+let currentOutIdx = -1;
+
 function connectPorts(inputIdx, outputIdx, onMessageCallback) {
     try {
-        // Se já existirem instâncias abertas, limpamos tudo primeiro
+        const inIdx = parseInt(inputIdx);
+        const outIdx = parseInt(outputIdx);
+
+        // Se já estivermos conectados EXATAMENTE nessas portas, não fazemos nada
+        if (input && output && currentInIdx === inIdx && currentOutIdx === outIdx) {
+            console.log(`ℹ️ [MIDI] Portas já conectadas (${inIdx}, ${outIdx}). Ignorando re-conexão.`);
+            return { success: true, inName: input.getPortName(inIdx), alreadyConnected: true };
+        }
+
+        // Se já existirem instâncias abertas mas as portas mudaram, limpamos tudo primeiro
         if (input) { try { input.closePort(); } catch(e){} }
         if (output) { try { output.closePort(); } catch(e){} }
 
@@ -42,8 +54,10 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         output = new midi.Output();
 
         // Abre as portas que o usuário escolheu no frontend
-        input.openPort(parseInt(inputIdx));
-        output.openPort(parseInt(outputIdx));
+        input.openPort(inIdx);
+        output.openPort(outIdx);
+        currentInIdx = inIdx;
+        currentOutIdx = outIdx;
         
         // Habilita SysEx IMEDIATAMENTE após abrir a porta (Essencial para a Yamaha)
         input.ignoreTypes(false, false, false);

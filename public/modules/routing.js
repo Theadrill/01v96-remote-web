@@ -52,6 +52,7 @@ window.renderRouting = function(chIdx) {
 };
 
 window.toggleStereoAssignment = function(chIdx) {
+    if (!appReady) return;
     const currentState = !!channelStates[chIdx].stereo;
     const newState = !currentState;
     
@@ -68,6 +69,7 @@ window.toggleStereoAssignment = function(chIdx) {
 };
 
 window.toggleBusAssignment = function(chIdx, busIdx) {
+    if (!appReady) return;
     const currentState = !!(channelStates[chIdx].buses && channelStates[chIdx].buses[busIdx]);
     const newState = !currentState;
     
@@ -181,6 +183,7 @@ window.openPatchSelector = function(chIdx) {
 };
 
 function selectPatch(chIdx, patchId) {
+    if (!appReady) return;
     console.log(`[FRONT] Mudando Canal ${chIdx + 1} para Patch ${patchId}`);
     socket.emit('control', {
         type: 'kChannelInput/kChannelIn',

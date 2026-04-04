@@ -22,7 +22,7 @@ function renderDynamics(ch) {
         renderCompressor(container, ch);
     }
     
-    // LOGICA DE DEBUG RESTAURADA: Pede as dinâmicas apenas ao abrir a tela
+    // Pede as dinâmicas à mesa sempre que abrir a aba dyn de um canal
     if (typeof socket !== 'undefined' && socket) {
         socket.emit('requestDynamics', { channel: ch });
     }

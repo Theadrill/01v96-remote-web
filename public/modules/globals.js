@@ -1,4 +1,5 @@
-const socket = io();
+let socket;
+let appReady = false; // Flag para ignorar eventos de UI até que a sincronia inicial ocorra
 const NUM_CHANNELS = 32;
 let channelStates = [];
 for (let i = 0; i < NUM_CHANNELS; i++) {

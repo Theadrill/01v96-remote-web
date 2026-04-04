@@ -89,7 +89,8 @@ function renderGate(container, ch) {
             valEl.innerText = formatter(parseInt(sl.value));
         };
         sl.oninput = update;
-        sl.onchange = () => {
+        sl.onchange = (e) => {
+             if (!e.isTrusted || !appReady) return;
              const typeMap = {
                  'gateThresh': 'kInputGate/kGateThreshold',
                  'gateRange': 'kInputGate/kGateRange',
@@ -125,7 +126,8 @@ function renderGate(container, ch) {
     if (btnOn) {
         const isCurrentlyOn = !!state.on;
         btnOn.classList.toggle('active', isCurrentlyOn);
-        btnOn.onclick = () => {
+        btnOn.onclick = (e) => {
+            if (!appReady) return;
             const nextState = !btnOn.classList.contains('active');
             socket.emit('control', { type: 'kInputGate/kGateOn', channel: ch, value: nextState ? 1 : 0 });
             btnOn.classList.toggle('active', nextState);

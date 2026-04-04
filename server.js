@@ -9,6 +9,20 @@ const SysTray = require('systray2').default;
 const midiEngine = require('./src/midi-engine');
 const protocol = require('./src/protocol');
 const stateManager = require('./src/state-manager');
+
+// --- CARREGAMENTO INICIAL DE NOMES (JSON) ---
+let namesCache = {};
+try {
+    if (fs.existsSync('names.json')) {
+        namesCache = JSON.parse(fs.readFileSync('names.json', 'utf8'));
+        Object.entries(namesCache).forEach(([ch, name]) => {
+            stateManager.setChannelName(parseInt(ch), name);
+        });
+        console.log("📂 [NOMES] Nomes carregados do JSON com sucesso.");
+    }
+} catch (e) {
+    console.error("❌ [NOMES] Erro ao carregar names.json:", e);
+}
 const dummy = require('./src/meter_dummy');
 let dummyMeterInterval = null;
 
@@ -46,6 +60,15 @@ const handleMIDIData = (midiData) => {
     // Repassa o objeto INTEIRO para o gerenciador de estado (incluindo letras de nomes)
     stateManager.updateState(midiData);
     io.emit('update', midiData);
+}
+
+function saveNames() {
+    const state = stateManager.getState();
+    const names = {};
+    for (let i = 0; i < 32; i++) {
+        names[i] = state.channels[i].name;
+    }
+    fs.writeFileSync('names.json', JSON.stringify(names, null, 2));
 }
 
 function iniciarDummy() {
@@ -315,7 +338,14 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         isConnected = true;
         console.log(`✅ Conexão MIDI estabelecida com sucesso! (${inName})`);
         atualizarMenuTray();
-        triggerSync(targetSocket);
+        
+        if (result.alreadyConnected && isFullySynced) {
+            console.log("⚡ [SYNC] Pulando MIDI sync lenta pois o servidor já está totalmente atualizado.");
+            if (targetSocket) targetSocket.emit('sync', stateManager.getState());
+        } else {
+            triggerSync(targetSocket);
+        }
+        
         io.emit('connectionState', { connected: true });
 
         // Loop contínuo de requests do Meter (Heartbeat)
@@ -396,8 +426,9 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, 35)); 
             if (sReq) midiEngine.send(sReq); await new Promise(r => setTimeout(r, 35)); 
 
-            // Sincroniza Phase
+            // Sincroniza Phase e Atenuador (ATT)
             midiEngine.send(protocol.buildRequest('kInputPhase/kPhase', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kInputAttenuator/kAtt', i)); await new Promise(r => setTimeout(r, 35));
             
             // Sincroniza Master EQ ON de cada canal
             midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 35));
@@ -463,17 +494,13 @@ async function triggerSync(targetSocket = null, forceNames = false) {
 
         await new Promise(r => setTimeout(r, 600)); 
         
-        if (targetSocket) {
-            targetSocket.emit('sync', stateManager.getState());
-        } else {
-            io.emit('sync', stateManager.getState());
-        }
-        console.log("✅ Sincronização de parâmetros concluída!");
+        // Ao final da sincronia lenta, envia o estado completo para TODOS os clientes conectados
+        // Isso garante que qualquer um que tenha entrado durante o processo seja atualizado.
+        io.emit('sync', stateManager.getState());
+        console.log("✅ Sincronização de parâmetros concluída para todos os clientes!");
 
         // O server SEMPRE busca os nomes na mesa pelo menos uma vez por inicialização (session)
         // para garantir que o JSON esteja atualizado com a mesa física.
-        // Os clients seguintes usarão o que já estiver na memória (atualizado pelo primeiro sync ou carregado do JSON).
-        
         if (forceNames || !hasSyncedNamesThisSession) {
             console.log("📝 [SYNC] Iniciando busca obrigatória de nomes na mesa (1 vez por boot)...");
             await new Promise(r => setTimeout(r, 2000)); 
@@ -491,10 +518,10 @@ async function triggerSync(targetSocket = null, forceNames = false) {
                 }
             }
             console.log("\n✅ [SYNC] Carregamento de nomes via MIDI concluído!");
-            hasSyncedNamesThisSession = true; // Marca que o servidor já está atualizado com a mesa física
-            saveNames(); // Salva os novos nomes no JSON
+            hasSyncedNamesThisSession = true; 
+            saveNames(); // Persiste os nomes da mesa no JSON
         } else {
-            console.log("⏭️ [SYNC] Nomes já sincronizados nesta sessão. Ignorando busca lenta via MIDI.");
+            console.log("⏭️ [SYNC] Nomes já sincronizados nesta sessão.");
         }
 
         isFullySynced = true; 
@@ -592,13 +619,25 @@ io.on('connection', (socket) => {
         const { channel } = data;
         if (channel === undefined || !isConnected) return;
         
-        // Como agora sincronizamos tudo no boot, apenas devolvemos o estado atual do StateManager
-        const currentState = stateManager.getState().channels[channel];
-        socket.emit('dynamicsState', {
-            channel,
-            gate: currentState.gate,
-            comp: currentState.comp
+        // Requisita Gate
+        const gateParams = ['kGateOn', 'kGateAttack', 'kGateThreshold', 'kGateRange', 'kGateHold', 'kGateDecay'];
+        gateParams.forEach((p, i) => {
+            setTimeout(() => {
+                const req = protocol.buildRequest(`kInputGate/${p}`, channel);
+                if (req) midiEngine.send(req);
+            }, i * 20);
         });
+
+        // Requisita Compressor
+        const compParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
+        setTimeout(() => {
+            compParams.forEach((p, i) => {
+                setTimeout(() => {
+                    const req = protocol.buildRequest(`kInputComp/${p}`, channel);
+                    if (req) midiEngine.send(req);
+                }, i * 20);
+            });
+        }, 200);
     });
 
     socket.on('requestEqAtt', (data) => {

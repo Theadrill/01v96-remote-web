@@ -77,6 +77,7 @@ function nudgeAuxLevel(ch, auxIdx, dir) {
 }
 
 function auxLevelInput(e, ch, auxIdx) {
+    if (!e.isTrusted || !appReady) return;
     const val = parseInt(e.target.value);
     updateAuxManual(ch, auxIdx, val);
     socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: val });
@@ -93,6 +94,7 @@ function updateAuxManual(ch, auxIdx, val) {
 }
 
 function toggleAuxOn(ch, auxIdx) {
+    if (!appReady) return;
     const type = `kInputAUX/kAUX${auxIdx}On`;
     if (!channelStates[ch]) channelStates[ch] = {};
     

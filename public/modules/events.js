@@ -97,6 +97,7 @@ function toggleState(type, ch) {
     
     // Para Mix/Bus, o canal emitido é o número após m/b. 
     // Importante: verificar 'master' primeiro para não confundir com Mixes (que começam com 'm')
+    if (!appReady) return; 
     const emitCh = (ch === 'master') ? 0 : ((typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b'))) ? parseInt(ch.substring(1)) : ch);
     socket.emit('control', { type: actualType, channel: emitCh, value: val ? 1 : 0 });
 }
@@ -144,6 +145,7 @@ function nudgeFader(ch, dir) {
     else if (typeof ch === 'string' && ch.startsWith('b')) typeFader = 'kBusFader/kFader';
     else typeFader = 'kInputFader/kFader';
 
+    if (!appReady) return;
     const emitCh = isMaster ? 0 : (isMixOrBus ? parseInt(ch.substring(1)) : ch);
     socket.emit('control', { type: typeFader, channel: emitCh, value: nRaw });
 }
@@ -161,12 +163,13 @@ function commitFaderChange(ch, v) {
     else if (typeof ch === 'string' && ch.startsWith('b')) typeFader = 'kBusFader/kFader';
     else typeFader = 'kInputFader/kFader';
 
+    if (!appReady) return;
     const emitCh = isMaster ? 0 : (isMixOrBus ? parseInt(ch.substring(1)) : ch);
     socket.emit('control', { type: typeFader, channel: emitCh, value: v });
 }
 
 function faderInput(e, ch) {
-    if (!e.isTrusted) return;
+    if (!e.isTrusted || !appReady) return;
     commitFaderChange(ch, parseInt(e.target.value));
 }
 
