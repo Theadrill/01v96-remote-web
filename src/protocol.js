@@ -75,24 +75,19 @@ function parseIncoming(message) {
 
   const element = message[6];
 
-  // METER DATA: F0 43 1n 3E (0D/1A/7F) (21/20) ...
-  // Removido ID 21 pois na 01V96 ele é usado para Dynamics, causando conflito no parsing
-  // Adicionado check de message.length > 20 para garantir que é uma mensagem longa de meters (maior que parâm de 14b)
+  // 🚨 [CRITICAL SYNC LOGIC] - NÃO ALTERAR A LÓGICA DE METER ABAIXO
+  // O check 'message.length > 20' é VITAL para diferenciar meters de parâmetros de dinâmica (Gate/Comp).
+  // Se remover esse check ou os IDs (13/26/127), a sincronia de Gate/Comp da 01V96 IRÁ QUEBRAR.
   const isMeter = message.length > 20 && (message[4] === 13 || message[4] === 26 || message[4] === 127) && (message[5] === 33 || message[5] === 32);
 
-  // METER DATA logic
   if (isMeter) {
       let levels = [];
       const dataStart = 9; 
-      // 01V96 envia 32 canais + 1 master Stereo (no canal 33) no Universal 33
-      // Limitamos a 33 pontos para ser robusto e compatível com o frontend
       for (let i = 0; i < 33; i++) {
           const deviceLevel = message[dataStart + (i * 2)];
           levels.push(deviceLevel || 0);
       }
       return { type: 'METER_DATA', levels };
-
-
   }
 
   if (message[4] === 13 && message[5] === 127) return null;
@@ -101,10 +96,13 @@ function parseIncoming(message) {
   const parameter = message[7];
   const channel = message[8];
 
-  // Param Changes support ID 13, 26, 127
+  // 🚨 [CRITICAL SYNC LOGIC] - PARAMETER CHANGES
+  // Suporta ID 13, 26 e 127 (Universal) que são os comandos de mudança de parâmetro da 01V96.
   if (message[4] === 13 || message[4] === 127 || message[4] === 26 || message[4] === 1) {
-      // Input EQ (Elements 32 and 33)
-      if ((element === 32 || element === 33) && parameter <= 15) {
+      // EQ Parsing: Input (32, 33), Bus (46), AUX (60), Stereo (82)
+      // Note: Bus EQ (46) collides with Solo (46) when requested, so we check message[5] === 1 (Param Change)
+      const eqMap = { 32: 'kInput', 33: 'kInput', 46: 'kBus', 60: 'kAUX', 82: 'kStereo' };
+      if (eqMap[element] && parameter <= 15 && message[5] === 1) {
           const eqKeys = [
               'kEQMode', 'kEQLowQ', 'kEQLowF', 'kEQLowG', 'kEQHPFOn',
               'kEQLowMidQ', 'kEQLowMidF', 'kEQLowMidG',
@@ -112,12 +110,11 @@ function parseIncoming(message) {
               'kEQHiQ', 'kEQHiF', 'kEQHiG',
               'kEQLPFOn', 'kEQOn'
           ];
+          const prefix = eqMap[element];
           const key = eqKeys[parameter];
           const converter = (key.endsWith('G')) ? CONVERTERS.bytesToSigned : CONVERTERS.bytesToFader;
-          // Channel byte usually already carries the shift if it's 0-31, but some mixers use element shift.
-          // For now, we trust the channel byte message[8].
-        return { type: `kInputEQ/${key}`, channel, value: converter(dataBytes) };
-    }
+          return { type: `${prefix}EQ/${key}`, channel: (prefix === 'kStereo' ? 'master' : channel), value: converter(dataBytes) };
+      }
 
     // Input GATE (Element 30)
     if (element === 30) {
@@ -155,7 +152,9 @@ function parseIncoming(message) {
         }
     }
 
-    // Nomes de Canais (Group 13, Element 02 04)
+    // 🚨 [CRITICAL SYNC LOGIC] - NOMES DE CANAIS (YAMAHA 01V96 PADRÃO)
+    // Mantemos o limite de 19 (16 caracteres) para compatibilidade total com o protocolo da mesa.
+    // O controle visual de 4 caracteres deve ser feito apenas no Front-end.
     if (message[4] === 13 && message[5] === 2 && element === 4) {
         if (parameter >= 4 && parameter <= 19) {
             const charIndex = parameter - 4;

@@ -9,7 +9,7 @@ function enableDragScroll(el) {
     el.addEventListener('wheel', (evt) => {
         if (evt.deltaY !== 0) {
             evt.preventDefault();
-            el.scrollLeft += evt.deltaY * 3.5;
+            el.scrollLeft += evt.deltaY * 1.0;
         }
     }, { passive: false });
 
@@ -34,7 +34,7 @@ function enableDragScroll(el) {
         if (!isDragging) return;
         e.preventDefault();
         const x = e.pageX - el.offsetLeft;
-        const walk = (x - startX) * 1.5; 
+        const walk = (x - startX) * 1.0; 
         el.scrollLeft = startScrollLeft - walk;
     });
 }

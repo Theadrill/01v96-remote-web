@@ -197,18 +197,20 @@ window.saveChannelName = function() {
     const ch = activeConfigChannel;
     if (ch === null) return;
 
-    const newName = document.getElementById('inputChName').value.trim().toUpperCase();
+    // 🚨 [CRITICAL SYNC LOGIC] - LIMITAÇÃO DE 4 CARACTERES (FRONT-END)
+    // A 01V96 só exibe 4 letras. Truncamos aqui para evitar "BUMBE" (5 letras) no names.json.
+    const newName = document.getElementById('inputChName').value.trim().toUpperCase().substring(0, 4);
     
     // Emitir para o servidor
     socket.emit('updateName', { channel: ch, name: newName });
     
+    // Feedback local imediato (sempre limitado a 4)
     const finalName = newName || `CH ${ch + 1}`;
-    // Feedback local imediato
     document.getElementById(`name${ch}`).innerText = finalName;
     const sideTitle = document.getElementById('chSideTitle');
     if (sideTitle) {
         sideTitle.innerText = `${ch + 1} - ${finalName}`;
-        autoScaleTitle(); // Ajusta fonte após mudar texto
+        autoScaleTitle(); 
     }
     
     document.getElementById('nameEditorModal').style.display = 'none';

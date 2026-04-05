@@ -245,6 +245,44 @@ document.addEventListener('mousemove', (e) => {
     if (!area) return;
     e.preventDefault();
     const x = e.pageX - area.offsetLeft;
-    const walk = (x - startX) * 1.5; // Velocidade do scroll
+    const walk = (x - startX) * 1.0; // Velocidade do scroll
     area.scrollLeft = scrollLeft - walk;
 });
+
+// Proteção Global contra cliques no corpo (track) do slider
+// Impede que o volume "pule" para o local clicado, permitindo apenas o arrasto do thumb
+window.addEventListener('pointerdown', function(e) {
+    if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
+        const input = e.target;
+        const rect = input.getBoundingClientRect();
+        
+        // Detecta orientação baseando-se no elemento
+        const isVertical = input.getAttribute('orient') === 'vertical' || 
+                           input.clientHeight > input.clientWidth || 
+                           (window.getComputedStyle(input).writingMode || "").includes('vertical');
+
+        const min = parseFloat(input.min || 0);
+        const max = parseFloat(input.max || 100);
+        const val = parseFloat(input.value);
+        const percent = (val - min) / (max - min);
+
+        let clickPosPx, thumbPosPx;
+
+        if (isVertical) {
+            clickPosPx = e.clientY - rect.top;
+            // Para faders verticais (mixer), o valor máximo (100%) costuma ser no topo (0px)
+            thumbPosPx = (1 - percent) * rect.height;
+        } else {
+            clickPosPx = e.clientX - rect.left;
+            // Para faders horizontais, o valor inicial (0%) costuma ser na esquerda (0px)
+            thumbPosPx = percent * rect.width;
+        }
+
+        const distance = Math.abs(clickPosPx - thumbPosPx);
+        const threshold = 30; // Tolerância de 30px para o centro do thumb
+
+        if (distance > threshold) {
+            e.preventDefault(); 
+        }
+    }
+}, { capture: true });

@@ -98,14 +98,47 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
 }
 
 /* Fader Groups Outline */
+/* Fader Groups Outline & Glow */
 .fader-group-1 {
-    border-color: rgba(0, 150, 255, 0.4) !important;
-    box-shadow: 0 0 10px rgba(0, 150, 255, 0.1) inset;
+    border-top: 3px solid #00adef !important;
+    box-shadow: 0 -5px 15px rgba(0, 173, 239, 0.2) inset, 0 0 5px rgba(0, 173, 239, 0.1);
 }
 
 .fader-group-2 {
-    border-color: rgba(255, 200, 0, 0.4) !important;
-    box-shadow: 0 0 10px rgba(255, 200, 0, 0.1) inset;
+    border-top: 3px solid #00ff88 !important;
+    box-shadow: 0 -5px 15px rgba(0, 255, 136, 0.2) inset, 0 0 5px rgba(0, 255, 136, 0.1);
+}
+
+/* Versão Desktop (Glow mais horizontal no pé ou topo) */
+.fader-card-desktop.fader-group-1 {
+    border-top: 2px solid #00adef !important;
+    border-bottom: 3px solid #00adef !important;
+}
+
+.fader-card-desktop.fader-group-2 {
+    border-top: 2px solid #00ff88 !important;
+    border-bottom: 3px solid #00ff88 !important;
+}
+
+/* Dynamic Label Coloring (Desktop) */
+.fader-group-1 .desk-label {
+    background: #003a5e !important; /* Azul "Slate" sutil para OFF */
+    color: #00adef !important;
+}
+.fader-group-1 .desk-label.label-on {
+    background: #00568a !important; /* Azul um pouco mais denso para ON */
+    color: #fff !important;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.fader-group-2 .desk-label {
+    background: #004a30 !important; /* Verde "Slate" sutil para OFF */
+    color: #00ff88 !important;
+}
+.fader-group-2 .desk-label.label-on {
+    background: #006b41 !important; /* Verde um pouco mais denso para ON */
+    color: #fff !important;
+    font-weight: 900;
 }
 body.layout-horizontal .master-card {
     margin-left: 0 !important;
@@ -201,9 +234,109 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
 .nudge-zone:active::after { background: rgba(255,255,255,0.15); }
 .nudge-zone .btn-nudge, .nudge-zone .fader-val { position: relative; z-index: 1; }
 .nudge-zone:active .btn-nudge { background: #444; border-color: #666; }
-.fader-card input[type=range] { -webkit-appearance: slider-vertical; appearance: slider-vertical; width: 50px; flex: 1; min-height: 0; margin: 4px 0; outline: none; touch-action: none; pointer-events: none; }
-.fader-card input[type=range]::-webkit-slider-thumb { pointer-events: auto; }
-.fader-card input[type=range]::-moz-range-thumb { pointer-events: auto; }
+/* Faders Mobile Customizados p/ Toque (Dentro do fader-rotated-container) */
+.fader-card .fader-rotated-container {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Estica o fader verticalmente */
+    min-height: 50px;
+    margin: 10px 0;
+}
+
+.fader-card input[type=range] {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    
+    /* 🚨 [AUTO-STRETCH] O segredo para não invadir botões */
+    writing-mode: vertical-lr !important;
+    direction: rtl !important; /* Bottom -> Top */
+    
+    width: 48px !important;    /* Largura da zona de toque */
+    height: 100% !important;   /* Ocupa exatamente o espaço do container */
+    
+    position: relative !important;
+    display: block !important;
+    background: linear-gradient(to bottom, #555, #555) no-repeat center / 6px 100% !important; 
+    border: none !important;
+    outline: none !important;
+    cursor: default;
+    touch-action: none;
+    pointer-events: auto !important;
+    z-index: 1;
+    margin: 0 auto !important;
+    padding: 0 !important;
+}
+
+/* Thumbs unificados para todos os motores */
+.fader-card input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 6px !important;
+    background: #eee !important;
+    border: 2px solid #000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 5px rgba(255,255,255,0.2) inset;
+    margin-top: 0 !important; 
+    cursor: grab;
+}
+
+.fader-card input[type=range]::-moz-range-thumb {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 6px !important;
+    background: #eee !important;
+    border: 2px solid #000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 5px rgba(255,255,255,0.2) inset;
+    cursor: grab;
+}
+
+/* Thumbs menores para modo Landscape ou janelas curtas */
+@media (max-height: 500px) {
+    .fader-card .fader-rotated-container {
+        margin: 2px 0 !important; /* Libera mais curso vertical p/ o fader */
+    }
+    .fader-card input[type=range]::-webkit-slider-thumb {
+        width: 38px !important;
+        height: 30px !important; /* Altura reduzida, largura mantida */
+        border-radius: 5px !important;
+    }
+    .fader-card input[type=range]::-moz-range-thumb {
+        width: 38px !important;
+        height: 30px !important;
+        border-radius: 5px !important;
+    }
+}
+
+/* Thumbs ultra-achatados para telas extremamente curtas (Mobile Landscape agressivo) */
+@media (max-height: 350px) {
+    .fader-card input[type=range]::-webkit-slider-thumb {
+        width: 32px !important;
+        height: 18px !important; /* Bem achatado verticalmente */
+        border-radius: 3px !important;
+    }
+    .fader-card input[type=range]::-moz-range-thumb {
+        width: 32px !important;
+        height: 18px !important;
+        border-radius: 3px !important;
+    }
+}
+
+/* Esconder os tracks nativos */
+.fader-card input[type=range]::-webkit-slider-runnable-track { background: transparent !important; border: none !important; }
+.fader-card input[type=range]::-moz-range-track { background: transparent !important; border: none !important; }
+
+/* Cores específicas por grupo */
+.fader-group-1 input[type=range]::-webkit-slider-thumb { background: #00adef !important; border-color: #004a80; }
+.fader-group-2 input[type=range]::-webkit-slider-thumb { background: #00ff88 !important; border-color: #008a4a; }
+.fader-group-aux input[type=range]::-webkit-slider-thumb { background: #9d00ff !important; border-color: #4a008a; }
+
+.fader-group-1 input[type=range]::-moz-range-thumb { background: #00adef !important; border-color: #004a80; }
+.fader-group-2 input[type=range]::-moz-range-thumb { background: #00ff88 !important; border-color: #008a4a; }
+.fader-group-aux input[type=range]::-moz-range-thumb { background: #9d00ff !important; border-color: #4a008a; }
 
 /* Sidebar e botões globais */
 /* Sidebar e botões globais */
@@ -327,8 +460,12 @@ body.layout-desktop .sidebar {
     transition: background 0.4s ease;
 }
 
-.fader-card-desktop.desk-on-bg {
-    background-color: #2d2b1f; /* Amarelo extremamente sutil para canais */
+.fader-card-desktop.fader-group-1.desk-on-bg {
+    background-color: #1a2633 !important; /* Azul escuro sutil para o corpo do canal ON */
+}
+
+.fader-card-desktop.fader-group-2.desk-on-bg {
+    background-color: #1a2b22 !important; /* Verde escuro sutil para o corpo do canal ON */
 }
 
 .master-card-desktop.desk-on-bg {
@@ -586,7 +723,7 @@ body.layout-desktop .sidebar {
     appearance: slider-vertical;
     width: 32px;
     height: 95%;
-    cursor: pointer;
+    cursor: default;
     outline: none;
     background: transparent;
 }

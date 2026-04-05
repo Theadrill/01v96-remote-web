@@ -1,9 +1,7 @@
 // O app.js agora atua apenas como Bootstrapper final
 initUI();
 
-// Inicializamos o socket APÓS a UI estar pronta
-socket = io();
-if (typeof initSocketListeners === 'function') initSocketListeners();
+// Inicializamos o socket APÓS a UI estar pronta (já ocorre em globals.js)
 
 // Aguardamos um breve momento para estabilizar a renderização e o sync inicial antes de permitir envios
 setTimeout(() => {

@@ -7,7 +7,9 @@ const state = {
     master: { value: 0, on: false, name: "MASTER" }
 };
 
-// Inicia os 32 canais e 8 mixes/buses vazios
+// 🚨 [CRITICAL SYNC LOGIC] - ESTRUTURA DO ESTADO
+// Os nomes das chaves em 'gate' e 'comp' (ex: thresh, range, attack) devem ser MANTIDOS EXATAMENTE.
+// O frontend e os reducers do socket dependem desses nomes específicos para injetar dados via dynamicsState.
 for (let i = 0; i < 32; i++) {
     state.channels[i] = {
         value: 0,
@@ -146,7 +148,9 @@ function updateState(d) {
     }
 }
 
-// Junta a letrinha nova com as outras e forma o nome do Canal
+// 🚨 [CRITICAL SYNC LOGIC] - NOMES DE CANAIS (PROTOCOL SYNC)
+// Permitimos que a array cresça além de 4 conforme o protocolo MIDI.
+// O front-end é responsável por limitar a exibição e o input se necessário.
 function updateChannelNameChar(channel, charIndex, char) {
     if (!state.channels[channel]) return;
     state.channels[channel].nameChars[charIndex] = char;
