@@ -858,7 +858,8 @@ let freqNudgeInterval = null;
 window.startFreqNudge = function(dir) {
     stopFreqNudge();
     nudgeFreq(dir);
-    freqNudgeInterval = setInterval(() => nudgeFreq(dir), 100);
+    // Reduzido o intervalo (de 100 para 250ms) para ficar menos agressivo
+    freqNudgeInterval = setInterval(() => nudgeFreq(dir), 250);
 };
 window.stopFreqNudge = function() {
     if (freqNudgeInterval) clearInterval(freqNudgeInterval);

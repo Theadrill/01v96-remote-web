@@ -206,7 +206,7 @@ function createDesktopChannelStrip(i, isMaster = false) {
         isMaster,
         hasSolo: !isMaster && !musicianMode && !technicianMixMode,
         onAction,
-        configAction: (musicianMode || technicianMixMode) ? "" : `openChannelConfig(event, ${i})`,
+        configAction: musicianMode ? "" : `openChannelConfig(event, ${i})`,
         type: "main"
     });
 }
@@ -297,7 +297,7 @@ function createChannelStrip(i, isMaster = false) {
         isMaster,
         hasSolo: !isMaster && !musicianMode && !technicianMixMode,
         onAction,
-        configAction: (musicianMode || technicianMixMode) ? "" : `openChannelConfig(event, ${i})`,
+        configAction: musicianMode ? "" : `openChannelConfig(event, ${i})`,
         val: 0,
         dbLabel: "-∞",
         isOn: false

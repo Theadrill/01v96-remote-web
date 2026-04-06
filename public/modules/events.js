@@ -1,5 +1,5 @@
 function openChannelConfig(e, ch) {
-    if (musicianMode || technicianMixMode) return; // Músico ou Técnico em modo Mix não abrem config
+    if (musicianMode) return; // Apenas Músico é bloqueado de abrir config base
     if (e.target.closest('button') || e.target.closest('input')) return;
     
     activeConfigChannel = ch;
@@ -44,17 +44,19 @@ function changeConfigChannel(delta) {
 function closeChannelConfig() {
     if (window.stopEQAnimation) stopEQAnimation();
     document.getElementById('chConfigModal').style.display = 'none';
-    document.getElementById('mainNav').style.display = 'flex';
+    
+    // Restaura o painel principal, a menos que estejamos em fones/mix
+    document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode) ? 'none' : 'flex';
     document.getElementById('chNav').style.display = 'none';
     document.getElementById('chContext').style.display = 'none';
 
-    // Mostra botões de logout de volta ao sair
+    // Mostra botões de logout de volta ao sair (respeitando modos)
     if (musicianMode) {
         const mExit = document.getElementById('musicianExitBtn');
         if (mExit) mExit.style.display = 'block';
     } else {
         const tExit = document.getElementById('tecnicoExitBtn');
-        if (tExit) tExit.style.display = 'block';
+        if (tExit) tExit.style.display = (outsMode || technicianMixMode) ? 'none' : 'block';
     }
     
     // Reseta cores dos cards
