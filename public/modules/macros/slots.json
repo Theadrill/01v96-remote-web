@@ -16,6 +16,15 @@
     "3": {
       "scriptId": "channel_toggler",
       "name": "VDJ"
+    },
+    "4": {
+      "scriptId": "lumikit",
+      "name": "DJ/LOGO"
+    },
+    "5": {
+      "scriptId": "lumikit",
+      "name": "BANDA/LOGO",
+      "color": "#ff8605"
     }
   }
 }

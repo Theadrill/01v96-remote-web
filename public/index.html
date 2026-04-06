@@ -206,8 +206,8 @@
 
     <!-- Modal de Macros Dinâmico -->
     <div id="macrosModal" class="modal-overlay" style="z-index:13000; display:none;">
-        <div class="modal-content" style="max-width:550px; background:#1a1a1a; border:2px solid #6a1b9a; border-radius:15px; padding:25px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;">
+        <div class="modal-content" style="max-width:550px; display:flex; flex-direction:column; overflow:hidden; background:#1a1a1a; border:2px solid #6a1b9a; border-radius:15px; padding:25px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px; flex-shrink:0;">
                 <div>
                     <h2 style="margin:0; font-size:18px; letter-spacing:1px;">PAINEL DE MACROS</h2>
                     <span id="currentPresetLabel" style="font-size:10px; color:#666; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">PRESET: ...</span>
@@ -219,9 +219,14 @@
             </div>
             
             <!-- Grid de slots que será populado via JS -->
-            <div id="macroSlotsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px;"></div>
+            <!-- flex: 1 and min-height: 0 lets this area scroll instead of the modal itself expanding -->
+            <div id="macroSlotsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; overflow-y:auto; scrollbar-width:none; flex:1; min-height:0; align-content:start;">
+                <style>
+                    #macroSlotsGrid::-webkit-scrollbar { display: none; }
+                </style>
+            </div>
 
-            <button onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close" style="width: 100%; height: 50px; border-radius:10px;">FECHAR PAINEL</button>
+            <button onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close" style="width: 100%; height: 50px; border-radius:10px; flex-shrink:0;">FECHAR PAINEL</button>
         </div>
     </div>
 
@@ -242,6 +247,10 @@
             <p id="ctxMacroName" style="color:#6a1b9a; font-weight:bold; margin-bottom:20px; font-size:16px;">Macro Config</p>
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <button class="btn-connect" style="background:#555; margin:0; height:50px;" onclick="openMacroNameEditor()">✏️ MUDAR NOME</button>
+                <div style="position:relative; width:100%; margin:0; padding:0;">
+                    <button class="btn-connect" style="background:#555; margin:0; height:50px; width:100%;" onclick="document.getElementById('macroColorPicker').click()">🎨 MUDAR COR</button>
+                    <input type="color" id="macroColorPicker" style="position:absolute; width:1px; height:1px; top:50%; left:50%; opacity:0; pointer-events:none;" onchange="saveMacroColor(this.value)">
+                </div>
                 <button class="btn-connect" style="background:#555; margin:0; height:50px;" onclick="changeSelectedMacro()">🔄 TROCAR MACRO</button>
                 <button class="btn-connect" style="background:#6a1b9a; margin:0; height:50px;" onclick="openMacroSettings()">⚙️ CONFIGURAR</button>
                 <button class="btn-connect" style="background:#c62828; margin:0; height:40px; font-size:10px;" onclick="removeMacroFromSlot()">🗑️ REMOVER MACRO</button>
@@ -268,7 +277,11 @@
             <p id="settingsMacroTitle" style="color:#6a1b9a; font-weight:bold; margin-bottom:10px; font-size:16px;">Configuração da Macro</p>
             <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:20px; letter-spacing:1px;">Selecione os canais desejados abaixo:</p>
             
-            <div id="macroSettingsGrid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; max-height:400px; overflow-y:auto; padding-right:10px; margin-bottom:25px;">
+            <div id="macroSettingsGrid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; max-height:400px; overflow-y:auto; margin-bottom:25px; scrollbar-width:none;">
+                <style>
+                    ::-webkit-scrollbar { display: none !important; }
+                    * { scrollbar-width: none !important; }
+                </style>
                 <!-- Grid de 32 botões gerado via JS -->
             </div>
 

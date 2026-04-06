@@ -213,7 +213,8 @@ function renderMacros() {
         if (slotData && !availableScripts.includes(slotData.scriptId)) { delete assignedMacros[i]; saveGlobalSlotsManifest(); continue; }
         const config = slotData ? macroDatabase[slotData.scriptId] : null;
         const slot = document.createElement('div'); slot.className = 'macro-slot';
-        slot.style.cssText = `height: 85px; border-radius: 12px; background: ${config ? (config.color || '#4a148c') : '#222'}; border: 2px solid ${config ? 'rgba(255,255,255,0.2)' : '#333'}; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; user-select: none; -webkit-user-select: none; transition: transform 0.1s; padding: 5px; text-align: center; touch-action: none;`;
+        const slotColor = (slotData && slotData.color) ? slotData.color : (config ? (config.color || '#4a148c') : '#222');
+        slot.style.cssText = `height: 85px; border-radius: 12px; background: ${slotColor}; border: 2px solid ${config ? 'rgba(255,255,255,0.2)' : '#333'}; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; user-select: none; -webkit-user-select: none; transition: transform 0.1s; padding: 5px; text-align: center; touch-action: none;`;
         if (slotData && config) {
             const displayName = slotData.name || `MACRO ${i+1}`; const modName = config.name || slotData.scriptId;
             slot.innerHTML = `<span style="font-size: 11px; font-weight: 800; color: white; display: block; margin-bottom: 3px; line-height: 1.1;">${displayName.toUpperCase()}</span><span style="font-size: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px;">${modName}</span>`;
@@ -247,7 +248,15 @@ async function openLibrary(index) {
     });
 }
 function selectMacroFromLibrary(id) { assignedMacros[activeSlotIndex] = { scriptId: id, name: `MACRO ${activeSlotIndex + 1}` }; saveGlobalSlotsManifest(); loadMacroScript(id); document.getElementById('macroLibraryModal').style.display = 'none'; renderMacros(); }
-function showContextMenu(index) { const sd = assignedMacros[index]; if (!sd) return; activeSlotIndex = index; document.getElementById('ctxMacroName').innerText = sd.name; document.getElementById('macroContextModal').style.display = 'flex'; }
+function showContextMenu(index) { 
+    const sd = assignedMacros[index]; if (!sd) return; 
+    activeSlotIndex = index; 
+    document.getElementById('ctxMacroName').innerText = sd.name; 
+    const picker = document.getElementById('macroColorPicker');
+    const config = macroDatabase[sd.scriptId];
+    if (picker) picker.value = sd.color || (config ? config.color || '#6a1b9a' : '#6a1b9a');
+    document.getElementById('macroContextModal').style.display = 'flex'; 
+}
 window.openMacroNameEditor = function() {
     const sd = assignedMacros[activeSlotIndex]; if (!sd) return;
     document.getElementById('inputMacroName').value = sd.name; document.getElementById('macroContextModal').style.display = 'none'; document.getElementById('macroNameEditorModal').style.display = 'flex'; setTimeout(() => document.getElementById('inputMacroName').focus(), 100);
@@ -256,6 +265,14 @@ window.saveMacroName = async function() {
     const nn = document.getElementById('inputMacroName').value.trim();
     if (nn && assignedMacros[activeSlotIndex]) { assignedMacros[activeSlotIndex].name = nn; await saveGlobalSlotsManifest(); renderMacros(); }
     document.getElementById('macroNameEditorModal').style.display = 'none';
+};
+window.saveMacroColor = async function(colorHex) {
+    if (activeSlotIndex !== null && assignedMacros[activeSlotIndex]) {
+        assignedMacros[activeSlotIndex].color = colorHex;
+        await saveGlobalSlotsManifest();
+        renderMacros();
+    }
+    document.getElementById('macroContextModal').style.display = 'none';
 };
 window.changeSelectedMacro = function() { document.getElementById('macroContextModal').style.display = 'none'; openLibrary(activeSlotIndex); };
 window.openMacroSettings = function() {

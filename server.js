@@ -188,6 +188,19 @@ app.get('/api/names', (req, res) => {
     } else { res.json({}); }
 });
 
+app.get('/api/proxy', (req, res) => {
+    const targetUrl = req.query.url;
+    if (!targetUrl) return res.status(400).json({error: "Falta url param"});
+    const reqProxy = http.get(targetUrl, (resProxy) => {
+        let body = '';
+        resProxy.on('data', chunk => body += chunk);
+        resProxy.on('end', () => {
+            try { res.json(JSON.parse(body)); } catch(e) { res.send(body); }
+        });
+    });
+    reqProxy.on('error', err => res.status(500).json({ error: err.message }));
+});
+
 const configFile = path.join(__dirname, 'config.json');
 const namesFile = path.join(__dirname, 'names.json');
 

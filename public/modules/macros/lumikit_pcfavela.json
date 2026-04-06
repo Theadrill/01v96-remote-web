@@ -1,0 +1,22 @@
+{
+  "globalHost": {
+    "ip": "pcfavela",
+    "port": 5000
+  },
+  "slot_4": {
+    "scenes": [
+      12
+    ],
+    "extras": [
+      0
+    ]
+  },
+  "slot_5": {
+    "scenes": [
+      3
+    ],
+    "extras": [
+      0
+    ]
+  }
+}
