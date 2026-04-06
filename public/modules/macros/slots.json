@@ -1,0 +1,21 @@
+{
+  "pcmaria": {},
+  "pcfavela": {
+    "0": {
+      "scriptId": "channel_toggler",
+      "name": "intervalo"
+    },
+    "1": {
+      "scriptId": "channel_toggler",
+      "name": "CAV/VIOL"
+    },
+    "2": {
+      "scriptId": "channel_toggler",
+      "name": "SFIO"
+    },
+    "3": {
+      "scriptId": "channel_toggler",
+      "name": "VDJ"
+    }
+  }
+}

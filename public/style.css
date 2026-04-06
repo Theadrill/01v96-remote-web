@@ -1,16 +1,79 @@
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; height: 100dvh; overflow: hidden; display: flex; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
-body.layout-horizontal { flex-direction: column; }
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #111;
+    color: #fff;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: none !important;
+}
+
+body.layout-horizontal {
+    flex-direction: column;
+}
 
 /* Área dos faders com rolagem lateral fluida */
-.faders-area { flex: 1; display: flex; padding: 10px 20px; overflow-x: auto; overflow-y: hidden; align-items: center; justify-content: flex-start; gap: 15px; order: 1; scrollbar-width: none; min-height: 0; touch-action: pan-x; }
-body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
-.faders-area::-webkit-scrollbar { display: none; }
+.faders-area {
+    flex: 1;
+    display: flex;
+    padding: 10px 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    order: 1;
+    scrollbar-width: none;
+    min-height: 0;
+    touch-action: pan-x;
+}
+
+body.layout-horizontal .faders-area {
+    flex: 1;
+    padding: 10px;
+    gap: 8px;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.faders-area::-webkit-scrollbar {
+    display: none;
+}
 
 /* Agrupamento de 8 em 8 faders na tela principal */
-.faders-area > .fader-card:nth-child(8n) { margin-right: 55px; }
+.faders-area>.fader-card:nth-child(8n) {
+    margin-right: 55px;
+}
 
-.fader-card { background: #222; padding: 12px 10px; border-radius: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; max-height: 100%; min-width: 110px; box-sizing: border-box; cursor: default; min-height: 0; position: relative; transition: border-color 0.2s, box-shadow 0.2s; }
+.fader-card {
+    background: #222;
+    padding: 12px 10px;
+    border-radius: 15px;
+    border: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-height: 100%;
+    min-width: 110px;
+    box-sizing: border-box;
+    cursor: default;
+    min-height: 0;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
 
 .fader-card.peak-glow {
     border-color: #ff0000 !important;
@@ -18,12 +81,11 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
 }
 
 .fader-card.has-meter {
-    background-image: linear-gradient(to top, 
-        rgba(0, 255, 0, var(--meter-opacity, 0.4)) 0%, 
-        rgba(100, 255, 0, var(--meter-opacity, 0.4)) 60%, 
-        rgba(255, 221, 0, var(--meter-opacity, 0.5)) 85%, 
-        rgba(255, 0, 0, var(--meter-opacity, 0.55)) 100%
-    );
+    background-image: linear-gradient(to top,
+            rgba(0, 255, 0, var(--meter-opacity, 0.4)) 0%,
+            rgba(100, 255, 0, var(--meter-opacity, 0.4)) 60%,
+            rgba(255, 221, 0, var(--meter-opacity, 0.5)) 85%,
+            rgba(255, 0, 0, var(--meter-opacity, 0.55)) 100%);
     background-repeat: no-repeat;
     background-position: bottom;
     background-size: 100% 0%;
@@ -51,17 +113,18 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
     left: 2px !important;
     width: 8px !important;
     height: 1px !important;
-    border-top: 2px solid rgba(255,255,255,0.6) !important;
+    border-top: 2px solid rgba(255, 255, 255, 0.6) !important;
     z-index: 100 !important;
 }
 
 .mobile-db-tick span {
     position: absolute !important;
     left: 0 !important;
-    top: 3px !important; /* Posiciona logo abaixo do tracinho */
+    top: 3px !important;
+    /* Posiciona logo abaixo do tracinho */
     font-size: 8px !important;
     font-weight: bold !important;
-    color: rgba(255,255,255,0.7) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
     font-family: Arial, sans-serif !important;
     text-shadow: 1px 1px 3px #000 !important;
     z-index: 101 !important;
@@ -74,7 +137,7 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     z-index: 10;
     transition: background 0.05s;
 }
@@ -84,10 +147,10 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
     box-shadow: 0 0 10px #ff0000;
 }
 
-.fader-card.has-meter > * {
+.fader-card.has-meter>* {
     position: relative;
     z-index: 2;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9), -1px -1px 3px rgba(0, 0, 0, 0.9);
 }
 
 /* Master Fader Rule */
@@ -122,118 +185,341 @@ body.layout-horizontal .faders-area { flex: 1; padding: 10px; gap: 8px; flex-dir
 
 /* Dynamic Label Coloring (Desktop) */
 .fader-group-1 .desk-label {
-    background: #003a5e !important; /* Azul "Slate" sutil para OFF */
+    background: #003a5e !important;
+    /* Azul "Slate" sutil para OFF */
     color: #00adef !important;
 }
+
 .fader-group-1 .desk-label.label-on {
-    background: #00568a !important; /* Azul um pouco mais denso para ON */
+    background: #00568a !important;
+    /* Azul um pouco mais denso para ON */
     color: #fff !important;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .fader-group-2 .desk-label {
-    background: #004a30 !important; /* Verde "Slate" sutil para OFF */
+    background: #004a30 !important;
+    /* Verde "Slate" sutil para OFF */
     color: #00ff88 !important;
 }
+
 .fader-group-2 .desk-label.label-on {
-    background: #006b41 !important; /* Verde um pouco mais denso para ON */
+    background: #006b41 !important;
+    /* Verde um pouco mais denso para ON */
     color: #fff !important;
     font-weight: 900;
 }
+
 body.layout-horizontal .master-card {
     margin-left: 0 !important;
     margin-top: 30px !important;
 }
 
-body.layout-horizontal .fader-card {  
-    display: grid !important; 
+body.layout-horizontal .fader-card {
+    display: grid !important;
     grid-template-columns: 100px 42px minmax(0, 1fr) 42px 75px;
     grid-template-rows: 40px 40px;
-    grid-column-gap: 8px; grid-row-gap: 0;
-    width: 100% !important; height: 90px !important; min-height: 90px !important; 
-    padding: 5px 15px !important; border-radius: 12px;
-    align-items: center; justify-items: stretch; cursor: default;
+    grid-column-gap: 8px;
+    grid-row-gap: 0;
+    width: 100% !important;
+    height: 90px !important;
+    min-height: 90px !important;
+    padding: 5px 15px !important;
+    border-radius: 12px;
+    align-items: center;
+    justify-items: stretch;
+    cursor: default;
     box-sizing: border-box !important;
 }
 
-body.layout-horizontal .faders-area > .fader-card:nth-child(8n) { 
-    margin-right: 0 !important; 
-    margin-bottom: 45px !important; 
+body.layout-horizontal .faders-area>.fader-card:nth-child(8n) {
+    margin-right: 0 !important;
+    margin-bottom: 45px !important;
 }
 
 /* Coluna 1: Stack Interno Falsificado (Garante que não use grid rows p/ outros) */
-body.layout-horizontal .fader-card .card-title { grid-column: 1; grid-row: 1; align-self: end; margin: 0; font-size: 10px !important; text-align: center; }
-body.layout-horizontal .fader-card .ch-name { grid-column: 1; grid-row: 1; align-self: start; margin: 0 !important; font-size: 11px !important; text-align: center; width: 100% !important; box-sizing: border-box; }
+body.layout-horizontal .fader-card .card-title {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    margin: 0;
+    font-size: 10px !important;
+    text-align: center;
+}
 
-body.layout-horizontal .fader-card .btn-state[id^="solo"] { grid-column: 1; grid-row: 2; width: 45% !important; height: 35px !important; margin: 0 !important; justify-self: start; align-self: start; border-radius: 4px !important; font-size: 9px !important; }
-body.layout-horizontal .fader-card .btn-state[id^="on"], 
-body.layout-horizontal .fader-card .btn-state[id^="aux_on"] { grid-column: 1; grid-row: 2; width: 45% !important; height: 35px !important; margin: 0 !important; justify-self: end; align-self: start; border-radius: 4px !important; font-size: 9px !important; }
+body.layout-horizontal .fader-card .ch-name {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    margin: 0 !important;
+    font-size: 11px !important;
+    text-align: center;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+body.layout-horizontal .fader-card .btn-state[id^="solo"] {
+    grid-column: 1;
+    grid-row: 2;
+    width: 45% !important;
+    height: 35px !important;
+    margin: 0 !important;
+    justify-self: start;
+    align-self: start;
+    border-radius: 4px !important;
+    font-size: 9px !important;
+}
+
+body.layout-horizontal .fader-card .btn-state[id^="on"],
+body.layout-horizontal .fader-card .btn-state[id^="aux_on"] {
+    grid-column: 1;
+    grid-row: 2;
+    width: 45% !important;
+    height: 35px !important;
+    margin: 0 !important;
+    justify-self: end;
+    align-self: start;
+    border-radius: 4px !important;
+    font-size: 9px !important;
+}
 
 /* Elementos da Linha Única (Span rows p/ travar horizontal) */
-body.layout-horizontal .fader-card .nudge-zone:nth-of-type(1) { grid-column: 4; grid-row: 1 / 3; align-self: stretch; display: flex; align-items: center; justify-content: center; width: 100% !important; } /* Botão + */
-body.layout-horizontal .fader-card .nudge-zone:nth-of-type(2) { grid-column: 2; grid-row: 1 / 3; align-self: stretch; display: flex; align-items: center; justify-content: center; width: 100% !important; } /* Botão - */
-
-body.layout-horizontal input[type=range] { 
-    grid-column: 3; grid-row: 1 / 3;
-    -webkit-appearance: none !important; appearance: none !important; 
-    width: 100% !important; min-width: 0 !important; height: 8px !important; 
-    background: #444 !important; outline: none; margin: 0 !important; 
-    cursor: pointer; position: relative;
-}
-body.layout-horizontal input[type=range]::-webkit-slider-thumb { 
-    -webkit-appearance: none !important; appearance: none !important;
-    width: 15px !important; height: 60px !important; background: #fff !important; 
-    border-radius: 3px; border: 1px solid #000;
+body.layout-horizontal .fader-card .nudge-zone:nth-of-type(1) {
+    grid-column: 4;
+    grid-row: 1 / 3;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
 }
 
-body.layout-horizontal .fader-val { 
-    grid-column: 5; grid-row: 1 / 3; 
-    font-size: 16px !important; color: #007bff; text-align: right; width: 100%; margin: 0 !important;
+/* Botão + */
+body.layout-horizontal .fader-card .nudge-zone:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
 }
-body.layout-horizontal .nudge-zone .fader-val { display: none !important; }
+
+/* Botão - */
+
+body.layout-horizontal input[type=range] {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 8px !important;
+    background: #444 !important;
+    outline: none;
+    margin: 0 !important;
+    cursor: pointer;
+    position: relative;
+}
+
+body.layout-horizontal input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 15px !important;
+    height: 60px !important;
+    background: #fff !important;
+    border-radius: 3px;
+    border: 1px solid #000;
+}
+
+body.layout-horizontal .fader-val {
+    grid-column: 5;
+    grid-row: 1 / 3;
+    font-size: 16px !important;
+    color: #007bff;
+    text-align: right;
+    width: 100%;
+    margin: 0 !important;
+}
+
+body.layout-horizontal .nudge-zone .fader-val {
+    display: none !important;
+}
 
 /* Botões Nudge na Horizontal */
-body.layout-horizontal .btn-nudge { width: 38px !important; height: 38px !important; font-size: 18px !important; }
+body.layout-horizontal .btn-nudge {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 18px !important;
+}
 
 /* Sidebar Horizontal */
 /* Sidebar Horizontal */
-body.layout-horizontal .sidebar { width: 100%; height: 80px; flex-direction: row; border: none; border-top: 2px solid #333; padding: 0 15px; order: 3; justify-content: space-around; flex-shrink: 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.7); z-index: 100; background: #1a1a1a; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
-body.layout-horizontal #mainNav, body.layout-horizontal #chNav, body.layout-horizontal #chContext { flex-direction: row !important; height: 100%; width: auto !important; margin: 0; gap: 5px; border: none !important; padding: 0 !important; }
-body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; font-size: 11px; }
+body.layout-horizontal .sidebar {
+    width: 100%;
+    height: 80px;
+    flex-direction: row;
+    border: none;
+    border-top: 2px solid #333;
+    padding: 0 15px;
+    order: 3;
+    justify-content: space-around;
+    flex-shrink: 0;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.7);
+    z-index: 100;
+    background: #1a1a1a;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
 
-.card-title, .ch-name { cursor: pointer; }
+body.layout-horizontal #mainNav,
+body.layout-horizontal #chNav,
+body.layout-horizontal #chContext {
+    flex-direction: row !important;
+    height: 100%;
+    width: auto !important;
+    margin: 0;
+    gap: 5px;
+    border: none !important;
+    padding: 0 !important;
+}
 
-.ch-name { 
-    background: rgba(0, 0, 0, 0.4); 
+body.layout-horizontal .side-btn {
+    min-width: 70px;
+    height: 45px;
+    margin: 0;
+    font-size: 11px;
+}
+
+.card-title,
+.ch-name {
+    cursor: pointer;
+}
+
+.ch-name {
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(3px);
-    color: #0f0; 
-    padding: 2px; 
-    border-radius: 4px; 
-    font-size: 16px; 
-    margin: 1px 0 4px 0; 
-    text-transform: uppercase; 
-    font-weight: bold; 
-    border: 1px solid rgba(255,255,255,0.1); 
-    width: 95%; 
-    text-align: center; 
-    overflow: hidden; 
-    white-space: nowrap; 
+    color: #0f0;
+    padding: 2px;
+    border-radius: 4px;
+    font-size: 16px;
+    margin: 1px 0 4px 0;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 95%;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
     z-index: 10;
 }
-.btn-state { width: 85%; padding: 10px 0; margin-bottom: 6px; border-radius: 5px; font-size: 12px; font-weight: bold; border: 1px solid #444; background: #333; color: #666; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-.solo-active { background: #28a745 !important; color: white !important; border-color: #34ce57; }
-.on-active { background: #ffc107 !important; color: black !important; border-color: #ffdb6e; }
-.phase-norm { background: #007bff !important; color: white !important; border-color: #00a2ff; }
-.phase-inv { background: #28a745 !important; color: white !important; border-color: #34ce57; }
+
+.btn-state {
+    width: 85%;
+    padding: 10px 0;
+    margin-bottom: 6px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #444;
+    background: #333;
+    color: #666;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+
+.solo-active {
+    background: #28a745 !important;
+    color: white !important;
+    border-color: #34ce57;
+}
+
+.on-active {
+    background: #ffc107 !important;
+    color: black !important;
+    border-color: #ffdb6e;
+}
+
+.phase-norm {
+    background: #007bff !important;
+    color: white !important;
+    border-color: #00a2ff;
+}
+
+.phase-inv {
+    background: #28a745 !important;
+    color: white !important;
+    border-color: #34ce57;
+}
 
 
 /* Botões de Nudge e Zonas de Toque */
-.btn-nudge { width: 50px; height: 50px; border-radius: 50%; background: #333; color: #fff; font-size: 26px; font-weight: bold; border: 2px solid #555; display: flex; justify-content: center; align-items: center; margin: 0; touch-action: none; -webkit-touch-callout: none; }
-.nudge-zone { align-self: stretch; margin: 0; padding: 6px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; touch-action: none; -webkit-touch-callout: none; user-select: none; border-radius: 8px; position: relative; }
-.nudge-zone::after { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 100%; max-height: 80px; background: transparent; border-radius: 8px; transition: background 0.1s; pointer-events: none; z-index: 0; }
-.nudge-zone:active::after { background: rgba(255,255,255,0.15); }
-.nudge-zone .btn-nudge, .nudge-zone .fader-val { position: relative; z-index: 1; }
-.nudge-zone:active .btn-nudge { background: #444; border-color: #666; }
+.btn-nudge {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #333;
+    color: #fff;
+    font-size: 26px;
+    font-weight: bold;
+    border: 2px solid #555;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    touch-action: none;
+    -webkit-touch-callout: none;
+}
+
+.nudge-zone {
+    align-self: stretch;
+    margin: 0;
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+    border-radius: 8px;
+    position: relative;
+}
+
+.nudge-zone::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 100%;
+    max-height: 80px;
+    background: transparent;
+    border-radius: 8px;
+    transition: background 0.1s;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.nudge-zone:active::after {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.nudge-zone .btn-nudge,
+.nudge-zone .fader-val {
+    position: relative;
+    z-index: 1;
+}
+
+.nudge-zone:active .btn-nudge {
+    background: #444;
+    border-color: #666;
+}
+
 /* Faders Mobile Customizados p/ Toque (Dentro do fader-rotated-container) */
 .fader-card .fader-rotated-container {
     flex: 1;
@@ -241,7 +527,8 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: stretch; /* Estica o fader verticalmente */
+    align-items: stretch;
+    /* Estica o fader verticalmente */
     min-height: 50px;
     margin: 10px 0;
 }
@@ -250,17 +537,20 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
-    
+
     /* 🚨 [AUTO-STRETCH] O segredo para não invadir botões */
     writing-mode: vertical-lr !important;
-    direction: rtl !important; /* Bottom -> Top */
-    
-    width: 48px !important;    /* Largura da zona de toque */
-    height: 100% !important;   /* Ocupa exatamente o espaço do container */
-    
+    direction: rtl !important;
+    /* Bottom -> Top */
+
+    width: 48px !important;
+    /* Largura da zona de toque */
+    height: 100% !important;
+    /* Ocupa exatamente o espaço do container */
+
     position: relative !important;
     display: block !important;
-    background: linear-gradient(to bottom, #555, #555) no-repeat center / 6px 100% !important; 
+    background: linear-gradient(to bottom, #555, #555) no-repeat center / 6px 100% !important;
     border: none !important;
     outline: none !important;
     cursor: default;
@@ -279,8 +569,8 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
     border-radius: 6px !important;
     background: #eee !important;
     border: 2px solid #000;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 5px rgba(255,255,255,0.2) inset;
-    margin-top: 0 !important; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), 0 0 5px rgba(255, 255, 255, 0.2) inset;
+    margin-top: 0 !important;
     cursor: grab;
 }
 
@@ -290,20 +580,24 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
     border-radius: 6px !important;
     background: #eee !important;
     border: 2px solid #000;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 5px rgba(255,255,255,0.2) inset;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), 0 0 5px rgba(255, 255, 255, 0.2) inset;
     cursor: grab;
 }
 
 /* Thumbs menores para modo Landscape ou janelas curtas */
 @media (max-height: 500px) {
     .fader-card .fader-rotated-container {
-        margin: 2px 0 !important; /* Libera mais curso vertical p/ o fader */
+        margin: 2px 0 !important;
+        /* Libera mais curso vertical p/ o fader */
     }
+
     .fader-card input[type=range]::-webkit-slider-thumb {
         width: 38px !important;
-        height: 30px !important; /* Altura reduzida, largura mantida */
+        height: 30px !important;
+        /* Altura reduzida, largura mantida */
         border-radius: 5px !important;
     }
+
     .fader-card input[type=range]::-moz-range-thumb {
         width: 38px !important;
         height: 30px !important;
@@ -315,9 +609,11 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
 @media (max-height: 350px) {
     .fader-card input[type=range]::-webkit-slider-thumb {
         width: 32px !important;
-        height: 18px !important; /* Bem achatado verticalmente */
+        height: 18px !important;
+        /* Bem achatado verticalmente */
         border-radius: 3px !important;
     }
+
     .fader-card input[type=range]::-moz-range-thumb {
         width: 32px !important;
         height: 18px !important;
@@ -326,43 +622,127 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
 }
 
 /* Esconder os tracks nativos */
-.fader-card input[type=range]::-webkit-slider-runnable-track { background: transparent !important; border: none !important; }
-.fader-card input[type=range]::-moz-range-track { background: transparent !important; border: none !important; }
+.fader-card input[type=range]::-webkit-slider-runnable-track {
+    background: transparent !important;
+    border: none !important;
+}
+
+.fader-card input[type=range]::-moz-range-track {
+    background: transparent !important;
+    border: none !important;
+}
 
 /* Cores específicas por grupo */
-.fader-group-1 input[type=range]::-webkit-slider-thumb { background: #00adef !important; border-color: #004a80; }
-.fader-group-2 input[type=range]::-webkit-slider-thumb { background: #00ff88 !important; border-color: #008a4a; }
-.fader-group-aux input[type=range]::-webkit-slider-thumb { background: #9d00ff !important; border-color: #4a008a; }
+.fader-group-1 input[type=range]::-webkit-slider-thumb {
+    background: #00adef !important;
+    border-color: #004a80;
+}
 
-.fader-group-1 input[type=range]::-moz-range-thumb { background: #00adef !important; border-color: #004a80; }
-.fader-group-2 input[type=range]::-moz-range-thumb { background: #00ff88 !important; border-color: #008a4a; }
-.fader-group-aux input[type=range]::-moz-range-thumb { background: #9d00ff !important; border-color: #4a008a; }
+.fader-group-2 input[type=range]::-webkit-slider-thumb {
+    background: #00ff88 !important;
+    border-color: #008a4a;
+}
+
+.fader-group-aux input[type=range]::-webkit-slider-thumb {
+    background: #9d00ff !important;
+    border-color: #4a008a;
+}
+
+.fader-group-1 input[type=range]::-moz-range-thumb {
+    background: #00adef !important;
+    border-color: #004a80;
+}
+
+.fader-group-2 input[type=range]::-moz-range-thumb {
+    background: #00ff88 !important;
+    border-color: #008a4a;
+}
+
+.fader-group-aux input[type=range]::-moz-range-thumb {
+    background: #9d00ff !important;
+    border-color: #4a008a;
+}
 
 /* Sidebar e botões globais */
 /* Sidebar e botões globais */
-.sidebar { width: 100px; background: #222; border-left: 1px solid #444; padding: 15px 10px; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; order: 2; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.sidebar::-webkit-scrollbar { display: none; }
-.side-btn { width: 100%; padding: 15px 5px; margin-bottom: 10px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; }
-.fs-btn { 
-    background: rgba(85, 85, 85, 0.8); 
-    position: fixed; 
-    bottom: 20px; 
-    right: 20px; 
-    width: 44px; 
-    height: 44px; 
-    border-radius: 50%; 
-    z-index: 10001; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+.sidebar {
+    width: 100px;
+    background: #222;
+    border-left: 1px solid #444;
+    padding: 15px 10px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    order: 2;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.side-btn {
+    width: 100%;
+    padding: 15px 5px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.fs-btn {
+    background: rgba(85, 85, 85, 0.8);
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    z-index: 10001;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     border: 1px solid #666;
     backdrop-filter: blur(5px);
     transition: transform 0.2s, background 0.2s;
 }
-.fs-btn:active { transform: scale(0.9); background: rgba(100, 100, 100, 0.9); }
 
-.btn-config { background: #444; color: white; }
-.btn-outs { background: #28a745; color: white; transition: 0.3s; border: 1px solid #34ce57; }
-.btn-outs.active-tab { background: #1b5e20 !important; border-color: #2e7d32 !important; box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); }
-.btn-sync { background: #007bff; color: white; }
+.fs-btn:active {
+    transform: scale(0.9);
+    background: rgba(100, 100, 100, 0.9);
+}
+
+.btn-config {
+    background: #444;
+    color: white;
+}
+
+.btn-outs {
+    background: #28a745;
+    color: white;
+    transition: 0.3s;
+    border: 1px solid #34ce57;
+}
+
+.btn-outs.active-tab {
+    background: #1b5e20 !important;
+    border-color: #2e7d32 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+}
+
+.btn-sync {
+    background: #007bff;
+    color: white;
+}
 
 .fader-group-mix {
     border-color: rgba(255, 204, 0, 0.5) !important;
@@ -375,33 +755,106 @@ body.layout-horizontal .side-btn { min-width: 70px; height: 45px; margin: 0; fon
 }
 
 /* Ajuste dinâmico para os botões de saída para não quebrar linha */
-#musicianExitBtn, #tecnicoExitBtn {
+#musicianExitBtn,
+#tecnicoExitBtn {
     white-space: nowrap !important;
     overflow: hidden !important;
-    font-size: 10px !important; /* Ajuste para caber 11 caracteres em 80-100px */
+    font-size: 10px !important;
+    /* Ajuste para caber 11 caracteres em 80-100px */
     letter-spacing: -0.5px;
     padding: 10px 2px !important;
     text-overflow: clip;
 }
 
 /* Classes Modulares de Estilo Limpo */
-.card-title { font-size: 12px; margin: 0; color: #aaa; font-weight: normal; }
-.fader-val { font-size: 18px; margin: 5px 0 0 0; color: #007bff; font-family: monospace; white-space: nowrap; pointer-events: none; }
-.pointer-none { pointer-events: none; }
-.color-green { color: #0f0; }
-.font-13-bold { font-size: 13px; font-weight: bold; }
-.mb-20 { margin-bottom: 20px; }
-.fs-icon-btn { color: white; display: flex; justify-content: center; align-items: center; }
-.ch-clickable-zone { width: 100%; padding: 5px 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; border-radius: 8px; transition: background 0.1s; z-index: 5; }
-.ch-clickable-zone:active { background: transparent; } /* Removido brilho retangular redundante */
-.mt-auto { margin-top: auto; }
-.nav-btn { background: #333; color: #5cacee; border: 1px solid #444; border-radius: 4px; width: 30px; height: 30px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; user-select: none; }
-.nav-btn:active { background: #444; transform: scale(0.9); }
+.card-title {
+    font-size: 12px;
+    margin: 0;
+    color: #aaa;
+    font-weight: normal;
+}
+
+.fader-val {
+    font-size: 18px;
+    margin: 5px 0 0 0;
+    color: #007bff;
+    font-family: monospace;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.pointer-none {
+    pointer-events: none;
+}
+
+.color-green {
+    color: #0f0;
+}
+
+.font-13-bold {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.fs-icon-btn {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ch-clickable-zone {
+    width: 100%;
+    padding: 5px 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 8px;
+    transition: background 0.1s;
+    z-index: 5;
+}
+
+.ch-clickable-zone:active {
+    background: transparent;
+}
+
+/* Removido brilho retangular redundante */
+.mt-auto {
+    margin-top: auto;
+}
+
+.nav-btn {
+    background: #333;
+    color: #5cacee;
+    border: 1px solid #444;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s;
+    user-select: none;
+}
+
+.nav-btn:active {
+    background: #444;
+    transform: scale(0.9);
+}
+
 /* --- DESKTOP LAYOUT (AirFader Style) --- */
 body.layout-desktop .faders-area {
     display: flex;
     flex-direction: row;
-    overflow-x: scroll; /* Força scrollbar visível no Desktop */
+    overflow-x: scroll;
+    /* Força scrollbar visível no Desktop */
     overflow-y: hidden;
     padding: 0;
     gap: 0;
@@ -411,7 +864,7 @@ body.layout-desktop .faders-area {
     order: 1;
     cursor: grab;
     user-select: none;
-    scrollbar-width: thin; 
+    scrollbar-width: thin;
     scrollbar-color: #4a90e2 #1a1a1a;
 }
 
@@ -431,7 +884,8 @@ body.layout-desktop .faders-area::-webkit-scrollbar-track {
 }
 
 body.layout-desktop .faders-area::-webkit-scrollbar-thumb {
-    background: #4a90e2; /* Azul elegante */
+    background: #4a90e2;
+    /* Azul elegante */
     border-radius: 10px;
     border: 3px solid #111;
 }
@@ -461,15 +915,18 @@ body.layout-desktop .sidebar {
 }
 
 .fader-card-desktop.fader-group-1.desk-on-bg {
-    background-color: #1a2633 !important; /* Azul escuro sutil para o corpo do canal ON */
+    background-color: #1a2633 !important;
+    /* Azul escuro sutil para o corpo do canal ON */
 }
 
 .fader-card-desktop.fader-group-2.desk-on-bg {
-    background-color: #1a2b22 !important; /* Verde escuro sutil para o corpo do canal ON */
+    background-color: #1a2b22 !important;
+    /* Verde escuro sutil para o corpo do canal ON */
 }
 
 .master-card-desktop.desk-on-bg {
-    background-color: #5d1a1a !important; /* Vermelho sutil exclusivo para o Master */
+    background-color: #5d1a1a !important;
+    /* Vermelho sutil exclusivo para o Master */
 }
 
 /* Remover gradiente do card completo no Desktop */
@@ -477,7 +934,7 @@ body.layout-desktop .sidebar {
     background-image: none !important;
 }
 
-.fader-card-desktop > * {
+.fader-card-desktop>* {
     position: relative;
     z-index: 2;
 }
@@ -514,13 +971,17 @@ body.layout-desktop .sidebar {
     cursor: pointer;
     text-transform: uppercase;
 }
+
 .btn-cue.solo-active {
     background: #ffc107;
     color: #000;
     border-color: #fff;
 }
 
-.btn-cue-placeholder { height: 38px; margin: 4px; }
+.btn-cue-placeholder {
+    height: 38px;
+    margin: 4px;
+}
 
 .desk-ch-name-zone {
     height: 32px;
@@ -555,6 +1016,7 @@ body.layout-desktop .sidebar {
     font-weight: 800;
     cursor: pointer;
 }
+
 .btn-on-desk.on-active {
     background: #ff4500;
     color: #fff;
@@ -610,7 +1072,8 @@ body.layout-desktop .sidebar {
     align-items: center;
     transition: 0.1s;
     user-select: none;
-    pointer-events: none; /* Deixa o zone tratar o evento */
+    pointer-events: none;
+    /* Deixa o zone tratar o evento */
 }
 
 .nudge-zone-desk:active .btn-nudge-desk {
@@ -621,11 +1084,14 @@ body.layout-desktop .sidebar {
 .desk-fader-container {
     flex: 1;
     display: flex;
-    flex-direction: row; /* Para o meter ficar ao lado */
+    flex-direction: row;
+    /* Para o meter ficar ao lado */
     justify-content: center;
-    align-items: center; /* Centraliza fader e meter */
+    align-items: center;
+    /* Centraliza fader e meter */
     position: relative;
-    padding: 0 5px 0 25px; /* Aumentado padding left para a escala */
+    padding: 0 5px 0 25px;
+    /* Aumentado padding left para a escala */
     min-height: 100px;
 }
 
@@ -652,7 +1118,8 @@ body.layout-desktop .sidebar {
 
 .desk-db-item span {
     font-size: 8px;
-    color: #999; /* Slightly brighter */
+    color: #999;
+    /* Slightly brighter */
     font-family: 'Arial Narrow', sans-serif;
     margin-right: 3px;
     font-weight: bold;
@@ -662,7 +1129,8 @@ body.layout-desktop .sidebar {
 .desk-db-item .tick {
     width: 6px;
     height: 1px;
-    background: #555; /* Slightly brighter */
+    background: #555;
+    /* Slightly brighter */
 }
 
 .desk-db-item .tick-small {
@@ -691,13 +1159,12 @@ body.layout-desktop .sidebar {
 .desk-meter-wrap {
     width: 5px;
     height: 92%;
-    background: linear-gradient(to top, 
-        #28a745 0%, 
-        #28a745 60%, 
-        #ffc107 71%, 
-        #dc3545 80.5%, 
-        #ff0000 100%
-    );
+    background: linear-gradient(to top,
+            #28a745 0%,
+            #28a745 60%,
+            #ffc107 71%,
+            #dc3545 80.5%,
+            #ff0000 100%);
     margin-left: 2px;
     border: 1px solid #111;
     border-radius: 1px;
@@ -729,7 +1196,9 @@ body.layout-desktop .sidebar {
 }
 
 /* Fader Thumb Custom for Desktop? (Opcional, mas melhora premium) */
-.desk-fader-container input[type=range]::-webkit-slider-runnable-track { background: transparent; }
+.desk-fader-container input[type=range]::-webkit-slider-runnable-track {
+    background: transparent;
+}
 
 .desk-footer-label {
     height: 25px;
@@ -749,9 +1218,17 @@ body.layout-desktop .sidebar .side-btn {
     background: #222;
 }
 
-body.layout-desktop .sidebar .btn-config { background: #333; }
-body.layout-desktop .sidebar .btn-outs { background: #1b5e20; }
-body.layout-desktop .sidebar .btn-sync { background: #004d99; }
+body.layout-desktop .sidebar .btn-config {
+    background: #333;
+}
+
+body.layout-desktop .sidebar .btn-outs {
+    background: #1b5e20;
+}
+
+body.layout-desktop .sidebar .btn-sync {
+    background: #004d99;
+}
 
 /* Fixed Master on Desktop */
 body.layout-desktop #master-container {
@@ -772,76 +1249,251 @@ body.layout-desktop .ch-modal-overlay {
 }
 
 @media screen and (max-width: 800px) {
-    .hide-mobile { display: none !important; }
-    .show-mobile { display: flex !important; }
+    .hide-mobile {
+        display: none !important;
+    }
+
+    .show-mobile {
+        display: flex !important;
+    }
 }
 
 /* Estilos do Modal */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; }
-.modal-content { background: #222; padding: 20px; border-radius: 15px; width: 80%; max-height: 90vh; overflow-y: auto; scrollbar-width: thin; box-sizing: border-box; }
-.modal-select { width: 100%; padding: 10px; margin-bottom: 10px; }
-.modal-actions { display: flex; gap: 10px; width: 100%; }
-.btn-connect { flex: 1; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; }
-.btn-close { flex: 1; padding: 15px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: bold; }
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #222;
+    padding: 20px;
+    border-radius: 15px;
+    width: 80%;
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    box-sizing: border-box;
+}
+
+.modal-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-connect {
+    flex: 1;
+    padding: 15px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.btn-close {
+    flex: 1;
+    padding: 15px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
 
 /* Ajuste fino para o layout de Paisagem (Landscape) em Celulares / Telas curtas */
 @media screen and (max-height: 600px) and (orientation: landscape) {
-    .faders-area { padding: 5px; gap: 5px; }
-    .fader-card { padding: 3px 4px; min-width: 80px; border-radius: 8px; }
-    .card-title { font-size: 9px !important; flex-shrink: 0; }
-    .ch-name { font-size: 12px !important; margin: 0 0 2px 0 !important; padding: 3px; flex-shrink: 0; }
-    .btn-state { padding: 4px 0; margin-bottom: 2px; border-radius: 4px; font-size: 9px; width: 90%; }
-    .nudge-zone { margin: 0 -4px; padding: 3px 0; }
-    .btn-nudge { width: 32px; height: 32px; font-size: 18px; margin: 0; border: 1px solid #555; }
-    input[type=range] { margin: 1px 0; width: 100%; }
-    .fader-val { font-size: 12px !important; margin: 1px 0 0 0 !important; }
-    
-    .sidebar { width: 85px; padding: 5px; }
-    #scn { margin-bottom: 5px !important; font-size: 10px !important; }
-    .side-btn { padding: 8px 2px; margin-bottom: 5px; font-size: 10px; }
-    
+    .faders-area {
+        padding: 5px;
+        gap: 5px;
+    }
+
+    .fader-card {
+        padding: 3px 4px;
+        min-width: 80px;
+        border-radius: 8px;
+    }
+
+    .card-title {
+        font-size: 9px !important;
+        flex-shrink: 0;
+    }
+
+    .ch-name {
+        font-size: 12px !important;
+        margin: 0 0 2px 0 !important;
+        padding: 3px;
+        flex-shrink: 0;
+    }
+
+    .btn-state {
+        padding: 4px 0;
+        margin-bottom: 2px;
+        border-radius: 4px;
+        font-size: 9px;
+        width: 90%;
+    }
+
+    .nudge-zone {
+        margin: 0 -4px;
+        padding: 3px 0;
+    }
+
+    .btn-nudge {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+        margin: 0;
+        border: 1px solid #555;
+    }
+
+    input[type=range] {
+        margin: 1px 0;
+        width: 100%;
+    }
+
+    .fader-val {
+        font-size: 12px !important;
+        margin: 1px 0 0 0 !important;
+    }
+
+    .sidebar {
+        width: 85px;
+        padding: 5px;
+    }
+
+    #scn {
+        margin-bottom: 5px !important;
+        font-size: 10px !important;
+    }
+
+    .side-btn {
+        padding: 8px 2px;
+        margin-bottom: 5px;
+        font-size: 10px;
+    }
+
     /* Evita que o gráfico de EQ empurre o conteúdo para fora da tela em modo paisagem */
-    .eq-graph-container { min-height: 180px !important; }
+    .eq-graph-container {
+        min-height: 180px !important;
+    }
 }
 
 /* Configuração do Modal (Idêntico à Faders-Area) */
-.ch-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 100px; height: 100vh; height: 100dvh; background: #111; z-index: 2000; flex-direction: column; border-right: 1px solid #333; }
-.ch-modal-body { flex: 1; display: flex; padding: 0; overflow: hidden; align-items: center; justify-content: flex-start; scrollbar-width: none; }
-.drag-scroll-area { scrollbar-width: none; }
-.drag-scroll-area::-webkit-scrollbar { display: none; }
+.ch-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 100px;
+    height: 100vh;
+    height: 100dvh;
+    background: #111;
+    z-index: 2000;
+    flex-direction: column;
+    border-right: 1px solid #333;
+}
+
+.ch-modal-body {
+    flex: 1;
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+    align-items: center;
+    justify-content: flex-start;
+    scrollbar-width: none;
+}
+
+.drag-scroll-area {
+    scrollbar-width: none;
+}
+
+.drag-scroll-area::-webkit-scrollbar {
+    display: none;
+}
 
 /* Botão de Sair Vermelho na Sidebar */
-.btn-close-side { background: #dc3545; color: white; border: none; font-size: 11px; padding: 12px 0; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
-.btn-tab { background: #333; color: #888; border: 1px solid #444; font-size: 11px; }
-.active-tab { background: #007bff !important; color: white !important; border-color: #00a2ff !important; box-shadow: 0 0 10px rgba(0,123,255,0.4); }
+.btn-close-side {
+    background: #dc3545;
+    color: white;
+    border: none;
+    font-size: 11px;
+    padding: 12px 0;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-tab {
+    background: #333;
+    color: #888;
+    border: 1px solid #444;
+    font-size: 11px;
+}
+
+.active-tab {
+    background: #007bff !important;
+    color: white !important;
+    border-color: #00a2ff !important;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+}
 
 /* Estilo Específico para as Strips dos Auxiliares no Modal (Respeitando padrões) */
-.aux-card { min-width: 90px !important; }
-.aux-card .card-title { font-size: 11px !important; margin-bottom: 5px; }
+.aux-card {
+    min-width: 90px !important;
+}
 
-.mb-10 { margin-bottom: 10px; }
-.ch-side-title { 
-    text-align: center; 
-    font-size: 15px; 
-    letter-spacing: 0.5px; 
+.aux-card .card-title {
+    font-size: 11px !important;
+    margin-bottom: 5px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.ch-side-title {
+    text-align: center;
+    font-size: 15px;
+    letter-spacing: 0.5px;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 24px;
-    width: 100%; 
-    box-sizing: border-box; 
-    color: #0f0; 
+    width: 100%;
+    box-sizing: border-box;
+    color: #0f0;
     font-weight: bold;
     white-space: nowrap;
 }
+
 @media screen and (max-height: 600px) and (orientation: landscape) {
-    .ch-side-title { font-size: 12px; }
+    .ch-side-title {
+        font-size: 12px;
+    }
 }
 
 
 /* Ajuste do modal para Mobile Landscape */
 @media screen and (max-height: 600px) and (orientation: landscape) {
-    .ch-modal-overlay { right: 85px; }
+    .ch-modal-overlay {
+        right: 85px;
+    }
 }
 
 .eq-graph-container {
@@ -857,14 +1509,14 @@ body.layout-desktop .ch-modal-overlay {
 /* Regras para Versão Retrato (Mobile vertical) */
 body.is-portrait .eq-graph-container {
     flex: 0 0 auto;
-    height: 40vh; 
+    height: 40vh;
     max-height: 350px;
     min-height: 220px;
-    margin: auto auto; 
+    margin: auto auto;
     border: 1px solid #333;
     border-radius: 12px;
     overflow: visible;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* --- EQ GAIN FADER NOVO --- */
@@ -879,11 +1531,13 @@ body.is-portrait .eq-graph-container {
     border-left: 1px solid #333;
     padding: 15px 0;
     box-sizing: border-box;
-    display: none; /* Escondido por padrão, aparece em landscape/largo */
+    display: none;
+    /* Escondido por padrão, aparece em landscape/largo */
 }
 
 /* Mostra apenas em telas largas ou landscape */
-@media screen and (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+@media screen and (min-width: 900px),
+(orientation: landscape) and (min-width: 600px) {
     .eq-fader-container {
         display: flex;
     }
@@ -922,8 +1576,14 @@ body.is-portrait .eq-fader-container {
     outline: none;
     pointer-events: none;
 }
-.eq-fader-input::-webkit-slider-thumb { pointer-events: auto; }
-.eq-fader-input::-moz-range-thumb { pointer-events: auto; }
+
+.eq-fader-input::-webkit-slider-thumb {
+    pointer-events: auto;
+}
+
+.eq-fader-input::-moz-range-thumb {
+    pointer-events: auto;
+}
 
 .eq-fader-input::-webkit-slider-runnable-track {
     background: #333;
@@ -953,11 +1613,13 @@ body.is-portrait .eq-fader-container {
     padding: 0 15px;
     box-sizing: border-box;
     border-top: 1px solid #222;
-    display: none; /* Escondido por padrão, aparece em landscape/largo */
+    display: none;
+    /* Escondido por padrão, aparece em landscape/largo */
 }
 
 /* Mostra apenas em telas largas ou landscape */
-@media screen and (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+@media screen and (min-width: 900px),
+(orientation: landscape) and (min-width: 600px) {
     .eq-freq-fader-container {
         display: flex;
     }
@@ -1070,7 +1732,7 @@ body.is-portrait .side-btn {
     transition: all 0.2s;
     letter-spacing: 1px;
     text-transform: uppercase;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .splash-btn:active {
@@ -1169,7 +1831,7 @@ body.is-portrait .side-btn {
     font-weight: bold;
     font-size: 14px;
     z-index: 10001;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -1191,8 +1853,8 @@ body.is-portrait .side-btn {
 }
 
 .btn-exit-musician {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
     padding: 6px 12px;
     border-radius: 6px;
@@ -1202,7 +1864,7 @@ body.is-portrait .side-btn {
 }
 
 .btn-exit-musician:hover {
-    background: rgba(255,0,0,0.3);
+    background: rgba(255, 0, 0, 0.3);
     border-color: #f44336;
 }
 
@@ -1213,7 +1875,7 @@ body.is-portrait .side-btn {
 }
 
 .sidebar-musician #scn {
-    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .fone-indicator {
@@ -1226,8 +1888,9 @@ body.is-portrait .side-btn {
     text-orientation: upright;
     letter-spacing: clamp(1px, 0.5vh, 4px) !important;
     opacity: 0.9;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-    white-space: nowrap !important; /* Impede quebra para 2 linhas */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    white-space: nowrap !important;
+    /* Impede quebra para 2 linhas */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1239,16 +1902,19 @@ body.is-portrait .side-btn {
     .sidebar-musician {
         padding: 5px 10px !important;
     }
+
     .sidebar-musician #scn {
         font-size: 10px !important;
         margin-bottom: 5px !important;
     }
+
     .sidebar-musician .side-btn {
         min-height: 34px !important;
         padding: 8px 2px !important;
         font-size: 9px !important;
         margin-bottom: 5px !important;
     }
+
     .sidebar-musician #fsBtnSidebar {
         height: 34px !important;
     }
@@ -1263,7 +1929,8 @@ body.is-portrait .sidebar-musician {
     width: 100% !important;
     height: 60px !important;
     flex-direction: row !important;
-    order: 2 !important; /* Move para o rodapé */
+    order: 2 !important;
+    /* Move para o rodapé */
     border-left: none !important;
     border-top: 2px solid #388e3c !important;
     padding: 0 15px !important;
@@ -1301,11 +1968,11 @@ body.is-portrait .sidebar-musician #musicianExitBtn {
     letter-spacing: 0 !important;
 }
 
-    body.is-portrait .sidebar-musician #fsBtnSidebar {
-        width: 44px !important;
-        height: 40px !important;
-        margin: 0 !important;
-    }
+body.is-portrait .sidebar-musician #fsBtnSidebar {
+    width: 44px !important;
+    height: 40px !important;
+    margin: 0 !important;
+}
 
 
 
@@ -1330,14 +1997,15 @@ body.is-portrait .dyn-container {
 .dyn-box {
     flex: 1;
     min-width: 320px;
-    max-width: 600px; /* Evita que fique absurdamente largo em monitores gigantes */
+    max-width: 600px;
+    /* Evita que fique absurdamente largo em monitores gigantes */
     background: #1e1e1e;
     border: 1px solid #333;
     border-radius: 12px;
     padding: 15px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 body.is-portrait .dyn-box {
@@ -1395,7 +2063,8 @@ body.is-portrait .dyn-box {
     border-radius: 6px;
     margin-bottom: 25px;
     border: 1px solid #222;
-    position: relative; /* Para a flecha de threshold */
+    position: relative;
+    /* Para a flecha de threshold */
 }
 
 .dyn-thresh-arrow {
@@ -1408,7 +2077,7 @@ body.is-portrait .dyn-box {
     transform: translateX(-50%);
     transition: left 0.1s ease-out;
     z-index: 10;
-    box-shadow: 0 0 5px rgba(255,255,255,0.5);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 .dyn-meter-track {
@@ -1453,7 +2122,7 @@ body.is-portrait .dyn-box {
     align-items: center;
     gap: 15px;
     padding: 5px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .dyn-param label {
@@ -1482,7 +2151,13 @@ body.is-portrait .dyn-box {
     cursor: pointer;
 }
 
-.dyn-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #333; border-radius: 3px; }
+.dyn-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+}
+
 .dyn-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -1492,8 +2167,9 @@ body.is-portrait .dyn-box {
     border: 1px solid #555;
     border-radius: 4px;
     cursor: pointer;
-    margin-top: -9px; /* Centraliza o thumb */
-    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    margin-top: -9px;
+    /* Centraliza o thumb */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
 .dyn-value {
@@ -1501,7 +2177,7 @@ body.is-portrait .dyn-box {
     color: #007bff;
     font-family: monospace;
     font-weight: bold;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
     padding: 3px 6px;
     border-radius: 4px;
     text-align: right;
@@ -1509,17 +2185,41 @@ body.is-portrait .dyn-box {
 
 /* Responsive adjustment for Mobile Vertical (já estava em coluna, apenas ajuste de proporção) */
 @media screen and (max-width: 768px) {
-    .dyn-box { min-width: 100%; }
-    .dyn-param { grid-template-columns: 55px 1fr 50px; gap: 5px; padding: 3px 0; }
-    .dyn-value { font-size: 11px; padding: 2px 4px; }
+    .dyn-box {
+        min-width: 100%;
+    }
+
+    .dyn-param {
+        grid-template-columns: 55px 1fr 50px;
+        gap: 5px;
+        padding: 3px 0;
+    }
+
+    .dyn-value {
+        font-size: 11px;
+        padding: 2px 4px;
+    }
 }
 
 /* Mobile Landscape Tweak */
 @media screen and (max-height: 600px) and (orientation: landscape) {
-    .dyn-container { padding: 10px; gap: 15px; }
-    .dyn-box { padding: 8px 12px; }
-    .dyn-header { margin-bottom: 5px; }
-    .dyn-param { padding: 2px 0; gap: 6px; }
+    .dyn-container {
+        padding: 10px;
+        gap: 15px;
+    }
+
+    .dyn-box {
+        padding: 8px 12px;
+    }
+
+    .dyn-header {
+        margin-bottom: 5px;
+    }
+
+    .dyn-param {
+        padding: 2px 0;
+        gap: 6px;
+    }
 }
 
 /* --- ROUTING & ETC STYLES --- */

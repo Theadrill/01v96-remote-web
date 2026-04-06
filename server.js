@@ -84,6 +84,110 @@ let dynamicsQueue = [];
 process.title = "01V96-BRIDGE-SERVER";
 
 app.use(express.static('public'));
+
+// ===============================================
+// API DE MODS / MACROS (VERSÃO MULTI-PRESET)
+// ===============================================
+
+// Endpoint de Reconhecimento de Hosts
+app.get('/api/macros/hosts', (req, res) => {
+    const hostsPath = path.join(__dirname, 'public/modules/macros', 'hosts.json');
+    if (fs.existsSync(hostsPath)) {
+        res.json(JSON.parse(fs.readFileSync(hostsPath, 'utf8')));
+    } else {
+        // Exemplo default se não existir
+        res.json([
+            { match: "192.168.15.99", preset: "pcmaria" },
+            { match: "pcfavela", preset: "pcfavela" }
+        ]);
+    }
+});
+
+// Listar arquivos físicos (.js)
+app.get('/api/macros', (req, res) => {
+    const macrosDir = path.join(__dirname, 'public/modules/macros');
+    if (!fs.existsSync(macrosDir)) fs.mkdirSync(macrosDir, { recursive: true });
+    fs.readdir(macrosDir, (err, files) => {
+        if (err) return res.status(500).json({ error: "Erro ao listar mods" });
+        const jsFiles = files.filter(f => f.endsWith('.js') && !f.includes('.server.js')).map(f => f.replace('.js', ''));
+        res.json(jsFiles);
+    });
+});
+
+// 1. Manifesto Global de Slots (Chaves por Preset: { "default": {...}, "pcmaria": {...} })
+app.get('/api/macros/slots', (req, res) => {
+    const slotsPath = path.join(__dirname, 'public/modules/macros', 'slots.json');
+    if (fs.existsSync(slotsPath)) {
+        res.json(JSON.parse(fs.readFileSync(slotsPath, 'utf8')));
+    } else { res.json({ "default": {} }); }
+});
+
+app.post('/api/macros/slots', express.json(), (req, res) => {
+    const preset = req.query.preset || 'default';
+    const slotsPath = path.join(__dirname, 'public/modules/macros', 'slots.json');
+    
+    let allSlots = {};
+    if (fs.existsSync(slotsPath)) {
+        try { allSlots = JSON.parse(fs.readFileSync(slotsPath, 'utf8')); } catch(e) {}
+    }
+    
+    // Atualiza apenas a "caixa" (preset) correspondente
+    allSlots[preset] = req.body;
+
+    try {
+        fs.writeFileSync(slotsPath, JSON.stringify(allSlots, null, 2));
+        res.json({ success: true, preset });
+    } catch (e) { res.status(500).json({ error: "Erro ao salvar manifesto centralizado" }); }
+});
+
+app.delete('/api/macros/slots', (req, res) => {
+    const preset = req.query.preset;
+    if (!preset || preset === 'default') return res.status(400).json({ error: "Preset inválido ou protegido" });
+
+    const slotsPath = path.join(__dirname, 'public/modules/macros', 'slots.json');
+    if (!fs.existsSync(slotsPath)) return res.status(404).json({ error: "Arquivo não encontrado" });
+
+    try {
+        let allSlots = JSON.parse(fs.readFileSync(slotsPath, 'utf8'));
+        if (allSlots[preset]) {
+            delete allSlots[preset];
+            fs.writeFileSync(slotsPath, JSON.stringify(allSlots, null, 2));
+            res.json({ success: true, deleted: preset });
+        } else {
+            res.status(404).json({ error: "Preset não existe no manifesto" });
+        }
+    } catch (e) { res.status(500).json({ error: "Erro ao deletar preset" }); }
+});
+
+// 2. Banco de Configuração do Mod por Preset
+app.get('/api/macros/config/:modId', (req, res) => {
+    const preset = req.query.preset || 'default';
+    const modId = req.params.modId;
+    const filename = preset === 'default' ? `${modId}.json` : `${modId}_${preset}.json`;
+    const configPath = path.join(__dirname, 'public/modules/macros', filename);
+    if (fs.existsSync(configPath)) {
+        res.json(JSON.parse(fs.readFileSync(configPath, 'utf8')));
+    } else { res.json({}); }
+});
+
+app.post('/api/macros/config/:modId', express.json(), (req, res) => {
+    const preset = req.query.preset || 'default';
+    const modId = req.params.modId;
+    const filename = preset === 'default' ? `${modId}.json` : `${modId}_${preset}.json`;
+    const configPath = path.join(__dirname, 'public/modules/macros', filename);
+    try {
+        fs.writeFileSync(configPath, JSON.stringify(req.body, null, 2));
+        res.json({ success: true, mod: modId, preset });
+    } catch (e) { res.status(500).json({ error: "Erro ao salvar config do mod" }); }
+});
+
+// Endpoint de Nomes para os Mods
+app.get('/api/names', (req, res) => {
+    if (fs.existsSync(namesFile)) {
+        res.json(JSON.parse(fs.readFileSync(namesFile, 'utf8')));
+    } else { res.json({}); }
+});
+
 const configFile = path.join(__dirname, 'config.json');
 const namesFile = path.join(__dirname, 'names.json');
 
@@ -641,6 +745,13 @@ io.on('connection', (socket) => {
         
         const req = protocol.buildRequest('kInputAttenuator/kAtt', channel);
         if (req) midiEngine.send(req);
+    });
+
+    // --- INJETOR DE MODS (SYSEX DIRETO) ---
+    socket.on('sysex', (rawBytes) => {
+        if (!isConnected || !rawBytes) return;
+        // Espera um array de números [240, 67, ...]
+        midiEngine.send(rawBytes);
     });
 
     socket.on('control', (data) => {

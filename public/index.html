@@ -68,7 +68,7 @@
         <div id="mainNav" style="display: flex; flex-direction: column; width: 100%; align-items: center;">
             <button class="side-btn btn-config" onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
             <button id="btnOuts" class="side-btn btn-outs" onclick="toggleOuts()">OUTS</button>
-            <button class="side-btn btn-sync" onclick="forceSync()">SYNC</button> 
+            <button class="side-btn btn-macros" style="background:#6a1b9a; color:white;" onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
         </div>
 
         <!-- Navegação de Configuração do Canal (Abas) -->
@@ -133,6 +133,8 @@
             <select id="sin" class="modal-select"></select>
             <select id="sout" class="modal-select"></select>
             
+            <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #007bff;" onclick="forceSync()">MANUAL SYNC</button>
+
             <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
                 <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">MODO DE VISUALIZAÇÃO</p>
                 <div style="display: flex; gap: 10px;">
@@ -202,7 +204,118 @@
         </div>
     </div>
 
+    <!-- Modal de Macros Dinâmico -->
+    <div id="macrosModal" class="modal-overlay" style="z-index:13000; display:none;">
+        <div class="modal-content" style="max-width:550px; background:#1a1a1a; border:2px solid #6a1b9a; border-radius:15px; padding:25px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;">
+                <div>
+                    <h2 style="margin:0; font-size:18px; letter-spacing:1px;">PAINEL DE MACROS</h2>
+                    <span id="currentPresetLabel" style="font-size:10px; color:#666; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">PRESET: ...</span>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="openSaveAsModal()" class="btn-connect" style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#2e7d32;">💾 SALVAR NOVO PRESET</button>
+                    <button onclick="openPresetPicker()" class="btn-connect" style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#333;">🔄 LOAD PRESET</button>
+                </div>
+            </div>
+            
+            <!-- Grid de slots que será populado via JS -->
+            <div id="macroSlotsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px;"></div>
+
+            <button onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close" style="width: 100%; height: 50px; border-radius:10px;">FECHAR PAINEL</button>
+        </div>
+    </div>
+
+    <!-- Modal de Biblioteca de Macros (Listagem da pasta) -->
+    <div id="macroLibraryModal" class="modal-overlay" style="z-index:14000; display:none;">
+        <div class="modal-content" style="max-width:400px; background:#111; border:1px solid #444; border-radius:12px; padding:20px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; text-align:center;">Biblioteca de Scripts (.js)</p>
+            <div id="macroLibraryList" style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; margin-bottom:20px;">
+                <!-- Lista será preenchida via API -->
+            </div>
+            <button onclick="document.getElementById('macroLibraryModal').style.display='none'" class="btn-close" style="width:100%; height:45px;">CANCELAR</button>
+        </div>
+    </div>
+
+    <!-- Menu Contextual de Macros (Toque Longo) -->
+    <div id="macroContextModal" class="modal-overlay" style="z-index:15000; display:none;">
+        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #6a1b9a; border-radius:12px; padding:25px;">
+            <p id="ctxMacroName" style="color:#6a1b9a; font-weight:bold; margin-bottom:20px; font-size:16px;">Macro Config</p>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn-connect" style="background:#555; margin:0; height:50px;" onclick="openMacroNameEditor()">✏️ MUDAR NOME</button>
+                <button class="btn-connect" style="background:#555; margin:0; height:50px;" onclick="changeSelectedMacro()">🔄 TROCAR MACRO</button>
+                <button class="btn-connect" style="background:#6a1b9a; margin:0; height:50px;" onclick="openMacroSettings()">⚙️ CONFIGURAR</button>
+                <button class="btn-connect" style="background:#c62828; margin:0; height:40px; font-size:10px;" onclick="removeMacroFromSlot()">🗑️ REMOVER MACRO</button>
+                <button class="btn-close" style="margin-top:10px; background:#444;" onclick="document.getElementById('macroContextModal').style.display='none'">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Nome da Macro -->
+    <div id="macroNameEditorModal" class="modal-overlay" style="z-index:17000; display:none;">
+        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Nome do Botão</p>
+            <input type="text" id="inputMacroName" maxlength="12" placeholder="MACRO X" style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:18px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveMacroName()" class="btn-connect" style="flex:1; margin:0; height:45px; background:#28a745;">OK</button>
+                <button onclick="document.getElementById('macroNameEditorModal').style.display='none'" class="btn-close" style="flex:1; margin:0; height:45px;">VOLTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações Avançadas da Macro (Ex: Seleção de Gp de Canais) -->
+    <div id="macroSettingsModal" class="modal-overlay" style="z-index:16000; display:none;">
+        <div class="modal-content" style="max-width:600px; background:#111; border:2px solid #6a1b9a; border-radius:15px; padding:25px;">
+            <p id="settingsMacroTitle" style="color:#6a1b9a; font-weight:bold; margin-bottom:10px; font-size:16px;">Configuração da Macro</p>
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:20px; letter-spacing:1px;">Selecione os canais desejados abaixo:</p>
+            
+            <div id="macroSettingsGrid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; max-height:400px; overflow-y:auto; padding-right:10px; margin-bottom:25px;">
+                <!-- Grid de 32 botões gerado via JS -->
+            </div>
+
+            <div style="display:flex; gap:15px;">
+                <button onclick="saveCurrentMacroSettings()" class="btn-connect" style="flex:1; height:50px; background:#28a745;">SALVAR</button>
+                <button onclick="document.getElementById('macroSettingsModal').style.display='none'" class="btn-close" style="flex:1; height:50px; background:#444;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Salvar Preset Como -->
+    <div id="macroSaveAsModal" class="modal-overlay" style="z-index:18500; display:none;">
+        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #2e7d32; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Salvar como Novo Preset...</p>
+            <input type="text" id="inputNewPresetName" maxlength="15" placeholder="NOME DO PRESET" style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:16px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
+            <div style="display:flex; gap:10px;">
+                <button onclick="savePresetAs()" class="btn-connect" style="flex:1; margin:0; height:45px; background:#2e7d32;">SALVAR</button>
+                <button onclick="document.getElementById('macroSaveAsModal').style.display='none'" class="btn-close" style="flex:1; margin:0; height:45px;">VOLTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Deleção -->
+    <div id="macroDeleteConfirmModal" class="modal-overlay" style="z-index:19000; display:none;">
+        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #c62828; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Atenção!</p>
+            <p id="deleteConfirmText" style="color:#fff; font-weight:bold; margin-bottom:25px;">Deseja deletar o preset?</p>
+            <div style="display:flex; gap:10px;">
+                <button onclick="confirmDeletePreset()" class="btn-connect" style="flex:1; margin:0; height:45px; background:#c62828;">DELETAR</button>
+                <button onclick="document.getElementById('macroDeleteConfirmModal').style.display='none'" class="btn-close" style="flex:1; margin:0; height:45px;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Presets Globais -->
+    <div id="macroPresetModal" class="modal-overlay" style="z-index:18000; display:none;">
+        <div class="modal-content" style="max-width:350px; background:#111; border:2px solid #555; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align:center;">Escolha o Preset</p>
+            <div id="macroPresetList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+                <!-- Lista de presets do slots.json -->
+            </div>
+            <button onclick="document.getElementById('macroPresetModal').style.display='none'" class="btn-close" style="width:100%; height:45px;">CANCELAR</button>
+        </div>
+    </div>
+
     <script src="modules/globals.js"></script>
+    <script src="modules/macros.js"></script>
     <script src="modules/channel_strip.js"></script>
     <script src="modules/eq.js"></script>
     <script src="modules/gate.js"></script>

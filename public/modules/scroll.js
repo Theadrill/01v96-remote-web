@@ -1,7 +1,7 @@
 // Função genérica para habilitar rolagem por arrasto e roda do mouse
 function enableDragScroll(el) {
     if (!el) return;
-    
+
     let isDragging = false;
     let startX, startScrollLeft;
 
@@ -34,7 +34,7 @@ function enableDragScroll(el) {
         if (!isDragging) return;
         e.preventDefault();
         const x = e.pageX - el.offsetLeft;
-        const walk = (x - startX) * 1.0; 
+        const walk = (x - startX) * 1.0;
         el.scrollLeft = startScrollLeft - walk;
     });
 }
