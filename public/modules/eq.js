@@ -200,8 +200,10 @@ function renderEQ(ch) {
                     </div>
 
                     <!-- NOVO: Fader de Frequência Horizontal -->
-                    <div id="eqFreqFaderContainer" class="eq-freq-fader-container" style="opacity: 0.3; pointer-events: none;">
-                        <input type="range" id="eqFreqFaderInput" class="eq-freq-fader-input" min="0" max="124" step="1" value="72" orient="horizontal" oninput="eqFreqInput(event)">
+                    <div id="eqFreqFaderContainer" class="eq-freq-fader-container" style="opacity: 0.3; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startFreqNudge(-1)" onpointerup="stopFreqNudge()" onpointerleave="stopFreqNudge()" onpointercancel="stopFreqNudge()">-</button>
+                        <input type="range" id="eqFreqFaderInput" class="eq-freq-fader-input" min="0" max="124" step="1" value="72" orient="horizontal" oninput="eqFreqInput(event)" style="flex: 1;">
+                        <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startFreqNudge(1)" onpointerup="stopFreqNudge()" onpointerleave="stopFreqNudge()" onpointercancel="stopFreqNudge()">+</button>
                     </div>
 
                     <div id="eqInfo" style="background:#111; color:#777; font-size:10px; padding:5px 35px 18px 35px; font-family:monospace; height:20px; border-top: 1px solid #222;">
@@ -210,10 +212,12 @@ function renderEQ(ch) {
                 </div>
 
                 <!-- NOVO: Fader de Ganho Lateral (Referência AirFader) -->
-                <div id="eqGainFaderContainer" class="eq-fader-container" style="opacity: 0.3; pointer-events: none;">
-                    <div id="eqFaderVal" class="eq-fader-val">+18.0</div>
+                <div id="eqGainFaderContainer" class="eq-fader-container" style="opacity: 0.3; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startGainNudge(1)" onpointerup="stopGainNudge()" onpointerleave="stopGainNudge()" onpointercancel="stopGainNudge()">+</button>
+                    <div id="eqFaderVal" class="eq-fader-val" style="margin: 0;">+18.0</div>
                     <input type="range" id="eqFaderInput" class="eq-fader-input" min="-180" max="180" step="1" value="0" orient="vertical" oninput="eqGainInput(event)">
-                    <div id="eqFaderLabel" class="eq-fader-label">GAIN</div>
+                    <div id="eqFaderLabel" class="eq-fader-label" style="margin: 0;">GAIN</div>
+                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 22px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startGainNudge(-1)" onpointerup="stopGainNudge()" onpointerleave="stopGainNudge()" onpointercancel="stopGainNudge()">-</button>
                 </div>
             </div>
 
@@ -234,8 +238,10 @@ function renderEQ(ch) {
                     <button onclick="toggleATTModal(false)" style="background:none; border:none; color:#777; font-size:24px; cursor:pointer; padding:0 5px;">&times;</button>
                 </div>
                 <div id="eqATTVal" style="font-size:32px; color:#5cacee; font-family:monospace; font-weight:bold;">0.0 dB</div>
-                <div style="width:100%; padding:10px 0;">
-                    <input type="range" id="eqATTInput" min="-960" max="120" step="1" value="0" style="width:100%; height:12px; -webkit-appearance:none; background:#333; border-radius:6px; outline:none; cursor:pointer;" oninput="eqATTInput(event)">
+                <div style="width:100%; padding:10px 0; display:flex; align-items:center; justify-content:center; gap:8px; min-width:0;">
+                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startATTNudge(-1)" onpointerup="stopATTNudge()" onpointerleave="stopATTNudge()" onpointercancel="stopATTNudge()">-</button>
+                    <input type="range" id="eqATTInput" min="-960" max="120" step="1" value="0" style="flex:1; min-width:0; height:12px; -webkit-appearance:none; background:#333; border-radius:6px; outline:none; cursor:pointer;" oninput="eqATTInput(event)">
+                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startATTNudge(1)" onpointerup="stopATTNudge()" onpointerleave="stopATTNudge()" onpointercancel="stopATTNudge()">+</button>
                 </div>
                 <p style="margin:0; font-size:10px; color:#666; text-align:center;">Ajuste o ganho de entrada do equalizador</p>
                 <button onclick="toggleATTModal(false)" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; margin-top:10px;">FECHAR</button>
@@ -311,7 +317,7 @@ function onEQDown(e) {
                 longPressTimeout = setTimeout(() => {
                     showEQContextMenu(e.clientX, e.clientY, i);
                     longPressOccurred = true;
-                }, 600);
+                }, 900); // 1.5x mais demorado (600 -> 900)
             }
         }
     });
@@ -407,10 +413,13 @@ function setBandMode(bandIdx, mode) {
 function onEQMove(e, ch) {
     if (activeBandIdx === -1) return;
 
-    // Se moveu, cancela long press. No touch (Android) usamos um threshold maior (25px)
-    const threshold = e.pointerType === 'touch' ? 25 : 10;
+    // Reduçao de threshold p/ Android não interpretar arrastos de "Fine Tuning" como Long Press.
+    const threshold = e.pointerType === 'touch' ? 8 : 4;
     if (!longPressOccurred && Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y) > threshold) {
-        if (longPressTimeout) clearTimeout(longPressTimeout);
+        if (longPressTimeout) {
+            clearTimeout(longPressTimeout);
+            longPressTimeout = null;
+        }
     }
 
     if (longPressOccurred) return; // Não arrasta se o menu estiver aberto
@@ -844,6 +853,93 @@ function updateQControlsUI() {
     // Agora o controle de Q é feito via balão contextual posicionado pelo run()
 }
 
+// NUDGE FREQUENCY
+let freqNudgeInterval = null;
+window.startFreqNudge = function(dir) {
+    stopFreqNudge();
+    nudgeFreq(dir);
+    freqNudgeInterval = setInterval(() => nudgeFreq(dir), 100);
+};
+window.stopFreqNudge = function() {
+    if (freqNudgeInterval) clearInterval(freqNudgeInterval);
+    freqNudgeInterval = null;
+};
+function nudgeFreq(dir) {
+    if (selectedBandIdx === -1) return;
+    const ch = activeConfigChannel;
+    const b = eqBands[selectedBandIdx];
+    const chEq = channelStates[ch].eq;
+    if (!chEq || !chEq[b.key]) return;
+
+    let v = sysexToVal(chEq[b.key].f);
+    v += dir;
+    if (v < 0) v = 0;
+    if (v > 124) v = 124;
+
+    chEq[b.key].f = v;
+    const newF = rawToFreq(v);
+    if (b.filter) b.filter.frequency.value = newF;
+
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const label = labelMap[b.key] || 'Low';
+    socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: v });
+    
+    const fader = document.getElementById('eqFreqFaderInput');
+    if (fader) fader.value = v;
+    
+    const info = document.getElementById('eqInfo');
+    if (info) {
+        const g = b.filter.gain.value;
+        info.innerText = `${label.toUpperCase()}: ${Math.round(newF)}Hz | ${g.toFixed(1)}dB`;
+    }
+}
+
+// NUDGE GAIN
+let gainNudgeInterval = null;
+window.startGainNudge = function(dir) {
+    stopGainNudge();
+    nudgeGain(dir);
+    gainNudgeInterval = setInterval(() => nudgeGain(dir), 100);
+};
+window.stopGainNudge = function() {
+    if (gainNudgeInterval) clearInterval(gainNudgeInterval);
+    gainNudgeInterval = null;
+};
+function nudgeGain(dir) {
+    if (selectedBandIdx === -1) return;
+    const ch = activeConfigChannel;
+    const b = eqBands[selectedBandIdx];
+    if (b.filter.type === 'highpass' || b.filter.type === 'lowpass') return;
+
+    const chEq = channelStates[ch].eq;
+    if (!chEq || !chEq[b.key]) return;
+
+    let v = sysexToVal(chEq[b.key].g);
+    v += (dir * 1); // 0.1dB por clique
+    if (v < -180) v = -180;
+    if (v > 180) v = 180;
+
+    chEq[b.key].g = v;
+    const newG = v / 10;
+    if (b.filter) b.filter.gain.value = newG;
+
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const label = labelMap[b.key] || 'Low';
+    socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: v });
+    
+    const fader = document.getElementById('eqFaderInput');
+    if (fader) fader.value = v;
+
+    const valEl = document.getElementById('eqFaderVal');
+    if (valEl) valEl.innerText = (newG >= 0 ? '+' : '') + newG.toFixed(1);
+    
+    const info = document.getElementById('eqInfo');
+    if (info) {
+        const f = b.filter.frequency.value;
+        info.innerText = `${label.toUpperCase()}: ${Math.round(f)}Hz | ${newG.toFixed(1)}dB`;
+    }
+}
+
 // Funções de Cópia e Cola
 window.copyEQ = function(ch) {
     const s = channelStates[ch].eq;
@@ -991,6 +1087,42 @@ window.eqFreqInput = function(e) {
         info.innerText = `${label.toUpperCase()}: ${Math.round(newF)}Hz | ${g.toFixed(1)}dB`;
     }
 };
+
+// NUDGE EQ ATT
+let attNudgeInterval = null;
+window.startATTNudge = function(dir) {
+    stopATTNudge();
+    nudgeATT(dir);
+    attNudgeInterval = setInterval(() => nudgeATT(dir), 100);
+};
+window.stopATTNudge = function() {
+    if (attNudgeInterval) clearInterval(attNudgeInterval);
+    attNudgeInterval = null;
+};
+function nudgeATT(dir) {
+    const ch = activeConfigChannel;
+    const state = channelStates[ch];
+    if (!state) return;
+
+    let v = state.att !== undefined ? state.att : (state.eq && state.eq.att !== undefined ? state.eq.att : 0);
+    v = sysexToVal(v) + (dir * 1); // 0.1dB por clique
+
+    if (v < -960) v = -960; // -96.0 dB
+    if (v > 120) v = 120; // +12.0 dB
+
+    state.att = v;
+    if (state.eq) state.eq.att = v;
+    socket.emit('control', { type: 'kInputAttenuator/kAtt', channel: ch, value: v });
+
+    const fader = document.getElementById('eqATTInput');
+    if (fader) fader.value = v;
+
+    const valEl = document.getElementById('eqATTVal');
+    if (valEl) {
+        const db = v / 10;
+        valEl.innerText = (db >= 0 ? '+' : '') + db.toFixed(1) + ' dB';
+    }
+}
 
 window.updateEQFadersUI = function() {
     // 1. Ganho (Fader Vertical)

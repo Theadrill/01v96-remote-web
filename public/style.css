@@ -554,11 +554,14 @@ body.layout-horizontal .side-btn {
     border: none !important;
     outline: none !important;
     cursor: default;
-    touch-action: none;
     pointer-events: auto !important;
     z-index: 1;
     margin: 0 auto !important;
     padding: 0 !important;
+}
+
+.fader-card input[type=range]:disabled {
+    opacity: 1 !important;
 }
 
 /* Thumbs unificados para todos os motores */

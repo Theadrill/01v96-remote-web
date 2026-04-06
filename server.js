@@ -140,6 +140,58 @@ app.post('/api/macros/slots', express.json(), (req, res) => {
     } catch (e) { res.status(500).json({ error: "Erro ao salvar manifesto centralizado" }); }
 });
 
+app.post('/api/macros/swap', express.json(), (req, res) => {
+    const preset = req.query.preset || 'default';
+    const fromIndex = parseInt(req.body.from);
+    const toIndex = parseInt(req.body.to);
+    if (isNaN(fromIndex) || isNaN(toIndex)) return res.status(400).json({ error: "Invalid indices" });
+
+    const dirPath = path.join(__dirname, 'public/modules/macros');
+    
+    // 1. Swap in slots.json
+    const slotsPath = path.join(dirPath, 'slots.json');
+    if (fs.existsSync(slotsPath)) {
+        try {
+            let allSlots = JSON.parse(fs.readFileSync(slotsPath, 'utf8'));
+            if (allSlots[preset]) {
+                const tempFrom = allSlots[preset][fromIndex];
+                const tempTo = allSlots[preset][toIndex];
+                delete allSlots[preset][fromIndex];
+                delete allSlots[preset][toIndex];
+                if (tempTo) allSlots[preset][fromIndex] = tempTo;
+                if (tempFrom) allSlots[preset][toIndex] = tempFrom;
+                fs.writeFileSync(slotsPath, JSON.stringify(allSlots, null, 2));
+            }
+        } catch(e) {}
+    }
+
+    // 2. Swap configs in all plugin files
+    if (fs.existsSync(dirPath)) {
+        const files = fs.readdirSync(dirPath);
+        for (let file of files) {
+            if (file.endsWith('.json') && file !== 'slots.json' && file !== 'hosts.json') {
+                const isTargetFile = (preset === 'default') ? !file.includes('_') : file.endsWith(`_${preset}.json`);
+                if (isTargetFile) {
+                    try {
+                        const fp = path.join(dirPath, file);
+                        let modConfig = JSON.parse(fs.readFileSync(fp, 'utf8'));
+                        const keyFrom = `slot_${fromIndex}`;
+                        const keyTo = `slot_${toIndex}`;
+                        const tempFromData = modConfig[keyFrom];
+                        const tempToData = modConfig[keyTo];
+                        delete modConfig[keyFrom];
+                        delete modConfig[keyTo];
+                        if (tempToData) modConfig[keyFrom] = tempToData;
+                        if (tempFromData) modConfig[keyTo] = tempFromData;
+                        fs.writeFileSync(fp, JSON.stringify(modConfig, null, 2));
+                    } catch(e) {}
+                }
+            }
+        }
+    }
+    res.json({ success: true });
+});
+
 app.delete('/api/macros/slots', (req, res) => {
     const preset = req.query.preset;
     if (!preset || preset === 'default') return res.status(400).json({ error: "Preset inválido ou protegido" });

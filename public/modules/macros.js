@@ -11,6 +11,8 @@ let longPressTimer = null;
 let availableScripts = []; 
 let currentPreset = 'default';
 let protectedPresets = ['default']; // Lista de nomes que não podem ser deletados
+let isMovingMacro = false;
+let moveSourceIndex = -1;
 
 async function initMacros() {
     await detectCurrentPreset(); 
@@ -214,26 +216,100 @@ function renderMacros() {
         const config = slotData ? macroDatabase[slotData.scriptId] : null;
         const slot = document.createElement('div'); slot.className = 'macro-slot';
         const slotColor = (slotData && slotData.color) ? slotData.color : (config ? (config.color || '#4a148c') : '#222');
-        slot.style.cssText = `height: 85px; border-radius: 12px; background: ${slotColor}; border: 2px solid ${config ? 'rgba(255,255,255,0.2)' : '#333'}; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; user-select: none; -webkit-user-select: none; transition: transform 0.1s; padding: 5px; text-align: center; touch-action: none;`;
+        const defaultBorder = `2px solid ${config ? 'rgba(255,255,255,0.2)' : '#333'}`;
+        const isBlinking = (isMovingMacro && i === moveSourceIndex);
+        const animCss = isBlinking ? `animation: blink 1s infinite; border: 2px dashed #00ffcc; opacity:0.8;` : `border: ${defaultBorder};`;
+        slot.style.cssText = `height: 85px; min-width: 0; box-sizing: border-box; border-radius: 12px; background: ${slotColor}; ${animCss} display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; user-select: none; -webkit-user-select: none; transition: transform 0.1s; padding: 5px; text-align: center; overflow: hidden;`;
         if (slotData && config) {
             const displayName = slotData.name || `MACRO ${i+1}`; const modName = config.name || slotData.scriptId;
-            slot.innerHTML = `<span style="font-size: 11px; font-weight: 800; color: white; display: block; margin-bottom: 3px; line-height: 1.1;">${displayName.toUpperCase()}</span><span style="font-size: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px;">${modName}</span>`;
+            slot.innerHTML = `<span style="font-size: 11px; font-weight: 800; color: white; display: block; margin-bottom: 3px; line-height: 1.1; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${displayName.toUpperCase()}</span><span style="font-size: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${modName}</span>`;
         } else { slot.innerHTML = `<span style="font-size: 24px; color: #444;">+</span>`; }
-        slot.onpointerdown = (e) => handleTouchStart(i, e); slot.onpointerup = (e) => handleTouchEnd(i, e);
+        
+        slot.onpointerdown = (e) => handleTouchStart(i, e); 
+        slot.onpointerup = (e) => handleTouchEnd(i, e);
         slot.onpointerleave = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
+        slot.onpointercancel = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
         slot.oncontextmenu = (e) => { e.preventDefault(); return false; };
+
         grid.appendChild(slot);
     }
 }
 function handleTouchStart(index, e) {
-    if (e.type === 'touchstart') e.preventDefault(); activeSlotIndex = index; const el = e.currentTarget;
+    activeSlotIndex = index; const el = e.currentTarget;
     if (el) { el.style.transform = 'scale(0.92)'; el.style.transition = 'transform 0.1s'; }
-    longPressTimer = setTimeout(() => { showContextMenu(index); longPressTimer = null; if (el) el.style.transform = 'scale(1)'; }, 300);
+    if (isMovingMacro) return; // Prevent long press context menu while moving
+    longPressTimer = setTimeout(() => { showContextMenu(index); longPressTimer = null; if (el) el.style.transform = 'scale(1)'; }, 500);
 }
 function handleTouchEnd(index, e) {
     const el = e.currentTarget; if (el) el.style.transform = 'scale(1)';
-    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; const sd = assignedMacros[index];
-        if (sd && availableScripts.includes(sd.scriptId) && macroDatabase[sd.scriptId]) executeMacro(sd.scriptId, index); else openLibrary(index);
+    
+    let wasLongPress = (longPressTimer === null);
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    
+    if (isMovingMacro) {
+        completeMacroMove(index);
+        return;
+    }
+
+    // Apenas executar a macro se o toque foi rápido (não foi um long press)
+    if (!wasLongPress) {
+        const sd = assignedMacros[index];
+        if (sd && availableScripts.includes(sd.scriptId) && macroDatabase[sd.scriptId]) executeMacro(sd.scriptId, index); 
+        else openLibrary(index);
+    }
+}
+
+function startMovingMacro() {
+    isMovingMacro = true;
+    moveSourceIndex = activeSlotIndex;
+    document.getElementById('macroContextModal').style.display = 'none';
+    
+    const modal = document.getElementById('macrosModal');
+    const warning = document.createElement('div');
+    warning.id = 'moveMacroWarning';
+    warning.style.cssText = 'position:absolute; top:0; left:0; width:100%; min-height:40px; background:#1976d2; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:99999; text-transform:uppercase; font-size:12px; letter-spacing:1px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); padding:10px; box-sizing:border-box; text-align:center; border-radius: 12px 12px 0 0;';
+    warning.innerHTML = '👉 TOQUE NO NOVO ESPAÇO PARA MOVER';
+    
+    const modalContent = modal.querySelector('.modal-content');
+    modalContent.style.position = 'relative';
+    modalContent.appendChild(warning);
+    
+    if (!document.getElementById('blinkStyleAnim')) {
+        const style = document.createElement('style');
+        style.id = 'blinkStyleAnim';
+        style.innerHTML = `@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }`;
+        document.head.appendChild(style);
+    }
+    
+    renderMacros();
+}
+
+async function completeMacroMove(targetIndex) {
+    isMovingMacro = false;
+    const fromIndex = moveSourceIndex;
+    moveSourceIndex = -1;
+    
+    const warning = document.getElementById('moveMacroWarning');
+    if (warning) warning.remove();
+
+    if (fromIndex !== targetIndex && !isNaN(fromIndex) && fromIndex !== -1) {
+        // Optimistic visual block update
+        const t = assignedMacros[fromIndex];
+        assignedMacros[fromIndex] = assignedMacros[targetIndex];
+        assignedMacros[targetIndex] = t;
+        if (!assignedMacros[fromIndex]) delete assignedMacros[fromIndex];
+        if (!assignedMacros[targetIndex]) delete assignedMacros[targetIndex];
+        renderMacros();
+        
+        try {
+            await fetch(`/api/macros/swap?preset=${currentPreset}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ from: fromIndex, to: targetIndex })
+            });
+            await loadSlotsManifest();
+        } catch(err) { console.error("Erro no move touch", err); }
+    } else {
+        renderMacros();
     }
 }
 function executeMacro(id, slotIndex) {

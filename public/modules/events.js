@@ -251,38 +251,52 @@ document.addEventListener('mousemove', (e) => {
 
 // Proteção Global contra cliques no corpo (track) do slider
 // Impede que o volume "pule" para o local clicado, permitindo apenas o arrasto do thumb
-window.addEventListener('pointerdown', function(e) {
+let sliderRevertState = null;
+
+function restrictSliderTrackTap(e) {
     if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
         const input = e.target;
         const rect = input.getBoundingClientRect();
         
-        // Detecta orientação baseando-se no elemento
+        // Detecta orientação
         const isVertical = input.getAttribute('orient') === 'vertical' || 
                            input.clientHeight > input.clientWidth || 
                            (window.getComputedStyle(input).writingMode || "").includes('vertical');
 
         const min = parseFloat(input.min || 0);
         const max = parseFloat(input.max || 100);
-        const val = parseFloat(input.value);
+        let val = parseFloat(input.value);
+        if (isNaN(val)) val = 0;
         const percent = (val - min) / (max - min);
 
+        let clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+        let clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+        
         let clickPosPx, thumbPosPx;
 
         if (isVertical) {
-            clickPosPx = e.clientY - rect.top;
-            // Para faders verticais (mixer), o valor máximo (100%) costuma ser no topo (0px)
+            clickPosPx = clientY - rect.top;
             thumbPosPx = (1 - percent) * rect.height;
         } else {
-            clickPosPx = e.clientX - rect.left;
-            // Para faders horizontais, o valor inicial (0%) costuma ser na esquerda (0px)
+            clickPosPx = clientX - rect.left;
             thumbPosPx = percent * rect.width;
         }
 
         const distance = Math.abs(clickPosPx - thumbPosPx);
-        const threshold = 30; // Tolerância de 30px para o centro do thumb
+        const threshold = 45; // Tolerância para tocar no botão real
 
         if (distance > threshold) {
-            e.preventDefault(); 
+            if (e.type === 'pointerdown' && e.pointerType === 'mouse') {
+                e.preventDefault(); // Mouse: podemos bloquear
+            } else if (e.type === 'touchstart' || e.pointerType === 'touch') {
+                // Em touch, se evitarmos preventDefault, a página poderá rolar (o que o usuário quer).
+                // Para impedir o salto estúpido, "desativamos" o input por um flash de tempo.
+                input.disabled = true;
+                setTimeout(() => { input.disabled = false; }, 600);
+            }
         }
     }
-}, { capture: true });
+}
+
+window.addEventListener('pointerdown', restrictSliderTrackTap, { capture: true });
+window.addEventListener('touchstart', restrictSliderTrackTap, { capture: true, passive: true });
