@@ -505,11 +505,11 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
             // Selain disso, PAUSA os meters temporariamente se estivermos buscando algo vital (opcional)
             if (!isFullySynced) return; 
             
-            const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247]); 
-            const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247]);
-            const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247]);  // 01v96i
-            const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247]);  // 01v96 Original 33
-            const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247]);  // 01v96 Original 32
+            const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 32, 247]); 
+            const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 32, 247]);
+            const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 32, 247]);  // 01v96i
+            const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247]);  // 01v96 Original 33
+            const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247]);  // 01v96 Original 32
             
             if (!s1 && !s2 && !s3 && !s4 && !s5) {
                 console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI. Cabo removido?");

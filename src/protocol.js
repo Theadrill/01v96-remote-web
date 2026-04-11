@@ -83,9 +83,15 @@ function parseIncoming(message) {
   if (isMeter) {
       let levels = [];
       const dataStart = 9; 
+      // 01V96 envia 32 canais. O Master ou outros dependem do grupo pedido.
+      // Limitamos a 33 pontos, mas garantimos que não lemos o byte F7 (message.length - 1)
       for (let i = 0; i < 33; i++) {
-          const deviceLevel = message[dataStart + (i * 2)];
-          levels.push(deviceLevel || 0);
+          const idx = dataStart + (i * 2);
+          if (idx >= message.length - 1) {
+              levels.push(0); // Evita ler F7 (247) como valor de meter
+          } else {
+              levels.push(message[idx] || 0);
+          }
       }
       return { type: 'METER_DATA', levels };
   }
