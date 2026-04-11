@@ -10,31 +10,42 @@ const midiEngine = require('./src/midi-engine');
 const protocol = require('./src/protocol');
 const stateManager = require('./src/state-manager');
 const dummy = require('./src/meter_dummy');
+const masterMeter = require('./src/master-meter');
 let dummyMeterInterval = null;
 
 let meterDataBuffer = new Array(33).fill(0);
 let lastMeterTime = 0;
 
-const handleMIDIData = (midiData) => {
+const handleMIDIData = (midiData, rawMessage = null) => {
     if (!midiData) return;
     lastActivityTime = Date.now(); 
 
+    // Processamento Independente do Master Meter
+    if (rawMessage) {
+        const mLevel = masterMeter.parse(rawMessage);
+        if (mLevel !== null) {
+            meterDataBuffer[32] = mLevel;
+        }
+    }
+
+    // O METER_DATA processa canais 1-32. O 33 (Master) vem isolado.
     if (midiData.type === 'METER_DATA') {
-        const now = Date.now();
-        // Atualiza BUFFER local (32 Canais + 1 Master)
-        for (let i = 0; i < 33; i++) {
+        for (let i = 0; i < 32; i++) {
             if (midiData.levels[i] !== undefined) {
                 meterDataBuffer[i] = midiData.levels[i];
             }
         }
-        
-        // Emissão Throttled para a Web (padrão 20 FPS para fluidez sem sobrecarga)
-        if (now - lastMeterTime > 50) { 
-            io.emit('meterData', meterDataBuffer);
-            lastMeterTime = now;
-        }
-        return;
     }
+
+    // Emissão Throttled para a Web (apenas se sincronizado para evitar lag no boot)
+    const now = Date.now();
+    if (isFullySynced && (now - lastMeterTime > 50)) { 
+        io.emit('meterData', meterDataBuffer);
+        lastMeterTime = now;
+    }
+    
+    if (midiData.type === 'METER_DATA') return;
+
 
     if (midiData.type === 'HEARTBEAT') return; 
 
@@ -335,6 +346,8 @@ function loadConfig() {
         try { 
             const loaded = JSON.parse(fs.readFileSync(configFile, 'utf8'));
             config = { ...config, ...loaded };
+            // Atualiza config do Master Meter
+            masterMeter.setConfig(config);
         } catch (err) {}
     }
     return config;
@@ -494,28 +507,27 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         global.meterInterval = setInterval(() => {
             if (!isConnected) return;
 
-            // 1. Verificação de Time-out (Cabo puxado ou Mesa desligada)
-            // Se passar mais de 5 segundos sem nenhum bit da mesa, consideramos desconectado.
             if (Date.now() - lastActivityTime > 5000) {
                 console.log("\n⚠️ Watchdog: Timeout de conexão. A mesa parou de responder.");
                 handleDisconnection();
                 return;
             }
 
-            // Selain disso, PAUSA os meters temporariamente se estivermos buscando algo vital (opcional)
+            // Meters só rodam após sincronia completa
             if (!isFullySynced) return; 
-            
+
+            const sMaster = midiEngine.send(masterMeter.buildRequest());
             const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 32, 247]); 
-            const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 32, 247]);
-            const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 32, 247]);  // 01v96i
-            const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247]);  // 01v96 Original 33
-            const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247]);  // 01v96 Original 32
+            const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 32, 247]); 
+            const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 32, 247]);  
+            const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247]);  
+            const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247]); 
             
-            if (!s1 && !s2 && !s3 && !s4 && !s5) {
-                console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI. Cabo removido?");
+            if (!s2 && !s3 && !s4 && !s5 && !sMaster) {
+                console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI.");
                 handleDisconnection();
             }
-        }, 100); // Polling mais leve (10 FPS) para economizar processamento
+        }, 100); 
     } else {
         handleDisconnection(false);
     }
@@ -542,9 +554,13 @@ function handleDisconnection(retry = true) {
 
 async function triggerSync(targetSocket = null, forceNames = false) {
     if (!isConnected || isSyncing) return;
+    const config = loadConfig();
+    const delay = config.sync_delay_ms || 35;
+    const nameDelay = config.sync_name_delay_ms || 45;
+
     isSyncing = true;
     isFullySynced = false; // Reseta a flag para pausar meters
-    console.log(`🔄 Sincronizando faders e botões vitais ${targetSocket ? '(apenas novo cliente)' : '(global)'}...`);
+    console.log(`🔄 Sincronizando (Delay: ${delay}ms / Nomes: ${nameDelay}ms)...`);
     try {
         await new Promise(r => setTimeout(r, 1000));
         
@@ -553,64 +569,64 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             const mReq = protocol.buildRequest('kInputChannelOn/kChannelOn', i);
             const sReq = protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i);
             
-            if (fReq) midiEngine.send(fReq); await new Promise(r => setTimeout(r, 35)); 
-            if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, 35)); 
-            if (sReq) midiEngine.send(sReq); await new Promise(r => setTimeout(r, 35)); 
+            if (fReq) midiEngine.send(fReq); await new Promise(r => setTimeout(r, delay)); 
+            if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, delay)); 
+            if (sReq) midiEngine.send(sReq); await new Promise(r => setTimeout(r, delay)); 
 
             // Sincroniza Phase
-            midiEngine.send(protocol.buildRequest('kInputPhase/kPhase', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kInputPhase/kPhase', i)); await new Promise(r => setTimeout(r, delay));
             
             // Sincroniza Master EQ ON de cada canal
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 35));
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQMode', i)); await new Promise(r => setTimeout(r, 35));
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQHPFOn', i)); await new Promise(r => setTimeout(r, 35));
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQLPFOn', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQMode', i)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQHPFOn', i)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest('kInputEQ/kEQLPFOn', i)); await new Promise(r => setTimeout(r, delay));
             
             // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, High)
             const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
             for (const b of bands) {
-                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 35));
-                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 35));
-                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i)); await new Promise(r => setTimeout(r, 35));
+                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, delay));
+                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, delay));
+                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i)); await new Promise(r => setTimeout(r, delay));
             }
 
             // Requisita também os 8 auxiliares
             for (let a = 1; a <= 8; a++) {
                 const auxReq = protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i);
                 const auxOnReq = protocol.buildRequest(`kInputAUX/kAUX${a}On`, i);
-                if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, 15));
-                if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, 15));
+                if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, delay));
+                if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, delay));
             }
 
             // 🚨 [CRITICAL SYNC LOGIC] - DINÂMICAS
             // Delays de 15ms entre mensagens e pausa de 600ms a cada 4 canais são MANDATÓRIOS.
-            // Sem isso, a 01V96 satura o buffer MIDI e descarta os pacotes de Threshold/Attack/Range.
             const gateParams = ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'];
             for (const p of gateParams) {
                 const req = protocol.buildRequest(`kInputGate/${p}`, i);
                 if (req) midiEngine.send(req);
-                await new Promise(r => setTimeout(r, 15));
+                await new Promise(r => setTimeout(r, delay));
             }
 
             const compParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
             for (const p of compParams) {
                 const req = protocol.buildRequest(`kInputComp/${p}`, i);
                 if (req) midiEngine.send(req);
-                await new Promise(r => setTimeout(r, 15));
+                await new Promise(r => setTimeout(r, delay));
             }
             
             // Sincroniza Patch (REATIVADO PARA DEBUG CONFORME PEDIDO)
-            midiEngine.send(protocol.buildRequest('kChannelInput/kChannelIn', i)); await new Promise(r => setTimeout(r, 15));
+            midiEngine.send(protocol.buildRequest('kChannelInput/kChannelIn', i)); await new Promise(r => setTimeout(r, delay));
 
             // Sincroniza Buses 1-8 e Stereo
-            midiEngine.send(protocol.buildRequest('kInputBus/kStereo', i)); await new Promise(r => setTimeout(r, 10));
+            midiEngine.send(protocol.buildRequest('kInputBus/kStereo', i)); await new Promise(r => setTimeout(r, delay));
             for (let b = 1; b <= 8; b++) {
-                midiEngine.send(protocol.buildRequest(`kInputBus/kBus${b}`, i)); await new Promise(r => setTimeout(r, 10));
+                midiEngine.send(protocol.buildRequest(`kInputBus/kBus${b}`, i)); await new Promise(r => setTimeout(r, delay));
             }
 
             // [CRITICAL] Pausa estratégica a cada 4 canais para alívio do buffer da mesa
             if ((i + 1) % 4 === 0) {
                 process.stdout.write("|");
+                midiEngine.send(masterMeter.buildRequest()); // Força meter na pausa
                 await new Promise(r => setTimeout(r, 600));
             }
         }
@@ -619,41 +635,41 @@ async function triggerSync(targetSocket = null, forceNames = false) {
         console.log("🔄 Sincronizando Mixes e Buses (Faders + EQ)...");
         const outBands = ['Low', 'LowMid', 'HiMid', 'Hi'];
         for (let i = 0; i < 8; i++) {
-            midiEngine.send(protocol.buildRequest('kAUXFader/kFader', i)); await new Promise(r => setTimeout(r, 35));
-            midiEngine.send(protocol.buildRequest('kAUXChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, 35));
-            midiEngine.send(protocol.buildRequest('kBusFader/kFader', i)); await new Promise(r => setTimeout(r, 35));
-            midiEngine.send(protocol.buildRequest('kBusChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kAUXFader/kFader', i)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest('kAUXChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest('kBusFader/kFader', i)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest('kBusChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, delay));
 
             // AUX EQ
-            midiEngine.send(protocol.buildRequest('kAUXEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kAUXEQ/kEQOn', i)); await new Promise(r => setTimeout(r, delay));
             for (const b of outBands) {
-                midiEngine.send(protocol.buildRequest(`kAUXEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 20));
-                midiEngine.send(protocol.buildRequest(`kAUXEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 20));
+                midiEngine.send(protocol.buildRequest(`kAUXEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, delay));
+                midiEngine.send(protocol.buildRequest(`kAUXEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, delay));
             }
 
             // BUS EQ
-            midiEngine.send(protocol.buildRequest('kBusEQ/kEQOn', i)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest('kBusEQ/kEQOn', i)); await new Promise(r => setTimeout(r, delay));
             for (const b of outBands) {
-                midiEngine.send(protocol.buildRequest(`kBusEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, 20));
-                midiEngine.send(protocol.buildRequest(`kBusEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, 20));
+                midiEngine.send(protocol.buildRequest(`kBusEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, delay));
+                midiEngine.send(protocol.buildRequest(`kBusEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, delay));
             }
         }
 
         // Stereo Master robust sync
         console.log("🔄 Sincronizando Stereo Master (Fader + EQ + Comp)...");
-        midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, 35));
-        midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, 35));
-        midiEngine.send(protocol.buildRequest('kStereoAttenuator/kAtt', 0)); await new Promise(r => setTimeout(r, 35));
+        midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, delay));
+        midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, delay));
+        midiEngine.send(protocol.buildRequest('kStereoAttenuator/kAtt', 0)); await new Promise(r => setTimeout(r, delay));
 
         // Master EQ
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQOn', 0)); await new Promise(r => setTimeout(r, 35));
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQMode', 0)); await new Promise(r => setTimeout(r, 35));
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQHPFOn', 0)); await new Promise(r => setTimeout(r, 35));
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQLPFOn', 0)); await new Promise(r => setTimeout(r, 35));
+        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQOn', 0)); await new Promise(r => setTimeout(r, delay));
+        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQMode', 0)); await new Promise(r => setTimeout(r, delay));
+        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQHPFOn', 0)); await new Promise(r => setTimeout(r, delay));
+        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQLPFOn', 0)); await new Promise(r => setTimeout(r, delay));
         for (const b of outBands) {
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}F`, 0)); await new Promise(r => setTimeout(r, 20));
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}G`, 0)); await new Promise(r => setTimeout(r, 20));
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}Q`, 0)); await new Promise(r => setTimeout(r, 20));
+            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}F`, 0)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}G`, 0)); await new Promise(r => setTimeout(r, delay));
+            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}Q`, 0)); await new Promise(r => setTimeout(r, delay));
         }
 
         // Master Compressor
@@ -661,7 +677,7 @@ async function triggerSync(targetSocket = null, forceNames = false) {
         for (const p of masterCompParams) {
             const req = protocol.buildRequest(`kStereoComp/${p}`, 0);
             if (req) midiEngine.send(req);
-            await new Promise(r => setTimeout(r, 15));
+            await new Promise(r => setTimeout(r, delay));
         }
 
         await new Promise(r => setTimeout(r, 600)); 
@@ -673,26 +689,17 @@ async function triggerSync(targetSocket = null, forceNames = false) {
         }
         console.log("✅ Sincronização de parâmetros concluída!");
 
-        // O server SEMPRE busca os nomes na mesa pelo menos uma vez por inicialização (session)
-        // para garantir que o JSON esteja atualizado com a mesa física.
-        // Os clients seguintes usarão o que já estiver na memória (atualizado pelo primeiro sync ou carregado do JSON).
-        
         if (forceNames || !hasSyncedNamesThisSession) {
             console.log("📝 [SYNC] Iniciando busca obrigatória de nomes na mesa (1 vez por boot)...");
             await new Promise(r => setTimeout(r, 2000)); 
 
-            // 🚨 [CRITICAL SYNC LOGIC] - NOMES (MAX 4 CHARS)
-            // Procedimento:
-            // 1. Resetamos o nome local para CH X (limpa fantasmas de sessions antigas como "BUMBE")
-            // 2. Pedimos as 4 letras (0 a 3) para a mesa física.
             for (let i = 0; i < 32; i++) {
-                // Reset local preventivo para garantir array de tamanho 4
                 stateManager.setChannelName(i, ""); 
 
                 for (let c = 0; c < 4; c++) {
                     const nameReq = protocol.buildNameRequest(i, c);
                     if (nameReq) midiEngine.send(nameReq);
-                    await new Promise(r => setTimeout(r, 45)); 
+                    await new Promise(r => setTimeout(r, nameDelay)); 
                 }
                 
                 if (i % 2 === 0) {

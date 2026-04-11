@@ -72,7 +72,10 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
                 const translated = protocol.parseIncoming(message);
                 
                 if (translated) {
-                    onMessageCallback(translated);
+                    onMessageCallback(translated, message);
+                } else {
+                    // Se não foi traduzido como parâmetro conhecido, ainda assim enviamos o RAW para módulos independentes
+                    onMessageCallback({ type: 'RAW_MIDI' }, message);
                 }
             }
         });

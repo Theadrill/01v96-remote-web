@@ -77,23 +77,23 @@ function parseIncoming(message) {
 
   // 🚨 [CRITICAL SYNC LOGIC] - NÃO ALTERAR A LÓGICA DE METER ABAIXO
   // O check 'message.length > 20' é VITAL para diferenciar meters de parâmetros de dinâmica (Gate/Comp).
-  // Se remover esse check ou os IDs (13/26/127), a sincronia de Gate/Comp da 01V96 IRÁ QUEBRAR.
-  const isMeter = message.length > 20 && (message[4] === 13 || message[4] === 26 || message[4] === 127) && (message[5] === 33 || message[5] === 32);
+  // Se for meter (Geralmente byte 4 é 13, 26 ou 127 dependendo da seção, e o tamanho é fixo > 20)
+  const isMeter = message.length > 20 && (message[4] === 13 || message[4] === 26 || message[4] === 127);
 
+  // Agora aceitamos qualquer grupo (message[5]) para permitir busca livre pelo Master
   if (isMeter) {
       let levels = [];
       const dataStart = 9; 
-      // 01V96 envia 32 canais. O Master ou outros dependem do grupo pedido.
-      // Limitamos a 33 pontos, mas garantimos que não lemos o byte F7 (message.length - 1)
+      // Revertido para 33 pontos para manter paridade absoluta com o original
       for (let i = 0; i < 33; i++) {
           const idx = dataStart + (i * 2);
           if (idx >= message.length - 1) {
-              levels.push(0); // Evita ler F7 (247) como valor de meter
+              levels.push(0);
           } else {
               levels.push(message[idx] || 0);
           }
       }
-      return { type: 'METER_DATA', levels };
+      return { type: 'METER_DATA', levels, group: message[5] };
   }
 
   if (message[4] === 13 && message[5] === 127) return null;
