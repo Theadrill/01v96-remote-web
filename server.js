@@ -547,15 +547,7 @@ async function triggerSync(targetSocket = null, forceNames = false) {
     console.log(`🔄 Sincronizando faders e botões vitais ${targetSocket ? '(apenas novo cliente)' : '(global)'}...`);
     try {
         await new Promise(r => setTimeout(r, 1000));
-        // Master Fader & ON
-        const mastF = protocol.buildRequest('kStereoFader/kFader', 0);
-        const mastO = protocol.buildRequest('kStereoChannelOn/kChannelOn', 0);
-        if (mastF) midiEngine.send(mastF); await new Promise(r => setTimeout(r, 40));
-        if (mastO) midiEngine.send(mastO); await new Promise(r => setTimeout(r, 40));
-
-        // Pausa extra após o Master
-        await new Promise(r => setTimeout(r, 100));
-
+        
         for (let i = 0; i < 32; i++) {
             const fReq = protocol.buildRequest('kInputFader/kFader', i);
             const mReq = protocol.buildRequest('kInputChannelOn/kChannelOn', i);
@@ -647,11 +639,29 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             }
         }
 
-        // Stereo Master EQ
+        // Stereo Master robust sync
+        console.log("🔄 Sincronizando Stereo Master (Fader + EQ + Comp)...");
+        midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, 35));
+        midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, 35));
+        midiEngine.send(protocol.buildRequest('kStereoAttenuator/kAtt', 0)); await new Promise(r => setTimeout(r, 35));
+
+        // Master EQ
         midiEngine.send(protocol.buildRequest('kStereoEQ/kEQOn', 0)); await new Promise(r => setTimeout(r, 35));
+        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQMode', 0)); await new Promise(r => setTimeout(r, 35));
+        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQHPFOn', 0)); await new Promise(r => setTimeout(r, 35));
+        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQLPFOn', 0)); await new Promise(r => setTimeout(r, 35));
         for (const b of outBands) {
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}F`, 0)); await new Promise(r => setTimeout(r, 35));
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}G`, 0)); await new Promise(r => setTimeout(r, 35));
+            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}F`, 0)); await new Promise(r => setTimeout(r, 20));
+            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}G`, 0)); await new Promise(r => setTimeout(r, 20));
+            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}Q`, 0)); await new Promise(r => setTimeout(r, 20));
+        }
+
+        // Master Compressor
+        const masterCompParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
+        for (const p of masterCompParams) {
+            const req = protocol.buildRequest(`kStereoComp/${p}`, 0);
+            if (req) midiEngine.send(req);
+            await new Promise(r => setTimeout(r, 15));
         }
 
         await new Promise(r => setTimeout(r, 600)); 

@@ -4,7 +4,20 @@ const state = {
     channels: {},
     mixes: {},
     buses: {},
-    master: { value: 0, on: false, name: "MASTER" }
+    master: { 
+        value: 0, 
+        on: false, 
+        name: "MASTER",
+        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        eq: {
+            on: false,
+            mode: 0,
+            low: { f: 32, g: 0, q: 20, hpfOn: 0 },
+            lowmid: { f: 60, g: 0, q: 20 },
+            himid: { f: 84, g: 0, q: 20 },
+            high: { f: 108, g: 0, q: 20, lpfOn: 0 }
+        }
+    }
 };
 
 // 🚨 [CRITICAL SYNC LOGIC] - ESTRUTURA DO ESTADO
@@ -43,9 +56,43 @@ for (let i = 0; i < 8; i++) {
 function updateState(d) {
     if (!d) return;
     const { type, channel, value } = d;
+    
+    // Suporte ao Master (Stereo)
     if (channel === 'master' || type.startsWith('kStereo')) {
         if (type === 'kStereoFader/kFader') state.master.value = value;
         if (type === 'kStereoChannelOn/kChannelOn') state.master.on = value;
+        
+        // Master EQ
+        if (type.includes('kStereoEQ/')) {
+            const eqKey = type.split('/')[1];
+            if (eqKey === 'kEQOn') state.master.eq.on = !!value;
+            const map = {
+                'kEQLowF': ['low', 'f'], 'kEQLowG': ['low', 'g'], 'kEQLowQ': ['low', 'q'],
+                'kEQHPFOn': ['low', 'hpfOn'],
+                'kEQLowMidF': ['lowmid', 'f'], 'kEQLowMidG': ['lowmid', 'g'], 'kEQLowMidQ': ['lowmid', 'q'],
+                'kEQHiMidF': ['himid', 'f'], 'kEQHiMidG': ['himid', 'g'], 'kEQHiMidQ': ['himid', 'q'],
+                'kEQHiF': ['high', 'f'], 'kEQHiG': ['high', 'g'], 'kEQHiQ': ['high', 'q'],
+                'kEQLPFOn': ['high', 'lpfOn'],
+                'kEQMode': ['eq', 'mode']
+            };
+            if (map[eqKey]) {
+                const [band, param] = map[eqKey];
+                if (band === 'eq') state.master.eq[param] = value;
+                else state.master.eq[band][param] = value;
+            }
+        }
+
+        // Master Comp
+        if (type.startsWith('kStereoComp/')) {
+            const key = type.split('/')[1];
+            if (key === 'kCompOn') state.master.comp.on = !!value;
+            if (key === 'kCompThreshold') state.master.comp.thresh = value;
+            if (key === 'kCompRatio') state.master.comp.ratio = value;
+            if (key === 'kCompAttack') state.master.comp.attack = value;
+            if (key === 'kCompRelease') state.master.comp.release = value;
+            if (key === 'kCompGain') state.master.comp.gain = value;
+            if (key === 'kCompKnee') state.master.comp.knee = value;
+        }
         return;
     }
 

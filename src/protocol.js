@@ -135,17 +135,19 @@ function parseIncoming(message) {
         return { type: `kInputGate/${key}`, channel, value: converter(dataBytes) };
     }
 
-    // Input Comp (Element 31)
-    if (element === 31) {
+    // Compressor Parsing (Input 31, Bus 45, AUX 59, Matrix 71, Stereo 81)
+    const compMap = { 31: 'kInput', 45: 'kBus', 59: 'kAUX', 71: 'kMatrix', 81: 'kStereo' };
+    if (compMap[element]) {
         const compKeys = [
             'kCompLocComp', 'kCompOn', 'kCompLink', 'kCompType',
             'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'
         ];
         const key = compKeys[parameter];
+        const prefix = compMap[element];
         let converter = CONVERTERS.bytesToFader;
         if (key === 'kCompThreshold') converter = CONVERTERS.bytesToSigned;
         if (key === 'kCompOn' || key === 'kCompLink') converter = CONVERTERS.bytesToOn;
-        return { type: `kInputComp/${key}`, channel, value: converter(dataBytes) };
+        return { type: `${prefix}Comp/${key}`, channel: (prefix === 'kStereo' ? 'master' : channel), value: converter(dataBytes) };
     }
 
     // Bus Assign (Element 34)
