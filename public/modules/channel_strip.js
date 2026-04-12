@@ -119,18 +119,18 @@ function updateUI(ch, val, onState, soloState) {
  * sincronização em 'socket.js' e 'updateUI' seja atualizado de acordo.
  */
 function createDesktopStrip(config) {
-    const { 
+    const {
         id,              // ID base
         elId,            // ID do container card
         title,           // Texto no topo/base
         name,            // Texto display verde
-        customClass = "", 
-        onAction, 
-        configAction = "", 
+        customClass = "",
+        onAction,
+        configAction = "",
         isMaster = false,
         hasSolo = false,
         evtCh,           // Identificador do socket (0, 'm0', etc)
-        onWheelAction = "handleWheelFader", 
+        onWheelAction = "handleWheelFader",
         onInputAction = "faderInput",
         onNudgeStartAction = "startNudge",
         onNudgeStopAction = "stopNudge",
@@ -198,9 +198,9 @@ function createDesktopStrip(config) {
 }
 
 function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
-    const title = isMaster ? "MASTER" : `${i + 1}`;
     const s = isMaster ? masterState : channelStates[i];
-    const nameDiv = isMaster ? "MASTER" : (s.name || "...");
+    const title = isMaster ? "MASTER" : `${i + 1}`;
+    const nameDiv = isMaster ? (s.name || "MASTER") : (s.name || "...");
     let customClass = isMaster ? "master-card-desktop" : "";
     if (!isMaster) {
         if (i < 16) customClass += " fader-group-1";
@@ -354,11 +354,14 @@ function createDesktopOutputStrip(i, type) {
     const cmdPrefix = type === 'mix' ? 'kAUX' : 'kBus';
     const customClass = type === 'mix' ? "fader-group-mix" : "fader-group-bus";
 
+    const stateRef = type === 'mix' ? mixesState[i] : busesState[i];
+    const nameDiv = stateRef ? stateRef.name : title;
+
     return createDesktopStrip({
         id: prefix + i,
         evtCh: `'${prefix}${i}'`,
         title,
-        name: title,
+        name: nameDiv,
         customClass,
         onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', '${prefix}${i}')`,
         configAction: type === 'mix' ? `enterTechnicianMixMode(${i})` : '',
@@ -377,12 +380,15 @@ function createOutputStrip(i, type) {
     let onAction = `toggleState('${cmdPrefix}ChannelOn/kChannelOn', '${prefix}${i}')`;
     const evtCh = `'${prefix}${i}'`;
 
+    const stateRef = type === 'mix' ? mixesState[i] : busesState[i];
+    const nameDiv = stateRef ? stateRef.name : title;
+
     return `
         <div class="fader-card ${customClass}">
             ${getMobileScaleHTML()}
             <div class="ch-clickable-zone" onclick="${type === 'mix' ? `enterTechnicianMixMode(${i})` : ''}">
                 <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : '#00ffcc'}">${title}</h2>
-                <div id="name${prefix}${i}" class="ch-name">${title}</div>
+                <div id="name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>
             
             <button id="on${prefix}${i}" class="btn-state" onclick="${onAction}">On</button>

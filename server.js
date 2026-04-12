@@ -64,6 +64,9 @@ const handleMIDIData = (midiData, rawMessage = null) => {
     }
 
     // Repassa o objeto INTEIRO para o gerenciador de estado (incluindo letras de nomes)
+    if (midiData.type === 'updateNameChar') {
+        console.log(`🌐 [EMIT -> WEB] Name update for Ch:${midiData.channel} Pos:${midiData.charIndex} Char:'${midiData.char}'`);
+    }
     stateManager.updateState(midiData);
     io.emit('update', midiData);
 }
@@ -370,9 +373,10 @@ function loadNames() {
     if (fs.existsSync(namesFile)) {
         try {
             const names = JSON.parse(fs.readFileSync(namesFile, 'utf8'));
-            for (let i = 0; i < 32; i++) {
-                if (names[i] !== undefined) {
-                    stateManager.setChannelName(parseInt(i), names[i]);
+            for (const key in names) {
+                const idx = parseInt(key);
+                if (!isNaN(idx)) {
+                    stateManager.setChannelName(idx, names[key]);
                 }
             }
             console.log("✅ [NAMES] Nomes carregados do arquivo names.json");
@@ -387,9 +391,14 @@ function loadNames() {
 function saveNames() {
     const s = stateManager.getState();
     const names = {};
-    for (let i = 0; i < 32; i++) {
-        names[i] = s.channels[i].name;
-    }
+    // Inputs (0-31)
+    for (let i = 0; i < 32; i++) { names[i] = s.channels[i].name; }
+    // Mixes (36-43)
+    for (let i = 0; i < 8; i++) { if(s.mixes[i]) names[36 + i] = s.mixes[i].name; }
+    // Buses (44-51)
+    for (let i = 0; i < 8; i++) { if(s.buses[i]) names[44 + i] = s.buses[i].name; }
+    // Stereo (52)
+    if(s.master) names[52] = s.master.name;
     try {
         fs.writeFileSync(namesFile, JSON.stringify(names, null, 2));
         console.log("💾 [NAMES] Nomes salvos com sucesso em names.json");
@@ -689,10 +698,10 @@ async function triggerSync(targetSocket = null, forceNames = false) {
 
             // [SCENE SYNC] - Sincroniza o número e nome da cena atual (Relocado para estabilidade)
             console.log("📝 [SYNC] Solicitando Número e Nome da Cena...");
-            midiEngine.send(protocol.buildRequest('kSceneNumber', 0)); 
+            midiEngine.send(protocol.buildRequest('kSceneNumber', 0));
             await new Promise(r => setTimeout(r, 300));
-            midiEngine.send(protocol.buildRequest('kSceneNumberFallback', 0)); 
-            await new Promise(r => setTimeout(r, 500)); 
+            midiEngine.send(protocol.buildRequest('kSceneNumberFallback', 0));
+            await new Promise(r => setTimeout(r, 500));
 
             for (let c = 0; c < 16; c++) {
                 midiEngine.send(protocol.buildRequest(`kSceneTitle/kTitle${c + 1}`, 0));
@@ -715,6 +724,24 @@ async function triggerSync(targetSocket = null, forceNames = false) {
                     process.stdout.write(".");
                     await new Promise(r => setTimeout(r, 100));
                 }
+            }
+
+            // [SYNC] Nomes de Saídas (Mixes 36-43, Buses 44-51, Master 52)
+            console.log("\n📝 [SYNC] Solicitando nomes de Mixes, Buses e Master (8 chars)...");
+            const outIndices = [];
+            for (let i = 36; i <= 43; i++) outIndices.push(i); 
+            for (let i = 44; i <= 51; i++) outIndices.push(i); 
+            outIndices.push(52);
+
+            for (const idx of outIndices) {
+                stateManager.setChannelName(idx, "");
+                for (let c = 0; c < 8; c++) { 
+                    const nameReq = protocol.buildNameRequest(idx, c);
+                    if (nameReq) midiEngine.send(nameReq);
+                    await new Promise(r => setTimeout(r, nameDelay));
+                }
+                process.stdout.write("o");
+                await new Promise(r => setTimeout(r, 50));
             }
             console.log("\n✅ [SYNC] Carregamento de nomes via MIDI concluído!");
             hasSyncedNamesThisSession = true;
@@ -762,6 +789,23 @@ async function syncNames() {
                 process.stdout.write(".");
                 await new Promise(r => setTimeout(r, 200));
             }
+        }
+
+        // Saídas no Manual Sync (8 chars)
+        const outIndices = [];
+        for (let i = 36; i <= 43; i++) outIndices.push(i); 
+        for (let i = 44; i <= 51; i++) outIndices.push(i); 
+        outIndices.push(52);
+
+        for (const idx of outIndices) {
+            stateManager.setChannelName(idx, "");
+            for (let c = 0; c < 8; c++) {
+                const nameReq = protocol.buildNameRequest(idx, c);
+                if (nameReq) midiEngine.send(nameReq);
+                await new Promise(r => setTimeout(r, nameDelay));
+            }
+            process.stdout.write("o");
+            await new Promise(r => setTimeout(r, 100));
         }
 
         console.log("\n✅ [MANUAL SYNC] Concluído!");

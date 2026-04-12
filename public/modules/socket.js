@@ -31,7 +31,7 @@ socket.on('update', (d) => {
             if (d.type === 'kInputChannelOn/kChannelOn') updateUI(d.channel, undefined, isTrue, undefined);
         }
         if (d.type === 'kSetupSoloChOn/kSoloChOn') updateUI(d.channel, undefined, undefined, isTrue);
-        
+
         if (d.type === 'kInputPhase/kPhase') {
             channelStates[d.channel].phase = d.value;
             if (activeConfigChannel === d.channel && window.updatePhaseUI) updatePhaseUI(d.channel, d.value);
@@ -41,7 +41,7 @@ socket.on('update', (d) => {
             channelStates[d.channel].att = d.value;
             if (activeConfigChannel === d.channel && window.updateATTUI) window.updateATTUI(d.value);
         }
-        
+
         // Suporte a Auxiliares
         if (d.type.includes('kInputAUX/kAUX')) {
             updateAuxFromSocket(d.channel, d.type, d.value);
@@ -100,7 +100,7 @@ socket.on('update', (d) => {
                 }
             }
         }
-        
+
         // Suporte a BUS / STEREO (ETC)
         if (d.type && d.type.startsWith('kInputBus/k')) {
             if (d.type === 'kInputBus/kStereo') {
@@ -110,34 +110,60 @@ socket.on('update', (d) => {
                 if (!channelStates[d.channel].buses) channelStates[d.channel].buses = new Array(8).fill(false);
                 channelStates[d.channel].buses[busIdx] = !!d.value;
             }
-            
+
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
         }
+    }
 
-        // Suporte a Letras de Nomes (ECHO da mesa física)
-        if (d.type === 'updateNameChar') {
-            if (!channelStates[d.channel].nameChars) {
-                channelStates[d.channel].nameChars = new Array(4).fill(' ');
-            }
-            channelStates[d.channel].nameChars[d.charIndex] = d.char;
-            const newName = channelStates[d.channel].nameChars.join('').trim() || `CH ${d.channel + 1}`;
-            channelStates[d.channel].name = newName;
+    if (d.type === 'updateNameChar') {
+        let stateObj = null;
+        let targetId = `name${d.channel}`;
+        
+        if (d.channel >= 36) {
+            console.log(`📡 [FRONT-NAME] INCOMING: Ch:${d.channel} Pos:${d.charIndex} Char:'${d.char}'`);
+        }
 
-            // Atualiza o texto visual no fader
-            const el = document.getElementById(`name${d.channel}`);
-            if (el) el.innerText = newName;
+        if (d.channel >= 0 && d.channel <= 31) {
+            stateObj = channelStates[d.channel];
+        } else if (d.channel >= 36 && d.channel <= 43) {
+            stateObj = mixesState[d.channel - 36];
+            targetId = `namem${d.channel - 36}`;
+        } else if (d.channel >= 44 && d.channel <= 51) {
+            stateObj = busesState[d.channel - 44];
+            targetId = `nameb${d.channel - 44}`;
+        } else if (d.channel === 52) {
+            stateObj = masterState;
+            targetId = `namemaster`;
+        }
 
-            // Atualiza sidebar se necessário
-            if (activeConfigChannel === d.channel) {
-                const sideTitle = document.getElementById('chSideTitle');
-                if (sideTitle) {
-                    sideTitle.innerText = `${d.channel + 1} - ${newName}`;
-                    if (window.autoScaleTitle) autoScaleTitle();
-                }
+        if (!stateObj) return;
+
+        if (!stateObj.nameChars) {
+            stateObj.nameChars = new Array(16).fill(' ');
+        }
+        stateObj.nameChars[d.charIndex] = d.char;
+        const newName = stateObj.nameChars.join('').trim() || (d.channel < 32 ? `CH ${d.channel + 1}` : targetId.replace('name', '').toUpperCase());
+        stateObj.name = newName;
+        
+        if (d.channel >= 36) {
+            console.log(`✅ [FRONT-NAME] UPDATED: ID:${targetId} Name:'${newName}'`);
+        }
+
+        // Atualiza o texto visual no fader
+        const el = document.getElementById(targetId);
+        if (el) el.innerText = newName;
+
+        // Atualiza sidebar se necessário
+        if (activeConfigChannel === d.channel) {
+            const sideTitle = document.getElementById('chSideTitle');
+            if (sideTitle) {
+                sideTitle.innerText = `${d.channel + 1} - ${newName}`;
+                if (window.autoScaleTitle) autoScaleTitle();
             }
         }
+        return;
     }
 
     // Suporte a Cena (Echo da mesa)
@@ -165,11 +191,11 @@ socket.on('updateName', (data) => {
     const { channel, name } = data;
     if (channelStates[channel]) {
         channelStates[channel].name = name;
-        
+
         // Atualiza label no fader
         const el = document.getElementById(`name${channel}`);
         if (el) el.innerText = name;
-        
+
         // Se estiver com o modal aberto nesse canal, atualiza o título lateral
         if (activeConfigChannel === channel) {
             const sideTitle = document.getElementById('chSideTitle');
@@ -230,10 +256,10 @@ socket.on('updateName', (d) => {
     if (typeof d.channel === 'number' && d.channel < NUM_CHANNELS) {
         const newName = d.name || `CH ${d.channel + 1}`;
         const el = document.getElementById(`name${d.channel}`);
-        if(el && el.innerText !== newName) {
+        if (el && el.innerText !== newName) {
             el.innerText = newName;
         }
-        
+
         // Se este canal for o que está aberto na sidebar, atualiza o título lá tbm
         if (activeConfigChannel === d.channel) {
             const sideTitle = document.getElementById('chSideTitle');
@@ -250,19 +276,19 @@ socket.on('sync', (s) => {
         for (let i = 0; i < NUM_CHANNELS; i++) {
             if (s.channels[i]) {
                 Object.assign(channelStates[i], s.channels[i]);
-                
+
                 let v = s.channels[i].value;
                 let o = s.channels[i].on;
-                
+
                 if (musicianMode || technicianMixMode) {
                     v = s.channels[i][`aux${activeMix}`] || 0;
                     o = s.channels[i][`aux${activeMix}On`] || false;
                 }
-                
+
                 updateUI(i, v, o, s.channels[i].solo);
                 const elN = document.getElementById(`name${i}`);
                 const newName = s.channels[i].name || `CH ${i + 1}`;
-                if(elN && elN.innerText !== newName) {
+                if (elN && elN.innerText !== newName) {
                     elN.innerText = newName;
                 }
             }
@@ -314,16 +340,16 @@ socket.on('portsList', (data) => {
     if (data.savedConfig && data.savedConfig.tecnico_pass) {
         tecnicoPassword = data.savedConfig.tecnico_pass;
     }
-    
+
     const sinEl = document.getElementById('sin');
     const soutEl = document.getElementById('sout');
-    if (sinEl) sinEl.innerHTML = data.available.inputs.map(p => `<option value="${p.id}" ${data.savedConfig.inIdx == p.id ? 'selected':''}>IN: ${p.name}</option>`).join('');
-    if (soutEl) soutEl.innerHTML = data.available.outputs.map(p => `<option value="${p.id}" ${data.savedConfig.outIdx == p.id ? 'selected':''}>OUT: ${p.name}</option>`).join('');
-    
+    if (sinEl) sinEl.innerHTML = data.available.inputs.map(p => `<option value="${p.id}" ${data.savedConfig.inIdx == p.id ? 'selected' : ''}>IN: ${p.name}</option>`).join('');
+    if (soutEl) soutEl.innerHTML = data.available.outputs.map(p => `<option value="${p.id}" ${data.savedConfig.outIdx == p.id ? 'selected' : ''}>OUT: ${p.name}</option>`).join('');
+
     if (data.savedConfig && data.savedConfig.inIdx !== null && data.savedConfig.outIdx !== null) {
-        conn(); 
-    } else { 
-        document.getElementById('configModal').style.display='flex'; 
+        conn();
+    } else {
+        document.getElementById('configModal').style.display = 'flex';
     }
     // Sincroniza o modo demo e opacidade
     const demoBtn = document.getElementById('demoBtn');
@@ -358,7 +384,7 @@ socket.on('meterData', (levels) => {
         // Seleciona cards de ambos os layouts (Mobile/Desktop) e containers (Area/Master)
         faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
     }
-    
+
     requestAnimationFrame(() => {
         if (!faderCardsCache) {
             faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
@@ -371,7 +397,7 @@ socket.on('meterData', (levels) => {
             for (let i = 0; i < faderCardsCache.length; i++) {
                 const card = faderCardsCache[i];
                 if (!card) continue;
-                
+
                 let levelIdx = -1;
                 if (i < 8) levelIdx = 34 + i;       // Mix 1-8
                 else if (i < 16) levelIdx = 42 + (i - 8); // Bus 1-8
@@ -460,7 +486,7 @@ socket.on('meterData', (levels) => {
                     if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
                     miniCard.style.backgroundSize = `100% ${finalPercent}%`; // Layout Mobile
                 }
-                
+
                 if (finalPercent >= 98) {
                     if (peakLed) peakLed.classList.add('active');
                     miniCard.classList.add('peak-glow');
@@ -478,7 +504,7 @@ socket.on('meterData', (levels) => {
         const levelIdx = isMaster ? 32 : activeConfigChannel;
         if (levelIdx < levels.length) {
             const dbVal = (window.meterCalibration && window.meterCalibration[levels[levelIdx]]) !== undefined ? window.meterCalibration[levels[levelIdx]] : -138;
-            
+
             const gateMeter = document.getElementById('gateMeter');
             if (gateMeter) gateMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'gate')}%`;
 

@@ -56,14 +56,42 @@ function buildRequest(commandName, channelIndex = 0) {
 
 function buildNameRequest(channelIndex, charIndex) {
     const parameter = 4 + charIndex;
+    let element = 4;
+    let localCh = channelIndex;
+
+    if (channelIndex >= 36 && channelIndex <= 43) {
+        element = 16;
+        localCh = channelIndex - 36;
+    } else if (channelIndex >= 44 && channelIndex <= 51) {
+        element = 15;
+        localCh = channelIndex - 44;
+    } else if (channelIndex === 52) {
+        element = 18;
+        localCh = 0;
+    }
+    
     // Retornamos ao ID 13 (0x0D) pois é o padrão clássico da 01V96 para Nomes
-    return [...HEADER, 48, MODEL_ID, 13, 2, 4, parameter, channelIndex, ...FOOTER];
+    return [...HEADER, 48, MODEL_ID, 13, 2, element, parameter, localCh, ...FOOTER];
 }
 
 function buildNameChange(channelIndex, charIndex, charCode) {
     const parameter = 4 + charIndex;
-    // F0 43 10 3E 0D 02 04 [PARAM] [CH] 00 00 00 [VAL] F7
-    return [...HEADER, 16, MODEL_ID, 13, 2, 4, parameter, channelIndex, 0, 0, 0, charCode, ...FOOTER];
+    let element = 4;
+    let localCh = channelIndex;
+
+    if (channelIndex >= 36 && channelIndex <= 43) {
+        element = 16;
+        localCh = channelIndex - 36;
+    } else if (channelIndex >= 44 && channelIndex <= 51) {
+        element = 15;
+        localCh = channelIndex - 44;
+    } else if (channelIndex === 52) {
+        element = 18;
+        localCh = 0;
+    }
+
+    // F0 43 10 3E 0D 02 [ELEMENT] [PARAM] [CH] 00 00 00 [VAL] F7
+    return [...HEADER, 16, MODEL_ID, 13, 2, element, parameter, localCh, 0, 0, 0, charCode, ...FOOTER];
 }
 
 function parseIncoming(message) {
@@ -73,11 +101,22 @@ function parseIncoming(message) {
     // Isso evita processar nossos próprios pedidos (Requests 0x3n) que o loopMIDI ecoa de volta.
     if ((message[2] & 0xF0) !== 0x10) return null;
 
+    const section = message[4];
+    const group = message[5];
+    const parameter = message[7];
+    const channel = message[8];
+
+    // Debug para nomes (Section 13, Group 2)
+    if (section === 13 && group === 2 && message[6] >= 4) {
+        const hex = Buffer.from(message).toString('hex').toUpperCase();
+        console.log(`🧐 [PROTOCOL DEBUG] Sec:${section} Grp:${group} Elm:${message[6]} Prm:${parameter} Ch:${channel} Hex:${hex}`);
+    }
+
     const element = message[6];
 
     // 🚨 [CRITICAL SYNC LOGIC] - NÃO ALTERAR A LÓGICA DE METER ABAIXO
     // message[5] deve ser o grupo de meters (32, 33) para evitar colisão com parâmetros.
-    const isMeter = message.length > 20 && (message[5] === 33 || message[5] === 32);
+    const isMeter = message.length > 20 && (group === 33 || group === 32);
 
     if (isMeter) {
         let levels = [];
@@ -97,12 +136,35 @@ function parseIncoming(message) {
     if (message[4] === 13 && message[5] === 127) return null;
 
     const dataBytes = message.slice(9, -1);
-    const parameter = message[7];
-    const channel = message[8];
-
+    // canal e parameter já declarados no topo para debug
+    
     // 🚨 [CRITICAL SYNC LOGIC] - PARAMETER CHANGES
     // Suporta ID 13, 26 e 127 (Universal) que são os comandos de mudança de parâmetro da 01V96.
     if (message[4] === 13 || message[4] === 127 || message[4] === 26 || message[4] === 1) {
+        
+        // --- PRIORIDADE 1: NOMES DE CANAIS E CENAS ---
+        // Se o elemento for um dos IDs de nome (4, 15, 16, 18) e o parâmetro estiver no range de caracteres (4-19)
+        if ([4, 15, 16, 18].includes(element) && parameter >= 4 && parameter <= 19) {
+            const charIndex = parameter - 4;
+            const charCode = dataBytes[dataBytes.length - 1];
+            const char = String.fromCharCode(charCode);
+
+            // Traduz o canal local do módulo de volta para o ID global do sistema
+            let globalCh = channel;
+            if (element === 16) globalCh = 36 + channel;      // Mixes
+            else if (element === 15) globalCh = 44 + channel; // Buses
+            else if (element === 18) globalCh = 52;           // Stereo Master
+
+            console.log(`✅ [NAME PARSED] Elm:${element} Ch:${channel} -> Global:${globalCh} Pos:${charIndex} Char:'${char}'`);
+
+            return {
+                type: 'updateNameChar',
+                channel: globalCh,
+                charIndex: charIndex,
+                char: char
+            };
+        }
+
         // EQ Parsing: Input (32, 33), Bus (46), AUX (60), Stereo (82)
         // Note: Bus EQ (46) collides with Solo (46) when requested, so we check message[5] === 1 (Param Change)
         const eqMap = { 32: 'kInput', 33: 'kInput', 46: 'kBus', 60: 'kAUX', 82: 'kStereo' };
@@ -155,20 +217,6 @@ function parseIncoming(message) {
             }
             if (parameter >= 3 && parameter <= 10) {
                 return { type: `kInputBus/kBus${parameter - 2}`, channel, value: CONVERTERS.bytesToOn(dataBytes) };
-            }
-        }
-
-        // 🚨 [CRITICAL SYNC LOGIC] - NOMES DE CANAIS E CENAS (YAMAHA 01V96 PADRÃO)
-        if (message[4] === 13 && message[5] === 2 && element === 4) {
-            if (parameter >= 4 && parameter <= 19) {
-                const charIndex = parameter - 4;
-                const charCode = dataBytes[dataBytes.length - 1];
-                return {
-                    type: 'updateNameChar',
-                    channel,
-                    charIndex,
-                    char: String.fromCharCode(charCode)
-                };
             }
         }
 

@@ -50,23 +50,44 @@ for (let i = 0; i < 32; i++) {
 }
 
 for (let i = 0; i < 8; i++) {
-    state.mixes[i] = { value: 0, on: false, name: `MIX ${i + 1}` };
-    state.buses[i] = { value: 0, on: false, name: `BUS ${i + 1}` };
+    state.mixes[i] = { 
+        value: 0, 
+        on: false, 
+        name: `MIX ${i + 1}`,
+        nameChars: Array(16).fill(' ')
+    };
+    state.buses[i] = { 
+        value: 0, 
+        on: false, 
+        name: `BUS ${i + 1}`,
+        nameChars: Array(16).fill(' ')
+    };
 }
+
+state.master.nameChars = Array(16).fill(' ');
 
 function updateState(d) {
     if (!d) return;
     const { type, channel, value } = d;
 
-    // Suporte a Cena
-    if (type === 'kSceneNumber') {
-        state.sceneNumber = value;
-        return;
+    // --- PRIORIDADE: NOMES DE CANAIS ---
+    // Deve vir antes da trava de '!state.channels[channel]' para permitir IDs de saídas (36-52)
+    if (type === 'updateNameChar') {
+        updateChannelNameChar(d.channel, d.charIndex, d.char);
+        return; 
     }
+
     if (type === 'updateSceneChar') {
         updateSceneChar(d.charIndex, d.char);
         return;
     }
+
+    if (type === 'kSceneNumber') {
+        state.sceneNumber = value;
+        return;
+    }
+
+
 
     // Suporte ao Master (Stereo)
     if (channel === 'master' || type.startsWith('kStereo')) {
@@ -201,25 +222,32 @@ function updateState(d) {
         }
     }
 
-    // Suporte a Letras de Nomes
-    if (type === 'updateNameChar') {
-        updateChannelNameChar(d.channel, d.charIndex, d.char);
-    }
 }
 
 // 🚨 [CRITICAL SYNC LOGIC] - NOMES DE CANAIS (PROTOCOL SYNC)
 // Permitimos que a array cresça além de 4 conforme o protocolo MIDI.
 // O front-end é responsável por limitar a exibição e o input se necessário.
 function updateChannelNameChar(channel, charIndex, char) {
-    if (!state.channels[channel]) return;
-    state.channels[channel].nameChars[charIndex] = char;
-    state.channels[channel].name = state.channels[channel].nameChars.join('').trim();
+    const s = getChannelStateById(channel);
+    if (!s) return;
+    if (!s.nameChars) s.nameChars = Array(16).fill(' ');
+    s.nameChars[charIndex] = char;
+    s.name = s.nameChars.join('').trim();
 }
 
 function setChannelName(channel, name) {
-    if (!state.channels[channel]) return;
-    state.channels[channel].name = name;
-    state.channels[channel].nameChars = name.padEnd(4, ' ').split('');
+    const s = getChannelStateById(channel);
+    if (!s) return;
+    s.name = name;
+    s.nameChars = name.padEnd(16, ' ').split('');
+}
+
+function getChannelStateById(id) {
+    if (id >= 0 && id <= 31) return state.channels[id];
+    if (id >= 36 && id <= 43) return state.mixes[id - 36];
+    if (id >= 44 && id <= 51) return state.buses[id - 44];
+    if (id === 52) return state.master;
+    return null;
 }
 
 function updateSceneChar(index, char) {
