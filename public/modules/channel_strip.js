@@ -464,6 +464,13 @@ function initUI() {
         masterHtml = createChannelStrip(0, true);
     }
 
+    // Injetar Macro Fader na string HTML se o módulo estiver carregado
+    if (typeof getMacroFaderHtml === 'function') {
+        html += '<div style="flex: 0 0 55px !important; width: 55px !important; background: transparent !important;"></div>';
+        html += getMacroFaderHtml();
+        html += '<div style="flex: 0 0 55px !important; width: 55px !important; background: transparent !important;"></div>';
+    }
+
     const masterContainer = document.getElementById('master-container');
     if (layoutMode === 'desktop' && !musicianMode && !technicianMixMode) {
         container.innerHTML = html;

@@ -78,9 +78,8 @@ function parseIncoming(message) {
   // 🚨 [CRITICAL SYNC LOGIC] - NÃO ALTERAR A LÓGICA DE METER ABAIXO
   // O check 'message.length > 20' é VITAL para diferenciar meters de parâmetros de dinâmica (Gate/Comp).
   // Se for meter (Geralmente byte 4 é 13, 26 ou 127 dependendo da seção, e o tamanho é fixo > 20)
-  const isMeter = message.length > 20 && (message[4] === 13 || message[4] === 26 || message[4] === 127);
+  const isMeter = message.length > 40 && (message[4] === 13 || message[4] === 26 || message[4] === 127);
 
-  // Agora aceitamos qualquer grupo (message[5]) para permitir busca livre pelo Master
   if (isMeter) {
       let levels = [];
       const dataStart = 9; 

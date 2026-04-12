@@ -326,6 +326,11 @@ socket.on('meterData', (levels) => {
     }
     
     requestAnimationFrame(() => {
+        if (!faderCardsCache) {
+            faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
+        }
+        if (!faderCardsCache || !faderCardsCache.length) return;
+
         if (outsMode) {
             // No modo OUTS, mapeamos os índices recebidos para Mix/Bus/Master
             // 34-41: Mixes, 42-49: Buses, 32: Stereo Master L
@@ -373,7 +378,7 @@ socket.on('meterData', (levels) => {
                 let levelIdx = i;
                 if (i >= NUM_CHANNELS) levelIdx = 32; // Stereo Master encostado no fim
 
-                if (levelIdx >= 0 && levelIdx < levels.length) {
+                if (levelIdx >= 0 && levelIdx < (levels ? levels.length : 0)) {
                     const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
                     smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.2) + (targetPercent * 0.8);
                     const finalPercent = smoothedLevels[levelIdx];

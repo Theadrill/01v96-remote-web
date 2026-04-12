@@ -112,8 +112,7 @@ function stopAuxNudge() {
 
 function nudgeAuxLevel(ch, auxIdx, dir) {
     const currentRaw = (channelStates[ch] && channelStates[ch][`aux${auxIdx}`]) || 0;
-    let nRaw = currentRaw + dir;
-    if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
+    const nRaw = getSteppedRaw(currentRaw, dir, 0.5);
 
     // Atualiza UI e Estado
     updateAuxManual(ch, auxIdx, nRaw);

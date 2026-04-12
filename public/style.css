@@ -2284,3 +2284,101 @@ body.is-portrait .dyn-box {
     background: #333;
     border-radius: 3px;
 }
+
+/* MACRO FADER STYLES */
+.macro-fader-card {
+    background: #e0e0e0 !important; /* Cinza claro */
+    border: 2px solid #ccc !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.macro-fader-card .card-title, 
+.macro-fader-card .desk-label {
+    color: #333 !important;
+    font-weight: bold !important;
+}
+
+.macro-fader-card .ch-name,
+.macro-fader-card .desk-ch-name {
+    background: transparent !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+.macro-fader-card .btn-nudge {
+    background: #fff !important;
+    color: #000 !important;
+    border: 2px solid #999 !important;
+    box-shadow: 0 4px 0 #bbb;
+}
+
+.macro-fader-card .btn-nudge:active {
+    box-shadow: 0 0 0 #bbb;
+    transform: translateY(4px);
+}
+
+.macro-fader-card .btn-nudge-desk {
+    background: #fff !important;
+    color: #000 !important;
+    border: 2px solid #999 !important;
+    box-shadow: 0 4px 0 #bbb;
+    width: 100% !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.macro-fader-card .btn-nudge-desk:active {
+    box-shadow: 0 0 0 #bbb;
+    transform: translateY(2px);
+}
+
+.macro-fader-card .nudge-zone-desk {
+    padding: 0 10px !important;
+}
+
+.macro-ch-selected {
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
+    border: 1px solid #ffcc00 !important;
+}
+
+.macro-nudge-btn-container {
+    height: 100%;
+    width: 100%;
+}
+
+.btn-nudge-macro-big {
+    width: 100%;
+    height: 100%;
+    background: #fff !important;
+    color: #000 !important;
+    border: 2px solid #999 !important;
+    font-size: 36px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #bbb;
+    transition: transform 0.05s, box-shadow 0.05s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-nudge-macro-big:active {
+    box-shadow: 0 0 0 #bbb;
+    transform: translateY(4px);
+}
+
+/* Ajuste no modo horizontal */
+body.layout-horizontal .macro-fader-card {
+    height: 120px !important;
+    min-height: 120px !important;
+}
+
+@media (max-width: 600px) {
+    #macro-fader-container {
+        margin-left: 20px !important;
+    }
+}

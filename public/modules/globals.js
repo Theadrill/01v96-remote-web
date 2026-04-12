@@ -69,6 +69,30 @@ function dbToRaw(db) {
     return 0; 
 }
 
+/**
+ * Calcula o próximo valor RAW baseado em um step em dB.
+ * Útil para botões de nudge (+/-) que operam em passos fixos de volume.
+ */
+function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
+    const magnitude = Math.abs(dir);
+    const isUp = dir > 0;
+    const currentDbStr = rawToDb(currentRaw, false);
+    let currentDb = currentDbStr === "-∞" ? -138 : parseFloat(currentDbStr);
+
+    // Se estiver no infinito e subir, começa do fundo da curva (-138)
+    if (currentRaw === 0 && isUp) {
+        return dbToRaw(-138 + (stepDb * magnitude));
+    }
+    
+    let nextDb = isUp ? (currentDb + (stepDb * magnitude)) : (currentDb - (stepDb * magnitude));
+    
+    // Proteções de limites
+    if (nextDb > 10) nextDb = 10;
+    if (nextDb < -138) return 0;
+
+    return dbToRaw(nextDb);
+}
+
 // Mapeamento Piecewise Linear para Dynamics (Gate e Compressor)
 // Resolve a não-linearidade das escalas visuais e alinha com os labels.
 window.mapDynDbToPercent = function(val, type) {

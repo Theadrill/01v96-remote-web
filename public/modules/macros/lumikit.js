@@ -2,6 +2,7 @@
  * MOD: LUMIKIT SCENE AND EXTRAS
  * Envia comandos HTTP GET diretos para o web server local da Lumikit
  * Seleciona 1 ou mais cenas + 1 ou mais funções extras combinadas via Grid nativa.
+ * Suporte a PÁGINA 1 e PÁGINA 2 de cenas.
  */
 (function() {
     const ID = "lumikit";
@@ -36,7 +37,14 @@
         if (actions.scenes && actions.scenes.length > 0) {
             for (let scene of actions.scenes) {
                 try {
-                    fetch(`${baseUrl}/services/edmx_change_scene/0/${scene}`, { mode: 'no-cors' });
+                    let p = 0;
+                    let s = scene;
+                    if (typeof scene === 'string' && scene.includes(':')) {
+                        const parts = scene.split(':');
+                        p = parseInt(parts[0]);
+                        s = parseInt(parts[1]);
+                    }
+                    fetch(`${baseUrl}/services/edmx_change_scene/${p}/${s}`, { mode: 'no-cors' });
                 } catch(e) {}
             }
         }
@@ -87,7 +95,8 @@
         const currentlySelectedExtras = allSlotsConfig[slotKey].extras || [];
         const host = allSlotsConfig.globalHost || { ip: '127.0.0.1', port: 5000 };
 
-        let cenas = [];
+        let cenasP1 = [];
+        let cenasP2 = [];
         let extras = [];
         
         // Função para engatilhar as requisições manualmente (botão SYNC) ou na vinda de cachê.
@@ -106,13 +115,28 @@
             
             function checkRender() {
                 passCounter++;
-                if (passCounter >= 2) renderUI();
+                if (passCounter >= 3) renderUI();
             }
 
-            try { fetch(`/api/proxy?url=${encodeURIComponent(baseUrl + '/services/edmx_get_scenes_status/0')}`).then(r=>r.json()).then(d=>{if(d&&d.data&&Array.isArray(d.data)) cenas=d.data; console.log("Lumikit (Debug): Cenas obtidas:", cenas); checkRender();}).catch(e=>{ console.warn("Lumikit (Debug): Falha nas Cenas", e); checkRender();}); } catch(e) { checkRender(); }
-            try { fetch(`/api/proxy?url=${encodeURIComponent(baseUrl + '/services/main_get_ef_status')}`).then(r=>r.json()).then(d=>{if(d&&d.data&&d.data[0]&&d.data[0].items) extras=d.data[0].items; console.log("Lumikit (Debug): Extras obtidos:", extras); checkRender();}).catch(e=>{ console.warn("Lumikit (Debug): Falha nos Extras", e); checkRender();}); } catch(e) { checkRender(); }
+            // Busca Página 1
+            fetch(`/api/proxy?url=${encodeURIComponent(baseUrl + '/services/edmx_get_scenes_status/0')}`)
+                .then(r=>r.json())
+                .then(d=>{if(d&&d.data&&Array.isArray(d.data)) cenasP1=d.data; checkRender();})
+                .catch(e=>{ console.warn("Lumikit (Debug): Falha P1", e); checkRender();});
 
-            setTimeout(() => { if (passCounter < 2) { passCounter=99; renderUI(); } }, 1500);
+            // Busca Página 2
+            fetch(`/api/proxy?url=${encodeURIComponent(baseUrl + '/services/edmx_get_scenes_status/1')}`)
+                .then(r=>r.json())
+                .then(d=>{if(d&&d.data&&Array.isArray(d.data)) cenasP2=d.data; checkRender();})
+                .catch(e=>{ console.warn("Lumikit (Debug): Falha P2", e); checkRender();});
+
+            // Busca Extras
+            fetch(`/api/proxy?url=${encodeURIComponent(baseUrl + '/services/main_get_ef_status')}`)
+                .then(r=>r.json())
+                .then(d=>{if(d&&d.data&&d.data[0]&&d.data[0].items) extras=d.data[0].items; checkRender();})
+                .catch(e=>{ console.warn("Lumikit (Debug): Falha Extras", e); checkRender();});
+
+            setTimeout(() => { if (passCounter < 3) { passCounter=99; renderUI(); } }, 2000);
         }
 
         fetchLumikitData(false);
@@ -128,11 +152,6 @@
                         <button id="lumiSyncBtn" style="flex:1; min-width:80px; background:#ff5722; color:#fff; border:none; border-radius:8px; padding:10px; font-size:13px; font-weight:bold; cursor:pointer; text-transform:uppercase; box-sizing:border-box;">SYNC</button>
                     </div>
                 </div>
-                
-                <!-- SCENES GRID SECTION -->
-                <div style="grid-column: 1 / -1; width:100%; border-bottom: 1px solid #444; margin-bottom: 5px; padding-bottom: 5px;">
-                    <span style="font-size:12px; font-weight:bold; color:#ff5722;">CENAS</span>
-                </div>
             `;
 
             document.getElementById('lumiSyncBtn').onclick = () => {
@@ -142,32 +161,76 @@
                 fetchLumikitData(true);
             };
 
-            // Renderizar 16 botões de cena no mínimo
-            const totalCenas = cenas.length > 0 ? cenas.length : 16;
-            for (let i = 0; i < totalCenas; i++) {
-                const rawName = cenas[i] ? cenas[i].name : "";
+            // SEÇÃO PÁGINA 1
+            const h1 = document.createElement('div');
+            h1.style.cssText = `grid-column: 1 / -1; width:100%; border-bottom: 1px solid #444; margin-bottom: 5px; padding-bottom: 5px;`;
+            h1.innerHTML = `<span style="font-size:12px; font-weight:bold; color:#ff5722;">CENAS - PÁGINA 1</span>`;
+            grid.appendChild(h1);
+
+            renderSceneButtons(0, cenasP1);
+
+            // SEÇÃO PÁGINA 2
+            const h2 = document.createElement('div');
+            h2.style.cssText = `grid-column: 1 / -1; width:100%; border-bottom: 1px solid #444; margin-top:20px; margin-bottom: 5px; padding-bottom: 5px;`;
+            h2.innerHTML = `<span style="font-size:12px; font-weight:bold; color:#ffc107;">CENAS - PÁGINA 2</span>`;
+            grid.appendChild(h2);
+
+            renderSceneButtons(1, cenasP2);
+
+            // SEÇÃO EXTRAS
+            const hEx = document.createElement('div');
+            hEx.style.cssText = `grid-column: 1 / -1; width:100%; border-bottom: 1px solid #444; margin-top: 20px; margin-bottom: 5px; padding-bottom: 5px;`;
+            hEx.innerHTML = `<span style="font-size:12px; font-weight:bold; color:#03a9f4;">FUNÇÕES EXTRAS</span>`;
+            grid.appendChild(hEx);
+
+            renderExtraButtons(extras);
+        }
+
+        function renderSceneButtons(page, dataArray) {
+            const count = dataArray.length > 0 ? dataArray.length : 16;
+            const accent = page === 0 ? "#ff5722" : "#ffc107";
+            const borderAccent = page === 0 ? "#e64a19" : "#ff9800";
+
+            for (let i = 0; i < count; i++) {
+                const rawName = dataArray[i] ? dataArray[i].name : "";
                 const cName = rawName ? rawName : `CENA ${i+1}`;
-                const isSelected = currentlySelectedScenes.includes(i);
+                
+                // Representação interna: "p:s". Páginas antigas (só número) são p=0.
+                const val = `${page}:${i}`;
+                const isSelected = currentlySelectedScenes.includes(val) || (page === 0 && currentlySelectedScenes.includes(i));
+                
                 const btn = document.createElement('button');
                 btn.className = 'btn-connect';
-                btn.style.cssText = `background: ${isSelected? '#ff5722':'#333'}; min-height: 72px; width: 100%; padding: 6px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0; font-size: 9px; line-height: 1.1; border: 1px solid ${isSelected? '#e64a19':'#444'}; color: ${isSelected? '#fff':'#888'}; text-transform: uppercase; word-break: break-word; border-radius: 8px;`;
-                btn.innerHTML = `<span style="font-size:7px; opacity:0.5; margin-bottom:2px;">IDX ${i}</span><span style="font-weight:bold; text-align:center;">${cName}</span>`;
+                btn.style.cssText = `background: ${isSelected? accent : '#333'}; min-height: 72px; width: 100%; padding: 6px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0; font-size: 9px; line-height: 1.1; border: 1px solid ${isSelected? borderAccent : '#444'}; color: ${isSelected? '#fff':'#888'}; text-transform: uppercase; word-break: break-word; border-radius: 8px;`;
+                btn.innerHTML = `<span style="font-size:7px; opacity:0.5; margin-bottom:2px;">P${page+1} ID ${i}</span><span style="font-weight:bold; text-align:center;">${cName}</span>`;
                 btn.onclick = () => {
-                    const idx = allSlotsConfig[slotKey].scenes.indexOf(i);
-                    if (idx === -1) { allSlotsConfig[slotKey].scenes.push(i); btn.style.background='#ff5722'; btn.style.color="#fff"; btn.style.border="1px solid #e64a19"; } 
-                    else { allSlotsConfig[slotKey].scenes.splice(idx, 1); btn.style.background='#333'; btn.style.color="#888"; btn.style.border="1px solid #444"; }
+                    // Limpeza de legado (números puros para string se necessário)
+                    if (page === 0) {
+                        const legacyIdx = allSlotsConfig[slotKey].scenes.indexOf(i);
+                        if (legacyIdx !== -1) allSlotsConfig[slotKey].scenes.splice(legacyIdx, 1);
+                    }
+                    
+                    const idx = allSlotsConfig[slotKey].scenes.indexOf(val);
+                    if (idx === -1) { 
+                        allSlotsConfig[slotKey].scenes.push(val); 
+                        btn.style.background = accent; 
+                        btn.style.color = "#fff"; 
+                        btn.style.border = `1px solid ${borderAccent}`; 
+                    } else { 
+                        allSlotsConfig[slotKey].scenes.splice(idx, 1); 
+                        btn.style.background = '#333'; 
+                        btn.style.color = "#888"; 
+                        btn.style.border = "1px solid #444"; 
+                    }
                 };
                 grid.appendChild(btn);
             }
+        }
 
-            const extrasHeader = document.createElement('div');
-            extrasHeader.style.cssText = `grid-column: 1 / -1; width:100%; border-bottom: 1px solid #444; margin-top: 15px; margin-bottom: 5px; padding-bottom: 5px;`;
-            extrasHeader.innerHTML = `<span style="font-size:12px; font-weight:bold; color:#03a9f4;">FUNÇÕES EXTRAS</span>`;
-            grid.appendChild(extrasHeader);
-
-            const totalExtras = extras.length > 0 ? extras.length : 16;
+        function renderExtraButtons(dataArray) {
+            const totalExtras = dataArray.length > 0 ? dataArray.length : 16;
             for (let i = 0; i < totalExtras; i++) {
-                const rawName = extras[i] ? extras[i].name : "";
+                const rawName = dataArray[i] ? dataArray[i].name : "";
                 const eName = rawName ? rawName : `EXTRA F${i+1}`;
                 const isSelected = currentlySelectedExtras.includes(i);
                 const eBtn = document.createElement('button');

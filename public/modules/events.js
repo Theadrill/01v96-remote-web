@@ -1,7 +1,7 @@
 function openChannelConfig(e, ch) {
     if (musicianMode) return; // Apenas Músico é bloqueado de abrir config base
     if (e.target.closest('button') || e.target.closest('input')) return;
-    
+
     activeConfigChannel = ch;
     updateConfigUIForChannel(ch);
     activeConfigTab = 'aux'; // Sempre abre em Aux por padrão
@@ -11,22 +11,22 @@ function openChannelConfig(e, ch) {
 function updateConfigUIForChannel(ch) {
     const chName = document.getElementById(`name${ch}`).innerText;
     document.getElementById('chSideTitle').innerText = `${ch + 1} - ${chName === '...' ? `CH ${ch + 1}` : chName}`;
-    
+
     document.getElementById('chConfigModal').style.display = 'flex';
     document.getElementById('mainNav').style.display = 'none';
     document.getElementById('chNav').style.display = 'flex';
     document.getElementById('chContext').style.display = 'flex';
-    
+
     // Esconde botões de logout ao entrar na config do canal
     const mExit = document.getElementById('musicianExitBtn');
     if (mExit) mExit.style.display = 'none';
     const tExit = document.getElementById('tecnicoExitBtn');
     if (tExit) tExit.style.display = 'none';
-    
+
     if (window.autoScaleTitle) autoScaleTitle();
-    
+
     const cards = document.querySelectorAll('.fader-card');
-    cards.forEach(c => c.style.background = ''); 
+    cards.forEach(c => c.style.background = '');
     if (cards[ch]) cards[ch].style.background = '#15304d';
 }
 
@@ -34,7 +34,7 @@ function changeConfigChannel(delta) {
     let nextCh = activeConfigChannel + delta;
     if (nextCh < 0) nextCh = NUM_CHANNELS - 1;
     if (nextCh >= NUM_CHANNELS) nextCh = 0;
-    
+
     activeConfigChannel = nextCh;
     updateConfigUIForChannel(nextCh);
 
@@ -44,7 +44,7 @@ function changeConfigChannel(delta) {
 function closeChannelConfig() {
     if (window.stopEQAnimation) stopEQAnimation();
     document.getElementById('chConfigModal').style.display = 'none';
-    
+
     // Restaura o painel principal, a menos que estejamos em fones/mix
     document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode) ? 'none' : 'flex';
     document.getElementById('chNav').style.display = 'none';
@@ -58,7 +58,7 @@ function closeChannelConfig() {
         const tExit = document.getElementById('tecnicoExitBtn');
         if (tExit) tExit.style.display = (outsMode || technicianMixMode) ? 'none' : 'block';
     }
-    
+
     // Reseta cores dos cards
     document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
 }
@@ -82,13 +82,13 @@ function toggleState(type, ch) {
     if (actualType.includes('On') || actualType.includes('Solo')) {
         let currentOn;
         if ((musicianMode || technicianMixMode) && typeof ch === 'number' && actualType.includes('kInputAUX/kAUX')) {
-             currentOn = s[`aux${activeMix}On`] || false;
+            currentOn = s[`aux${activeMix}On`] || false;
         } else {
-             currentOn = actualType.includes('Solo') ? s.solo : s.on;
+            currentOn = actualType.includes('Solo') ? s.solo : s.on;
         }
-        
+
         val = !currentOn;
-        
+
         // Atualiza a visualização local
         if (actualType.includes('Solo')) {
             updateUI(ch, undefined, undefined, val);
@@ -96,10 +96,10 @@ function toggleState(type, ch) {
             updateUI(ch, undefined, val, undefined);
         }
     }
-    
+
     // Para Mix/Bus, o canal emitido é o número após m/b. 
     // Importante: verificar 'master' primeiro para não confundir com Mixes (que começam com 'm')
-    if (!appReady) return; 
+    if (!appReady) return;
     const emitCh = (ch === 'master') ? 0 : ((typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b'))) ? parseInt(ch.substring(1)) : ch);
     socket.emit('control', { type: actualType, channel: emitCh, value: val ? 1 : 0 });
 }
@@ -108,13 +108,13 @@ let nudgeTimeout = null;
 let nudgeInterval = null;
 
 function startNudge(ch, dir) {
-    stopNudge(); 
-    nudgeFader(ch, dir); 
-    
+    stopNudge();
+    nudgeFader(ch, dir);
+
     nudgeTimeout = setTimeout(() => {
         nudgeInterval = setInterval(() => {
             nudgeFader(ch, dir * 3);
-        }, 80); 
+        }, 80);
     }, 500);
 }
 
@@ -133,10 +133,17 @@ function nudgeFader(ch, dir) {
     else s = channelStates[ch];
 
     let currentVal = ((musicianMode || technicianMixMode) && typeof ch === 'number') ? (s[`aux${activeMix}`] || 0) : s.value;
-    let nRaw = currentVal + dir;
+
+    let nRaw;
+    if ((musicianMode || technicianMixMode) && typeof ch === 'number') {
+        nRaw = getSteppedRaw(currentVal, dir, 0.5);
+    } else {
+        nRaw = currentVal + dir;
+    }
+
     if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
     updateUI(ch, nRaw, undefined, undefined);
-    
+
     const isMaster = ch === 'master';
     const isMixOrBus = typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b')) && !isMaster;
 
@@ -154,7 +161,7 @@ function nudgeFader(ch, dir) {
 
 function commitFaderChange(ch, v) {
     updateUI(ch, v, undefined, undefined);
-    
+
     const isMaster = ch === 'master';
     const isMixOrBus = typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b')) && !isMaster;
 
@@ -177,27 +184,27 @@ function faderInput(e, ch) {
 
 function handleWheelFader(e, ch) {
     if (layoutMode !== 'desktop') return;
-    
+
     // Interromper scroll da tela
     e.preventDefault();
     e.stopPropagation();
 
     // Incremento de volume
     const delta = e.deltaY < 0 ? 10 : -10;
-    
+
     let currentVal = 0;
     const isMaster = ch === 'master';
     const stateRef = isMaster ? masterState : (typeof ch === 'string' ? (ch.startsWith('m') ? mixesState[ch.substring(1)] : busesState[ch.substring(1)]) : channelStates[ch]);
-    
+
     if (stateRef) {
         if ((musicianMode || technicianMixMode) && typeof ch === 'number') currentVal = stateRef[`aux${activeMix}`] || 0;
         else currentVal = stateRef.value || 0;
     }
-    
+
     let newVal = currentVal + delta;
     if (newVal < 0) newVal = 0;
     if (newVal > 1023) newVal = 1023;
-    
+
     commitFaderChange(ch, newVal);
 }
 
@@ -259,11 +266,11 @@ function restrictSliderTrackTap(e) {
     if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
         const input = e.target;
         const rect = input.getBoundingClientRect();
-        
+
         // Detecta orientação
-        const isVertical = input.getAttribute('orient') === 'vertical' || 
-                           input.clientHeight > input.clientWidth || 
-                           (window.getComputedStyle(input).writingMode || "").includes('vertical');
+        const isVertical = input.getAttribute('orient') === 'vertical' ||
+            input.clientHeight > input.clientWidth ||
+            (window.getComputedStyle(input).writingMode || "").includes('vertical');
 
         const min = parseFloat(input.min || 0);
         const max = parseFloat(input.max || 100);
@@ -273,7 +280,7 @@ function restrictSliderTrackTap(e) {
 
         let clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
         let clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
-        
+
         let clickPosPx, thumbPosPx;
 
         if (isVertical) {

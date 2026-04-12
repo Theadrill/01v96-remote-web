@@ -353,11 +353,49 @@ window.saveMacroColor = async function(colorHex) {
 window.changeSelectedMacro = function() { document.getElementById('macroContextModal').style.display = 'none'; openLibrary(activeSlotIndex); };
 window.openMacroSettings = function() {
     const sd = assignedMacros[activeSlotIndex]; if (!sd) return; const config = macroDatabase[sd.scriptId];
-    if (config && typeof config.onConfigure === 'function') { document.getElementById('macroContextModal').style.display = 'none'; document.getElementById('macroSettingsModal').style.display = 'flex'; config.onConfigure(activeSlotIndex); }
+    if (config && typeof config.onConfigure === 'function') { 
+        document.getElementById('macroContextModal').style.display = 'none'; 
+        document.getElementById('macroSettingsModal').style.display = 'flex'; 
+        
+        // Garante que o botão SALVAR execute o onSave desta macro
+        const saveBtn = document.getElementById('btnMacroSave');
+        if (saveBtn) {
+            saveBtn.onclick = () => window.saveCurrentMacroSettings();
+        }
+        
+        config.onConfigure(activeSlotIndex); 
+    }
 };
 window.saveCurrentMacroSettings = function() {
+    // Suporte especial para o MACRO FADER (que não é via plugin/slot)
+    const title = document.getElementById('settingsMacroTitle');
+    if (title && title.innerText.includes("MACRO FADER")) {
+        if (typeof saveMacroChannels === 'function') saveMacroChannels();
+        document.getElementById('macroSettingsModal').style.display = 'none';
+        if (typeof renderMacroFader === 'function') renderMacroFader();
+        return;
+    }
+
     const sd = assignedMacros[activeSlotIndex]; if (!sd) return; const config = macroDatabase[sd.scriptId];
-    if (config && typeof config.onSave === 'function') config.onSave(activeSlotIndex); else document.getElementById('macroSettingsModal').style.display = 'none';
+    if (config && typeof config.onSave === 'function') {
+        config.onSave(activeSlotIndex);
+    } else {
+        document.getElementById('macroSettingsModal').style.display = 'none';
+    }
+};
+
+window.clearCurrentMacroSettings = function() {
+    // Suporte especial para o MACRO FADER
+    const title = document.getElementById('settingsMacroTitle');
+    if (title && title.innerText.includes("MACRO FADER")) {
+        if (typeof clearMacroSelection === 'function') clearMacroSelection();
+        return;
+    }
+
+    const sd = assignedMacros[activeSlotIndex]; if (!sd) return; const config = macroDatabase[sd.scriptId];
+    if (config && typeof config.onClear === 'function') {
+        config.onClear(activeSlotIndex);
+    }
 };
 async function removeMacroFromSlot() {
     if (activeSlotIndex !== null) {

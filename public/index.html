@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,14 +8,19 @@
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
+
 <body>
 
     <!-- Splash Screen Overlay -->
     <div id="splashScreen" class="splash-overlay">
         <!-- Botão de Fullscreen para Splash -->
-        <button id="fsBtnSplash" class="fs-btn" style="position:fixed; bottom:20px; right:20px; z-index:10001; width:44px; height:44px; border-radius:50%; background:rgba(85,85,85,0.8); border:1px solid #666; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="toggleFullScreen()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+        <button id="fsBtnSplash" class="fs-btn"
+            style="position:fixed; bottom:20px; right:20px; z-index:10001; width:44px; height:44px; border-radius:50%; background:rgba(85,85,85,0.8); border:1px solid #666; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer;"
+            onclick="toggleFullScreen()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                </path>
             </svg>
         </button>
         <div class="splash-container">
@@ -32,7 +38,8 @@
             <!-- Tecnico Password -->
             <div id="splashTecnico" class="splash-step" style="display: none;">
                 <p class="splash-msg">ENTRADA TÉCNICO</p>
-                <input type="password" id="tecnicoPass" class="splash-input" placeholder="••••" maxlength="4" inputmode="numeric">
+                <input type="password" id="tecnicoPass" class="splash-input" placeholder="••••" maxlength="4"
+                    inputmode="numeric">
                 <div class="splash-actions">
                     <button class="splash-btn btn-back" onclick="showSplashStep('initial')">VOLTAR</button>
                     <button class="splash-btn btn-confirm" onclick="checkTecnicoPass()">ENTRAR</button>
@@ -52,7 +59,8 @@
                     <button class="splash-btn btn-fone" onclick="musicoAlert(7)">FONE 7</button>
                     <button class="splash-btn btn-fone" onclick="musicoAlert(8)">FONE 8</button>
                 </div>
-                <button class="splash-btn btn-back" onclick="showSplashStep('initial')" style="margin-top: 20px;">VOLTAR</button>
+                <button class="splash-btn btn-back" onclick="showSplashStep('initial')"
+                    style="margin-top: 20px;">VOLTAR</button>
             </div>
         </div>
     </div>
@@ -64,10 +72,14 @@
     <div class="sidebar">
         <!-- Navegação Principal (Config/Sync) -->
         <div id="mainNav" style="display: flex; flex-direction: column; width: 100%; flex: 1; align-items: center;">
-            <div id="scn" class="color-green font-13-bold" style="text-align: center; width: 100%; letter-spacing: 1px; margin-bottom: 20px;">01V96</div>
-            <button class="side-btn btn-config" onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
+            <div id="scn" class="color-green font-13-bold"
+                style="text-align: center; width: 100%; letter-spacing: 1px; margin-bottom: 20px;">01V96</div>
+            <button class="side-btn btn-config"
+                onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
             <button id="btnOuts" class="side-btn btn-outs" onclick="toggleOuts()">OUTS</button>
-            <button class="side-btn btn-macros" style="background:#6a1b9a; color:white; flex: 1; min-height: 50px; margin-bottom: 20px;" onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
+            <button class="side-btn btn-macros"
+                style="background:#6a1b9a; color:white; flex: 1; min-height: 50px; margin-bottom: 20px;"
+                onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
         </div>
 
         <!-- Navegação de Configuração do Canal (Abas) -->
@@ -76,75 +88,109 @@
             <button class="side-btn btn-tab" onclick="switchTab('dyn')">DYN</button>
             <button class="side-btn btn-tab" onclick="switchTab('aux')">AUXS</button>
             <button class="side-btn btn-tab" onclick="switchTab('etc')">ETC</button>
-            <button class="side-btn btn-macros" style="background:#6a1b9a; color:white; flex: 1; min-height: 50px; margin-top: 10px; margin-bottom: 20px;" onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
+            <button class="side-btn btn-macros"
+                style="background:#6a1b9a; color:white; flex: 1; min-height: 50px; margin-top: 10px; margin-bottom: 20px;"
+                onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
         </div>
 
-            <div id="sideFooter" style="margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center;">
-                <!-- Área de Contexto do Canal (Aparece ao abrir) -->
-                <div id="chContext" style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
-                    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 12px; gap: 8px;">
-                        <div id="chSideTitle" class="ch-side-title" style="cursor: pointer; text-decoration: underline dotted #5cacee;" onclick="openNameEditor()">1 - CH 1</div>
-                        <div style="display: flex; gap: 8px; width: 100%; justify-content: center;">
-                            <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;" onclick="changeConfigChannel(-1)">&lt;</button>
-                            <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;" onclick="changeConfigChannel(1)">&gt;</button>
-                        </div>
+        <div id="sideFooter"
+            style="margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <!-- Área de Contexto do Canal (Aparece ao abrir) -->
+            <div id="chContext"
+                style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 12px; gap: 8px;">
+                    <div id="chSideTitle" class="ch-side-title"
+                        style="cursor: pointer; text-decoration: underline dotted #5cacee;" onclick="openNameEditor()">1
+                        - CH 1</div>
+                    <div style="display: flex; gap: 8px; width: 100%; justify-content: center;">
+                        <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;"
+                            onclick="changeConfigChannel(-1)">&lt;</button>
+                        <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;"
+                            onclick="changeConfigChannel(1)">&gt;</button>
                     </div>
-                    <button class="side-btn btn-close-side" onclick="closeChannelConfig()">SAIR</button>
                 </div>
-
-                <!-- Área de Contexto do Outs (Aparece no modo OUTS) -->
-                <div id="outsContext" style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
-                    <div style="color: #666; font-size: 10px; text-transform: uppercase; margin-bottom: 5px;">MODO SAÍDAS</div>
-                    <div style="color: #00ffcc; font-size: 14px; font-weight: bold; margin-bottom: 15px;">MIX / BUS</div>
-                    <button class="side-btn btn-close-side" style="background: #dc3545;" onclick="toggleOuts()">SAIR</button>
-                </div>
-
-                <!-- Área de Contexto do Técnico Mix (Edição de Mix pelo Técnico) -->
-                <div id="techMixContext" style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
-                    <div style="color: #666; font-size: 10px; text-transform: uppercase; margin-bottom: 5px;">EDITANDO MIX</div>
-                    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 12px; gap: 8px;">
-                        <div id="techMixTitle" class="ch-side-title" style="color: #ffcc00; cursor: pointer; text-decoration: underline dotted #5cacee;">MIX 1</div>
-                        <div style="display: flex; gap: 8px; width: 100%; justify-content: center;">
-                            <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;" onclick="changeTechnicianMix(-1)">&lt;</button>
-                            <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;" onclick="changeTechnicianMix(1)">&gt;</button>
-                        </div>
-                    </div>
-                    <button class="side-btn btn-close-side" style="background: #dc3545;" onclick="exitTechnicianMixMode()">SAIR</button>
-                </div>
-
-                <!-- Botão de Sair do Músico (Apenas no modo Músico) -->
-                <button id="musicianExitBtn" class="side-btn" style="display:none; width:100%; background:#dc3545; color:white;" onclick="document.getElementById('logoutConfirmModal').style.display='flex'">DESCONECTAR</button>
-                
-                <!-- Botão de Logout do Técnico (No Rodapé) -->
-                <button id="tecnicoExitBtn" class="side-btn" style="display:none; width:100%; background:#dc3545; color:white;" onclick="document.getElementById('logoutConfirmModal').style.display='flex'">DESCONECTAR</button>
-
-                <!-- Botão Fullscreen da Sidebar -->
-                <button id="fsBtnSidebar" class="side-btn fs-icon-btn" style="width:100%; height:44px; margin-top:10px; background:#444;" onclick="toggleFullScreen()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-                    </svg>
-                </button>
+                <button class="side-btn btn-close-side" onclick="closeChannelConfig()">SAIR</button>
             </div>
+
+            <!-- Área de Contexto do Outs (Aparece no modo OUTS) -->
+            <div id="outsContext"
+                style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; margin-bottom: 5px;">MODO SAÍDAS
+                </div>
+                <div style="color: #00ffcc; font-size: 14px; font-weight: bold; margin-bottom: 15px;">MIX / BUS</div>
+                <button class="side-btn btn-close-side" style="background: #dc3545;"
+                    onclick="toggleOuts()">SAIR</button>
+            </div>
+
+            <!-- Área de Contexto do Técnico Mix (Edição de Mix pelo Técnico) -->
+            <div id="techMixContext"
+                style="display: none; flex-direction: column; width: 100%; align-items: center; border-top: 1px solid #444; padding-top: 10px; margin-bottom: 10px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; margin-bottom: 5px;">EDITANDO MIX
+                </div>
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 12px; gap: 8px;">
+                    <div id="techMixTitle" class="ch-side-title"
+                        style="color: #ffcc00; cursor: pointer; text-decoration: underline dotted #5cacee;">MIX 1</div>
+                    <div style="display: flex; gap: 8px; width: 100%; justify-content: center;">
+                        <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;"
+                            onclick="changeTechnicianMix(-1)">&lt;</button>
+                        <button class="nav-btn" style="flex: 1; max-width: 44px; height: 38px; font-size: 20px;"
+                            onclick="changeTechnicianMix(1)">&gt;</button>
+                    </div>
+                </div>
+                <button class="side-btn btn-close-side" style="background: #dc3545;"
+                    onclick="exitTechnicianMixMode()">SAIR</button>
+            </div>
+
+            <!-- Botão de Sair do Músico (Apenas no modo Músico) -->
+            <button id="musicianExitBtn" class="side-btn"
+                style="display:none; width:100%; background:#dc3545; color:white;"
+                onclick="document.getElementById('logoutConfirmModal').style.display='flex'">DESCONECTAR</button>
+
+            <!-- Botão de Logout do Técnico (No Rodapé) -->
+            <button id="tecnicoExitBtn" class="side-btn"
+                style="display:none; width:100%; background:#dc3545; color:white;"
+                onclick="document.getElementById('logoutConfirmModal').style.display='flex'">DESCONECTAR</button>
+
+            <!-- Botão Fullscreen da Sidebar -->
+            <button id="fsBtnSidebar" class="side-btn fs-icon-btn"
+                style="width:100%; height:44px; margin-top:10px; background:#444;" onclick="toggleFullScreen()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                    </path>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <div id="configModal" class="modal-overlay">
         <div class="modal-content">
             <select id="sin" class="modal-select"></select>
             <select id="sout" class="modal-select"></select>
-            
-            <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #007bff;" onclick="forceSync()">MANUAL SYNC</button>
+
+            <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #007bff;"
+                onclick="forceSync()">MANUAL SYNC</button>
+            <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #6a1b9a;"
+                onclick="socket.emit('syncNamesOnly')">SYNC NOMES</button>
 
             <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
-                <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">MODO DE VISUALIZAÇÃO</p>
+                <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">MODO DE VISUALIZAÇÃO
+                </p>
                 <div style="display: flex; gap: 10px;">
-                    <button id="btnLayoutMobile" onclick="setLayoutMode('mobile')" class="btn-connect" style="background:#555;">MOBILE</button>
-                    <button id="btnLayoutDesktop" onclick="setLayoutMode('desktop')" class="btn-connect" style="background:#555;">DESKTOP</button>
+                    <button id="btnLayoutMobile" onclick="setLayoutMode('mobile')" class="btn-connect"
+                        style="background:#555;">MOBILE</button>
+                    <button id="btnLayoutDesktop" onclick="setLayoutMode('desktop')" class="btn-connect"
+                        style="background:#555;">DESKTOP</button>
                 </div>
             </div>
 
             <div class="modal-actions">
                 <button onclick="conn()" class="btn-connect">CONECTAR</button>
-                <button onclick="document.getElementById('configModal').style.display='none'" class="btn-close">FECHAR</button>
+                <button onclick="document.getElementById('configModal').style.display='none'"
+                    class="btn-close">FECHAR</button>
             </div>
         </div>
     </div>
@@ -157,173 +203,255 @@
     </div>
     <!-- Modal de Confirmação Customizado para EQ -->
     <div id="customConfirmModal" class="modal-overlay" style="z-index:9999; display:none;">
-        <div class="modal-content" style="max-width:400px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #333; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <h3 style="margin-top:0; color:#5cacee; font-size:16px; letter-spacing:1px; text-transform:uppercase;">Confirmação de Cópia</h3>
-            <p id="customConfirmMsg" style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja colar as definições para este canal?</p>
+        <div class="modal-content"
+            style="max-width:400px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #333; background:#1a1a1a; padding:30px; border-radius:15px;">
+            <h3 style="margin-top:0; color:#5cacee; font-size:16px; letter-spacing:1px; text-transform:uppercase;">
+                Confirmação de Cópia</h3>
+            <p id="customConfirmMsg" style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja
+                colar as definições para este canal?</p>
             <div style="display:flex; gap:15px;">
-                <button id="customConfirmOk" style="flex:1; border-radius:10px; padding:15px; font-size:13px; background:#007bff; color:#fff; border:none; cursor:pointer;">SIM, COLAR</button>
-                <button id="customConfirmCancel" style="flex:1; border-radius:10px; padding:15px; font-size:13px; background:#444; color:#fff; border:none; cursor:pointer;">CANCELAR</button>
+                <button id="customConfirmOk"
+                    style="flex:1; border-radius:10px; padding:15px; font-size:13px; background:#007bff; color:#fff; border:none; cursor:pointer;">SIM,
+                    COLAR</button>
+                <button id="customConfirmCancel"
+                    style="flex:1; border-radius:10px; padding:15px; font-size:13px; background:#444; color:#fff; border:none; cursor:pointer;">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Edição de Nome do Canal -->
     <div id="nameEditorModal" class="modal-overlay" style="z-index:10000; display:none;">
-        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Editar Nome do Canal</p>
-            <input type="text" id="inputChName" maxlength="4" style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:22px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
+        <div class="modal-content"
+            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Editar Nome do Canal</p>
+            <input type="text" id="inputChName" maxlength="4"
+                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:22px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
             <div style="display:flex; gap:10px;">
-                <button onclick="saveChannelName()" class="btn-connect" style="flex:1; margin:0; height:45px;">SALVAR</button>
-                <button onclick="document.getElementById('nameEditorModal').style.display='none'" class="btn-close" style="flex:1; margin:0; height:45px;">CANCELAR</button>
+                <button onclick="saveChannelName()" class="btn-connect"
+                    style="flex:1; margin:0; height:45px;">SALVAR</button>
+                <button onclick="document.getElementById('nameEditorModal').style.display='none'" class="btn-close"
+                    style="flex:1; margin:0; height:45px;">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Confirmação de Logout -->
     <div id="logoutConfirmModal" class="modal-overlay" style="z-index:11000; display:none;">
-        <div class="modal-content" style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #333; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Confirmação</p>
-            <h3 style="margin-top:0; color:#f44336; font-size:18px; letter-spacing:1px; text-transform:uppercase;">Desconectar?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente sair e voltar para a tela inicial?</p>
+        <div class="modal-content"
+            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #333; background:#1a1a1a; padding:30px; border-radius:15px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Confirmação</p>
+            <h3 style="margin-top:0; color:#f44336; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+                Desconectar?</h3>
+            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente sair e voltar
+                para a tela inicial?</p>
             <div style="display:flex; gap:15px;">
-                <button onclick="clearRole(); location.reload();" class="btn-close" style="flex:1; margin:0; height:45px;">SIM, SAIR</button>
-                <button onclick="document.getElementById('logoutConfirmModal').style.display='none'" class="btn-connect" style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
+                <button onclick="clearRole(); location.reload();" class="btn-close"
+                    style="flex:1; margin:0; height:45px;">SIM, SAIR</button>
+                <button onclick="document.getElementById('logoutConfirmModal').style.display='none'" class="btn-connect"
+                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Seleção de Patch -->
     <div id="patchSelectorModal" class="modal-overlay" style="z-index:12000; display:none;">
-        <div class="modal-content" style="max-width:90%; width: 500px; max-height: 80vh; display: flex; flex-direction: column; background:#111; border: 2px solid #333; border-radius: 15px; padding: 20px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align: center;">Selecionar Entrada (Patch)</p>
-            <div id="patchGrid" class="patch-grid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding-right: 5px;">
+        <div class="modal-content"
+            style="max-width:90%; width: 500px; max-height: 80vh; display: flex; flex-direction: column; background:#111; border: 2px solid #333; border-radius: 15px; padding: 20px;">
+            <p
+                style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align: center;">
+                Selecionar Entrada (Patch)</p>
+            <div id="patchGrid" class="patch-grid"
+                style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding-right: 5px;">
                 <!-- Botões gerados via JS -->
             </div>
-            <button onclick="document.getElementById('patchSelectorModal').style.display='none'" class="btn-close" style="width: 100%; height: 50px; margin-top: 20px;">CANCELAR</button>
+            <button onclick="document.getElementById('patchSelectorModal').style.display='none'" class="btn-close"
+                style="width: 100%; height: 50px; margin-top: 20px;">CANCELAR</button>
         </div>
     </div>
 
     <!-- Modal de Macros Dinâmico -->
-    <div id="macrosModal" class="modal-overlay" style="z-index:13000; display:none; background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
-        <div class="modal-content" style="max-width:550px; display:flex; flex-direction:column; overflow:hidden; background:rgba(26, 26, 26, 0.85); border:2px solid #6a1b9a; border-radius:15px; padding:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px; flex-shrink:0;">
+    <div id="macrosModal" class="modal-overlay"
+        style="z-index:13000; display:none; background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+        <div class="modal-content"
+            style="max-width:550px; display:flex; flex-direction:column; overflow:hidden; background:rgba(26, 26, 26, 0.85); border:2px solid #6a1b9a; border-radius:15px; padding:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px; flex-shrink:0;">
                 <div>
                     <h2 style="margin:0; font-size:18px; letter-spacing:1px;">PAINEL DE MACROS</h2>
-                    <span id="currentPresetLabel" style="font-size:10px; color:#666; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">PRESET: ...</span>
+                    <span id="currentPresetLabel"
+                        style="font-size:10px; color:#666; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">PRESET:
+                        ...</span>
                 </div>
                 <div style="display:flex; gap:8px;">
-                    <button onclick="openSaveAsModal()" class="btn-connect" style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#2e7d32;">💾 SALVAR NOVO PRESET</button>
-                    <button onclick="openPresetPicker()" class="btn-connect" style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#333;">🔄 LOAD PRESET</button>
+                    <button onclick="openSaveAsModal()" class="btn-connect"
+                        style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#2e7d32;">💾
+                        SALVAR NOVO PRESET</button>
+                    <button onclick="openPresetPicker()" class="btn-connect"
+                        style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#333;">🔄
+                        LOAD PRESET</button>
                 </div>
             </div>
-            
+
             <!-- Grid de slots que será populado via JS -->
             <!-- flex: 1 and min-height: 0 lets this area scroll instead of the modal itself expanding -->
-            <div id="macroSlotsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; overflow-y:auto; scrollbar-width:none; flex:1; min-height:0; align-content:start;">
+            <div id="macroSlotsGrid"
+                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; overflow-y:auto; scrollbar-width:none; flex:1; min-height:0; align-content:start;">
                 <style>
-                    #macroSlotsGrid::-webkit-scrollbar { display: none; }
+                    #macroSlotsGrid::-webkit-scrollbar {
+                        display: none;
+                    }
                 </style>
             </div>
 
-            <button onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close" style="width: 100%; height: 50px; border-radius:10px; flex-shrink:0;">FECHAR PAINEL</button>
+            <button onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close"
+                style="width: 100%; height: 50px; border-radius:10px; flex-shrink:0;">FECHAR PAINEL</button>
         </div>
     </div>
 
     <!-- Modal de Biblioteca de Macros (Listagem da pasta) -->
     <div id="macroLibraryModal" class="modal-overlay" style="z-index:14000; display:none;">
-        <div class="modal-content" style="max-width:400px; background:#111; border:1px solid #444; border-radius:12px; padding:20px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; text-align:center;">Biblioteca de Scripts (.js)</p>
-            <div id="macroLibraryList" style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; margin-bottom:20px;">
+        <div class="modal-content"
+            style="max-width:400px; background:#111; border:1px solid #444; border-radius:12px; padding:20px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; text-align:center;">
+                Biblioteca de Scripts (.js)</p>
+            <div id="macroLibraryList"
+                style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; margin-bottom:20px;">
                 <!-- Lista será preenchida via API -->
             </div>
-            <button onclick="document.getElementById('macroLibraryModal').style.display='none'" class="btn-close" style="width:100%; height:45px;">CANCELAR</button>
+            <button onclick="document.getElementById('macroLibraryModal').style.display='none'" class="btn-close"
+                style="width:100%; height:45px;">CANCELAR</button>
         </div>
     </div>
 
     <!-- Menu Contextual de Macros (Toque Longo) -->
     <div id="macroContextModal" class="modal-overlay" style="z-index:15000; display:none;">
-        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #6a1b9a; border-radius:12px; padding:25px;">
-            <p id="ctxMacroName" style="color:#6a1b9a; font-weight:bold; margin-bottom:20px; font-size:16px;">Macro Config</p>
+        <div class="modal-content"
+            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #6a1b9a; border-radius:12px; padding:25px;">
+            <p id="ctxMacroName" style="color:#6a1b9a; font-weight:bold; margin-bottom:20px; font-size:16px;">Macro
+                Config</p>
             <div style="display:flex; flex-direction:column; gap:12px;">
-                <button class="btn-connect" style="background:#555; margin:0; height:50px;" onclick="openMacroNameEditor()">✏️ MUDAR NOME</button>
+                <button class="btn-connect" style="background:#555; margin:0; height:50px;"
+                    onclick="openMacroNameEditor()">✏️ MUDAR NOME</button>
                 <div style="position:relative; width:100%; margin:0; padding:0;">
-                    <button class="btn-connect" style="background:#555; margin:0; height:50px; width:100%;" onclick="document.getElementById('macroColorPicker').click()">🎨 MUDAR COR</button>
-                    <input type="color" id="macroColorPicker" style="position:absolute; width:1px; height:1px; top:50%; left:50%; opacity:0; pointer-events:none;" onchange="saveMacroColor(this.value)">
+                    <button class="btn-connect" style="background:#555; margin:0; height:50px; width:100%;"
+                        onclick="document.getElementById('macroColorPicker').click()">🎨 MUDAR COR</button>
+                    <input type="color" id="macroColorPicker"
+                        style="position:absolute; width:1px; height:1px; top:50%; left:50%; opacity:0; pointer-events:none;"
+                        onchange="saveMacroColor(this.value)">
                 </div>
-                <button class="btn-connect" style="background:#555; margin:0; height:50px;" onclick="changeSelectedMacro()">🔄 TROCAR MOD MACRO</button>
-                <button class="btn-connect" style="background:#1976d2; margin:0; height:50px;" onclick="startMovingMacro()">↕️ MOVER DE LUGAR</button>
-                <button class="btn-connect" style="background:#6a1b9a; margin:0; height:50px;" onclick="openMacroSettings()">⚙️ CONFIGURAR</button>
-                <button class="btn-connect" style="background:#c62828; margin:0; height:40px; font-size:10px;" onclick="removeMacroFromSlot()">🗑️ REMOVER MACRO</button>
-                <button class="btn-close" style="margin-top:10px; background:#444;" onclick="document.getElementById('macroContextModal').style.display='none'">CANCELAR</button>
+                <button class="btn-connect" style="background:#555; margin:0; height:50px;"
+                    onclick="changeSelectedMacro()">🔄 TROCAR MOD MACRO</button>
+                <button class="btn-connect" style="background:#1976d2; margin:0; height:50px;"
+                    onclick="startMovingMacro()">↕️ MOVER DE LUGAR</button>
+                <button class="btn-connect" style="background:#6a1b9a; margin:0; height:50px;"
+                    onclick="openMacroSettings()">⚙️ CONFIGURAR</button>
+                <button class="btn-connect" style="background:#c62828; margin:0; height:40px; font-size:10px;"
+                    onclick="removeMacroFromSlot()">🗑️ REMOVER MACRO</button>
+                <button class="btn-close" style="margin-top:10px; background:#444;"
+                    onclick="document.getElementById('macroContextModal').style.display='none'">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Edição de Nome da Macro -->
     <div id="macroNameEditorModal" class="modal-overlay" style="z-index:17000; display:none;">
-        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Nome do Botão</p>
-            <input type="text" id="inputMacroName" maxlength="12" placeholder="MACRO X" style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:18px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
+        <div class="modal-content"
+            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Nome do Botão</p>
+            <input type="text" id="inputMacroName" maxlength="12" placeholder="MACRO X"
+                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:18px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
             <div style="display:flex; gap:10px;">
-                <button onclick="saveMacroName()" class="btn-connect" style="flex:1; margin:0; height:45px; background:#28a745;">OK</button>
-                <button onclick="document.getElementById('macroNameEditorModal').style.display='none'" class="btn-close" style="flex:1; margin:0; height:45px;">VOLTAR</button>
+                <button onclick="saveMacroName()" class="btn-connect"
+                    style="flex:1; margin:0; height:45px; background:#28a745;">OK</button>
+                <button onclick="document.getElementById('macroNameEditorModal').style.display='none'" class="btn-close"
+                    style="flex:1; margin:0; height:45px;">VOLTAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Configurações Avançadas da Macro (Ex: Seleção de Gp de Canais) -->
     <div id="macroSettingsModal" class="modal-overlay" style="z-index:16000; display:none;">
-        <div class="modal-content" style="max-width:600px; background:#111; border:2px solid #6a1b9a; border-radius:15px; padding:25px;">
-            <p id="settingsMacroTitle" style="color:#6a1b9a; font-weight:bold; margin-bottom:10px; font-size:16px;">Configuração da Macro</p>
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:20px; letter-spacing:1px;">Selecione os canais desejados abaixo:</p>
-            
-            <div id="macroSettingsGrid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; max-height:400px; overflow-y:auto; margin-bottom:25px; scrollbar-width:none;">
+        <div class="modal-content"
+            style="max-width:600px; background:#111; border:2px solid #6a1b9a; border-radius:15px; padding:25px;">
+            <p id="settingsMacroTitle" style="color:#6a1b9a; font-weight:bold; margin-bottom:10px; font-size:16px;">
+                Configuração da Macro</p>
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:20px; letter-spacing:1px;">
+                Selecione os canais desejados abaixo:</p>
+
+            <div id="macroSettingsGrid"
+                style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; max-height:400px; overflow-y:auto; margin-bottom:25px; scrollbar-width:none;">
                 <style>
-                    ::-webkit-scrollbar { display: none !important; }
-                    * { scrollbar-width: none !important; }
+                    ::-webkit-scrollbar {
+                        display: none !important;
+                    }
+
+                    * {
+                        scrollbar-width: none !important;
+                    }
                 </style>
                 <!-- Grid de 32 botões gerado via JS -->
             </div>
 
             <div style="display:flex; gap:15px;">
-                <button onclick="saveCurrentMacroSettings()" class="btn-connect" style="flex:1; height:50px; background:#28a745;">SALVAR</button>
-                <button onclick="document.getElementById('macroSettingsModal').style.display='none'" class="btn-close" style="flex:1; height:50px; background:#444;">CANCELAR</button>
+                <button id="btnMacroSave" class="btn-connect"
+                    style="flex:1; height:50px; background:#28a745;" onclick="window.saveCurrentMacroSettings()">SALVAR</button>
+                <button id="btnMacroClear" class="btn-connect"
+                    style="flex:1; height:50px; background:#dc3545;" onclick="window.clearCurrentMacroSettings()">LIMPAR</button>
+                <button class="btn-close" style="flex:1; height:50px; background:#444;"
+                    onclick="document.getElementById('macroSettingsModal').style.display='none'">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Salvar Preset Como -->
     <div id="macroSaveAsModal" class="modal-overlay" style="z-index:18500; display:none;">
-        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #2e7d32; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Salvar como Novo Preset...</p>
-            <input type="text" id="inputNewPresetName" maxlength="15" placeholder="NOME DO PRESET" style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:16px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
+        <div class="modal-content"
+            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #2e7d32; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Salvar como Novo Preset...</p>
+            <input type="text" id="inputNewPresetName" maxlength="15" placeholder="NOME DO PRESET"
+                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:16px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
             <div style="display:flex; gap:10px;">
-                <button onclick="savePresetAs()" class="btn-connect" style="flex:1; margin:0; height:45px; background:#2e7d32;">SALVAR</button>
-                <button onclick="document.getElementById('macroSaveAsModal').style.display='none'" class="btn-close" style="flex:1; margin:0; height:45px;">VOLTAR</button>
+                <button onclick="savePresetAs()" class="btn-connect"
+                    style="flex:1; margin:0; height:45px; background:#2e7d32;">SALVAR</button>
+                <button onclick="document.getElementById('macroSaveAsModal').style.display='none'" class="btn-close"
+                    style="flex:1; margin:0; height:45px;">VOLTAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Confirmação de Deleção -->
     <div id="macroDeleteConfirmModal" class="modal-overlay" style="z-index:19000; display:none;">
-        <div class="modal-content" style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #c62828; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Atenção!</p>
-            <p id="deleteConfirmText" style="color:#fff; font-weight:bold; margin-bottom:25px;">Deseja deletar o preset?</p>
+        <div class="modal-content"
+            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #c62828; border-radius:12px; padding:25px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Atenção!</p>
+            <p id="deleteConfirmText" style="color:#fff; font-weight:bold; margin-bottom:25px;">Deseja deletar o preset?
+            </p>
             <div style="display:flex; gap:10px;">
-                <button onclick="confirmDeletePreset()" class="btn-connect" style="flex:1; margin:0; height:45px; background:#c62828;">DELETAR</button>
-                <button onclick="document.getElementById('macroDeleteConfirmModal').style.display='none'" class="btn-close" style="flex:1; margin:0; height:45px;">CANCELAR</button>
+                <button onclick="confirmDeletePreset()" class="btn-connect"
+                    style="flex:1; margin:0; height:45px; background:#c62828;">DELETAR</button>
+                <button onclick="document.getElementById('macroDeleteConfirmModal').style.display='none'"
+                    class="btn-close" style="flex:1; margin:0; height:45px;">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Seleção de Presets Globais -->
     <div id="macroPresetModal" class="modal-overlay" style="z-index:18000; display:none;">
-        <div class="modal-content" style="max-width:350px; background:#111; border:2px solid #555; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align:center;">Escolha o Preset</p>
+        <div class="modal-content"
+            style="max-width:350px; background:#111; border:2px solid #555; border-radius:12px; padding:25px;">
+            <p
+                style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align:center;">
+                Escolha o Preset</p>
             <div id="macroPresetList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
                 <!-- Lista de presets do slots.json -->
             </div>
-            <button onclick="document.getElementById('macroPresetModal').style.display='none'" class="btn-close" style="width:100%; height:45px;">CANCELAR</button>
+            <button onclick="document.getElementById('macroPresetModal').style.display='none'" class="btn-close"
+                style="width:100%; height:45px;">CANCELAR</button>
         </div>
     </div>
 
@@ -337,6 +465,7 @@
     <script src="modules/auxs_sends.js"></script>
     <script src="modules/events.js"></script>
     <script src="modules/steps.js"></script>
+    <script src="modules/macro_fader.js"></script>
     <script src="modules/socket.js"></script>
     <script src="modules/sidebar.js"></script>
     <script src="modules/routing.js"></script>
@@ -345,4 +474,5 @@
     <script src="app.js"></script>
 
 </body>
+
 </html>
