@@ -35,6 +35,12 @@ function updateConfigUIForChannel(ch) {
     document.getElementById('chNav').style.display = 'flex';
     document.getElementById('chContext').style.display = 'flex';
 
+    // Esconde rodapés de modo para não bugar a UI com múltiplos botões SAIR
+    const outsCtx = document.getElementById('outsContext');
+    if (outsCtx) outsCtx.style.display = 'none';
+    const techCtx = document.getElementById('techMixContext');
+    if (techCtx) techCtx.style.display = 'none';
+
     const miniFader = document.getElementById('miniFaderContext');
     if (miniFader && typeof createChannelStrip === 'function') {
         const isM = ch === 52;
@@ -101,6 +107,16 @@ function closeChannelConfig() {
     document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode) ? 'none' : 'flex';
     document.getElementById('chNav').style.display = 'none';
     document.getElementById('chContext').style.display = 'none';
+
+    // Restaura rodapés de modo se necessário
+    if (outsMode) {
+        const outsCtx = document.getElementById('outsContext');
+        if (outsCtx) outsCtx.style.display = 'flex';
+    }
+    if (technicianMixMode) {
+        const techCtx = document.getElementById('techMixContext');
+        if (techCtx) techCtx.style.display = 'flex';
+    }
 
     const miniFader = document.getElementById('miniFaderContext');
     if (miniFader) miniFader.innerHTML = '';

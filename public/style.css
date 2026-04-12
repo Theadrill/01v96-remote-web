@@ -1,4 +1,4 @@
-* {
+﻿* {
     box-sizing: border-box;
 }
 
@@ -22,7 +22,7 @@ body.layout-horizontal {
     flex-direction: column;
 }
 
-/* Área dos faders com rolagem lateral fluida */
+/* ÃƒÂrea dos faders com rolagem lateral fluida */
 .faders-area {
     flex: 1;
     display: flex;
@@ -172,7 +172,7 @@ body.layout-horizontal .faders-area {
     box-shadow: 0 -5px 15px rgba(0, 255, 136, 0.2) inset, 0 0 5px rgba(0, 255, 136, 0.1);
 }
 
-/* Versão Desktop (Glow mais horizontal no pé ou topo) */
+/* VersÃƒÂ£o Desktop (Glow mais horizontal no pÃƒÂ© ou topo) */
 .fader-card-desktop.fader-group-1 {
     border-top: 2px solid #00adef !important;
     border-bottom: 3px solid #00adef !important;
@@ -237,7 +237,7 @@ body.layout-horizontal .faders-area>.fader-card:nth-child(8n) {
     margin-bottom: 45px !important;
 }
 
-/* Coluna 1: Stack Interno Falsificado (Garante que não use grid rows p/ outros) */
+/* Coluna 1: Stack Interno Falsificado (Garante que nÃƒÂ£o use grid rows p/ outros) */
 body.layout-horizontal .fader-card .card-title {
     grid-column: 1;
     grid-row: 1;
@@ -283,7 +283,7 @@ body.layout-horizontal .fader-card .btn-state[id^="aux_on"] {
     font-size: 9px !important;
 }
 
-/* Elementos da Linha Única (Span rows p/ travar horizontal) */
+/* Elementos da Linha ÃƒÅ¡nica (Span rows p/ travar horizontal) */
 body.layout-horizontal .fader-card .nudge-zone:nth-of-type(1) {
     grid-column: 4;
     grid-row: 1 / 3;
@@ -294,7 +294,7 @@ body.layout-horizontal .fader-card .nudge-zone:nth-of-type(1) {
     width: 100% !important;
 }
 
-/* Botão + */
+/* BotÃƒÂ£o + */
 body.layout-horizontal .fader-card .nudge-zone:nth-of-type(2) {
     grid-column: 2;
     grid-row: 1 / 3;
@@ -305,7 +305,7 @@ body.layout-horizontal .fader-card .nudge-zone:nth-of-type(2) {
     width: 100% !important;
 }
 
-/* Botão - */
+/* BotÃƒÂ£o - */
 
 body.layout-horizontal input[type=range] {
     grid-column: 3;
@@ -346,7 +346,7 @@ body.layout-horizontal .nudge-zone .fader-val {
     display: none !important;
 }
 
-/* Botões Nudge na Horizontal */
+/* BotÃƒÂµes Nudge na Horizontal */
 body.layout-horizontal .btn-nudge {
     width: 38px !important;
     height: 38px !important;
@@ -455,7 +455,7 @@ body.layout-horizontal .side-btn {
 }
 
 
-/* Botões de Nudge e Zonas de Toque */
+/* BotÃƒÂµes de Nudge e Zonas de Toque */
 .btn-nudge {
     width: 50px;
     height: 50px;
@@ -538,7 +538,7 @@ body.layout-horizontal .side-btn {
     -moz-appearance: none !important;
     appearance: none !important;
 
-    /* 🚨 [AUTO-STRETCH] O segredo para não invadir botões */
+    /* Ã°Å¸Å¡Â¨ [AUTO-STRETCH] O segredo para nÃƒÂ£o invadir botÃƒÂµes */
     writing-mode: vertical-lr !important;
     direction: rtl !important;
     /* Bottom -> Top */
@@ -546,7 +546,7 @@ body.layout-horizontal .side-btn {
     width: 48px !important;
     /* Largura da zona de toque */
     height: 100% !important;
-    /* Ocupa exatamente o espaço do container */
+    /* Ocupa exatamente o espaÃƒÂ§o do container */
 
     position: relative !important;
     display: block !important;
@@ -635,7 +635,7 @@ body.layout-horizontal .side-btn {
     border: none !important;
 }
 
-/* Cores específicas por grupo */
+/* Cores especÃƒÂ­ficas por grupo */
 .fader-group-1 input[type=range]::-webkit-slider-thumb {
     background: #00adef !important;
     border-color: #004a80;
@@ -666,8 +666,8 @@ body.layout-horizontal .side-btn {
     border-color: #4a008a;
 }
 
-/* Sidebar e botões globais */
-/* Sidebar e botões globais */
+/* Sidebar e botÃƒÂµes globais */
+/* Sidebar e botÃƒÂµes globais */
 .sidebar {
     width: 100px;
     background: #222;
@@ -757,7 +757,7 @@ body.layout-horizontal .side-btn {
     box-shadow: 0 0 15px rgba(0, 255, 204, 0.15) inset;
 }
 
-/* Ajuste dinâmico para os botões de saída para não quebrar linha */
+/* Ajuste dinÃƒÂ¢mico para os botÃƒÂµes de saÃƒÂ­da para nÃƒÂ£o quebrar linha */
 #musicianExitBtn,
 #tecnicoExitBtn {
     white-space: nowrap !important;
@@ -857,7 +857,7 @@ body.layout-desktop .faders-area {
     display: flex;
     flex-direction: row;
     overflow-x: scroll;
-    /* Força scrollbar visível no Desktop */
+    /* ForÃƒÂ§a scrollbar visÃƒÂ­vel no Desktop */
     overflow-y: hidden;
     padding: 0;
     gap: 0;
@@ -1404,13 +1404,13 @@ body.layout-desktop .ch-modal-overlay {
         font-size: 10px;
     }
 
-    /* Evita que o gráfico de EQ empurre o conteúdo para fora da tela em modo paisagem */
+    /* Evita que o grÃƒÂ¡fico de EQ empurre o conteÃƒÂºdo para fora da tela em modo paisagem */
     .eq-graph-container {
         min-height: 180px !important;
     }
 }
 
-/* Configuração do Modal (Idêntico à Faders-Area) */
+/* ConfiguraÃƒÂ§ÃƒÂ£o do Modal (IdÃƒÂªntico ÃƒÂ  Faders-Area) */
 .ch-modal-overlay {
     display: none;
     position: fixed;
@@ -1443,7 +1443,7 @@ body.layout-desktop .ch-modal-overlay {
     display: none;
 }
 
-/* Botão de Sair Vermelho na Sidebar */
+/* BotÃƒÂ£o de Sair Vermelho na Sidebar */
 .btn-close-side {
     background: #dc3545;
     color: white;
@@ -1470,7 +1470,7 @@ body.layout-desktop .ch-modal-overlay {
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
 }
 
-/* Estilo Específico para as Strips dos Auxiliares no Modal (Respeitando padrões) */
+/* Estilo EspecÃƒÂ­fico para as Strips dos Auxiliares no Modal (Respeitando padrÃƒÂµes) */
 .aux-card {
     min-width: 90px !important;
 }
@@ -1523,7 +1523,7 @@ body.layout-desktop .ch-modal-overlay {
     flex-direction: column;
 }
 
-/* Regras para Versão Retrato (Mobile vertical) */
+/* Regras para VersÃƒÂ£o Retrato (Mobile vertical) */
 body.is-portrait .eq-graph-container {
     flex: 0 0 auto;
     height: 40vh;
@@ -1549,7 +1549,7 @@ body.is-portrait .eq-graph-container {
     padding: 15px 0;
     box-sizing: border-box;
     display: none;
-    /* Escondido por padrão, aparece em landscape/largo */
+    /* Escondido por padrÃƒÂ£o, aparece em landscape/largo */
 }
 
 /* Mostra apenas em telas largas ou landscape */
@@ -1560,7 +1560,7 @@ body.is-portrait .eq-graph-container {
     }
 }
 
-/* No modo retrato de celular, o ganho é feito apenas arrastando o ponto, fader some para poupar espaço */
+/* No modo retrato de celular, o ganho ÃƒÂ© feito apenas arrastando o ponto, fader some para poupar espaÃƒÂ§o */
 body.is-portrait .eq-fader-container {
     display: none !important;
 }
@@ -1631,7 +1631,7 @@ body.is-portrait .eq-fader-container {
     box-sizing: border-box;
     border-top: 1px solid #222;
     display: none;
-    /* Escondido por padrão, aparece em landscape/largo */
+    /* Escondido por padrÃƒÂ£o, aparece em landscape/largo */
 }
 
 /* Mostra apenas em telas largas ou landscape */
@@ -1680,7 +1680,7 @@ body.is-portrait .eq-freq-fader-container {
     cursor: pointer;
 }
 
-/* Ajuste fino dos botões laterais em retrato */
+/* Ajuste fino dos botÃƒÂµes laterais em retrato */
 body.is-portrait .side-btn {
     min-height: 40px;
     padding: 10px 5px;
@@ -1937,7 +1937,7 @@ body.is-portrait .side-btn {
     }
 }
 
-/* Layout de Retrato para Músico */
+/* Layout de Retrato para MÃƒÂºsico */
 body.is-portrait:has(.sidebar-musician) {
     flex-direction: column !important;
 }
@@ -1947,7 +1947,7 @@ body.is-portrait .sidebar-musician {
     height: 60px !important;
     flex-direction: row !important;
     order: 2 !important;
-    /* Move para o rodapé */
+    /* Move para o rodapÃƒÂ© */
     border-left: none !important;
     border-top: 2px solid #388e3c !important;
     padding: 0 15px !important;
@@ -2004,7 +2004,7 @@ body.is-portrait .sidebar-musician #fsBtnSidebar {
     overflow-y: auto;
 }
 
-/* Quando em modo retrato (is-portrait), força coluna única sem esmagar */
+/* Quando em modo retrato (is-portrait), forÃƒÂ§a coluna ÃƒÂºnica sem esmagar */
 body.is-portrait .dyn-container {
     flex-direction: column;
     flex-wrap: nowrap;
@@ -2200,7 +2200,7 @@ body.is-portrait .dyn-box {
     text-align: right;
 }
 
-/* Responsive adjustment for Mobile Vertical (já estava em coluna, apenas ajuste de proporção) */
+/* Responsive adjustment for Mobile Vertical (jÃƒÂ¡ estava em coluna, apenas ajuste de proporÃƒÂ§ÃƒÂ£o) */
 @media screen and (max-width: 768px) {
     .dyn-box {
         min-width: 100%;
@@ -2239,187 +2239,10 @@ body.is-portrait .dyn-box {
     }
 }
 
-/* --- ROUTING & ETC STYLES --- */
-.routing-container {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-}
 
-.patch-display-box {
-    transition: all 0.2s;
-}
-
-.patch-display-box:active {
-    background: #444 !important;
-    transform: scale(0.98);
-}
-
-.patch-opt-btn {
-    transition: transform 0.1s;
-}
-
-.patch-opt-btn:active {
-    background: #007bff !important;
-    transform: scale(0.95);
-}
-
-.bus-btn {
-    transition: background 0.2s, transform 0.1s;
-}
-
-.bus-btn:active {
-    transform: scale(0.95);
-}
-
-.patch-grid::-webkit-scrollbar {
-    width: 6px;
-}
-
-.patch-grid::-webkit-scrollbar-track {
-    background: #111;
-}
-
-.patch-grid::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 3px;
-}
-
-/* MACRO FADER STYLES */
-.macro-fader-card {
-    background: #e0e0e0 !important; /* Cinza claro */
-    border: 2px solid #ccc !important;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-}
-
-.macro-fader-card .card-title, 
-.macro-fader-card .desk-label {
-    color: #333 !important;
-    font-weight: bold !important;
-}
-
-.macro-fader-card .ch-name,
-.macro-fader-card .desk-ch-name {
-    background: transparent !important;
-    color: #fff !important;
-    border: none !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-}
-
-.macro-fader-card .btn-nudge {
-    background: #fff !important;
-    color: #000 !important;
-    border: 2px solid #999 !important;
-    box-shadow: 0 4px 0 #bbb;
-}
-
-.macro-fader-card .btn-nudge:active {
-    box-shadow: 0 0 0 #bbb;
-    transform: translateY(4px);
-}
-
-.macro-fader-card .btn-nudge-desk {
-    background: #fff !important;
-    color: #000 !important;
-    border: 2px solid #999 !important;
-    box-shadow: 0 4px 0 #bbb;
-    width: 100% !important;
-    border-radius: 8px !important;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
-
-.macro-fader-card .btn-nudge-desk:active {
-    box-shadow: 0 0 0 #bbb;
-    transform: translateY(2px);
-}
-
-.macro-fader-card .nudge-zone-desk {
-    padding: 0 10px !important;
-}
-
-.macro-ch-selected {
-    box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
-    border: 1px solid #ffcc00 !important;
-}
-
-.macro-nudge-btn-container {
-    height: 100%;
-    width: 100%;
-}
-
-.btn-nudge-macro-big {
-    width: 100%;
-    height: 100%;
-    background: #fff !important;
-    color: #000 !important;
-    border: 2px solid #999 !important;
-    font-size: 36px;
-    font-weight: bold;
-    border-radius: 12px;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #bbb;
-    transition: transform 0.05s, box-shadow 0.05s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-nudge-macro-big:active {
-    box-shadow: 0 0 0 #bbb;
-    transform: translateY(4px);
-}
-
-/* Ajuste no modo horizontal */
-body.layout-horizontal .macro-fader-card {
-    height: 120px !important;
-    min-height: 120px !important;
-}
-
-@media (max-width: 600px) {
-    #macro-fader-container {
-        margin-left: 20px !important;
+/* --- RESPONSIVIDADE DA BARRA DE CONFIGURAÇÃO --- */
+@media (max-width: 800px) {
+    #miniFaderContainer {
+        display: none !important;
     }
-}
-
-/* Escudo de Sincronização (Versão Light para performance) */
-.sync-shield {
-    position: fixed;
-    top: 25px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #000;
-    padding: 10px 20px;
-    border-radius: 8px;
-    color: #0f0;
-    font-weight: bold;
-    font-size: 13px;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 10002;
-    border: 2px solid #0f0;
-    animation: slideDownSync 0.4s ease-out;
-    pointer-events: none;
-}
-
-@keyframes slideDownSync {
-    from { top: -60px; opacity: 0; }
-    to { top: 25px; opacity: 1; }
-}
-
-.sync-loader {
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(0, 255, 0, 0.2);
-    border-top: 3px solid #0f0;
-    border-radius: 50%;
-    animation: spinSync 1s linear infinite;
-}
-
-@keyframes spinSync {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
