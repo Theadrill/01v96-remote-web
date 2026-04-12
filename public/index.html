@@ -204,8 +204,16 @@
 
     <!-- Modal de Configuração de Canal (Sem Header para ganhar espaço) -->
     <div id="chConfigModal" class="ch-modal-overlay">
-        <div class="ch-modal-body">
-            Área Reservada...
+        <div style="display: flex; height: 100%; width: 100%; overflow: hidden;">
+            <div id="chModalContent" class="ch-modal-body" style="flex: 1;">
+                <!-- Conteúdo (EQ, AUXs, etc) -->
+                Área Reservada...
+            </div>
+            <!-- Mini Channel Strip fixo à direita -->
+            <div id="miniFaderContainer"
+                style="min-width: 85px; width: auto; height: 100%; padding: 10px 5px; box-sizing: border-box; border-left: 1px solid #333; background: #111; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
+                <div id="miniFaderContext" style="height: 100%; width: 100%; display: flex; justify-content: center;"></div>
+            </div>
         </div>
     </div>
     <!-- Modal de Confirmação Customizado para EQ -->

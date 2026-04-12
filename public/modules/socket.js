@@ -441,6 +441,35 @@ socket.on('meterData', (levels) => {
                 }
             }
         }
+
+        // --- Suporte ao METER do Mini Fader (no modal de config) ---
+        if (activeConfigChannel !== null) {
+            const miniCard = document.getElementById(`mini-card${activeConfigChannel}`);
+            if (miniCard) {
+                const levelIdx = activeConfigChannel;
+                const targetPercent = calibrateStep(levels[levelIdx], false);
+                // Usamos o mesmo array de suavização para manter a consistência
+                const finalPercent = smoothedLevels[levelIdx];
+
+                const meterCurtain = miniCard.querySelector('.desk-meter-curtain');
+                const peakLed = miniCard.querySelector('.desk-peak-led') || miniCard.querySelector('.mobile-peak-led');
+
+                if (meterCurtain) {
+                    meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                } else {
+                    if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
+                    miniCard.style.backgroundSize = `100% ${finalPercent}%`; // Layout Mobile
+                }
+                
+                if (finalPercent >= 98) {
+                    if (peakLed) peakLed.classList.add('active');
+                    miniCard.classList.add('peak-glow');
+                } else {
+                    if (peakLed) peakLed.classList.remove('active');
+                    miniCard.classList.remove('peak-glow');
+                }
+            }
+        }
     });
 
     // --- Atualização em tempo real das meters internas de Gate/Comp se o modal estiver aberto ---

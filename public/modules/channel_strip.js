@@ -65,8 +65,13 @@ function updateUI(ch, val, onState, soloState) {
     if (val !== undefined && val !== null) {
         const elF = document.getElementById(`f${ch}`);
         if (elF) elF.value = val;
+        const elFMini = document.getElementById(`mini-f${ch}`);
+        if (elFMini) elFMini.value = val;
+
         const elV = document.getElementById(`v${ch}`);
         if (elV) elV.innerText = rawToDb(val, layoutMode !== 'desktop', isMaster);
+        const elVMini = document.getElementById(`mini-v${ch}`);
+        if (elVMini) elVMini.innerText = rawToDb(val, false, isMaster);
 
         // Se no modo músico ou modo técnico editando mix, salvamos no AUX correspondente
         if ((musicianMode || technicianMixMode) && typeof ch === 'number') {
@@ -83,19 +88,27 @@ function updateUI(ch, val, onState, soloState) {
         }
         const elOn = document.getElementById(`on${ch}`);
         if (elOn) elOn.classList.toggle('on-active', onState);
+        const elOnMini = document.getElementById(`mini-on${ch}`);
+        if (elOnMini) elOnMini.classList.toggle('on-active', onState);
 
         // Novo: Subtle yellow background for desktop layout when channel is ON
         const elCard = document.getElementById(`card${ch}`);
         if (elCard && layoutMode === 'desktop') elCard.classList.toggle('desk-on-bg', onState);
+        const elCardMini = document.getElementById(`mini-card${ch}`);
+        if (elCardMini) elCardMini.classList.toggle('desk-on-bg', onState);
 
         // Novo: Colorized Label background
         const elLabel = document.getElementById(`label${ch}`);
         if (elLabel && layoutMode === 'desktop') elLabel.classList.toggle('label-on', onState);
+        const elLabelMini = document.getElementById(`mini-label${ch}`);
+        if (elLabelMini) elLabelMini.classList.toggle('label-on', onState);
     }
     if (typeof ch === 'number' && soloState !== undefined && soloState !== null) {
         if (stateRef) stateRef.solo = soloState;
         const elSolo = document.getElementById(`solo${ch}`);
         if (elSolo) elSolo.classList.toggle('solo-active', soloState);
+        const elSoloMini = document.getElementById(`mini-solo${ch}`);
+        if (elSoloMini) elSoloMini.classList.toggle('solo-active', soloState);
     }
 }
 /**
@@ -128,20 +141,21 @@ function createDesktopStrip(config) {
         isOn = false     // Estado ON/OFF inicial
     } = config;
 
+    const pfx = config.idPrefix || "";
     // Resolve IDs: Se não houver override, usa padrao (f0, v0, etc)
-    const fId = ids.f || `f${id}`;
-    const vId = ids.v || `v${id}`;
-    const onId = ids.on || `on${id}`;
-    const pId = ids.p || `p${id}`;
-    const mId = ids.m || `m${id}`;
-    const nameId = ids.name || `name${id}`;
-    const labelId = ids.label || `label${id}`;
+    const fId = ids.f || `${pfx}f${id}`;
+    const vId = ids.v || `${pfx}v${id}`;
+    const onId = ids.on || `${pfx}on${id}`;
+    const pId = ids.p || `${pfx}p${id}`;
+    const mId = ids.m || `${pfx}m${id}`;
+    const nameId = ids.name || `${pfx}name${id}`;
+    const labelId = ids.label || `${pfx}label${id}`;
 
     const wheelCall = `${onWheelAction}(event, ${evtCh})`;
     const inputCall = `${onInputAction}(event, ${evtCh})`;
 
     return `
-        <div class="fader-card-desktop ${customClass}" id="${elId || `card${id}`}">
+        <div class="fader-card-desktop ${customClass}" id="${elId || `${pfx}card${id}`}">
             <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${isMaster ? '' : configAction}">${title}</div>
             
             ${hasSolo ?
@@ -183,13 +197,24 @@ function createDesktopStrip(config) {
     `;
 }
 
-function createDesktopChannelStrip(i, isMaster = false) {
+function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
     const title = isMaster ? "MASTER" : `${i + 1}`;
-    const nameDiv = isMaster ? "MASTER" : "...";
+    const s = isMaster ? masterState : channelStates[i];
+    const nameDiv = isMaster ? "MASTER" : (s.name || "...");
     let customClass = isMaster ? "master-card-desktop" : "";
     if (!isMaster) {
         if (i < 16) customClass += " fader-group-1";
         else if (i < 32) customClass += " fader-group-2";
+    }
+
+    let val = s.value;
+    let isOn = s.on;
+    let solo = !isMaster ? s.solo : false;
+
+    // Se estivermos editando um Mix (Sends on Faders)
+    if ((musicianMode || technicianMixMode) && !isMaster) {
+        val = s[`aux${activeMix}`] || 0;
+        isOn = s[`aux${activeMix}On`] || false;
     }
 
     let onAction = isMaster ? "toggleState('kStereoChannelOn/kChannelOn', 'master')" : `toggleState('kInputChannelOn/kChannelOn', ${i})`;
@@ -204,9 +229,14 @@ function createDesktopChannelStrip(i, isMaster = false) {
         name: nameDiv,
         customClass,
         isMaster,
+        idPrefix,
         hasSolo: !isMaster && !musicianMode && !technicianMixMode,
         onAction,
-        configAction: musicianMode ? "" : `openChannelConfig(event, ${i})`,
+        val,
+        isOn,
+        solo,
+        dbLabel: rawToDb(val, false, isMaster),
+        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`), // Evita recursão no mini-fader
         type: "main"
     });
 }
@@ -235,16 +265,18 @@ function createMobileStrip(config) {
         isOn = false
     } = config;
 
-    const fId = ids.f || `f${id}`;
-    const vId = ids.v || `v${id}`;
-    const onId = ids.on || `on${id}`;
-    const soloId = ids.solo || `solo${id}`;
-    const nameId = ids.name || `name${id}`;
+    const pfx = config.idPrefix || "";
+    const fId = ids.f || `${pfx}f${id}`;
+    const vId = ids.v || `${pfx}v${id}`;
+    const onId = ids.on || `${pfx}on${id}`;
+    const soloId = ids.solo || `${pfx}solo${id}`;
+    const nameId = ids.name || `${pfx}name${id}`;
+    const cardId = ids.card || `${pfx}card${id}`;
 
     const inputCall = `${onInputAction}(event, ${evtCh})`;
 
     return `
-        <div class="fader-card ${customClass}">
+        <div class="fader-card ${customClass}" id="${cardId}">
             ${getMobileScaleHTML()}
             <div class="ch-clickable-zone" onclick="${isMaster ? '' : configAction}">
                 <h2 class="card-title">${title}</h2>
@@ -272,15 +304,26 @@ function createMobileStrip(config) {
     `;
 }
 
-function createChannelStrip(i, isMaster = false) {
-    if (layoutMode === 'desktop') return createDesktopChannelStrip(i, isMaster);
+function createChannelStrip(i, isMaster = false, idPrefix = "") {
+    if (layoutMode === 'desktop') {
+        return createDesktopChannelStrip(i, isMaster, idPrefix);
+    }
 
     const title = isMaster ? "STEREO" : `CH ${i + 1}`;
-    const nameDiv = isMaster ? "MASTER" : "...";
+    const s = isMaster ? masterState : channelStates[i];
+    const nameDiv = isMaster ? "MASTER" : (s.name || "...");
     let customClass = isMaster ? "master-card" : "";
     if (!isMaster) {
         if (i < 16) customClass = "fader-group-1";
         else if (i < 32) customClass = "fader-group-2";
+    }
+
+    let val = s.value;
+    let isOn = s.on;
+
+    if ((musicianMode || technicianMixMode) && !isMaster) {
+        val = s[`aux${activeMix}`] || 0;
+        isOn = s[`aux${activeMix}On`] || false;
     }
 
     let onAction = isMaster ? "toggleState('kStereoChannelOn/kChannelOn', 'master')" : `toggleState('kInputChannelOn/kChannelOn', ${i})`;
@@ -295,12 +338,13 @@ function createChannelStrip(i, isMaster = false) {
         name: nameDiv,
         customClass,
         isMaster,
+        idPrefix,
         hasSolo: !isMaster && !musicianMode && !technicianMixMode,
         onAction,
-        configAction: musicianMode ? "" : `openChannelConfig(event, ${i})`,
-        val: 0,
-        dbLabel: "-∞",
-        isOn: false
+        val,
+        isOn,
+        dbLabel: rawToDb(val, true, isMaster),
+        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`)
     });
 }
 

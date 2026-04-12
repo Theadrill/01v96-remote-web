@@ -17,6 +17,11 @@ function updateConfigUIForChannel(ch) {
     document.getElementById('chNav').style.display = 'flex';
     document.getElementById('chContext').style.display = 'flex';
 
+    const miniFader = document.getElementById('miniFaderContext');
+    if (miniFader && typeof createChannelStrip === 'function') {
+        miniFader.innerHTML = createChannelStrip(ch, false, "mini-");
+    }
+
     // Esconde botões de logout ao entrar na config do canal
     const mExit = document.getElementById('musicianExitBtn');
     if (mExit) mExit.style.display = 'none';
@@ -49,6 +54,9 @@ function closeChannelConfig() {
     document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode) ? 'none' : 'flex';
     document.getElementById('chNav').style.display = 'none';
     document.getElementById('chContext').style.display = 'none';
+
+    const miniFader = document.getElementById('miniFaderContext');
+    if (miniFader) miniFader.innerHTML = '';
 
     // Mostra botões de logout de volta ao sair (respeitando modos)
     if (musicianMode) {
