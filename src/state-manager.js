@@ -4,9 +4,9 @@ const state = {
     channels: {},
     mixes: {},
     buses: {},
-    master: { 
-        value: 0, 
-        on: false, 
+    master: {
+        value: 0,
+        on: false,
         name: "MASTER",
         comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
         eq: {
@@ -32,7 +32,7 @@ for (let i = 0; i < 32; i++) {
         att: 0,
         patch: 1, // AD1 default
         nameChars: Array(4).fill(' '), // 4 espaços para as letras
-        name: `CH ${i+1}`,
+        name: `CH ${i + 1}`,
         gate: { on: false, thresh: -26, range: -60, attack: 0, hold: 20, decay: 50 },
         comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
         buses: Array(8).fill(false), // Novo: Assignments para Bus 1-8
@@ -49,19 +49,20 @@ for (let i = 0; i < 32; i++) {
 }
 
 for (let i = 0; i < 8; i++) {
-    state.mixes[i] = { value: 0, on: false, name: `MIX ${i+1}` };
-    state.buses[i] = { value: 0, on: false, name: `BUS ${i+1}` };
+    state.mixes[i] = { value: 0, on: false, name: `MIX ${i + 1}` };
+    state.buses[i] = { value: 0, on: false, name: `BUS ${i + 1}` };
 }
 
 function updateState(d) {
     if (!d) return;
     const { type, channel, value } = d;
-    
+
     // Suporte ao Master (Stereo)
     if (channel === 'master' || type.startsWith('kStereo')) {
         if (type === 'kStereoFader/kFader') state.master.value = value;
         if (type === 'kStereoChannelOn/kChannelOn') state.master.on = value;
-        
+        if (type === 'kStereoAttenuator/kAtt') state.master.att = value;
+
         // Master EQ
         if (type.includes('kStereoEQ/')) {
             const eqKey = type.split('/')[1];
@@ -133,7 +134,7 @@ function updateState(d) {
     if (type.includes('kInputEQ/')) {
         const eqKey = type.split('/')[1];
         if (eqKey === 'kEQOn') state.channels[channel].eq.on = !!value;
-        
+
         const map = {
             'kEQLowF': ['low', 'f'], 'kEQLowG': ['low', 'g'], 'kEQLowQ': ['low', 'q'],
             'kEQHPFOn': ['low', 'hpfOn'],
@@ -223,11 +224,11 @@ function getState() {
     return state;
 }
 
-module.exports = { 
-    updateState, 
-    updateChannelNameChar, 
+module.exports = {
+    updateState,
+    updateChannelNameChar,
     setChannelName,
-    updateSceneChar, 
-    getFullSceneName, 
-    getState 
+    updateSceneChar,
+    getFullSceneName,
+    getState
 };

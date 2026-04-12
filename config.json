@@ -5,6 +5,6 @@
   "demo_mode": false,
   "master_meter_group": 34,
   "master_meter_offset": 18,
-  "sync_delay_ms": 10,
-  "sync_name_delay_ms": 10
+  "sync_delay_ms": 15,
+  "sync_name_delay_ms": 20
 }
