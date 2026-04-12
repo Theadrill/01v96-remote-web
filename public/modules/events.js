@@ -9,8 +9,26 @@ function openChannelConfig(e, ch) {
 }
 
 function updateConfigUIForChannel(ch) {
-    const chName = document.getElementById(`name${ch}`).innerText;
-    document.getElementById('chSideTitle').innerText = `${ch + 1} - ${chName === '...' ? `CH ${ch + 1}` : chName}`;
+    let targetId = `name${ch}`;
+    let displayTitle = `${ch + 1}`;
+
+    if (ch >= 0 && ch <= 31) {
+        targetId = `name${ch}`;
+        displayTitle = `CH ${ch + 1}`;
+    } else if (ch >= 36 && ch <= 43) {
+        targetId = `namem${ch - 36}`;
+        displayTitle = `MIX ${ch - 35}`;
+    } else if (ch >= 44 && ch <= 51) {
+        targetId = `nameb${ch - 44}`;
+        displayTitle = `BUS ${ch - 43}`;
+    } else if (ch === 52) {
+        targetId = `namemaster`;
+        displayTitle = `MASTER`;
+    }
+
+    const nameEl = document.getElementById(targetId);
+    const chName = nameEl ? nameEl.innerText : "";
+    document.getElementById('chSideTitle').innerText = `${displayTitle} - ${chName || `...`}`;
 
     document.getElementById('chConfigModal').style.display = 'flex';
     document.getElementById('mainNav').style.display = 'none';
@@ -19,7 +37,15 @@ function updateConfigUIForChannel(ch) {
 
     const miniFader = document.getElementById('miniFaderContext');
     if (miniFader && typeof createChannelStrip === 'function') {
-        miniFader.innerHTML = createChannelStrip(ch, false, "mini-");
+        const isM = ch === 52;
+        const isOut = (ch >= 36 && ch <= 51);
+        if (isM) miniFader.innerHTML = createChannelStrip(0, true, "mini-");
+        else if (isOut) {
+            const type = (ch <= 43) ? 'mix' : 'bus';
+            const idx = (ch <= 43) ? (ch - 36) : (ch - 44);
+            miniFader.innerHTML = createOutputStrip(idx, type);
+        }
+        else miniFader.innerHTML = createChannelStrip(ch, false, "mini-");
     }
 
     // Esconde botões de logout ao entrar na config do canal
@@ -30,15 +56,36 @@ function updateConfigUIForChannel(ch) {
 
     if (window.autoScaleTitle) autoScaleTitle();
 
-    const cards = document.querySelectorAll('.fader-card');
-    cards.forEach(c => c.style.background = '');
-    if (cards[ch]) cards[ch].style.background = '#15304d';
+    // Remove realce de todos
+    document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
+
+    // Aplica realce no card correto
+    let currentCard = null;
+    if (ch >= 0 && ch <= 31) {
+        currentCard = document.querySelectorAll('.fader-card')[ch];
+    } else if (ch >= 36 && ch <= 43) {
+        const idx = ch - 36;
+        currentCard = document.querySelectorAll('.fader-group-mix')[idx];
+    } else if (ch >= 44 && ch <= 51) {
+        const idx = ch - 44;
+        currentCard = document.querySelectorAll('.fader-group-bus')[idx];
+    } else if (ch === 52) {
+        currentCard = document.querySelector('.master-card');
+    }
+
+    if (currentCard) currentCard.style.background = '#15304d';
 }
 
 function changeConfigChannel(delta) {
     let nextCh = activeConfigChannel + delta;
-    if (nextCh < 0) nextCh = NUM_CHANNELS - 1;
-    if (nextCh >= NUM_CHANNELS) nextCh = 0;
+    
+    // Pula o "gap" entre 32 e 36
+    if (nextCh > 31 && nextCh < 36 && delta > 0) nextCh = 36;
+    if (nextCh > 31 && nextCh < 36 && delta < 0) nextCh = 31;
+
+    // Limites
+    if (nextCh < 0) nextCh = 52;
+    if (nextCh > 52) nextCh = 0;
 
     activeConfigChannel = nextCh;
     updateConfigUIForChannel(nextCh);
@@ -79,9 +126,15 @@ function toggleState(type, ch) {
     let s;
     let actualType = type;
 
-    if (ch === 'master') s = masterState;
-    else if (typeof ch === 'string' && ch.startsWith('m')) s = mixesState[ch.substring(1)];
-    else if (typeof ch === 'string' && ch.startsWith('b')) s = busesState[ch.substring(1)];
+    if (ch === 'master' || ch === 52) s = masterState;
+    else if ((typeof ch === 'string' && ch.startsWith('m')) || (ch >= 36 && ch <= 43)) {
+        const idx = typeof ch === 'string' ? ch.substring(1) : (ch - 36);
+        s = mixesState[idx];
+    }
+    else if ((typeof ch === 'string' && ch.startsWith('b')) || (ch >= 44 && ch <= 51)) {
+        const idx = typeof ch === 'string' ? ch.substring(1) : (ch - 44);
+        s = busesState[idx];
+    }
     else s = channelStates[ch];
 
     // Se no modo músico ou técnico editando mix, o tipo base recebido (kInputChannelOn) vira o AUX ativo

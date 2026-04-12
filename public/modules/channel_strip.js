@@ -236,7 +236,7 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         isOn,
         solo,
         dbLabel: rawToDb(val, false, isMaster),
-        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`), // Evita recursão no mini-fader
+        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${isMaster ? 52 : i})`), // Evita recursão no mini-fader
         type: "main"
     });
 }
@@ -364,7 +364,7 @@ function createDesktopOutputStrip(i, type) {
         name: nameDiv,
         customClass,
         onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', '${prefix}${i}')`,
-        configAction: type === 'mix' ? `enterTechnicianMixMode(${i})` : '',
+        configAction: `openChannelConfig(event, ${type === 'mix' ? 36 + i : 44 + i})`,
         type: "output"
     });
 }
@@ -386,7 +386,7 @@ function createOutputStrip(i, type) {
     return `
         <div class="fader-card ${customClass}">
             ${getMobileScaleHTML()}
-            <div class="ch-clickable-zone" onclick="${type === 'mix' ? `enterTechnicianMixMode(${i})` : ''}">
+            <div class="ch-clickable-zone" onclick="openChannelConfig(event, ${type === 'mix' ? 36 + i : 44 + i})">
                 <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : '#00ffcc'}">${title}</h2>
                 <div id="name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>

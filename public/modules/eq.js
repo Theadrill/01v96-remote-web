@@ -76,7 +76,7 @@ let showBubbleRequest = false; // Flag de controle de visibilidade temporária d
 function initEQEngine(ch) {
     if (!eqContext) eqContext = new (window.AudioContext || window.webkitAudioContext)();
     
-    let state = channelStates[ch] || { eq: {} };
+    let state = getChannelStateById(ch) || { eq: {} };
     const chEq = state.eq || {};
     eqBands = [];
     
@@ -157,7 +157,7 @@ function renderEQ(ch) {
     selectedBandIdx = -1; // Reseta seleção de banda ao abrir novo canal
     socket.emit('requestEqAtt', { channel: ch }); // Reabre sync do ganho ao entrar na tela da mesa
     initEQEngine(ch);
-    const state = channelStates[ch] || { eq: {} };
+    const state = getChannelStateById(ch) || { eq: {} };
     const isEqOn = state.eq ? !!state.eq.on : false;
     const isPhase = !!state.phase;
 
@@ -370,8 +370,9 @@ function setBandMode(bandIdx, mode) {
     if (mode.includes('pass')) b.filter.Q.value = 0.707;
 
     // Sincroniza com a Mesa
-    const hpfOnType = isLow ? 'kInputEQ/kEQHPFOn' : 'kInputEQ/kEQLPFOn';
-    const qType = isLow ? 'kInputEQ/kEQLowQ' : 'kInputEQ/kEQHiQ';
+    const prefix = getChannelParamPrefix(ch);
+    const hpfOnType = `${prefix}EQ/${prefix === 'kInput' ? 'kEQHPFOn' : 'kEQHPFOn'}`; // 01V96 unificado
+    const qType = `${prefix}EQ/kEQ${isLow ? 'Low' : 'Hi'}Q`;
     
     let qValue = 20; // Default Padrão (Q=1.0)
     let switchOn = 0;
@@ -388,17 +389,20 @@ function setBandMode(bandIdx, mode) {
     }
 
     // Persiste no state local para evitar flicker
-    if (!channelStates[ch].eq) channelStates[ch].eq = { low:{}, high:{} };
+    const targetState = getChannelStateById(ch);
+    if (targetState && !targetState.eq) targetState.eq = { low:{}, high:{} };
     const bandKey = isLow ? 'low' : 'high';
-    if (!channelStates[ch].eq[bandKey]) channelStates[ch].eq[bandKey] = {};
-    channelStates[ch].eq[bandKey].q = qValue;
-    channelStates[ch].eq[bandKey][isLow ? 'hpfOn' : 'lpfOn'] = switchOn;
+    if (targetState && !targetState.eq[bandKey]) targetState.eq[bandKey] = {};
+    if (targetState) {
+        targetState.eq[bandKey].q = qValue;
+        targetState.eq[bandKey][isLow ? 'hpfOn' : 'lpfOn'] = switchOn;
+    }
 
     // Se for HPF/LPF, o ganho deve ser fixado em 0dB
     if (mode.includes('pass')) {
         b.filter.gain.value = 0;
-        channelStates[ch].eq[bandKey].g = 0;
-        socket.emit('control', { type: `kInputEQ/kEQ${isLow?'Low':'Hi'}G`, channel: ch, value: 0 });
+        if (targetState) targetState.eq[bandKey].g = 0;
+        socket.emit('control', { type: `${prefix}EQ/kEQ${isLow?'Low':'Hi'}G`, channel: ch, value: 0 });
     }
 
     // Envia os comandos para a mesa
@@ -451,14 +455,15 @@ function onEQMove(e, ch) {
     const label = labelMap[b.key] || 'Low';
     
     // ATUALIZAÇÃO DO ESTADO LOCAL (MEMÓRIA)
-    const chState = channelStates[ch];
+    const chState = getChannelStateById(ch);
     if (chState && chState.eq && chState.eq[b.key]) {
         chState.eq[b.key].f = rawF;
         chState.eq[b.key].g = rawG;
     }
 
-    socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: rawF });
-    socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: rawG });
+    const prefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}F`, channel: ch, value: rawF });
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}G`, channel: ch, value: rawG });
 
     updateEQFadersUI();
 
@@ -474,7 +479,8 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     const targetCh = ch !== null ? ch : activeConfigChannel;
     
     // 1. SALVAR NO ESTADO LOCAL (MEMÓRIA) - SEMPRE, MESMO SE UI ESTIVER FECHADA
-    const chState = channelStates[targetCh];
+    const chState = getChannelStateById(targetCh);
+    if (!chState) return;
     if (!chState.eq) chState.eq = { on: false };
     if (!chState.eq.low) chState.eq.low = { f:32, g:0, q:44, hpfOn:0 };
     if (!chState.eq.lowmid) chState.eq.lowmid = { f:60, g:0, q:20 };
@@ -750,21 +756,23 @@ window.resetBubbleTimer = function() {
     }, 4000); // 4 segundos de inatividade
 };
 
-function toggleEQ(ch) {
-    const s = channelStates[ch].eq;
-    if (!s) return;
-    s.on = !s.on;
-    const btn = document.getElementById('sideBtnEQOn');
-    if (btn) btn.classList.toggle('on-active', s.on);
-    const hBtn = document.getElementById('headerBtnEQOn');
-    if (hBtn) hBtn.classList.toggle('on-active', s.on);
-    socket.emit('control', { type: 'kInputEQ/kEQOn', channel: ch, value: s.on ? 1 : 0 });
+function toggleEQOn(ch) {
+    const state = getChannelStateById(ch);
+    if (!state) return;
+    const nextOn = !state.eq.on;
+    state.eq.on = nextOn;
+    
+    const prefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${prefix}EQ/kEQOn`, channel: ch, value: nextOn ? 1 : 0 });
+    
+    const btn = document.getElementById('eqOnBtn');
+    if (btn) btn.classList.toggle('active', nextOn);
 }
 
 // Reversão: Funcionalidade de Copia e Cola removida conforme solicitado pelo usuário para restaurar a estabilidade.
 
 window.togglePhase = function(ch) {
-    const s = channelStates[ch];
+    const s = getChannelStateById(ch);
     if (!s) return;
     s.phase = !s.phase;
     const btn = document.getElementById('sideBtnPhase');
@@ -777,14 +785,16 @@ window.togglePhase = function(ch) {
         hBtn.classList.toggle('phase-inv', s.phase);
         hBtn.classList.toggle('phase-norm', !s.phase);
     }
-    socket.emit('control', { type: 'kInputPhase/kPhase', channel: ch, value: s.phase ? 1 : 0 });
+    const prefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${prefix}Phase/kPhase`, channel: ch, value: s.phase ? 1 : 0 });
 }
 
 window.flatEQ = function(ch) {
     // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, Hi)
     const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
+    const prefix = getChannelParamPrefix(ch);
     bands.forEach(bName => {
-        const type = `kInputEQ/kEQ${bName}G`;
+        const type = `${prefix}EQ/kEQ${bName}G`;
         // Para a 01V96, 0.0dB é o valor central (0 assinado)
         socket.emit('control', { type, channel: ch, value: 0 });
         
@@ -846,7 +856,8 @@ function nudgeQ(dir) {
     chEq[b.key].q = v;
     
     if (b.filter) b.filter.Q.value = rawToQ(v);
-    socket.emit('control', { type: `kInputEQ/kEQ${label}Q`, channel: ch, value: v });
+    const prefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}Q`, channel: ch, value: v });
 }
 
 function updateQControlsUI() {
@@ -883,7 +894,8 @@ function nudgeFreq(dir) {
 
     const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
     const label = labelMap[b.key] || 'Low';
-    socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: v });
+    const prefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}F`, channel: ch, value: v });
     
     const fader = document.getElementById('eqFreqFaderInput');
     if (fader) fader.value = v;
@@ -1045,9 +1057,10 @@ window.eqGainInput = function(e) {
     }
 
     // Envia para mesa
+    const prefix = getChannelParamPrefix(ch);
     const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
     const label = labelMap[b.key] || 'Low';
-    socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: rawG });
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}G`, channel: ch, value: rawG });
     
     // Atualiza Texto do Valor no Fader
     const valEl = document.getElementById('eqFaderVal');
@@ -1077,9 +1090,10 @@ window.eqFreqInput = function(e) {
     }
 
     // Envia para mesa
+    const prefix = getChannelParamPrefix(ch);
     const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
     const label = labelMap[b.key] || 'Low';
-    socket.emit('control', { type: `kInputEQ/kEQ${label}F`, channel: ch, value: rawF });
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}F`, channel: ch, value: rawF });
     
     // Atualiza a barra de info
     const info = document.getElementById('eqInfo');

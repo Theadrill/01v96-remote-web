@@ -394,11 +394,11 @@ function saveNames() {
     // Inputs (0-31)
     for (let i = 0; i < 32; i++) { names[i] = s.channels[i].name; }
     // Mixes (36-43)
-    for (let i = 0; i < 8; i++) { if(s.mixes[i]) names[36 + i] = s.mixes[i].name; }
+    for (let i = 0; i < 8; i++) { if (s.mixes[i]) names[36 + i] = s.mixes[i].name; }
     // Buses (44-51)
-    for (let i = 0; i < 8; i++) { if(s.buses[i]) names[44 + i] = s.buses[i].name; }
+    for (let i = 0; i < 8; i++) { if (s.buses[i]) names[44 + i] = s.buses[i].name; }
     // Stereo (52)
-    if(s.master) names[52] = s.master.name;
+    if (s.master) names[52] = s.master.name;
     try {
         fs.writeFileSync(namesFile, JSON.stringify(names, null, 2));
         console.log("💾 [NAMES] Nomes salvos com sucesso em names.json");
@@ -729,13 +729,13 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             // [SYNC] Nomes de Saídas (Mixes 36-43, Buses 44-51, Master 52)
             console.log("\n📝 [SYNC] Solicitando nomes de Mixes, Buses e Master (8 chars)...");
             const outIndices = [];
-            for (let i = 36; i <= 43; i++) outIndices.push(i); 
-            for (let i = 44; i <= 51; i++) outIndices.push(i); 
+            for (let i = 36; i <= 43; i++) outIndices.push(i);
+            for (let i = 44; i <= 51; i++) outIndices.push(i);
             outIndices.push(52);
 
             for (const idx of outIndices) {
                 stateManager.setChannelName(idx, "");
-                for (let c = 0; c < 8; c++) { 
+                for (let c = 0; c < 8; c++) {
                     const nameReq = protocol.buildNameRequest(idx, c);
                     if (nameReq) midiEngine.send(nameReq);
                     await new Promise(r => setTimeout(r, nameDelay));
@@ -793,8 +793,8 @@ async function syncNames() {
 
         // Saídas no Manual Sync (8 chars)
         const outIndices = [];
-        for (let i = 36; i <= 43; i++) outIndices.push(i); 
-        for (let i = 44; i <= 51; i++) outIndices.push(i); 
+        for (let i = 36; i <= 43; i++) outIndices.push(i);
+        for (let i = 44; i <= 51; i++) outIndices.push(i);
         outIndices.push(52);
 
         for (const idx of outIndices) {
@@ -913,12 +913,14 @@ io.on('connection', (socket) => {
         const { channel } = data;
         if (channel === undefined || !isConnected) return;
 
-        // Como agora sincronizamos tudo no boot, apenas devolvemos o estado atual do StateManager
-        const currentState = stateManager.getState().channels[channel];
+        // USA O BUSCADOR INTELIGENTE PARA PEGAR O ESTADO (INPUT, MIX, BUS OU MASTER)
+        const currentState = stateManager.getChannelStateById(channel);
+        if (!currentState) return;
+
         socket.emit('dynamicsState', {
             channel,
-            gate: currentState.gate,
-            comp: currentState.comp
+            gate: currentState.gate || { on: false },
+            comp: currentState.comp || { on: false }
         });
     });
 

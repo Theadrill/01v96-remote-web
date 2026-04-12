@@ -21,7 +21,7 @@ function buildRequest() {
 
 function parse(message) {
     if (!message || message.length < 20) return null;
-    
+
     // Verifica se é uma resposta de meter (Type 0x1n ou 0x3n que o loopMIDI ecoa? No protocol.js ignoramos se não for 0x1n)
     // Para simplificar, verificamos apenas se o grupo coincide com o configurado
     if (message[5] !== config.group) return null;

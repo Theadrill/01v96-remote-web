@@ -1,16 +1,30 @@
-/**
- * 🚨 [CRITICAL SYNC LOGIC]
- * A renderização de Auxiliares deve manter IDs compatíveis com 'updateAuxFromSocket'.
- * Ao usar o componente universal, certifique-se de passar o objeto 'ids' mapeando
- * corretamente para aux_f_N, aux_v_N, aux_on_N.
- */
 function renderAuxs(ch) {
     const body = document.querySelector('.ch-modal-body');
+    
+    // 01V96: Saídas não têm Aux Sends (exceto para Matrix, que é outro módulo)
+    if (ch >= 36) {
+        body.innerHTML = `
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#666; padding:20px; text-align:center;">
+                <div style="font-size:48px; margin-bottom:15px; opacity:0.3;">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div style="font-size:14px; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">
+                    Sends Não Disponíveis
+                </div>
+                <div style="font-size:12px; margin-top:5px; opacity:0.7;">
+                    Canais de saída não possuem barramentos de envio auxiliares.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
     let html = '';
+    const state = getChannelStateById(ch);
 
     for (let i = 1; i <= 8; i++) {
-        const currentVal = (channelStates[ch] && channelStates[ch][`aux${i}`]) || 0;
-        const isOn = (channelStates[ch] && channelStates[ch][`aux${i}On`]) || false;
+        const currentVal = (state && state[`aux${i}`]) || 0;
+        const isOn = (state && state[`aux${i}On`]) || false;
 
         if (layoutMode === 'desktop') {
             html += createDesktopStrip({
@@ -61,9 +75,6 @@ function renderAuxs(ch) {
         }
     }
 
-    const chName = document.getElementById(`name${ch}`).innerText;
-    const titleText = `${ch + 1} - ${chName === '...' ? `CH ${ch + 1}` : chName}`;
-
     body.style.flexDirection = 'column';
     body.style.alignItems = 'stretch';
     body.innerHTML = `
@@ -80,7 +91,8 @@ function auxWheelInput(e, ch, auxIdx) {
     if (layoutMode !== 'desktop') return;
     e.preventDefault();
     e.stopPropagation();
-    const currentRaw = (channelStates[ch] && channelStates[ch][`aux${auxIdx}`]) || 0;
+    const state = getChannelStateById(ch);
+    const currentRaw = (state && state[`aux${auxIdx}`]) || 0;
     const delta = e.deltaY < 0 ? 10 : -10;
     let nRaw = currentRaw + delta;
     if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
@@ -88,7 +100,6 @@ function auxWheelInput(e, ch, auxIdx) {
     socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });
 }
 
-// Lógica de Nudge para Auxiliares
 let auxNudgeTimeout = null;
 let auxNudgeInterval = null;
 
@@ -111,10 +122,10 @@ function stopAuxNudge() {
 }
 
 function nudgeAuxLevel(ch, auxIdx, dir) {
-    const currentRaw = (channelStates[ch] && channelStates[ch][`aux${auxIdx}`]) || 0;
+    const state = getChannelStateById(ch);
+    const currentRaw = (state && state[`aux${auxIdx}`]) || 0;
     const nRaw = getSteppedRaw(currentRaw, dir, 0.5);
 
-    // Atualiza UI e Estado
     updateAuxManual(ch, auxIdx, nRaw);
     socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });
 }
@@ -127,8 +138,8 @@ function auxLevelInput(e, ch, auxIdx) {
 }
 
 function updateAuxManual(ch, auxIdx, val) {
-    if (!channelStates[ch]) channelStates[ch] = {};
-    channelStates[ch][`aux${auxIdx}`] = val;
+    const state = getChannelStateById(ch);
+    if (state) state[`aux${auxIdx}`] = val;
 
     if (document.getElementById(`aux_f_${auxIdx}`)) {
         document.getElementById(`aux_f_${auxIdx}`).value = val;
@@ -139,10 +150,11 @@ function updateAuxManual(ch, auxIdx, val) {
 function toggleAuxOn(ch, auxIdx) {
     if (!appReady) return;
     const type = `kInputAUX/kAUX${auxIdx}On`;
-    if (!channelStates[ch]) channelStates[ch] = {};
+    const state = getChannelStateById(ch);
+    if (!state) return;
 
-    const newVal = !channelStates[ch][`aux${auxIdx}On`];
-    channelStates[ch][`aux${auxIdx}On`] = newVal;
+    const newVal = !state[`aux${auxIdx}On`];
+    state[`aux${auxIdx}On`] = newVal;
 
     const btn = document.getElementById(`aux_on_${auxIdx}`);
     if (btn) btn.classList.toggle('on-active', newVal);
@@ -150,12 +162,11 @@ function toggleAuxOn(ch, auxIdx) {
 }
 
 /**
- * 🚨 [CRITICAL SYNC LOGIC]
- * Atualiza o canal quando o servidor envia dados via socket.
- * Os seletores 'getElementById' abaixo são o vínculo direto com o motor MIDI.
+ * [CRITICAL] Apenas canais de entrada recebem atualizações de AUX Send.
  */
 function updateAuxFromSocket(ch, type, value) {
-    if (!channelStates[ch]) channelStates[ch] = {};
+    const state = getChannelStateById(ch);
+    if (!state) return;
     const match = type.match(/kInputAUX\/kAUX(\d+)(Level|On)/);
     if (!match) return;
 
@@ -163,14 +174,14 @@ function updateAuxFromSocket(ch, type, value) {
     const subType = match[2];
 
     if (subType === 'Level') {
-        channelStates[ch][`aux${auxIdx}`] = value;
+        state[`aux${auxIdx}`] = value;
         if (activeConfigChannel === ch && document.getElementById(`aux_f_${auxIdx}`)) {
             document.getElementById(`aux_f_${auxIdx}`).value = value;
             document.getElementById(`aux_v_${auxIdx}`).innerText = rawToDb(value);
         }
     } else if (subType === 'On') {
         const isTrue = (value === 1 || value === true);
-        channelStates[ch][`aux${auxIdx}On`] = isTrue;
+        state[`aux${auxIdx}On`] = isTrue;
         if (activeConfigChannel === ch && document.getElementById(`aux_on_${auxIdx}`)) {
             document.getElementById(`aux_on_${auxIdx}`).classList.toggle('on-active', isTrue);
         }

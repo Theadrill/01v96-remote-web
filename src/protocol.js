@@ -69,7 +69,7 @@ function buildNameRequest(channelIndex, charIndex) {
         element = 18;
         localCh = 0;
     }
-    
+
     // Retornamos ao ID 13 (0x0D) pois é o padrão clássico da 01V96 para Nomes
     return [...HEADER, 48, MODEL_ID, 13, 2, element, parameter, localCh, ...FOOTER];
 }
@@ -137,11 +137,11 @@ function parseIncoming(message) {
 
     const dataBytes = message.slice(9, -1);
     // canal e parameter já declarados no topo para debug
-    
+
     // 🚨 [CRITICAL SYNC LOGIC] - PARAMETER CHANGES
     // Suporta ID 13, 26 e 127 (Universal) que são os comandos de mudança de parâmetro da 01V96.
     if (message[4] === 13 || message[4] === 127 || message[4] === 26 || message[4] === 1) {
-        
+
         // --- PRIORIDADE 1: NOMES DE CANAIS E CENAS ---
         // Se o elemento for um dos IDs de nome (4, 15, 16, 18) e o parâmetro estiver no range de caracteres (4-19)
         if ([4, 15, 16, 18].includes(element) && parameter >= 4 && parameter <= 19) {

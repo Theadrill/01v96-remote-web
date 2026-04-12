@@ -70,6 +70,29 @@ function dbToRaw(db) {
 }
 
 /**
+ * Retorna o objeto de estado correto baseado no ID global do canal
+ * IDs: 0-31 (Inputs), 36-43 (Mixes), 44-51 (Buses), 52 (Master)
+ */
+function getChannelStateById(id) {
+    if (id === 'master' || id === 52) return masterState;
+    if (id >= 0 && id <= 31) return channelStates[id];
+    if (id >= 36 && id <= 43) return mixesState[id - 36];
+    if (id >= 44 && id <= 51) return busesState[id - 44];
+    return null;
+}
+
+/**
+ * Retorna o prefixo do parâmetro baseado no ID global do canal
+ */
+function getChannelParamPrefix(id) {
+    if (id === 'master' || id === 52) return 'kStereo';
+    if (id >= 0 && id <= 31) return 'kInput';
+    if (id >= 36 && id <= 43) return 'kAUX';
+    if (id >= 44 && id <= 51) return 'kBus';
+    return 'kInput'; // Fallback
+}
+
+/**
  * Calcula o próximo valor RAW baseado em um step em dB.
  * Útil para botões de nudge (+/-) que operam em passos fixos de volume.
  */

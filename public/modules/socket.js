@@ -55,6 +55,30 @@ socket.on('update', (d) => {
             }
         }
 
+      if (d.type === 'updateState') {
+        const prefixMatch = d.typeParam.match(/^(kInput|kAUX|kBus|kStereo)(EQ|Comp|Gate)\/(.*)/);
+        if (prefixMatch) {
+            const module = prefixMatch[2]; // EQ, Comp, Gate
+            const param = prefixMatch[3];  // Ex: kEQOn, kCompThreshold
+            
+            if (module === 'EQ' && typeof updateEQFromSocket === 'function') {
+                updateEQFromSocket(d.channel, param, d.value);
+            } else if (module === 'Comp' && typeof updateCompFromSocket === 'function') {
+                updateCompFromSocket(d.channel, param, d.value);
+            } else if (module === 'Gate' && typeof updateGateFromSocket === 'function') {
+                updateGateFromSocket(d.channel, param, d.value);
+            }
+            return;
+        }
+
+        if (d.typeParam.startsWith('kInputAUX/')) {
+            if (typeof updateAuxFromSocket === 'function') {
+                updateAuxFromSocket(d.channel, d.typeParam, d.value);
+            }
+        }
+        // ... restante do updateState (Phase, Patch, Buses, Stereo On)
+    }
+
         // Suporte a EQ
         if (d.type.includes('kInputEQ/')) {
             if (window.updateEQParam) {
@@ -118,27 +142,16 @@ socket.on('update', (d) => {
     }
 
     if (d.type === 'updateNameChar') {
-        let stateObj = null;
+        const stateObj = getChannelStateById(d.channel);
         let targetId = `name${d.channel}`;
         
-        if (d.channel >= 36) {
-            console.log(`📡 [FRONT-NAME] INCOMING: Ch:${d.channel} Pos:${d.charIndex} Char:'${d.char}'`);
-        }
-
-        if (d.channel >= 0 && d.channel <= 31) {
-            stateObj = channelStates[d.channel];
-        } else if (d.channel >= 36 && d.channel <= 43) {
-            stateObj = mixesState[d.channel - 36];
+        if (d.channel >= 36 && d.channel <= 43) {
             targetId = `namem${d.channel - 36}`;
         } else if (d.channel >= 44 && d.channel <= 51) {
-            stateObj = busesState[d.channel - 44];
             targetId = `nameb${d.channel - 44}`;
         } else if (d.channel === 52) {
-            stateObj = masterState;
             targetId = `namemaster`;
         }
-
-        if (!stateObj) return;
 
         if (!stateObj.nameChars) {
             stateObj.nameChars = new Array(16).fill(' ');
@@ -159,7 +172,14 @@ socket.on('update', (d) => {
         if (activeConfigChannel === d.channel) {
             const sideTitle = document.getElementById('chSideTitle');
             if (sideTitle) {
-                sideTitle.innerText = `${d.channel + 1} - ${newName}`;
+                // Resolve o Label do canal (ex: ST MASTER ou MIX 1)
+                let chLabel = d.channel;
+                if (d.channel >= 36 && d.channel <= 43) chLabel = `MIX ${d.channel - 35}`;
+                else if (d.channel >= 44 && d.channel <= 51) chLabel = `BUS ${d.channel - 43}`;
+                else if (d.channel === 52) chLabel = `ST MASTER`;
+                else chLabel = d.channel + 1;
+
+                sideTitle.innerText = `${chLabel} - ${newName}`;
                 if (window.autoScaleTitle) autoScaleTitle();
             }
         }

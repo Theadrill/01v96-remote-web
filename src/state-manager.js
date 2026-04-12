@@ -54,13 +54,31 @@ for (let i = 0; i < 8; i++) {
         value: 0, 
         on: false, 
         name: `MIX ${i + 1}`,
-        nameChars: Array(16).fill(' ')
+        nameChars: Array(16).fill(' '),
+        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        eq: {
+            on: false,
+            mode: 0,
+            low: { f: 32, g: 0, q: 20, hpfOn: 0 },
+            lowmid: { f: 60, g: 0, q: 20 },
+            himid: { f: 84, g: 0, q: 20 },
+            high: { f: 108, g: 0, q: 20, lpfOn: 0 }
+        }
     };
     state.buses[i] = { 
         value: 0, 
         on: false, 
         name: `BUS ${i + 1}`,
-        nameChars: Array(16).fill(' ')
+        nameChars: Array(16).fill(' '),
+        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        eq: {
+            on: false,
+            mode: 0,
+            low: { f: 32, g: 0, q: 20, hpfOn: 0 },
+            lowmid: { f: 60, g: 0, q: 20 },
+            himid: { f: 84, g: 0, q: 20 },
+            high: { f: 108, g: 0, q: 20, lpfOn: 0 }
+        }
     };
 }
 
@@ -162,55 +180,51 @@ function updateState(d) {
         }
     }
 
-    // Suporte a EQ (Elemento 32)
-    if (type.includes('kInputEQ/')) {
-        const eqKey = type.split('/')[1];
-        if (eqKey === 'kEQOn') state.channels[channel].eq.on = !!value;
+    // Suporte Universal a EQ/Comp/Gate (Qualquer prefixo)
+    const dynMatch = type.match(/^(kInput|kAUX|kBus|kStereo)(EQ|Comp|Gate)\/(.*)/);
+    if (dynMatch) {
+        const s = getChannelStateById(channel);
+        if (!s) return;
+        const module = dynMatch[2].toLowerCase(); // eq, comp, gate
+        const key = dynMatch[3];
 
-        const map = {
-            'kEQLowF': ['low', 'f'], 'kEQLowG': ['low', 'g'], 'kEQLowQ': ['low', 'q'],
-            'kEQHPFOn': ['low', 'hpfOn'],
-            'kEQLowMidF': ['lowmid', 'f'], 'kEQLowMidG': ['lowmid', 'g'], 'kEQLowMidQ': ['lowmid', 'q'],
-            'kEQHiMidF': ['himid', 'f'], 'kEQHiMidG': ['himid', 'g'], 'kEQHiMidQ': ['himid', 'q'],
-            'kEQHiF': ['high', 'f'], 'kEQHiG': ['high', 'g'], 'kEQHiQ': ['high', 'q'],
-            'kEQLPFOn': ['high', 'lpfOn'],
-            'kEQMode': ['eq', 'mode']
-        };
-
-        if (map[eqKey]) {
-            const [band, param] = map[eqKey];
-            if (band === 'eq') {
-                state.channels[channel].eq[param] = value;
-            } else {
-                state.channels[channel].eq[band][param] = value;
+        if (module === 'eq') {
+            const eqKey = key;
+            if (eqKey === 'kEQOn') s.eq.on = !!value;
+            const map = {
+                'kEQLowF': ['low', 'f'], 'kEQLowG': ['low', 'g'], 'kEQLowQ': ['low', 'q'],
+                'kEQHPFOn': ['low', 'hpfOn'],
+                'kEQLowMidF': ['lowmid', 'f'], 'kEQLowMidG': ['lowmid', 'g'], 'kEQLowMidQ': ['lowmid', 'q'],
+                'kEQHiMidF': ['himid', 'f'], 'kEQHiMidG': ['himid', 'g'], 'kEQHiMidQ': ['himid', 'q'],
+                'kEQHiF': ['high', 'f'], 'kEQHiG': ['high', 'g'], 'kEQHiQ': ['high', 'q'],
+                'kEQLPFOn': ['high', 'lpfOn'],
+                'kEQMode': ['eq', 'mode']
+            };
+            if (map[eqKey]) {
+                const [band, p] = map[eqKey];
+                if (band === 'eq') s.eq[p] = value;
+                else s.eq[band][p] = value;
             }
+        } else if (module === 'gate' && s.gate) {
+            if (key === 'kGateOn') s.gate.on = !!value;
+            if (key === 'kGateThreshold') s.gate.thresh = value;
+            if (key === 'kGateAttack') s.gate.attack = value;
+            if (key === 'kGateRange') s.gate.range = value;
+            if (key === 'kGateHold') s.gate.hold = value;
+            if (key === 'kGateDecay') s.gate.decay = value;
+        } else if (module === 'comp' && s.comp) {
+            if (key === 'kCompOn') s.comp.on = !!value;
+            if (key === 'kCompThreshold') s.comp.thresh = value;
+            if (key === 'kCompRatio') s.comp.ratio = value;
+            if (key === 'kCompAttack') s.comp.attack = value;
+            if (key === 'kCompRelease') s.comp.release = value;
+            if (key === 'kCompGain') s.comp.gain = value;
+            if (key === 'kCompKnee') s.comp.knee = value;
         }
+        return;
     }
 
-    // Suporte a Gate
-    if (type.startsWith('kInputGate/')) {
-        const key = type.split('/')[1];
-        if (key === 'kGateOn') state.channels[channel].gate.on = !!value;
-        if (key === 'kGateThreshold') state.channels[channel].gate.thresh = value;
-        if (key === 'kGateAttack') state.channels[channel].gate.attack = value;
-        if (key === 'kGateRange') state.channels[channel].gate.range = value;
-        if (key === 'kGateHold') state.channels[channel].gate.hold = value;
-        if (key === 'kGateDecay') state.channels[channel].gate.decay = value;
-    }
-
-    // Suporte a Compressor
-    if (type.startsWith('kInputComp/')) {
-        const key = type.split('/')[1];
-        if (key === 'kCompOn') state.channels[channel].comp.on = !!value;
-        if (key === 'kCompThreshold') state.channels[channel].comp.thresh = value;
-        if (key === 'kCompRatio') state.channels[channel].comp.ratio = value;
-        if (key === 'kCompAttack') state.channels[channel].comp.attack = value;
-        if (key === 'kCompRelease') state.channels[channel].comp.release = value;
-        if (key === 'kCompGain') state.channels[channel].comp.gain = value;
-        if (key === 'kCompKnee') state.channels[channel].comp.knee = value;
-    }
-
-    // Suporte a BUS / STEREO
+    // Suporte a BUS / STEREO Assignments (Apenas Inputs)
     if (type.startsWith('kInputBus/k')) {
         if (type === 'kInputBus/kStereo') {
             if (state.channels[channel]) state.channels[channel].stereo = !!value;
@@ -269,5 +283,6 @@ module.exports = {
     setChannelName,
     updateSceneChar,
     getFullSceneName,
-    getState
+    getState,
+    getChannelStateById
 };
