@@ -1,7 +1,8 @@
-
 let macroSelectedChannels = JSON.parse(localStorage.getItem('macro_selected_channels')) || [];
+let tempMacroSelectedChannels = [];
 
 function saveMacroChannels() {
+    macroSelectedChannels = [...tempMacroSelectedChannels];
     localStorage.setItem('macro_selected_channels', JSON.stringify(macroSelectedChannels));
 }
 
@@ -66,17 +67,28 @@ function getMacroFaderHtml() {
 
 function openMacroConfig() {
     const modal = document.getElementById('macroSettingsModal');
-    const grid = document.getElementById('macroSettingsGrid');
     const title = document.getElementById('settingsMacroTitle');
 
     title.innerText = "CONFIGURAÇÃO MACRO FADER";
     title.style.color = "#00ffcc";
     modal.style.borderColor = "#00ffcc";
 
+    // CARREGA CÓPIA TEMPORÁRIA (Para não limpar o storage real se cancelar)
+    tempMacroSelectedChannels = [...macroSelectedChannels];
+    renderMacroGrid();
+
+    // Os botões agora são gerenciados pelo motor central em macros.js
+    modal.style.display = 'flex';
+}
+
+function renderMacroGrid() {
+    const grid = document.getElementById('macroSettingsGrid');
+    if (!grid) return;
     grid.innerHTML = '';
+
     for (let i = 0; i < 32; i++) {
-        const isSelected = macroSelectedChannels.includes(i);
-        const isOnMixer = channelStates[i].on === true; // Status real do canal na mesa
+        const isSelected = tempMacroSelectedChannels.includes(i);
+        const isOnMixer = channelStates[i].on === true;
         const chName = channelStates[i].name || `CH ${i + 1}`;
 
         const btn = document.createElement('button');
@@ -85,11 +97,9 @@ function openMacroConfig() {
         btn.style.height = '50px';
         btn.style.fontSize = '11px';
 
-        // Fundo amarelo apenas se estiver selecionado para a Macro
         btn.style.background = isSelected ? '#ffcc00' : '#333';
         btn.style.color = isSelected ? '#000' : '#fff';
 
-        // Contorno amarelo se o canal estiver ON na mesa (status real)
         if (isOnMixer) {
             btn.style.border = '2px solid #ffcc00';
             btn.style.boxShadow = 'inset 0 0 5px rgba(255, 204, 0, 0.5)';
@@ -99,65 +109,28 @@ function openMacroConfig() {
         }
 
         btn.innerText = `${i + 1}\n${chName}`;
-        btn.onclick = () => toggleMacroChannel(i, btn);
+        btn.onclick = () => toggleMacroChannel(i);
         grid.appendChild(btn);
     }
-
-    // Configuração dos botões do rodapé
-    const saveBtn = document.getElementById('btnMacroSave');
-    if (saveBtn) {
-        saveBtn.onclick = () => {
-            saveMacroChannels();
-            document.getElementById('macroSettingsModal').style.display = 'none';
-            renderMacroFader();
-        };
-    }
-
-    const clearBtn = document.getElementById('btnMacroClear');
-    if (clearBtn) {
-        clearBtn.onclick = clearMacroSelection;
-    }
-
-    modal.style.display = 'flex';
 }
 
 function clearMacroSelection() {
-    // Esvazia o array sem perder a referência
-    macroSelectedChannels.splice(0, macroSelectedChannels.length);
-    // Atualiza visualmente todos os botões da grid
-    const grid = document.getElementById('macroSettingsGrid');
-    const buttons = grid.querySelectorAll('button');
-    buttons.forEach((btn, i) => {
-        const isOnMixer = channelStates[i].on === true;
-        btn.style.background = '#333';
-        btn.style.color = '#fff';
-        btn.style.border = isOnMixer ? '2px solid #ffcc00' : '1px solid #444';
-        btn.classList.remove('macro-ch-selected');
-    });
+    // Limpa apenas o temporário
+    tempMacroSelectedChannels = [];
+    renderMacroGrid();
 }
 
 window.saveMacroChannels = saveMacroChannels;
 window.clearMacroSelection = clearMacroSelection;
 
-function toggleMacroChannel(i, btn) {
-    const idx = macroSelectedChannels.indexOf(i);
-    const isOnMixer = channelStates[i].on === true;
-
+function toggleMacroChannel(i) {
+    const idx = tempMacroSelectedChannels.indexOf(i);
     if (idx > -1) {
-        macroSelectedChannels.splice(idx, 1);
-        btn.style.background = '#333';
-        btn.style.color = '#fff';
-        // Mantém a borda amarela se ainda estiver ON na mesa, senão volta pro normal
-        btn.style.border = isOnMixer ? '2px solid #ffcc00' : '1px solid #444';
-        btn.classList.remove('macro-ch-selected');
+        tempMacroSelectedChannels.splice(idx, 1);
     } else {
-        macroSelectedChannels.push(i);
-        btn.style.background = '#ffcc00';
-        btn.style.color = '#000';
-        // Ao selecionar para a macro, garantimos o destaque
-        btn.style.border = '2px solid #ffcc00';
-        btn.classList.add('macro-ch-selected');
+        tempMacroSelectedChannels.push(i);
     }
+    renderMacroGrid();
 }
 
 let macroNudgeInterval = null;
@@ -209,8 +182,5 @@ function renderMacroFader() {
     if (typeof initUI === 'function') initUI();
 }
 
-// listener para quando a página carrega pela primeira vez
 window.addEventListener('load', renderMacroFader);
-
-// No caso de redimensionamento
 window.addEventListener('resize', renderMacroFader);

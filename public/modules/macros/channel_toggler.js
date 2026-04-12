@@ -26,13 +26,16 @@
     // 2. Configuração: Tabela de canais da casa atual
     async function onConfigure(slotIndex) {
         await loadFullConfig(); 
+        renderUI(slotIndex);
+    }
+
+    async function renderUI(slotIndex) {
         const grid = document.getElementById('macroSettingsGrid');
         const title = document.getElementById('settingsMacroTitle');
         if (!grid) return;
 
         title.innerText = `Configurar Toggler - Slot ${slotIndex + 1}`;
-        grid.innerHTML = '<p style="color:#666; font-size:11px; text-align:center; width:100%;">Carregando nomes da casa...</p>';
-
+        
         let namesMap = {};
         try { const res = await fetch('/api/names'); namesMap = await res.json(); } catch (e) {}
 
@@ -50,8 +53,9 @@
             btn.innerHTML = `<span style="display:block; font-size:8px; opacity:0.5;">${i+1}</span> ${chName}`;
             btn.onclick = () => {
                 const idx = allSlotsConfig[slotKey].indexOf(i);
-                if (idx === -1) { allSlotsConfig[slotKey].push(i); btn.style.background='#2e7d32'; } 
-                else { allSlotsConfig[slotKey].splice(idx, 1); btn.style.background='#333'; }
+                if (idx === -1) { allSlotsConfig[slotKey].push(i); } 
+                else { allSlotsConfig[slotKey].splice(idx, 1); }
+                renderUI(slotIndex);
             };
             grid.appendChild(btn);
         }
@@ -69,7 +73,16 @@
         } catch (e) { alert("Erro ao salvar toggler."); }
     }
 
-    // 4. Deleta daquela casa específica
+    // 4. Limpeza da seleção
+    async function onClear(slotIndex) {
+        const slotKey = `slot_${slotIndex}`;
+        if (allSlotsConfig[slotKey]) {
+            allSlotsConfig[slotKey] = [];
+            renderUI(slotIndex);
+        }
+    }
+
+    // 5. Deleta daquela casa específica
     async function onDelete(slotIndex) {
         await loadFullConfig(); 
         const slotKey = `slot_${slotIndex}`;
@@ -91,6 +104,6 @@
 
     window.registerMacro(ID, {
         name: "Toggler", color: "#6a1b9a",
-        execute, onConfigure, onSave, onDelete
+        execute, onConfigure, onSave, onClear, onDelete
     });
 })();

@@ -357,11 +357,12 @@ window.openMacroSettings = function() {
         document.getElementById('macroContextModal').style.display = 'none'; 
         document.getElementById('macroSettingsModal').style.display = 'flex'; 
         
-        // Garante que o botão SALVAR execute o onSave desta macro
+        // Garante que os botões SALVAR e LIMPAR executem as funções centralizadas
         const saveBtn = document.getElementById('btnMacroSave');
-        if (saveBtn) {
-            saveBtn.onclick = () => window.saveCurrentMacroSettings();
-        }
+        if (saveBtn) saveBtn.onclick = () => window.saveCurrentMacroSettings();
+
+        const clearBtn = document.getElementById('btnMacroClear');
+        if (clearBtn) clearBtn.onclick = () => window.clearCurrentMacroSettings();
         
         config.onConfigure(activeSlotIndex); 
     }
