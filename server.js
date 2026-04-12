@@ -568,6 +568,7 @@ async function triggerSync(targetSocket = null, forceNames = false) {
     const nameDelay = config.sync_name_delay_ms || 45;
 
     isSyncing = true;
+    io.emit('syncStatus', true);
     isFullySynced = false; // Reseta a flag para pausar meters
     console.log(`🔄 Sincronizando (Delay: ${delay}ms / Nomes: ${nameDelay}ms)...`);
     try {
@@ -686,6 +687,18 @@ async function triggerSync(targetSocket = null, forceNames = false) {
             console.log("📝 [SYNC] Iniciando busca obrigatória de nomes na mesa (1 vez por boot)...");
             await new Promise(r => setTimeout(r, 2000));
 
+            // [SCENE SYNC] - Sincroniza o número e nome da cena atual (Relocado para estabilidade)
+            console.log("📝 [SYNC] Solicitando Número e Nome da Cena...");
+            midiEngine.send(protocol.buildRequest('kSceneNumber', 0)); 
+            await new Promise(r => setTimeout(r, 300));
+            midiEngine.send(protocol.buildRequest('kSceneNumberFallback', 0)); 
+            await new Promise(r => setTimeout(r, 500)); 
+
+            for (let c = 0; c < 16; c++) {
+                midiEngine.send(protocol.buildRequest(`kSceneTitle/kTitle${c + 1}`, 0));
+                await new Promise(r => setTimeout(r, 60)); // 60ms delay para cada letra (extremamente seguro)
+            }
+
             for (let i = 0; i < 32; i++) {
                 stateManager.setChannelName(i, "");
 
@@ -715,6 +728,7 @@ async function triggerSync(targetSocket = null, forceNames = false) {
 
     } finally {
         isSyncing = false;
+        io.emit('syncStatus', false);
     }
 }
 
@@ -766,6 +780,7 @@ io.on('connection', (socket) => {
     const currentConfig = loadConfig();
     socket.emit('portsList', { available: midiEngine.getAvailablePorts(), savedConfig: currentConfig });
     socket.emit('sync', stateManager.getState());
+    socket.emit('syncStatus', isSyncing);
     socket.emit('connectionState', { connected: isConnected });
 
     socket.on('requestConnect', async (data) => {

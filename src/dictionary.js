@@ -1,4 +1,6 @@
 const COMMAND_BYTES = {
+  'kSceneNumber': [127, 1, 0, 0],
+  'kSceneNumberFallback': [13, 4, 10, 0],
   'kSceneTitle/kTitle1': [127, 1, 1, 0],
   'kSceneTitle/kTitle2': [127, 1, 1, 1],
   'kSceneTitle/kTitle3': [127, 1, 1, 2],

@@ -11,6 +11,12 @@
 
 <body>
 
+    <!-- Sync Shield Overlay -->
+    <div id="syncShield" class="sync-shield" style="display: none;">
+        <div class="sync-loader"></div>
+        <span>SINCRONIZANDO...</span>
+    </div>
+
     <!-- Splash Screen Overlay -->
     <div id="splashScreen" class="splash-overlay">
         <!-- Botão de Fullscreen para Splash -->
@@ -73,7 +79,8 @@
         <!-- Navegação Principal (Config/Sync) -->
         <div id="mainNav" style="display: flex; flex-direction: column; width: 100%; flex: 1; align-items: center;">
             <div id="scn" class="color-green font-13-bold"
-                style="text-align: center; width: 100%; letter-spacing: 1px; margin-bottom: 20px;">01V96</div>
+                style="text-align: center; width: 100%; letter-spacing: 1px; margin-bottom: 2px;">01V96</div>
+            <div id="scene-info" style="font-size: 10px; color: #aaa; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; width: 100%; text-align: center;">---</div>
             <button class="side-btn btn-config"
                 onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
             <button id="btnOuts" class="side-btn btn-outs" onclick="toggleOuts()">OUTS</button>

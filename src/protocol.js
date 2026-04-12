@@ -158,9 +158,7 @@ function parseIncoming(message) {
             }
         }
 
-        // 🚨 [CRITICAL SYNC LOGIC] - NOMES DE CANAIS (YAMAHA 01V96 PADRÃO)
-        // Mantemos o limite de 19 (16 caracteres) para compatibilidade total com o protocolo da mesa.
-        // O controle visual de 4 caracteres deve ser feito apenas no Front-end.
+        // 🚨 [CRITICAL SYNC LOGIC] - NOMES DE CANAIS E CENAS (YAMAHA 01V96 PADRÃO)
         if (message[4] === 13 && message[5] === 2 && element === 4) {
             if (parameter >= 4 && parameter <= 19) {
                 const charIndex = parameter - 4;
@@ -172,6 +170,33 @@ function parseIncoming(message) {
                     char: String.fromCharCode(charCode)
                 };
             }
+        }
+
+        // Suporte a Cena (Section 127 - Group 1)
+        if (message[4] === 127 && message[5] === 1) {
+            // Número da Cena (Element 0)
+            if (element === 0 && parameter === 0) {
+                const val = dataBytes[dataBytes.length - 1];
+                console.log(`🎯 [SCENE SYNC] Número recebido (Sec 127): ${val}`);
+                return { type: 'kSceneNumber', value: val };
+            }
+            // Nome da Cena (Element 1)
+            if (element === 1 && parameter >= 0 && parameter <= 15) {
+                const char = String.fromCharCode(dataBytes[dataBytes.length - 1] || 32);
+                console.log(`📝 [SCENE CHAR] Idx:${parameter} Char:${char}`);
+                return {
+                    type: 'updateSceneChar',
+                    charIndex: parameter,
+                    char: char
+                };
+            }
+        }
+
+        // Suporte a Cena (Número - Fallback Section 13)
+        if (message[4] === 13 && message[5] === 4 && element === 10 && parameter === 0) {
+            const val = dataBytes[dataBytes.length - 1];
+            console.log(`🎯 [SCENE SYNC] Número recebido (Sec 13): ${val}`);
+            return { type: 'kSceneNumber', value: val };
         }
 
         // Input Faders / On / Solo / Name / Attenuator etc
@@ -209,6 +234,12 @@ function parseIncoming(message) {
         if (message[4] === 13 && message[5] === 2 && element === 1 && parameter === 0) {
             return { type: 'kChannelInput/kChannelIn', channel, value: CONVERTERS.bytesToFader(dataBytes), raw: message };
         }
+    }
+
+    // [DEBUG LOG FOR UNHANDLED SCENE/PARAM MESSAGES]
+    if ((message[4] === 127 || message[4] === 13) && message[5] !== 2) {
+        const hex = Buffer.from(message).toString('hex').toUpperCase();
+        console.log(`🎯 [DEBUG MIDI] Sec:${message[4]} Grp:${message[5]} Elm:${element} Prm:${parameter} Hex:${hex}`);
     }
 
     // Debug capture for unparsed messages (excluding meters and heartbeat)

@@ -1,4 +1,5 @@
 const state = {
+    sceneNumber: 0,
     sceneChars: Array(16).fill(' '),
     sceneName: "01V96",
     channels: {},
@@ -56,6 +57,16 @@ for (let i = 0; i < 8; i++) {
 function updateState(d) {
     if (!d) return;
     const { type, channel, value } = d;
+
+    // Suporte a Cena
+    if (type === 'kSceneNumber') {
+        state.sceneNumber = value;
+        return;
+    }
+    if (type === 'updateSceneChar') {
+        updateSceneChar(d.charIndex, d.char);
+        return;
+    }
 
     // Suporte ao Master (Stereo)
     if (channel === 'master' || type.startsWith('kStereo')) {

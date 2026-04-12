@@ -464,8 +464,8 @@ function initUI() {
         masterHtml = createChannelStrip(0, true);
     }
 
-    // Injetar Macro Fader na string HTML se o módulo estiver carregado
-    if (typeof getMacroFaderHtml === 'function') {
+    // Injetar Macro Fader na string HTML se o módulo estiver carregado e estivermos EXCLUSIVAMENTE na tela principal (CH 1-32)
+    if (typeof getMacroFaderHtml === 'function' && !musicianMode && !outsMode && !technicianMixMode && activeConfigChannel === null) {
         html += '<div style="flex: 0 0 55px !important; width: 55px !important; background: transparent !important;"></div>';
         html += getMacroFaderHtml();
         html += '<div style="flex: 0 0 55px !important; width: 55px !important; background: transparent !important;"></div>';

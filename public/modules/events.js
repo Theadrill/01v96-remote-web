@@ -61,6 +61,9 @@ function closeChannelConfig() {
 
     // Reseta cores dos cards
     document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
+
+    activeConfigChannel = null;
+    initUI();
 }
 
 function toggleState(type, ch) {

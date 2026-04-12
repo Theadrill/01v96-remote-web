@@ -2382,3 +2382,44 @@ body.layout-horizontal .macro-fader-card {
         margin-left: 20px !important;
     }
 }
+
+/* Escudo de Sincronização (Versão Light para performance) */
+.sync-shield {
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: #0f0;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10002;
+    border: 2px solid #0f0;
+    animation: slideDownSync 0.4s ease-out;
+    pointer-events: none;
+}
+
+@keyframes slideDownSync {
+    from { top: -60px; opacity: 0; }
+    to { top: 25px; opacity: 1; }
+}
+
+.sync-loader {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 255, 0, 0.2);
+    border-top: 3px solid #0f0;
+    border-radius: 50%;
+    animation: spinSync 1s linear infinite;
+}
+
+@keyframes spinSync {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

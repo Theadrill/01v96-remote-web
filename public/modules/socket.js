@@ -4,6 +4,13 @@ let faderCardsCache = null;
 // Este módulo depende do objeto 'socket' global (definido em globals.js).
 // Os handlers 'update', 'dynamicsState' e 'meterData' garantem que a UI reflita a mesa física em tempo real.
 // Se quebrar essa estrutura de listeners, a sincronia bidirecional da dynamics/faders irá parar de funcionar.
+
+socket.on('syncStatus', (isActive) => {
+    const shield = document.getElementById('syncShield');
+    if (shield) {
+        shield.style.display = isActive ? 'flex' : 'none';
+    }
+});
 socket.on('update', (d) => {
     const isTrue = (d.value === 1 || d.value === true);
     if (d.channel === 'master' || d.type.startsWith('kStereo')) {
@@ -132,7 +139,27 @@ socket.on('update', (d) => {
             }
         }
     }
+
+    // Suporte a Cena (Echo da mesa)
+    if (d.type === 'kSceneNumber') {
+        window.currentSceneNumber = d.value;
+        updateSceneDisplay();
+    }
+    if (d.type === 'updateSceneChar') {
+        if (!window.sceneChars) window.sceneChars = Array(16).fill(' ');
+        window.sceneChars[d.charIndex] = d.char;
+        window.currentSceneName = window.sceneChars.join('').trim();
+        updateSceneDisplay();
+    }
 });
+
+function updateSceneDisplay() {
+    const el = document.getElementById('scene-info');
+    if (!el) return;
+    const num = String(window.currentSceneNumber || 0).padStart(2, '0');
+    const name = window.currentSceneName || "---";
+    el.innerText = `CENA: ${num} - ${name}`;
+}
 
 socket.on('updateName', (data) => {
     const { channel, name } = data;
@@ -261,6 +288,13 @@ socket.on('sync', (s) => {
     if (s.master) {
         Object.assign(masterState, s.master);
         updateUI('master', s.master.value, s.master.on, undefined);
+    }
+
+    if (s.sceneName) {
+        window.currentSceneName = s.sceneName;
+        window.currentSceneNumber = s.sceneNumber || 0;
+        if (s.sceneChars) window.sceneChars = s.sceneChars;
+        updateSceneDisplay();
     }
 });
 
