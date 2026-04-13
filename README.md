@@ -74,6 +74,8 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 - [x] Ninja Sync (Auto-Git push/pull).
 - [ ] Implementação de Meters GPU-Accelerated (Curtain Rendering).
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
+- [ ] Fazer o meter do master funcionar.
+
 
 ---
 
