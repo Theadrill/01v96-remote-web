@@ -42,6 +42,12 @@ async function detectCurrentPreset() {
         const chk = document.getElementById('chkSharedSync');
         if (chk) chk.checked = syncState;
 
+        /**
+         * FIXME: [FUTURE UI IMPLEMENTATION]
+         * Se o Auto-Sync estiver ligado mas o Git falhar no check (server-side),
+         * devemos desabilitar o checkbox e mostrar um botão 'LOGIN GITHUB / SETUP'.
+         */
+
         updatePresetUI();
     } catch (e) { currentPreset = 'default'; updatePresetUI(); }
 }

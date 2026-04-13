@@ -146,6 +146,16 @@ app.get('/api/macros', (req, res) => {
 });
 
 // --- LÓGICA NINJA: AUTO-GIT SYNC (DEBOUNCED) ---
+
+/** 
+ * FIXME: [FUTURE IMPLEMENTATION] 
+ * Implementar Assistente de Sync para novos usuários (Wizard).
+ * Precisamos de:
+ * 1. GET /api/sync/check - Verifica integridade do Git e Permissões.
+ * 2. POST /api/sync/setup - Configura PAT (Token) e troca URL do Remote.
+ * Ref: docs/github_sync_implementation_plan.md
+ */
+
 let gitSyncTimer = null;
 let gitSyncQueue = new Set();
 
@@ -170,6 +180,12 @@ function triggerGitSync() {
         console.log(`☁️  [NINJA SYNC] =======================================\n`);
     });
 }
+
+/**
+ * TODO: Criar endpoints de health-check do Git aqui futuramente
+ * Para alimentar o 'GitHub Sync Wizard' no frontend.
+ */
+
 app.get('/api/macros/slots', (req, res) => {
     const preset = req.query.preset;
     const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
