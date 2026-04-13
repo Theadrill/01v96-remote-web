@@ -88,5 +88,5 @@ Contribuições são o que fazem a comunidade open source um lugar incrível par
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 ---
-**Desenvolvido por Rodrigo (Theadrill)**  
+**Desenvolvido por Rodrigo (Theadrill) usando Antigravity**  
 *Transformando o controle de áudio ao vivo em uma experiência moderna e conectada.*
