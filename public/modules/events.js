@@ -258,45 +258,100 @@ function commitFaderChange(ch, v) {
 }
 
 function faderInput(e, ch) {
-    if (!e.isTrusted || !appReady) return;
+    if (!appReady) return;
     commitFaderChange(ch, parseInt(e.target.value));
 }
 
-function handleWheelFader(e, ch) {
+function handleWheelFader(e, ch, auxIdx) {
     if (layoutMode !== 'desktop') return;
 
     // Interromper scroll da tela
     e.preventDefault();
     e.stopPropagation();
 
-    // Incremento de volume
-    const delta = e.deltaY < 0 ? 10 : -10;
+    // Determinar se estamos na "Tela Principal" (Visão de canais técnica, sem modais abertos)
+    const isMainScreen = (activeConfigChannel === null && !musicianMode && !outsMode && !technicianMixMode);
+    const dir = e.deltaY < 0 ? 1 : -1;
 
-    let currentVal = 0;
-    const isMaster = ch === 'master';
-    const stateRef = isMaster ? masterState : (typeof ch === 'string' ? (ch.startsWith('m') ? mixesState[ch.substring(1)] : busesState[ch.substring(1)]) : channelStates[ch]);
-
-    if (stateRef) {
-        if ((musicianMode || technicianMixMode) && typeof ch === 'number') currentVal = stateRef[`aux${activeMix}`] || 0;
-        else currentVal = stateRef.value || 0;
+    // Caso 1: Fader de Aux Send (dentro de renderAuxs ou sidebar de mix)
+    if (auxIdx !== undefined) {
+        const state = getChannelStateById(ch);
+        if (!state) return;
+        const currentRaw = state[`aux${auxIdx}`] || 0;
+        // Sempre 0.5dB para envios auxiliares/músico conforme pedido ("0.5db nos demais")
+        const nRaw = getSteppedRaw(currentRaw, dir, 0.5);
+        
+        if (typeof updateAuxManual === 'function') {
+            updateAuxManual(ch, auxIdx, nRaw);
+            socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });
+        }
+        return;
     }
 
-    let newVal = currentVal + delta;
+    // Caso 2: Fader de Canal (Input, Mix, Bus ou Master)
+    let currentVal = 0;
+    const isMaster = ch === 'master';
+    const stateRef = getChannelStateById(ch);
+
+    if (stateRef) {
+        if ((musicianMode || technicianMixMode) && typeof ch === 'number') {
+            currentVal = stateRef[`aux${activeMix}`] || 0;
+        } else {
+            currentVal = stateRef.value || 0;
+        }
+    }
+
+    let newVal;
+    if (isMainScreen) {
+        // "Fine tuning" na tela principal: 2 unidades raw (~0.2% do fader)
+        newVal = currentVal + (dir * 2);
+    } else {
+        // 0.5dB de passo nos demais casos (Modais, Modo Músico, etc)
+        newVal = getSteppedRaw(currentVal, dir, 0.5);
+    }
+
     if (newVal < 0) newVal = 0;
     if (newVal > 1023) newVal = 1023;
 
     commitFaderChange(ch, newVal);
 }
 
-// Bloqueio AGRESSIVO de scroll por roda do mouse no modo Desktop 
-// para priorizar controle de faders e permitir rolagem horizontal apenas por clique-arrasto ou barra
+// Bloqueio de scroll por roda do mouse no modo Desktop e manipulação global de sliders
 window.addEventListener('wheel', (e) => {
-    if (layoutMode === 'desktop') {
-        const area = document.getElementById('faders-container');
-        if (area && (area === e.target || area.contains(e.target))) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+    if (layoutMode !== 'desktop') return;
+
+    // NOVO: Suporte Universal para TODOS os Sliders (EQ, Dynamics, etc)
+    const input = e.target.closest('input[type="range"]');
+    if (input) {
+        // Se o slider já for um fader gerido pelo handleWheelFader (detectado via onwheel no container pai), 
+        // deixamos o evento propagar normalmente para ser capturado lá.
+        const parentWithWheel = input.parentElement.closest('[onwheel]');
+        if (parentWithWheel && parentWithWheel.getAttribute('onwheel').includes('handleWheelFader')) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const dir = e.deltaY < 0 ? 1 : -1;
+        const step = parseFloat(input.step) || 1;
+        const currentVal = parseFloat(input.value) || 0;
+        const min = parseFloat(input.min) || 0;
+        const max = parseFloat(input.max) || 100;
+
+        let newVal = currentVal + (dir * step);
+        if (newVal < min) newVal = min;
+        if (newVal > max) newVal = max;
+
+        input.value = newVal;
+        // Dispara o evento de input para que o módulo dono do slider (EQ, Comp, etc) processe a lógica
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        return;
+    }
+
+    // Bloqueio de scroll na área dos faders (permitindo apenas horizontal via grab)
+    const area = document.getElementById('faders-container');
+    if (area && (area === e.target || area.contains(e.target))) {
+        e.preventDefault();
+        e.stopPropagation();
     }
 }, { passive: false });
 

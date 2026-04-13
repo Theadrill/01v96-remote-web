@@ -1036,7 +1036,7 @@ window.pasteEQ = function(ch) {
 };
 
 window.eqGainInput = function(e) {
-    if (!e.isTrusted || !appReady) return;
+    if (!appReady) return;
     if (selectedBandIdx === -1) return;
     const ch = activeConfigChannel;
     const b = eqBands[selectedBandIdx];
@@ -1072,7 +1072,7 @@ window.eqGainInput = function(e) {
 };
 
 window.eqFreqInput = function(e) {
-    if (!e.isTrusted || !appReady) return;
+    if (!appReady) return;
     if (selectedBandIdx === -1) return;
     const ch = activeConfigChannel;
     const b = eqBands[selectedBandIdx];
@@ -1234,7 +1234,7 @@ window.updateATTUI = function(value) {
 }
 
 window.eqATTInput = function(e) {
-    if (!e.isTrusted || !appReady) return;
+    if (!appReady) return;
     const ch = activeConfigChannel;
     const rawVal = parseInt(e.target.value);
     const dbValue = rawVal / 10;

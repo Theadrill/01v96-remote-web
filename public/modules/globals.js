@@ -75,6 +75,13 @@ function dbToRaw(db) {
  */
 function getChannelStateById(id) {
     if (id === 'master' || id === 52) return masterState;
+
+    // Se for string no formato 'm0' (Mix) ou 'b0' (Bus)
+    if (typeof id === 'string') {
+        if (id.startsWith('m')) return mixesState[parseInt(id.substring(1))];
+        if (id.startsWith('b')) return busesState[parseInt(id.substring(1))];
+    }
+
     if (id >= 0 && id <= 31) return channelStates[id];
     if (id >= 36 && id <= 43) return mixesState[id - 36];
     if (id >= 44 && id <= 51) return busesState[id - 44];
@@ -86,6 +93,12 @@ function getChannelStateById(id) {
  */
 function getChannelParamPrefix(id) {
     if (id === 'master' || id === 52) return 'kStereo';
+    
+    if (typeof id === 'string') {
+        if (id.startsWith('m')) return 'kAUX';
+        if (id.startsWith('b')) return 'kBus';
+    }
+
     if (id >= 0 && id <= 31) return 'kInput';
     if (id >= 36 && id <= 43) return 'kAUX';
     if (id >= 44 && id <= 51) return 'kBus';
@@ -113,7 +126,16 @@ function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
     if (nextDb > 10) nextDb = 10;
     if (nextDb < -138) return 0;
 
-    return dbToRaw(nextDb);
+    let nRaw = dbToRaw(nextDb);
+
+    // 🚨 CORREÇÃO: Se nRaw não mudou mas houve direção, força mudança de pelo menos 1 unidade raw
+    // Isso evita o "travamento" em áreas de baixa resolução da curva (ex: perto de -∞)
+    if (nRaw === currentRaw) {
+        if (isUp && currentRaw < 1023) nRaw = currentRaw + 1;
+        else if (!isUp && currentRaw > 0) nRaw = currentRaw - 1;
+    }
+
+    return nRaw;
 }
 
 // Mapeamento Piecewise Linear para Dynamics (Gate e Compressor)

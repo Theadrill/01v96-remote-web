@@ -122,7 +122,7 @@ function nudgeAuxLevel(ch, auxIdx, dir) {
 }
 
 function auxLevelInput(e, ch, auxIdx) {
-    if (!e.isTrusted || !appReady) return;
+    if (!appReady) return;
     const val = parseInt(e.target.value);
     updateAuxManual(ch, auxIdx, val);
     socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: val });
