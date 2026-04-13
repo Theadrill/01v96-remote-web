@@ -157,8 +157,8 @@ function triggerGitSync() {
     console.log(`\n☁️  [NINJA SYNC] =======================================`);
     console.log(`☁️  [NINJA SYNC] Sincronizando: ${filesToSync}`);
     
-    // Sequência Master Blaster: Add -> Commit -> Pull (Rebase) -> Push
-    const cmd = `git add ${filesToSync} && git commit -m "auto-sync: profiles updated from ${hostname}" && git pull --rebase && git push`;
+    // Sequência Master Blaster: Add -> Commit -> Pull (Rebase + Autostash) -> Push
+    const cmd = `git add ${filesToSync} && git commit -m "auto-sync: profiles updated from ${hostname}" && git pull --rebase --autostash && git push`;
 
     exec(cmd, { cwd: __dirname }, (error, stdout, stderr) => {
         gitSyncQueue.clear();
@@ -231,6 +231,7 @@ app.post('/api/macros/slots', express.json(), (req, res) => {
             
             if (gitSyncTimer) clearTimeout(gitSyncTimer);
             gitSyncTimer = setTimeout(triggerGitSync, 10000); 
+            console.log(`☁️  [NINJA SYNC] Mudança em [${preset}]. Sincronização automática agendada para daqui a 10s...`);
         }
         res.json({ success: true, preset, synced: syncShared });
     } catch (e) { res.status(500).json({ error: "Erro ao salvar perfil" }); }
@@ -259,6 +260,18 @@ app.post('/api/macros/swap', express.json(), (req, res) => {
 
     handleSwap(path.join(macrosDir, 'local'));
     handleSwap(path.join(macrosDir, 'shared'));
+
+    // --- CORREÇÃO: Ativa o Gatilho Ninja no SWAP também ---
+    const sharedPath = path.join(macrosDir, 'shared', `profile_${preset}.json`);
+    if (fs.existsSync(sharedPath)) {
+        const relativeSharedPath = path.relative(__dirname, sharedPath);
+        gitSyncQueue.add(relativeSharedPath);
+        
+        if (gitSyncTimer) clearTimeout(gitSyncTimer);
+        gitSyncTimer = setTimeout(triggerGitSync, 10000); 
+        console.log(`☁️  [NINJA SYNC] Mudança detects no SWAP de [${preset}]. Sync agendado (10s)...`);
+    }
+
     res.json({ success: true });
 });
 
