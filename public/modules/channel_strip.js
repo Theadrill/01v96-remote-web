@@ -426,6 +426,12 @@ function initUI() {
     if (typeof resetFaderCache === 'function') resetFaderCache();
     let html = '';
 
+    // 🔒 SEGURANÇA: Apenas o Técnico vê botões de Macros
+    const macroButtons = document.querySelectorAll('.btn-macros');
+    macroButtons.forEach(btn => {
+        btn.style.display = musicianMode ? 'none' : 'flex';
+    });
+
     const sidebar = document.querySelector('.sidebar');
     if (musicianMode) {
         // Remove banner de topo legado se ainda existir
@@ -457,24 +463,32 @@ function initUI() {
         container.style.marginTop = "0";
     } else {
         sidebar.classList.remove('sidebar-musician');
-        // Mantém o menu principal visível para técnicos, mas esconde em technicianMixMode
-        document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode) ? 'none' : 'flex';
-        // MOSTRA o painel de contexto do OUTS ou Technico Mix
-        document.getElementById('outsContext').style.display = (outsMode && !musicianMode) ? 'flex' : 'none';
+        
+        // CORREÇÃO: Respeita o modo de configuração de canal ao atualizar a sidebar
+        const isConfig = activeConfigChannel !== null;
+        
+        // Mantém o menu principal visível para técnicos, mas esconde em technicianMixMode ou Config do Canal
+        document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode || isConfig) ? 'none' : 'flex';
+        // Mostra navegação de canal APENAS se estiver configurando
+        document.getElementById('chNav').style.display = isConfig ? 'flex' : 'none';
+        // Mostra contexto do canal APENAS se estiver configurando
+        document.getElementById('chContext').style.display = isConfig ? 'flex' : 'none';
+
+        // MOSTRA o painel de contexto do OUTS ou Technico Mix (apenas se não estiver configurando canal)
+        document.getElementById('outsContext').style.display = (outsMode && !musicianMode && !isConfig) ? 'flex' : 'none';
 
         // Novo container de contexto para Técnico Mix
         const tmContext = document.getElementById('techMixContext');
-        if (tmContext) tmContext.style.display = technicianMixMode ? 'flex' : 'none';
+        if (tmContext) tmContext.style.display = (technicianMixMode && !isConfig) ? 'flex' : 'none';
 
         document.getElementById('sideFooter').style.display = 'flex';
-        document.getElementById('chContext').style.display = 'none';
 
         const mExit = document.getElementById('musicianExitBtn');
-        if (mExit) mExit.style.display = 'none';
+        if (mExit) mExit.style.display = 'none'; // Sempre escondido no modo técnico aqui
 
-        // Esconde apenas o desconectar técnico quando estiver na visão de saídas ou editando mix
+        // Esconde apenas o desconectar técnico quando estiver na visão de saídas, editando mix ou configurando canal
         const tExit = document.getElementById('tecnicoExitBtn');
-        if (tExit) tExit.style.display = (outsMode || musicianMode || technicianMixMode) ? 'none' : 'block';
+        if (tExit) tExit.style.display = (outsMode || musicianMode || technicianMixMode || isConfig) ? 'none' : 'block';
 
         const mInd = document.getElementById('foneIndicator');
         if (mInd && !technicianMixMode) mInd.remove();

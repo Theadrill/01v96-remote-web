@@ -1,77 +1,68 @@
 function renderAuxs(ch) {
     const body = document.querySelector('.ch-modal-body');
     
-    // 01V96: Saídas não têm Aux Sends (exceto para Matrix, que é outro módulo)
-    if (ch >= 36) {
+    // 01V96: Buses (44-51) e Master (52) realmente não possuem envios.
+    if (ch >= 44) {
         body.innerHTML = `
             <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#666; padding:20px; text-align:center;">
-                <div style="font-size:48px; margin-bottom:15px; opacity:0.3;">
-                    <i class="fas fa-project-diagram"></i>
-                </div>
-                <div style="font-size:14px; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">
-                    Sends Não Disponíveis
-                </div>
-                <div style="font-size:12px; margin-top:5px; opacity:0.7;">
-                    Canais de saída não possuem barramentos de envio auxiliares.
-                </div>
-            </div>
-        `;
+                <div style="font-size:48px; margin-bottom:15px; opacity:0.3;"><i class="fas fa-project-diagram"></i></div>
+                <div style="font-size:14px; font-weight:bold; text-transform:uppercase;">Sends Não Disponíveis</div>
+            </div>`;
         return;
     }
 
     let html = '';
-    const state = getChannelStateById(ch);
+    
+    // --- MODO 1: MIXER DO BARRAMENTO (Se clicou em MIX 1-8, mostra os 32 canais enviando para ele) ---
+    if (ch >= 36 && ch <= 43) {
+        const auxIdx = ch - 35; // Mix 1 (36) vira Aux 1
+        for (let i = 0; i < 32; i++) {
+            const state = getChannelStateById(i);
+            const currentVal = (state && state[`aux${auxIdx}`]) || 0;
+            const isOn = (state && state[`aux${auxIdx}On`]) || false;
+            const chName = (state && state.name && state.name.trim() !== "") ? state.name : `CH ${i+1}`;
 
-    for (let i = 1; i <= 8; i++) {
-        const currentVal = (state && state[`aux${i}`]) || 0;
-        const isOn = (state && state[`aux${i}On`]) || false;
-
-        if (layoutMode === 'desktop') {
-            html += createDesktopStrip({
+            const config = {
                 id: i,
-                elId: `aux_card_${i}`,
-                evtCh: `${ch}, ${i}`,
-                title: `AUX ${i}`,
-                name: `AUX ${i}`,
-                customClass: "fader-group-aux",
-                onAction: `toggleAuxOn(${ch}, ${i})`,
-                onWheelAction: "auxWheelInput",
-                onInputAction: "auxLevelInput",
-                onNudgeStartAction: "startAuxNudge",
-                onNudgeStopAction: "stopAuxNudge",
-                type: "aux",
-                val: currentVal,
-                dbLabel: rawToDb(currentVal),
-                isOn: isOn,
-                ids: { 
-                    f: `aux_f_${i}`, 
-                    v: `aux_v_${i}`, 
-                    on: `aux_on_${i}`, 
-                    label: `aux_label_${i}`,
-                    name: `aux_name_display_${i}` 
-                }
-            });
-        } else {
-            html += createMobileStrip({
-                id: i,
-                title: `AUX ${i}`,
-                name: `AUX ${i}`,
-                customClass: "fader-group-aux",
-                onAction: `toggleAuxOn(${ch}, ${i})`,
+                title: chName,
+                name: chName,
+                customClass: "fader-group-aux-send",
+                onAction: `toggleAuxOn(${i}, ${auxIdx})`,
                 onInputAction: "auxLevelInput",
                 onNudgeStartAction: "startAuxNudge",
                 onNudgeStopAction: "stopAuxNudge",
                 val: currentVal,
                 dbLabel: rawToDb(currentVal),
                 isOn: isOn,
+                evtCh: `${i}, ${auxIdx}`,
+                ids: { f: `aux_f_ch_${i}`, v: `aux_v_ch_${i}`, on: `aux_on_ch_${i}`, name: `aux_name_ch_${i}` }
+            };
+            html += (layoutMode === 'desktop') ? createDesktopStrip(config) : createMobileStrip(config);
+        }
+    } 
+    // --- MODO 2: ENVIOS DO CANAL (Se clicou em CH 1-32, mostra os 8 botões de Aux) ---
+    else {
+        const state = getChannelStateById(ch);
+        for (let i = 1; i <= 8; i++) {
+            const currentVal = (state && state[`aux${i}`]) || 0;
+            const isOn = (state && state[`aux${i}On`]) || false;
+            
+            const config = {
+                id: i,
+                title: `AUX ${i}`,
+                name: `AUX ${i}`,
+                customClass: "fader-group-aux",
+                onAction: `toggleAuxOn(${ch}, ${i})`,
+                onInputAction: "auxLevelInput",
+                onNudgeStartAction: "startAuxNudge",
+                onNudgeStopAction: "stopAuxNudge",
+                val: currentVal,
+                dbLabel: rawToDb(currentVal),
+                isOn: isOn,
                 evtCh: `${ch}, ${i}`,
-                ids: {
-                    f: `aux_f_${i}`,
-                    v: `aux_v_${i}`,
-                    on: `aux_on_${i}`,
-                    name: `aux_name_display_${i}`
-                }
-            });
+                ids: { f: `aux_f_${i}`, v: `aux_v_${i}`, on: `aux_on_${i}`, name: `aux_name_display_${i}` }
+            };
+            html += (layoutMode === 'desktop') ? createDesktopStrip(config) : createMobileStrip(config);
         }
     }
 
@@ -141,10 +132,11 @@ function updateAuxManual(ch, auxIdx, val) {
     const state = getChannelStateById(ch);
     if (state) state[`aux${auxIdx}`] = val;
 
-    if (document.getElementById(`aux_f_${auxIdx}`)) {
-        document.getElementById(`aux_f_${auxIdx}`).value = val;
-        document.getElementById(`aux_v_${auxIdx}`).innerText = rawToDb(val);
-    }
+    const fader = document.getElementById(`aux_f_${auxIdx}`) || document.getElementById(`aux_f_ch_${ch}`);
+    const valDisplay = document.getElementById(`aux_v_${auxIdx}`) || document.getElementById(`aux_v_ch_${ch}`);
+    
+    if (fader) fader.value = val;
+    if (valDisplay) valDisplay.innerText = rawToDb(val);
 }
 
 function toggleAuxOn(ch, auxIdx) {
@@ -156,14 +148,11 @@ function toggleAuxOn(ch, auxIdx) {
     const newVal = !state[`aux${auxIdx}On`];
     state[`aux${auxIdx}On`] = newVal;
 
-    const btn = document.getElementById(`aux_on_${auxIdx}`);
+    const btn = document.getElementById(`aux_on_${auxIdx}`) || document.getElementById(`aux_on_ch_${ch}`);
     if (btn) btn.classList.toggle('on-active', newVal);
     socket.emit('control', { type, channel: ch, value: newVal ? 1 : 0 });
 }
 
-/**
- * [CRITICAL] Apenas canais de entrada recebem atualizações de AUX Send.
- */
 function updateAuxFromSocket(ch, type, value) {
     const state = getChannelStateById(ch);
     if (!state) return;
@@ -175,15 +164,28 @@ function updateAuxFromSocket(ch, type, value) {
 
     if (subType === 'Level') {
         state[`aux${auxIdx}`] = value;
-        if (activeConfigChannel === ch && document.getElementById(`aux_f_${auxIdx}`)) {
-            document.getElementById(`aux_f_${auxIdx}`).value = value;
-            document.getElementById(`aux_v_${auxIdx}`).innerText = rawToDb(value);
+        const targetFaderMix = document.getElementById(`aux_f_ch_${ch}`);
+        if (activeConfigChannel >= 36 && activeConfigChannel <= 43 && (activeConfigChannel - 35) === auxIdx && targetFaderMix) {
+            targetFaderMix.value = value;
+            const targetValMix = document.getElementById(`aux_v_ch_${ch}`);
+            if (targetValMix) targetValMix.innerText = rawToDb(value);
+        } else if (activeConfigChannel === ch) {
+            const targetFaderCh = document.getElementById(`aux_f_${auxIdx}`);
+            if (targetFaderCh) {
+                targetFaderCh.value = value;
+                const targetValCh = document.getElementById(`aux_v_${auxIdx}`);
+                if (targetValCh) targetValCh.innerText = rawToDb(value);
+            }
         }
     } else if (subType === 'On') {
         const isTrue = (value === 1 || value === true);
         state[`aux${auxIdx}On`] = isTrue;
-        if (activeConfigChannel === ch && document.getElementById(`aux_on_${auxIdx}`)) {
-            document.getElementById(`aux_on_${auxIdx}`).classList.toggle('on-active', isTrue);
+        const targetOnMix = document.getElementById(`aux_on_ch_${ch}`);
+        if (activeConfigChannel >= 36 && activeConfigChannel <= 43 && (activeConfigChannel - 35) === auxIdx && targetOnMix) {
+            targetOnMix.classList.toggle('on-active', isTrue);
+        } else if (activeConfigChannel === ch) {
+            const targetOnCh = document.getElementById(`aux_on_${auxIdx}`);
+            if (targetOnCh) targetOnCh.classList.toggle('on-active', isTrue);
         }
     }
 }

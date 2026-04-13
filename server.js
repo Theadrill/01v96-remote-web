@@ -5,12 +5,14 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const SysTray = require('systray2').default;
+const dgram = require('dgram');
 
 const midiEngine = require('./src/midi-engine');
 const protocol = require('./src/protocol');
 const stateManager = require('./src/state-manager');
 const dummy = require('./src/meter_dummy');
 const masterMeter = require('./src/master-meter');
+const { exec } = require('child_process');
 let dummyMeterInterval = null;
 
 let meterDataBuffer = new Array(33).fill(0);
@@ -126,92 +128,137 @@ app.get('/api/macros/hosts', (req, res) => {
     }
 });
 
-// Listar arquivos físicos (.js)
+// Listar scripts de macros disponíveis (.js)
 app.get('/api/macros', (req, res) => {
     const macrosDir = path.join(__dirname, 'public/modules/macros');
     if (!fs.existsSync(macrosDir)) fs.mkdirSync(macrosDir, { recursive: true });
     fs.readdir(macrosDir, (err, files) => {
         if (err) return res.status(500).json({ error: "Erro ao listar mods" });
-        const jsFiles = files.filter(f => f.endsWith('.js') && !f.includes('.server.js')).map(f => f.replace('.js', ''));
+        // Filtra para mostrar apenas macros reais, ignorando o core e o motor principal
+        const jsFiles = files.filter(f => 
+            f.endsWith('.js') && 
+            !f.includes('.server.js') && 
+            f !== 'core.js' && 
+            f !== 'macros.js'
+        ).map(f => f.replace('.js', ''));
         res.json(jsFiles);
     });
 });
 
-// 1. Manifesto Global de Slots (Chaves por Preset: { "default": {...}, "pcmaria": {...} })
+// --- LÓGICA NINJA: AUTO-GIT SYNC (DEBOUNCED) ---
+let gitSyncTimer = null;
+let gitSyncQueue = new Set();
+
+function triggerGitSync() {
+    if (gitSyncQueue.size === 0) return;
+    
+    const filesToSync = Array.from(gitSyncQueue).join(' ');
+    const hostname = os.hostname();
+    console.log(`\n☁️  [NINJA SYNC] =======================================`);
+    console.log(`☁️  [NINJA SYNC] Sincronizando: ${filesToSync}`);
+    
+    // Sequência Master Blaster: Add -> Commit -> Pull (Rebase) -> Push
+    const cmd = `git add ${filesToSync} && git commit -m "auto-sync: profiles updated from ${hostname}" && git pull --rebase && git push`;
+
+    exec(cmd, { cwd: __dirname }, (error, stdout, stderr) => {
+        gitSyncQueue.clear();
+        if (error) {
+            console.error(`❌ [NINJA SYNC] Erro: ${error.message}`);
+            return;
+        }
+        console.log(`✅ [NINJA SYNC] GitHub Atualizado com Sucesso!`);
+        console.log(`☁️  [NINJA SYNC] =======================================\n`);
+    });
+}
 app.get('/api/macros/slots', (req, res) => {
-    const slotsPath = path.join(__dirname, 'public/modules/macros', 'slots.json');
-    if (fs.existsSync(slotsPath)) {
-        res.json(JSON.parse(fs.readFileSync(slotsPath, 'utf8')));
-    } else { res.json({ "default": {} }); }
+    const preset = req.query.preset;
+    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
+    const localDir = path.join(macrosDir, 'local');
+    const sharedDir = path.join(macrosDir, 'shared');
+
+    if (preset) {
+        // Prioridade: Local (máquina atual), depois Shared (nuvem/git)
+        const localPath = path.join(localDir, `profile_${preset}.json`);
+        const sharedPath = path.join(sharedDir, `profile_${preset}.json`);
+        
+        if (fs.existsSync(localPath)) return res.json(JSON.parse(fs.readFileSync(localPath, 'utf8')));
+        if (fs.existsSync(sharedPath)) return res.json(JSON.parse(fs.readFileSync(sharedPath, 'utf8')));
+        
+        return res.json({});
+    } else {
+        // Lista todos os perfis únicos das duas pastas para o seletor de presets
+        const profiles = {};
+        const scan = (dir) => {
+            if (fs.existsSync(dir)) {
+                fs.readdirSync(dir).forEach(f => {
+                    if (f.startsWith('profile_') && f.endsWith('.json')) {
+                        profiles[f.replace('profile_', '').replace('.json', '')] = true;
+                    }
+                });
+            }
+        };
+        scan(sharedDir);
+        scan(localDir);
+        
+        if (Object.keys(profiles).length === 0) profiles["default"] = true;
+        res.json(profiles);
+    }
 });
 
 app.post('/api/macros/slots', express.json(), (req, res) => {
     const preset = req.query.preset || 'default';
-    const slotsPath = path.join(__dirname, 'public/modules/macros', 'slots.json');
-
-    let allSlots = {};
-    if (fs.existsSync(slotsPath)) {
-        try { allSlots = JSON.parse(fs.readFileSync(slotsPath, 'utf8')); } catch (e) { }
-    }
-
-    // Atualiza apenas a "caixa" (preset) correspondente
-    allSlots[preset] = req.body;
+    const syncShared = req.query.syncShared === 'true'; // Toggle do front-end
+    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
+    
+    const localPath = path.join(macrosDir, 'local', `profile_${preset}.json`);
+    const sharedPath = path.join(macrosDir, 'shared', `profile_${preset}.json`);
 
     try {
-        fs.writeFileSync(slotsPath, JSON.stringify(allSlots, null, 2));
-        res.json({ success: true, preset });
-    } catch (e) { res.status(500).json({ error: "Erro ao salvar manifesto centralizado" }); }
+        const content = JSON.stringify(req.body, null, 2);
+        
+        // Sempre salva na pasta local (específica desta máquina)
+        if (!fs.existsSync(path.dirname(localPath))) fs.mkdirSync(path.dirname(localPath), { recursive: true });
+        fs.writeFileSync(localPath, content);
+        
+        // Se o Auto-Sync estiver ligado, espelha na pasta Shared (que o Git monitora)
+        if (syncShared) {
+            if (!fs.existsSync(path.dirname(sharedPath))) fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
+            fs.writeFileSync(sharedPath, content);
+            
+            // Ativa o Gatilho Ninja (Debounce de 10 segundos)
+            const relativeSharedPath = path.relative(__dirname, sharedPath);
+            gitSyncQueue.add(relativeSharedPath);
+            
+            if (gitSyncTimer) clearTimeout(gitSyncTimer);
+            gitSyncTimer = setTimeout(triggerGitSync, 10000); 
+        }
+        res.json({ success: true, preset, synced: syncShared });
+    } catch (e) { res.status(500).json({ error: "Erro ao salvar perfil" }); }
 });
 
 app.post('/api/macros/swap', express.json(), (req, res) => {
     const preset = req.query.preset || 'default';
     const fromIndex = parseInt(req.body.from);
     const toIndex = parseInt(req.body.to);
-    if (isNaN(fromIndex) || isNaN(toIndex)) return res.status(400).json({ error: "Invalid indices" });
+    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
 
-    const dirPath = path.join(__dirname, 'public/modules/macros');
-
-    // 1. Swap in slots.json
-    const slotsPath = path.join(dirPath, 'slots.json');
-    if (fs.existsSync(slotsPath)) {
-        try {
-            let allSlots = JSON.parse(fs.readFileSync(slotsPath, 'utf8'));
-            if (allSlots[preset]) {
-                const tempFrom = allSlots[preset][fromIndex];
-                const tempTo = allSlots[preset][toIndex];
-                delete allSlots[preset][fromIndex];
-                delete allSlots[preset][toIndex];
-                if (tempTo) allSlots[preset][fromIndex] = tempTo;
-                if (tempFrom) allSlots[preset][toIndex] = tempFrom;
-                fs.writeFileSync(slotsPath, JSON.stringify(allSlots, null, 2));
-            }
-        } catch (e) { }
-    }
-
-    // 2. Swap configs in all plugin files
-    if (fs.existsSync(dirPath)) {
-        const files = fs.readdirSync(dirPath);
-        for (let file of files) {
-            if (file.endsWith('.json') && file !== 'slots.json' && file !== 'hosts.json') {
-                const isTargetFile = (preset === 'default') ? !file.includes('_') : file.endsWith(`_${preset}.json`);
-                if (isTargetFile) {
-                    try {
-                        const fp = path.join(dirPath, file);
-                        let modConfig = JSON.parse(fs.readFileSync(fp, 'utf8'));
-                        const keyFrom = `slot_${fromIndex}`;
-                        const keyTo = `slot_${toIndex}`;
-                        const tempFromData = modConfig[keyFrom];
-                        const tempToData = modConfig[keyTo];
-                        delete modConfig[keyFrom];
-                        delete modConfig[keyTo];
-                        if (tempToData) modConfig[keyFrom] = tempToData;
-                        if (tempFromData) modConfig[keyTo] = tempFromData;
-                        fs.writeFileSync(fp, JSON.stringify(modConfig, null, 2));
-                    } catch (e) { }
-                }
-            }
+    const handleSwap = (dir) => {
+        const pPath = path.join(dir, `profile_${preset}.json`);
+        if (fs.existsSync(pPath)) {
+            try {
+                let config = JSON.parse(fs.readFileSync(pPath, 'utf8'));
+                const tFrom = config[fromIndex];
+                const tTo = config[toIndex];
+                delete config[fromIndex]; delete config[toIndex];
+                if (tTo) config[fromIndex] = tTo;
+                if (tFrom) config[toIndex] = tFrom;
+                fs.writeFileSync(pPath, JSON.stringify(config, null, 2));
+            } catch (e) { }
         }
-    }
+    };
+
+    handleSwap(path.join(macrosDir, 'local'));
+    handleSwap(path.join(macrosDir, 'shared'));
     res.json({ success: true });
 });
 
@@ -219,41 +266,103 @@ app.delete('/api/macros/slots', (req, res) => {
     const preset = req.query.preset;
     if (!preset || preset === 'default') return res.status(400).json({ error: "Preset inválido ou protegido" });
 
-    const slotsPath = path.join(__dirname, 'public/modules/macros', 'slots.json');
-    if (!fs.existsSync(slotsPath)) return res.status(404).json({ error: "Arquivo não encontrado" });
-
+    const localPath = path.join(__dirname, 'public/modules/macros/profiles/local', `profile_${preset}.json`);
+    const sharedPath = path.join(__dirname, 'public/modules/macros/profiles/shared', `profile_${preset}.json`);
+    
     try {
-        let allSlots = JSON.parse(fs.readFileSync(slotsPath, 'utf8'));
-        if (allSlots[preset]) {
-            delete allSlots[preset];
-            fs.writeFileSync(slotsPath, JSON.stringify(allSlots, null, 2));
-            res.json({ success: true, deleted: preset });
-        } else {
-            res.status(404).json({ error: "Preset não existe no manifesto" });
-        }
-    } catch (e) { res.status(500).json({ error: "Erro ao deletar preset" }); }
+        if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+        if (fs.existsSync(sharedPath)) fs.unlinkSync(sharedPath);
+        res.json({ success: true, deleted: preset });
+    } catch (e) { res.status(500).json({ error: "Erro ao deletar perfil" }); }
 });
 
-// 2. Banco de Configuração do Mod por Preset
+// 2. Banco de Configuração do Mod por Preset (Busca no novo sistema de profiles)
 app.get('/api/macros/config/:modId', (req, res) => {
     const preset = req.query.preset || 'default';
     const modId = req.params.modId;
     const filename = preset === 'default' ? `${modId}.json` : `${modId}_${preset}.json`;
-    const configPath = path.join(__dirname, 'public/modules/macros', filename);
-    if (fs.existsSync(configPath)) {
-        res.json(JSON.parse(fs.readFileSync(configPath, 'utf8')));
-    } else { res.json({}); }
+    
+    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
+    const localPath = path.join(macrosDir, 'local', filename);
+    const sharedPath = path.join(macrosDir, 'shared', filename);
+
+    if (fs.existsSync(localPath)) return res.json(JSON.parse(fs.readFileSync(localPath, 'utf8')));
+    if (fs.existsSync(sharedPath)) return res.json(JSON.parse(fs.readFileSync(sharedPath, 'utf8')));
+    
+    res.json({});
 });
 
 app.post('/api/macros/config/:modId', express.json(), (req, res) => {
     const preset = req.query.preset || 'default';
     const modId = req.params.modId;
+    const syncShared = req.query.syncShared === 'true';
     const filename = preset === 'default' ? `${modId}.json` : `${modId}_${preset}.json`;
-    const configPath = path.join(__dirname, 'public/modules/macros', filename);
+
+    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
+    const localPath = path.join(macrosDir, 'local', filename);
+    const sharedPath = path.join(macrosDir, 'shared', filename);
+
     try {
-        fs.writeFileSync(configPath, JSON.stringify(req.body, null, 2));
-        res.json({ success: true, mod: modId, preset });
+        const content = JSON.stringify(req.body, null, 2);
+        if (!fs.existsSync(path.dirname(localPath))) fs.mkdirSync(path.dirname(localPath), { recursive: true });
+        fs.writeFileSync(localPath, content);
+        
+        if (syncShared) {
+            if (!fs.existsSync(path.dirname(sharedPath))) fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
+            fs.writeFileSync(sharedPath, content);
+            
+            // Ativa o Ninja Sync para a config do mod também
+            const relativeSharedPath = path.relative(__dirname, sharedPath);
+            gitSyncQueue.add(relativeSharedPath);
+            if (gitSyncTimer) clearTimeout(gitSyncTimer);
+            gitSyncTimer = setTimeout(triggerGitSync, 10000);
+        }
+        res.json({ success: true, mod: modId, preset, synced: syncShared });
     } catch (e) { res.status(500).json({ error: "Erro ao salvar config do mod" }); }
+});
+
+// --- GENERIC PROXY GATEWAY (Security & Power for Modders) ---
+
+app.post('/api/macros/proxy/http', express.json(), async (req, res) => {
+    const { url, options } = req.body;
+    if (!url) return res.status(400).json({ error: "URL inválida" });
+    
+    // Filtro de segurança básico: Impede acesso a arquivos locais do sistema
+    if (url.startsWith('file://')) return res.status(403).json({ error: "Acesso a arquivos locais negado" });
+
+    console.log(`🌐 [PROXY HTTP] -> ${url}`);
+
+    try {
+        const response = await fetch(url, options);
+        let rawData = await response.text();
+        let data;
+        
+        // Tenta converter para JSON de forma agressiva (resiliente a cabeçalhos mal formados)
+        try {
+            data = JSON.parse(rawData);
+        } catch (e) {
+            data = rawData;
+        }
+
+        res.json({ status: response.status, data });
+    } catch (e) { 
+        console.error(`❌ [PROXY HTTP] Erro ao acessar ${url}: ${e.message}`);
+        res.status(500).json({ error: e.message }); 
+    }
+});
+
+app.post('/api/macros/proxy/udp', express.json(), (req, res) => {
+    const { host, port, data } = req.body;
+    if (!host || !port || !data) return res.status(400).json({ error: "Dados UDP incompletos" });
+
+    const client = dgram.createSocket('udp4');
+    const message = Buffer.from(typeof data === 'string' ? data : JSON.stringify(data));
+
+    client.send(message, port, host, (err) => {
+        client.close();
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
 });
 
 // Endpoint de Nomes para os Mods
@@ -940,6 +1049,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('control', (data) => {
+        if (data && data.type !== 'HEARTBEAT') {
+            console.log(`📡 [WEB -> MESA] Comando: ${data.type} Ch:${data.channel} Val:${data.value}`);
+        }
         if (data.type === 'kChannelInput/kChannelIn') {
             console.log(`🌐 [BROWSER -> SERVER] Mudança de Patch Solicitada: Canal ${data.channel + 1} -> Patch ${data.value}`);
         }

@@ -466,12 +466,18 @@
             <div id="macroPresetList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
                 <!-- Lista de presets do slots.json -->
             </div>
+            <div id="macroSharedSyncContainer" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:15px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <input type="checkbox" id="chkSharedSync" style="width:18px; height:18px; cursor:pointer;" onchange="toggleSharedSync(this.checked)">
+                <label for="chkSharedSync" style="color:#00e676; font-size:10px; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">Sincronizar com Nuvem (Shared)</label>
+            </div>
+            <p style="font-size:8px; color:#555; text-align:center; margin-top:5px; line-height:1.2;">Ao ligar, todas as mudanÃ§as neste preset serÃ£o espelhadas na pasta Shared do Git automaticamente.</p>
             <button onclick="document.getElementById('macroPresetModal').style.display='none'" class="btn-close"
-                style="width:100%; height:45px;">CANCELAR</button>
+                style="width:100%; height:45px; margin-top:15px;">CANCELAR</button>
         </div>
     </div>
 
     <script src="modules/globals.js"></script>
+    <script src="modules/macros/core.js"></script>
     <script src="modules/macros.js"></script>
     <script src="modules/channel_strip.js"></script>
     <script src="modules/eq.js"></script>

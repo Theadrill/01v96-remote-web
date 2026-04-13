@@ -1,0 +1,39 @@
+{
+  "0": {
+    "scriptId": "channel_toggler",
+    "name": "intervalo",
+    "config": [9, 10, 11, 12, 13, 14, 25, 26, 27, 28, 29]
+  },
+  "1": {
+    "scriptId": "channel_toggler",
+    "name": "CAV/VIOL",
+    "config": [5, 6]
+  },
+  "2": {
+    "scriptId": "channel_toggler",
+    "name": "SFIO",
+    "config": [30]
+  },
+  "3": {
+    "scriptId": "channel_toggler",
+    "name": "VDJ",
+    "config": [22]
+  },
+  "4": {
+    "scriptId": "lumikit",
+    "name": "DJ/LOGO",
+    "config": { "scenes": ["0:12"], "extras": [0] }
+  },
+  "5": {
+    "scriptId": "lumikit",
+    "name": "BANDA/LOGO",
+    "color": "#ff8605",
+    "config": { "scenes": ["0:3"], "extras": [0] }
+  },
+  "globalConfig": {
+    "lumikit": {
+      "ip": "pcfavela",
+      "port": 5000
+    }
+  }
+}
