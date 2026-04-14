@@ -52,6 +52,18 @@ class SceneManager {
                 setTimeout(() => {
                     this.isSyncing = false;
                     console.log(`✅ [Scene Manager] Sincronização concluída! ${this.scenes.filter(Boolean).length} cenas carregadas.`);
+                    // Try to infer active scene index: if the Edit Buffer (currentScene)
+                    // has a name that matches one of the library scenes, assume that
+                    // that slot is the active scene and update indexes accordingly.
+                    if (this.currentScene && this.currentScene.name) {
+                        const match = this.scenes.find(s => s && s.name === this.currentScene.name);
+                        if (match) {
+                            this.activeSceneIndex = match.index;
+                            this.currentScene.index = match.index;
+                            console.log(`🎯 [Scene Manager] Inferred active scene index: ${match.index} for '${this.currentScene.name}'`);
+                        }
+                    }
+
                     if (this.io) {
                         this.io.emit('scenesUpdated', this.getState());
                     }
@@ -91,16 +103,31 @@ class SceneManager {
                         name += ' ';
                     }
                 }
-                name = name.trim();
+                name = name.toUpperCase().trim();
 
                 const sceneData = { index, name };
 
                 if (type === 0x02) {
-                    this.currentScene = {
-                        index: this.activeSceneIndex || 0, // Usa o index ativamente armazenado
-                        name: sceneData.name
-                    };
-                    if (this.io) this.io.emit('currentScene', this.currentScene);
+                    // Recebemos o Edit Buffer (nome da cena atual), mas essa mensagem
+                    // não contém o índice do slot. Guardamos apenas o nome e tentamos
+                    // inferir o índice a partir da biblioteca já carregada. Se não
+                    // for possível inferir agora, aguardamos a conclusão do fetch
+                    // para emitir o index correto.
+                    this.currentScene = { name: sceneData.name };
+                    console.log(`🎬 [Scene Manager] Current Scene atualizada: [unknown] "${this.currentScene.name}"`);
+
+                    // Tenta inferir índice a partir da biblioteca já carregada
+                    const match = this.scenes.find(s => s && s.name === this.currentScene.name);
+                    if (match) {
+                        this.activeSceneIndex = match.index;
+                        this.currentScene.index = match.index;
+                        console.log(`🎯 [Scene Manager] Índice inferido imediatamente: ${match.index}`);
+                        if (this.io) {
+                            this.io.emit('currentScene', this.currentScene);
+                            this.io.emit('scenesUpdated', this.getState());
+                        }
+                    }
+                    // Senão, não emitimos agora — o fetchScenes emitirá ao terminar
                 } else {
                     this.scenes[index] = sceneData;
                 }
@@ -134,6 +161,10 @@ class SceneManager {
         this.activeSceneIndex = index;
         if (this.currentScene) {
             this.currentScene.index = index;
+            // Tenta atualizar o nome a partir da biblioteca se já houver
+            if (this.scenes[index]) {
+                this.currentScene.name = this.scenes[index].name;
+            }
         }
     }
 }

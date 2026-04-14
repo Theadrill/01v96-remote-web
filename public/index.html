@@ -18,6 +18,11 @@
         <span>SINCRONIZANDO...</span>
     </div>
 
+    <!-- Offline Overlay (aparece quando a mesa estiver desconectada) -->
+    <div id="offlineOverlay" style="display:none;">
+        <div class="offline-inner">MESA OFFLINE</div>
+    </div>
+
     <!-- Splash Screen Overlay -->
     <div id="splashScreen" class="splash-overlay">
         <!-- Botão de Fullscreen para Splash -->
@@ -81,7 +86,7 @@
         <div id="mainNav" style="display: flex; flex-direction: column; width: 100%; flex: 1; align-items: center;">
             <div id="scn" class="color-green font-13-bold"
                 style="text-align: center; width: 100%; letter-spacing: 1px; margin-bottom: 2px;">01V96</div>
-            <div id="scene-info" style="font-size: 10px; color: #aaa; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; width: 100%; text-align: center;">---</div>
+            <div id="scene-info" style="font-size: 10px; color: #aaa; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; width: 100%; text-align: center;">SINCRONIZANDO...</div>
             <button class="side-btn btn-config"
                 onclick="document.getElementById('configModal').style.display='flex'">CONFIG</button>
             <button id="btnOuts" class="side-btn btn-outs" onclick="toggleOuts()">OUTS</button>
@@ -186,7 +191,7 @@
             <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px; text-align: center;">
                 <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">GERENCIAMENTO DE CENAS</p>
                 <div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                    <span id="configSceneDisplay" style="font-size: 18px; color: #ffcc00; font-weight: bold; letter-spacing: 1px;">CENA: --</span>
+                    <span id="configSceneDisplay" style="font-size: 18px; color: #ffcc00; font-weight: bold; letter-spacing: 1px;">SINCRONIZANDO...</span>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-connect" onclick="showSceneGrid('save')" style="flex: 1; margin: 0; background: #dc3545; font-size: 11px;">SALVAR CENA</button>
@@ -210,6 +215,19 @@
                 <button onclick="conn()" class="btn-connect">CONECTAR</button>
                 <button onclick="document.getElementById('configModal').style.display='none'"
                     class="btn-close">FECHAR</button>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #444;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
+                    <div>
+                        <p style="font-size: 11px; color: #888; margin: 0; letter-spacing: 1px;">ABRIR INTERFACE AUTOMATICAMENTE</p>
+                        <p style="font-size: 9px; color: #555; margin: 4px 0 0 0;">Ao iniciar o servidor</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleOpenBrowser" onchange="updateOpenBrowser(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -503,6 +521,25 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmação de Delete de Cena -->
+    <div id="sceneDeleteModal" class="modal-overlay" style="z-index:19500; display:none;">
+        <div class="modal-content"
+            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #c62828; background:#1a1a1a; padding:30px; border-radius:15px;">
+            <p style="font-size:10px; color:#c62828; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                ⚠️ Deleção</p>
+            <h3 style="margin-top:0; color:#c62828; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+                DELETAR CENA?</h3>
+            <p id="sceneDeleteText" style="font-size:14px; color:#aaa; margin:20px 0 10px 0; line-height:1.5;"></p>
+            <p style="font-size:11px; color:#888; margin-bottom:20px;">Esta ação não pode ser desfeita.</p>
+            <div style="display:flex; gap:15px;">
+                <button id="sceneDeleteActionBtn" class="btn-connect"
+                    style="flex:1; margin:0; height:45px; background:#c62828;">DELETAR</button>
+                <button onclick="document.getElementById('sceneDeleteModal').style.display='none'" class="btn-close"
+                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Confirmação de Cena -->
     <div id="sceneConfirmModal" class="modal-overlay" style="z-index:19000; display:none;">
         <div class="modal-content"
@@ -511,7 +548,15 @@
                 Atenção!</p>
             <h3 id="sceneConfirmTitle" style="margin-top:0; color:#ffcc00; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
                 CARREGAR CENA?</h3>
-            <p id="sceneConfirmText" style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente carregar a cena?</p>
+            <p id="sceneConfirmText" style="font-size:14px; color:#aaa; margin:20px 0 10px 0; line-height:1.5;">Deseja realmente carregar a cena?</p>
+            
+            <!-- Campo de Renomeação (Apenas para modo SAVE) -->
+            <div id="sceneRenameContainer" style="display:none; margin-bottom:20px;">
+                <p style="font-size:10px; color:#888; text-transform:uppercase; margin-bottom:8px;">NOME DA CENA (16 chars)</p>
+                <input type="text" id="sceneRenameInput" maxlength="16" 
+                    style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:18px; font-weight:bold; border-radius:8px; outline:none; text-transform:uppercase;">
+            </div>
+
             <div style="display:flex; gap:15px;">
                 <button id="sceneConfirmActionBtn" class="btn-connect"
                     style="flex:1; margin:0; height:45px; background:#28a745;">SIM</button>

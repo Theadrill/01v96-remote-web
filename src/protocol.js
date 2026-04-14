@@ -108,10 +108,12 @@ function parseIncoming(message) {
     const channel = message[8];
 
     // Debug para nomes (Section 13, Group 2)
+    /*
     if (section === 13 && group === 2 && message[6] >= 4) {
         const hex = Buffer.from(message).toString('hex').toUpperCase();
         console.log(`🧐 [PROTOCOL DEBUG] Sec:${section} Grp:${group} Elm:${message[6]} Prm:${parameter} Ch:${channel} Hex:${hex}`);
     }
+    */
 
     const element = message[6];
 
@@ -156,7 +158,7 @@ function parseIncoming(message) {
             else if (element === 15) globalCh = 44 + channel; // Buses
             else if (element === 18) globalCh = 52;           // Stereo Master
 
-            console.log(`✅ [NAME PARSED] Elm:${element} Ch:${channel} -> Global:${globalCh} Pos:${charIndex} Char:'${char}'`);
+            // console.log(`✅ [NAME PARSED] Elm:${element} Ch:${channel} -> Global:${globalCh} Pos:${charIndex} Char:'${char}'`);
 
             return {
                 type: 'updateNameChar',

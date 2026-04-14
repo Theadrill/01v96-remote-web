@@ -4,6 +4,30 @@ const { Server } = require('socket.io');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+
+// Redirecionamento de Logs para Arquivo (server_log.txt)
+const logFile = path.join(__dirname, 'server_log.txt');
+const logStream = fs.createWriteStream(logFile, { flags: 'w' });
+const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+
+console.log = function(...args) {
+    const timestamp = new Date().toISOString();
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+    logStream.write(`[${timestamp}] INFO: ${message}\n`);
+    originalConsoleLog.apply(console, args);
+};
+
+console.error = function(...args) {
+    const timestamp = new Date().toISOString();
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+    logStream.write(`[${timestamp}] ERROR: ${message}\n`);
+    originalConsoleError.apply(console, args);
+};
+
+console.log('🚀 [SERVER] Iniciando servidor e sistema de logs...');
+console.log('📂 [SERVER] Log gravando em:', logFile);
+
 const SysTray = require('systray2').default;
 const dgram = require('dgram');
 
@@ -31,6 +55,12 @@ const handleMIDIData = (midiData, rawMessage = null) => {
 
     if (!midiData) return;
     lastActivityTime = Date.now();
+
+    if (midiData.type === 'kSceneNumber') {
+        console.log(`🎬 [SCENE CHANGE] Mudança de cena detectada pela mesa: ${midiData.value}`);
+        sceneManager.setActiveScene(midiData.value);
+        // Opcional: Pedir dump atualizado do Edit Buffer se necessário (o SceneManager pode lidar com isso se disparado)
+    }
 
     // Processamento Independente do Master Meter
     if (rawMessage) {
@@ -76,9 +106,9 @@ const handleMIDIData = (midiData, rawMessage = null) => {
     }
 
     // Repassa o objeto INTEIRO para o gerenciador de estado (incluindo letras de nomes)
-    if (midiData.type === 'updateNameChar') {
-        console.log(`🌐 [EMIT -> WEB] Name update for Ch:${midiData.channel} Pos:${midiData.charIndex} Char:'${midiData.char}'`);
-    }
+    // if (midiData.type === 'updateNameChar') {
+    //     console.log(`🌐 [EMIT -> WEB] Name update for Ch:${midiData.channel} Pos:${midiData.charIndex} Char:'${midiData.char}'`);
+    // }
     stateManager.updateState(midiData);
     io.emit('update', midiData);
 }
@@ -502,7 +532,7 @@ function atualizarMenuTray() {
 // --- FUNÇÕES DE APOIO E BUSCA ---
 
 function loadConfig() {
-    let config = { inIdx: null, outIdx: null, "loopmidi-monitor": false };
+    let config = { inIdx: null, outIdx: null, "loopmidi-monitor": false, open_browser_startup: true };
     if (fs.existsSync(configFile)) {
         try {
             const loaded = JSON.parse(fs.readFileSync(configFile, 'utf8'));
@@ -976,6 +1006,119 @@ io.on('connection', (socket) => {
         }, 2000);
     });
 
+    socket.on('saveScene', (data) => {
+        const { index, newName } = data;
+        if (!isConnected || index === undefined || !sceneManager.currentScene) return;
+
+        const originalName = (sceneManager.currentScene.name || "").trim();
+        const targetNameRaw = (newName || originalName).trim();
+        const targetName = targetNameRaw.padEnd(16, ' ').substring(0, 16);
+        
+        console.log(`\n🎬 [SCENE SAVE] Iniciando salvamento no slot ${index}`);
+        console.log(`📝 Nome original: "${originalName}" | Nome escolhido: "${targetName.trim()}"`);
+
+        // Estágio 1: STORE (Sempre salva com o nome que está no Edit Buffer da mesa)
+        // Sysex Store: F0 43 10 3E 7F 10 20 00 [INDEX] 02 00 F7
+        const storeSysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x20, 0x00, index, 0x02, 0x00, 0xF7];
+        midiEngine.send(storeSysex);
+        console.log(`✅ Estágio 1: Cena salva no slot ${index} com o nome original.`);
+
+        // Verifica se precisa de RENAME (Estágio 2)
+        // Normaliza para comparação (Case-Insensitive e Trim)
+        const normalizedOriginal = originalName.toUpperCase().trim();
+        const normalizedTarget = targetNameRaw.toUpperCase().trim();
+
+        if (normalizedTarget !== normalizedOriginal) {
+            console.log(`⚠️ Nomes diferentes detectados ("${normalizedOriginal}" vs "${normalizedTarget}")! Aguardando delay de segurança...`);
+            
+            setTimeout(() => {
+                // Sysex Rename: F0 43 10 3E 7F 10 40 00 [INDEX] [16 BYTES NAME] F7
+                const nameBytes = [];
+                const finalName = normalizedTarget.padEnd(16, ' ').substring(0, 16);
+                for (let i = 0; i < 16; i++) {
+                    nameBytes.push(finalName.charCodeAt(i) || 0x20);
+                }
+                
+                const renameSysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x40, 0x00, index, ...nameBytes, 0xF7];
+                midiEngine.send(renameSysex);
+                console.log(`✅ Estágio 2: Enviado comando RENAME para "${normalizedTarget}" no slot ${index}.`);
+                
+                // Atualiza biblioteca local para refletir a mudança imediatamente no UI
+                sceneManager.scenes[index] = { index, name: normalizedTarget };
+
+                // Marca o slot como ativo no gerenciador local para atualizar o ID exibido
+                if (index > 0) {
+                    sceneManager.setActiveScene(index);
+                    io.emit('currentScene', sceneManager.getCurrentScene());
+                    console.log(`📡 [SCENE] Atualizado activeSceneIndex para slot ${index} após save.`);
+                }
+
+                // Se salvou na cena atual, atualiza o nome da cena ativa (mesmo se for diferente do original)
+                if (sceneManager.activeSceneIndex === index || index === 0) {
+                    sceneManager.currentScene = { index, name: normalizedTarget };
+                    io.emit('currentScene', sceneManager.currentScene);
+                    console.log(`📡 [SCENE] Emitido 'currentScene' com novo nome: ${normalizedTarget}`);
+                }
+
+                io.emit('scenesUpdated', sceneManager.getState());
+
+                // Força uma re-leitura da biblioteca de cenas a partir da mesa
+                // após pequenas latências do hardware para garantir consistência
+                setTimeout(() => {
+                    if (typeof sceneManager.fetchScenes === 'function' && midiEngine) {
+                        sceneManager.fetchScenes(midiEngine).catch(err => {
+                            console.log('⚠️ [SCENE] Falha ao re-sincronizar cenas:', err && err.message ? err.message : err);
+                        });
+                    }
+                }, 700);
+            }, 500); // Delay de meio segundo conforme solicitado
+        } else {
+            console.log(`✅ Nomes são idênticos (ignorando case/espaços). Salvamento concluído.`);
+            // Atualiza biblioteca local mesmo se for igual (para garantir consistência caso o slot estivesse vazio)
+            sceneManager.scenes[index] = { index, name: normalizedOriginal };
+            
+            // Se salvou na cena atual, garante que o currentScene esteja sincronizado
+            if (sceneManager.activeSceneIndex === index || index === 0) {
+                sceneManager.currentScene = { index, name: normalizedOriginal };
+                io.emit('currentScene', sceneManager.currentScene);
+                console.log(`📡 [SCENE] Emitido 'currentScene' com nome original: ${normalizedOriginal}`);
+            } else if (index > 0) {
+                // Mesmo que não fosse a cena ativa, atualizamos o activeSceneIndex para refletir o slot salvo
+                sceneManager.setActiveScene(index);
+                io.emit('currentScene', sceneManager.getCurrentScene());
+                console.log(`📡 [SCENE] activeSceneIndex atualizado para slot ${index} (igual ao save).`);
+            }
+
+            io.emit('scenesUpdated', sceneManager.getState());
+        }
+    });
+
+    socket.on('deleteScene', (data) => {
+        const index = data.index;
+        if (!isConnected || index === undefined || index < 1 || index > 99) return;
+
+        console.log(`🗑️ [SCENE DELETE] Comando recebido: DELETAR Cena ${index}`);
+        
+        // Comando de Clear Library: F0 43 10 3E 7F 10 60 00 [INDEX] F7
+        const deleteSysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x60, 0x00, index, 0xF7];
+        midiEngine.send(deleteSysex);
+        console.log(`✅ [SCENE DELETE] Comando enviado para deletar slot ${index}.`);
+
+        // Atualiza a biblioteca local
+        sceneManager.scenes[index] = null;
+
+        io.emit('scenesUpdated', sceneManager.getState());
+
+        // Re-sincroniza após pequeno delay
+        setTimeout(() => {
+            if (typeof sceneManager.fetchScenes === 'function' && midiEngine) {
+                sceneManager.fetchScenes(midiEngine).catch(err => {
+                    console.log('⚠️ [SCENE DELETE] Falha ao re-sincronizar cenas:', err && err.message ? err.message : err);
+                });
+            }
+        }, 700);
+    });
+
     socket.on('toggleDemo', (data) => {
         const config = loadConfig();
         config.demo_mode = data.enabled;
@@ -1001,6 +1144,12 @@ io.on('connection', (socket) => {
     socket.on('updateMeterConfig', (data) => {
         const config = loadConfig();
         config.meter_opacity = data.opacity;
+        saveConfig(config);
+    });
+
+    socket.on('updateOpenBrowser', (data) => {
+        const config = loadConfig();
+        config.open_browser_startup = data.enabled;
         saveConfig(config);
     });
 
@@ -1122,11 +1271,16 @@ server.listen(PORT, '0.0.0.0', () => {
     addresses.forEach(addr => console.log(`   - Rede: http://${addr}:${PORT}`));
     console.log(`=================================================\n`);
 
-    // Abrir o navegador automaticamente
-    const url = `http://localhost:${PORT}`;
-    exec(`start ${url}`);
-
     const config = loadConfig();
+    
+    // Abrir o navegador automaticamente apenas se a flag estiver ativa
+    if (config.open_browser_startup !== false) {
+        const url = `http://localhost:${PORT}`;
+        exec(`start ${url}`);
+    } else {
+        console.log(`ℹ️ [CONFIG] Auto-abertura do navegador desativada. Acesse manualmente: http://localhost:${PORT}`);
+    }
+
     if (config.demo_mode) {
         iniciarDummy();
     } else {

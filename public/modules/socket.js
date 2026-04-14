@@ -202,10 +202,18 @@ socket.on('update', (d) => {
 function updateSceneDisplay() {
     const el = document.getElementById('scene-info');
     const elConfig = document.getElementById('configSceneDisplay');
-    
-    const displayNum = window.currentSceneNumber || 0;
-    const num = String(displayNum).padStart(2, '0');
-    const name = window.currentSceneName || "---";
+    // Enquanto não tivermos nem número nem nome do currentScene, mostramos indicador
+    if ((!window.currentSceneName || window.currentSceneName === '') && (window.currentSceneNumber === undefined || window.currentSceneNumber === null)) {
+        if (el) el.innerText = 'SINCRONIZANDO...';
+        if (elConfig) elConfig.innerText = 'SINCRONIZANDO...';
+        return;
+    }
+
+    // Fallback para 0 se não houver número de cena
+    const displayNum = (window.currentSceneNumber !== undefined && window.currentSceneNumber !== null) ? window.currentSceneNumber : '--';
+    const num = (displayNum === '--') ? '--' : String(displayNum).padStart(2, '0');
+
+    const name = window.currentSceneName || '---';
     const fullText = `CENA: ${num} - ${name}`;
 
     if (el) el.innerText = fullText;
@@ -350,6 +358,7 @@ socket.on('scenesUpdated', (data) => {
     if (data.currentScene) {
         window.currentSceneNumber = data.currentScene.index;
         window.currentSceneName = data.currentScene.name;
+        console.log(`🎬 Cena Atual Atualizada (scenesUpdated): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
     }
 });
@@ -358,6 +367,7 @@ socket.on('currentScene', (data) => {
     if (data) {
         window.currentSceneNumber = data.index;
         window.currentSceneName = data.name;
+        console.log(`🎬 Cena Atual Atualizada (currentScene): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
     }
 });
@@ -371,6 +381,10 @@ socket.on('connectionState', (state) => {
     } else {
         scn.innerText = '01V96 (offline)';
         scn.style.color = '#dc3545';
+    }
+    const overlay = document.getElementById('offlineOverlay');
+    if (overlay) {
+        overlay.style.display = state.connected ? 'none' : 'flex';
     }
 });
 
@@ -406,8 +420,16 @@ socket.on('portsList', (data) => {
             if (opacityValSpan) opacityValSpan.innerText = op + '%';
             document.documentElement.style.setProperty('--meter-opacity', op / 100);
         }
+        const toggleBrowser = document.getElementById('toggleOpenBrowser');
+        if (toggleBrowser) {
+            toggleBrowser.checked = data.savedConfig.open_browser_startup !== false;
+        }
     }
 });
+
+window.updateOpenBrowser = function(enabled) {
+    socket.emit('updateOpenBrowser', { enabled: enabled });
+};
 
 window.resetFaderCache = () => { faderCardsCache = null; };
 

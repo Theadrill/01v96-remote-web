@@ -65,28 +65,103 @@ window.showSceneGrid = (action) => {
         btn.appendChild(spanNum);
         btn.appendChild(spanName);
         
+        let longPressTimer = null;
+        let isLongPress = false;
+        
+        const handleLongPress = () => {
+            isLongPress = true;
+            if (!scene.isEmpty) {
+                const deleteModal = document.getElementById('sceneDeleteModal');
+                const deleteText = document.getElementById('sceneDeleteText');
+                const deleteBtn = document.getElementById('sceneDeleteActionBtn');
+                
+                deleteText.innerHTML = `Deseja DELETAR a cena <b>${scene.index} (${scene.name})</b>?<br><br>Todos os dados desta cena serão removidos permanentemente.`;
+                
+                deleteBtn.onclick = () => {
+                    socket.emit('deleteScene', { index: scene.index });
+                    deleteModal.style.display = 'none';
+                    modal.style.display = 'none';
+                    window.scenesLibrary = window.scenesLibrary.filter(s => s.index !== scene.index);
+                };
+                
+                deleteModal.style.display = 'flex';
+            }
+        };
+        
+        const cancelLongPress = () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        };
+        
+        btn.addEventListener('mousedown', (e) => {
+            if (scene.isEmpty) return;
+            isLongPress = false;
+            longPressTimer = setTimeout(handleLongPress, 600);
+        });
+        
+        btn.addEventListener('mouseup', cancelLongPress);
+        btn.addEventListener('mouseleave', cancelLongPress);
+        
+        btn.addEventListener('touchstart', (e) => {
+            if (scene.isEmpty) return;
+            e.preventDefault();
+            isLongPress = false;
+            longPressTimer = setTimeout(handleLongPress, 600);
+        }, { passive: false });
+        
+        btn.addEventListener('touchend', (e) => {
+            cancelLongPress();
+        });
+        
+        btn.addEventListener('touchcancel', cancelLongPress);
+        
         btn.onclick = () => {
+            if (isLongPress) return;
+            
+            const confirmModal = document.getElementById('sceneConfirmModal');
+            const actionBtn = document.getElementById('sceneConfirmActionBtn');
+            const renameContainer = document.getElementById('sceneRenameContainer');
+            const renameInput = document.getElementById('sceneRenameInput');
+            const confirmText = document.getElementById('sceneConfirmText');
+
             if (action === 'load') {
                 document.getElementById('sceneConfirmTitle').innerText = "CARREGAR CENA?";
                 document.getElementById('sceneConfirmTitle').style.color = "#ffcc00";
-                document.getElementById('sceneConfirmText').innerHTML = `Deseja CARREGAR a cena <b>${scene.index} (${scene.name})</b>?<br><br>ISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`;
+                confirmText.innerHTML = `Deseja CARREGAR a cena <b>${scene.index} (${scene.name})</b>?<br><br>ISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`;
+                renameContainer.style.display = 'none';
                 
-                const actionBtn = document.getElementById('sceneConfirmActionBtn');
                 actionBtn.style.background = "#28a745";
                 actionBtn.innerText = "SIM, CARREGAR";
                 actionBtn.onclick = () => {
                     socket.emit('recallScene', { index: scene.index });
-                    document.getElementById('sceneConfirmModal').style.display = 'none';
+                    confirmModal.style.display = 'none';
                     modal.style.display = 'none';
                     const shield = document.getElementById('syncShield');
                     if (shield) shield.style.display = 'flex';
                 };
-                
-                document.getElementById('sceneConfirmModal').style.display = 'flex';
             } else {
-                alert(`Ação de ${action} para a cena ${scene.index} (${scene.name}) ainda não implementada neste escopo!`);
-                modal.style.display = 'none';
+                document.getElementById('sceneConfirmTitle').innerText = "SALVAR CENA?";
+                document.getElementById('sceneConfirmTitle').style.color = "#dc3545";
+                confirmText.innerHTML = `Deseja SALVAR a mixagem atual no slot <b>${scene.index}</b>?`;
+                
+                renameContainer.style.display = 'block';
+                renameInput.value = window.currentSceneName || scene.name || "";
+                
+                actionBtn.style.background = "#dc3545";
+                actionBtn.innerText = "SIM, SALVAR";
+                actionBtn.onclick = () => {
+                    const newName = renameInput.value.trim().toUpperCase();
+                    socket.emit('saveScene', { 
+                        index: scene.index, 
+                        newName: newName 
+                    });
+                    confirmModal.style.display = 'none';
+                    modal.style.display = 'none';
+                };
             }
+            confirmModal.style.display = 'flex';
         };
         
         grid.appendChild(btn);
