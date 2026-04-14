@@ -1131,6 +1131,10 @@ server.listen(PORT, '0.0.0.0', () => {
     addresses.forEach(addr => console.log(`   - Rede: http://${addr}:${PORT}`));
     console.log(`=================================================\n`);
 
+    // Abrir o navegador automaticamente
+    const url = `http://localhost:${PORT}`;
+    exec(`start ${url}`);
+
     const config = loadConfig();
     if (config.demo_mode) {
         iniciarDummy();
