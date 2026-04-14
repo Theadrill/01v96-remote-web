@@ -5,7 +5,5 @@
   "open_browser_startup": false,
   "demo_mode": false,
   "master_meter_group": 33,
-  "master_meter_offset": 52,
-  "sync_delay_ms": 15,
-  "sync_name_delay_ms": 20
+  "master_meter_offset": 52
 }
