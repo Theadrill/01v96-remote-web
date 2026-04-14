@@ -1,5 +1,7 @@
 const midi = require('midi');
 const protocol = require('./protocol');
+const syncCounter = require('./sync-counter');
+
 
 
 // Deixamos as variáveis globais, mas sem instanciar o 'new' ainda
@@ -48,6 +50,8 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         // Se já existirem instâncias abertas mas as portas mudaram, limpamos tudo primeiro
         if (input) { try { input.closePort(); } catch(e){} }
         if (output) { try { output.closePort(); } catch(e){} }
+        syncCounter.reset(); // Zera os pendentes
+
 
         // Criamos as instâncias NO MOMENTO exato da conexão
         input = new midi.Input();
@@ -64,6 +68,16 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
 
         // Escuta as mensagens vindas da mesa física
         input.on('message', (delta, message) => {
+            // ?? [CRITICAL SYNC LOGIC] - O ESCUDO ANTI-LOOP
+            // O Studio Manager incrementa um contador ao enviar params, e se a mesa devolver o mesmo log (eco param-change 0x1n), ele descarta.
+            if (message && message.length > 2 && (message[2] & 0xF0) === 0x10) {
+                // Meters nunca entram na conta de ecos! As repostas do hardware usam group 32/33.
+                const isMeter = message.length > 20 && (message[5] === 33 || message[5] === 32);
+                if (!isMeter) {
+                    if (syncCounter.shouldIgnore()) return; // Aborta! É apenas um eco do que nós mesmos acabamos de enviar
+                }
+            }
+
             // Se recebemos qualquer dado, a mesa está viva
             if (onMessageCallback) {
                 onMessageCallback({ type: 'HEARTBEAT' });
@@ -91,8 +105,14 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
 function send(msg) {
     if (output && msg) {
         try {
+            // Se estamos enviando um Command Byte de Modificação Paramétrica (0x1n), sinalizamos ao Anti-Loop
+            if (msg.length > 2 && (msg[2] & 0xF0) === 0x10) {
+                syncCounter.beginSync();
+            }
+
             output.sendMessage(msg);
             return true;
+
         } catch (e) {
             console.error("❌ Erro fatal ao enviar MIDI (Cabo desconectado?):", e.message);
             return false;

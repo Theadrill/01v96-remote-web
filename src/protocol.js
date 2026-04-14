@@ -1,4 +1,5 @@
 const { COMMAND_BYTES } = require('./dictionary');
+const propertyMap = require('./property-map');
 
 const CONVERTERS = {
     faderToBytes: (value) => [0, 0, (value >> 7) & 0x07, value & 0x7F],

@@ -21,15 +21,17 @@ Este documento servirá como nosso guia de rastreabilidade (checklist) para refa
 ### Fase 3: Migração para o Mapa Estático de Propriedades (Risco Médio)
 **Objetivo**: Abandonar a "adivinhação" ou conversões baseadas em hardcode substituindo por mapeamento absoluto da interface.
 
-- [ ] Incorporar o arquivo base `01v96_property_map.json` na leitura do núcleo do Node (`src/protocol.js` ou novo parser).
-- [ ] Refatorar os métodos de gerência de status para ler o mapa (Name -> Hex ID / Hex ID -> Name) ativamente antes de tentar serializar ou desserializar arrays.
+- [x] Incorporar o arquivo base `01v96_property_map.json` na leitura do núcleo do Node (`src/protocol.js` ou novo parser).
+- [x] Refatorar os métodos de gerência de status para ler o mapa (Name -> Hex ID / Hex ID -> Name) ativamente antes de tentar serializar ou desserializar arrays.
+
 - [ ] Correlacionar `Tabela GG` aos métodos que parseiam grupos inteiros.
 
-### Fase 4: O Fim do Polling de Boot — A Revolução Bulk Dump (Risco Alto)
-**Objetivo**: Abandonar o processo de Sincronização em looping iterativo canal a canal (atrasado intencionalmente no `server.js`) pelo carregamento passivo em grande rajada.
+### Fase 4: O Fim do Polling de Boot — Pipeline Sequencial (ESCOLHIDO)
+**Objetivo**: Abandonar o processo de Sincronização bloqueante canal a canal pelo gerenciamento assíncrono em Pipeline.
 
-- [ ] Refatorar (ou sobrescrever em paralelo) a mecânica da função `triggerSync` monstra atual do App.
+- [x] Refatorar a mecânica da função `triggerSync` para uso do `MidiPipeline`.
 - [ ] Implementar envio de handshake que solicita habilitar a Transferência Massiva (`kTxEnableBulk` etc).
+
 - [ ] Ensinar o `protocol.js` e o `state-manager.js` a absorverem e decodificarem lotes (buffers) gigantes com tudo de uma só vez.
 
 ### Fase 5: Dual Buffer & Gerenciador Completo de Cenas (Risco Alto)

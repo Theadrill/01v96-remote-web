@@ -13,7 +13,11 @@ const stateManager = require('./src/state-manager');
 const dummy = require('./src/meter_dummy');
 const masterMeter = require('./src/master-meter');
 const { exec } = require('child_process');
+const MidiPipeline = require('./src/midi-pipeline');
+
 let dummyMeterInterval = null;
+const syncPipeline = new MidiPipeline(midiEngine);
+
 
 let meterDataBuffer = new Array(33).fill(0);
 let lastMeterTime = 0;
@@ -654,7 +658,15 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         isConnected = true;
         console.log(`✅ Conexão MIDI estabelecida com sucesso! (${inName})`);
         atualizarMenuTray();
-        triggerSync(targetSocket);
+        
+        // --- COOLDOWN ESTRATÉGICO ---
+        // Aguardamos 5s antes de iniciar o Sync para garantir que a mesa e o driver 
+        // MIDI (loopMIDI) limpem buffers residuais da sessão anterior.
+        setTimeout(() => {
+            if (isConnected) triggerSync(targetSocket);
+        }, 5000);
+
+
         io.emit('connectionState', { connected: true });
 
         // Loop contínuo de requests do Meter (Heartbeat)
@@ -684,7 +696,7 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
                 console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI.");
                 handleDisconnection();
             }
-        }, 100);
+        }, 41); // Otimizado: Studio Manager Native Polling Rate (~24fps)
     } else {
         handleDisconnection(false);
     }
@@ -711,249 +723,173 @@ function handleDisconnection(retry = true) {
 
 async function triggerSync(targetSocket = null, forceNames = false) {
     if (!isConnected || isSyncing) return;
-    const config = loadConfig();
-    const delay = config.sync_delay_ms || 35;
-    const nameDelay = config.sync_name_delay_ms || 45;
-
+    
     isSyncing = true;
     io.emit('syncStatus', true);
     isFullySynced = false; // Reseta a flag para pausar meters
-    console.log(`🔄 Sincronizando (Delay: ${delay}ms / Nomes: ${nameDelay}ms)...`);
-    try {
-        await new Promise(r => setTimeout(r, 1000));
+    
+    console.log(`🔄 [Sync] Iniciando sincronização via Pipeline...`);
+    
+    syncPipeline.clear();
+    
+    // 1. Número e Nome da Cena (Prioridade Máxima)
+    syncPipeline.addTask(protocol.buildRequest('kSceneNumber', 0));
+    syncPipeline.addTask(protocol.buildRequest('kSceneNumberFallback', 0));
+    for (let c = 0; c < 16; c++) {
+        syncPipeline.addTask(protocol.buildRequest(`kSceneTitle/kTitle${c + 1}`, 0));
+    }
 
+    // 2. Parâmetros de Canal (Input 1-32)
+    for (let i = 0; i < 32; i++) {
+        syncPipeline.addTask(protocol.buildRequest('kInputFader/kFader', i));
+        syncPipeline.addTask(protocol.buildRequest('kInputChannelOn/kChannelOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kInputPhase/kPhase', i));
+        syncPipeline.addTask(protocol.buildRequest('kInputAttenuator/kAtt', i));
+        
+        // EQ
+        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQMode', i));
+        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQHPFOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQLPFOn', i));
+        ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
+            syncPipeline.addTask(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i));
+            syncPipeline.addTask(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i));
+            syncPipeline.addTask(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i));
+        });
+
+        // Auxiliares (1-8)
+        for (let a = 1; a <= 8; a++) {
+            syncPipeline.addTask(protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i));
+            syncPipeline.addTask(protocol.buildRequest(`kInputAUX/kAUX${a}On`, i));
+        }
+
+        // Dinâmicas
+        ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'].forEach(p => {
+            syncPipeline.addTask(protocol.buildRequest(`kInputGate/${p}`, i));
+        });
+        ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
+            syncPipeline.addTask(protocol.buildRequest(`kInputComp/${p}`, i));
+        });
+
+        // Patch e Routing
+        syncPipeline.addTask(protocol.buildRequest('kChannelInput/kChannelIn', i));
+        syncPipeline.addTask(protocol.buildRequest('kInputBus/kStereo', i));
+        for (let b = 1; b <= 8; b++) {
+            syncPipeline.addTask(protocol.buildRequest(`kInputBus/kBus${b}`, i));
+        }
+    }
+
+    // 3. Mixes e Buses Masters
+    for (let i = 0; i < 8; i++) {
+        syncPipeline.addTask(protocol.buildRequest('kAUXFader/kFader', i));
+        syncPipeline.addTask(protocol.buildRequest('kAUXChannelOn/kChannelOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kBusFader/kFader', i));
+        syncPipeline.addTask(protocol.buildRequest('kBusChannelOn/kChannelOn', i));
+    }
+
+    // 4. Stereo Master
+    syncPipeline.addTask(protocol.buildRequest('kStereoFader/kFader', 0));
+    syncPipeline.addTask(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0));
+    syncPipeline.addTask(protocol.buildRequest('kStereoAttenuator/kAtt', 0));
+    syncPipeline.addTask(protocol.buildRequest('kStereoEQ/kEQOn', 0));
+    ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
+        syncPipeline.addTask(protocol.buildRequest(`kStereoEQ/kEQ${b}F`, 0));
+        syncPipeline.addTask(protocol.buildRequest(`kStereoEQ/kEQ${b}G`, 0));
+        syncPipeline.addTask(protocol.buildRequest(`kStereoEQ/kEQ${b}Q`, 0));
+    });
+    ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
+        syncPipeline.addTask(protocol.buildRequest(`kStereoComp/${p}`, 0));
+    });
+
+    // 5. Nomes (Se necessário)
+    if (forceNames || !hasSyncedNamesThisSession) {
+        console.log("📝 [Sync] Adicionando busca de nomes ao Pipeline...");
+        // Nomes de Canais (0-31)
         for (let i = 0; i < 32; i++) {
-            const fReq = protocol.buildRequest('kInputFader/kFader', i);
-            const mReq = protocol.buildRequest('kInputChannelOn/kChannelOn', i);
-            const sReq = protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i);
-
-            if (fReq) midiEngine.send(fReq); await new Promise(r => setTimeout(r, delay));
-            if (mReq) midiEngine.send(mReq); await new Promise(r => setTimeout(r, delay));
-            if (sReq) midiEngine.send(sReq); await new Promise(r => setTimeout(r, delay));
-
-            // Sincroniza Phase e Attenuator
-            midiEngine.send(protocol.buildRequest('kInputPhase/kPhase', i)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest('kInputAttenuator/kAtt', i)); await new Promise(r => setTimeout(r, delay));
-
-            // Sincroniza Master EQ ON de cada canal
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQOn', i)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQMode', i)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQHPFOn', i)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest('kInputEQ/kEQLPFOn', i)); await new Promise(r => setTimeout(r, delay));
-
-            // Sincroniza Frequências, Ganhos e Q das 4 bandas
-            const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
-            for (const b of bands) {
-                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i)); await new Promise(r => setTimeout(r, delay));
-                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i)); await new Promise(r => setTimeout(r, delay));
-                midiEngine.send(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i)); await new Promise(r => setTimeout(r, delay));
-            }
-
-            // Requisita também os 8 auxiliares com delays dinâmicos
-            const auxDelay = Math.max(delay, 20);
-            for (let a = 1; a <= 8; a++) {
-                const auxReq = protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i);
-                const auxOnReq = protocol.buildRequest(`kInputAUX/kAUX${a}On`, i);
-                if (auxReq) midiEngine.send(auxReq); await new Promise(r => setTimeout(r, auxDelay));
-                if (auxOnReq) midiEngine.send(auxOnReq); await new Promise(r => setTimeout(r, auxDelay));
-            }
-
-            // [CRITICAL SYNC LOGIC] - DINÂMICAS (Delays configuráveis)
-            const gateParams = ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'];
-            for (const p of gateParams) {
-                const req = protocol.buildRequest(`kInputGate/${p}`, i);
-                if (req) midiEngine.send(req);
-                await new Promise(r => setTimeout(r, auxDelay));
-            }
-
-            const compParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
-            for (const p of compParams) {
-                const req = protocol.buildRequest(`kInputComp/${p}`, i);
-                if (req) midiEngine.send(req);
-                await new Promise(r => setTimeout(r, auxDelay));
-            }
-
-            // Sincroniza Patch
-            midiEngine.send(protocol.buildRequest('kChannelInput/kChannelIn', i)); await new Promise(r => setTimeout(r, auxDelay));
-
-            // Sincroniza Buses 1-8 e Stereo
-            midiEngine.send(protocol.buildRequest('kInputBus/kStereo', i)); await new Promise(r => setTimeout(r, auxDelay));
-            for (let b = 1; b <= 8; b++) {
-                midiEngine.send(protocol.buildRequest(`kInputBus/kBus${b}`, i)); await new Promise(r => setTimeout(r, auxDelay));
-            }
-
-            // [CRITICAL] Pausa estratégica a cada 4 canais para alívio do buffer da mesa
-            if ((i + 1) % 4 === 0) {
-                process.stdout.write("|");
-                await new Promise(r => setTimeout(r, 600));
+            for (let c = 0; c < 4; c++) {
+                syncPipeline.addTask(protocol.buildNameRequest(i, c));
             }
         }
-
-        // Sincroniza Mixes (1-8) e Buses (1-8)
-        console.log("🔄 Sincronizando Mixes e Buses (Faders + EQ)...");
-        const outBands = ['Low', 'LowMid', 'HiMid', 'Hi'];
-        for (let i = 0; i < 8; i++) {
-            midiEngine.send(protocol.buildRequest('kAUXFader/kFader', i)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest('kAUXChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest('kBusFader/kFader', i)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest('kBusChannelOn/kChannelOn', i)); await new Promise(r => setTimeout(r, delay));
+        // Mixes (36-43), Buses (44-51), Master (52)
+        const outIndices = [];
+        for (let i = 36; i <= 43; i++) outIndices.push(i);
+        for (let i = 44; i <= 51; i++) outIndices.push(i);
+        outIndices.push(52);
+        for (const idx of outIndices) {
+            for (let c = 0; c < 8; c++) {
+                syncPipeline.addTask(protocol.buildNameRequest(idx, c));
+            }
         }
+    }
 
-        // Master Sync (Relocado para o final para não atropelar os primeiros canais)
-        console.log("🔄 Sincronizando Stereo Master (Fader + EQ + Comp)...");
-        midiEngine.send(protocol.buildRequest('kStereoFader/kFader', 0)); await new Promise(r => setTimeout(r, delay));
-        midiEngine.send(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0)); await new Promise(r => setTimeout(r, delay));
-        midiEngine.send(protocol.buildRequest('kStereoAttenuator/kAtt', 0)); await new Promise(r => setTimeout(r, delay));
-
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQOn', 0)); await new Promise(r => setTimeout(r, delay));
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQMode', 0)); await new Promise(r => setTimeout(r, delay));
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQHPFOn', 0)); await new Promise(r => setTimeout(r, delay));
-        midiEngine.send(protocol.buildRequest('kStereoEQ/kEQLPFOn', 0)); await new Promise(r => setTimeout(r, delay));
-        for (const b of outBands) {
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}F`, 0)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}G`, 0)); await new Promise(r => setTimeout(r, delay));
-            midiEngine.send(protocol.buildRequest(`kStereoEQ/kEQ${b}Q`, 0)); await new Promise(r => setTimeout(r, delay));
-        }
-
-        const masterCompParams = ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'];
-        for (const p of masterCompParams) {
-            const req = protocol.buildRequest(`kStereoComp/${p}`, 0);
-            if (req) midiEngine.send(req);
-            await new Promise(r => setTimeout(r, delay));
-        }
-
-        await new Promise(r => setTimeout(r, 600));
-
+    // Define o que fazer ao terminar
+    syncPipeline.setCompletionHandler(() => {
+        isSyncing = false;
+        isFullySynced = true;
+        hasSyncedNamesThisSession = true;
+        io.emit('syncStatus', false);
+        saveNames();
+        
         if (targetSocket) {
             targetSocket.emit('sync', stateManager.getState());
         } else {
             io.emit('sync', stateManager.getState());
         }
-        console.log("✅ Sincronização de parâmetros concluída!");
+        console.log("✅ [Sync] Sincronização via Pipeline concluída com sucesso!");
+    });
 
-        if (forceNames || !hasSyncedNamesThisSession) {
-            console.log("📝 [SYNC] Iniciando busca obrigatória de nomes na mesa (1 vez por boot)...");
-            await new Promise(r => setTimeout(r, 2000));
-
-            // [SCENE SYNC] - Sincroniza o número e nome da cena atual (Relocado para estabilidade)
-            console.log("📝 [SYNC] Solicitando Número e Nome da Cena...");
-            midiEngine.send(protocol.buildRequest('kSceneNumber', 0));
-            await new Promise(r => setTimeout(r, 300));
-            midiEngine.send(protocol.buildRequest('kSceneNumberFallback', 0));
-            await new Promise(r => setTimeout(r, 500));
-
-            for (let c = 0; c < 16; c++) {
-                midiEngine.send(protocol.buildRequest(`kSceneTitle/kTitle${c + 1}`, 0));
-                await new Promise(r => setTimeout(r, 60)); // 60ms delay para cada letra (extremamente seguro)
-            }
-
-            for (let i = 0; i < 32; i++) {
-                stateManager.setChannelName(i, "");
-
-                for (let c = 0; c < 4; c++) {
-                    const nameReq = protocol.buildNameRequest(i, c);
-                    if (nameReq) midiEngine.send(nameReq);
-                    await new Promise(r => setTimeout(r, nameDelay));
-                }
-
-                if ((i + 1) % 4 === 0) {
-                    process.stdout.write("|");
-                    await new Promise(r => setTimeout(r, 400));
-                } else {
-                    process.stdout.write(".");
-                    await new Promise(r => setTimeout(r, 100));
-                }
-            }
-
-            // [SYNC] Nomes de Saídas (Mixes 36-43, Buses 44-51, Master 52)
-            console.log("\n📝 [SYNC] Solicitando nomes de Mixes, Buses e Master (8 chars)...");
-            const outIndices = [];
-            for (let i = 36; i <= 43; i++) outIndices.push(i);
-            for (let i = 44; i <= 51; i++) outIndices.push(i);
-            outIndices.push(52);
-
-            for (const idx of outIndices) {
-                stateManager.setChannelName(idx, "");
-                for (let c = 0; c < 8; c++) {
-                    const nameReq = protocol.buildNameRequest(idx, c);
-                    if (nameReq) midiEngine.send(nameReq);
-                    await new Promise(r => setTimeout(r, nameDelay));
-                }
-                process.stdout.write("o");
-                await new Promise(r => setTimeout(r, 50));
-            }
-            console.log("\n✅ [SYNC] Carregamento de nomes via MIDI concluído!");
-            hasSyncedNamesThisSession = true;
-            saveNames();
-        } else {
-            console.log("⏭️ [SYNC] Nomes já sincronizados nesta sessão. Ignorando busca lenta via MIDI.");
+    // Inicia o processamento rápido (10ms entre mensagens durante o Sync)
+    syncPipeline.start(5, (progress) => {
+        if (progress.percent % 10 === 0) {
+            console.log(`⏳ [Sync] Progresso: ${progress.percent}% (${progress.completed}/${progress.total})`);
         }
+    });
 
-        isFullySynced = true;
-        console.log("🚀 Meters liberados e sincronizados!");
-
-    } finally {
-        isSyncing = false;
-        io.emit('syncStatus', false);
-    }
 }
 
 async function syncNames() {
     if (!isConnected || isSyncing) return;
-    const config = loadConfig();
-    // Para o botão manual, vamos ser um pouco mais conservadores que o boot
-    const nameDelay = Math.max(config.sync_name_delay_ms || 45, 30);
-
+    
     isSyncing = true;
     isFullySynced = false; // Pausa meters
-    console.log(`🔄 [MANUAL SYNC] Sincronizando nomes (Delay: ${nameDelay}ms)...`);
+    console.log(`🔄 [MANUAL SYNC] Iniciando busca de nomes via Pipeline...`);
 
-    try {
-        await new Promise(r => setTimeout(r, 1000));
+    syncPipeline.clear();
 
-        for (let i = 0; i < 32; i++) {
-            stateManager.setChannelName(i, "");
-
-            for (let c = 0; c < 4; c++) {
-                const nameReq = protocol.buildNameRequest(i, c);
-                if (nameReq) midiEngine.send(nameReq);
-                await new Promise(r => setTimeout(r, nameDelay));
-            }
-
-            // Pausa estratégica a cada 4 canais para alívio do buffer da mesa
-            if ((i + 1) % 4 === 0) {
-                process.stdout.write("|");
-                await new Promise(r => setTimeout(r, 800));
-            } else {
-                process.stdout.write(".");
-                await new Promise(r => setTimeout(r, 200));
-            }
+    // Nomes de Canais (0-31)
+    for (let i = 0; i < 32; i++) {
+        for (let c = 0; c < 4; c++) {
+            syncPipeline.addTask(protocol.buildNameRequest(i, c));
         }
+    }
 
-        // Saídas no Manual Sync (8 chars)
-        const outIndices = [];
-        for (let i = 36; i <= 43; i++) outIndices.push(i);
-        for (let i = 44; i <= 51; i++) outIndices.push(i);
-        outIndices.push(52);
+    // Saídas (Mixes 36-43, Buses 44-51, Master 52)
+    const outIndices = [];
+    for (let i = 36; i <= 43; i++) outIndices.push(i);
+    for (let i = 44; i <= 51; i++) outIndices.push(i);
+    outIndices.push(52);
 
-        for (const idx of outIndices) {
-            stateManager.setChannelName(idx, "");
-            for (let c = 0; c < 8; c++) {
-                const nameReq = protocol.buildNameRequest(idx, c);
-                if (nameReq) midiEngine.send(nameReq);
-                await new Promise(r => setTimeout(r, nameDelay));
-            }
-            process.stdout.write("o");
-            await new Promise(r => setTimeout(r, 100));
+    for (const idx of outIndices) {
+        for (let c = 0; c < 8; c++) {
+            syncPipeline.addTask(protocol.buildNameRequest(idx, c));
         }
+    }
 
-        console.log("\n✅ [MANUAL SYNC] Concluído!");
+    syncPipeline.setCompletionHandler(() => {
+        isSyncing = false;
+        isFullySynced = true;
         saveNames();
         io.emit('sync', stateManager.getState());
-    } finally {
-        isFullySynced = true; // Libera meters
-        isSyncing = false;
-    }
+        console.log("✅ [MANUAL SYNC] Concluído via Pipeline!");
+    });
+
+    syncPipeline.start(20, (progress) => {
+        if (progress.percent % 20 === 0) {
+            console.log(`⏳ [MANUAL SYNC] Progresso: ${progress.percent}%`);
+        }
+    });
+
 }
 
 
