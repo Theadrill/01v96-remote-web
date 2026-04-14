@@ -6,3 +6,5 @@ prints/
 # Pasta Local de Profiles (Não sincroniza com a nuvem)
 public/modules/macros/profiles/local/*
 !public/modules/macros/profiles/local/.gitkeep
+
+names.json
