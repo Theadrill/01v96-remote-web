@@ -181,8 +181,18 @@
 
             <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #007bff;"
                 onclick="forceSync()">MANUAL SYNC</button>
-            <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #6a1b9a;"
-                onclick="socket.emit('syncNamesOnly')">SYNC NOMES</button>
+
+            <!-- Seção de Cenas (Visual) -->
+            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px; text-align: center;">
+                <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">GERENCIAMENTO DE CENAS</p>
+                <div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                    <span id="configSceneDisplay" style="font-size: 18px; color: #ffcc00; font-weight: bold; letter-spacing: 1px;">CENA: --</span>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-connect" style="flex: 1; margin: 0; background: #dc3545; font-size: 11px;">SALVAR CENA</button>
+                    <button class="btn-connect" style="flex: 1; margin: 0; background: #28a745; font-size: 11px;">CARREGAR CENA</button>
+                </div>
+            </div>
 
             <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
                 <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">MODO DE VISUALIZAÇÃO

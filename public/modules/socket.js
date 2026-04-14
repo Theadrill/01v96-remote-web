@@ -201,12 +201,16 @@ socket.on('update', (d) => {
 
 function updateSceneDisplay() {
     const el = document.getElementById('scene-info');
-    if (!el) return;
+    const elConfig = document.getElementById('configSceneDisplay');
+    
     // Ajuste solicitado pelo usuário: índice - 1 para bater com ID da mesa
     const displayNum = Math.max(0, (window.currentSceneNumber || 0) - 1);
     const num = String(displayNum).padStart(2, '0');
     const name = window.currentSceneName || "---";
-    el.innerText = `CENA: ${num} - ${name}`;
+    const fullText = `CENA: ${num} - ${name}`;
+
+    if (el) el.innerText = fullText;
+    if (elConfig) elConfig.innerText = fullText;
 }
 
 socket.on('updateName', (data) => {
