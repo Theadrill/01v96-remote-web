@@ -1,0 +1,742 @@
+[
+  {
+    "offset": 2504372,
+    "id": "ffffffff",
+    "name": "kRecallSafeIndex"
+  },
+  {
+    "offset": 2504540,
+    "id": "ffffffff",
+    "name": "kRecallSafeEnable"
+  },
+  {
+    "offset": 2504552,
+    "id": "e",
+    "name": "kRecallSafeMode"
+  },
+  {
+    "offset": 2504564,
+    "id": "1000e",
+    "name": "kRecallSafeIndMode"
+  },
+  {
+    "offset": 2511908,
+    "id": "240056",
+    "name": "kGEQNotch1Freq"
+  },
+  {
+    "offset": 2517752,
+    "id": "f0004",
+    "name": "kUserDefineBankMem1"
+  },
+  {
+    "offset": 2517764,
+    "id": "100004",
+    "name": "kUserDefineBankMem2"
+  },
+  {
+    "offset": 2517776,
+    "id": "110004",
+    "name": "kUserDefineBankMem3"
+  },
+  {
+    "offset": 2517788,
+    "id": "120004",
+    "name": "kUserDefineBankMem4"
+  },
+  {
+    "offset": 2517800,
+    "id": "130004",
+    "name": "kUserDefineBankMem5"
+  },
+  {
+    "offset": 2517812,
+    "id": "140004",
+    "name": "kUserDefineBankMem6"
+  },
+  {
+    "offset": 2517824,
+    "id": "150004",
+    "name": "kUserDefineBankMem7"
+  },
+  {
+    "offset": 2517836,
+    "id": "160004",
+    "name": "kUserDefineBankMem8"
+  },
+  {
+    "offset": 2517848,
+    "id": "170004",
+    "name": "kUserDefineBankMem9"
+  },
+  {
+    "offset": 2517860,
+    "id": "180004",
+    "name": "kUserDefineBankMem10"
+  },
+  {
+    "offset": 2517872,
+    "id": "190004",
+    "name": "kUserDefineBankMem11"
+  },
+  {
+    "offset": 2517884,
+    "id": "1a0004",
+    "name": "kUserDefineBankMem12"
+  },
+  {
+    "offset": 2517896,
+    "id": "1b0004",
+    "name": "kUserDefineBankMem13"
+  },
+  {
+    "offset": 2517908,
+    "id": "1c0004",
+    "name": "kUserDefineBankMem14"
+  },
+  {
+    "offset": 2517920,
+    "id": "1d0004",
+    "name": "kUserDefineBankMem15"
+  },
+  {
+    "offset": 2517932,
+    "id": "1e0004",
+    "name": "kUserDefineBankMem16"
+  },
+  {
+    "offset": 2518172,
+    "id": "ffffffff",
+    "name": "kAutomixMem"
+  },
+  {
+    "offset": 2519444,
+    "id": "20000c",
+    "name": "kMachineInTimeMinute"
+  },
+  {
+    "offset": 2519492,
+    "id": "24000c",
+    "name": "kMachineOutTimeMinute"
+  },
+  {
+    "offset": 2519540,
+    "id": "28000c",
+    "name": "kMachineRtzTimeMinute"
+  },
+  {
+    "offset": 2521268,
+    "id": "ffffffff",
+    "name": "kAutomixChLibLast"
+  },
+  {
+    "offset": 2521280,
+    "id": "3e",
+    "name": "kAutomixEQLibLast"
+  },
+  {
+    "offset": 2521292,
+    "id": "1003e",
+    "name": "kAutomixGtLibLast"
+  },
+  {
+    "offset": 2521304,
+    "id": "2003e",
+    "name": "kAutomixCoLibLast"
+  },
+  {
+    "offset": 2523944,
+    "id": "47",
+    "name": "kOutPortTrimInit"
+  },
+  {
+    "offset": 2524256,
+    "id": "20055",
+    "name": "kAutomixTotalSize"
+  },
+  {
+    "offset": 2525168,
+    "id": "72",
+    "name": "kMeterEQOutH"
+  },
+  {
+    "offset": 2525480,
+    "id": "73",
+    "name": "kMeterEQOut"
+  },
+  {
+    "offset": 2527844,
+    "id": "1002d",
+    "name": "kSoloChTotalOn"
+  },
+  {
+    "offset": 2527892,
+    "id": "1002e",
+    "name": "kSoloMasterTotalOn"
+  },
+  {
+    "offset": 2529560,
+    "id": "130038",
+    "name": "kAutomixSyncDropSMPTE"
+  },
+  {
+    "offset": 2529572,
+    "id": "140038",
+    "name": "kAutomixSyncDropMTC"
+  },
+  {
+    "offset": 2529584,
+    "id": "150038",
+    "name": "kAutomixSyncLockSMPTE"
+  },
+  {
+    "offset": 2529596,
+    "id": "160038",
+    "name": "kAutomixSyncLockMTC"
+  },
+  {
+    "offset": 2529608,
+    "id": "170038",
+    "name": "kAutomixSyncJumpSMPTE"
+  },
+  {
+    "offset": 2529620,
+    "id": "180038",
+    "name": "kAutomixSyncJumpMTC"
+  },
+  {
+    "offset": 2530352,
+    "id": "290041",
+    "name": "kEditEQLib"
+  },
+  {
+    "offset": 2530364,
+    "id": "2a0041",
+    "name": "kEditGateLib"
+  },
+  {
+    "offset": 2530376,
+    "id": "2b0041",
+    "name": "kEditCompLib"
+  },
+  {
+    "offset": 2530388,
+    "id": "2c0041",
+    "name": "kEditEffLib"
+  },
+  {
+    "offset": 2530400,
+    "id": "2d0041",
+    "name": "kEditGEQLib"
+  },
+  {
+    "offset": 2530412,
+    "id": "2e0041",
+    "name": "kEditChLib"
+  },
+  {
+    "offset": 2530424,
+    "id": "2f0041",
+    "name": "kEditEffLib1"
+  },
+  {
+    "offset": 2530436,
+    "id": "300041",
+    "name": "kEditEffLib2"
+  },
+  {
+    "offset": 2530448,
+    "id": "310041",
+    "name": "kEditEffLib3"
+  },
+  {
+    "offset": 2530460,
+    "id": "320041",
+    "name": "kEditEffLib4"
+  },
+  {
+    "offset": 2530472,
+    "id": "330041",
+    "name": "kEditEffLib5"
+  },
+  {
+    "offset": 2530484,
+    "id": "340041",
+    "name": "kEditEffLib6"
+  },
+  {
+    "offset": 2530496,
+    "id": "350041",
+    "name": "kEditEffLib7"
+  },
+  {
+    "offset": 2530508,
+    "id": "360041",
+    "name": "kEditEffLib8"
+  },
+  {
+    "offset": 2530652,
+    "id": "40042",
+    "name": "kEditMemNo"
+  },
+  {
+    "offset": 2531300,
+    "id": "20054",
+    "name": "kTxEnableBulk"
+  },
+  {
+    "offset": 2531336,
+    "id": "50054",
+    "name": "kTxBulkInterval"
+  },
+  {
+    "offset": 2531396,
+    "id": "20055",
+    "name": "kRxEnableBulk"
+  },
+  {
+    "offset": 2531516,
+    "id": "20056",
+    "name": "kOmniEnableBulk"
+  },
+  {
+    "offset": 2531636,
+    "id": "20057",
+    "name": "kEchoEnableBulk"
+  },
+  {
+    "offset": 2534360,
+    "id": "ff",
+    "name": "kMemSceneNow"
+  },
+  {
+    "offset": 2534372,
+    "id": "9",
+    "name": "kMemSceneLast"
+  },
+  {
+    "offset": 2534384,
+    "id": "10009",
+    "name": "kMemSceneEditFlag"
+  },
+  {
+    "offset": 2534396,
+    "id": "20009",
+    "name": "kMemSceneUndoStatus"
+  },
+  {
+    "offset": 2534408,
+    "id": "30009",
+    "name": "kMemSceneUndoKind"
+  },
+  {
+    "offset": 2534420,
+    "id": "40009",
+    "name": "kMemSceneUndoNum"
+  },
+  {
+    "offset": 2534448,
+    "id": "ff",
+    "name": "kMemInPatchNow"
+  },
+  {
+    "offset": 2534460,
+    "id": "a",
+    "name": "kMemInPatchLast"
+  },
+  {
+    "offset": 2534472,
+    "id": "1000a",
+    "name": "kMemInPatchEditFlag"
+  },
+  {
+    "offset": 2534484,
+    "id": "2000a",
+    "name": "kMemInPatchUndoStatus"
+  },
+  {
+    "offset": 2534496,
+    "id": "3000a",
+    "name": "kMemInPatchUndoKind"
+  },
+  {
+    "offset": 2534508,
+    "id": "4000a",
+    "name": "kMemInPatchUndoNum"
+  },
+  {
+    "offset": 2534536,
+    "id": "ff",
+    "name": "kMemOutPatchNow"
+  },
+  {
+    "offset": 2534548,
+    "id": "b",
+    "name": "kMemOutPatchLast"
+  },
+  {
+    "offset": 2534560,
+    "id": "1000b",
+    "name": "kMemOutPatchEditFlag"
+  },
+  {
+    "offset": 2534572,
+    "id": "2000b",
+    "name": "kMemOutPatchUndoStatus"
+  },
+  {
+    "offset": 2534584,
+    "id": "3000b",
+    "name": "kMemOutPatchUndoKind"
+  },
+  {
+    "offset": 2534596,
+    "id": "4000b",
+    "name": "kMemOutPatchUndoNum"
+  },
+  {
+    "offset": 2534624,
+    "id": "ff",
+    "name": "kMemChLibNow"
+  },
+  {
+    "offset": 2534636,
+    "id": "c",
+    "name": "kMemChLibLast"
+  },
+  {
+    "offset": 2534648,
+    "id": "1000c",
+    "name": "kMemChLibEditFlag"
+  },
+  {
+    "offset": 2534660,
+    "id": "2000c",
+    "name": "kMemChLibUndoStatus"
+  },
+  {
+    "offset": 2534672,
+    "id": "3000c",
+    "name": "kMemChLibUndoKind"
+  },
+  {
+    "offset": 2534684,
+    "id": "4000c",
+    "name": "kMemChLibUndoNum"
+  },
+  {
+    "offset": 2534712,
+    "id": "ff",
+    "name": "kMemEQLibNow"
+  },
+  {
+    "offset": 2534724,
+    "id": "d",
+    "name": "kMemEQLibLast"
+  },
+  {
+    "offset": 2534736,
+    "id": "1000d",
+    "name": "kMemEQLibEditFlag"
+  },
+  {
+    "offset": 2534748,
+    "id": "2000d",
+    "name": "kMemEQLibUndoStatus"
+  },
+  {
+    "offset": 2534760,
+    "id": "3000d",
+    "name": "kMemEQLibUndoKind"
+  },
+  {
+    "offset": 2534772,
+    "id": "4000d",
+    "name": "kMemEQLibUndoNum"
+  },
+  {
+    "offset": 2534800,
+    "id": "ff",
+    "name": "kMemGtLibNow"
+  },
+  {
+    "offset": 2534812,
+    "id": "e",
+    "name": "kMemGtLibLast"
+  },
+  {
+    "offset": 2534824,
+    "id": "1000e",
+    "name": "kMemGtLibEditFlag"
+  },
+  {
+    "offset": 2534836,
+    "id": "2000e",
+    "name": "kMemGtLibUndoStatus"
+  },
+  {
+    "offset": 2534848,
+    "id": "3000e",
+    "name": "kMemGtLibUndoKind"
+  },
+  {
+    "offset": 2534860,
+    "id": "4000e",
+    "name": "kMemGtLibUndoNum"
+  },
+  {
+    "offset": 2534888,
+    "id": "ff",
+    "name": "kMemCoLibNow"
+  },
+  {
+    "offset": 2534900,
+    "id": "f",
+    "name": "kMemCoLibLast"
+  },
+  {
+    "offset": 2534912,
+    "id": "1000f",
+    "name": "kMemCoLibEditFlag"
+  },
+  {
+    "offset": 2534924,
+    "id": "2000f",
+    "name": "kMemCoLibUndoStatus"
+  },
+  {
+    "offset": 2534936,
+    "id": "3000f",
+    "name": "kMemCoLibUndoKind"
+  },
+  {
+    "offset": 2534948,
+    "id": "4000f",
+    "name": "kMemCoLibUndoNum"
+  },
+  {
+    "offset": 2534976,
+    "id": "ff",
+    "name": "kMemEfLibNow"
+  },
+  {
+    "offset": 2534988,
+    "id": "10",
+    "name": "kMemEfLibLast"
+  },
+  {
+    "offset": 2535000,
+    "id": "10010",
+    "name": "kMemEfLibEditFlag"
+  },
+  {
+    "offset": 2535012,
+    "id": "20010",
+    "name": "kMemEfLibUndoStatus"
+  },
+  {
+    "offset": 2535024,
+    "id": "30010",
+    "name": "kMemEfLibUndoKind"
+  },
+  {
+    "offset": 2535036,
+    "id": "40010",
+    "name": "kMemEfLibUndoNum"
+  },
+  {
+    "offset": 2535064,
+    "id": "ff",
+    "name": "kMemGEQLibNow"
+  },
+  {
+    "offset": 2535076,
+    "id": "11",
+    "name": "kMemGEQLibLast"
+  },
+  {
+    "offset": 2535088,
+    "id": "10011",
+    "name": "kMemGEQLibEditFlag"
+  },
+  {
+    "offset": 2535100,
+    "id": "20011",
+    "name": "kMemGEQLibUndoStatus"
+  },
+  {
+    "offset": 2535112,
+    "id": "30011",
+    "name": "kMemGEQLibUndoKind"
+  },
+  {
+    "offset": 2535124,
+    "id": "40011",
+    "name": "kMemGEQLibUndoNum"
+  },
+  {
+    "offset": 2535152,
+    "id": "ff",
+    "name": "kMemB2SLibNow"
+  },
+  {
+    "offset": 2535164,
+    "id": "12",
+    "name": "kMemB2SLibLast"
+  },
+  {
+    "offset": 2535176,
+    "id": "10012",
+    "name": "kMemB2SLibEditFlag"
+  },
+  {
+    "offset": 2535188,
+    "id": "20012",
+    "name": "kMemB2SLibUndoStatus"
+  },
+  {
+    "offset": 2535200,
+    "id": "30012",
+    "name": "kMemB2SLibUndoKind"
+  },
+  {
+    "offset": 2535212,
+    "id": "40012",
+    "name": "kMemB2SLibUndoNum"
+  },
+  {
+    "offset": 2535240,
+    "id": "ff",
+    "name": "kMemMonLibNow"
+  },
+  {
+    "offset": 2535252,
+    "id": "13",
+    "name": "kMemMonLibLast"
+  },
+  {
+    "offset": 2535264,
+    "id": "10013",
+    "name": "kMemMonLibEditFlag"
+  },
+  {
+    "offset": 2535276,
+    "id": "20013",
+    "name": "kMemMonLibUndoStatus"
+  },
+  {
+    "offset": 2535288,
+    "id": "30013",
+    "name": "kMemMonLibUndoKind"
+  },
+  {
+    "offset": 2535300,
+    "id": "40013",
+    "name": "kMemMonLibUndoNum"
+  },
+  {
+    "offset": 2535856,
+    "id": "ffffffff",
+    "name": "kFadCalibFlag"
+  },
+  {
+    "offset": 2535880,
+    "id": "ffffffff",
+    "name": "kFadCalibFdRank"
+  },
+  {
+    "offset": 2536964,
+    "id": "20024",
+    "name": "kBULKLibraryType"
+  },
+  {
+    "offset": 2536976,
+    "id": "30024",
+    "name": "kEQLibSelection"
+  },
+  {
+    "offset": 2536988,
+    "id": "40024",
+    "name": "kGateLibSelection"
+  },
+  {
+    "offset": 2537000,
+    "id": "50024",
+    "name": "kCompLibSelection"
+  },
+  {
+    "offset": 2537012,
+    "id": "60024",
+    "name": "kChLibSelection"
+  },
+  {
+    "offset": 2537024,
+    "id": "70024",
+    "name": "kEffectLibSelection"
+  },
+  {
+    "offset": 2537036,
+    "id": "80024",
+    "name": "kBus2StLibSelection"
+  },
+  {
+    "offset": 2537048,
+    "id": "90024",
+    "name": "kGEQLibSelection"
+  },
+  {
+    "offset": 2537060,
+    "id": "a0024",
+    "name": "kInPatchLibSelection"
+  },
+  {
+    "offset": 2537072,
+    "id": "b0024",
+    "name": "kOutPatchLibSelection"
+  },
+  {
+    "offset": 2537084,
+    "id": "c0024",
+    "name": "kSurrMonLibSelection"
+  },
+  {
+    "offset": 2537096,
+    "id": "d0024",
+    "name": "kBULKBankType"
+  },
+  {
+    "offset": 2538388,
+    "id": "a002a",
+    "name": "kHuiMemLoc"
+  },
+  {
+    "offset": 2544132,
+    "id": "ffffffff",
+    "name": "kAutomixEfLibLast"
+  },
+  {
+    "offset": 2544156,
+    "id": "ffffffff",
+    "name": "kAutomixGEQLibLast"
+  },
+  {
+    "offset": 2544180,
+    "id": "ffffffff",
+    "name": "kAutomixB2SLibLast"
+  },
+  {
+    "offset": 2544204,
+    "id": "ffffffff",
+    "name": "kAutomixMonLibLast"
+  },
+  {
+    "offset": 2544460,
+    "id": "8004d",
+    "name": "kLockSafeSceneMemory"
+  },
+  {
+    "offset": 2548572,
+    "id": "0",
+    "name": "kStMgrWinLibrary"
+  }
+]
