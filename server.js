@@ -953,12 +953,18 @@ io.on('connection', (socket) => {
 
         // Previne override do index 0 do Edit Buffer
         sceneManager.setActiveScene(index);
+        
+        // Copia localmente o nome da biblioteca para o Edit Buffer sem precisar baixar tudo de novo
+        const cachedParams = sceneManager.getScenes().find(s => s && s.index === index);
+        if (cachedParams && sceneManager.currentScene) {
+            sceneManager.currentScene.name = cachedParams.name;
+        }
 
-        setTimeout(async () => {
+        // Os motores dos faders demoram cerca de 1 a 1.5s para realizar as viagens físicas longas.
+        // A CPU da 01V96 ignora tráfego SysEx moderado/pesado enquanto opera motores massivamente.
+        // Esperamos 2000ms cravados para o desk assentar antes de pedir a avalanche de updates.
+        setTimeout(() => {
             if (isConnected) {
-                // Atualiza o Edit Buffer para pegarmos o novo nome da cena
-                await sceneManager.fetchScenes(midiEngine);
-                
                 io.emit('scenesUpdated', {
                     scenes: sceneManager.getScenes(),
                     currentScene: sceneManager.getCurrentScene()
@@ -967,7 +973,7 @@ io.on('connection', (socket) => {
                 // Manda sync para recarregar todos os faders na nova view
                 triggerSync(null); 
             }
-        }, 800);
+        }, 2000);
     });
 
     socket.on('toggleDemo', (data) => {
