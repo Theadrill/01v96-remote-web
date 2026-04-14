@@ -203,8 +203,7 @@ function updateSceneDisplay() {
     const el = document.getElementById('scene-info');
     const elConfig = document.getElementById('configSceneDisplay');
     
-    // Ajuste solicitado pelo usuário: índice - 1 para bater com ID da mesa
-    const displayNum = Math.max(0, (window.currentSceneNumber || 0) - 1);
+    const displayNum = window.currentSceneNumber || 0;
     const num = String(displayNum).padStart(2, '0');
     const name = window.currentSceneName || "---";
     const fullText = `CENA: ${num} - ${name}`;
@@ -340,13 +339,6 @@ socket.on('sync', (s) => {
     if (s.master) {
         Object.assign(masterState, s.master);
         updateUI('master', s.master.value, s.master.on, undefined);
-    }
-
-    if (s.sceneName) {
-        window.currentSceneName = s.sceneName;
-        window.currentSceneNumber = s.sceneNumber || 0;
-        if (s.sceneChars) window.sceneChars = s.sceneChars;
-        updateSceneDisplay();
     }
 });
 

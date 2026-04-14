@@ -67,12 +67,22 @@ window.showSceneGrid = (action) => {
         
         btn.onclick = () => {
             if (action === 'load') {
-                if (confirm(`Tem certeza que deseja CARREGAR a cena ${scene.index} (${scene.name})?\n\nISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`)) {
+                document.getElementById('sceneConfirmTitle').innerText = "CARREGAR CENA?";
+                document.getElementById('sceneConfirmTitle').style.color = "#ffcc00";
+                document.getElementById('sceneConfirmText').innerHTML = `Deseja CARREGAR a cena <b>${scene.index} (${scene.name})</b>?<br><br>ISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`;
+                
+                const actionBtn = document.getElementById('sceneConfirmActionBtn');
+                actionBtn.style.background = "#28a745";
+                actionBtn.innerText = "SIM, CARREGAR";
+                actionBtn.onclick = () => {
                     socket.emit('recallScene', { index: scene.index });
+                    document.getElementById('sceneConfirmModal').style.display = 'none';
                     modal.style.display = 'none';
                     const shield = document.getElementById('syncShield');
                     if (shield) shield.style.display = 'flex';
-                }
+                };
+                
+                document.getElementById('sceneConfirmModal').style.display = 'flex';
             } else {
                 alert(`Ação de ${action} para a cena ${scene.index} (${scene.name}) ainda não implementada neste escopo!`);
                 modal.style.display = 'none';

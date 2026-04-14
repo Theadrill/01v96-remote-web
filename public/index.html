@@ -503,6 +503,24 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmação de Cena -->
+    <div id="sceneConfirmModal" class="modal-overlay" style="z-index:19000; display:none;">
+        <div class="modal-content"
+            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #333; background:#1a1a1a; padding:30px; border-radius:15px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Atenção!</p>
+            <h3 id="sceneConfirmTitle" style="margin-top:0; color:#ffcc00; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+                CARREGAR CENA?</h3>
+            <p id="sceneConfirmText" style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente carregar a cena?</p>
+            <div style="display:flex; gap:15px;">
+                <button id="sceneConfirmActionBtn" class="btn-connect"
+                    style="flex:1; margin:0; height:45px; background:#28a745;">SIM</button>
+                <button onclick="document.getElementById('sceneConfirmModal').style.display='none'" class="btn-close"
+                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
     <script src="modules/globals.js"></script>
     <script src="modules/macros/core.js"></script>
     <script src="modules/macros.js"></script>

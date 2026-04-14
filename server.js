@@ -741,12 +741,12 @@ async function triggerSync(targetSocket = null, forceNames = false) {
     
     syncPipeline.clear();
     
-    // 1. Número e Nome da Cena (Prioridade Máxima)
-    syncPipeline.addTask(protocol.buildRequest('kSceneNumber', 0));
-    syncPipeline.addTask(protocol.buildRequest('kSceneNumberFallback', 0));
-    for (let c = 0; c < 16; c++) {
-        syncPipeline.addTask(protocol.buildRequest(`kSceneTitle/kTitle${c + 1}`, 0));
-    }
+    // --- CENA ---
+    // (As requisições kSceneTitle e kSceneNumber não são confiáveis via Parameter Request.
+    // O tráfego de cena agora é gerenciado 100% pelo modulo SceneManager via Bulk Dump Type 0x02 e emitido via 'scenesUpdated').
+
+    // --- MESTRE ---
+    syncPipeline.addTask(protocol.buildRequest('kStereoFader/kFader', 0));
 
     // 2. Parâmetros de Canal (Input 1-32)
     for (let i = 0; i < 32; i++) {
@@ -948,15 +948,25 @@ io.on('connection', (socket) => {
         if (!isConnected || index === undefined) return;
 
         console.log(`🎬 [SCENE] Comando recebido: RECALL Cena ${index}`);
-        // Comando retirado da engenharia reversa (sys ex de memory control - recall)
-        // F0 43 10 3E 7F 10 00 00 [INDEX] 02 00 F7
         const sysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x00, 0x00, index, 0x02, 0x00, 0xF7];
         midiEngine.send(sysex);
 
-        // Ao dar recall, os motores físicos da mesa operam e muitos dados mudam internamente.
-        // Damos 800ms para a mesa estabilizar e forçamos a ressincronização total para atualizar o app web
-        setTimeout(() => {
-            if (isConnected) triggerSync(null); 
+        // Previne override do index 0 do Edit Buffer
+        sceneManager.setActiveScene(index);
+
+        setTimeout(async () => {
+            if (isConnected) {
+                // Atualiza o Edit Buffer para pegarmos o novo nome da cena
+                await sceneManager.fetchScenes(midiEngine);
+                
+                io.emit('scenesUpdated', {
+                    scenes: sceneManager.getScenes(),
+                    currentScene: sceneManager.getCurrentScene()
+                });
+
+                // Manda sync para recarregar todos os faders na nova view
+                triggerSync(null); 
+            }
         }, 800);
     });
 

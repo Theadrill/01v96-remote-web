@@ -7,9 +7,11 @@ class SceneManager {
     constructor() {
         this.scenes = [];
         this.currentScene = null;
+        this.activeSceneIndex = 0;
         this.isSyncing = false;
         this.io = null;
     }
+
 
     setIO(ioInstance) {
         this.io = ioInstance;
@@ -94,8 +96,11 @@ class SceneManager {
                 const sceneData = { index, name };
 
                 if (type === 0x02) {
-                    this.currentScene = sceneData;
-                    if (this.io) this.io.emit('currentScene', sceneData);
+                    this.currentScene = {
+                        index: this.activeSceneIndex || 0, // Usa o index ativamente armazenado
+                        name: sceneData.name
+                    };
+                    if (this.io) this.io.emit('currentScene', this.currentScene);
                 } else {
                     this.scenes[index] = sceneData;
                 }
@@ -112,6 +117,26 @@ class SceneManager {
             scenes: this.scenes.filter(s => s != null) // Retorna lista compactada
         };
     }
+
+    getScenes() {
+        return this.scenes.filter(s => s != null);
+    }
+
+    getCurrentScene() {
+        if (!this.currentScene) return null;
+        return {
+            index: this.activeSceneIndex || 0,
+            name: this.currentScene.name
+        };
+    }
+
+    setActiveScene(index) {
+        this.activeSceneIndex = index;
+        if (this.currentScene) {
+            this.currentScene.index = index;
+        }
+    }
 }
+
 
 module.exports = new SceneManager();
