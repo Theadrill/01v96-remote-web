@@ -2,6 +2,15 @@ const midi = require('midi');
 const fs = require('fs');
 const path = require('path');
 
+const logStream = fs.createWriteStream(path.join(__dirname, 'monitor_log.txt'), { flags: 'w' });
+const originalConsoleLog = console.log;
+console.log = function(...args) {
+    const formattedMessage = require('util').format(...args);
+    const cleanMessage = formattedMessage.replace(/\x1b\[[0-9;]*m/g, ''); // Remove ANSI color codes
+    logStream.write(cleanMessage + '\n');
+    originalConsoleLog.apply(console, args);
+};
+
 /**
  * MONITOR.JS - MIDI Bridge com Reassembly de SysEx
  * 

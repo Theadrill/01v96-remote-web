@@ -14,6 +14,7 @@ const dummy = require('./src/meter_dummy');
 const masterMeter = require('./src/master-meter');
 const { exec } = require('child_process');
 const MidiPipeline = require('./src/midi-pipeline');
+const sceneManager = require('./src/scene_manager');
 
 let dummyMeterInterval = null;
 const syncPipeline = new MidiPipeline(midiEngine);
@@ -23,6 +24,11 @@ let meterDataBuffer = new Array(33).fill(0);
 let lastMeterTime = 0;
 
 const handleMIDIData = (midiData, rawMessage = null) => {
+    // Intercepta cenas (Bulk Dumps grandes Type 00 e 02)
+    if (sceneManager.handleMIDIData(rawMessage)) {
+        return; // É um dump de cena, o Scene Manager já lidou com ele
+    }
+
     if (!midiData) return;
     lastActivityTime = Date.now();
 
@@ -659,11 +665,14 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         console.log(`✅ Conexão MIDI estabelecida com sucesso! (${inName})`);
         atualizarMenuTray();
         
-        // --- COOLDOWN ESTRATÉGICO ---
-        // Aguardamos 5s antes de iniciar o Sync para garantir que a mesa e o driver 
-        // MIDI (loopMIDI) limpem buffers residuais da sessão anterior.
-        setTimeout(() => {
-            if (isConnected) triggerSync(targetSocket);
+        // --- COOLDOWN ESTRATÉGICO E SINCRONIA DE CENAS ---
+        // Aguardamos 5s para os buffers residuais, mas NESSE TEMPO, baixamos a biblioteca de cenas
+        sceneManager.setIO(io);
+        setTimeout(async () => {
+            if (isConnected) {
+                await sceneManager.fetchScenes(midiEngine);
+                triggerSync(targetSocket);
+            }
         }, 5000);
 
 
@@ -899,6 +908,7 @@ io.on('connection', (socket) => {
     const currentConfig = loadConfig();
     socket.emit('portsList', { available: midiEngine.getAvailablePorts(), savedConfig: currentConfig });
     socket.emit('sync', stateManager.getState());
+    socket.emit('scenesUpdated', sceneManager.getState());
     socket.emit('syncStatus', isSyncing);
     socket.emit('connectionState', { connected: isConnected });
 
@@ -908,6 +918,7 @@ io.on('connection', (socket) => {
         if (isConnected && config.inIdx === data.inIdx && config.outIdx === data.outIdx) {
             console.log("🔌 Cliente reconectando, mas MIDI já está ativo nestas portas. Enviando apenas sync local...");
             socket.emit('sync', stateManager.getState());
+            socket.emit('scenesUpdated', sceneManager.getState());
             socket.emit('connectResult', { success: true });
             return;
         }
@@ -930,6 +941,23 @@ io.on('connection', (socket) => {
     socket.on('syncNamesOnly', () => {
         console.log("🔄 Solicitação manual de SINCRONIA DE NOMES...");
         syncNames();
+    });
+
+    socket.on('recallScene', (data) => {
+        const index = data.index;
+        if (!isConnected || index === undefined) return;
+
+        console.log(`🎬 [SCENE] Comando recebido: RECALL Cena ${index}`);
+        // Comando retirado da engenharia reversa (sys ex de memory control - recall)
+        // F0 43 10 3E 7F 10 00 00 [INDEX] 02 00 F7
+        const sysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x00, 0x00, index, 0x02, 0x00, 0xF7];
+        midiEngine.send(sysex);
+
+        // Ao dar recall, os motores físicos da mesa operam e muitos dados mudam internamente.
+        // Damos 800ms para a mesa estabilizar e forçamos a ressincronização total para atualizar o app web
+        setTimeout(() => {
+            if (isConnected) triggerSync(null); 
+        }, 800);
     });
 
     socket.on('toggleDemo', (data) => {

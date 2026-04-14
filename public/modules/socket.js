@@ -350,6 +350,26 @@ socket.on('sync', (s) => {
     }
 });
 
+socket.on('scenesUpdated', (data) => {
+    if (data.scenes) {
+        window.scenesLibrary = data.scenes;
+        console.log(`📚 Biblioteca de Cenas atualizada: ${data.scenes.length} cenas.`);
+    }
+    if (data.currentScene) {
+        window.currentSceneNumber = data.currentScene.index;
+        window.currentSceneName = data.currentScene.name;
+        if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
+    }
+});
+
+socket.on('currentScene', (data) => {
+    if (data) {
+        window.currentSceneNumber = data.index;
+        window.currentSceneName = data.name;
+        if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
+    }
+});
+
 socket.on('connectionState', (state) => {
     document.body.classList.toggle('is-offline', !state.connected);
     const scn = document.getElementById('scn');

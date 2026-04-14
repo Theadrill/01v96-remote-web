@@ -1,0 +1,107 @@
+--- MAPEANDO PORTAS MIDI ---
+  [IN]  0: Yamaha 01V96-1
+  [IN]  1: Yamaha 01V96-2
+  [IN]  2: Yamaha 01V96-3
+  [IN]  3: Yamaha 01V96-4
+  [IN]  4: Yamaha 01V96-5
+  [IN]  5: Yamaha 01V96-6
+  [IN]  6: Yamaha 01V96-7
+  [IN]  7: Yamaha 01V96-8
+  [IN]  8: SMC-PAD-bt-2
+  [IN]  9: monitor
+  [OUT] 0: Microsoft GS Wavetable Synth
+  [OUT] 1: Yamaha 01V96-1
+  [OUT] 2: Yamaha 01V96-2
+  [OUT] 3: Yamaha 01V96-3
+  [OUT] 4: Yamaha 01V96-4
+  [OUT] 5: Yamaha 01V96-5
+  [OUT] 6: Yamaha 01V96-6
+  [OUT] 7: Yamaha 01V96-7
+  [OUT] 8: Yamaha 01V96-8
+  [OUT] 9: SMC-PAD-bt-2
+  [OUT] 10: monitor
+
+====================================================
+🚀 BRIDGE MIDI ATIVO (SysEx Reassembly)
+   YAMAHA  IN:0  OUT:1
+   MONITOR IN:9  OUT:10
+====================================================
+
+✅ [FILTER] 3 prefixos carregados.
+[04:20:46] 🎹 Y→S (1b): F7
+[04:20:47] 🎹 Y→S (14b): F0 43 10 3E 0D 04 24 00 00 00 00 00 01 F7
+[04:20:47] 💻 S→Y (14b): F0 43 10 3E 0D 04 24 00 00 00 00 00 01 F7
+📊 Y→S: 1662 | S→Y: 7 | 📶 Meters: 1660 | 🛡️ Filtrados: 6 | 🔁 Loopback filtrado: 1660
+📊 Y→S: 1159 | S→Y: 4 | 📶 Meters: 1159 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 1159
+📊 Y→S: 394 | S→Y: 0 | 📶 Meters: 394 | 🔁 Loopback filtrado: 394
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+📊 Y→S: 380 | S→Y: 4 | 📶 Meters: 380 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 380
+[04:21:12] 💻 S→Y (12b): F0 43 10 3E 7F 10 00 00 01 02 00 F7
+[04:21:12] 🎹 Y→S (15b): F0 43 10 3E 7F 50 00 00 01 00 00 00 00 00 F7
+[04:21:12] 💻 S→Y (15b): F0 43 10 3E 7F 50 00 00 01 00 00 00 00 00 F7
+[04:21:12] 🎹 Y→S (14b): F0 43 10 3E 0D 03 17 01 00 00 00 00 00 F7
+[04:21:12] 💻 S→Y (14b): F0 43 10 3E 0D 03 17 01 00 00 00 00 00 F7
+📊 Y→S: 460 | S→Y: 3 | 📶 Meters: 458 | 🔁 Loopback filtrado: 458
+📊 Y→S: 488 | S→Y: 4 | 📶 Meters: 488 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 488
+📊 Y→S: 355 | S→Y: 0 | 📶 Meters: 355 | 🔁 Loopback filtrado: 355
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+📊 Y→S: 447 | S→Y: 4 | 📶 Meters: 447 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 447
+📊 Y→S: 391 | S→Y: 0 | 📶 Meters: 391 | 🔁 Loopback filtrado: 391
+📊 Y→S: 488 | S→Y: 4 | 📶 Meters: 488 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 488
+📊 Y→S: 381 | S→Y: 4 | 📶 Meters: 381 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 380
+[04:21:56] 💻 S→Y (12b): F0 43 10 3E 7F 10 20 00 03 02 00 F7
+[04:21:56] 🎹 Y→S (15b): F0 43 10 3E 7F 50 20 00 03 00 00 00 00 00 F7
+[04:21:56] 💻 S→Y (15b): F0 43 10 3E 7F 50 20 00 03 00 00 00 00 00 F7
+📊 Y→S: 458 | S→Y: 2 | 📶 Meters: 457 | 🔁 Loopback filtrado: 458
+📊 Y→S: 491 | S→Y: 4 | 📶 Meters: 491 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 491
+📊 Y→S: 352 | S→Y: 0 | 📶 Meters: 352 | 🔁 Loopback filtrado: 352
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+[04:22:14] 💻 S→Y (26b): F0 43 10 3E 7F 10 40 00 03 74 65 73 74 65 65 33 33 33 20 20 20 20 20 20 20 F7
+[04:22:15] 🎹 Y→S (15b): F0 43 10 3E 7F 50 40 00 03 00 00 00 00 00 F7
+[04:22:15] 💻 S→Y (15b): F0 43 10 3E 7F 50 40 00 03 00 00 00 00 00 F7
+📊 Y→S: 448 | S→Y: 6 | 📶 Meters: 447 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 447
+📊 Y→S: 391 | S→Y: 0 | 📶 Meters: 391 | 🔁 Loopback filtrado: 391
+📊 Y→S: 488 | S→Y: 4 | 📶 Meters: 488 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 488
+📊 Y→S: 383 | S→Y: 4 | 📶 Meters: 383 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 383
+[04:22:36] 💻 S→Y (12b): F0 43 10 3E 7F 10 20 00 05 02 00 F7
+[04:22:36] 🎹 Y→S (15b): F0 43 10 3E 7F 50 20 00 05 00 00 00 00 00 F7
+[04:22:36] 💻 S→Y (15b): F0 43 10 3E 7F 50 20 00 05 00 00 00 00 00 F7
+📊 Y→S: 456 | S→Y: 2 | 📶 Meters: 455 | 🔁 Loopback filtrado: 455
+[04:22:38] 💻 S→Y (26b): F0 43 10 3E 7F 10 40 00 05 74 65 73 74 65 65 33 33 33 20 20 20 20 20 20 20 F7
+[04:22:38] 🎹 Y→S (15b): F0 43 10 3E 7F 50 40 00 05 00 00 00 00 00 F7
+[04:22:38] 💻 S→Y (15b): F0 43 10 3E 7F 50 40 00 05 00 00 00 00 00 F7
+[04:22:41] 💻 S→Y (26b): F0 43 10 3E 7F 10 40 00 05 74 65 73 74 65 65 33 33 33 20 20 20 20 20 20 20 F7
+[04:22:41] 🎹 Y→S (15b): F0 43 10 3E 7F 50 40 00 05 00 00 00 00 00 F7
+[04:22:41] 💻 S→Y (15b): F0 43 10 3E 7F 50 40 00 05 00 00 00 00 00 F7
+📊 Y→S: 493 | S→Y: 8 | 📶 Meters: 491 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 491
+📊 Y→S: 352 | S→Y: 0 | 📶 Meters: 352 | 🔁 Loopback filtrado: 352
+[04:22:48] 💻 S→Y (10b): F0 43 10 3E 7F 10 60 00 05 F7
+[04:22:48] 🎹 Y→S (15b): F0 43 10 3E 7F 50 60 00 05 00 00 00 00 00 F7
+[04:22:48] 💻 S→Y (15b): F0 43 10 3E 7F 50 60 00 05 00 00 00 00 00 F7
+📊 Y→S: 492 | S→Y: 6 | 📶 Meters: 491 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 491
+📊 Y→S: 451 | S→Y: 4 | 📶 Meters: 451 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 451
+📊 Y→S: 391 | S→Y: 0 | 📶 Meters: 391 | 🔁 Loopback filtrado: 391
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+📊 Y→S: 384 | S→Y: 4 | 📶 Meters: 384 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 384
+📊 Y→S: 459 | S→Y: 0 | 📶 Meters: 459 | 🔁 Loopback filtrado: 459
+📊 Y→S: 486 | S→Y: 4 | 📶 Meters: 486 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 486
+📊 Y→S: 352 | S→Y: 0 | 📶 Meters: 352 | 🔁 Loopback filtrado: 352
+📊 Y→S: 488 | S→Y: 4 | 📶 Meters: 488 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 488
+📊 Y→S: 447 | S→Y: 4 | 📶 Meters: 447 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 447
+📊 Y→S: 391 | S→Y: 0 | 📶 Meters: 391 | 🔁 Loopback filtrado: 391
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+📊 Y→S: 385 | S→Y: 4 | 📶 Meters: 385 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 384
+📊 Y→S: 457 | S→Y: 0 | 📶 Meters: 457 | 🔁 Loopback filtrado: 458
+📊 Y→S: 488 | S→Y: 4 | 📶 Meters: 488 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 488
+📊 Y→S: 351 | S→Y: 0 | 📶 Meters: 351 | 🔁 Loopback filtrado: 351
+📊 Y→S: 488 | S→Y: 4 | 📶 Meters: 488 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 488
+📊 Y→S: 448 | S→Y: 4 | 📶 Meters: 448 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 448
+📊 Y→S: 391 | S→Y: 0 | 📶 Meters: 391 | 🔁 Loopback filtrado: 391
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+📊 Y→S: 382 | S→Y: 4 | 📶 Meters: 382 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 381
+📊 Y→S: 460 | S→Y: 0 | 📶 Meters: 460 | 🔁 Loopback filtrado: 461
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+📊 Y→S: 351 | S→Y: 0 | 📶 Meters: 351 | 🔁 Loopback filtrado: 351
+📊 Y→S: 487 | S→Y: 4 | 📶 Meters: 487 | 🛡️ Filtrados: 4 | 🔁 Loopback filtrado: 487
+
+Encerrando monitor...
