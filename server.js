@@ -102,6 +102,7 @@ let lastActivityTime = 0; // Timestamp da última mensagem recebida da mesa
 let isSyncing = false; // Flag para evitar múltiplas sincronias simultâneas
 let isFullySynced = false; // Flag para liberar os meters apenas após carga total
 let hasSyncedNamesThisSession = false; // Flag para garantir que o server busque na mesa pelo menos 1 vez por boot
+const nameUpdateTimers = new Map();
 
 // Fila para pedidos de Dynamics, evitando encavalamento de MIDI
 let dynamicsQueue = [];
@@ -1023,26 +1024,36 @@ io.on('connection', (socket) => {
         saveConfig(config);
     });
 
-    socket.on('updateName', async (data) => {
+    socket.on('updateName', (data) => {
         const { channel, name } = data;
         const s = stateManager.getState();
         if (s.channels[channel] !== undefined) {
-            // Atualiza o estado local IMEDIATAMENTE (limita a 4 para ser robusto)
-            const limitedName = name.substring(0, 4);
+            // 1. Atualiza e salva o estado no servidor (Suporte a 16 chars)
+            const limitedName = name.substring(0, 16);
             stateManager.setChannelName(channel, limitedName);
-            saveNames(); // Garante o salvamento no JSON
+            saveNames();
 
-            // --- ENVIO PARA A MESA FÍSICA ---
+            // 2. BROADCAST: Envia para TODOS os clientes (Socket.io) para atualizar o UI em tempo real sem refresh
+            io.emit('updateName', { channel, name: limitedName });
+
+            // 3. MIDI SYNC: Envia para a mesa física com Debounce e Intervalo de Segurança
             if (isConnected) {
-                console.log(`📝 Enviando nome para Canal ${channel + 1}: "${limitedName}"`);
-                const paddedName = limitedName.padEnd(16, ' ').substring(0, 16);
+                if (nameUpdateTimers.has(channel)) clearTimeout(nameUpdateTimers.get(channel));
 
-                for (let i = 0; i < 16; i++) {
-                    const charCode = paddedName.charCodeAt(i);
-                    const msg = protocol.buildNameChange(channel, i, charCode);
-                    if (msg) midiEngine.send(msg);
-                    await new Promise(r => setTimeout(r, 5));
-                }
+                const timer = setTimeout(async () => {
+                    console.log(`📝 [NAMES] Sincronizando com Yamaha Ch:${channel + 1} -> "${limitedName}"`);
+                    const paddedName = limitedName.padEnd(16, ' ').substring(0, 16);
+
+                    for (let i = 0; i < 16; i++) {
+                        const charCode = paddedName.charCodeAt(i);
+                        const msg = protocol.buildNameChange(channel, i, charCode);
+                        if (msg) midiEngine.send(msg);
+                        await new Promise(r => setTimeout(r, 30)); // 30ms para estabilidade do visor da mesa
+                    }
+                    nameUpdateTimers.delete(channel);
+                }, 500); // Debounce de 500ms facilita a digitação fluida
+
+                nameUpdateTimers.set(channel, timer);
             }
         }
     });
