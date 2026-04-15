@@ -7,5 +7,17 @@ prints/
 public/modules/macros/profiles/local/*
 !public/modules/macros/profiles/local/.gitkeep
 
-names.json
+# Logs
+logs/
 server_log.txt
+monitor_log.txt
+monitor_log_full.txt
+monitor_log_scenes.txt
+debugs.txt
+dump do studiomanager.txt
+
+# Reverse Engineering - Studio Manager & AirFader DLLs
+reverse_dll_project/Studio Manager/
+reverse_dll_project/AirFader/
+reverse_dll_project/ghidra_12.0.4_PUBLIC/
+reverse_dll_project/inspect_dll/

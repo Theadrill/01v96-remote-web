@@ -1,0 +1,61 @@
+# Junie Master Meter Report - Yamaha 01V96V2
+Este relatório detalha como o AirFader lida com o meter do canal Master (Stereo) para a console Yamaha 01V96V2, baseado na análise do código-fonte decompilado.
+
+### 1. Comando de Requisição de Meter (SysEx Request)
+Para iniciar o recebimento dos dados de meter do Master Stereo, o AirFader envia a seguinte mensagem SysEx:
+
+`F0 43 3n 3E 0D 21 04 PP CC 00 01 F7`
+
+**Onde:**
+*   `F0 43`: Cabeçalho Yamaha.
+*   `3n`: `n` é o canal MIDI (ex: `30` para o canal 1).
+*   `3E`: Categoria (Digital Mixer).
+*   `0D`: ID do Modelo (01V96).
+*   `21`: Comando de Meter.
+*   `04`: Point ID para Stereo Master.
+*   `PP`: Posição do Meter (ex: Pre-fader, Post-fader). No código, isso é variável.
+*   `CC`: Sub-canal (00 para Left, 01 para Right).
+*   `00 01`: Indica o modo de operação/ativação do envio.
+
+### 2. Identificação dos Canais (Offsets)
+Internamente, o AirFader mapeia os canais Master Stereo com os seguintes offsets para o modelo 01V96V2:
+*   **Master Stereo Left:** Offset 56
+*   **Master Stereo Right:** Offset 57
+
+### 3. Fluxo de Captura e Exibição do Master Meter (v5)
+O sistema opera em um ciclo contínuo de requisição e resposta para manter a fluidez visual de 25 FPS (40ms).
+
+#### 3.1. Captura (Backend)
+1.  **Requisição Ativa:** O `server.js` executa um `setInterval` que invoca `masterMeter.buildRequest()`. Este envia o comando nativo `0x21` para o Point 4 (Stereo Master).
+2.  **Recepção MIDI:** A Yamaha responde com um pacote SysEx de 26 bytes. O `midi-engine.js` captura os bytes brutos e o `protocol.js` os identifica como `METER_DATA` (isMaster: true).
+3.  **Processamento de 14-bits (Unstuffing):** O módulo `src/master-meter.js` reconstrói os valores originais de 14 bits para os canais Left (bytes 9-10) e Right (bytes 11-12) usando a lógica: `raw = (high << 7) | low`.
+4.  **Calibração Reversa:**
+    *   O valor bruto é convertido para dB: `db = (raw - 4493) / 63.66`.
+    *   O sistema busca na chave `"master"` do `public/steps.json` qual o "Step" (0-32) que possui o valor de dB mais próximo do real da mesa.
+    *   O maior valor entre Left e Right é selecionado para alimentar o index 32 do buffer de meters.
+
+#### 3.2. Exibição (Frontend)
+1.  **Transmissão via Socket:** O `server.js` emite o evento `meterData` para todos os clientes conectados.
+2.  **Recebimento e Mapeamento:** No `public/modules/socket.js`, o frontend recebe o array. Para o index 32 (Master), ele utiliza a função `calibrateStep` do módulo `steps.js`.
+3.  **Calibração Visual Independente:**
+    *   A função `calibrateStep(step, isMaster)` detecta que se trata do Master.
+    *   Ela consulta `window.meterCalibration.master` (carregado do `steps.json`) para determinar a porcentagem de preenchimento da barra de LEDs.
+    *   Isso garante que, se o usuário alterar o `steps.json` na seção master, apenas o Master Meter será afetado visualmente.
+
+### 4. Vantagens da Arquitetura Híbrida
+*   **Precisão de 14 bits:** Diferente dos canais 1-32 que usam 7 bits (0-127), o Master usa a resolução nativa da Yamaha, permitindo detectar variações de até 0.1dB.
+*   **Sincronia Perfeita:** Como backend e frontend compartilham o `steps.json`, o que você vê no navegador é o reflexo exato do cálculo matemático da mesa.
+*   **Desempenho:** O processamento pesado de busca na tabela é feito no backend, deixando o frontend livre para apenas renderizar o Canvas/CSS.
+
+### 5. Correção de Fluxo e Sincronia
+- **Emissão de Dados**: A emissão de `meterData` via Socket.io ocorre independentemente do status de sincronização dos faders, garantindo feedback visual imediato.
+- **Detecção de Meter**: O `protocol.js` utiliza filtragem por tamanho e cabeçalho para garantir que as mensagens de meter não sejam confundidas com outros comandos SysEx.
+
+### 6. Comando de Parada (Stop Meter)
+Para interromper o fluxo de dados de meter, o AirFader envia:
+`F0 43 3n 3E 0D 21 7F 00 00 00 00 F7`
+
+### 7. Localização no Código Fonte (AirFader Decompilado)
+*   **Lógica de Processamento:** `MixEngine.cs`, linhas 3369 a 3777 (aproximadamente).
+*   **Geração de Comandos:** `MixEngine.cs`, linhas 14524 a 14527.
+*   **Definição de Offsets:** `MixEngine.cs`, linhas 1034 a 1038.

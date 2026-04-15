@@ -66,15 +66,16 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         // Habilita SysEx IMEDIATAMENTE após abrir a porta (Essencial para a Yamaha)
         input.ignoreTypes(false, false, false);
 
-        // Escuta as mensagens vindas da mesa física
+// Escuta as mensagens vindas da mesa física
         input.on('message', (delta, message) => {
+
             // ?? [CRITICAL SYNC LOGIC] - O ESCUDO ANTI-LOOP
-            // O Studio Manager incrementa um contador ao enviar params, e se a mesa devolver o mesmo log (eco param-change 0x1n), ele descarta.
-            if (message && message.length > 2 && (message[2] & 0xF0) === 0x10) {
-                // Meters nunca entram na conta de ecos! As repostas do hardware usam group 32/33.
-                const isMeter = message.length > 20 && (message[5] === 33 || message[5] === 32);
+            // Por enquanto, NÃO filtrar - deixar tudo passar para debug
+            if (message && message.length > 5 && (message[2] & 0xF0) === 0x10) {
+                const group = message[5];
+                const isMeter = group === 33 || group === 32 || group === 82 || message.length > 20;
                 if (!isMeter) {
-                    if (syncCounter.shouldIgnore()) return; // Aborta! É apenas um eco do que nós mesmos acabamos de enviar
+                    if (syncCounter.shouldIgnore()) return;
                 }
             }
 

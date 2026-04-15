@@ -117,23 +117,31 @@ function parseIncoming(message) {
 
     const element = message[6];
 
-    // 🚨 [CRITICAL SYNC LOGIC] - NÃO ALTERAR A LÓGICA DE METER ABAIXO
-    // message[5] deve ser o grupo de meters (32, 33) para evitar colisão com parâmetros.
-    const isMeter = message.length > 20 && (group === 33 || group === 32);
+    // 🚨 [CRITICAL SYNC LOGIC] - METER DATA
+    // Captura mensagens de Metering Universal (Seções 13, 26, 127) da Yamaha 01V96.
+    // Para os canais 1-32, a Yamaha envia mensagens longas (>20 bytes) com os "steps" (0-31) no High Byte de cada canal.
+    const isMasterMeter = (message.length === 14) && (message[4] === 13) && (message[5] === 33) && (message[6] === 4);
+    const isUniversalMeter = (message.length > 20) && 
+                    (message[4] === 13 || message[4] === 26 || message[4] === 127) && 
+                    (group === 33 || group === 32 || group === 82);
 
-    if (isMeter) {
-        let levels = [];
+    if (isMasterMeter || isUniversalMeter) {
+        let levels = {};
         const dataStart = 9;
-        // Revertido para 33 pontos para manter paridade absoluta com o original
-        for (let i = 0; i < 33; i++) {
+        // Stereo Master (Point 4 no comando 0x21) tem 2 canais (L/R)
+        // Se a mensagem for curta (14 bytes), é provavelmente o Master Meter.
+        const isMasterPoint = (message[6] === 4);
+        
+        // Determina quantos canais de meter existem nesta mensagem (High Byte de cada par)
+        const dataBytesAvailable = (message.length - 1) - dataStart;
+        const numChannelsInMessage = Math.floor(dataBytesAvailable / 2);
+
+        for (let i = 0; i < numChannelsInMessage; i++) {
             const idx = dataStart + (i * 2);
-            if (idx >= message.length - 1) {
-                levels.push(0);
-            } else {
-                levels.push(message[idx] || 0);
-            }
+            // Usamos objeto esparso para o server.js ignorar os canais ausentes em fatias parciais
+            levels[i] = message[idx] || 0;
         }
-        return { type: 'METER_DATA', levels, group: message[5] };
+        return { type: 'METER_DATA', levels, group: message[5], isMaster: isMasterPoint };
     }
 
     if (message[4] === 13 && message[5] === 127) return null;
@@ -287,17 +295,6 @@ function parseIncoming(message) {
         }
     }
 
-    // [DEBUG LOG FOR UNHANDLED SCENE/PARAM MESSAGES]
-    if ((message[4] === 127 || message[4] === 13) && message[5] !== 2) {
-        const hex = Buffer.from(message).toString('hex').toUpperCase();
-        console.log(`🎯 [DEBUG MIDI] Sec:${message[4]} Grp:${message[5]} Elm:${element} Prm:${parameter} Hex:${hex}`);
-    }
-
-    // Debug capture for unparsed messages (excluding meters and heartbeat)
-    if (message[2] !== 33 && message[2] !== 32 && message[2] !== 0x7F) {
-        const hex = Buffer.from(message).toString('hex').toUpperCase();
-        console.log(`🔍 [MIDI UNPARSED] -> ${hex}`);
-    }
 
     return null;
 }

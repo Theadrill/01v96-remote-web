@@ -2,7 +2,7 @@ const midi = require('midi');
 const fs = require('fs');
 const path = require('path');
 
-const logStream = fs.createWriteStream(path.join(__dirname, 'monitor_log.txt'), { flags: 'w' });
+const logStream = fs.createWriteStream(path.join(__dirname, 'logs', 'monitor_log.txt'), { flags: 'w' });
 const originalConsoleLog = console.log;
 console.log = function(...args) {
     const formattedMessage = require('util').format(...args);
@@ -242,7 +242,7 @@ yamahaIn.on('message', (deltaTime, message) => {
     forwardToMonitor(message);
     y2s++;
 
-    // Log: silenciar todo ruído repetitivo
+    // [BACKUP] Original filter - to re-enable, uncomment below:
     if (isNoise(message)) { 
         if (matchesCustomFilter(message)) filteredCount++;
         else meterCount++; 
@@ -260,9 +260,8 @@ yamahaIn.on('message', (deltaTime, message) => {
 monitorIn.on('message', (deltaTime, message) => {
     if (message[0] === 0xFE) return;
 
+    // [BACKUP] Original filter - to re-enable, uncomment below:
     // Descartar loopback:
-    // 1. Mensagens que sabemos que são nossas (Meter data e heartbeats)
-    // 2. Fragmentos de SysEx (qualquer msg > 3 bytes que não comece com F0)
     if (isMeterData(message) || isHeartbeat(message) || (message.length > 3 && message[0] !== 0xF0)) {
         loopbackCount++;
         return;
@@ -272,7 +271,7 @@ monitorIn.on('message', (deltaTime, message) => {
     forwardToYamaha(message);
     s2y++;
 
-    // Log: silenciar meter requests (server.js polling), mostrar o resto
+    // [BACKUP] Original filter - to re-enable, uncomment below:
     if (isMeterRequest(message) || matchesCustomFilter(message)) { 
         if (matchesCustomFilter(message)) filteredCount++;
         else meterCount++; 

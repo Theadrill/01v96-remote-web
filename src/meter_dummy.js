@@ -10,23 +10,29 @@ function startMeterSimulation(callback) {
     return setInterval(() => {
         time += 0.2;
 
-        // Cabeçalho da 01V96 (Meters): F0 43 10 3E 7F 21 00 00 00
-        let sysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x21, 0x00, 0x00, 0x00];
-
+        // 1. Canais 1 a 32 (Simulando Universal Metering Group 0x21)
+        // A Yamaha envia o step (0-31) no high byte e um padding no low byte.
+        let sysex = [0xF0, 0x43, 0x10, 0x3E, 13, 33, 0, 0, 0];
         for (let i = 0; i < 32; i++) {
-            const wave = Math.sin(time + offsets[i]) * 15 + 15; // 0-30
-            const rawValue = Math.floor(Math.min(32, Math.max(0, wave + (Math.random() * 2))));
-
-            // A mesa manda 2 bytes por canal. O primeiro é o nível (0-32). O segundo ignoramos.
-            sysex.push(rawValue);
-            sysex.push(0x00);
+            const wave = Math.sin(time + offsets[i]) * 15 + 15;
+            const level31 = Math.floor(Math.min(31, Math.max(0, wave + (Math.random() * 2))));
+            sysex.push(level31); // High Byte = Step
+            sysex.push(0x7F);    // Low Byte = Padding típico
         }
-
-        sysex.push(0xF7); // Fim do SysEx
-
-        // No modo realista, passamos os BYTES brutos para o servidor processar
+        sysex.push(0xF7);
         callback(sysex);
-    }, 100); // 10 FPS para não travar o console de log
+
+        // 2. Stereo Master (Point 4)
+        const waveM = Math.sin(time * 0.7) * 15 + 15;
+        const level32M = Math.floor(Math.min(32, Math.max(0, waveM + (Math.random() * 2))));
+        const rawM = Math.floor((level32M * 3.96875 / 0.031170805879371516) + 37);
+        const highM = (rawM >> 7) & 0x7F;
+        const lowM = rawM & 0x7F;
+        
+        let masterSysex = [0xF0, 0x43, 0x10, 0x3E, 13, 33, 4, 0, 0, highM, lowM, highM, lowM, 0xF7];
+        callback(masterSysex);
+
+    }, 100);
 }
 
 module.exports = { startMeterSimulation };

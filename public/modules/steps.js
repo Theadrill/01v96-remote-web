@@ -18,7 +18,10 @@ window.calibrateStep = function(step, isMaster = false) {
     // Se o step for 32 (PICO/CLIP), forçamos 100% de preenchimento na hora
     if (step >= 32) return 100;
 
-    const dbValue = window.meterCalibration[step];
+    const source = isMaster ? window.meterCalibration.master : window.meterCalibration.inputs;
+    if (!source) return 0;
+    
+    const dbValue = source[step];
     
     // Se não houver valor definido para esse step, consideramos -inf
     if (dbValue === undefined || dbValue <= -138) return 0;

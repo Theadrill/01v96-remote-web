@@ -563,7 +563,8 @@ socket.on('meterData', (levels) => {
         const isMaster = activeConfigChannel === 'master';
         const levelIdx = isMaster ? 32 : activeConfigChannel;
         if (levelIdx < levels.length) {
-            const dbVal = (window.meterCalibration && window.meterCalibration[levels[levelIdx]]) !== undefined ? window.meterCalibration[levels[levelIdx]] : -138;
+            const source = isMaster ? (window.meterCalibration ? window.meterCalibration.master : null) : (window.meterCalibration ? window.meterCalibration.inputs : null);
+            const dbVal = (source && source[levels[levelIdx]]) !== undefined ? source[levels[levelIdx]] : -138;
 
             const gateMeter = document.getElementById('gateMeter');
             if (gateMeter) gateMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'gate')}%`;

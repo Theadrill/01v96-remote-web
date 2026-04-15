@@ -5,8 +5,8 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
-// Redirecionamento de Logs para Arquivo (server_log.txt)
-const logFile = path.join(__dirname, 'server_log.txt');
+// Redirecionamento de Logs para Arquivo (logs/server_log.txt)
+const logFile = path.join(__dirname, 'logs', 'server_log.txt');
 const logStream = fs.createWriteStream(logFile, { flags: 'w' });
 const originalConsoleLog = console.log;
 const originalConsoleError = console.error;
@@ -27,6 +27,19 @@ console.error = function(...args) {
 
 console.log('🚀 [SERVER] Iniciando servidor e sistema de logs...');
 console.log('📂 [SERVER] Log gravando em:', logFile);
+
+// Carregar calibração do steps.json para sincronizar com o frontend
+try {
+    const stepsPath = path.join(__dirname, 'public', 'steps.json');
+    if (fs.existsSync(stepsPath)) {
+        const stepsData = JSON.parse(fs.readFileSync(stepsPath, 'utf8'));
+        const masterMeter = require('./src/master-meter');
+        masterMeter.setSteps(stepsData.master);
+        console.log('✅ [SERVER] Calibração de steps carregada com sucesso do steps.json para o Master Meter');
+    }
+} catch (e) {
+    console.error('❌ [SERVER] Erro ao carregar steps.json para o Master Meter:', e.message);
+}
 
 const SysTray = require('systray2').default;
 const dgram = require('dgram');
@@ -59,43 +72,38 @@ const handleMIDIData = (midiData, rawMessage = null) => {
     if (midiData.type === 'kSceneNumber') {
         console.log(`🎬 [SCENE CHANGE] Mudança de cena detectada pela mesa: ${midiData.value}`);
         sceneManager.setActiveScene(midiData.value);
-        // Opcional: Pedir dump atualizado do Edit Buffer se necessário (o SceneManager pode lidar com isso se disparado)
     }
 
-    // Processamento Independente do Master Meter
-    if (rawMessage) {
-        const mLevel = masterMeter.parse(rawMessage);
-        if (mLevel !== null) {
-            meterDataBuffer[32] = mLevel;
-        }
-    }
-
-    // O METER_DATA processa canais 1-32. O 33 (Master) vem isolado.
+    // METER_DATA - processa channels 1-32 e Master
     if (midiData.type === 'METER_DATA') {
-        // Se o grupo for 32 ou 33 (padrão 01V96 para Input Channels)
-        if (midiData.group === 32 || midiData.group === 33) {
-            for (let i = 0; i < 32; i++) {
-                if (midiData.levels[i] !== undefined) {
-                    meterDataBuffer[i] = midiData.levels[i];
+        if (midiData.isMaster) {
+            // Master Meter (Stereo L/R) - Point 4 (Comando 0x21)
+            // Usamos a lógica de calibração do master-meter.js que segue o steps.json
+            if (rawMessage) {
+                const mLevel = masterMeter.parse(rawMessage);
+                if (mLevel !== null) {
+                    meterDataBuffer[32] = mLevel;
                 }
             }
-        } else if (midiData.group === config.master_meter_group) {
-            // Se for o grupo configurado para o Master Meter
-            const mIdx = config.master_meter_offset || 0;
-            if (midiData.levels[mIdx] !== undefined) {
-                meterDataBuffer[32] = midiData.levels[mIdx];
+        } else {
+            for (let i = 0; i < 32; i++) {
+                if (midiData.levels[i] !== undefined) {
+                    // Nos grupos 13/26/127 (Universal Metering) a Yamaha já envia o valor escalonado (0-31) no byte alto
+                    let level = midiData.levels[i];
+                    if (level > 32) level = 32;
+                    meterDataBuffer[i] = level;
+                }
             }
         }
-    }
 
-    // Emissão Throttled para a Web (apenas se sincronizado para evitar lag no boot)
-    const now = Date.now();
-    if (isFullySynced && (now - lastMeterTime > 50)) {
-        io.emit('meterData', meterDataBuffer);
-        lastMeterTime = now;
+        // Emissão Throttled para a Web (padrão 20 FPS para fluidez sem sobrecarga)
+        const now = Date.now();
+        if (now - lastMeterTime > 50) {
+            io.emit('meterData', meterDataBuffer);
+            lastMeterTime = now;
+        }
+        return;
     }
-
-    if (midiData.type === 'METER_DATA') return;
 
 
     if (midiData.type === 'HEARTBEAT') return;
@@ -537,8 +545,6 @@ function loadConfig() {
         try {
             const loaded = JSON.parse(fs.readFileSync(configFile, 'utf8'));
             config = { ...config, ...loaded };
-            // Atualiza config do Master Meter
-            masterMeter.setConfig(config);
         } catch (err) { }
     }
     return config;
@@ -724,7 +730,10 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
             // Meters só rodam após sincronia completa
             if (!isFullySynced) return;
 
+            // [NATIVE METER] Stereo Master (Point 4) via MasterMeter module (AirFader Approach)
             const sMaster = midiEngine.send(masterMeter.buildRequest());
+
+            // [NATIVE METER] Input Channels (Group 32/33) via Parameter Request (Classic approach)
             const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247]);
             const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247]);
             const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247]);
@@ -746,6 +755,11 @@ function handleDisconnection(retry = true) {
     if (!isConnected && retry) return; // Evita duplicação se já estiver buscando
 
     isConnected = false;
+    // Tenta enviar o comando de parada de meter para limpar o tráfego na mesa física (se ainda houver conexão física)
+    try {
+        midiEngine.send(masterMeter.buildStopRequest());
+    } catch(e){}
+
     if (global.meterInterval) clearInterval(global.meterInterval);
     if (dummyMeterInterval) {
         clearInterval(dummyMeterInterval);
@@ -1265,12 +1279,12 @@ server.listen(PORT, '0.0.0.0', () => {
         }
     }
 
-    console.log(`\n=================================================`);
+console.log(`\n=================================================`);
     console.log(`🚀 SERVIDOR 01V96 BRIDGE ATIVO`);
     console.log(`🌍 Disponível em: http://localhost:${PORT}`);
     addresses.forEach(addr => console.log(`   - Rede: http://${addr}:${PORT}`));
     console.log(`=================================================\n`);
-
+    
     const config = loadConfig();
     
     // Abrir o navegador automaticamente apenas se a flag estiver ativa

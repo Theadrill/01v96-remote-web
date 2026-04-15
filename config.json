@@ -3,7 +3,5 @@
   "outIdx": 1,
   "loopmidi-monitor": false,
   "open_browser_startup": false,
-  "demo_mode": false,
-  "master_meter_group": 33,
-  "master_meter_offset": 52
+  "demo_mode": false
 }

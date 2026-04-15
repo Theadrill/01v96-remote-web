@@ -484,8 +484,9 @@ handleSceneChange(int) → Chamado quando cena muda no hardware
 ### 8.1 Fluxo de Meter Data
 
 ```
-postMeterRequest()  → Solicita à mesa que comece a enviar meter data
-Mesa envia          → Pacotes SysEx com raw meter values (0-127 per channel)
+postMeterRequest()  → Solicita à mesa que comece a enviar meter data (Universal Metering para Canais 1-32)
+postMasterMeterRequest() → Envia comando 0x21 para capturar Master em Alta Resolução (25 fps)
+Mesa envia          → Pacotes SysEx com raw meter values (0-127 para canais, 14-bit para Master)
 updateMeter()       → Chamado a cada update recebido
 meterUpdate()       → Notifica a UI que os valores mudaram
 meterReset()        → Reseta todos os meters para 0
@@ -500,8 +501,9 @@ postMeterStopRequest() → Para o polling de meters
 | **Bus level** | `kMeterBusRaw/kMeterChannel` | 8 |
 | **AUX level** | `kMeterAUXRaw/kMeterChannel` | 12 |
 | **Matrix level** | `kMeterMatrixRaw/kMeterChannel` | 8 |
-| **Stereo L** | `kMeterStereoRaw/kMeterChannel` | index 0 |
-| **Stereo R** | `kMeterStereoRaw/kMeterChannel` | index 1 |
+| **Stereo L** | `kMeterStereoRaw/kMeterChannel` | index 0 | (Modo 7-bits legado) |
+| **Stereo R** | `kMeterStereoRaw/kMeterChannel` | index 1 | (Modo 7-bits legado) |
+| **Master Stereo** | **Native Command 0x21** | **Index 32** | **(Modo 14-bits / Alta Precisão)** |
 | **Input Comp GR** | `FEkMeterInputRaw/kMeterCompGR` | 32 |
 | **Bus Comp GR** | `;08FEkMeterBusRaw/kMeterCompGR` | 8 |
 | **AUX Comp GR** | `;0CFEkMeterAUXRaw/kMeterCompGR` | 12 |
@@ -577,7 +579,31 @@ function meterRawToPosition(raw, table = meter32Seg) {
     }
     return 1;
 }
-```
+
+### 8.8 High-Resolution Master Metering (Comando 0x21)
+
+Ao contrário dos canais 1-32, o Master Stereo utiliza um comando específico (0x21) para obter maior precisão (14-bits) e maior taxa de atualização.
+
+#### 8.8.1 Requisição e Resposta
+*   **Requisição:** `F0 43 1n 3E 0D 21 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 F7`
+    *   `0x21`: Comando nativo de meter (Point 4 = Stereo Master).
+*   **Resposta:** Pacote SysEx de 26 bytes: `F0 43 1n 3E 0D 21 [L-high] [L-low] [R-high] [R-low] ... F7`
+    *   Os valores de 14 bits são reconstruídos do bit-unstuffing: `raw = (high << 7) | low`.
+
+#### 8.8.2 Calibração Independente (steps.json)
+Para garantir que o nível no navegador bata exatamente com a mesa física, o sistema utiliza uma "Calibração Reversa" baseada no arquivo `public/steps.json`.
+
+1.  **Chaves Separadas:** O arquivo possui as chaves `"inputs"` (0-127) e `"master"` (dB calibrado).
+2.  **Backend (Search):** O servidor calcula o dB real da mesa (`db = (raw - 4493) / 63.66`) e busca no `steps.json` o "Step" (0-32) que possui o valor de dB mais próximo.
+3.  **Frontend (Display):** O frontend recebe o Step e utiliza a função `calibrateStep(step, isMaster)` para desenhar a barra de LEDs, consultando a escala específica de Master no JSON.
+
+#### 8.8.3 Diferenças Técnicas
+| Característica | Canais 1-32 (Universal) | Stereo Master (Native 0x21) |
+|---|---|---|
+| **Resolução** | 7 bits (0-127) | 14 bits (0-16383) |
+| **Transporte** | Byte Alto (Step Nativo) | Raw Value + Bit-Unstuffing |
+| **Frequência** | 100ms (padrão app) | 40ms (25 fps - Real-Time) |
+| **Calibração** | Escala Linear/Mapeada | Busca Reversa por dB no JSON |
 
 ---
 
