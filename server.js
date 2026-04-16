@@ -5,9 +5,13 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
-// Redirecionamento de Logs para Arquivo (logs/server_log.txt)
-const logFile = path.join(__dirname, 'logs', 'server_log.txt');
-const logStream = fs.createWriteStream(logFile, { flags: 'w' });
+// Redirecionamento de Logs para Arquivo (log/server_log.txt)
+const logDir = path.join(__dirname, 'log');
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+}
+const logFile = path.join(logDir, 'server_log.txt');
+const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 const originalConsoleLog = console.log;
 const originalConsoleError = console.error;
 
@@ -76,6 +80,8 @@ const handleMIDIData = (midiData, rawMessage = null) => {
 
     // METER_DATA - processa channels 1-32 e Master
     if (midiData.type === 'METER_DATA') {
+        if (!isFullySynced) return;
+
         if (midiData.isMaster) {
             // Master Meter (Stereo L/R) - Point 4 (Comando 0x21)
             // Usamos a lógica de calibração do master-meter.js que segue o steps.json
@@ -781,6 +787,11 @@ async function triggerSync(targetSocket = null, forceNames = false) {
     io.emit('syncStatus', true);
     isFullySynced = false; // Reseta a flag para pausar meters
     
+    // Comando STOP para meters (Garante barramento livre e evita 'bagunça' nos dados)
+    try { midiEngine.send(masterMeter.buildStopRequest()); } catch(e){}
+    meterDataBuffer = new Array(33).fill(0);
+    io.emit('meterData', meterDataBuffer);
+
     console.log(`🔄 [Sync] Iniciando sincronização via Pipeline...`);
     
     syncPipeline.clear();
@@ -906,6 +917,12 @@ async function syncNames() {
     
     isSyncing = true;
     isFullySynced = false; // Pausa meters
+
+    // Comando STOP para meters
+    try { midiEngine.send(masterMeter.buildStopRequest()); } catch(e){}
+    meterDataBuffer = new Array(33).fill(0);
+    io.emit('meterData', meterDataBuffer);
+
     console.log(`🔄 [MANUAL SYNC] Iniciando busca de nomes via Pipeline...`);
 
     syncPipeline.clear();
