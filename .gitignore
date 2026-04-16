@@ -21,3 +21,6 @@ reverse_dll_project/Studio Manager/
 reverse_dll_project/AirFader/
 reverse_dll_project/ghidra_12.0.4_PUBLIC/
 reverse_dll_project/inspect_dll/
+
+# Configurações de Estado Local
+names.json
