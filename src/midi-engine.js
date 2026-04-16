@@ -1,12 +1,16 @@
 const midi = require('midi');
 const protocol = require('./protocol');
 const syncCounter = require('./sync-counter');
+const MidiAssembler = require('./midi-assembler');
+const MidiScheduler = require('./midi-scheduler');
 
 
 
 // Deixamos as variáveis globais, mas sem instanciar o 'new' ainda
 let input = null;
 let output = null;
+let assembler = null;
+let scheduler = null;
 
 
 function getAvailablePorts() {
@@ -49,6 +53,7 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
 
         // Se já existirem instâncias abertas mas as portas mudaram, limpamos tudo primeiro
         if (input) { try { input.closePort(); } catch(e){} }
+        assembler = null;
         if (output) { try { output.closePort(); } catch(e){} }
         syncCounter.reset(); // Zera os pendentes
 
@@ -65,33 +70,32 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         
         // Habilita SysEx IMEDIATAMENTE após abrir a porta (Essencial para a Yamaha)
         input.ignoreTypes(false, false, false);
-
-// Escuta as mensagens vindas da mesa física
-        input.on('message', (delta, message) => {
-
-            // ?? [CRITICAL SYNC LOGIC] - O ESCUDO ANTI-LOOP
-            // Por enquanto, NÃO filtrar - deixar tudo passar para debug
-            if (message && message.length > 5 && (message[2] & 0xF0) === 0x10) {
-                const group = message[5];
-                const isMeter = group === 33 || group === 32 || group === 82 || message.length > 20;
-                if (!isMeter) {
-                    if (syncCounter.shouldIgnore()) return;
-                }
-            }
-
-            // Se recebemos qualquer dado, a mesa está viva
+        // Instancia o MidiAssembler para montar SysEx completos e filtrar bytes ruidosos
+        assembler = new MidiAssembler((completeSysEx) => {
             if (onMessageCallback) {
                 onMessageCallback({ type: 'HEARTBEAT' });
-                
-                // Passa para o tradutor (protocol.js) ver se é algo útil
-                const translated = protocol.parseIncoming(message);
+                const translated = protocol.parseIncoming(completeSysEx);
                 
                 if (translated) {
-                    onMessageCallback(translated, message);
+                    onMessageCallback(translated, completeSysEx);
                 } else {
-                    // Se não foi traduzido como parâmetro conhecido, ainda assim enviamos o RAW para módulos independentes
-                    onMessageCallback({ type: 'RAW_MIDI' }, message);
+                    onMessageCallback({ type: 'RAW_MIDI' }, completeSysEx);
                 }
+            }
+        });
+
+        // Instancia o MidiScheduler responsável por controlar todo o envio
+        if (!scheduler) {
+            scheduler = new MidiScheduler({ send: (msg) => sendDirect(msg) });
+            try { scheduler.start(); } catch (e) {}
+        }
+
+        // Escuta as mensagens vindas da mesa física e passa para o assembler
+        input.on('message', (delta, message) => {
+            try {
+                assembler.processInput(Array.from(message));
+            } catch (e) {
+                console.error('Erro no MidiAssembler.processInput:', e);
             }
         });
 
@@ -103,17 +107,14 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
     }
 }
 
-function send(msg) {
+function sendDirect(msg) {
     if (output && msg) {
         try {
-            // Se estamos enviando um Command Byte de Modificação Paramétrica (0x1n), sinalizamos ao Anti-Loop
             if (msg.length > 2 && (msg[2] & 0xF0) === 0x10) {
                 syncCounter.beginSync();
             }
-
             output.sendMessage(msg);
             return true;
-
         } catch (e) {
             console.error("❌ Erro fatal ao enviar MIDI (Cabo desconectado?):", e.message);
             return false;
@@ -122,4 +123,13 @@ function send(msg) {
     return false;
 }
 
-module.exports = { getAvailablePorts, connectPorts, send };
+function send(msg, priority = 0) {
+    if (scheduler && scheduler.isRunning) {
+        return scheduler.enqueue(msg, priority);
+    }
+    return sendDirect(msg);
+}
+
+function getScheduler() { return scheduler; }
+
+module.exports = { getAvailablePorts, connectPorts, send, getScheduler };

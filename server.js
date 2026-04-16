@@ -54,11 +54,12 @@ const stateManager = require('./src/state-manager');
 const dummy = require('./src/meter_dummy');
 const masterMeter = require('./src/master-meter');
 const { exec } = require('child_process');
-const MidiPipeline = require('./src/midi-pipeline');
+// MidiPipeline legacy removed — use SyncManager instead
 const sceneManager = require('./src/scene_manager');
+const SyncManager = require('./src/sync-manager');
 
 let dummyMeterInterval = null;
-const syncPipeline = new MidiPipeline(midiEngine);
+let syncManager = null;
 
 
 let meterDataBuffer = new Array(33).fill(0);
@@ -165,289 +166,10 @@ process.title = "01V96-BRIDGE-SERVER";
 
 app.use(express.static('public'));
 
-// ===============================================
-// API DE MODS / MACROS (VERSÃO MULTI-PRESET)
-// ===============================================
+const macroRoutes = require('./src/api/macros');
+app.use('/api', macroRoutes);
 
-// Endpoint de Reconhecimento de Hosts
-app.get('/api/macros/hosts', (req, res) => {
-    const hostsPath = path.join(__dirname, 'public/modules/macros', 'hosts.json');
-    if (fs.existsSync(hostsPath)) {
-        res.json(JSON.parse(fs.readFileSync(hostsPath, 'utf8')));
-    } else {
-        // Exemplo default se não existir
-        res.json([
-            { match: "192.168.15.99", preset: "pcmaria" },
-            { match: "pcfavela", preset: "pcfavela" }
-        ]);
-    }
-});
 
-// Listar scripts de macros disponíveis (.js)
-app.get('/api/macros', (req, res) => {
-    const macrosDir = path.join(__dirname, 'public/modules/macros');
-    if (!fs.existsSync(macrosDir)) fs.mkdirSync(macrosDir, { recursive: true });
-    fs.readdir(macrosDir, (err, files) => {
-        if (err) return res.status(500).json({ error: "Erro ao listar mods" });
-        // Filtra para mostrar apenas macros reais, ignorando o core e o motor principal
-        const jsFiles = files.filter(f => 
-            f.endsWith('.js') && 
-            !f.includes('.server.js') && 
-            f !== 'core.js' && 
-            f !== 'macros.js'
-        ).map(f => f.replace('.js', ''));
-        res.json(jsFiles);
-    });
-});
-
-// --- LÓGICA NINJA: AUTO-GIT SYNC (DEBOUNCED) ---
-
-/** 
- * FIXME: [FUTURE IMPLEMENTATION] 
- * Implementar Assistente de Sync para novos usuários (Wizard).
- * Precisamos de:
- * 1. GET /api/sync/check - Verifica integridade do Git e Permissões.
- * 2. POST /api/sync/setup - Configura PAT (Token) e troca URL do Remote.
- * Ref: docs/github_sync_implementation_plan.md
- */
-
-let gitSyncTimer = null;
-let gitSyncQueue = new Set();
-
-function triggerGitSync() {
-    if (gitSyncQueue.size === 0) return;
-    
-    const filesToSync = Array.from(gitSyncQueue).join(' ');
-    const hostname = os.hostname();
-    console.log(`\n☁️  [NINJA SYNC] =======================================`);
-    console.log(`☁️  [NINJA SYNC] Sincronizando: ${filesToSync}`);
-    
-    // Sequência Master Blaster: Add -> Commit -> Pull (Rebase + Autostash) -> Push
-    const cmd = `git add ${filesToSync} && git commit -m "auto-sync: profiles updated from ${hostname}" && git pull --rebase --autostash && git push`;
-
-    exec(cmd, { cwd: __dirname }, (error, stdout, stderr) => {
-        gitSyncQueue.clear();
-        if (error) {
-            console.error(`❌ [NINJA SYNC] Erro: ${error.message}`);
-            return;
-        }
-        console.log(`✅ [NINJA SYNC] GitHub Atualizado com Sucesso!`);
-        console.log(`☁️  [NINJA SYNC] =======================================\n`);
-    });
-}
-
-/**
- * TODO: Criar endpoints de health-check do Git aqui futuramente
- * Para alimentar o 'GitHub Sync Wizard' no frontend.
- */
-
-app.get('/api/macros/slots', (req, res) => {
-    const preset = req.query.preset;
-    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
-    const localDir = path.join(macrosDir, 'local');
-    const sharedDir = path.join(macrosDir, 'shared');
-
-    if (preset) {
-        // Prioridade: Local (máquina atual), depois Shared (nuvem/git)
-        const localPath = path.join(localDir, `profile_${preset}.json`);
-        const sharedPath = path.join(sharedDir, `profile_${preset}.json`);
-        
-        if (fs.existsSync(localPath)) return res.json(JSON.parse(fs.readFileSync(localPath, 'utf8')));
-        if (fs.existsSync(sharedPath)) return res.json(JSON.parse(fs.readFileSync(sharedPath, 'utf8')));
-        
-        return res.json({});
-    } else {
-        // Lista todos os perfis únicos das duas pastas para o seletor de presets
-        const profiles = {};
-        const scan = (dir) => {
-            if (fs.existsSync(dir)) {
-                fs.readdirSync(dir).forEach(f => {
-                    if (f.startsWith('profile_') && f.endsWith('.json')) {
-                        profiles[f.replace('profile_', '').replace('.json', '')] = true;
-                    }
-                });
-            }
-        };
-        scan(sharedDir);
-        scan(localDir);
-        
-        if (Object.keys(profiles).length === 0) profiles["default"] = true;
-        res.json(profiles);
-    }
-});
-
-app.post('/api/macros/slots', express.json(), (req, res) => {
-    const preset = req.query.preset || 'default';
-    const syncShared = req.query.syncShared === 'true'; // Toggle do front-end
-    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
-    
-    const localPath = path.join(macrosDir, 'local', `profile_${preset}.json`);
-    const sharedPath = path.join(macrosDir, 'shared', `profile_${preset}.json`);
-
-    try {
-        const content = JSON.stringify(req.body, null, 2);
-        
-        // Sempre salva na pasta local (específica desta máquina)
-        if (!fs.existsSync(path.dirname(localPath))) fs.mkdirSync(path.dirname(localPath), { recursive: true });
-        fs.writeFileSync(localPath, content);
-        
-        // Se o Auto-Sync estiver ligado, espelha na pasta Shared (que o Git monitora)
-        if (syncShared) {
-            if (!fs.existsSync(path.dirname(sharedPath))) fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
-            fs.writeFileSync(sharedPath, content);
-            
-            // Ativa o Gatilho Ninja (Debounce de 10 segundos)
-            const relativeSharedPath = path.relative(__dirname, sharedPath);
-            gitSyncQueue.add(relativeSharedPath);
-            
-            if (gitSyncTimer) clearTimeout(gitSyncTimer);
-            gitSyncTimer = setTimeout(triggerGitSync, 10000); 
-            console.log(`☁️  [NINJA SYNC] Mudança em [${preset}]. Sincronização automática agendada para daqui a 10s...`);
-        }
-        res.json({ success: true, preset, synced: syncShared });
-    } catch (e) { res.status(500).json({ error: "Erro ao salvar perfil" }); }
-});
-
-app.post('/api/macros/swap', express.json(), (req, res) => {
-    const preset = req.query.preset || 'default';
-    const fromIndex = parseInt(req.body.from);
-    const toIndex = parseInt(req.body.to);
-    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
-
-    const handleSwap = (dir) => {
-        const pPath = path.join(dir, `profile_${preset}.json`);
-        if (fs.existsSync(pPath)) {
-            try {
-                let config = JSON.parse(fs.readFileSync(pPath, 'utf8'));
-                const tFrom = config[fromIndex];
-                const tTo = config[toIndex];
-                delete config[fromIndex]; delete config[toIndex];
-                if (tTo) config[fromIndex] = tTo;
-                if (tFrom) config[toIndex] = tFrom;
-                fs.writeFileSync(pPath, JSON.stringify(config, null, 2));
-            } catch (e) { }
-        }
-    };
-
-    handleSwap(path.join(macrosDir, 'local'));
-    handleSwap(path.join(macrosDir, 'shared'));
-
-    // --- CORREÇÃO: Ativa o Gatilho Ninja no SWAP também ---
-    const sharedPath = path.join(macrosDir, 'shared', `profile_${preset}.json`);
-    if (fs.existsSync(sharedPath)) {
-        const relativeSharedPath = path.relative(__dirname, sharedPath);
-        gitSyncQueue.add(relativeSharedPath);
-        
-        if (gitSyncTimer) clearTimeout(gitSyncTimer);
-        gitSyncTimer = setTimeout(triggerGitSync, 10000); 
-        console.log(`☁️  [NINJA SYNC] Mudança detects no SWAP de [${preset}]. Sync agendado (10s)...`);
-    }
-
-    res.json({ success: true });
-});
-
-app.delete('/api/macros/slots', (req, res) => {
-    const preset = req.query.preset;
-    if (!preset || preset === 'default') return res.status(400).json({ error: "Preset inválido ou protegido" });
-
-    const localPath = path.join(__dirname, 'public/modules/macros/profiles/local', `profile_${preset}.json`);
-    const sharedPath = path.join(__dirname, 'public/modules/macros/profiles/shared', `profile_${preset}.json`);
-    
-    try {
-        if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
-        if (fs.existsSync(sharedPath)) fs.unlinkSync(sharedPath);
-        res.json({ success: true, deleted: preset });
-    } catch (e) { res.status(500).json({ error: "Erro ao deletar perfil" }); }
-});
-
-// 2. Banco de Configuração do Mod por Preset (Busca no novo sistema de profiles)
-app.get('/api/macros/config/:modId', (req, res) => {
-    const preset = req.query.preset || 'default';
-    const modId = req.params.modId;
-    const filename = preset === 'default' ? `${modId}.json` : `${modId}_${preset}.json`;
-    
-    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
-    const localPath = path.join(macrosDir, 'local', filename);
-    const sharedPath = path.join(macrosDir, 'shared', filename);
-
-    if (fs.existsSync(localPath)) return res.json(JSON.parse(fs.readFileSync(localPath, 'utf8')));
-    if (fs.existsSync(sharedPath)) return res.json(JSON.parse(fs.readFileSync(sharedPath, 'utf8')));
-    
-    res.json({});
-});
-
-app.post('/api/macros/config/:modId', express.json(), (req, res) => {
-    const preset = req.query.preset || 'default';
-    const modId = req.params.modId;
-    const syncShared = req.query.syncShared === 'true';
-    const filename = preset === 'default' ? `${modId}.json` : `${modId}_${preset}.json`;
-
-    const macrosDir = path.join(__dirname, 'public/modules/macros/profiles');
-    const localPath = path.join(macrosDir, 'local', filename);
-    const sharedPath = path.join(macrosDir, 'shared', filename);
-
-    try {
-        const content = JSON.stringify(req.body, null, 2);
-        if (!fs.existsSync(path.dirname(localPath))) fs.mkdirSync(path.dirname(localPath), { recursive: true });
-        fs.writeFileSync(localPath, content);
-        
-        if (syncShared) {
-            if (!fs.existsSync(path.dirname(sharedPath))) fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
-            fs.writeFileSync(sharedPath, content);
-            
-            // Ativa o Ninja Sync para a config do mod também
-            const relativeSharedPath = path.relative(__dirname, sharedPath);
-            gitSyncQueue.add(relativeSharedPath);
-            if (gitSyncTimer) clearTimeout(gitSyncTimer);
-            gitSyncTimer = setTimeout(triggerGitSync, 10000);
-        }
-        res.json({ success: true, mod: modId, preset, synced: syncShared });
-    } catch (e) { res.status(500).json({ error: "Erro ao salvar config do mod" }); }
-});
-
-// --- GENERIC PROXY GATEWAY (Security & Power for Modders) ---
-
-app.post('/api/macros/proxy/http', express.json(), async (req, res) => {
-    const { url, options } = req.body;
-    if (!url) return res.status(400).json({ error: "URL inválida" });
-    
-    // Filtro de segurança básico: Impede acesso a arquivos locais do sistema
-    if (url.startsWith('file://')) return res.status(403).json({ error: "Acesso a arquivos locais negado" });
-
-    console.log(`🌐 [PROXY HTTP] -> ${url}`);
-
-    try {
-        const response = await fetch(url, options);
-        let rawData = await response.text();
-        let data;
-        
-        // Tenta converter para JSON de forma agressiva (resiliente a cabeçalhos mal formados)
-        try {
-            data = JSON.parse(rawData);
-        } catch (e) {
-            data = rawData;
-        }
-
-        res.json({ status: response.status, data });
-    } catch (e) { 
-        console.error(`❌ [PROXY HTTP] Erro ao acessar ${url}: ${e.message}`);
-        res.status(500).json({ error: e.message }); 
-    }
-});
-
-app.post('/api/macros/proxy/udp', express.json(), (req, res) => {
-    const { host, port, data } = req.body;
-    if (!host || !port || !data) return res.status(400).json({ error: "Dados UDP incompletos" });
-
-    const client = dgram.createSocket('udp4');
-    const message = Buffer.from(typeof data === 'string' ? data : JSON.stringify(data));
-
-    client.send(message, port, host, (err) => {
-        client.close();
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true });
-    });
-});
 
 // Endpoint de Nomes para os Mods
 app.get('/api/names', (req, res) => {
@@ -713,7 +435,21 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         setTimeout(async () => {
             if (isConnected) {
                 await sceneManager.fetchScenes(midiEngine);
-                triggerSync(targetSocket);
+                if (!syncManager) syncManager = new SyncManager(midiEngine.getScheduler(), io, sceneManager);
+                    // Pause meters until sync completes and keep server flags in sync with SyncManager
+                    isFullySynced = false;
+                    isSyncing = true;
+                    if (!syncManager.onSyncComplete) {
+                        syncManager.onSyncComplete = function () {
+                            isFullySynced = true;
+                            isSyncing = false;
+                            hasSyncedNamesThisSession = true;
+                            try { io.emit('sync', stateManager.getState()); } catch(e){}
+                            try { io.emit('syncStatus', false); } catch(e){}
+                            console.log('✅ [SERVER] SyncManager signaled completion, meters re-enabled.');
+                        };
+                    }
+                    syncManager.fire(targetSocket);
             }
         }, 5000);
 
@@ -737,16 +473,20 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
             if (!isFullySynced) return;
 
             // [NATIVE METER] Stereo Master (Point 4) via MasterMeter module (AirFader Approach)
-            const sMaster = midiEngine.send(masterMeter.buildRequest());
+            const sMaster = midiEngine.send(masterMeter.buildRequest(), 2);
 
             // [NATIVE METER] Input Channels (Group 32/33) via Parameter Request (Classic approach)
-            const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247]);
-            const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247]);
-            const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247]);
-            const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247]);
-            const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247]);
+            const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247], 2);
+            const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247], 2);
+            const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247], 2);
+            const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247], 2);
+            const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247], 2);
 
-            if (!s2 && !s3 && !s4 && !s5 && !sMaster) {
+            // Não tratamos falha de enfileiramento (returns false) como erro se estivermos usando o MidiScheduler,
+            // pois o scheduler rejeita requests de priority 2 quando q0/q1 estão ocupadas (comportamento esperado).
+            const sched = midiEngine.getScheduler ? midiEngine.getScheduler() : null;
+            const allFailed = (!s2 && !s3 && !s4 && !s5 && !sMaster);
+            if (allFailed && (!sched || !sched.isRunning)) {
                 console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI.");
                 handleDisconnection();
             }
@@ -781,6 +521,7 @@ function handleDisconnection(retry = true) {
 }
 
 async function triggerSync(targetSocket = null, forceNames = false) {
+    if (syncManager) return syncManager.fire(targetSocket, forceNames);
     if (!isConnected || isSyncing) return;
     
     isSyncing = true;
@@ -992,11 +733,15 @@ io.on('connection', (socket) => {
         socket.emit('connectResult', result);
     });
 
-    socket.on('forceSync', () => triggerSync(null, true)); // Agora forceSync também força nomes
+    socket.on('forceSync', () => {
+        if (syncManager) return syncManager.fire(null, true);
+        return triggerSync(null, true);
+    }); // Agora forceSync também força nomes
 
     socket.on('refreshNames', () => {
         console.log("🔄 Solicitação manual de atualização de nomes...");
-        triggerSync(null, true);
+        if (syncManager) return syncManager.syncNamesOnly();
+        return triggerSync(null, true);
     });
 
     socket.on('syncNamesOnly', () => {
@@ -1185,37 +930,38 @@ io.on('connection', (socket) => {
     });
 
     socket.on('updateName', (data) => {
-        const { channel, name } = data;
-        const s = stateManager.getState();
-        if (s.channels[channel] !== undefined) {
-            // 1. Atualiza e salva o estado no servidor (Suporte a 16 chars)
-            const limitedName = name.substring(0, 16);
-            stateManager.setChannelName(channel, limitedName);
-            saveNames();
+            const { channel, name } = data;
+            const limitedName = (name || '').substring(0, 16);
+            // Suporta Inputs(0-31), Mixes(36-43), Buses(44-51) e Master(52)
+            const channelState = stateManager.getChannelStateById(channel);
+            if (channelState) {
+                // 1. Atualiza e salva o estado no servidor
+                stateManager.setChannelName(channel, limitedName);
+                saveNames();
 
-            // 2. BROADCAST: Envia para TODOS os clientes (Socket.io) para atualizar o UI em tempo real sem refresh
-            io.emit('updateName', { channel, name: limitedName });
+                // 2. BROADCAST: Envia para TODOS os clientes (Socket.io) para atualizar o UI em tempo real sem refresh
+                io.emit('updateName', { channel, name: limitedName });
 
-            // 3. MIDI SYNC: Envia para a mesa física com Debounce e Intervalo de Segurança
-            if (isConnected) {
-                if (nameUpdateTimers.has(channel)) clearTimeout(nameUpdateTimers.get(channel));
+                // 3. MIDI SYNC: Envia para a mesa física com Debounce e Intervalo de Segurança
+                if (isConnected) {
+                    if (nameUpdateTimers.has(channel)) clearTimeout(nameUpdateTimers.get(channel));
 
-                const timer = setTimeout(async () => {
-                    console.log(`📝 [NAMES] Sincronizando com Yamaha Ch:${channel + 1} -> "${limitedName}"`);
-                    const paddedName = limitedName.padEnd(16, ' ').substring(0, 16);
+                    const timer = setTimeout(async () => {
+                        console.log(`📝 [NAMES] Sincronizando com Yamaha Ch:${channel + 1} -> "${limitedName}"`);
+                        const paddedName = limitedName.padEnd(16, ' ').substring(0, 16);
 
-                    for (let i = 0; i < 16; i++) {
-                        const charCode = paddedName.charCodeAt(i);
-                        const msg = protocol.buildNameChange(channel, i, charCode);
-                        if (msg) midiEngine.send(msg);
-                        await new Promise(r => setTimeout(r, 30)); // 30ms para estabilidade do visor da mesa
-                    }
-                    nameUpdateTimers.delete(channel);
-                }, 500); // Debounce de 500ms facilita a digitação fluida
+                        for (let i = 0; i < 16; i++) {
+                            const charCode = paddedName.charCodeAt(i);
+                            const msg = protocol.buildNameChange(channel, i, charCode);
+                            if (msg) midiEngine.send(msg);
+                            await new Promise(r => setTimeout(r, 30)); // 30ms para estabilidade do visor da mesa
+                        }
+                        nameUpdateTimers.delete(channel);
+                    }, 500); // Debounce de 500ms facilita a digitação fluida
 
-                nameUpdateTimers.set(channel, timer);
+                    nameUpdateTimers.set(channel, timer);
+                }
             }
-        }
     });
 
     socket.on('requestDynamics', (data) => {

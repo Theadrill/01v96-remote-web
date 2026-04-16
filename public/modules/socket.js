@@ -222,21 +222,54 @@ function updateSceneDisplay() {
 
 socket.on('updateName', (data) => {
     const { channel, name } = data;
-    if (channelStates[channel]) {
+    // Inputs 0-31
+    if (typeof channel === 'number' && channel >= 0 && channel <= 31) {
         channelStates[channel].name = name;
-
-        // Atualiza label no fader
         const el = document.getElementById(`name${channel}`);
         if (el) el.innerText = name;
-
-        // Se estiver com o modal aberto nesse canal, atualiza o título lateral
         if (activeConfigChannel === channel) {
             const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle) {
-                sideTitle.innerText = `${channel + 1} - ${name}`;
-                if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle();
-            }
+            if (sideTitle) { sideTitle.innerText = `${channel + 1} - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
         }
+        return;
+    }
+
+    // Mixes 36-43 -> namem0..7
+    if (typeof channel === 'number' && channel >= 36 && channel <= 43) {
+        const idx = channel - 36;
+        mixesState[idx].name = name;
+        const el = document.getElementById(`namem${idx}`);
+        if (el) el.innerText = name;
+        if (activeConfigChannel === channel) {
+            const sideTitle = document.getElementById('chSideTitle');
+            if (sideTitle) { sideTitle.innerText = `MIX ${idx + 1} - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
+        }
+        return;
+    }
+
+    // Buses 44-51 -> nameb0..7
+    if (typeof channel === 'number' && channel >= 44 && channel <= 51) {
+        const idx = channel - 44;
+        busesState[idx].name = name;
+        const el = document.getElementById(`nameb${idx}`);
+        if (el) el.innerText = name;
+        if (activeConfigChannel === channel) {
+            const sideTitle = document.getElementById('chSideTitle');
+            if (sideTitle) { sideTitle.innerText = `BUS ${idx + 1} - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
+        }
+        return;
+    }
+
+    // Master 52 -> namemaster
+    if (channel === 52) {
+        masterState.name = name;
+        const el = document.getElementById('namemaster');
+        if (el) el.innerText = name;
+        if (activeConfigChannel === 52) {
+            const sideTitle = document.getElementById('chSideTitle');
+            if (sideTitle) { sideTitle.innerText = `MASTER - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
+        }
+        return;
     }
 });
 

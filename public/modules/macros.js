@@ -35,7 +35,13 @@ async function detectCurrentPreset() {
                 found = h.preset; break;
             }
         }
-        currentPreset = found;
+        // Primeiro, tenta restaurar o último preset usado no navegador
+        const saved = localStorage.getItem('macro_last_preset');
+        if (saved) {
+            currentPreset = saved;
+        } else {
+            currentPreset = found;
+        }
 
         // Carrega o estado do Auto-Sync do LocalStorage
         const syncState = localStorage.getItem(`macro_sync_shared_${currentPreset}`) === 'true';
@@ -52,10 +58,76 @@ async function detectCurrentPreset() {
     } catch (e) { currentPreset = 'default'; updatePresetUI(); }
 }
 
-window.toggleSharedSync = function(enabled) {
+window.toggleSharedSync = async function(enabled) {
+    // Persist UI state first
     localStorage.setItem(`macro_sync_shared_${currentPreset}`, enabled);
     console.log(`☁️ Auto-Sync Shared para [${currentPreset}]: ${enabled ? 'ON' : 'OFF'}`);
+
+    // If enabling, ensure current preset is saved and trigger sync
+    if (enabled) {
+        try {
+            await saveGlobalSlotsManifest();
+            const resp = await fetch(`/api/macros/sync?preset=${encodeURIComponent(currentPreset)}`, { method: 'POST' });
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                console.warn('⚠️ Falha ao iniciar sync:', err);
+            } else {
+                console.log('☁️ Sync iniciado para preset', currentPreset);
+            }
+        } catch (e) { console.warn('⚠️ Erro ao salvar ou iniciar sync:', e); }
+        return;
+    }
+
+    // If disabling, show confirmation modal before removing remote preset
+    const chk = document.getElementById('chkSharedSync');
+    // Re-check checkbox visually until user confirms or cancels
+    if (chk) chk.checked = true;
+    const modal = document.getElementById('macroUnshareConfirmModal');
+    const btn = document.getElementById('confirmUnshareBtn');
+    if (!modal || !btn) {
+        // Fallback: perform unshare immediately
+        await performUnshare();
+        return;
+    }
+
+    modal.style.display = 'flex';
+    const cancelBtn = document.getElementById('cancelUnshareBtn');
+    const onConfirm = async () => {
+        cleanup();
+        await performUnshare();
+    };
+    const onCancel = () => {
+        cleanup();
+        // restore checkbox to checked state
+        if (chk) chk.checked = true;
+    };
+    function cleanup() {
+        try { btn.removeEventListener('click', onConfirm); } catch(e){}
+        try { cancelBtn.removeEventListener('click', onCancel); } catch(e){}
+        modal.style.display = 'none';
+    }
+    btn.addEventListener('click', onConfirm);
+    if (cancelBtn) cancelBtn.addEventListener('click', onCancel);
 };
+
+async function performUnshare() {
+    try {
+        const resp = await fetch(`/api/macros/sync?preset=${encodeURIComponent(currentPreset)}`, { method: 'DELETE' });
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            console.warn('⚠️ Falha ao remover preset remoto:', err);
+            alert('Falha ao remover preset remoto. Verifique os logs do servidor.');
+            return;
+        }
+        // Update UI/localStorage
+        localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
+        const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = false;
+        console.log('☁️ Preset removido da nuvem e agora apenas local.');
+    } catch (e) {
+        console.warn('⚠️ Erro ao chamar API de remoção:', e);
+        alert('Erro ao comunicar com o servidor para remover o preset.');
+    }
+}
 
 function updatePresetUI() {
     const label = document.getElementById('currentPresetLabel');
@@ -146,6 +218,8 @@ window.confirmDeletePreset = async function () {
 
 async function switchPreset(newPreset) {
     currentPreset = newPreset;
+    // Persiste localmente para restaurar após refresh
+    try { localStorage.setItem('macro_last_preset', currentPreset); } catch (e) {}
     
     // Atualiza o checkbox de sync para o novo preset carregado
     const syncState = localStorage.getItem(`macro_sync_shared_${currentPreset}`) === 'true';
@@ -172,6 +246,9 @@ window.savePresetAs = async function () {
 
     currentPreset = newName;
     await saveGlobalSlotsManifest(); // Salva o set atual de macros no novo preset
+
+    // Persiste localmente o preset criado
+    try { localStorage.setItem('macro_last_preset', currentPreset); } catch (e) {}
 
     document.getElementById('macroSaveAsModal').style.display = 'none';
     updatePresetUI();

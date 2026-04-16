@@ -371,7 +371,7 @@ function setBandMode(bandIdx, mode) {
 
     // Sincroniza com a Mesa
     const prefix = getChannelParamPrefix(ch);
-    const hpfOnType = `${prefix}EQ/${prefix === 'kInput' ? 'kEQHPFOn' : 'kEQHPFOn'}`; // 01V96 unificado
+    const hpfOnType = `${prefix}EQ/${isLow ? 'kEQHPFOn' : 'kEQLPFOn'}`; // envia HPF para low, LPF para high
     const qType = `${prefix}EQ/kEQ${isLow ? 'Low' : 'Hi'}Q`;
     
     let qValue = 20; // Default Padrão (Q=1.0)
@@ -407,7 +407,11 @@ function setBandMode(bandIdx, mode) {
 
     // Envia os comandos para a mesa
     socket.emit('control', { type: qType, channel: ch, value: qValue });
-    socket.emit('control', { type: hpfOnType, channel: ch, value: switchOn });
+    // Pequeno atraso antes do HPF/LPF - alguns firmwares parecem ignorar mudança de modo
+    // quando enviada imediatamente após o Q. Temporalmente inofensivo e facilmente removível.
+    setTimeout(() => {
+        socket.emit('control', { type: hpfOnType, channel: ch, value: switchOn });
+    }, 90);
 
     document.getElementById('eqContextMenu').style.display = 'none';
     updateQControlsUI();
