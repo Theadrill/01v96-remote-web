@@ -800,10 +800,12 @@ body.layout-horizontal .side-btn {
 }
 
 /* Offline overlay */
-#offlineOverlay, #blockingOverlay, .blocking-overlay {
+#offlineOverlay,
+#blockingOverlay,
+.blocking-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
     z-index: 20000 !important;
     display: flex;
     align-items: center;
@@ -818,18 +820,21 @@ body.layout-horizontal .side-btn {
 
 #offlineOverlay .offline-inner {
     color: #ffcc00;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     padding: 24px 36px;
     border-radius: 12px;
     font-size: 28px;
     font-weight: 900;
     letter-spacing: 2px;
     text-transform: uppercase;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(255,204,0,0.08) inset;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 204, 0, 0.08) inset;
 }
 
 @media (max-width: 600px) {
-    #offlineOverlay .offline-inner { font-size: 20px; padding: 18px 24px; }
+    #offlineOverlay .offline-inner {
+        font-size: 20px;
+        padding: 18px 24px;
+    }
 }
 
 .mb-20 {
@@ -2328,12 +2333,13 @@ body.is-portrait .dyn-box {
 
 /* MACRO FADER STYLES */
 .macro-fader-card {
-    background: #e0e0e0 !important; /* Cinza claro */
+    background: #e0e0e0 !important;
+    /* Cinza claro */
     border: 2px solid #ccc !important;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-.macro-fader-card .card-title, 
+.macro-fader-card .card-title,
 .macro-fader-card .desk-label {
     color: #333 !important;
     font-weight: bold !important;
@@ -2447,8 +2453,15 @@ body.layout-horizontal .macro-fader-card {
 }
 
 @keyframes slideDownSync {
-    from { top: -60px; opacity: 0; }
-    to { top: 25px; opacity: 1; }
+    from {
+        top: -60px;
+        opacity: 0;
+    }
+
+    to {
+        top: 25px;
+        opacity: 1;
+    }
 }
 
 .sync-loader {
@@ -2461,8 +2474,13 @@ body.layout-horizontal .macro-fader-card {
 }
 
 @keyframes spinSync {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .switch {
@@ -2471,11 +2489,13 @@ body.layout-horizontal .macro-fader-card {
     width: 50px;
     height: 26px;
 }
+
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
+
 .slider {
     position: absolute;
     cursor: pointer;
@@ -2487,6 +2507,7 @@ body.layout-horizontal .macro-fader-card {
     transition: 0.3s;
     border-radius: 26px;
 }
+
 .slider:before {
     position: absolute;
     content: "";
@@ -2498,9 +2519,11 @@ body.layout-horizontal .macro-fader-card {
     transition: 0.3s;
     border-radius: 50%;
 }
-input:checked + .slider {
+
+input:checked+.slider {
     background-color: #28a745;
 }
-input:checked + .slider:before {
+
+input:checked+.slider:before {
     transform: translateX(24px);
 }

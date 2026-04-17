@@ -15,14 +15,14 @@ const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 const originalConsoleLog = console.log;
 const originalConsoleError = console.error;
 
-console.log = function(...args) {
+console.log = function (...args) {
     const timestamp = new Date().toISOString();
     const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
     logStream.write(`[${timestamp}] INFO: ${message}\n`);
     originalConsoleLog.apply(console, args);
 };
 
-console.error = function(...args) {
+console.error = function (...args) {
     const timestamp = new Date().toISOString();
     const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
     logStream.write(`[${timestamp}] ERROR: ${message}\n`);
@@ -432,7 +432,7 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         isConnected = true;
         console.log(`✅ Conexão MIDI estabelecida com sucesso! (${inName})`);
         atualizarMenuTray();
-        
+
         // --- COOLDOWN ESTRATÉGICO E SINCRONIA DE CENAS ---
         // Aguardamos 5s para os buffers residuais, mas NESSE TEMPO, baixamos a biblioteca de cenas
         sceneManager.setIO(io);
@@ -440,21 +440,21 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
             if (isConnected) {
                 await sceneManager.fetchScenes(midiEngine);
                 if (!syncManager) syncManager = new SyncManager(midiEngine.getScheduler(), io, sceneManager);
-                    // Pause meters until sync completes and keep server flags in sync with SyncManager
-                    isFullySynced = false;
-                    isSyncing = true;
-                    if (!syncManager.onSyncComplete) {
-                        syncManager.onSyncComplete = function () {
-                            isFullySynced = true;
-                            isSyncing = false;
-                            hasSyncedNamesThisSession = true;
-                            saveNames(); // Salva nomes na persistência local
-                            try { io.emit('sync', stateManager.getState()); } catch(e){}
-                            try { io.emit('syncStatus', false); } catch(e){}
-                            console.log('✅ [SERVER] SyncManager signaled completion, names saved and meters re-enabled.');
-                        };
-                    }
-                    syncManager.fire(targetSocket);
+                // Pause meters until sync completes and keep server flags in sync with SyncManager
+                isFullySynced = false;
+                isSyncing = true;
+                if (!syncManager.onSyncComplete) {
+                    syncManager.onSyncComplete = function () {
+                        isFullySynced = true;
+                        isSyncing = false;
+                        hasSyncedNamesThisSession = true;
+                        saveNames(); // Salva nomes na persistência local
+                        try { io.emit('sync', stateManager.getState()); } catch (e) { }
+                        try { io.emit('syncStatus', { active: false }); } catch (e) { }
+                        console.log('✅ [SERVER] SyncManager signaled completion, names saved and meters re-enabled.');
+                    };
+                }
+                syncManager.fire(targetSocket);
             }
         }, 5000);
 
@@ -509,7 +509,7 @@ function handleDisconnection(retry = true) {
     // Tenta enviar o comando de parada de meter para limpar o tráfego na mesa física (se ainda houver conexão física)
     try {
         midiEngine.send(masterMeter.buildStopRequest());
-    } catch(e){}
+    } catch (e) { }
 
     if (global.meterInterval) clearInterval(global.meterInterval);
     if (dummyMeterInterval) {
@@ -530,20 +530,20 @@ async function triggerSync(targetSocket = null, forceNames = false, type = 'norm
         return syncManager.fire(targetSocket, forceNames, type);
     }
     if (!isConnected || isSyncing) return;
-    
+
     isSyncing = true;
-    io.emit('syncStatus', true);
+    io.emit('syncStatus', { active: true, type: type });
     isFullySynced = false; // Reseta a flag para pausar meters
-    
+
     // Comando STOP para meters (Garante barramento livre e evita 'bagunça' nos dados)
-    try { midiEngine.send(masterMeter.buildStopRequest()); } catch(e){}
+    try { midiEngine.send(masterMeter.buildStopRequest()); } catch (e) { }
     meterDataBuffer = new Array(33).fill(0);
     io.emit('meterData', meterDataBuffer);
 
     console.log(`🔄 [Sync] Iniciando sincronização via Pipeline...`);
-    
+
     syncPipeline.clear();
-    
+
     // --- CENA ---
     // (As requisições kSceneTitle e kSceneNumber não são confiáveis via Parameter Request.
     // O tráfego de cena agora é gerenciado 100% pelo modulo SceneManager via Bulk Dump Type 0x02 e emitido via 'scenesUpdated').
@@ -558,7 +558,7 @@ async function triggerSync(targetSocket = null, forceNames = false, type = 'norm
         syncPipeline.addTask(protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i));
         syncPipeline.addTask(protocol.buildRequest('kInputPhase/kPhase', i));
         syncPipeline.addTask(protocol.buildRequest('kInputAttenuator/kAtt', i));
-        
+
         // EQ
         syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQOn', i));
         syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQMode', i));
@@ -640,9 +640,9 @@ async function triggerSync(targetSocket = null, forceNames = false, type = 'norm
         isSyncing = false;
         isFullySynced = true;
         hasSyncedNamesThisSession = true;
-        io.emit('syncStatus', false);
+        io.emit('syncStatus', { active: false });
         saveNames();
-        
+
         if (targetSocket) {
             targetSocket.emit('sync', stateManager.getState());
         } else {
@@ -662,14 +662,15 @@ async function triggerSync(targetSocket = null, forceNames = false, type = 'norm
 
 async function syncNames() {
     if (!isConnected || isSyncing) return;
-    
+
     isSyncing = true;
     isFullySynced = false; // Pausa meters
 
     // Comando STOP para meters
-    try { midiEngine.send(masterMeter.buildStopRequest()); } catch(e){}
+    try { midiEngine.send(masterMeter.buildStopRequest()); } catch (e) { }
     meterDataBuffer = new Array(33).fill(0);
     io.emit('meterData', meterDataBuffer);
+    io.emit('syncStatus', { active: true, type: 'is_scene' });
 
     console.log(`🔄 [MANUAL SYNC] Iniciando busca de nomes via Pipeline...`);
 
@@ -697,6 +698,7 @@ async function syncNames() {
     syncPipeline.setCompletionHandler(() => {
         isSyncing = false;
         isFullySynced = true;
+        io.emit('syncStatus', { active: false });
         saveNames();
         io.emit('sync', stateManager.getState());
         console.log("✅ [MANUAL SYNC] Concluído via Pipeline!");
@@ -718,7 +720,7 @@ io.on('connection', (socket) => {
     socket.emit('portsList', { available: midiEngine.getAvailablePorts(), savedConfig: currentConfig });
     socket.emit('sync', stateManager.getState());
     socket.emit('scenesUpdated', sceneManager.getState());
-    socket.emit('syncStatus', isSyncing);
+    socket.emit('syncStatus', { active: isSyncing });
     socket.emit('connectionState', { connected: isConnected });
 
     socket.on('requestConnect', async (data) => {
@@ -741,14 +743,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on('forceSync', () => {
-        if (syncManager) return syncManager.fire(null, true);
-        return triggerSync(null, true);
-    }); // Agora forceSync também força nomes
+        if (syncManager) return syncManager.fire(null, true, 'is_scene');
+        return triggerSync(null, true, 'is_scene');
+    }); // Agora forceSync também força nomes e bloqueia a UI
 
     socket.on('refreshNames', () => {
         console.log("🔄 Solicitação manual de atualização de nomes...");
         if (syncManager) return syncManager.syncNamesOnly();
-        return triggerSync(null, true);
+        return triggerSync(null, true, 'is_scene');
     });
 
     socket.on('syncNamesOnly', () => {
@@ -766,7 +768,7 @@ io.on('connection', (socket) => {
 
         // Previne override do index 0 do Edit Buffer
         sceneManager.setActiveScene(index);
-        
+
         // Copia localmente o nome da biblioteca para o Edit Buffer sem precisar baixar tudo de novo
         const cachedParams = sceneManager.getScenes().find(s => s && s.index === index);
         if (cachedParams && sceneManager.currentScene) {
@@ -785,7 +787,7 @@ io.on('connection', (socket) => {
 
                 // Manda sync para recarregar todos os faders na nova view
                 // Usamos o tipo 'is_scene' para que a UI bloqueie interações
-                triggerSync(null, false, 'is_scene'); 
+                triggerSync(null, false, 'is_scene');
             }
         }, 2000);
     });
@@ -797,7 +799,7 @@ io.on('connection', (socket) => {
         const originalName = (sceneManager.currentScene.name || "").trim();
         const targetNameRaw = (newName || originalName).trim();
         const targetName = targetNameRaw.padEnd(16, ' ').substring(0, 16);
-        
+
         console.log(`\n🎬 [SCENE SAVE] Iniciando salvamento no slot ${index}`);
         console.log(`📝 Nome original: "${originalName}" | Nome escolhido: "${targetName.trim()}"`);
 
@@ -814,7 +816,7 @@ io.on('connection', (socket) => {
 
         if (normalizedTarget !== normalizedOriginal) {
             console.log(`⚠️ Nomes diferentes detectados ("${normalizedOriginal}" vs "${normalizedTarget}")! Aguardando delay de segurança...`);
-            
+
             setTimeout(() => {
                 // Sysex Rename: F0 43 10 3E 7F 10 40 00 [INDEX] [16 BYTES NAME] F7
                 const nameBytes = [];
@@ -822,11 +824,11 @@ io.on('connection', (socket) => {
                 for (let i = 0; i < 16; i++) {
                     nameBytes.push(finalName.charCodeAt(i) || 0x20);
                 }
-                
+
                 const renameSysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x40, 0x00, index, ...nameBytes, 0xF7];
                 midiEngine.send(renameSysex);
                 console.log(`✅ Estágio 2: Enviado comando RENAME para "${normalizedTarget}" no slot ${index}.`);
-                
+
                 // Atualiza biblioteca local para refletir a mudança imediatamente no UI
                 sceneManager.scenes[index] = { index, name: normalizedTarget };
 
@@ -860,7 +862,7 @@ io.on('connection', (socket) => {
             console.log(`✅ Nomes são idênticos (ignorando case/espaços). Salvamento concluído.`);
             // Atualiza biblioteca local mesmo se for igual (para garantir consistência caso o slot estivesse vazio)
             sceneManager.scenes[index] = { index, name: normalizedOriginal };
-            
+
             // Se salvou na cena atual, garante que o currentScene esteja sincronizado
             if (sceneManager.activeSceneIndex === index || index === 0) {
                 sceneManager.currentScene = { index, name: normalizedOriginal };
@@ -882,7 +884,7 @@ io.on('connection', (socket) => {
         if (!isConnected || index === undefined || index < 1 || index > 99) return;
 
         console.log(`🗑️ [SCENE DELETE] Comando recebido: DELETAR Cena ${index}`);
-        
+
         // Comando de Clear Library: F0 43 10 3E 7F 10 60 00 [INDEX] F7
         const deleteSysex = [0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x60, 0x00, index, 0xF7];
         midiEngine.send(deleteSysex);
@@ -938,46 +940,46 @@ io.on('connection', (socket) => {
     });
 
     socket.on('updateName', (data) => {
-            const { channel, name } = data;
-            const limitedName = (name || '').substring(0, 16);
-            // Suporta Inputs(0-31), Mixes(36-43), Buses(44-51) e Master(52)
-            const channelState = stateManager.getChannelStateById(channel);
-            if (channelState) {
-                // 1. Atualiza e salva o estado no servidor
-                stateManager.setChannelName(channel, limitedName);
-                saveNames();
+        const { channel, name } = data;
+        const limitedName = (name || '').substring(0, 16);
+        // Suporta Inputs(0-31), Mixes(36-43), Buses(44-51) e Master(52)
+        const channelState = stateManager.getChannelStateById(channel);
+        if (channelState) {
+            // 1. Atualiza e salva o estado no servidor
+            stateManager.setChannelName(channel, limitedName);
+            saveNames();
 
-                // 2. BROADCAST: Envia para TODOS os clientes (Socket.io) para atualizar o UI em tempo real sem refresh
-                io.emit('updateName', { channel, name: limitedName });
+            // 2. BROADCAST: Envia para TODOS os clientes (Socket.io) para atualizar o UI em tempo real sem refresh
+            io.emit('updateName', { channel, name: limitedName });
 
-                // 3. MIDI SYNC: Envia para a mesa física com Debounce e Intervalo de Segurança
-                if (isConnected) {
-                    if (nameUpdateTimers.has(channel)) clearTimeout(nameUpdateTimers.get(channel));
+            // 3. MIDI SYNC: Envia para a mesa física com Debounce e Intervalo de Segurança
+            if (isConnected) {
+                if (nameUpdateTimers.has(channel)) clearTimeout(nameUpdateTimers.get(channel));
 
-                    const timer = setTimeout(async () => {
-                        console.log(`📝 [NAMES] Sincronizando com Yamaha Ch:${channel + 1} -> "${limitedName}"`);
-                        const paddedName = limitedName.padEnd(16, ' ').substring(0, 16);
+                const timer = setTimeout(async () => {
+                    console.log(`📝 [NAMES] Sincronizando com Yamaha Ch:${channel + 1} -> "${limitedName}"`);
+                    const paddedName = limitedName.padEnd(16, ' ').substring(0, 16);
 
-                        for (let i = 0; i < 16; i++) {
-                            const charCode = paddedName.charCodeAt(i);
-                            const msg = protocol.buildNameChange(channel, i, charCode);
-                            if (msg) midiEngine.send(msg);
-                            await new Promise(r => setTimeout(r, 30)); // 30ms para estabilidade do visor da mesa
-                        }
-                        
-                        // Após enviar todas as letras, solicita uma confirmação da mesa para garantir sincronia total
-                        const numChars = (channel >= 36) ? 16 : 4; // Canais de input usam 4 chars no visor curto, saídas 16
-                        for (let i = 0; i < numChars; i++) {
-                            const req = protocol.buildNameRequest(channel, i);
-                            if (req) midiEngine.send(req);
-                        }
-                        
-                        nameUpdateTimers.delete(channel);
-                    }, 500); // Debounce de 500ms facilita a digitação fluida
+                    for (let i = 0; i < 16; i++) {
+                        const charCode = paddedName.charCodeAt(i);
+                        const msg = protocol.buildNameChange(channel, i, charCode);
+                        if (msg) midiEngine.send(msg);
+                        await new Promise(r => setTimeout(r, 30)); // 30ms para estabilidade do visor da mesa
+                    }
 
-                    nameUpdateTimers.set(channel, timer);
-                }
+                    // Após enviar todas as letras, solicita uma confirmação da mesa para garantir sincronia total
+                    const numChars = (channel >= 36) ? 16 : 4; // Canais de input usam 4 chars no visor curto, saídas 16
+                    for (let i = 0; i < numChars; i++) {
+                        const req = protocol.buildNameRequest(channel, i);
+                        if (req) midiEngine.send(req);
+                    }
+
+                    nameUpdateTimers.delete(channel);
+                }, 500); // Debounce de 500ms facilita a digitação fluida
+
+                nameUpdateTimers.set(channel, timer);
             }
+        }
     });
 
     socket.on('requestDynamics', (data) => {
@@ -1058,14 +1060,14 @@ server.listen(PORT, '0.0.0.0', () => {
         }
     }
 
-console.log(`\n=================================================`);
+    console.log(`\n=================================================`);
     console.log(`🚀 SERVIDOR 01V96 BRIDGE ATIVO`);
     console.log(`🌍 Disponível em: http://localhost:${PORT}`);
     addresses.forEach(addr => console.log(`   - Rede: http://${addr}:${PORT}`));
     console.log(`=================================================\n`);
-    
+
     const config = loadConfig();
-    
+
     // Abrir o navegador automaticamente apenas se a flag estiver ativa
     if (config.open_browser_startup !== false) {
         const url = `http://localhost:${PORT}`;

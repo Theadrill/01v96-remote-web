@@ -158,6 +158,10 @@ class SyncManager {
         this.isSyncing = true;
         this.isFullySynced = false;
 
+        if (this.io) {
+            this.io.emit('syncStatus', { active: true, type: 'is_scene' });
+        }
+
         this.scheduler.enqueue(masterMeter.buildStopRequest(), 1);
 
         for (let i = 0; i < 32; i++) {
@@ -181,6 +185,7 @@ class SyncManager {
             self.isSyncing = false;
             self.isFullySynced = true;
             if (self.io) {
+                self.io.emit('syncStatus', { active: false });
                 self.io.emit('sync', stateManager.getState());
             }
             console.log('✅ [SyncManager] Nomes sincronizados!');
