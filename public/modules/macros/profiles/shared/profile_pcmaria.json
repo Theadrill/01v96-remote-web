@@ -1,8 +1,18 @@
 {
   "0": {
     "scriptId": "channel_toggler",
-    "name": "MACRO 1",
-    "config": []
+    "name": "INTERVALO",
+    "config": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      10,
+      11,
+      12,
+      13
+    ]
   },
   "1": {
     "scriptId": "channel_toggler",
