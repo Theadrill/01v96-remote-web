@@ -44,15 +44,41 @@ const MODEL_ID = 62;      // 3E
 const FOOTER = [247];     // F7
 
 function buildChange(commandName, channelIndex, value, converterFunc) {
-    const address = COMMAND_BYTES[commandName];
-    if (!address) return null;
-    return [...HEADER, 16, MODEL_ID, ...address, channelIndex, ...converterFunc(value), ...FOOTER];
+    const coords = COMMAND_BYTES[commandName];
+    if (!coords) return null;
+    const [section, group, element, parameter] = coords;
+    const bytes = converterFunc(value);
+    
+    // Tradução de Canal Global -> Local
+    let localIndex = channelIndex;
+    if (typeof channelIndex === 'number') {
+        if (commandName.includes('kAUX') && channelIndex >= 36) localIndex = channelIndex - 36;
+        else if (commandName.includes('kBus') && channelIndex >= 44) localIndex = channelIndex - 44;
+        else if (commandName.includes('kMatrix') && channelIndex >= 52) localIndex = channelIndex - 52;
+        else if (commandName.includes('kStereo')) localIndex = 0;
+    } else if (channelIndex === 'master') {
+        localIndex = 0;
+    }
+
+    return [0xF0, 0x43, 0x10, 0x3E, section, group, element, parameter, localIndex, ...bytes, 0xF7];
 }
 
-function buildRequest(commandName, channelIndex = 0) {
-    const address = COMMAND_BYTES[commandName];
-    if (!address) return null;
-    return [...HEADER, 48, MODEL_ID, ...address, channelIndex, ...FOOTER];
+function buildRequest(commandName, channelIndex) {
+    const coords = COMMAND_BYTES[commandName];
+    if (!coords) return null;
+    const [section, group, element, parameter] = coords;
+
+    let localIndex = channelIndex;
+    if (typeof channelIndex === 'number') {
+        if (commandName.includes('kAUX') && channelIndex >= 36) localIndex = channelIndex - 36;
+        else if (commandName.includes('kBus') && channelIndex >= 44) localIndex = channelIndex - 44;
+        else if (commandName.includes('kMatrix') && channelIndex >= 52) localIndex = channelIndex - 52;
+        else if (commandName.includes('kStereo')) localIndex = 0;
+    } else if (channelIndex === 'master') {
+        localIndex = 0;
+    }
+
+    return [0xF0, 0x43, 0x30, 0x3E, section, group, element, parameter, localIndex, 0xF7];
 }
 
 function buildNameRequest(channelIndex, charIndex) {
@@ -190,7 +216,13 @@ function parseIncoming(message) {
             const prefix = eqMap[element];
             const key = eqKeys[parameter];
             const converter = (key.endsWith('G')) ? CONVERTERS.bytesToSigned : CONVERTERS.bytesToFader;
-            return { type: `${prefix}EQ/${key}`, channel: (prefix === 'kStereo' ? 'master' : channel), value: converter(dataBytes) };
+            
+            let globalCh = channel;
+            if (prefix === 'kAUX') globalCh = 36 + channel;
+            else if (prefix === 'kBus') globalCh = 44 + channel;
+            else if (prefix === 'kStereo') globalCh = 'master';
+
+            return { type: `${prefix}EQ/${key}`, channel: globalCh, value: converter(dataBytes) };
         }
 
         // Input GATE (Element 30)
@@ -218,7 +250,14 @@ function parseIncoming(message) {
             let converter = CONVERTERS.bytesToFader;
             if (key === 'kCompThreshold') converter = CONVERTERS.bytesToSigned;
             if (key === 'kCompOn' || key === 'kCompLink') converter = CONVERTERS.bytesToOn;
-            return { type: `${prefix}Comp/${key}`, channel: (prefix === 'kStereo' ? 'master' : channel), value: converter(dataBytes) };
+
+            let globalCh = channel;
+            if (prefix === 'kAUX') globalCh = 36 + channel;
+            else if (prefix === 'kBus') globalCh = 44 + channel;
+            else if (prefix === 'kMatrix') globalCh = 52 + channel; // Matrix starts at 52? Check project global index.
+            else if (prefix === 'kStereo') globalCh = 'master';
+
+            return { type: `${prefix}Comp/${key}`, channel: globalCh, value: converter(dataBytes) };
         }
 
         // Bus Assign (Element 34)

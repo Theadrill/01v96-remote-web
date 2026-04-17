@@ -5,10 +5,22 @@ let faderCardsCache = null;
 // Os handlers 'update', 'dynamicsState' e 'meterData' garantem que a UI reflita a mesa física em tempo real.
 // Se quebrar essa estrutura de listeners, a sincronia bidirecional da dynamics/faders irá parar de funcionar.
 
-socket.on('syncStatus', (isActive) => {
+socket.on('syncStatus', (data) => {
     const shield = document.getElementById('syncShield');
+    const blocker = document.getElementById('blockingOverlay');
+    
+    // Suporte para formato antigo (boolean) ou novo (object)
+    const isActive = (typeof data === 'object') ? data.active : data;
+    const isScene = (typeof data === 'object') ? (data.type === 'is_scene') : false;
+
     if (shield) {
         shield.style.display = isActive ? 'flex' : 'none';
+    }
+
+    if (blocker) {
+        // Bloqueia a interface totalmente apenas se for um carregamento de cena
+        // Perdurando enquanto o shield de sincronismo estiver ativo
+        blocker.style.display = (isActive && isScene) ? 'block' : 'none';
     }
 });
 socket.on('update', (d) => {

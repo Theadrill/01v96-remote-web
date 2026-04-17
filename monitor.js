@@ -2,7 +2,12 @@ const midi = require('midi');
 const fs = require('fs');
 const path = require('path');
 
-const logStream = fs.createWriteStream(path.join(__dirname, 'logs', 'monitor_log.txt'), { flags: 'w' });
+const logDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+}
+
+const logStream = fs.createWriteStream(path.join(logDir, 'monitor_log.txt'), { flags: 'w' });
 const originalConsoleLog = console.log;
 console.log = function(...args) {
     const formattedMessage = require('util').format(...args);
@@ -221,10 +226,17 @@ function isNoise(msg) {
     return isMeterData(msg) || isMeterRequest(msg) || isHeartbeat(msg) || matchesCustomFilter(msg);
 }
 
+if (!fs.existsSync(filterFile)) {
+    fs.writeFileSync(filterFile, JSON.stringify({ prefixes: [] }, null, 2));
+    console.log(`📝 [FILTER] Criado filter.json inicial.`);
+}
+
 loadFilters();
-fs.watch(filterFile, (event) => {
-    if (event === 'change') loadFilters();
-});
+if (fs.existsSync(filterFile)) {
+    fs.watch(filterFile, (event) => {
+        if (event === 'change') loadFilters();
+    });
+}
 
 const C = {
     green: "\x1b[32m", blue: "\x1b[34m", dim: "\x1b[2m", reset: "\x1b[0m"

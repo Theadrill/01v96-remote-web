@@ -61,6 +61,13 @@ const SyncManager = require('./src/sync-manager');
 let dummyMeterInterval = null;
 let syncManager = null;
 
+const configFile = path.join(__dirname, 'config.json');
+const namesFile = path.join(__dirname, 'names.json');
+
+// Carregar nomes salvos imediatamente para que os clients vejam os nomes
+// mesmo antes da sincronização completa com a mesa física.
+loadNames();
+
 
 let meterDataBuffer = new Array(33).fill(0);
 let lastMeterTime = 0;
@@ -126,6 +133,12 @@ const handleMIDIData = (midiData, rawMessage = null) => {
     // }
     stateManager.updateState(midiData);
     io.emit('update', midiData);
+
+    // Se recebermos letras de nomes via MIDI (ex: mudança feita na mesa física),
+    // garantimos que o names.json seja atualizado para manter a sincronia.
+    if (midiData.type === 'updateNameChar' || midiData.type === 'updateSceneChar') {
+        saveNames();
+    }
 }
 
 function iniciarDummy() {
@@ -171,28 +184,8 @@ app.use('/api', macroRoutes);
 
 
 
-// Endpoint de Nomes para os Mods
-app.get('/api/names', (req, res) => {
-    if (fs.existsSync(namesFile)) {
-        res.json(JSON.parse(fs.readFileSync(namesFile, 'utf8')));
-    } else { res.json({}); }
-});
-
-app.get('/api/proxy', (req, res) => {
-    const targetUrl = req.query.url;
-    if (!targetUrl) return res.status(400).json({ error: "Falta url param" });
-    const reqProxy = http.get(targetUrl, (resProxy) => {
-        let body = '';
-        resProxy.on('data', chunk => body += chunk);
-        resProxy.on('end', () => {
-            try { res.json(JSON.parse(body)); } catch (e) { res.send(body); }
-        });
-    });
-    reqProxy.on('error', err => res.status(500).json({ error: err.message }));
-});
-
-const configFile = path.join(__dirname, 'config.json');
-const namesFile = path.join(__dirname, 'names.json');
+// Os endpoints /api/names e /api/proxy foram movidos para src/api/macros.js
+// para centralizar a lógica de API de macros e permitir acesso ao estado live.
 
 
 // --- LÓGICA DA SYSTEM TRAY ---
@@ -283,41 +276,52 @@ function saveConfig(configData) {
 }
 
 function loadNames() {
-    if (fs.existsSync(namesFile)) {
-        try {
-            const names = JSON.parse(fs.readFileSync(namesFile, 'utf8'));
-            for (const key in names) {
-                const idx = parseInt(key);
-                if (!isNaN(idx)) {
-                    stateManager.setChannelName(idx, names[key]);
-                }
-            }
-            console.log("✅ [NAMES] Nomes carregados do arquivo names.json");
-            return true;
-        } catch (err) {
-            console.error("❌ [NAMES] Erro ao carregar names.json:", err);
+    try {
+        console.log(`🔍 [NAMES] Tentando carregar: ${namesFile}`);
+        if (!fs.existsSync(namesFile)) {
+            console.log("⚠️ [NAMES] Arquivo names.json não encontrado no boot.");
+            return false;
         }
+        const data = fs.readFileSync(namesFile, 'utf8');
+        const names = JSON.parse(data);
+        let count = 0;
+        for (const key in names) {
+            const idx = parseInt(key);
+            if (!isNaN(idx)) {
+                stateManager.setChannelName(idx, names[key]);
+                count++;
+            }
+        }
+        console.log(`✅ [NAMES] ${count} nomes injetados no State Manager com sucesso.`);
+        return true;
+    } catch (err) {
+        console.error("❌ [NAMES] Erro fatal no loadNames:", err);
     }
     return false;
 }
 
+let saveNamesTimer = null;
 function saveNames() {
-    const s = stateManager.getState();
-    const names = {};
-    // Inputs (0-31)
-    for (let i = 0; i < 32; i++) { names[i] = s.channels[i].name; }
-    // Mixes (36-43)
-    for (let i = 0; i < 8; i++) { if (s.mixes[i]) names[36 + i] = s.mixes[i].name; }
-    // Buses (44-51)
-    for (let i = 0; i < 8; i++) { if (s.buses[i]) names[44 + i] = s.buses[i].name; }
-    // Stereo (52)
-    if (s.master) names[52] = s.master.name;
-    try {
-        fs.writeFileSync(namesFile, JSON.stringify(names, null, 2));
-        console.log("💾 [NAMES] Nomes salvos com sucesso em names.json");
-    } catch (err) {
-        console.error("❌ [NAMES] Erro ao salvar nomes:", err);
-    }
+    if (saveNamesTimer) clearTimeout(saveNamesTimer);
+    saveNamesTimer = setTimeout(() => {
+        const s = stateManager.getState();
+        const names = {};
+        // Inputs (0-31)
+        for (let i = 0; i < 32; i++) { names[i] = s.channels[i].name; }
+        // Mixes (36-43)
+        for (let i = 0; i < 8; i++) { if (s.mixes[i]) names[36 + i] = s.mixes[i].name; }
+        // Buses (44-51)
+        for (let i = 0; i < 8; i++) { if (s.buses[i]) names[44 + i] = s.buses[i].name; }
+        // Stereo (52)
+        if (s.master) names[52] = s.master.name;
+        try {
+            fs.writeFileSync(namesFile, JSON.stringify(names, null, 2));
+            console.log("💾 [NAMES] Nomes persistidos em names.json");
+        } catch (err) {
+            console.error("❌ [NAMES] Erro ao salvar nomes:", err);
+        }
+        saveNamesTimer = null;
+    }, 1000); // 1s de debounce para agrupar as 16 letras
 }
 
 function iniciarBuscaAutomatica() {
@@ -444,9 +448,10 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
                             isFullySynced = true;
                             isSyncing = false;
                             hasSyncedNamesThisSession = true;
+                            saveNames(); // Salva nomes na persistência local
                             try { io.emit('sync', stateManager.getState()); } catch(e){}
                             try { io.emit('syncStatus', false); } catch(e){}
-                            console.log('✅ [SERVER] SyncManager signaled completion, meters re-enabled.');
+                            console.log('✅ [SERVER] SyncManager signaled completion, names saved and meters re-enabled.');
                         };
                     }
                     syncManager.fire(targetSocket);
@@ -520,8 +525,10 @@ function handleDisconnection(retry = true) {
     }
 }
 
-async function triggerSync(targetSocket = null, forceNames = false) {
-    if (syncManager) return syncManager.fire(targetSocket, forceNames);
+async function triggerSync(targetSocket = null, forceNames = false, type = 'normal') {
+    if (syncManager) {
+        return syncManager.fire(targetSocket, forceNames, type);
+    }
     if (!isConnected || isSyncing) return;
     
     isSyncing = true;
@@ -777,7 +784,8 @@ io.on('connection', (socket) => {
                 });
 
                 // Manda sync para recarregar todos os faders na nova view
-                triggerSync(null); 
+                // Usamos o tipo 'is_scene' para que a UI bloqueie interações
+                triggerSync(null, false, 'is_scene'); 
             }
         }, 2000);
     });
@@ -956,6 +964,14 @@ io.on('connection', (socket) => {
                             if (msg) midiEngine.send(msg);
                             await new Promise(r => setTimeout(r, 30)); // 30ms para estabilidade do visor da mesa
                         }
+                        
+                        // Após enviar todas as letras, solicita uma confirmação da mesa para garantir sincronia total
+                        const numChars = (channel >= 36) ? 16 : 4; // Canais de input usam 4 chars no visor curto, saídas 16
+                        for (let i = 0; i < numChars; i++) {
+                            const req = protocol.buildNameRequest(channel, i);
+                            if (req) midiEngine.send(req);
+                        }
+                        
                         nameUpdateTimers.delete(channel);
                     }, 500); // Debounce de 500ms facilita a digitação fluida
 
@@ -1064,7 +1080,7 @@ console.log(`\n=================================================`);
         console.log("ℹ️ [INFO] Modo Demo desativado. Aguardando conexão física com Yamaha...");
     }
 
-    loadNames(); // Carrega nomes do arquivo na inicialização do servidor
+    // loadNames() movido para o início para agilizar o boot dos clients
 
     // Sempre iniciamos pela busca automática para respeitar a regra do loopmidi-monitor
     setTimeout(() => iniciarBuscaAutomatica(), 1500);

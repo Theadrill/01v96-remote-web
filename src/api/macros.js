@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { exec } = require('child_process');
+const stateManager = require('../state-manager');
 
 // Raiz do projeto (dois níveis acima de src/api/)
 const ROOT_DIR = path.join(__dirname, '..', '..');
@@ -11,16 +12,24 @@ const ROOT_DIR = path.join(__dirname, '..', '..');
 // --- GIT SYNC ---
 let gitSyncTimer = null;
 let gitSyncQueue = new Set();
+let gitSyncMessage = null;
 
 function triggerGitSync() {
     if (gitSyncQueue.size === 0) return;
     const filesToSync = Array.from(gitSyncQueue).join(' ');
     const hostname = os.hostname();
+    
+    // Use clear custom message if provided, otherwise fallback to generic
+    const msg = gitSyncMessage || `auto-sync: profiles updated from ${hostname}`;
+    
     // Use git add -A so that new files and deletions are detected from the working tree.
-    // Avoid running `git rm` here which may remove files from the working tree prematurely.
-    const cmd = `git add ${filesToSync} && git commit -m "auto-sync: profiles updated from ${hostname}" || true && git pull --rebase --autostash && git push`;
+    const cmd = `git add ${filesToSync} && git commit -m "${msg}" || true && git pull --rebase --autostash && git push`;
+    
+    console.log(`🚀 [NINJA SYNC] Iniciando sync: ${msg}`);
+    
     exec(cmd, { cwd: ROOT_DIR }, (error, stdout, stderr) => {
         gitSyncQueue.clear();
+        gitSyncMessage = null; // Reseta mensagem após o sync
         if (error) {
             console.error(`❌ [NINJA SYNC] Erro: ${error.message}`);
             if (stdout) console.error(`stdout: ${stdout}`);
@@ -32,6 +41,35 @@ function triggerGitSync() {
 }
 
 // --- ENDPOINTS ---
+
+// Retorna nomes live do state manager para os macros
+router.get('/names', (req, res) => {
+    const s = stateManager.getState();
+    const names = {};
+    // Inputs (0-31)
+    for (let i = 0; i < 32; i++) {
+        if (s.channels[i] && s.channels[i].name) {
+            names[i] = s.channels[i].name;
+        }
+    }
+    // Mixes (36-43)
+    for (let i = 0; i < 8; i++) {
+        if (s.mixes[i] && s.mixes[i].name) {
+            names[36 + i] = s.mixes[i].name;
+        }
+    }
+    // Buses (44-51)
+    for (let i = 0; i < 8; i++) {
+        if (s.buses[i] && s.buses[i].name) {
+            names[44 + i] = s.buses[i].name;
+        }
+    }
+    // Stereo (52)
+    if (s.master && s.master.name) {
+        names[52] = s.master.name;
+    }
+    res.json(names);
+});
 
 router.get('/macros/hosts', (req, res) => {
     const hostsPath = path.join(ROOT_DIR, 'public/modules/macros', 'hosts.json');
@@ -104,6 +142,7 @@ router.post('/macros/slots', express.json(), (req, res) => {
             fs.writeFileSync(sharedPath, content);
             const relativeSharedPath = path.relative(ROOT_DIR, sharedPath);
             gitSyncQueue.add(relativeSharedPath);
+            gitSyncMessage = `auto-sync: profile '${preset}' updated from ${os.hostname()}`;
             if (gitSyncTimer) clearTimeout(gitSyncTimer);
             gitSyncTimer = setTimeout(triggerGitSync, 10000);
         }
@@ -141,6 +180,7 @@ router.post('/macros/swap', express.json(), (req, res) => {
     if (fs.existsSync(sharedPath)) {
         const relativeSharedPath = path.relative(ROOT_DIR, sharedPath);
         gitSyncQueue.add(relativeSharedPath);
+        gitSyncMessage = `auto-sync: slots swapped in '${preset}' from ${os.hostname()}`;
         if (gitSyncTimer) clearTimeout(gitSyncTimer);
         gitSyncTimer = setTimeout(triggerGitSync, 10000);
     }
@@ -165,6 +205,8 @@ router.post('/macros/sync', express.json(), (req, res) => {
         gitSyncQueue.add(relativeSharedPath);
     });
 
+    gitSyncMessage = `auto-sync: manual full sync for '${preset}' from ${os.hostname()}`;
+
     if (gitSyncTimer) clearTimeout(gitSyncTimer);
     // Trigger almost immediately
     gitSyncTimer = setTimeout(triggerGitSync, 500);
@@ -173,38 +215,6 @@ router.post('/macros/sync', express.json(), (req, res) => {
 });
 
 // Remove shared preset files for a given preset and enqueue removal for git
-router.delete('/macros/sync', (req, res) => {
-    const preset = req.query.preset;
-    if (!preset) return res.status(400).json({ error: 'Preset faltando' });
-
-    const sharedDir = path.join(ROOT_DIR, 'public/modules/macros/profiles/shared');
-    if (!fs.existsSync(sharedDir)) return res.status(404).json({ error: 'Nenhum arquivo compartilhado encontrado' });
-
-    // Find matching files: either profile_<preset>.json or any file that ends with _<preset>.json
-    const files = fs.readdirSync(sharedDir).filter(f => f === `profile_${preset}.json` || f.endsWith(`_${preset}.json`));
-    if (files.length === 0) return res.status(404).json({ error: 'Nenhum arquivo correspondente ao preset compartilhado' });
-
-    const deleted = [];
-    files.forEach(f => {
-        const full = path.join(sharedDir, f);
-        try {
-            if (fs.existsSync(full)) fs.unlinkSync(full);
-            const relativeSharedPath = path.relative(ROOT_DIR, full);
-            // Ensure git will remove it in next sync
-            gitSyncQueue.add(relativeSharedPath);
-            deleted.push(f);
-        } catch (e) {
-            console.error('[NINJA SYNC] Falha ao deletar arquivo compartilhado:', full, e.message);
-        }
-    });
-
-    if (gitSyncTimer) clearTimeout(gitSyncTimer);
-    gitSyncTimer = setTimeout(triggerGitSync, 500);
-
-    res.json({ success: true, deleted });
-});
-
-// Remove shared preset files for a given preset and queue removal to git
 router.delete('/macros/sync', express.json(), (req, res) => {
     const preset = req.query.preset;
     if (!preset) return res.status(400).json({ error: 'Preset faltando' });
@@ -212,6 +222,7 @@ router.delete('/macros/sync', express.json(), (req, res) => {
     const sharedDir = path.join(ROOT_DIR, 'public/modules/macros/profiles/shared');
     if (!fs.existsSync(sharedDir)) return res.status(404).json({ error: 'Nenhum arquivo compartilhado encontrado' });
 
+    // Find matching files: either profile_<preset>.json or any file that includes _<preset>.json
     const files = fs.readdirSync(sharedDir).filter(f => f.includes(`_${preset}.json`) || f === `profile_${preset}.json`);
     if (files.length === 0) return res.status(404).json({ error: 'Nenhum arquivo correspondente ao preset compartilhado' });
 
@@ -223,12 +234,16 @@ router.delete('/macros/sync', express.json(), (req, res) => {
                 fs.unlinkSync(full);
                 deleted.push(f);
                 const relativeSharedPath = path.relative(ROOT_DIR, full);
+                // Ensure git will remove it in next sync
                 gitSyncQueue.add(relativeSharedPath);
             }
         } catch (e) {
-            console.error('Erro ao deletar shared file', full, e.message);
+            console.error('[NINJA SYNC] Falha ao deletar arquivo compartilhado:', full, e.message);
         }
     });
+
+    // Custom message for removal as requested by the user
+    gitSyncMessage = `cloud-sync: profile '${preset}' removed from cloud by ${os.hostname()}`;
 
     if (gitSyncTimer) clearTimeout(gitSyncTimer);
     gitSyncTimer = setTimeout(triggerGitSync, 500);
@@ -284,6 +299,7 @@ router.post('/macros/config/:modId', express.json(), (req, res) => {
             fs.writeFileSync(sharedPath, content);
             const relativeSharedPath = path.relative(ROOT_DIR, sharedPath);
             gitSyncQueue.add(relativeSharedPath);
+            gitSyncMessage = `auto-sync: mod config '${modId}' for '${preset}' updated from ${os.hostname()}`;
             if (gitSyncTimer) clearTimeout(gitSyncTimer);
             gitSyncTimer = setTimeout(triggerGitSync, 10000);
         }

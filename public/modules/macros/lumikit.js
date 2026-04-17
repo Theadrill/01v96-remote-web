@@ -3,7 +3,7 @@
  * Envia comandos HTTP GET diretos para o web server local da Lumikit.
  * Agora integrado 100% no Profile principal.
  */
-(function() {
+(function () {
     const ID = "lumikit";
     let internalSlotConfig = {}; // Temporário para a UI de edição
 
@@ -24,7 +24,7 @@
                     }
                     // Usa a Proxy API para evitar CORS
                     MixerAPI.network.fetch(`${baseUrl}/services/edmx_change_scene/${p}/${s}`, { mode: 'no-cors' });
-                } catch(e) {}
+                } catch (e) { }
             }
         }
 
@@ -35,25 +35,25 @@
                 try {
                     const stRes = await MixerAPI.network.fetch(`${baseUrl}/services/main_get_ef_status`);
                     // Ajuste: O Proxy retorna { status, data }, e o Lumikit retorna { data: [...] }
-                        if (stRes && stRes.data && stRes.data.data && stRes.data.data[0] && stRes.data.data[0].items) {
-                            efStatus = stRes.data.data[0].items;
-                        } else {
-                            console.warn("[LUMIKIT DEBUG] Estrutura de status desconhecida:", stRes);
-                        }
-                    } catch (err) { console.error("[LUMIKIT] Erro na checagem de status:", err); }
-
-                    for (let extra of actions.extras) {
-                        try {
-                            const item = efStatus[extra] || {};
-                            let isActive = (String(item.active) === "true");
-                            
-                            console.log(`[LUMIKIT DEBUG] Item F${extra+1}:`, item);
-                            console.log(`[LUMIKIT DEBUG] Status Final: ${isActive ? 'ON' : 'OFF'}. Enviando: ${isActive ? 'liberar' : 'pressionar'}`);
-                            
-                            const actionType = isActive ? "release" : "press";
-                            await MixerAPI.network.fetch(`${baseUrl}/services/main_${actionType}_ef/${extra}`, { mode: 'no-cors' });
-                        } catch(e) { console.error("[LUMIKIT] Falha ao alternar extra:", e); }
+                    if (stRes && stRes.data && stRes.data.data && stRes.data.data[0] && stRes.data.data[0].items) {
+                        efStatus = stRes.data.data[0].items;
+                    } else {
+                        console.warn("[LUMIKIT DEBUG] Estrutura de status desconhecida:", stRes);
                     }
+                } catch (err) { console.error("[LUMIKIT] Erro na checagem de status:", err); }
+
+                for (let extra of actions.extras) {
+                    try {
+                        const item = efStatus[extra] || {};
+                        let isActive = (String(item.active) === "true");
+
+                        console.log(`[LUMIKIT DEBUG] Item F${extra + 1}:`, item);
+                        console.log(`[LUMIKIT DEBUG] Status Final: ${isActive ? 'ON' : 'OFF'}. Enviando: ${isActive ? 'liberar' : 'pressionar'}`);
+
+                        const actionType = isActive ? "release" : "press";
+                        await MixerAPI.network.fetch(`${baseUrl}/services/main_${actionType}_ef/${extra}`, { mode: 'no-cors' });
+                    } catch (e) { console.error("[LUMIKIT] Falha ao alternar extra:", e); }
+                }
             }
         }, 100);
     }
@@ -93,28 +93,28 @@
             let passCounter = 0;
             const checkRender = () => { passCounter++; if (passCounter >= 3) renderUI(slotIndex); };
 
-            MixerAPI.network.fetch(`${baseUrl}/services/edmx_get_scenes_status/0`).then(d => { 
+            MixerAPI.network.fetch(`${baseUrl}/services/edmx_get_scenes_status/0`).then(d => {
                 console.log("[LUMIKIT DEBUG] Resposta Cenas P1:", d);
-                if(d && d.data && Array.isArray(d.data.data)) {
+                if (d && d.data && Array.isArray(d.data.data)) {
                     currentCenasP1 = d.data.data;
                 }
-                checkRender(); 
+                checkRender();
             }).catch(checkRender);
 
-            MixerAPI.network.fetch(`${baseUrl}/services/edmx_get_scenes_status/1`).then(d => { 
+            MixerAPI.network.fetch(`${baseUrl}/services/edmx_get_scenes_status/1`).then(d => {
                 console.log("[LUMIKIT DEBUG] Resposta Cenas P2:", d);
-                if(d && d.data && Array.isArray(d.data.data)) {
+                if (d && d.data && Array.isArray(d.data.data)) {
                     currentCenasP2 = d.data.data;
                 }
-                checkRender(); 
+                checkRender();
             }).catch(checkRender);
 
-            MixerAPI.network.fetch(`${baseUrl}/services/main_get_ef_status`).then(d => { 
-                if(d && d.data && d.data.data && d.data.data[0]) currentExtras=d.data.data[0].items; 
-                checkRender(); 
+            MixerAPI.network.fetch(`${baseUrl}/services/main_get_ef_status`).then(d => {
+                if (d && d.data && d.data.data && d.data.data[0]) currentExtras = d.data.data[0].items;
+                checkRender();
             }).catch(checkRender);
 
-            setTimeout(() => { if (passCounter < 3) { passCounter=99; renderUI(slotIndex); } }, 3000); 
+            setTimeout(() => { if (passCounter < 3) { passCounter = 99; renderUI(slotIndex); } }, 3000);
         }
 
         fetchLumikitData(false);
@@ -159,10 +159,10 @@
         for (let i = 0; i < count; i++) {
             const val = `${page}:${i}`;
             const isSel = sel.includes(val);
-            const name = items[i] ? items[i].name : `CENA ${i+1}`;
+            const name = items[i] ? items[i].name : `CENA ${i + 1}`;
             const btn = document.createElement('button');
             btn.className = 'btn-connect';
-            btn.style.cssText = `background:${isSel?'#ff5722':'#333'}; min-height:60px; border-radius:8px; font-size:10px; border:1px solid ${isSel?'#fff':'#444'}; color:${isSel?'#fff':'#888'};`;
+            btn.style.cssText = `background:${isSel ? '#ff5722' : '#333'}; min-height:60px; border-radius:8px; font-size:10px; border:1px solid ${isSel ? '#fff' : '#444'}; color:${isSel ? '#fff' : '#888'};`;
             btn.innerHTML = `<span>${name}</span>`;
             btn.onclick = () => { internalSlotConfig.scenes = isSel ? [] : [val]; renderUI(slotIdx); };
             grid.appendChild(btn);
@@ -175,14 +175,14 @@
         const count = items.length > 0 ? items.length : 16;
         for (let i = 0; i < count; i++) {
             const isSel = sel.includes(i);
-            const name = items[i] ? items[i].name : `EXTRA F${i+1}`;
+            const name = items[i] ? items[i].name : `EXTRA F${i + 1}`;
             const btn = document.createElement('button');
             btn.className = 'btn-connect';
-            btn.style.cssText = `background:${isSel?'#03a9f4':'#333'}; min-height:60px; border-radius:8px; font-size:10px; border:1px solid ${isSel?'#fff':'#444'}; color:${isSel?'#fff':'#888'};`;
+            btn.style.cssText = `background:${isSel ? '#03a9f4' : '#333'}; min-height:60px; border-radius:8px; font-size:10px; border:1px solid ${isSel ? '#fff' : '#444'}; color:${isSel ? '#fff' : '#888'};`;
             btn.innerHTML = `<span>${name}</span>`;
             btn.onclick = () => {
                 const idx = internalSlotConfig.extras.indexOf(i);
-                if(idx===-1) internalSlotConfig.extras.push(i); else internalSlotConfig.extras.splice(idx,1);
+                if (idx === -1) internalSlotConfig.extras.push(i); else internalSlotConfig.extras.splice(idx, 1);
                 renderUI(slotIdx);
             };
             grid.appendChild(btn);

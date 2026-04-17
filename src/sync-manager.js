@@ -16,14 +16,14 @@ class SyncManager {
     // fire(targetSocket, forceNames)
     // targetSocket: socket específico para receber o estado ao final (opcional)
     // forceNames: força re-sincronização de nomes mesmo que já feito nesta sessão
-    fire(targetSocket = null, forceNames = false) {
+    fire(targetSocket = null, forceNames = false, type = 'normal') {
         if (this.isSyncing) return;
 
         this.isSyncing = true;
         this.isFullySynced = false;
 
         if (this.io) {
-            this.io.emit('syncStatus', true);
+            this.io.emit('syncStatus', { active: true, type: type });
         }
 
         this._queueAllParams(forceNames, targetSocket);
@@ -136,7 +136,7 @@ class SyncManager {
         this.isFullySynced = true;
 
         if (this.io) {
-            this.io.emit('syncStatus', false);
+            this.io.emit('syncStatus', { active: false });
             this.io.emit('sync', stateManager.getState());
         }
 

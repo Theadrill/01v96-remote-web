@@ -800,15 +800,20 @@ body.layout-horizontal .side-btn {
 }
 
 /* Offline overlay */
-#offlineOverlay {
+#offlineOverlay, #blockingOverlay, .blocking-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.7);
-    z-index: 20000;
+    z-index: 20000 !important;
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: auto;
+}
+
+.blocking-overlay {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 #offlineOverlay .offline-inner {
@@ -2435,7 +2440,7 @@ body.layout-horizontal .macro-fader-card {
     display: flex;
     align-items: center;
     gap: 12px;
-    z-index: 10002;
+    z-index: 50000 !important;
     border: 2px solid #0f0;
     animation: slideDownSync 0.4s ease-out;
     pointer-events: none;

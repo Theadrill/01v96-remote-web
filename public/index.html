@@ -12,16 +12,13 @@
 
 <body>
 
-    <!-- Sync Shield Overlay -->
-    <div id="syncShield" class="sync-shield" style="display: none;">
-        <div class="sync-loader"></div>
-        <span>SINCRONIZANDO...</span>
-    </div>
-
     <!-- Offline Overlay (aparece quando a mesa estiver desconectada) -->
     <div id="offlineOverlay" style="display:none;">
         <div class="offline-inner">MESA OFFLINE</div>
     </div>
+
+    <!-- Blocking Overlay (para Cenas) -->
+    <div id="blockingOverlay" class="blocking-overlay" style="display: none;"></div>
 
     <!-- Splash Screen Overlay -->
     <div id="splashScreen" class="splash-overlay">
@@ -590,6 +587,13 @@
                     style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
             </div>
         </div>
+    </div>
+
+
+    <!-- Sync Shield Overlay (Movido para o fim para garantir z-index no topo) -->
+    <div id="syncShield" class="sync-shield" style="display: none;">
+        <div class="sync-loader"></div>
+        <span>SINCRONIZANDO...</span>
     </div>
 
     <script src="modules/globals.js"></script>
