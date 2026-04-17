@@ -2,10 +2,7 @@
   "0": {
     "scriptId": "channel_toggler",
     "name": "MACRO 1",
-    "config": [
-      0,
-      1
-    ]
+    "config": []
   },
   "1": {
     "scriptId": "channel_toggler",
