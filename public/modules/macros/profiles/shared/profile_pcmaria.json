@@ -16,10 +16,10 @@
   },
   "1": {
     "scriptId": "channel_toggler",
-    "name": "MACRO 2",
+    "name": "cav/viol",
     "config": [
-      2,
-      3
+      8,
+      9
     ]
   },
   "2": {
