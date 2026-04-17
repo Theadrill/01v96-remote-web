@@ -1,8 +1,0 @@
-{
-  "globalConfig": {
-    "lumikit": {
-      "ip": "pcmaria",
-      "port": 5000
-    }
-  }
-}
