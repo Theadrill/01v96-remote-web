@@ -3,15 +3,12 @@
     "scriptId": "channel_toggler",
     "name": "INTERVALO",
     "config": [
-      0,
       1,
-      2,
       3,
       4,
       10,
       11,
-      12,
-      13
+      12
     ]
   },
   "1": {
