@@ -16,27 +16,45 @@ let gitSyncMessage = null;
 
 function triggerGitSync() {
     if (gitSyncQueue.size === 0) return;
-    const filesToSync = Array.from(gitSyncQueue).join(' ');
+    
+    // Normalize paths for git (forward slashes) and quote them for safety
+    const filesToSync = Array.from(gitSyncQueue)
+        .map(f => `"${f.replace(/\\/g, '/')}"`)
+        .join(' ');
+        
     const hostname = os.hostname();
-    
-    // Use clear custom message if provided, otherwise fallback to generic
     const msg = gitSyncMessage || `auto-sync: profiles updated from ${hostname}`;
+    // Escape quotes for the commit message
+    const escapedMsg = msg.replace(/"/g, '\\"');
     
-    // Use git add -A so that new files and deletions are detected from the working tree.
-    const cmd = `git add ${filesToSync} && git commit -m "${msg}" || true && git pull --rebase --autostash && git push`;
+    // Use git add then commit. If commit fails (no changes), it continues to pull and push.
+    // We use a more explicit chain to ensure pull/push always run if staging is ok.
+    const cmd = `git add ${filesToSync} && (git commit -m "${escapedMsg}" || echo "Nothing to commit") && git pull --rebase --autostash && git push`;
     
     console.log(`🚀 [NINJA SYNC] Iniciando sync: ${msg}`);
     
     exec(cmd, { cwd: ROOT_DIR }, (error, stdout, stderr) => {
+        const currentQueue = Array.from(gitSyncQueue);
         gitSyncQueue.clear();
-        gitSyncMessage = null; // Reseta mensagem após o sync
+        gitSyncMessage = null; 
+        
         if (error) {
-            console.error(`❌ [NINJA SYNC] Erro: ${error.message}`);
-            if (stdout) console.error(`stdout: ${stdout}`);
-            if (stderr) console.error(`stderr: ${stderr}`);
+            console.error(`❌ [NINJA SYNC] Falha no comando Git!`);
+            console.error(`Status code: ${error.code}`);
+            if (stdout) console.error(`[STDOUT]: ${stdout.trim()}`);
+            if (stderr) console.error(`[STDERR]: ${stderr.trim()}`);
+            
+            // Se falhou por conflito ou algo grave, talvez queiramos re-enfileirar os arquivos
+            // mas por enquanto vamos apenas avisar.
             return;
         }
+        
+        if (stdout && stdout.includes('Updating')) {
+           console.log(`📡 [NINJA SYNC] Atualizações remotas recebidas durante o pull.`);
+        }
+
         console.log(`✅ [NINJA SYNC] GitHub Atualizado com Sucesso!`);
+        if (stdout) console.log(`[GIT]: ${stdout.split('\n').filter(l => l.trim()).pop() || ''}`);
     });
 }
 
