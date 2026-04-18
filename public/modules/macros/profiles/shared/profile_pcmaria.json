@@ -94,10 +94,6 @@
       ]
     }
   },
-  "9": {
-    "scriptId": "channel_toggler",
-    "name": "MACRO 10"
-  },
   "globalConfig": {
     "lumikit": {
       "ip": "pcmaria",
