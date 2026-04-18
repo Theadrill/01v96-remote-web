@@ -138,6 +138,56 @@ function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
     return nRaw;
 }
 
+/**
+ * Sincroniza visualmente o nome de um canal em todos os lugares necessários:
+ * Fader Principal, Mini Fader (Config) e Sidebar Title.
+ */
+window.updateNameUI = function(channel, name) {
+    const limitedName = (name || '').substring(0, 16).trim(); // Armazenamos até 16, mas exibimos 4 no visor
+    const displayName = limitedName.substring(0, 4) || (channel < 32 ? `CH ${channel + 1}` : '');
+    
+    // 1. Atualiza o estado local para consistência
+    const stateObj = getChannelStateById(channel);
+    if (stateObj) stateObj.name = limitedName;
+
+    // 2. Resolve IDs de elementos
+    let baseId = '';
+    let displayTitle = '';
+    
+    if (channel >= 0 && channel <= 31) {
+        baseId = `name${channel}`;
+        displayTitle = `${channel + 1}`;
+    } else if (channel >= 36 && channel <= 43) {
+        baseId = `namem${channel - 36}`;
+        displayTitle = `MIX ${channel - 35}`;
+    } else if (channel >= 44 && channel <= 51) {
+        baseId = `nameb${channel - 44}`;
+        displayTitle = `BUS ${channel - 43}`;
+    } else if (channel === 52) {
+        baseId = `namemaster`;
+        displayTitle = `MASTER`;
+    }
+
+    if (!baseId) return;
+
+    // 3. Atualiza fader na tela principal
+    const el = document.getElementById(baseId);
+    if (el) el.innerText = displayName;
+
+    // 4. Atualiza mini-fader se estiver aberto na config
+    const elMini = document.getElementById(`mini-${baseId}`);
+    if (elMini) elMini.innerText = displayName;
+
+    // 5. Atualiza título da sidebar se este canal for o ativo na config
+    if (activeConfigChannel === channel) {
+        const sideTitle = document.getElementById('chSideTitle');
+        if (sideTitle) {
+            sideTitle.innerText = `${displayTitle} - ${displayName || '...'}`;
+            if (window.autoScaleTitle) window.autoScaleTitle();
+        }
+    }
+};
+
 // Mapeamento Piecewise Linear para Dynamics (Gate e Compressor)
 // Resolve a não-linearidade das escalas visuais e alinha com os labels.
 window.mapDynDbToPercent = function(val, type) {

@@ -217,32 +217,9 @@ window.saveChannelName = function() {
     // Emitir para o servidor
     socket.emit('updateName', { channel: ch, name: newName });
     
-    // Feedback local imediato (sempre limitado a 4)
-    const finalName = newName || `CH ${ch + 1}`;
-
-    // Resolve targetId igual ao usado na abertura
-    let targetId = `name${ch}`;
-    let displayTitle = `${ch + 1}`;
-    if (ch >= 0 && ch <= 31) {
-        targetId = `name${ch}`;
-        displayTitle = `${ch + 1}`;
-    } else if (ch >= 36 && ch <= 43) {
-        targetId = `namem${ch - 36}`;
-        displayTitle = `MIX ${ch - 35}`;
-    } else if (ch >= 44 && ch <= 51) {
-        targetId = `nameb${ch - 44}`;
-        displayTitle = `BUS ${ch - 43}`;
-    } else if (ch === 52) {
-        targetId = `namemaster`;
-        displayTitle = `MASTER`;
-    }
-
-    const nameEl = document.getElementById(targetId);
-    if (nameEl) nameEl.innerText = finalName;
-    const sideTitle = document.getElementById('chSideTitle');
-    if (sideTitle) {
-        sideTitle.innerText = `${displayTitle} - ${finalName}`;
-        autoScaleTitle(); 
+    // Feedback visual imediato usando a função unificada
+    if (typeof updateNameUI === 'function') {
+        updateNameUI(ch, newName);
     }
     
     document.getElementById('nameEditorModal').style.display = 'none';

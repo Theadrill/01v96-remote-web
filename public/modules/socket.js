@@ -155,45 +155,14 @@ socket.on('update', (d) => {
 
     if (d.type === 'updateNameChar') {
         const stateObj = getChannelStateById(d.channel);
-        let targetId = `name${d.channel}`;
-        
-        if (d.channel >= 36 && d.channel <= 43) {
-            targetId = `namem${d.channel - 36}`;
-        } else if (d.channel >= 44 && d.channel <= 51) {
-            targetId = `nameb${d.channel - 44}`;
-        } else if (d.channel === 52) {
-            targetId = `namemaster`;
-        }
-
         if (!stateObj.nameChars) {
             stateObj.nameChars = new Array(16).fill(' ');
         }
         stateObj.nameChars[d.charIndex] = d.char;
-        const newName = stateObj.nameChars.join('').trim() || (d.channel < 32 ? `CH ${d.channel + 1}` : targetId.replace('name', '').toUpperCase());
-        stateObj.name = newName;
+        const newName = stateObj.nameChars.join('').trim();
         
-        if (d.channel >= 36) {
-            console.log(`✅ [FRONT-NAME] UPDATED: ID:${targetId} Name:'${newName}'`);
-        }
-
-        // Atualiza o texto visual no fader
-        const el = document.getElementById(targetId);
-        if (el) el.innerText = newName;
-
-        // Atualiza sidebar se necessário
-        if (activeConfigChannel === d.channel) {
-            const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle) {
-                // Resolve o Label do canal (ex: ST MASTER ou MIX 1)
-                let chLabel = d.channel;
-                if (d.channel >= 36 && d.channel <= 43) chLabel = `MIX ${d.channel - 35}`;
-                else if (d.channel >= 44 && d.channel <= 51) chLabel = `BUS ${d.channel - 43}`;
-                else if (d.channel === 52) chLabel = `ST MASTER`;
-                else chLabel = d.channel + 1;
-
-                sideTitle.innerText = `${chLabel} - ${newName}`;
-                if (window.autoScaleTitle) autoScaleTitle();
-            }
+        if (typeof updateNameUI === 'function') {
+            updateNameUI(d.channel, newName);
         }
         return;
     }
@@ -233,55 +202,8 @@ function updateSceneDisplay() {
 }
 
 socket.on('updateName', (data) => {
-    const { channel, name } = data;
-    // Inputs 0-31
-    if (typeof channel === 'number' && channel >= 0 && channel <= 31) {
-        channelStates[channel].name = name;
-        const el = document.getElementById(`name${channel}`);
-        if (el) el.innerText = name;
-        if (activeConfigChannel === channel) {
-            const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle) { sideTitle.innerText = `${channel + 1} - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
-        }
-        return;
-    }
-
-    // Mixes 36-43 -> namem0..7
-    if (typeof channel === 'number' && channel >= 36 && channel <= 43) {
-        const idx = channel - 36;
-        mixesState[idx].name = name;
-        const el = document.getElementById(`namem${idx}`);
-        if (el) el.innerText = name;
-        if (activeConfigChannel === channel) {
-            const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle) { sideTitle.innerText = `MIX ${idx + 1} - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
-        }
-        return;
-    }
-
-    // Buses 44-51 -> nameb0..7
-    if (typeof channel === 'number' && channel >= 44 && channel <= 51) {
-        const idx = channel - 44;
-        busesState[idx].name = name;
-        const el = document.getElementById(`nameb${idx}`);
-        if (el) el.innerText = name;
-        if (activeConfigChannel === channel) {
-            const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle) { sideTitle.innerText = `BUS ${idx + 1} - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
-        }
-        return;
-    }
-
-    // Master 52 -> namemaster
-    if (channel === 52) {
-        masterState.name = name;
-        const el = document.getElementById('namemaster');
-        if (el) el.innerText = name;
-        if (activeConfigChannel === 52) {
-            const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle) { sideTitle.innerText = `MASTER - ${name}`; if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle(); }
-        }
-        return;
+    if (typeof updateNameUI === 'function') {
+        updateNameUI(data.channel, data.name);
     }
 });
 
@@ -330,24 +252,7 @@ socket.on('dynamicsDebugLog', (data) => {
     console.log(`%c[DEBUG DYNAMICS] Resposta legada:`, 'color: gray; font-size: 11px;');
 });
 
-socket.on('updateName', (d) => {
-    if (typeof d.channel === 'number' && d.channel < NUM_CHANNELS) {
-        const newName = d.name || `CH ${d.channel + 1}`;
-        const el = document.getElementById(`name${d.channel}`);
-        if (el && el.innerText !== newName) {
-            el.innerText = newName;
-        }
-
-        // Se este canal for o que está aberto na sidebar, atualiza o título lá tbm
-        if (activeConfigChannel === d.channel) {
-            const sideTitle = document.getElementById('chSideTitle');
-            if (sideTitle && sideTitle.innerText !== `${d.channel + 1} - ${newName}`) {
-                sideTitle.innerText = `${d.channel + 1} - ${newName}`;
-                if (window.autoScaleTitle) autoScaleTitle();
-            }
-        }
-    }
-});
+// Listener de updateName consolidado acima.
 
 socket.on('sync', (s) => {
     if (s.channels) {
