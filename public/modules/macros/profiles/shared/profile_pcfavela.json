@@ -63,7 +63,13 @@
   },
   "6": {
     "scriptId": "lumikit",
-    "name": "MACRO 7"
+    "name": "MACRO 7",
+    "config": {
+      "scenes": [
+        "0:8"
+      ],
+      "extras": []
+    }
   },
   "globalConfig": {
     "lumikit": {
