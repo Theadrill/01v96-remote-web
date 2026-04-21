@@ -61,6 +61,10 @@
       ]
     }
   },
+  "6": {
+    "scriptId": "lumikit",
+    "name": "MACRO 7"
+  },
   "globalConfig": {
     "lumikit": {
       "ip": "pcfavela",
