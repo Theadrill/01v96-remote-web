@@ -5,7 +5,7 @@ class MidiScheduler {
         this.q1 = [];
         this.q2 = [];
         this.interval = null;
-        this.tickMs = 5;
+        this.tickMs = 15;
         this.isRunning = false;
         this.totalProcessed = 0;
         this.onQ1Empty = null;

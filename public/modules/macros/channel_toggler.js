@@ -12,10 +12,15 @@
         console.log(`[TOGGLER DEBUG] Slot: ${slotIndex}, Canais:`, channels);
         if (channels.length === 0) { console.warn("[TOGGLER] Nenhum canal configurado para este slot!"); return; }
         
-        channels.forEach(chIdx => {
-            // Usa as primitivas da MixerAPI
-            MixerAPI.mixer.toggleOn(chIdx, !getChannelStateById(chIdx).on);
-        });
+        // Execução sequencial com delay para garantir que a mesa física processe tudo
+        for (const chIdx of channels) {
+            const currentState = getChannelStateById(chIdx);
+            if (currentState) {
+                MixerAPI.mixer.toggleOn(chIdx, !currentState.on);
+                // Pequeno delay entre mensagens no macro para não saturar a ponte socket->midi
+                await new Promise(r => setTimeout(r, 20));
+            }
+        }
     }
 
     // 2. Configuração
