@@ -156,10 +156,13 @@ socket.on('update', (d) => {
     if (d.type === 'updateNameChar') {
         const stateObj = getChannelStateById(d.channel);
         if (!stateObj.nameChars) {
-            stateObj.nameChars = new Array(16).fill(' ');
+            stateObj.nameChars = (stateObj.name || '').padEnd(16, ' ').substring(0, 16).split('');
         }
         stateObj.nameChars[d.charIndex] = d.char;
         const newName = stateObj.nameChars.join('').trim();
+        
+        // Mantém sicronia do nome
+        stateObj.name = newName;
         
         if (typeof updateNameUI === 'function') {
             updateNameUI(d.channel, newName);
@@ -203,6 +206,10 @@ function updateSceneDisplay() {
 
 socket.on('updateName', (data) => {
     if (typeof updateNameUI === 'function') {
+        const stateObj = getChannelStateById(data.channel);
+        if (stateObj) {
+            stateObj.nameChars = (data.name || '').padEnd(16, ' ').substring(0, 16).split('');
+        }
         updateNameUI(data.channel, data.name);
     }
 });
