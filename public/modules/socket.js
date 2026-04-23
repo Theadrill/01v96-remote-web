@@ -98,41 +98,6 @@ socket.on('update', (d) => {
         // ... restante do updateState (Phase, Patch, Buses, Stereo On)
     }
 
-        // Suporte a EQ (todos os prefixos: Input, Bus, AUX, Stereo)
-        if (d.type.includes('EQ/kEQ')) {
-            if (window.updateEQParam) {
-                window.updateEQParam(d.type, d.value, d.mode, d.channel);
-            }
-        }
-
-        // Suporte a Gate
-        if (d.type.startsWith('kInputGate/')) {
-            const key = d.type.split('/')[1];
-            if (activeConfigChannel === d.channel && typeof updateGateFromSocket === 'function') {
-                updateGateFromSocket(d.channel, key, d.value);
-            } else {
-                // Atualiza apenas o estado sem tocar na UI
-                if (!channelStates[d.channel].gate) channelStates[d.channel].gate = {};
-                const iMap = { 'kGateOn': 'on', 'kGateThreshold': 'thresh', 'kGateAttack': 'attack', 'kGateRange': 'range', 'kGateHold': 'hold', 'kGateDecay': 'decay' };
-                const ik = iMap[key];
-                if (ik) channelStates[d.channel].gate[ik] = (key === 'kGateOn' ? !!d.value : d.value);
-            }
-        }
-
-        // Suporte a Compressor
-        if (d.type.startsWith('kInputComp/')) {
-            const key = d.type.split('/')[1];
-            if (activeConfigChannel === d.channel && typeof updateCompFromSocket === 'function') {
-                updateCompFromSocket(d.channel, key, d.value);
-            } else {
-                // Atualiza apenas o estado sem tocar na UI
-                if (!channelStates[d.channel].comp) channelStates[d.channel].comp = {};
-                const iMap = { 'kCompOn': 'on', 'kCompThreshold': 'thresh', 'kCompRatio': 'ratio', 'kCompAttack': 'attack', 'kCompRelease': 'release', 'kCompGain': 'gain', 'kCompKnee': 'knee' };
-                const ik = iMap[key];
-                if (ik) channelStates[d.channel].comp[ik] = (key === 'kCompOn' ? !!d.value : d.value);
-            }
-        }
-
         // Suporte a Patch (ETC)
         if (d.type === 'kChannelInput/kChannelIn') {
             channelStates[d.channel].patch = d.value;
@@ -156,6 +121,47 @@ socket.on('update', (d) => {
 
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
+            }
+        }
+    } // FIM DO BLOCO DE INPUTS (0-31)
+
+    // --- HANDLERS UNIVERSAIS (INPUTS E OUTS) ---
+
+    // Suporte Universal a EQ
+    if (d.type.includes('EQ/kEQ')) {
+        if (window.updateEQParam) {
+            window.updateEQParam(d.type, d.value, d.mode, d.channel);
+        }
+    }
+
+    // Suporte Universal a Gate
+    if (d.type.includes('Gate/')) {
+        const key = d.type.split('/')[1];
+        if (activeConfigChannel === d.channel && typeof updateGateFromSocket === 'function') {
+            updateGateFromSocket(d.channel, key, d.value);
+        } else {
+            const s = getChannelStateById(d.channel);
+            if (s) {
+                if (!s.gate) s.gate = {};
+                const iMap = { 'kGateOn': 'on', 'kGateThreshold': 'thresh', 'kGateAttack': 'attack', 'kGateRange': 'range', 'kGateHold': 'hold', 'kGateDecay': 'decay' };
+                const ik = iMap[key];
+                if (ik) s.gate[ik] = (key === 'kGateOn' ? !!d.value : d.value);
+            }
+        }
+    }
+
+    // Suporte Universal a Compressor
+    if (d.type.includes('Comp/')) {
+        const key = d.type.split('/')[1];
+        if (activeConfigChannel === d.channel && typeof updateCompFromSocket === 'function') {
+            updateCompFromSocket(d.channel, key, d.value);
+        } else {
+            const s = getChannelStateById(d.channel);
+            if (s) {
+                if (!s.comp) s.comp = {};
+                const iMap = { 'kCompOn': 'on', 'kCompThreshold': 'thresh', 'kCompRatio': 'ratio', 'kCompAttack': 'attack', 'kCompRelease': 'release', 'kCompGain': 'gain', 'kCompKnee': 'knee' };
+                const ik = iMap[key];
+                if (ik) s.comp[ik] = (key === 'kCompOn' ? !!d.value : d.value);
             }
         }
     }
@@ -225,10 +231,11 @@ socket.on('updateName', (data) => {
 socket.on('dynamicsState', (data) => {
     const { channel, gate, comp } = data;
 
-    // Salva sempre no estado local
-    if (channelStates[channel]) {
-        if (gate) channelStates[channel].gate = { ...channelStates[channel].gate, ...gate };
-        if (comp) channelStates[channel].comp = { ...channelStates[channel].comp, ...comp };
+    // Salva sempre no estado local (funciona p/ Input, Bus, AUX e Stereo)
+    const s = getChannelStateById(channel);
+    if (s) {
+        if (gate) s.gate = { ...(s.gate || {}), ...gate };
+        if (comp) s.comp = { ...(s.comp || {}), ...comp };
     }
 
     // Só atualiza a UI se o canal ainda estiver aberto

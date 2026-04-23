@@ -198,7 +198,7 @@ window.updateNameUI = function(channel, name) {
 // Mapeamento Piecewise Linear para Dynamics (Gate e Compressor)
 // Resolve a não-linearidade das escalas visuais e alinha com os labels.
 window.mapDynDbToPercent = function(val, type) {
-    const GATE_POINTS = [-720, -600, -400, -200, -100, 0];
+    const GATE_POINTS = [-540, -400, -200, -100, -50, 0];
     const COMP_POINTS = [-540, -400, -200, -100, -50, 0];
     const DYN_PERCENTS = [0, 20, 40, 60, 80, 100];
     

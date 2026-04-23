@@ -9,7 +9,7 @@ const state = {
         value: 0,
         on: false,
         name: "MASTER",
-        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        comp: { on: false, thresh: -80, ratio: 7, attack: 30, release: 250, gain: 0, knee: 2 },
         eq: {
             on: false,
             mode: 0,
@@ -34,8 +34,8 @@ for (let i = 0; i < 32; i++) {
         patch: 1, // AD1 default
         nameChars: Array(4).fill(' '), // 4 espaços para as letras
         name: `CH ${i + 1}`,
-        gate: { on: false, thresh: -26, range: -60, attack: 0, hold: 20, decay: 50 },
-        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        gate: { on: false, thresh: -260, range: -60, attack: 0, hold: 20, decay: 50 },
+        comp: { on: false, thresh: -80, ratio: 7, attack: 30, release: 250, gain: 0, knee: 2 },
         buses: Array(8).fill(false), // Novo: Assignments para Bus 1-8
         stereo: true, // Novo: On/Off no barramento L/R Stereo
         eq: {
@@ -55,7 +55,7 @@ for (let i = 0; i < 8; i++) {
         on: false, 
         name: `MIX ${i + 1}`,
         nameChars: Array(16).fill(' '),
-        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        comp: { on: false, thresh: -80, ratio: 7, attack: 30, release: 250, gain: 0, knee: 2 },
         eq: {
             on: false,
             mode: 0,
@@ -70,7 +70,7 @@ for (let i = 0; i < 8; i++) {
         on: false, 
         name: `BUS ${i + 1}`,
         nameChars: Array(16).fill(' '),
-        comp: { on: false, thresh: -8, ratio: 2.5, attack: 30, release: 250, gain: 0, knee: 2 },
+        comp: { on: false, thresh: -80, ratio: 7, attack: 30, release: 250, gain: 0, knee: 2 },
         eq: {
             on: false,
             mode: 0,

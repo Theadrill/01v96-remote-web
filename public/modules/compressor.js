@@ -12,10 +12,11 @@ function renderCompressor(container, ch) {
         '19.1s', '19.7s', '20.4s', '21.1s', '21.8s', '23.2s', '24.5s', '25.9s', '27.3s', '28.6s', '30.0s', '31.4s', '32.7s', '34.1s', '35.4s', '36.8s', '38.2s', '39.5s', '40.9s', '42.3s'
     ];
     
+    const prefix = getChannelParamPrefix(ch);
     const box = document.createElement('div');
     box.className = 'dyn-box comp-box';
     
-    const defaultState = { on: false, thresh: -8, ratio: 7, attack: 30, release: 250, gain: 0, knee: 2 };
+    const defaultState = { on: false, thresh: -80, ratio: 7, attack: 30, release: 250, gain: 0, knee: 2 };
     const targetState = getChannelStateById(ch);
     const savedState = (targetState && targetState.comp) || {};
     const state = { ...defaultState, ...savedState };
@@ -41,32 +42,56 @@ function renderCompressor(container, ch) {
         <div class="dyn-controls">
             <div class="dyn-param">
                 <label>THRESH</label>
-                <div class="dyn-slider-wrap"><input type="range" id="compThreshSl" class="dyn-slider" min="-540" max="0" step="1" value="${state.thresh * 10}"></div>
+                <div class="dyn-slider-wrap">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compThreshSl', -1, ${ch}, '${prefix}Comp/kCompThreshold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compThreshSl', -1, ${ch}, '${prefix}Comp/kCompThreshold')" ontouchend="stopDynNudge()">-</button>
+                    <input type="range" id="compThreshSl" class="dyn-slider" min="-540" max="0" step="1" value="${state.thresh}">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compThreshSl', 1, ${ch}, '${prefix}Comp/kCompThreshold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compThreshSl', 1, ${ch}, '${prefix}Comp/kCompThreshold')" ontouchend="stopDynNudge()">+</button>
+                </div>
                 <span class="dyn-value">-8.0</span>
             </div>
             <div class="dyn-param">
                 <label>RATIO</label>
-                <div class="dyn-slider-wrap"><input type="range" id="compRatioSl" class="dyn-slider" min="0" max="15" step="1" value="${state.ratio}"></div>
+                <div class="dyn-slider-wrap">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compRatioSl', -1, ${ch}, '${prefix}Comp/kCompRatio')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compRatioSl', -1, ${ch}, '${prefix}Comp/kCompRatio')" ontouchend="stopDynNudge()">-</button>
+                    <input type="range" id="compRatioSl" class="dyn-slider" min="0" max="15" step="1" value="${state.ratio}">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compRatioSl', 1, ${ch}, '${prefix}Comp/kCompRatio')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compRatioSl', 1, ${ch}, '${prefix}Comp/kCompRatio')" ontouchend="stopDynNudge()">+</button>
+                </div>
                 <span class="dyn-value">2.5:1</span>
             </div>
             <div class="dyn-param">
                 <label>ATTACK</label>
-                <div class="dyn-slider-wrap"><input type="range" id="compAttackSl" class="dyn-slider" min="0" max="120" step="1" value="${state.attack}"></div>
+                <div class="dyn-slider-wrap">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compAttackSl', -1, ${ch}, '${prefix}Comp/kCompAttack')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compAttackSl', -1, ${ch}, '${prefix}Comp/kCompAttack')" ontouchend="stopDynNudge()">-</button>
+                    <input type="range" id="compAttackSl" class="dyn-slider" min="0" max="120" step="1" value="${state.attack}">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compAttackSl', 1, ${ch}, '${prefix}Comp/kCompAttack')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compAttackSl', 1, ${ch}, '${prefix}Comp/kCompAttack')" ontouchend="stopDynNudge()">+</button>
+                </div>
                 <span class="dyn-value">30ms</span>
             </div>
             <div class="dyn-param">
                 <label>RELEASE</label>
-                <div class="dyn-slider-wrap"><input type="range" id="compReleaseSl" class="dyn-slider" min="0" max="${RELEASE_STEPS.length - 1}" step="1" value="${state.release}"></div>
+                <div class="dyn-slider-wrap">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compReleaseSl', -1, ${ch}, '${prefix}Comp/kCompRelease')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compReleaseSl', -1, ${ch}, '${prefix}Comp/kCompRelease')" ontouchend="stopDynNudge()">-</button>
+                    <input type="range" id="compReleaseSl" class="dyn-slider" min="0" max="${RELEASE_STEPS.length - 1}" step="1" value="${state.release}">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compReleaseSl', 1, ${ch}, '${prefix}Comp/kCompRelease')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compReleaseSl', 1, ${ch}, '${prefix}Comp/kCompRelease')" ontouchend="stopDynNudge()">+</button>
+                </div>
                 <span class="dyn-value">250ms</span>
             </div>
             <div class="dyn-param">
                 <label>OUTGAIN</label>
-                <div class="dyn-slider-wrap"><input type="range" id="compGainSl" class="dyn-slider" min="0" max="180" step="1" value="${state.gain}"></div>
+                <div class="dyn-slider-wrap">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compGainSl', -1, ${ch}, '${prefix}Comp/kCompGain')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compGainSl', -1, ${ch}, '${prefix}Comp/kCompGain')" ontouchend="stopDynNudge()">-</button>
+                    <input type="range" id="compGainSl" class="dyn-slider" min="0" max="180" step="1" value="${state.gain}">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compGainSl', 1, ${ch}, '${prefix}Comp/kCompGain')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compGainSl', 1, ${ch}, '${prefix}Comp/kCompGain')" ontouchend="stopDynNudge()">+</button>
+                </div>
                 <span class="dyn-value">0.0dB</span>
             </div>
             <div class="dyn-param">
                 <label>KNEE</label>
-                <div class="dyn-slider-wrap"><input type="range" id="compKneeSl" class="dyn-slider" min="0" max="5" step="1" value="${state.knee}"></div>
+                <div class="dyn-slider-wrap">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compKneeSl', -1, ${ch}, '${prefix}Comp/kCompKnee')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compKneeSl', -1, ${ch}, '${prefix}Comp/kCompKnee')" ontouchend="stopDynNudge()">-</button>
+                    <input type="range" id="compKneeSl" class="dyn-slider" min="0" max="5" step="1" value="${state.knee}">
+                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compKneeSl', 1, ${ch}, '${prefix}Comp/kCompKnee')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compKneeSl', 1, ${ch}, '${prefix}Comp/kCompKnee')" ontouchend="stopDynNudge()">+</button>
+                </div>
                 <span class="dyn-value">2</span>
             </div>
         </div>
@@ -77,11 +102,8 @@ function renderCompressor(container, ch) {
     const updateUIValue = (id, formatter) => {
         const sl = box.querySelector(`#${id}Sl`);
         const valEl = sl.parentElement.nextElementSibling;
-        const update = () => {
-            valEl.innerText = formatter(parseInt(sl.value));
-        };
-        sl.oninput = update;
-        sl.onchange = () => {
+
+        const sendToSocket = () => {
              const prefix = getChannelParamPrefix(ch);
              const typeMap = {
                  'compThresh': `${prefix}Comp/kCompThreshold`,
@@ -94,7 +116,33 @@ function renderCompressor(container, ch) {
              const type = typeMap[id];
              if (type && socket) socket.emit('control', { type, channel: ch, value: parseInt(sl.value) });
         };
-        update();
+
+        const updateVisuals = () => {
+            valEl.innerText = formatter(parseInt(sl.value));
+        };
+
+        sl.oninput = () => {
+            updateVisuals();
+            sendToSocket();
+        };
+
+        // Suporte a Roda do Mouse
+        sl.onwheel = (e) => {
+            e.preventDefault();
+            const step = parseInt(sl.step) || 1;
+            let val = parseInt(sl.value);
+            if (e.deltaY < 0) val += step;
+            else val -= step;
+            
+            if (val < parseInt(sl.min)) val = parseInt(sl.min);
+            if (val > parseInt(sl.max)) val = parseInt(sl.max);
+            
+            sl.value = val;
+            updateVisuals();
+            sendToSocket();
+        };
+
+        updateVisuals();
     };
 
     updateUIValue('compThresh', v => (v/10).toFixed(1));

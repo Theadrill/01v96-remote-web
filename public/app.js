@@ -106,10 +106,11 @@ window.showSceneGrid = (action) => {
         
         btn.addEventListener('touchstart', (e) => {
             if (scene.isEmpty) return;
-            e.preventDefault();
             isLongPress = false;
             longPressTimer = setTimeout(handleLongPress, 600);
-        }, { passive: false });
+        }, { passive: true });
+        
+        btn.addEventListener('touchmove', cancelLongPress, { passive: true });
         
         btn.addEventListener('touchend', (e) => {
             cancelLongPress();
