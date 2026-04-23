@@ -46,7 +46,8 @@
       "extras": [
         0
       ]
-    }
+    },
+    "color": "#ff2929"
   },
   "5": {
     "scriptId": "lumikit",

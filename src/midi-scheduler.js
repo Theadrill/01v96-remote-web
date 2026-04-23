@@ -51,9 +51,19 @@ class MidiScheduler {
 
     _extractAddress(bytes) {
         if (bytes.length >= 6 && bytes[0] === 0xF0 && bytes[1] === 0x43) {
+            const subStatus = bytes[2] & 0xF0;
             const dev = bytes[3] & 0x0F;
+
+            // Para Parameter Change (0x10) e Parameter Request (0x30), a identidade única
+            // é composta por Section, Group, Element, Parameter e Index (bytes 4 a 8).
+            if ((subStatus === 0x10 || subStatus === 0x30) && bytes.length >= 9) {
+                const addr = bytes.slice(4, 9);
+                return `P-${dev}-${addr.map(b => b.toString(16)).join('-')}`;
+            }
+
+            // Fallback para outros tipos de SysEx (Seção, Grupo e Elemento)
             const addr = bytes.slice(4, 7);
-            return `${dev}-${addr.map(b => b.toString(16)).join('-')}`;
+            return `O-${dev}-${addr.map(b => b.toString(16)).join('-')}`;
         }
         return null;
     }

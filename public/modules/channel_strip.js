@@ -109,6 +109,8 @@ function updateUI(ch, val, onState, soloState) {
         if (elSolo) elSolo.classList.toggle('solo-active', soloState);
         const elSoloMini = document.getElementById(`mini-solo${ch}`);
         if (elSoloMini) elSoloMini.classList.toggle('solo-active', soloState);
+        // Atualiza o indicador de SOLO no master sempre que qualquer solo muda
+        checkMasterSoloIndicator();
     }
 }
 /**
@@ -160,6 +162,8 @@ function createDesktopStrip(config) {
             
             ${hasSolo ?
             `<button id="solo${id}" class="btn-cue" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">SOLO</button>` :
+            isMaster ?
+            `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
             `<div class="btn-cue-placeholder"></div>`}
             
             <div class="desk-ch-name-zone" onclick="${isMaster ? '' : configAction}">
@@ -283,7 +287,7 @@ function createMobileStrip(config) {
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
             
-            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">Solo</button>` : ''}
+            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
             <button id="${onId}" class="btn-state ${isOn ? 'on-active' : ''}" onclick="${onAction}">On</button>
 
             <div class="nudge-zone" onpointerdown="${onNudgeStartAction}(${evtCh}, 1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" oncontextmenu="return false;" onclick="event.stopPropagation()">
@@ -565,5 +569,56 @@ function initUI() {
     }
     if (!technicianMixMode || !outsMode) {
         updateUI('master', masterState.value, masterState.on, undefined);
+    }
+    // Verifica estado inicial dos solos após renderizar a UI
+    checkMasterSoloIndicator();
+}
+
+/**
+ * Verifica se há canais com solo ativo e atualiza o indicador no botão SOLO do master.
+ * Roda no frontend puro, sem tráfego MIDI extra.
+ */
+function checkMasterSoloIndicator() {
+    const hasSolo = channelStates.some(s => s && s.solo === true);
+    const btn = document.getElementById('master-solo-btn');
+    if (!btn) return;
+    if (hasSolo) {
+        btn.classList.add('master-solo-alert');
+        btn.disabled = false; // Habilita o clique quando há algo a limpar
+    } else {
+        btn.classList.remove('master-solo-alert');
+        btn.disabled = true;  // Desabilita quando não há solos ativos
+    }
+}
+
+/**
+ * Desativa o solo de todos os canais que estão solados, enviando os comandos
+ * de forma sequencial com delay de 30ms entre cada um para evitar
+ * congestionamento na fila MIDI (mesmo padrão das macros).
+ */
+async function clearAllSolos() {
+    const soloedChannels = [];
+    for (let i = 0; i < NUM_CHANNELS; i++) {
+        if (channelStates[i] && channelStates[i].solo === true) {
+            soloedChannels.push(i);
+        }
+    }
+    if (soloedChannels.length === 0) return;
+
+    console.log(`[MASTER SOLO] Limpando solo de ${soloedChannels.length} canal(is):`, soloedChannels);
+
+    // Desativa o botão imediatamente para evitar cliques duplos
+    const btn = document.getElementById('master-solo-btn');
+    if (btn) { btn.disabled = true; btn.classList.remove('master-solo-alert'); }
+
+    for (const ch of soloedChannels) {
+        // Atualiza UI local imediatamente (sem esperar confirmação da mesa)
+        updateUI(ch, undefined, undefined, false);
+        // Envia comando MIDI via socket
+        if (appReady) {
+            socket.emit('control', { type: 'kSetupSoloChOn/kSoloChOn', channel: ch, value: 0 });
+        }
+        // Delay entre envios para não congestionar a fila
+        await new Promise(r => setTimeout(r, 30));
     }
 }

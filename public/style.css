@@ -436,6 +436,30 @@ body.layout-horizontal .side-btn {
     border-color: #34ce57;
 }
 
+/* === Master Solo Clear Button === */
+@keyframes master-solo-pulse {
+    0%   { background: #333; color: #555; box-shadow: none; border-color: #444; }
+    50%  { background: #c0000a; color: #fff; box-shadow: 0 0 10px rgba(220, 0, 10, 0.8); border-color: #ff2233; }
+    100% { background: #333; color: #555; box-shadow: none; border-color: #444; }
+}
+
+.btn-cue.master-solo-alert {
+    animation: master-solo-pulse 1s ease-in-out infinite !important;
+    cursor: pointer !important;
+}
+
+/* Mobile variant */
+@keyframes master-solo-pulse-mobile {
+    0%   { background: #333; color: #555; border-color: #444; }
+    50%  { background: #c0000a; color: #fff; border-color: #ff2233; box-shadow: 0 0 8px rgba(220, 0, 10, 0.7); }
+    100% { background: #333; color: #555; border-color: #444; }
+}
+
+.btn-state.master-solo-alert {
+    animation: master-solo-pulse-mobile 1s ease-in-out infinite !important;
+    cursor: pointer !important;
+}
+
 .on-active {
     background: #ffc107 !important;
     color: black !important;
