@@ -495,11 +495,13 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     if (type.includes('kEQLPFOn')) chState.eq.high.lpfOn = val;
     if (type.includes('kEQOn')) chState.eq.on = (val === 1 || val === true);
     
-    const parts = type.match(/kInputEQ\/kEQ(Low|LowMid|HiMid|Hi)(F|G|Q)/);
+    // ATENÇÃO: o regex deve cobrir TODOS os prefixos (kInput, kAUX, kBus, kStereo)
+    // Se ficar hardcoded em kInputEQ, os canais Out (Bus/Mix) nunca sincronizam no gráfico.
+    const parts = type.match(/^k(?:Input|AUX|Bus|Stereo)EQ\/kEQ(Low|LowMid|HiMid|Hi)(F|G|Q)/);
     if (parts) {
-        // Normaliza a chave para o estado: Hi -> high
+        // Normaliza a chave para o estado: Hi -> high, HiMid -> himid
         const bLabel = parts[1];
-        const bandKey = (bLabel === 'Hi' ? 'high' : bLabel.toLowerCase());
+        const bandKey = bLabel === 'Hi' ? 'high' : bLabel.toLowerCase();
         const paramKey = parts[2].toLowerCase();
         
         if (!chState.eq[bandKey]) chState.eq[bandKey] = {};
@@ -559,7 +561,9 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
 
     // Sincroniza Valores no Gráfico
     if (parts) {
-        const b = eqBands.find(x => x.key === (parts[1].toLowerCase() === 'hi' ? 'high' : parts[1].toLowerCase()));
+        // Normaliza: 'hi' -> 'high', 'himid' -> 'himid'
+        const lookupKey = parts[1].toLowerCase() === 'hi' ? 'high' : parts[1].toLowerCase();
+        const b = eqBands.find(x => x.key === lookupKey);
         if (b) {
             const label = parts[1].toUpperCase() === 'HI' ? 'HIGH' : parts[1].toUpperCase();
             if (parts[2] === 'F') b.filter.frequency.value = rawToFreq(val);
@@ -794,25 +798,52 @@ window.togglePhase = function(ch) {
 }
 
 window.flatEQ = function(ch) {
-    // Sincroniza Frequências, Ganhos e Q das 4 bandas (Low, LowMid, HiMid, Hi)
-    const bands = ['Low', 'LowMid', 'HiMid', 'Hi'];
     const prefix = getChannelParamPrefix(ch);
-    bands.forEach(bName => {
-        const type = `${prefix}EQ/kEQ${bName}G`;
-        // Para a 01V96, 0.0dB é o valor central (0 assinado)
-        socket.emit('control', { type, channel: ch, value: 0 });
-        
-        // Atualiza visual local imediatamente
-        const key = bName.toLowerCase().replace('hi', 'high').replace('highmid', 'himid');
+    const chState = getChannelStateById(ch);
+
+    // Monta a lista de comandos a enviar com delay escalonado (igual padrão macros)
+    // para evitar que múltiplos socket.emit síncronos sejam descartados pelo scheduler.
+    const cmds = [
+        { type: `${prefix}EQ/kEQHPFOn`, value: 0 },  // Low: desativa HPF/Shelf
+        { type: `${prefix}EQ/kEQLowQ`,  value: 20 },  // Low: Q normal
+        { type: `${prefix}EQ/kEQLowG`,  value: 0 },   // Low: gain flat
+        { type: `${prefix}EQ/kEQLowMidG`, value: 0 }, // LowMid: gain flat
+        { type: `${prefix}EQ/kEQHiMidG`, value: 0 },  // HiMid: gain flat
+        { type: `${prefix}EQ/kEQLPFOn`, value: 0 },   // High: desativa LPF/Shelf
+        { type: `${prefix}EQ/kEQHiQ`,   value: 20 },  // High: Q normal
+        { type: `${prefix}EQ/kEQHiG`,   value: 0 },   // High: gain flat
+    ];
+
+    cmds.forEach((cmd, idx) => {
+        setTimeout(() => {
+            socket.emit('control', { type: cmd.type, channel: ch, value: cmd.value });
+        }, idx * 30);
+    });
+
+    // Atualiza gráfico e state local imediatamente (não precisa esperar MIDI)
+    const bandMap = {
+        low:    { bandName: 'Low',    hasMode: true },
+        lowmid: { bandName: 'LowMid', hasMode: false },
+        himid:  { bandName: 'HiMid',  hasMode: false },
+        high:   { bandName: 'Hi',     hasMode: true }
+    };
+    Object.entries(bandMap).forEach(([key, { hasMode }]) => {
         const band = eqBands.find(x => x.key === key);
-        if (band) band.filter.gain.value = 0;
-        
-        // Persiste no state
-        if (channelStates[ch].eq && channelStates[ch].eq[key]) {
-            channelStates[ch].eq[key].g = 0;
+        if (band) {
+            band.filter.gain.value = 0;
+            if (hasMode) {
+                band.filter.type = 'peaking';
+                band.filter.Q.value = rawToQ(20);
+            }
+        }
+        if (chState && chState.eq && chState.eq[key]) {
+            chState.eq[key].g = 0;
+            if (key === 'low')  { chState.eq[key].hpfOn = 0; chState.eq[key].q = 20; }
+            if (key === 'high') { chState.eq[key].lpfOn = 0; chState.eq[key].q = 20; }
         }
     });
 }
+
 
 function updatePhaseUI(ch, val) {
     if (activeConfigChannel !== ch) return;
@@ -942,7 +973,8 @@ function nudgeGain(dir) {
 
     const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
     const label = labelMap[b.key] || 'Low';
-    socket.emit('control', { type: `kInputEQ/kEQ${label}G`, channel: ch, value: v });
+    const prefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}G`, channel: ch, value: v });
     
     const fader = document.getElementById('eqFaderInput');
     if (fader) fader.value = v;

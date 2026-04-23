@@ -81,12 +81,37 @@ class SyncManager {
             }
         }
 
-        // AUX Masters e Bus Masters (8 cada)
+        // AUX Masters e Bus Masters (8 cada) — Fader, On, EQ e Compressor
         for (let i = 0; i < 8; i++) {
+            // AUX (Mix)
             this.scheduler.enqueue(protocol.buildRequest('kAUXFader/kFader', i), priority);
             this.scheduler.enqueue(protocol.buildRequest('kAUXChannelOn/kChannelOn', i), priority);
+            this.scheduler.enqueue(protocol.buildRequest('kAUXEQ/kEQOn', i), priority);
+            this.scheduler.enqueue(protocol.buildRequest('kAUXEQ/kEQHPFOn', i), priority);
+            this.scheduler.enqueue(protocol.buildRequest('kAUXEQ/kEQLPFOn', i), priority);
+            ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
+                this.scheduler.enqueue(protocol.buildRequest(`kAUXEQ/kEQ${b}F`, i), priority);
+                this.scheduler.enqueue(protocol.buildRequest(`kAUXEQ/kEQ${b}G`, i), priority);
+                this.scheduler.enqueue(protocol.buildRequest(`kAUXEQ/kEQ${b}Q`, i), priority);
+            });
+            ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
+                this.scheduler.enqueue(protocol.buildRequest(`kAUXComp/${p}`, i), priority);
+            });
+
+            // Bus
             this.scheduler.enqueue(protocol.buildRequest('kBusFader/kFader', i), priority);
             this.scheduler.enqueue(protocol.buildRequest('kBusChannelOn/kChannelOn', i), priority);
+            this.scheduler.enqueue(protocol.buildRequest('kBusEQ/kEQOn', i), priority);
+            this.scheduler.enqueue(protocol.buildRequest('kBusEQ/kEQHPFOn', i), priority);
+            this.scheduler.enqueue(protocol.buildRequest('kBusEQ/kEQLPFOn', i), priority);
+            ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
+                this.scheduler.enqueue(protocol.buildRequest(`kBusEQ/kEQ${b}F`, i), priority);
+                this.scheduler.enqueue(protocol.buildRequest(`kBusEQ/kEQ${b}G`, i), priority);
+                this.scheduler.enqueue(protocol.buildRequest(`kBusEQ/kEQ${b}Q`, i), priority);
+            });
+            ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
+                this.scheduler.enqueue(protocol.buildRequest(`kBusComp/${p}`, i), priority);
+            });
         }
 
         // Stereo Master completo

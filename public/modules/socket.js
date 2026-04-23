@@ -36,6 +36,13 @@ socket.on('update', (d) => {
     if (d.type === 'kBusFader/kFader') { updateUI(`b${d.channel}`, d.value, undefined); return; }
     if (d.type === 'kBusChannelOn/kChannelOn') { updateUI(`b${d.channel}`, undefined, isTrue); return; }
 
+    // Handler para EQ de canais Out (Bus/AUX: channel IDs 36-51)
+    // Estes ficam FORA da guarda `d.channel < NUM_CHANNELS` abaixo.
+    if (typeof d.channel === 'number' && d.channel >= 36 && d.type.includes('EQ/kEQ')) {
+        if (window.updateEQParam) window.updateEQParam(d.type, d.value, null, d.channel);
+        return;
+    }
+
     if (typeof d.channel === 'number' && d.channel < NUM_CHANNELS) {
         // No modo músico ou técnico mix, ignoramos updates dos faders principais para não bagunçar a visão do AUX
         if (!musicianMode && !technicianMixMode) {
@@ -91,8 +98,8 @@ socket.on('update', (d) => {
         // ... restante do updateState (Phase, Patch, Buses, Stereo On)
     }
 
-        // Suporte a EQ
-        if (d.type.includes('kInputEQ/')) {
+        // Suporte a EQ (todos os prefixos: Input, Bus, AUX, Stereo)
+        if (d.type.includes('EQ/kEQ')) {
             if (window.updateEQParam) {
                 window.updateEQParam(d.type, d.value, d.mode, d.channel);
             }

@@ -15,11 +15,18 @@ for (let i = 0; i < NUM_CHANNELS; i++) {
         eq: { on: false }
     });
 }
+const DEFAULT_OUT_EQ = () => ({
+    on: false,
+    low:    { f: 32,  g: 0, q: 20, hpfOn: 0 },
+    lowmid: { f: 60,  g: 0, q: 20 },
+    himid:  { f: 84,  g: 0, q: 20 },
+    high:   { f: 108, g: 0, q: 20, lpfOn: 0 }
+});
 let mixesState = [];
 let busesState = [];
 for (let i = 0; i < 8; i++) {
-    mixesState.push({ value: 0, on: false, name: `MIX ${i+1}` });
-    busesState.push({ value: 0, on: false, name: `BUS ${i+1}` });
+    mixesState.push({ value: 0, on: false, name: `MIX ${i+1}`, eq: DEFAULT_OUT_EQ() });
+    busesState.push({ value: 0, on: false, name: `BUS ${i+1}`, eq: DEFAULT_OUT_EQ() });
 }
 
 let masterState = { value: 0, on: false };

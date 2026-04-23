@@ -147,40 +147,25 @@ function updateState(d) {
         return;
     }
 
-    // Suporte a Mixes (AUX Master)
-    if (type.startsWith('kAUX')) {
+    // Suporte a Mixes (AUX Master) — apenas Fader e On; EQ/Comp caem no dynMatch abaixo
+    if (type.startsWith('kAUX') && !type.includes('EQ') && !type.includes('Comp')) {
         if (!state.mixes[channel]) return;
         if (type === 'kAUXFader/kFader') state.mixes[channel].value = value;
         if (type === 'kAUXChannelOn/kChannelOn') state.mixes[channel].on = value;
         return;
     }
 
-    // Suporte a Buses (Bus Master)
-    if (type.startsWith('kBus')) {
+    // Suporte a Buses (Bus Master) — apenas Fader e On; EQ/Comp caem no dynMatch abaixo
+    if (type.startsWith('kBus') && !type.includes('EQ') && !type.includes('Comp')) {
         if (!state.buses[channel]) return;
         if (type === 'kBusFader/kFader') state.buses[channel].value = value;
         if (type === 'kBusChannelOn/kChannelOn') state.buses[channel].on = value;
         return;
     }
 
-    if (!state.channels[channel]) return;
-    if (type === 'kInputFader/kFader') state.channels[channel].value = value;
-    if (type === 'kInputChannelOn/kChannelOn') state.channels[channel].on = value;
-    if (type === 'kSetupSoloChOn/kSoloChOn') state.channels[channel].solo = value;
-    if (type === 'kInputPhase/kPhase') state.channels[channel].phase = value;
-    if (type === 'kInputAttenuator/kAtt') state.channels[channel].att = value;
-    if (type === 'kChannelInput/kChannelIn') state.channels[channel].patch = value;
-
-    if (type.includes('kInputAUX/kAUX')) {
-        const auxMatch = type.match(/kInputAUX\/kAUX(\d+)(Level|On)/);
-        if (auxMatch) {
-            const auxIdx = auxMatch[1];
-            if (auxMatch[2] === 'Level') state.channels[channel][`aux${auxIdx}`] = value;
-            if (auxMatch[2] === 'On') state.channels[channel][`aux${auxIdx}On`] = value;
-        }
-    }
-
-    // Suporte Universal a EQ/Comp/Gate (Qualquer prefixo)
+    // Suporte Universal a EQ/Comp/Gate (kInput, kAUX, kBus, kStereo)
+    // DEVE VIR ANTES da guarda de state.channels[], pois kBusEQ/kAUXEQ usam
+    // channel IDs globais (36-51) que não existem em state.channels.
     const dynMatch = type.match(/^(kInput|kAUX|kBus|kStereo)(EQ|Comp|Gate)\/(.*)/);
     if (dynMatch) {
         const s = getChannelStateById(channel);
@@ -222,6 +207,23 @@ function updateState(d) {
             if (key === 'kCompKnee') s.comp.knee = value;
         }
         return;
+    }
+
+    if (!state.channels[channel]) return;
+    if (type === 'kInputFader/kFader') state.channels[channel].value = value;
+    if (type === 'kInputChannelOn/kChannelOn') state.channels[channel].on = value;
+    if (type === 'kSetupSoloChOn/kSoloChOn') state.channels[channel].solo = value;
+    if (type === 'kInputPhase/kPhase') state.channels[channel].phase = value;
+    if (type === 'kInputAttenuator/kAtt') state.channels[channel].att = value;
+    if (type === 'kChannelInput/kChannelIn') state.channels[channel].patch = value;
+
+    if (type.includes('kInputAUX/kAUX')) {
+        const auxMatch = type.match(/kInputAUX\/kAUX(\d+)(Level|On)/);
+        if (auxMatch) {
+            const auxIdx = auxMatch[1];
+            if (auxMatch[2] === 'Level') state.channels[channel][`aux${auxIdx}`] = value;
+            if (auxMatch[2] === 'On') state.channels[channel][`aux${auxIdx}On`] = value;
+        }
     }
 
     // Suporte a BUS / STEREO Assignments (Apenas Inputs)

@@ -592,12 +592,37 @@ async function triggerSync(targetSocket = null, forceNames = false, type = 'norm
         }
     }
 
-    // 3. Mixes e Buses Masters
+    // 3. Mixes e Buses Masters — Fader, On, EQ e Compressor
     for (let i = 0; i < 8; i++) {
+        // AUX (Mix)
         syncPipeline.addTask(protocol.buildRequest('kAUXFader/kFader', i));
         syncPipeline.addTask(protocol.buildRequest('kAUXChannelOn/kChannelOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kAUXEQ/kEQOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kAUXEQ/kEQHPFOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kAUXEQ/kEQLPFOn', i));
+        ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
+            syncPipeline.addTask(protocol.buildRequest(`kAUXEQ/kEQ${b}F`, i));
+            syncPipeline.addTask(protocol.buildRequest(`kAUXEQ/kEQ${b}G`, i));
+            syncPipeline.addTask(protocol.buildRequest(`kAUXEQ/kEQ${b}Q`, i));
+        });
+        ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
+            syncPipeline.addTask(protocol.buildRequest(`kAUXComp/${p}`, i));
+        });
+
+        // Bus
         syncPipeline.addTask(protocol.buildRequest('kBusFader/kFader', i));
         syncPipeline.addTask(protocol.buildRequest('kBusChannelOn/kChannelOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kBusEQ/kEQOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kBusEQ/kEQHPFOn', i));
+        syncPipeline.addTask(protocol.buildRequest('kBusEQ/kEQLPFOn', i));
+        ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
+            syncPipeline.addTask(protocol.buildRequest(`kBusEQ/kEQ${b}F`, i));
+            syncPipeline.addTask(protocol.buildRequest(`kBusEQ/kEQ${b}G`, i));
+            syncPipeline.addTask(protocol.buildRequest(`kBusEQ/kEQ${b}Q`, i));
+        });
+        ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
+            syncPipeline.addTask(protocol.buildRequest(`kBusComp/${p}`, i));
+        });
     }
 
     // 4. Stereo Master
