@@ -4,7 +4,8 @@
   "description": "",
   "main": "sniffer.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -26,5 +27,9 @@
     "socket.io": "^4.8.3",
     "systray2": "^2.1.4",
     "uiohook-napi": "^1.5.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.1"
   }
 }

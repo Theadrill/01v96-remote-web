@@ -199,10 +199,10 @@ socket.on('update', (d) => {
 function updateSceneDisplay() {
     const el = document.getElementById('scene-info');
     const elConfig = document.getElementById('configSceneDisplay');
-    // Enquanto não tivermos nem número nem nome do currentScene, mostramos indicador
     if ((!window.currentSceneName || window.currentSceneName === '') && (window.currentSceneNumber === undefined || window.currentSceneNumber === null)) {
-        if (el) el.innerText = 'SINCRONIZANDO...';
-        if (elConfig) elConfig.innerText = 'SINCRONIZANDO...';
+        const text = window.isDemoMode ? 'MODO DEMO ON' : 'SINCRONIZANDO...';
+        if (el) el.innerText = text;
+        if (elConfig) elConfig.innerText = text;
         return;
     }
 
@@ -289,7 +289,10 @@ socket.on('sync', (s) => {
                     o = s.channels[i][`aux${activeMix}On`] || false;
                 }
 
-                updateUI(i, v, o, s.channels[i].solo);
+                const soloBool = !!s.channels[i].solo;
+                const onBool = !!o;
+
+                updateUI(i, v, onBool, soloBool);
                 const elN = document.getElementById(`name${i}`);
                 const newName = s.channels[i].name || `CH ${i + 1}`;
                 if (elN && elN.innerText !== newName) {
@@ -303,7 +306,7 @@ socket.on('sync', (s) => {
         for (let i = 0; i < 8; i++) {
             if (s.mixes[i]) {
                 Object.assign(mixesState[i], s.mixes[i]);
-                updateUI(`m${i}`, s.mixes[i].value, s.mixes[i].on);
+                updateUI(`m${i}`, s.mixes[i].value, !!s.mixes[i].on);
             }
         }
     }
@@ -311,13 +314,13 @@ socket.on('sync', (s) => {
         for (let i = 0; i < 8; i++) {
             if (s.buses[i]) {
                 Object.assign(busesState[i], s.buses[i]);
-                updateUI(`b${i}`, s.buses[i].value, s.buses[i].on);
+                updateUI(`b${i}`, s.buses[i].value, !!s.buses[i].on);
             }
         }
     }
     if (s.master) {
         Object.assign(masterState, s.master);
-        updateUI('master', s.master.value, s.master.on, undefined);
+        updateUI('master', s.master.value, !!s.master.on, undefined);
     }
 });
 
@@ -344,19 +347,31 @@ socket.on('currentScene', (data) => {
 });
 
 socket.on('connectionState', (state) => {
+    window.isDemoMode = !!state.demo_mode;
     document.body.classList.toggle('is-offline', !state.connected);
     const scn = document.getElementById('scn');
     if (state.connected) {
         scn.innerText = '01V96';
         scn.style.color = '#0f0';
     } else {
-        scn.innerText = '01V96 (offline)';
-        scn.style.color = '#dc3545';
+        scn.innerText = state.demo_mode ? '01V96 (demo)' : '01V96 (offline)';
+        scn.style.color = state.demo_mode ? '#ffc107' : '#dc3545';
     }
     const overlay = document.getElementById('offlineOverlay');
     if (overlay) {
-        overlay.style.display = state.connected ? 'none' : 'flex';
+        if (state.connected) {
+            overlay.style.display = 'none';
+            overlay.classList.remove('demo-mode');
+        } else if (state.demo_mode) {
+            overlay.style.display = 'flex';
+            overlay.classList.add('demo-mode');
+        } else {
+            overlay.style.display = 'flex';
+            overlay.classList.remove('demo-mode');
+        }
     }
+    // Força atualização do texto na sidebar caso ainda não tenha cena carregada
+    updateSceneDisplay();
 });
 
 socket.on('portsList', (data) => {
@@ -380,6 +395,7 @@ socket.on('portsList', (data) => {
     const opacityValSpan = document.getElementById('opacityVal');
 
     if (data.savedConfig) {
+        window.isDemoMode = !!data.savedConfig.demo_mode;
         if (demoBtn) {
             const isDemo = !!data.savedConfig.demo_mode;
             demoBtn.innerText = isDemo ? 'DEMO OFF' : 'DEMO ON';
@@ -395,6 +411,8 @@ socket.on('portsList', (data) => {
         if (toggleBrowser) {
             toggleBrowser.checked = data.savedConfig.open_browser_startup !== false;
         }
+        // Atualiza a UI inicial
+        updateSceneDisplay();
     }
 });
 

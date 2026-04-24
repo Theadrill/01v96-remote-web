@@ -1,0 +1,96 @@
+export default [
+    {
+        ignores: [
+            "node_modules/**",
+            "tmp/**",
+            "dist/**",
+            "build/**",
+            "public/lib/**",
+            "**/working_version/**"
+        ]
+    },
+    {
+        files: ["**/*.js", "**/*.mjs"],
+        languageOptions: {
+            ecmaVersion: "latest",
+            sourceType: "commonjs",
+            globals: {
+                // Node.js
+                process: "readonly",
+                __dirname: "readonly",
+                module: "readonly",
+                require: "readonly",
+                console: "readonly",
+                setInterval: "readonly",
+                clearInterval: "readonly",
+                setTimeout: "readonly",
+                clearTimeout: "readonly",
+                Buffer: "readonly",
+                // Browser
+                window: "readonly",
+                document: "readonly",
+                navigator: "readonly",
+                fetch: "readonly",
+                localStorage: "readonly",
+                requestAnimationFrame: "readonly",
+                alert: "readonly",
+                Event: "readonly",
+                // App Specific (Shared across files)
+                io: "readonly",
+                socket: "readonly",
+                updateUI: "readonly",
+                channelStates: "readonly",
+                NUM_CHANNELS: "readonly",
+                activeConfigChannel: "readonly",
+                musicianMode: "readonly",
+                technicianMixMode: "readonly",
+                activeMix: "readonly",
+                updatePhaseUI: "readonly",
+                updateAuxFromSocket: "readonly",
+                updateGateFromSocket: "readonly",
+                updateCompFromSocket: "readonly",
+                renderRouting: "readonly",
+                autoScaleTitle: "readonly",
+                mixesState: "readonly",
+                busesState: "readonly",
+                masterState: "readonly",
+                tecnicoPassword: "readonly",
+                conn: "readonly",
+                outsMode: "readonly",
+                calibrateStep: "readonly",
+                mapDynDbToPercent: "readonly",
+                dbToRaw: "readonly",
+                initUI: "readonly",
+                updateEQFromSocket: "readonly",
+                getChannelStateById: "readonly",
+                layoutMode: "readonly",
+                appOrientation: "readonly",
+                activeConfigTab: "readonly",
+                stopEQAnimation: "readonly",
+                renderEQ: "readonly",
+                renderDynamics: "readonly",
+                renderAuxs: "readonly",
+                closeChannelConfig: "readonly",
+                appReady: "readonly",
+                globalMacroConfig: "readonly",
+                MixerAPI: "readonly",
+                openPresetPicker: "readonly",
+                saveMacroChannels: "readonly",
+                renderMacroFader: "readonly",
+                clearMacroSelection: "readonly",
+                loadSlotsManifest: "readonly",
+                getSteppedRaw: "readonly",
+                updateAuxManual: "readonly",
+                switchTab: "readonly",
+                container: "readonly"
+            }
+        },
+        rules: {
+            "no-unused-vars": "warn",
+            "no-undef": "error",
+            "no-console": "off",
+            "no-constant-condition": "warn",
+            "no-redeclare": "error"
+        }
+    }
+];

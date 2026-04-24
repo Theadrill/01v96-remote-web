@@ -579,7 +579,7 @@ function initUI() {
  * Roda no frontend puro, sem tráfego MIDI extra.
  */
 function checkMasterSoloIndicator() {
-    const hasSolo = channelStates.some(s => s && s.solo === true);
+    const hasSolo = channelStates.some(s => s && !!s.solo);
     const btn = document.getElementById('master-solo-btn');
     if (!btn) return;
     if (hasSolo) {
@@ -599,7 +599,7 @@ function checkMasterSoloIndicator() {
 async function clearAllSolos() {
     const soloedChannels = [];
     for (let i = 0; i < NUM_CHANNELS; i++) {
-        if (channelStates[i] && channelStates[i].solo === true) {
+        if (channelStates[i] && !!channelStates[i].solo) {
             soloedChannels.push(i);
         }
     }

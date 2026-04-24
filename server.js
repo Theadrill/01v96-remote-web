@@ -46,7 +46,7 @@ try {
 }
 
 const SysTray = require('systray2').default;
-const dgram = require('dgram');
+// const dgram = require('dgram');
 
 const midiEngine = require('./src/midi-engine');
 const protocol = require('./src/protocol');
@@ -60,6 +60,7 @@ const SyncManager = require('./src/sync-manager');
 
 let dummyMeterInterval = null;
 let syncManager = null;
+let isDemoMode = false;
 
 const configFile = path.join(__dirname, 'config.json');
 const namesFile = path.join(__dirname, 'names.json');
@@ -73,13 +74,15 @@ let meterDataBuffer = new Array(33).fill(0);
 let lastMeterTime = 0;
 
 const handleMIDIData = (midiData, rawMessage = null) => {
+    // Qualquer tráfego MIDI (incluindo scene dumps) reseta o watchdog
+    lastActivityTime = Date.now();
+
     // Intercepta cenas (Bulk Dumps grandes Type 00 e 02)
     if (sceneManager.handleMIDIData(rawMessage)) {
         return; // É um dump de cena, o Scene Manager já lidou com ele
     }
 
     if (!midiData) return;
-    lastActivityTime = Date.now();
 
     if (midiData.type === 'kSceneNumber') {
         console.log(`🎬 [SCENE CHANGE] Mudança de cena detectada pela mesa: ${midiData.value}`);
@@ -88,7 +91,7 @@ const handleMIDIData = (midiData, rawMessage = null) => {
 
     // METER_DATA - processa channels 1-32 e Master
     if (midiData.type === 'METER_DATA') {
-        if (!isFullySynced) return;
+        if (!isFullySynced && !isDemoMode) return;
 
         if (midiData.isMaster) {
             // Master Meter (Stereo L/R) - Point 4 (Comando 0x21)
@@ -110,9 +113,10 @@ const handleMIDIData = (midiData, rawMessage = null) => {
             }
         }
 
-        // Emissão Throttled para a Web (padrão 20 FPS para fluidez sem sobrecarga)
+        // Emissão Throttled para a Web: 33ms (~30fps) em demo, 50ms (~20fps) com mesa real
         const now = Date.now();
-        if (now - lastMeterTime > 50) {
+        const throttleMs = isDemoMode ? 33 : 50;
+        if (now - lastMeterTime > throttleMs) {
             io.emit('meterData', meterDataBuffer);
             lastMeterTime = now;
         }
@@ -152,7 +156,7 @@ function iniciarDummy() {
         }
 
         const parsed = protocol.parseIncoming(sysex);
-        if (parsed) handleMIDIData(parsed);
+        if (parsed) handleMIDIData(parsed, sysex);
     });
 }
 
@@ -169,11 +173,7 @@ let linhaBuscaAtiva = false;
 let lastActivityTime = 0; // Timestamp da última mensagem recebida da mesa
 let isSyncing = false; // Flag para evitar múltiplas sincronias simultâneas
 let isFullySynced = false; // Flag para liberar os meters apenas após carga total
-let hasSyncedNamesThisSession = false; // Flag para garantir que o server busque na mesa pelo menos 1 vez por boot
 const nameUpdateTimers = new Map();
-
-// Fila para pedidos de Dynamics, evitando encavalamento de MIDI
-let dynamicsQueue = [];
 
 process.title = "01V96-BRIDGE-SERVER";
 
@@ -266,13 +266,17 @@ function loadConfig() {
         try {
             const loaded = JSON.parse(fs.readFileSync(configFile, 'utf8'));
             config = { ...config, ...loaded };
-        } catch (err) { }
+        } catch (err) {
+            // Ignora erro de parsing
+        }
     }
     return config;
 }
 
 function saveConfig(configData) {
-    try { fs.writeFileSync(configFile, JSON.stringify(configData, null, 2)); } catch (err) { }
+    try { fs.writeFileSync(configFile, JSON.stringify(configData, null, 2)); } catch (err) {
+        // Ignora erro de escrita
+    }
 }
 
 function loadNames() {
@@ -447,7 +451,6 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
                     syncManager.onSyncComplete = function () {
                         isFullySynced = true;
                         isSyncing = false;
-                        hasSyncedNamesThisSession = true;
                         saveNames(); // Salva nomes na persistência local
                         try { io.emit('sync', stateManager.getState()); } catch (e) { }
                         try { io.emit('syncStatus', { active: false }); } catch (e) { }
@@ -459,7 +462,7 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         }, 5000);
 
 
-        io.emit('connectionState', { connected: true });
+        io.emit('connectionState', { connected: true, demo_mode: loadConfig().demo_mode });
 
         // Loop contínuo de requests do Meter (Heartbeat)
         if (global.meterInterval) clearInterval(global.meterInterval);
@@ -481,16 +484,16 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
             const sMaster = midiEngine.send(masterMeter.buildRequest(), 2);
 
             // [NATIVE METER] Input Channels (Group 32/33) via Parameter Request (Classic approach)
-            const s1 = midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247], 2);
-            const s2 = midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247], 2);
-            const s3 = midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247], 2);
-            const s4 = midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247], 2);
-            const s5 = midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247], 2);
+            midiEngine.send([240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247], 2);
+            midiEngine.send([240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247], 2);
+            midiEngine.send([240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247], 2);
+            midiEngine.send([240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247], 2);
+            midiEngine.send([240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247], 2);
 
-            // Não tratamos falha de enfileiramento (returns false) como erro se estivermos usando o MidiScheduler,
+            // Não tratamos falha de enfileiramento como erro se estivermos usando o MidiScheduler,
             // pois o scheduler rejeita requests de priority 2 quando q0/q1 estão ocupadas (comportamento esperado).
             const sched = midiEngine.getScheduler ? midiEngine.getScheduler() : null;
-            const allFailed = (!s2 && !s3 && !s4 && !s5 && !sMaster);
+            const allFailed = (!sMaster); // Simplificado: Se o principal falhar e não houver scheduler ativo
             if (allFailed && (!sched || !sched.isRunning)) {
                 console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI.");
                 handleDisconnection();
@@ -509,7 +512,9 @@ function handleDisconnection(retry = true) {
     // Tenta enviar o comando de parada de meter para limpar o tráfego na mesa física (se ainda houver conexão física)
     try {
         midiEngine.send(masterMeter.buildStopRequest());
-    } catch (e) { }
+    } catch (err) {
+        // Ignora erro de envio no disconnect
+    }
 
     if (global.meterInterval) clearInterval(global.meterInterval);
     if (dummyMeterInterval) {
@@ -517,7 +522,7 @@ function handleDisconnection(retry = true) {
         dummyMeterInterval = null;
     }
 
-    io.emit('connectionState', { connected: false });
+    io.emit('connectionState', { connected: false, demo_mode: loadConfig().demo_mode });
 
     if (retry) {
         console.log("❌ Conexão perdida. Tentando reconectar automaticamente...");
@@ -525,216 +530,14 @@ function handleDisconnection(retry = true) {
     }
 }
 
-async function triggerSync(targetSocket = null, forceNames = false, type = 'normal') {
-    if (syncManager) {
-        return syncManager.fire(targetSocket, forceNames, type);
-    }
-    if (!isConnected || isSyncing) return;
-
-    isSyncing = true;
-    io.emit('syncStatus', { active: true, type: type });
-    isFullySynced = false; // Reseta a flag para pausar meters
-
-    // Comando STOP para meters (Garante barramento livre e evita 'bagunça' nos dados)
-    try { midiEngine.send(masterMeter.buildStopRequest()); } catch (e) { }
-    meterDataBuffer = new Array(33).fill(0);
-    io.emit('meterData', meterDataBuffer);
-
-    console.log(`🔄 [Sync] Iniciando sincronização via Pipeline...`);
-
-    syncPipeline.clear();
-
-    // --- CENA ---
-    // (As requisições kSceneTitle e kSceneNumber não são confiáveis via Parameter Request.
-    // O tráfego de cena agora é gerenciado 100% pelo modulo SceneManager via Bulk Dump Type 0x02 e emitido via 'scenesUpdated').
-
-    // --- MESTRE ---
-    syncPipeline.addTask(protocol.buildRequest('kStereoFader/kFader', 0));
-
-    // 2. Parâmetros de Canal (Input 1-32)
-    for (let i = 0; i < 32; i++) {
-        syncPipeline.addTask(protocol.buildRequest('kInputFader/kFader', i));
-        syncPipeline.addTask(protocol.buildRequest('kInputChannelOn/kChannelOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kSetupSoloChOn/kSoloChOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kInputPhase/kPhase', i));
-        syncPipeline.addTask(protocol.buildRequest('kInputAttenuator/kAtt', i));
-
-        // EQ
-        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQMode', i));
-        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQHPFOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kInputEQ/kEQLPFOn', i));
-        ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
-            syncPipeline.addTask(protocol.buildRequest(`kInputEQ/kEQ${b}F`, i));
-            syncPipeline.addTask(protocol.buildRequest(`kInputEQ/kEQ${b}G`, i));
-            syncPipeline.addTask(protocol.buildRequest(`kInputEQ/kEQ${b}Q`, i));
-        });
-
-        // Auxiliares (1-8)
-        for (let a = 1; a <= 8; a++) {
-            syncPipeline.addTask(protocol.buildRequest(`kInputAUX/kAUX${a}Level`, i));
-            syncPipeline.addTask(protocol.buildRequest(`kInputAUX/kAUX${a}On`, i));
-        }
-
-        // Dinâmicas
-        ['kGateOn', 'kGateAttack', 'kGateRange', 'kGateHold', 'kGateDecay', 'kGateThreshold'].forEach(p => {
-            syncPipeline.addTask(protocol.buildRequest(`kInputGate/${p}`, i));
-        });
-        ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
-            syncPipeline.addTask(protocol.buildRequest(`kInputComp/${p}`, i));
-        });
-
-        // Patch e Routing
-        syncPipeline.addTask(protocol.buildRequest('kChannelInput/kChannelIn', i));
-        syncPipeline.addTask(protocol.buildRequest('kInputBus/kStereo', i));
-        for (let b = 1; b <= 8; b++) {
-            syncPipeline.addTask(protocol.buildRequest(`kInputBus/kBus${b}`, i));
-        }
-    }
-
-    // 3. Mixes e Buses Masters — Fader, On, EQ e Compressor
-    for (let i = 0; i < 8; i++) {
-        // AUX (Mix)
-        syncPipeline.addTask(protocol.buildRequest('kAUXFader/kFader', i));
-        syncPipeline.addTask(protocol.buildRequest('kAUXChannelOn/kChannelOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kAUXEQ/kEQOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kAUXEQ/kEQHPFOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kAUXEQ/kEQLPFOn', i));
-        ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
-            syncPipeline.addTask(protocol.buildRequest(`kAUXEQ/kEQ${b}F`, i));
-            syncPipeline.addTask(protocol.buildRequest(`kAUXEQ/kEQ${b}G`, i));
-            syncPipeline.addTask(protocol.buildRequest(`kAUXEQ/kEQ${b}Q`, i));
-        });
-        ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
-            syncPipeline.addTask(protocol.buildRequest(`kAUXComp/${p}`, i));
-        });
-
-        // Bus
-        syncPipeline.addTask(protocol.buildRequest('kBusFader/kFader', i));
-        syncPipeline.addTask(protocol.buildRequest('kBusChannelOn/kChannelOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kBusEQ/kEQOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kBusEQ/kEQHPFOn', i));
-        syncPipeline.addTask(protocol.buildRequest('kBusEQ/kEQLPFOn', i));
-        ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
-            syncPipeline.addTask(protocol.buildRequest(`kBusEQ/kEQ${b}F`, i));
-            syncPipeline.addTask(protocol.buildRequest(`kBusEQ/kEQ${b}G`, i));
-            syncPipeline.addTask(protocol.buildRequest(`kBusEQ/kEQ${b}Q`, i));
-        });
-        ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
-            syncPipeline.addTask(protocol.buildRequest(`kBusComp/${p}`, i));
-        });
-    }
-
-    // 4. Stereo Master
-    syncPipeline.addTask(protocol.buildRequest('kStereoFader/kFader', 0));
-    syncPipeline.addTask(protocol.buildRequest('kStereoChannelOn/kChannelOn', 0));
-    syncPipeline.addTask(protocol.buildRequest('kStereoAttenuator/kAtt', 0));
-    syncPipeline.addTask(protocol.buildRequest('kStereoEQ/kEQOn', 0));
-    ['Low', 'LowMid', 'HiMid', 'Hi'].forEach(b => {
-        syncPipeline.addTask(protocol.buildRequest(`kStereoEQ/kEQ${b}F`, 0));
-        syncPipeline.addTask(protocol.buildRequest(`kStereoEQ/kEQ${b}G`, 0));
-        syncPipeline.addTask(protocol.buildRequest(`kStereoEQ/kEQ${b}Q`, 0));
-    });
-    ['kCompOn', 'kCompAttack', 'kCompRelease', 'kCompRatio', 'kCompGain', 'kCompKnee', 'kCompThreshold'].forEach(p => {
-        syncPipeline.addTask(protocol.buildRequest(`kStereoComp/${p}`, 0));
-    });
-
-    // 5. Nomes (Se necessário)
-    if (forceNames || !hasSyncedNamesThisSession) {
-        console.log("📝 [Sync] Adicionando busca de nomes ao Pipeline...");
-        // Nomes de Canais (0-31)
-        for (let i = 0; i < 32; i++) {
-            for (let c = 0; c < 4; c++) {
-                syncPipeline.addTask(protocol.buildNameRequest(i, c));
-            }
-        }
-        // Mixes (36-43), Buses (44-51), Master (52)
-        const outIndices = [];
-        for (let i = 36; i <= 43; i++) outIndices.push(i);
-        for (let i = 44; i <= 51; i++) outIndices.push(i);
-        outIndices.push(52);
-        for (const idx of outIndices) {
-            for (let c = 0; c < 8; c++) {
-                syncPipeline.addTask(protocol.buildNameRequest(idx, c));
-            }
-        }
-    }
-
-    // Define o que fazer ao terminar
-    syncPipeline.setCompletionHandler(() => {
-        isSyncing = false;
-        isFullySynced = true;
-        hasSyncedNamesThisSession = true;
-        io.emit('syncStatus', { active: false });
-        saveNames();
-
-        if (targetSocket) {
-            targetSocket.emit('sync', stateManager.getState());
-        } else {
-            io.emit('sync', stateManager.getState());
-        }
-        console.log("✅ [Sync] Sincronização via Pipeline concluída com sucesso!");
-    });
-
-    // Inicia o processamento rápido (10ms entre mensagens durante o Sync)
-    syncPipeline.start(5, (progress) => {
-        if (progress.percent % 10 === 0) {
-            console.log(`⏳ [Sync] Progresso: ${progress.percent}% (${progress.completed}/${progress.total})`);
-        }
-    });
-
+async function triggerSync(targetSocket = null, forceNames = false) {
+    if (syncManager) return syncManager.fire(targetSocket, forceNames);
+    console.warn('⚠️ [Sync] Tentativa de sync sem SyncManager ativo ou conexão MIDI.');
 }
 
 async function syncNames() {
-    if (!isConnected || isSyncing) return;
-
-    isSyncing = true;
-    isFullySynced = false; // Pausa meters
-
-    // Comando STOP para meters
-    try { midiEngine.send(masterMeter.buildStopRequest()); } catch (e) { }
-    meterDataBuffer = new Array(33).fill(0);
-    io.emit('meterData', meterDataBuffer);
-    io.emit('syncStatus', { active: true, type: 'is_scene' });
-
-    console.log(`🔄 [MANUAL SYNC] Iniciando busca de nomes via Pipeline...`);
-
-    syncPipeline.clear();
-
-    // Nomes de Canais (0-31)
-    for (let i = 0; i < 32; i++) {
-        for (let c = 0; c < 4; c++) {
-            syncPipeline.addTask(protocol.buildNameRequest(i, c));
-        }
-    }
-
-    // Saídas (Mixes 36-43, Buses 44-51, Master 52)
-    const outIndices = [];
-    for (let i = 36; i <= 43; i++) outIndices.push(i);
-    for (let i = 44; i <= 51; i++) outIndices.push(i);
-    outIndices.push(52);
-
-    for (const idx of outIndices) {
-        for (let c = 0; c < 8; c++) {
-            syncPipeline.addTask(protocol.buildNameRequest(idx, c));
-        }
-    }
-
-    syncPipeline.setCompletionHandler(() => {
-        isSyncing = false;
-        isFullySynced = true;
-        io.emit('syncStatus', { active: false });
-        saveNames();
-        io.emit('sync', stateManager.getState());
-        console.log("✅ [MANUAL SYNC] Concluído via Pipeline!");
-    });
-
-    syncPipeline.start(20, (progress) => {
-        if (progress.percent % 20 === 0) {
-            console.log(`⏳ [MANUAL SYNC] Progresso: ${progress.percent}%`);
-        }
-    });
-
+    if (syncManager) return syncManager.syncNamesOnly();
+    console.warn('⚠️ [Sync] Tentativa de sync de nomes sem SyncManager ativo.');
 }
 
 
@@ -746,7 +549,7 @@ io.on('connection', (socket) => {
     socket.emit('sync', stateManager.getState());
     socket.emit('scenesUpdated', sceneManager.getState());
     socket.emit('syncStatus', { active: isSyncing });
-    socket.emit('connectionState', { connected: isConnected });
+    socket.emit('connectionState', { connected: isConnected, demo_mode: currentConfig.demo_mode });
 
     socket.on('requestConnect', async (data) => {
         const config = loadConfig();
@@ -933,9 +736,19 @@ io.on('connection', (socket) => {
     socket.on('toggleDemo', (data) => {
         const config = loadConfig();
         config.demo_mode = data.enabled;
+        isDemoMode = data.enabled;
         saveConfig(config);
 
+        // Notify all clients about the demo_mode change so overlay updates
+        io.emit('connectionState', { connected: isConnected, demo_mode: data.enabled });
+
         if (data.enabled) {
+            // Para a busca automática na USB — não precisamos da mesa física
+            if (buscaInterval) {
+                clearInterval(buscaInterval);
+                buscaInterval = null;
+                console.log('🛑 [DEMO] Busca automática na USB suspensa.');
+            }
             iniciarDummy();
         } else {
             console.log("🛑 Parando Simulação de Meters...");
@@ -949,6 +762,12 @@ io.on('connection', (socket) => {
                 io.emit('meterData', zeros);
                 console.log("🧹 Meters zerados com sucesso.");
             }, 100);
+
+            // Retoma a busca pela mesa física
+            if (!isConnected) {
+                console.log('🔍 [DEMO OFF] Retomando busca automática na USB...');
+                iniciarBuscaAutomatica();
+            }
         }
     });
 
@@ -1102,13 +921,17 @@ server.listen(PORT, '0.0.0.0', () => {
     }
 
     if (config.demo_mode) {
+        isDemoMode = true;
         iniciarDummy();
+        console.log('ℹ️ [DEMO] Modo Demo ativo — busca na USB desativada.');
     } else {
         console.log("ℹ️ [INFO] Modo Demo desativado. Aguardando conexão física com Yamaha...");
     }
 
     // loadNames() movido para o início para agilizar o boot dos clients
 
-    // Sempre iniciamos pela busca automática para respeitar a regra do loopmidi-monitor
-    setTimeout(() => iniciarBuscaAutomatica(), 1500);
+    // Busca automática na USB apenas se NÃO estiver em demo mode
+    if (!config.demo_mode) {
+        setTimeout(() => iniciarBuscaAutomatica(), 1500);
+    }
 });

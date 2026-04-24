@@ -366,7 +366,8 @@ body.layout-horizontal .sidebar {
     justify-content: space-around;
     flex-shrink: 0;
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.7);
-    z-index: 100;
+    z-index: 950;
+    position: relative;
     background: #1a1a1a;
     overflow-x: auto;
     overflow-y: hidden;
@@ -434,30 +435,6 @@ body.layout-horizontal .side-btn {
     background: #28a745 !important;
     color: white !important;
     border-color: #34ce57;
-}
-
-/* === Master Solo Clear Button === */
-@keyframes master-solo-pulse {
-    0%   { background: #333; color: #555; box-shadow: none; border-color: #444; }
-    50%  { background: #c0000a; color: #fff; box-shadow: 0 0 10px rgba(220, 0, 10, 0.8); border-color: #ff2233; }
-    100% { background: #333; color: #555; box-shadow: none; border-color: #444; }
-}
-
-.btn-cue.master-solo-alert {
-    animation: master-solo-pulse 1s ease-in-out infinite !important;
-    cursor: pointer !important;
-}
-
-/* Mobile variant */
-@keyframes master-solo-pulse-mobile {
-    0%   { background: #333; color: #555; border-color: #444; }
-    50%  { background: #c0000a; color: #fff; border-color: #ff2233; box-shadow: 0 0 8px rgba(220, 0, 10, 0.7); }
-    100% { background: #333; color: #555; border-color: #444; }
-}
-
-.btn-state.master-solo-alert {
-    animation: master-solo-pulse-mobile 1s ease-in-out infinite !important;
-    cursor: pointer !important;
 }
 
 .on-active {
@@ -707,6 +684,8 @@ body.layout-horizontal .side-btn {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    position: relative;
+    z-index: 950;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -824,41 +803,53 @@ body.layout-horizontal .side-btn {
 }
 
 /* Offline overlay */
-#offlineOverlay,
-#blockingOverlay,
-.blocking-overlay {
+#offlineOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 20000 !important;
+    background: rgba(0,0,0,0.7);
+    z-index: 900;
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: auto;
 }
 
-.blocking-overlay {
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+/* Demo mode: overlay becomes subtle indicator, non-blocking */
+#offlineOverlay.demo-mode {
+    background: rgba(0,0,0,0.15);
+    pointer-events: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 8px;
 }
 
 #offlineOverlay .offline-inner {
     color: #ffcc00;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0,0,0,0.5);
     padding: 24px 36px;
     border-radius: 12px;
     font-size: 28px;
     font-weight: 900;
     letter-spacing: 2px;
     text-transform: uppercase;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 204, 0, 0.08) inset;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(255,204,0,0.08) inset;
+}
+
+#offlineOverlay.demo-mode .offline-inner {
+    background: rgba(0,0,0,0.45);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba(255,204,0,0.7);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,204,0,0.15);
 }
 
 @media (max-width: 600px) {
-    #offlineOverlay .offline-inner {
-        font-size: 20px;
-        padding: 18px 24px;
-    }
+    #offlineOverlay .offline-inner { font-size: 20px; padding: 18px 24px; }
+    #offlineOverlay.demo-mode .offline-inner { font-size: 10px; padding: 5px 14px; }
 }
 
 .mb-20 {
@@ -966,6 +957,8 @@ body.layout-desktop .sidebar {
     order: 10;
     padding: 10px;
     gap: 15px;
+    position: relative;
+    z-index: 950;
 }
 
 .fader-card-desktop {
@@ -2212,42 +2205,10 @@ body.is-portrait .dyn-box {
 }
 
 .dyn-slider-wrap {
-    height: 40px;
+    height: 30px;
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(0,0,0,0.2);
-    padding: 0 8px;
-    border-radius: 20px;
-}
-
-.dyn-nudge-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 1px solid #444;
-    background: #252525;
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.1s;
-    flex-shrink: 0;
-}
-
-.dyn-nudge-btn:active {
-    background: #444;
-    transform: scale(0.9);
-    border-color: #666;
-}
-
-.dyn-nudge-btn i {
-    pointer-events: none;
 }
 
 .dyn-slider {
@@ -2389,13 +2350,12 @@ body.is-portrait .dyn-box {
 
 /* MACRO FADER STYLES */
 .macro-fader-card {
-    background: #e0e0e0 !important;
-    /* Cinza claro */
+    background: #e0e0e0 !important; /* Cinza claro */
     border: 2px solid #ccc !important;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
 
-.macro-fader-card .card-title,
+.macro-fader-card .card-title, 
 .macro-fader-card .desk-label {
     color: #333 !important;
     font-weight: bold !important;
@@ -2502,22 +2462,15 @@ body.layout-horizontal .macro-fader-card {
     display: flex;
     align-items: center;
     gap: 12px;
-    z-index: 50000 !important;
+    z-index: 10002;
     border: 2px solid #0f0;
     animation: slideDownSync 0.4s ease-out;
     pointer-events: none;
 }
 
 @keyframes slideDownSync {
-    from {
-        top: -60px;
-        opacity: 0;
-    }
-
-    to {
-        top: 25px;
-        opacity: 1;
-    }
+    from { top: -60px; opacity: 0; }
+    to { top: 25px; opacity: 1; }
 }
 
 .sync-loader {
@@ -2530,13 +2483,8 @@ body.layout-horizontal .macro-fader-card {
 }
 
 @keyframes spinSync {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .switch {
@@ -2545,13 +2493,11 @@ body.layout-horizontal .macro-fader-card {
     width: 50px;
     height: 26px;
 }
-
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
-
 .slider {
     position: absolute;
     cursor: pointer;
@@ -2563,7 +2509,6 @@ body.layout-horizontal .macro-fader-card {
     transition: 0.3s;
     border-radius: 26px;
 }
-
 .slider:before {
     position: absolute;
     content: "";
@@ -2575,11 +2520,34 @@ body.layout-horizontal .macro-fader-card {
     transition: 0.3s;
     border-radius: 50%;
 }
-
-input:checked+.slider {
+input:checked + .slider {
     background-color: #28a745;
 }
-
-input:checked+.slider:before {
+input:checked + .slider:before {
     transform: translateX(24px);
+}
+
+
+/* === Master Solo Clear Button === */
+@keyframes master-solo-pulse {
+    0%   { background: #333; color: #555; box-shadow: none; border-color: #444; }
+    50%  { background: #c0000a; color: #fff; box-shadow: 0 0 10px rgba(220, 0, 10, 0.8); border-color: #ff2233; }
+    100% { background: #333; color: #555; box-shadow: none; border-color: #444; }
+}
+
+.btn-cue.master-solo-alert {
+    animation: master-solo-pulse 1s ease-in-out infinite !important;
+    cursor: pointer !important;
+}
+
+/* Mobile variant */
+@keyframes master-solo-pulse-mobile {
+    0%   { background: #333; color: #555; border-color: #444; }
+    50%  { background: #c0000a; color: #fff; border-color: #ff2233; box-shadow: 0 0 8px rgba(220, 0, 10, 0.7); }
+    100% { background: #333; color: #555; border-color: #444; }
+}
+
+.btn-state.master-solo-alert {
+    animation: master-solo-pulse-mobile 1s ease-in-out infinite !important;
+    cursor: pointer !important;
 }
