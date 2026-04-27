@@ -897,58 +897,63 @@ io.on('connection', (socket) => {
     });
 });
 
-function resetDmxSystem() {
-    console.log('🚀 [DMX] Iniciando procedimento de reset de hardware e software...');
+function startDmxApp(force = false) {
+    const exePath = path.join(__dirname, 'ArtNetToDMX_FTDI', 'ArtNetToDMX.exe');
+    
+    // Verifica se o processo já existe na lista do Windows
+    exec('tasklist /FI "IMAGENAME eq ArtNetToDMX.exe"', (err, stdout) => {
+        const isRunning = stdout.toLowerCase().includes('artnettodmx.exe');
 
-    // 1. Matar o processo .NET (se estiver rodando)
-    exec('taskkill /F /IM ArtNetToDMX.exe', (err) => {
-        if (err) {
-            console.log('⚠️ [DMX] Processo não estava rodando ou erro ao fechar:', err.message);
-        } else {
-            console.log('✅ [DMX] Processo ArtNetToDMX encerrado com sucesso.');
+        if (isRunning && !force) {
+            console.log('💡 [DMX] Aplicativo de luz já está em execução. Nenhuma ação necessária no boot.');
+            return;
         }
 
-        // 2. Delay para garantir que o Windows liberou o hardware
+        if (isRunning && force) {
+            console.log('♻️ [DMX] Forçando reinicialização do aplicativo...');
+            exec('taskkill /F /IM ArtNetToDMX.exe', () => spawnDmx());
+        } else {
+            console.log('🎬 [DMX] Iniciando aplicativo de luz...');
+            spawnDmx();
+        }
+    });
+
+    function spawnDmx() {
+        if (!fs.existsSync(exePath)) return console.error('❌ [DMX] Executável não encontrado em', exePath);
+        try {
+            const child = spawn(exePath, [], {
+                cwd: path.dirname(exePath),
+                detached: true,
+                stdio: 'ignore'
+            });
+            child.unref(); 
+            console.log('🚀 [DMX] Sistema de luz online!');
+        } catch (e) {
+            console.error('❌ [DMX] Erro ao abrir executável:', e.message);
+        }
+    }
+}
+
+function resetDmxSystem() {
+    console.log('🚀 [DMX] Iniciando procedimento de reset de hardware (USB) e software...');
+
+    // 1. Matar o processo para liberar o handle do USB
+    exec('taskkill /F /IM ArtNetToDMX.exe', () => {
+        // 2. Delay para o Windows processar o fechamento
         setTimeout(() => {
             console.log('🔧 [DMX] Executando reset USB elevado via PowerShell (pnputil)...');
-
-            // Este comando usa 'Start-Process -Verb RunAs' para ganhar privilégios de Admin 
-            // e rodar o pnputil de forma silenciosa e invisível.
             const psCommand = `powershell -Command "Start-Process powershell -ArgumentList '-NoProfile -Command $dev = Get-PnpDevice | Where-Object { $_.InstanceId -like ''*VID_0403&PID_6001*'' -or $_.FriendlyName -like ''*USB Serial Converter*'' } | Select-Object -First 1; if ($dev) { pnputil /restart-device $dev.InstanceId }' -Verb RunAs -WindowStyle Hidden"`;
+            
+            exec(psCommand, (psErr) => {
+                if (psErr) console.error('❌ [DMX] Erro ao disparar reset elevado:', psErr.message);
+                else console.log('✅ [DMX] Comando de reset enviado para o Windows.');
 
-            exec(psCommand, (psErr, stdout, stderr) => {
-                if (psErr) {
-                    console.error('❌ [DMX] Erro ao disparar reset elevado:', psErr.message);
-                } else {
-                    console.log('✅ [DMX] Comando de reset enviado para o Windows.');
-                }
-
-                // 3. Reiniciar o executável ArtNetToDMX
+                // 3. Reabrir o app após o reset do hardware
                 setTimeout(() => {
-                    const exePath = path.join(__dirname, 'ArtNetToDMX_FTDI', 'ArtNetToDMX.exe');
-
-                    if (!fs.existsSync(exePath)) {
-                        console.error('❌ [DMX] Erro: Executável não encontrado em', exePath);
-                        return;
-                    }
-
-                    console.log('🎬 [DMX] Reiniciando ArtNetToDMX em background...');
-
-                    // Spawn desvinculado (detached) para que o app continue vivo se o servidor cair/resetar
-                    try {
-                        const child = spawn(exePath, [], {
-                            cwd: path.dirname(exePath),
-                            detached: true,
-                            stdio: 'ignore'
-                        });
-                        child.unref();
-                        console.log('🚀 [DMX] Sistema de luz online!');
-                    } catch (spawnErr) {
-                        console.error('❌ [DMX] Erro ao disparar executável:', spawnErr.message);
-                    }
-                }, 2000);
+                    startDmxApp(true); // 'true' para garantir que ele abra mesmo que o tasklist demore a atualizar
+                }, 1500);
             });
-        }, 1500);
+        }, 1000);
     });
 }
 
@@ -993,5 +998,12 @@ server.listen(PORT, '0.0.0.0', () => {
     // Busca automática na USB apenas se NÃO estiver em demo mode
     if (!config.demo_mode) {
         setTimeout(() => iniciarBuscaAutomatica(), 1500);
+        
+        // --- AUTO-START DMX (INTELIGENTE) ---
+        // Apenas abre o app se ele não estiver rodando. Não mexe no USB no boot.
+        setTimeout(() => {
+            console.log('💡 [BOOT] Verificando sistema de iluminação...');
+            startDmxApp(false); 
+        }, 3000);
     }
 });
