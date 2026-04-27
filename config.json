@@ -3,5 +3,9 @@
   "outIdx": 1,
   "loopmidi-monitor": false,
   "open_browser_startup": false,
-  "demo_mode": false
+  "demo_mode": false,
+  "lumikit_ips": [
+    "192.168.15.99",
+    "192.168.1.111"
+  ]
 }

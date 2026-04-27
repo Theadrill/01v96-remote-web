@@ -920,6 +920,10 @@ function startDmxApp(force = false) {
 
     function spawnDmx() {
         if (!fs.existsSync(exePath)) return console.error('❌ [DMX] Executável não encontrado em', exePath);
+        
+        // --- AUTO-CONFIGURAÇÃO DE IP ---
+        updateLumikitConfig();
+
         try {
             const child = spawn(exePath, [], {
                 cwd: path.dirname(exePath),
@@ -955,6 +959,52 @@ function resetDmxSystem() {
             });
         }, 1000);
     });
+}
+
+function updateLumikitConfig() {
+    const config = loadConfig();
+    const lumikitIps = config.lumikit_ips || [];
+    if (lumikitIps.length === 0) return;
+
+    const infoPath = path.join(__dirname, 'ArtNetToDMX_FTDI', 'info');
+    const interfaces = os.networkInterfaces();
+    let localIps = [];
+    for (const k in interfaces) {
+        for (const k2 in interfaces[k]) {
+            const address = interfaces[k][k2];
+            if (address.family === 'IPv4' && !address.internal) {
+                localIps.push(address.address);
+            }
+        }
+    }
+
+    const match = lumikitIps.find(ip => localIps.includes(ip));
+
+    if (match) {
+        try {
+            // Se o arquivo não existe, cria um novo com as configurações padrão
+            if (!fs.existsSync(infoPath)) {
+                console.log(`📝 [DMX] Arquivo "info" não encontrado. Criando um novo para o IP ${match}...`);
+                const defaultContent = `IP: ${match}\nUni: 0\nOneUni: true\nAutostart: true\n`;
+                fs.writeFileSync(infoPath, defaultContent);
+                return;
+            }
+
+            let infoContent = fs.readFileSync(infoPath, 'utf8');
+            const newContent = infoContent.replace(/^IP:.*$/m, `IP: ${match}`);
+            
+            if (infoContent !== newContent) {
+                fs.writeFileSync(infoPath, newContent);
+                console.log(`🌐 [DMX] IP configurado automaticamente no arquivo info: ${match}`);
+            } else {
+                console.log(`🌐 [DMX] IP ${match} já estava configurado corretamente.`);
+            }
+        } catch (err) {
+            console.error('❌ [DMX] Erro ao gravar/criar o arquivo info:', err.message);
+        }
+    } else {
+        console.warn('⚠️ [DMX] Nenhum IP da lista "lumikit_ips" bate com as redes ativas deste PC.');
+    }
 }
 
 // --- INICIALIZAÇÃO DO SERVIDOR ---
