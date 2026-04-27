@@ -900,6 +900,11 @@ io.on('connection', (socket) => {
 function startDmxApp(force = false) {
     const exePath = path.join(__dirname, 'ArtNetToDMX_FTDI', 'ArtNetToDMX.exe');
     
+    // --- AUTO-CONFIGURAÇÃO DE IP ---
+    // Sempre garante que o arquivo info está com o IP correto para a rede atual,
+    // independente de o aplicativo já estar aberto ou não.
+    updateLumikitConfig();
+
     // Verifica se o processo já existe na lista do Windows
     exec('tasklist /FI "IMAGENAME eq ArtNetToDMX.exe"', (err, stdout) => {
         const isRunning = stdout.toLowerCase().includes('artnettodmx.exe');
@@ -921,9 +926,6 @@ function startDmxApp(force = false) {
     function spawnDmx() {
         if (!fs.existsSync(exePath)) return console.error('❌ [DMX] Executável não encontrado em', exePath);
         
-        // --- AUTO-CONFIGURAÇÃO DE IP ---
-        updateLumikitConfig();
-
         try {
             const child = spawn(exePath, [], {
                 cwd: path.dirname(exePath),
