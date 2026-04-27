@@ -238,3 +238,12 @@ window.addEventListener('mousedown', (e) => {
         else e.target.style.display = 'none';
     }
 });
+
+function resetDmx() {
+    document.getElementById('dmxResetConfirmModal').style.display = 'flex';
+    document.getElementById('dmxResetConfirmBtn').onclick = () => {
+        socket.emit('resetDmx');
+        document.getElementById('dmxResetConfirmModal').style.display = 'none';
+        document.getElementById('configModal').style.display = 'none';
+    };
+}
