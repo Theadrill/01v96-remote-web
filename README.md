@@ -89,6 +89,10 @@ Contribuições são o que fazem a comunidade open source um lugar incrível par
 
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
+## 💡 Créditos e Referências
+
+O módulo de integração DMX deste projeto utiliza o motor de tradução ArtNet para DMX baseado no projeto open-source [ArtNetDMX](https://github.com/nt2ds/ArtNetDMX) de **nt2ds**. O executável incluído foi adaptado para suportar o fluxo de auto-recuperação e reset forçado de hardware FTDI integrados à interface da Yamaha 01V96.
+
 ---
 **Desenvolvido por Rodrigo (Theadrill) usando Antigravity**  
 *Transformando o controle de áudio ao vivo em uma experiência moderna e conectada.*

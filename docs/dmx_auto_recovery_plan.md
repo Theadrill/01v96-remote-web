@@ -1,5 +1,7 @@
 # Plano de Ação: Integração Art-Net DMX com Auto-Recovery
 
+Este projeto utiliza o motor de DMX baseado no projeto original [ArtNetDMX](https://github.com/nt2ds/ArtNetDMX) de **nt2ds**. O sistema foi adaptado para integrar-se ao ecossistema da Yamaha 01V96 com foco em estabilidade e recuperação automática.
+
 Este documento detalha a estratégia para integrar o projeto `ArtNetToDMX` (.NET) ao `01v96-remote-web` (Node.js), focando na estabilidade do hardware DMX e recuperação automática de falhas (EMI/Picos de energia).
 
 ## 1. Modificação no Projeto .NET (O Heartbeat)
