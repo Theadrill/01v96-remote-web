@@ -437,26 +437,29 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         console.log(`✅ Conexão MIDI estabelecida com sucesso! (${inName})`);
         atualizarMenuTray();
 
-        // --- COOLDOWN ESTRATÉGICO E SINCRONIA DE CENAS ---
-        // Aguardamos 5s para os buffers residuais, mas NESSE TEMPO, baixamos a biblioteca de cenas
+        // --- COOLDOWN ESTRATÉGICO E SINCRONIA GERAL ---
+        // Aguardamos 5s para os buffers residuais assentarem antes de iniciar a carga massiva
         sceneManager.setIO(io);
         setTimeout(async () => {
             if (isConnected) {
-                await sceneManager.fetchScenes(midiEngine);
                 if (!syncManager) syncManager = new SyncManager(midiEngine.getScheduler(), io, sceneManager);
-                // Pause meters until sync completes and keep server flags in sync with SyncManager
+                
+                // Reinicia flags de sincronismo
                 isFullySynced = false;
                 isSyncing = true;
+
                 if (!syncManager.onSyncComplete) {
                     syncManager.onSyncComplete = function () {
                         isFullySynced = true;
                         isSyncing = false;
-                        saveNames(); // Salva nomes na persistência local
+                        saveNames(); 
                         try { io.emit('sync', stateManager.getState()); } catch (e) { }
                         try { io.emit('syncStatus', { active: false }); } catch (e) { }
-                        console.log('✅ [SERVER] SyncManager signaled completion, names saved and meters re-enabled.');
+                        console.log('✅ [SERVER] SyncManager sinalizou conclusão (Cenas + Parâmetros + Nomes).');
                     };
                 }
+                
+                // O fire() agora é async e cuida de baixar as cenas antes dos parâmetros
                 syncManager.fire(targetSocket);
             }
         }, 5000);

@@ -13,10 +13,7 @@ class SyncManager {
         this.onSyncComplete = null;
     }
 
-    // fire(targetSocket, forceNames)
-    // targetSocket: socket específico para receber o estado ao final (opcional)
-    // forceNames: força re-sincronização de nomes mesmo que já feito nesta sessão
-    fire(targetSocket = null, forceNames = false, type = 'normal') {
+    async fire(targetSocket = null, forceNames = false, type = 'normal') {
         if (this.isSyncing) return;
 
         this.isSyncing = true;
@@ -24,6 +21,11 @@ class SyncManager {
 
         if (this.io) {
             this.io.emit('syncStatus', { active: true, type: type });
+        }
+
+        // Sincroniza a biblioteca de cenas antes de pedir os parâmetros dos faders/EQ
+        if (this.sceneManager && this.scheduler && this.scheduler.midiEngine) {
+            await this.sceneManager.fetchScenes(this.scheduler.midiEngine);
         }
 
         this._queueAllParams(forceNames, targetSocket);
