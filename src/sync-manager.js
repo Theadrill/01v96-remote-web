@@ -150,13 +150,16 @@ class SyncManager {
         this.hasSyncedNamesThisSession = true;
 
         // Registra callback para quando a q1 esvaziar
-        const self = this;
-        this.scheduler.onQ1Empty = function () {
-            self._onQueueEmpty(targetSocket);
+        this.scheduler.onQ1Empty = () => {
+            this._onQueueEmpty(targetSocket);
         };
     }
 
     _onQueueEmpty(targetSocket) {
+        this._finishSync(targetSocket, '[OK] [SyncManager] Sincronização concluída!');
+    }
+
+    _finishSync(targetSocket = null, logMsg = '') {
         this.isSyncing = false;
         this.isFullySynced = true;
 
@@ -169,7 +172,7 @@ class SyncManager {
             targetSocket.emit('sync', stateManager.getState());
         }
 
-        console.log('✅ [SyncManager] Sincronização concluída!');
+        if (logMsg) console.log(logMsg);
 
         if (this.onSyncComplete) {
             this.onSyncComplete();
@@ -205,15 +208,8 @@ class SyncManager {
             }
         }
 
-        const self = this;
-        this.scheduler.onQ1Empty = function () {
-            self.isSyncing = false;
-            self.isFullySynced = true;
-            if (self.io) {
-                self.io.emit('syncStatus', { active: false });
-                self.io.emit('sync', stateManager.getState());
-            }
-            console.log('✅ [SyncManager] Nomes sincronizados!');
+        this.scheduler.onQ1Empty = () => {
+            this._finishSync(null, '[OK] [SyncManager] Nomes sincronizados!');
         };
     }
 

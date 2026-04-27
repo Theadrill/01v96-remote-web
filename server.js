@@ -530,13 +530,21 @@ function handleDisconnection(retry = true) {
     }
 }
 
-async function triggerSync(targetSocket = null, forceNames = false) {
-    if (syncManager) return syncManager.fire(targetSocket, forceNames);
+async function triggerSync(targetSocket = null, forceNames = false, type = 'normal') {
+    if (syncManager) {
+        isSyncing = true;
+        isFullySynced = false;
+        return syncManager.fire(targetSocket, forceNames, type);
+    }
     console.warn('⚠️ [Sync] Tentativa de sync sem SyncManager ativo ou conexão MIDI.');
 }
 
 async function syncNames() {
-    if (syncManager) return syncManager.syncNamesOnly();
+    if (syncManager) {
+        isSyncing = true;
+        isFullySynced = false;
+        return syncManager.syncNamesOnly();
+    }
     console.warn('⚠️ [Sync] Tentativa de sync de nomes sem SyncManager ativo.');
 }
 
@@ -571,14 +579,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('forceSync', () => {
-        if (syncManager) return syncManager.fire(null, true, 'is_scene');
         return triggerSync(null, true, 'is_scene');
     }); // Agora forceSync também força nomes e bloqueia a UI
 
     socket.on('refreshNames', () => {
         console.log("🔄 Solicitação manual de atualização de nomes...");
-        if (syncManager) return syncManager.syncNamesOnly();
-        return triggerSync(null, true, 'is_scene');
+        return syncNames();
     });
 
     socket.on('syncNamesOnly', () => {
