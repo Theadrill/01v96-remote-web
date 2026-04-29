@@ -25,7 +25,13 @@
 
     // 2. Configuração
     async function onConfigure(slotIndex, slotConfig) {
-        internalSlotConfig = JSON.parse(JSON.stringify(slotConfig || []));
+        // Garante que internalSlotConfig seja sempre um array de números (IDs de canais)
+        if (Array.isArray(slotConfig)) {
+            internalSlotConfig = JSON.parse(JSON.stringify(slotConfig));
+        } else {
+            internalSlotConfig = []; // fallback seguro
+            console.warn(`[TOGGLER] slotConfig não é um array:`, slotConfig);
+        }
         renderUI(slotIndex);
     }
 

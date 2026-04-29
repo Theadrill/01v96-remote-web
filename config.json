@@ -1,11 +1,23 @@
 {
-  "inIdx": 0,
-  "outIdx": 1,
+  "inIdx": 2,
+  "outIdx": 3,
   "loopmidi-monitor": false,
   "open_browser_startup": false,
   "demo_mode": false,
   "lumikit_ips": [
     "192.168.15.99",
     "192.168.1.111"
-  ]
+  ],
+  "meter_throttle_demo_ms": 33,
+  "meter_throttle_real_ms": 50,
+  "watchdog_timeout_ms": 5000,
+  "meter_poll_interval_ms": 41,
+  "name_save_debounce_ms": 1000,
+  "scene_recall_delay_ms": 2000,
+  "scene_save_delay_ms": 500,
+  "scene_resync_delay_ms": 700,
+  "name_update_char_delay_ms": 30,
+  "scheduler_tick_ms": 5,
+  "boot_delay_ms": 1500,
+  "dmx_boot_delay_ms": 3000
 }

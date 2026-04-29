@@ -1,36 +1,58 @@
+// Node.js built-in modules
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const { exec, spawn } = require('child_process');
 
-// Redirecionamento de Logs para Arquivo (log/server_log.txt)
-const logDir = path.join(__dirname, 'log');
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
-}
-const logFile = path.join(logDir, 'server_log.txt');
-const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+// Armazenar referências originais antes de sobrescrever
 const originalConsoleLog = console.log;
 const originalConsoleError = console.error;
 
+// Sistema de Logs melhorado com proper error handling
+const setupLogger = () => {
+    const logDir = path.join(__dirname, 'log');
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+    }
+    const logFile = path.join(logDir, 'server_log.txt');
+    const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+
+    return {
+        info: (...args) => {
+            const timestamp = new Date().toISOString();
+            const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+            logStream.write(`[${timestamp}] INFO: ${message}\n`);
+            originalConsoleLog.apply(console, args);
+        },
+        error: (...args) => {
+            const timestamp = new Date().toISOString();
+            const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+            logStream.write(`[${timestamp}] ERROR: ${message}\n`);
+            originalConsoleError.apply(console, args);
+        }
+    };
+};
+
+const logger = setupLogger();
+
+// Wrapper functions to maintain compatibility
+const logInfo = logger.info.bind(logger);
+const logError = logger.error.bind(logger);
+
+// Override console methods for backward compatibility
 console.log = function (...args) {
-    const timestamp = new Date().toISOString();
-    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
-    logStream.write(`[${timestamp}] INFO: ${message}\n`);
-    originalConsoleLog.apply(console, args);
+    logInfo(...args);
 };
 
 console.error = function (...args) {
-    const timestamp = new Date().toISOString();
-    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
-    logStream.write(`[${timestamp}] ERROR: ${message}\n`);
-    originalConsoleError.apply(console, args);
+    logError(...args);
 };
 
 console.log('🚀 [SERVER] Iniciando servidor e sistema de logs...');
-console.log('📂 [SERVER] Log gravando em:', logFile);
+console.log('📂 [SERVER] Log gravando em:', path.join(__dirname, 'log', 'server_log.txt'));
 
 // Carregar calibração do steps.json para sincronizar com o frontend
 try {
@@ -53,7 +75,6 @@ const protocol = require('./src/protocol');
 const stateManager = require('./src/state-manager');
 const dummy = require('./src/meter_dummy');
 const masterMeter = require('./src/master-meter');
-const { exec, spawn } = require('child_process');
 // MidiPipeline legacy removed — use SyncManager instead
 const sceneManager = require('./src/scene_manager');
 const SyncManager = require('./src/sync-manager');
@@ -62,12 +83,74 @@ let dummyMeterInterval = null;
 let syncManager = null;
 let isDemoMode = false;
 
+// Configurações serão carregadas do config.json
+let configConstants = {};
+
 const configFile = path.join(__dirname, 'config.json');
 const namesFile = path.join(__dirname, 'names.json');
+
+// Carregar configurações do config.json
+const loadConfigConstants = () => {
+  try {
+    if (fs.existsSync(configFile)) {
+      const loadedConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+      // Extrair apenas as constantes de configuração (excluindo as configurações de conexão)
+      configConstants = {
+        meter_throttle_demo_ms: loadedConfig.meter_throttle_demo_ms || 33,
+        meter_throttle_real_ms: loadedConfig.meter_throttle_real_ms || 50,
+        watchdog_timeout_ms: loadedConfig.watchdog_timeout_ms || 5000,
+        meter_poll_interval_ms: loadedConfig.meter_poll_interval_ms || 41,
+        name_save_debounce_ms: loadedConfig.name_save_debounce_ms || 1000,
+        scene_recall_delay_ms: loadedConfig.scene_recall_delay_ms || 2000,
+        scene_save_delay_ms: loadedConfig.scene_save_delay_ms || 500,
+        scene_resync_delay_ms: loadedConfig.scene_resync_delay_ms || 700,
+        name_update_char_delay_ms: loadedConfig.name_update_char_delay_ms || 30,
+        scheduler_tick_ms: loadedConfig.scheduler_tick_ms || 15,
+        boot_delay_ms: loadedConfig.boot_delay_ms || 1500,
+        dmx_boot_delay_ms: loadedConfig.dmx_boot_delay_ms || 3000
+      };
+    } else {
+      // Valores padrão se o arquivo não existir
+      configConstants = {
+        meter_throttle_demo_ms: 33,
+        meter_throttle_real_ms: 50,
+        watchdog_timeout_ms: 5000,
+        meter_poll_interval_ms: 41,
+        name_save_debounce_ms: 1000,
+        scene_recall_delay_ms: 2000,
+        scene_save_delay_ms: 500,
+        scene_resync_delay_ms: 700,
+        name_update_char_delay_ms: 30,
+        scheduler_tick_ms: 15,
+        boot_delay_ms: 1500,
+        dmx_boot_delay_ms: 3000
+      };
+    }
+  } catch (err) {
+    console.error('❌ [SERVER] Erro ao carregar config.json para constantes:', err.message);
+    // Valores padrão em caso de erro
+    configConstants = {
+      meter_throttle_demo_ms: 33,
+      meter_throttle_real_ms: 50,
+      watchdog_timeout_ms: 5000,
+      meter_poll_interval_ms: 41,
+      name_save_debounce_ms: 1000,
+      scene_recall_delay_ms: 2000,
+      scene_save_delay_ms: 500,
+      scene_resync_delay_ms: 700,
+      name_update_char_delay_ms: 30,
+      scheduler_tick_ms: 15,
+      boot_delay_ms: 1500,
+      dmx_boot_delay_ms: 3000
+    };
+  }
+};
 
 // Carregar nomes salvos imediatamente para que os clients vejam os nomes
 // mesmo antes da sincronização completa com a mesa física.
 loadNames();
+// Carregar constantes de configuração
+loadConfigConstants();
 
 
 let meterDataBuffer = new Array(33).fill(0);
@@ -113,9 +196,9 @@ const handleMIDIData = (midiData, rawMessage = null) => {
             }
         }
 
-        // Emissão Throttled para a Web: 33ms (~30fps) em demo, 50ms (~20fps) com mesa real
+        // Emissão Throttled para a Web: METER_THROTTLE_DEMO_MS (~30fps) em demo, METER_THROTTLE_REAL_MS (~20fps) com mesa real
         const now = Date.now();
-        const throttleMs = isDemoMode ? 33 : 50;
+        const throttleMs = isDemoMode ? configConstants.meter_throttle_demo_ms : configConstants.meter_throttle_real_ms;
         if (now - lastMeterTime > throttleMs) {
             io.emit('meterData', meterDataBuffer);
             lastMeterTime = now;
@@ -325,7 +408,7 @@ function saveNames() {
             console.error("❌ [NAMES] Erro ao salvar nomes:", err);
         }
         saveNamesTimer = null;
-    }, 1000); // 1s de debounce para agrupar as 16 letras
+    }, configConstants.name_save_debounce_ms); // 1s de debounce para agrupar as 16 letras
 }
 
 function iniciarBuscaAutomatica() {
@@ -335,16 +418,8 @@ function iniciarBuscaAutomatica() {
 
     console.log("");
 
-    buscaInterval = setInterval(() => {
-        if (isConnected) {
-            clearInterval(buscaInterval);
-            if (linhaBuscaAtiva) {
-                process.stdout.write("\n");
-                linhaBuscaAtiva = false;
-            }
-            return;
-        }
-
+    // Extrai a função de busca para melhorar legibilidade
+    const buscarPortaYamaha = () => {
         const horaAtual = new Date().toLocaleTimeString('pt-BR');
         const config = loadConfig();
         const searchMonitor = config["loopmidi-monitor"];
@@ -392,7 +467,22 @@ function iniciarBuscaAutomatica() {
             config.outIdx = foundOutIdx;
             saveConfig(config);
             executarConexao(foundInIdx, foundOutIdx);
+            return true; // Indica que encontrou e conectou
         }
+        return false; // Ainda não encontrou
+    };
+
+    buscaInterval = setInterval(() => {
+        if (isConnected) {
+            clearInterval(buscaInterval);
+            if (linhaBuscaAtiva) {
+                process.stdout.write("\n");
+                linhaBuscaAtiva = false;
+            }
+            return;
+        }
+
+        buscarPortaYamaha();
     }, 1000);
 }
 
@@ -411,7 +501,8 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
     if (inName && inName.name) inName = inName.name;
     if (outName && outName.name) outName = outName.name;
 
-    const matchesCriteria = (name) => {
+    // Extrai a função de validação para melhorar legibilidade
+    const ehPortaValida = (name) => {
         if (!name) return false;
         const lower = String(name).toLowerCase();
         if (searchMonitor) {
@@ -421,7 +512,7 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         return lower.includes('yamaha') && lower.includes('-1');
     };
 
-    if (!matchesCriteria(inName) || !matchesCriteria(outName)) {
+    if (!ehPortaValida(inName) || !ehPortaValida(outName)) {
         if (linhaBuscaAtiva) { process.stdout.write("\n"); linhaBuscaAtiva = false; }
         console.log(`🚫 Conexão bloqueada: A porta [${inName || 'Desconhecida'}] não corresponde aos critérios (${searchMonitor ? 'Monitor' : 'Yamaha'}).`);
         return { success: false, error: searchMonitor ? "A porta não contém 'monitor' no nome." : "Equipamento não é uma Yamaha 01V96." };
@@ -443,6 +534,9 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         setTimeout(async () => {
             if (isConnected) {
                 if (!syncManager) syncManager = new SyncManager(midiEngine.getScheduler(), io, sceneManager);
+                
+                // Configura a taxa de tick do scheduler baseado na configuração
+                midiEngine.setSchedulerTickMs(configConstants.scheduler_tick_ms);
                 
                 // Reinicia flags de sincronismo
                 isFullySynced = false;
@@ -474,7 +568,7 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
         global.meterInterval = setInterval(() => {
             if (!isConnected) return;
 
-            if (Date.now() - lastActivityTime > 5000) {
+            if (Date.now() - lastActivityTime > configConstants.watchdog_timeout_ms) {
                 console.log("\n⚠️ Watchdog: Timeout de conexão. A mesa parou de responder.");
                 handleDisconnection();
                 return;
@@ -501,7 +595,7 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
                 console.log("\n⚠️ Watchdog: Falha crítica no driver MIDI.");
                 handleDisconnection();
             }
-        }, 41); // Otimizado: Studio Manager Native Polling Rate (~24fps)
+        }, configConstants.meter_poll_interval_ms); // Otimizado: Studio Manager Native Polling Rate (~24fps)
     } else {
         handleDisconnection(false);
     }
@@ -626,7 +720,7 @@ io.on('connection', (socket) => {
                 // Usamos o tipo 'is_scene' para que a UI bloqueie interações
                 triggerSync(null, false, 'is_scene');
             }
-        }, 2000);
+        }, configConstants.scene_recall_delay_ms);
     });
 
     socket.on('saveScene', (data) => {
@@ -693,8 +787,8 @@ io.on('connection', (socket) => {
                             console.log('⚠️ [SCENE] Falha ao re-sincronizar cenas:', err && err.message ? err.message : err);
                         });
                     }
-                }, 700);
-            }, 500); // Delay de meio segundo conforme solicitado
+                }, configConstants.scene_resync_delay_ms);
+            }, configConstants.scene_save_delay_ms); // Delay de meio segundo conforme solicitado
         } else {
             console.log(`✅ Nomes são idênticos (ignorando case/espaços). Salvamento concluído.`);
             // Atualiza biblioteca local mesmo se for igual (para garantir consistência caso o slot estivesse vazio)
@@ -739,7 +833,7 @@ io.on('connection', (socket) => {
                     console.log('⚠️ [SCENE DELETE] Falha ao re-sincronizar cenas:', err && err.message ? err.message : err);
                 });
             }
-        }, 700);
+        }, configConstants.scene_resync_delay_ms);
     });
 
     socket.on('toggleDemo', (data) => {
@@ -817,7 +911,7 @@ io.on('connection', (socket) => {
                         const charCode = paddedName.charCodeAt(i);
                         const msg = protocol.buildNameChange(channel, i, charCode);
                         if (msg) midiEngine.send(msg);
-                        await new Promise(r => setTimeout(r, 30)); // 30ms para estabilidade do visor da mesa
+                        await new Promise(r => setTimeout(r, configConstants.name_update_char_delay_ms)); // 30ms para estabilidade do visor da mesa
                     }
 
                     // Após enviar todas as letras, solicita uma confirmação da mesa para garantir sincronia total
@@ -1058,13 +1152,13 @@ server.listen(PORT, '0.0.0.0', () => {
 
     // Busca automática na USB apenas se NÃO estiver em demo mode
     if (!config.demo_mode) {
-        setTimeout(() => iniciarBuscaAutomatica(), 1500);
+        setTimeout(() => iniciarBuscaAutomatica(), configConstants.boot_delay_ms);
         
         // --- AUTO-START DMX (INTELIGENTE) ---
         // Apenas abre o app se ele não estiver rodando. Não mexe no USB no boot.
         setTimeout(() => {
             console.log('💡 [BOOT] Verificando sistema de iluminação...');
-            startDmxApp(false); 
-        }, 3000);
+            startDmxApp(false);
+        }, configConstants.dmx_boot_delay_ms);
     }
 });

@@ -86,7 +86,7 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
 
         // Instancia o MidiScheduler responsável por controlar todo o envio
         if (!scheduler) {
-            scheduler = new MidiScheduler({ send: (msg) => sendDirect(msg) });
+            scheduler = new MidiScheduler({ send: (msg) => sendDirect(msg) }, 15); // padrão 15ms
             try { scheduler.start(); } catch (e) {}
         }
 
@@ -132,4 +132,12 @@ function send(msg, priority = 0) {
 
 function getScheduler() { return scheduler; }
 
-module.exports = { getAvailablePorts, connectPorts, send, getScheduler };
+function setSchedulerTickMs(tickMs) {
+    if (scheduler && typeof scheduler.setTickMs === 'function') {
+        scheduler.setTickMs(tickMs);
+        return true;
+    }
+    return false;
+}
+
+module.exports = { getAvailablePorts, connectPorts, send, getScheduler, setSchedulerTickMs };
