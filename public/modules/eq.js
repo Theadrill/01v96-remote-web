@@ -764,7 +764,7 @@ window.resetBubbleTimer = function() {
     }, 4000); // 4 segundos de inatividade
 };
 
-function toggleEQOn(ch) {
+window.toggleEQ = function(ch) {
     const state = getChannelStateById(ch);
     if (!state) return;
     const nextOn = !state.eq.on;
@@ -773,8 +773,10 @@ function toggleEQOn(ch) {
     const prefix = getChannelParamPrefix(ch);
     socket.emit('control', { type: `${prefix}EQ/kEQOn`, channel: ch, value: nextOn ? 1 : 0 });
     
-    const btn = document.getElementById('eqOnBtn');
-    if (btn) btn.classList.toggle('active', nextOn);
+    const btn = document.getElementById('headerBtnEQOn');
+    if (btn) {
+        btn.classList.toggle('on-active', nextOn);
+    }
 }
 
 // Reversão: Funcionalidade de Copia e Cola removida conforme solicitado pelo usuário para restaurar a estabilidade.
