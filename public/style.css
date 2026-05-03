@@ -2407,6 +2407,42 @@ body.is-portrait .dyn-box {
     border: 1px solid #ffcc00 !important;
 }
 
+/* --- Macro dB Delta Display --- */
+.macro-db-display {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    background: #0a0a0a;
+    color: #3a3a3a;
+    border: 1px solid #222;
+    border-radius: 6px;
+    margin: 4px 6px;
+    padding: 5px 4px;
+    min-height: 26px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+    user-select: none;
+    transition: color 0.2s, text-shadow 0.2s;
+    flex-shrink: 0;
+}
+
+.macro-db-display.macro-db-active {
+    color: #00ff88;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.8), 0 0 16px rgba(0, 255, 136, 0.4);
+    animation: macro-db-blink-in 0.15s ease-out;
+}
+
+@keyframes macro-db-blink-in {
+    0%   { opacity: 0.4; transform: scaleY(0.85); }
+    100% { opacity: 1;   transform: scaleY(1); }
+}
+/* --- Fim Macro dB Delta Display --- */
+
 .macro-nudge-btn-container {
     height: 100%;
     width: 100%;

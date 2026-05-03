@@ -28,6 +28,8 @@ function getMacroFaderHtml() {
                 <div style="padding: 10px 5px;">
                     <button class="side-btn btn-config" style="margin: 0; width: 100%; height: 35px; font-size: 10px; background: #6a1b9a; color: white; border: none;" onclick="openMacroConfig()">CONFIG</button>
                 </div>
+
+                <div id="macro-db-display" class="macro-db-display">--</div>
                 
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; padding: 5px;">
                     <div class="macro-nudge-btn-container" style="flex: 1;" onpointerdown="startMacroNudge(1)" onpointerup="stopMacroNudge()" onpointerleave="stopMacroNudge()">
@@ -51,6 +53,8 @@ function getMacroFaderHtml() {
                 </div>
 
                 <button class="btn-state" style="width: 90%; margin: 5px auto; padding: 8px 0; background: #6a1b9a; color: white; border: 1px solid #8e24aa;" onclick="openMacroConfig()">CONFIG</button>
+
+                <div id="macro-db-display" class="macro-db-display">--</div>
                 
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; width: 100%;">
                     <div class="macro-nudge-btn-container" style="flex: 1;" onpointerdown="startMacroNudge(1)" onpointerup="stopMacroNudge()" onpointerleave="stopMacroNudge()">
@@ -136,6 +140,43 @@ function toggleMacroChannel(i) {
 let macroNudgeInterval = null;
 let macroNudgeTimeout = null;
 
+// --- Macro dB Display ---
+let macroDeltaSteps = 0;      // Acúmulo de steps desde o último reset
+let macroDbResetTimer = null; // Timer para voltar a '--'
+
+/**
+ * Converte um delta de steps raw (escala 0-1023) para dB aproximado.
+ * Cada step raw ≈ 0.1 dB na região de uso normal do 01V96 (perto de 0 dB).
+ * Usamos 0.1 dB/step como aproximação simples e útil.
+ */
+function macroDeltaToDB(steps) {
+    const db = steps * 0.05;
+    const sign = db >= 0 ? '+' : '';
+    return `${sign}${db.toFixed(2)} dB`;
+}
+
+function updateMacroDbDisplay() {
+    const el = document.getElementById('macro-db-display');
+    if (!el) return;
+    if (macroDeltaSteps === 0) {
+        el.textContent = '--';
+        el.classList.remove('macro-db-active');
+    } else {
+        el.textContent = macroDeltaToDB(macroDeltaSteps);
+        el.classList.add('macro-db-active');
+    }
+}
+
+function resetMacroDbDisplay() {
+    if (macroDbResetTimer) clearTimeout(macroDbResetTimer);
+    macroDbResetTimer = setTimeout(() => {
+        macroDeltaSteps = 0;
+        updateMacroDbDisplay();
+        macroDbResetTimer = null;
+    }, 5000);
+}
+// --- Fim Macro dB Display ---
+
 function startMacroNudge(dir) {
     stopMacroNudge();
     nudgeMacro(dir);
@@ -176,6 +217,11 @@ function nudgeMacro(dir) {
             socket.emit('control', { type: typeFader, channel: chIdx, value: nRaw });
         }
     });
+
+    // Atualiza o visor de dB
+    macroDeltaSteps += dir;
+    updateMacroDbDisplay();
+    resetMacroDbDisplay();
 }
 
 function renderMacroFader() {
