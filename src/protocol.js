@@ -164,8 +164,8 @@ function parseIncoming(message) {
 
         for (let i = 0; i < numChannelsInMessage; i++) {
             const idx = dataStart + (i * 2);
-            // Usamos objeto esparso para o server.js ignorar os canais ausentes em fatias parciais
-            levels[i] = message[idx] || 0;
+            // Usamos objeto esparso com o offset do canal (byte 8)
+            levels[channel + i] = message[idx] || 0;
         }
         return { type: 'METER_DATA', levels, group: message[5], isMaster: isMasterPoint };
     }
@@ -192,7 +192,10 @@ function parseIncoming(message) {
             else if (element === 15) globalCh = 44 + channel; // Buses
             else if (element === 18) globalCh = 52;           // Stereo Master
 
-            // console.log(`✅ [NAME PARSED] Elm:${element} Ch:${channel} -> Global:${globalCh} Pos:${charIndex} Char:'${char}'`);
+            // 🚨 [STRICT CHECK] Apenas Seção 13 (Current) e Grupo 2 contêm nomes de canais nesta estrutura de elemento/parâmetro
+            if (message[4] !== 13 || group !== 2) return null;
+
+            // console.log(`✅ [NAME PARSED] Sec:${message[4]} Grp:${group} Elm:${element} Ch:${channel} -> Global:${globalCh} Pos:${charIndex} Char:'${char}' (Code:${charCode})`);
 
             return {
                 type: 'updateNameChar',

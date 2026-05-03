@@ -154,7 +154,7 @@ loadNames();
 loadConfigConstants();
 
 
-let meterDataBuffer = new Array(33).fill(0);
+let meterDataBuffer = new Array(64).fill(0);
 let lastMeterTime = 0;
 
 const handleMIDIData = (midiData, rawMessage = null) => {
@@ -187,13 +187,11 @@ const handleMIDIData = (midiData, rawMessage = null) => {
                 }
             }
         } else {
-            for (let i = 0; i < 32; i++) {
-                if (midiData.levels[i] !== undefined) {
-                    // Nos grupos 13/26/127 (Universal Metering) a Yamaha já envia o valor escalonado (0-31) no byte alto
-                    let level = midiData.levels[i];
-                    if (level > 32) level = 32;
-                    meterDataBuffer[i] = level;
-                }
+            // Processa todos os níveis recebidos (Inputs, Mixes, Buses, etc)
+            for (const chIdx in midiData.levels) {
+                let level = midiData.levels[chIdx];
+                if (level > 32) level = 32;
+                meterDataBuffer[chIdx] = level;
             }
         }
 
@@ -662,9 +660,18 @@ io.on('connection', (socket) => {
         const { action, chA, chB, sourceCh } = data;
         const outputProxy = { sendMessage: (msg) => midiEngine.send(msg) };
 
-        if (action === 'pair')   pairModule.pairChannels(outputProxy, chA, chB, sourceCh);
-        if (action === 'unpair') pairModule.unpairChannels(outputProxy, chA, chB);
-        if (action === 'reset')  pairModule.resetBothChannels(outputProxy, chA, chB);
+        if (action === 'pair') {
+            pairModule.pairChannels(outputProxy, chA, chB, sourceCh);
+            stateManager.updateState({ type: 'kInputPair/kPair', channel: chA, value: 1 });
+        }
+        if (action === 'unpair') {
+            pairModule.unpairChannels(outputProxy, chA, chB);
+            stateManager.updateState({ type: 'kInputPair/kPair', channel: chA, value: 0 });
+        }
+        if (action === 'reset') {
+            pairModule.resetBothChannels(outputProxy, chA, chB);
+            stateManager.updateState({ type: 'kInputPair/kPair', channel: chA, value: 1 });
+        }
     });
 
     socket.on('requestConnect', async (data) => {

@@ -519,34 +519,54 @@ socket.on('meterData', (levels) => {
                 if (!card) continue;
 
                 const dataCh = card.getAttribute('data-ch');
+                const partnerCh = card.getAttribute('data-partner-ch');
                 let levelIdx = (dataCh === 'master') ? 32 : parseInt(dataCh);
 
                 if (levelIdx >= 0 && levelIdx < (levels ? levels.length : 0)) {
+                    // Update main level
                     const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
                     smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.2) + (targetPercent * 0.8);
                     const finalPercent = smoothedLevels[levelIdx];
 
-                    const meterCurtain = card.querySelector('.desk-meter-curtain');
-                    const peakLed = card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led');
-                    if (meterCurtain) {
-                        meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                    // Determine peak state (main OR partner)
+                    let isPeaking = finalPercent >= 98;
+                    let partnerPercent = 0;
+
+                    // Support for dual meters (Paired channels)
+                    const curtains = card.querySelectorAll('.desk-meter-curtain');
+                    if (curtains.length > 0) {
+                        // Main curtain
+                        curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                        
+                        // Check if channel is paired via channelStates
+                        const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
+                        if (s && s.paired && s.pairedWith !== null && curtains.length > 1) {
+                            const pIdx = s.pairedWith;
+                            if (pIdx < levels.length) {
+                                const pTarget = calibrateStep(levels[pIdx], false);
+                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
+                                partnerPercent = smoothedLevels[pIdx];
+                                curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                                if (partnerPercent >= 98) isPeaking = true;
+                            }
+                        }
                     } else {
+                        // Mobile layout (background-based meter)
                         if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
                         card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
-                    // Alerta de Peak (Glow no card sempre, LED apenas se existir)
+
+                    // Peak LED and Glow handling
+                    const peakLed = card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led');
                     const now = Date.now();
-                    if (finalPercent >= 98) {
+                    if (isPeaking) {
                         lastPeakTime[levelIdx] = now;
                         if (peakLed) peakLed.classList.add('active');
                         card.classList.add('peak-glow');
                     } else if (now - lastPeakTime[levelIdx] > 1000) {
-                        // Só limpa se passou mais de 1 segundo desde o último pico
                         if (peakLed) peakLed.classList.remove('active');
                         card.classList.remove('peak-glow');
                     }
-
-
                 }
             }
         }

@@ -82,8 +82,17 @@ class SyncManager {
                 this.scheduler.enqueue(protocol.buildRequest(`kInputBus/kBus${b}`, i), priority);
             }
 
-            // Pair Status (solicitado um por um na etapa de patch/bus)
-            this.scheduler.enqueue(protocol.buildRequest('kInputPair/kPair', i), priority);
+            // Pair Status (solicitado apenas para canais ímpares da mesa/pares de índice, ex: CH1, CH3...)
+            if (i % 2 === 0) {
+                this.scheduler.enqueue(protocol.buildRequest('kInputPair/kPair', i), priority);
+            }
+
+            // Nomes de canais (intercalado um por um se necessário)
+            if (forceNames || !this.hasSyncedNamesThisSession) {
+                for (let c = 0; c < 4; c++) {
+                    this.scheduler.enqueue(protocol.buildNameRequest(i, c), priority);
+                }
+            }
         }
 
 
@@ -134,14 +143,8 @@ class SyncManager {
             this.scheduler.enqueue(protocol.buildRequest(`kStereoComp/${p}`, 0), priority);
         });
 
-        // Nomes de canais (apenas na primeira sync da sessão, ou se forceNames=true)
+        // Nomes das Saídas: AUX 36-43, Bus 44-51, Master 52
         if (forceNames || !this.hasSyncedNamesThisSession) {
-            for (let i = 0; i < 32; i++) {
-                for (let c = 0; c < 4; c++) {
-                    this.scheduler.enqueue(protocol.buildNameRequest(i, c), priority);
-                }
-            }
-            // Outputs: AUX 36-43, Bus 44-51, Master 52
             const outIndices = [];
             for (let i = 36; i <= 43; i++) outIndices.push(i);
             for (let i = 44; i <= 51; i++) outIndices.push(i);
