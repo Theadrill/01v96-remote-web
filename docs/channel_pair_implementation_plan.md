@@ -674,14 +674,28 @@ if (d.type === 'kChannelPair') {
 
 ---
 
-### PASSO 4 — Fader Unificado para Canais Pareados
+## Passo 4: UI dos Faders Unificados e Dual Patch
 
-**Arquivo:** `public/modules/channel_strip.js`
+O objetivo final é a representação visual unificada dos canais vinculados.
 
-**Objetivo:** Ao invés de renderizar dois cards separados para canais pareados, renderizar um único card "wide" que controla apenas o canal ímpar (chA). A mesa propaga o movimento ao chB automaticamente.
+### 4.1. Lógica de Renderização (channel_strip.js)
+- **Detecção de Par:** Se `channelStates[i].paired === true`:
+    - Se for o canal ímpar (CH 1, 3, 5...): Renderizar um fader "wide" usando a classe `.fader-card-paired`.
+    - Se for o canal par (CH 2, 4, 6...): **Não renderizar**. Ele será absorvido visualmente pelo canal ímpar.
+- **Identificação:** O label do canal deve mostrar os dois números (ex: "1 + 2").
 
-#### 4.1 — Ajuste no loop de `initUI()`
+### 4.2. Dual Patch na Aba ETC (routing.js)
+- **IMPORTANTE:** Embora quase todos os parâmetros sejam compartilhados no Pair, o **Patch (Input Source)** é independente para cada canal.
+- Quando a aba ETC for aberta para um canal pareado, ela deve exibir **dois seletores de patch**:
+    - "PATCH CH X" e "PATCH CH Y".
+- Isso permite rotear fontes diferentes para cada lado do par estéreo (ex: AD1 no CH1 e AD2 no CH2).
 
+### 4.3. Regra de Ouro (Estabilidade)
+- > [!IMPORTANT]
+  > **PROIBIÇÃO TOTAL:** Durante a implementação do Passo 4, não deve ser alterado em hipótese nenhuma o esquema de **Sync inicial** (SyncManager / protocol.js). 
+  > A sincronização do servidor é a parte mais crítica e já está validada. O Passo 4 deve ser focado puramente em **DOM, CSS e Lógica de UI no Frontend**.
+
+---
 Localizar o loop principal de renderização de canais:
 ```js
 for (let i = 0; i < NUM_CHANNELS; i++) {
