@@ -12,7 +12,10 @@ for (let i = 0; i < NUM_CHANNELS; i++) {
         patch: 1, // AD1 padrão
         buses: Array(8).fill(false), // Novo: Assignments Bus 1-8
         stereo: true, // Novo: On/Off no barramento L/R Stereo
-        eq: { on: false }
+        eq: { on: false },
+        paired: false,      // bool: este canal está em pair?
+        pairedWith: null,   // number|null: índice 0-based do canal parceiro
+        pairSource: null    // number|null: qual canal foi a fonte na última operação de pair
     });
 }
 const DEFAULT_OUT_EQ = () => ({

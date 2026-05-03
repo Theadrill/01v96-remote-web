@@ -78,6 +78,7 @@ const masterMeter = require('./src/master-meter');
 // MidiPipeline legacy removed — use SyncManager instead
 const sceneManager = require('./src/scene_manager');
 const SyncManager = require('./src/sync-manager');
+const pairModule = require('./src/pair');
 
 let dummyMeterInterval = null;
 let syncManager = null;
@@ -655,6 +656,16 @@ io.on('connection', (socket) => {
     socket.emit('scenesUpdated', sceneManager.getState());
     socket.emit('syncStatus', { active: isSyncing });
     socket.emit('connectionState', { connected: isConnected, demo_mode: currentConfig.demo_mode });
+
+    socket.on('pairChannel', (data) => {
+        if (!midiEngine || !isConnected) return;
+        const { action, chA, chB, sourceCh } = data;
+        const outputProxy = { sendMessage: (msg) => midiEngine.send(msg) };
+
+        if (action === 'pair')   pairModule.pairChannels(outputProxy, chA, chB, sourceCh);
+        if (action === 'unpair') pairModule.unpairChannels(outputProxy, chA, chB);
+        if (action === 'reset')  pairModule.resetBothChannels(outputProxy, chA, chB);
+    });
 
     socket.on('requestConnect', async (data) => {
         const config = loadConfig();

@@ -45,7 +45,10 @@ for (let i = 0; i < 32; i++) {
             lowmid: { f: 60, g: 0, q: 20 },           // 500Hz, 0dB
             himid: { f: 84, g: 0, q: 20 },            // 2kHz, 0dB
             high: { f: 108, g: 0, q: 20, lpfOn: 0 }   // 8kHz, 0dB
-        }
+        },
+        paired: false,
+        pairedWith: null,
+        pairSource: null
     };
 }
 
@@ -236,6 +239,22 @@ function updateState(d) {
                 state.channels[channel].buses[busIdx] = !!value;
             }
         }
+    }
+
+    // --- CHANNEL PAIR (LINK) ---
+    if (type === 'kInputPair/kPair') {
+        const isPaired = !!value;
+        const partnerIdx = channel % 2 === 0 ? channel + 1 : channel - 1;
+        
+        if (state.channels[channel]) {
+            state.channels[channel].paired = isPaired;
+            state.channels[channel].pairedWith = isPaired ? partnerIdx : null;
+        }
+        if (state.channels[partnerIdx]) {
+            state.channels[partnerIdx].paired = isPaired;
+            state.channels[partnerIdx].pairedWith = isPaired ? channel : null;
+        }
+        return;
     }
 
 }

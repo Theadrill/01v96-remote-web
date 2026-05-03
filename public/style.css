@@ -2587,3 +2587,69 @@ input:checked + .slider:before {
     animation: master-solo-pulse-mobile 1s ease-in-out infinite !important;
     cursor: pointer !important;
 }
+
+/* === FADER CARD PAREADO === */
+
+/* Desktop: ocupa espaço de dois canais */
+.fader-card-desktop.fader-card-paired {
+    flex: 2 !important;
+    min-width: 130px !important;
+    border: 1px solid #34c759 !important;
+    background: linear-gradient(180deg, #0a1f10 0%, #111 100%) !important;
+    position: relative;
+}
+
+.fader-card-desktop.fader-card-paired::after {
+    content: '🔗';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 9px;
+    opacity: 0.6;
+}
+
+/* Nome no card pareado */
+.fader-card-desktop.fader-card-paired .desk-label,
+.fader-card-desktop.fader-card-paired .desk-footer-label {
+    color: #34c759 !important;
+    font-size: 9px;
+    letter-spacing: 0;
+}
+
+/* Mobile: largura de dois cards + gap */
+.fader-card.fader-card-paired {
+    min-width: calc(85px * 2 + 8px) !important;
+    border: 1px solid #34c759 !important;
+    background: linear-gradient(180deg, #0a1f10 0%, #111 100%) !important;
+}
+
+/* Botões do Modal de Pair */
+.pair-direction-btn {
+    width: 100%;
+    height: 70px;
+    background: #1a1f2e;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.pair-direction-btn:hover {
+    background: #252a3d;
+    border-color: #5cacee;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.pair-direction-btn:active {
+    transform: translateY(0);
+}

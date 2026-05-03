@@ -332,6 +332,11 @@ function parseIncoming(message) {
         if (message[4] === 13 && message[5] === 2 && element === 1 && parameter === 0) {
             return { type: 'kChannelInput/kChannelIn', channel, value: CONVERTERS.bytesToFader(dataBytes), raw: message };
         }
+
+        // Channel Pair (Element 24)
+        if (element === 24 && parameter === 0) {
+            return { type: 'kInputPair/kPair', channel, value: dataBytes[dataBytes.length - 1] };
+        }
     }
 
 

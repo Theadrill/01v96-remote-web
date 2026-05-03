@@ -49,7 +49,16 @@ window.renderRouting = function(chIdx) {
             </div>
         </div>
     `;
+
+    // Adicionar seção de Pair (apenas para Inputs 1-32)
+    if (chIdx >= 0 && chIdx <= 31) {
+        const routeContainer = container.querySelector('.routing-container');
+        if (routeContainer) {
+            routeContainer.innerHTML += renderPairSection(chIdx);
+        }
+    }
 };
+
 
 window.toggleStereoAssignment = function(chIdx) {
     if (!appReady) return;
@@ -195,4 +204,142 @@ function selectPatch(chIdx, patchId) {
     channelStates[chIdx].patch = patchId;
     const nameEl = document.getElementById('currentPatchName');
     if (nameEl) nameEl.innerText = getPatchName(patchId);
+}
+
+
+/**
+ * Renderiza o botão de PAIR ou o status de PAREADO
+ */
+function renderPairSection(chIdx) {
+    const partnerIdx = chIdx % 2 === 0 ? chIdx + 1 : chIdx - 1;
+    const state = channelStates[chIdx];
+    const isPaired = state && state.paired;
+
+    if (isPaired) {
+        return `
+        <div class="routing-section" style="border-top:1px solid #333; padding-top:20px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">Pair de Canal</p>
+            <div style="background:#0a1f10; border:1px solid #34c759; border-radius:10px; padding:16px; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    <span style="color:#34c759; font-size:13px; font-weight:bold;">🔗 PAREADO</span><br>
+                    <span style="color:#aaa; font-size:11px; margin-top:4px; display:block;">CH ${chIdx+1} + CH ${state.pairedWith+1}</span>
+                </div>
+                <button onclick="openUnpairConfirm(${chIdx})"
+                    style="background:#c62828; color:#fff; border:none; border-radius:8px; padding:10px 16px; font-size:12px; font-weight:bold; cursor:pointer;">
+                    🔌 UNPAIR
+                </button>
+            </div>
+        </div>`;
+    } else {
+        return `
+        <div class="routing-section" style="border-top:1px solid #333; padding-top:20px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">Pair de Canal</p>
+            <button onclick="openPairModal(${chIdx})"
+                style="width:100%; height:55px; background:#1a1f2e; border:1px solid #5cacee; color:#5cacee; border-radius:10px; font-size:14px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
+                ♥ PAIR &nbsp; CH ${chIdx+1} + CH ${partnerIdx+1}
+            </button>
+        </div>`;
+    }
+}
+
+// Variável de contexto para os modais
+let _pairCtx = { chA: null, chB: null };
+
+window.openPairModal = function(chIdx) {
+    const partnerIdx = chIdx % 2 === 0 ? chIdx + 1 : chIdx - 1;
+    _pairCtx = { 
+        chA: Math.min(chIdx, partnerIdx), 
+        chB: Math.max(chIdx, partnerIdx) 
+    };
+    
+    document.getElementById('pairModalSubtitle').innerText = `CH ${_pairCtx.chA+1} + CH ${_pairCtx.chB+1}`;
+    
+    const btnAtoB = document.getElementById('pairBtn_AtoB');
+    const btnBtoA = document.getElementById('pairBtn_BtoA');
+    
+    btnAtoB.innerHTML = `CH ${_pairCtx.chA+1} → ${_pairCtx.chB+1}<br><small style="font-size:10px; opacity:0.7;">Copiar CH ${_pairCtx.chA+1} para CH ${_pairCtx.chB+1}</small>`;
+    btnBtoA.innerHTML = `CH ${_pairCtx.chB+1} → ${_pairCtx.chA+1}<br><small style="font-size:10px; opacity:0.7;">Copiar CH ${_pairCtx.chB+1} para CH ${_pairCtx.chA+1}</small>`;
+    
+    document.getElementById('pairModal').style.display = 'flex';
+};
+
+window.confirmPairDirection = function(direction) {
+    const { chA, chB } = _pairCtx;
+    const confirmModal = document.getElementById('pairConfirmModal');
+    const title = document.getElementById('pairConfirmTitle');
+    const text = document.getElementById('pairConfirmText');
+    const okBtn = document.getElementById('pairConfirmOkBtn');
+
+    if (direction === 'a_to_b') {
+        title.innerText = 'CONFIRMAR PAIR';
+        text.innerText = `Parear canal ${chA+1} + ${chB+1}, copiando as informações do canal ${chA+1}.`;
+        okBtn.style.background = '#28a745';
+        okBtn.innerText = 'CONFIRMAR';
+        okBtn.onclick = () => { executePair(chA, chB, chA); confirmModal.style.display='none'; document.getElementById('pairModal').style.display='none'; };
+    } else if (direction === 'b_to_a') {
+        title.innerText = 'CONFIRMAR PAIR';
+        text.innerText = `Parear canal ${chA+1} + ${chB+1}, copiando as informações do canal ${chB+1}.`;
+        okBtn.style.background = '#28a745';
+        okBtn.innerText = 'CONFIRMAR';
+        okBtn.onclick = () => { executePair(chA, chB, chB); confirmModal.style.display='none'; document.getElementById('pairModal').style.display='none'; };
+    } else if (direction === 'reset') {
+        title.innerText = 'RESETAR E PAREAR?';
+        text.innerText = `Esta ação irá resetar os canais ${chA+1} e ${chB+1} para o padrão de fábrica e ATIVAR o pareamento entre eles.`;
+        okBtn.style.background = '#ffa726';
+        okBtn.innerText = 'SIM, RESETAR E PAREAR';
+        okBtn.onclick = () => { executeResetBoth(chA, chB); confirmModal.style.display='none'; document.getElementById('pairModal').style.display='none'; };
+    }
+    confirmModal.style.display = 'flex';
+};
+
+window.openUnpairConfirm = function(chIdx) {
+    const partnerIdx = channelStates[chIdx].pairedWith;
+    const chA = Math.min(chIdx, partnerIdx);
+    const chB = Math.max(chIdx, partnerIdx);
+    
+    const confirmModal = document.getElementById('pairConfirmModal');
+    const title = document.getElementById('pairConfirmTitle');
+    const text = document.getElementById('pairConfirmText');
+    const okBtn = document.getElementById('pairConfirmOkBtn');
+    
+    title.innerText = 'DESFAZER PAIR?';
+    text.innerText = `Deseja desparear o canal ${chA+1} e ${chB+1}? Os canais voltarão a ser independentes.`;
+    okBtn.style.background = '#c62828';
+    okBtn.innerText = 'SIM, UNPAIR';
+    okBtn.onclick = () => { executeUnpair(chA, chB); confirmModal.style.display='none'; };
+    
+    confirmModal.style.display = 'flex';
+};
+
+function executePair(chA, chB, sourceCh) {
+    if (!appReady) return;
+    console.log(`[PAIR] Executando: CH ${chA+1}+${chB+1} (Source: ${sourceCh+1})`);
+    socket.emit('pairChannel', { action: 'pair', chA, chB, sourceCh });
+    
+    // Update Local
+    channelStates[chA].paired = true; channelStates[chA].pairedWith = chB;
+    channelStates[chB].paired = true; channelStates[chB].pairedWith = chA;
+    channelStates[chA].pairSource = sourceCh;
+    
+    renderRouting(activeConfigChannel);
+    if (typeof initUI === 'function') initUI();
+}
+
+function executeUnpair(chA, chB) {
+    if (!appReady) return;
+    console.log(`[PAIR] Desfazendo: CH ${chA+1}+${chB+1}`);
+    socket.emit('pairChannel', { action: 'unpair', chA, chB });
+    
+    // Update Local
+    channelStates[chA].paired = false; channelStates[chA].pairedWith = null;
+    channelStates[chB].paired = false; channelStates[chB].pairedWith = null;
+    
+    renderRouting(activeConfigChannel);
+    if (typeof initUI === 'function') initUI();
+}
+
+function executeResetBoth(chA, chB) {
+    if (!appReady) return;
+    console.log(`[PAIR] Resetando: CH ${chA+1} e ${chB+1}`);
+    socket.emit('pairChannel', { action: 'reset', chA, chB });
 }

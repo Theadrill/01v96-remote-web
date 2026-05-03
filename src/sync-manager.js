@@ -81,7 +81,11 @@ class SyncManager {
             for (let b = 1; b <= 8; b++) {
                 this.scheduler.enqueue(protocol.buildRequest(`kInputBus/kBus${b}`, i), priority);
             }
+
+            // Pair Status (solicitado um por um na etapa de patch/bus)
+            this.scheduler.enqueue(protocol.buildRequest('kInputPair/kPair', i), priority);
         }
+
 
         // AUX Masters e Bus Masters (8 cada) — Fader, On, EQ e Compressor
         for (let i = 0; i < 8; i++) {

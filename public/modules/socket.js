@@ -194,6 +194,38 @@ socket.on('update', (d) => {
         window.currentSceneName = window.sceneChars.join('').trim();
         updateSceneDisplay();
     }
+
+    // Suporte a Pair (Link) de Canais
+    if (d.type === 'kInputPair/kPair') {
+        const chA = d.channel;
+        const partnerIdx = chA % 2 === 0 ? chA + 1 : chA - 1;
+        const isPaired = !!d.value;
+
+        console.log(`🔗 [SOCKET] Atualização de Pair: CH ${chA+1} + ${partnerIdx+1} = ${isPaired}`);
+
+        // Update State
+        if (channelStates[chA]) {
+            channelStates[chA].paired = isPaired;
+            channelStates[chA].pairedWith = isPaired ? partnerIdx : null;
+        }
+        if (channelStates[partnerIdx]) {
+            channelStates[partnerIdx].paired = isPaired;
+            channelStates[partnerIdx].pairedWith = isPaired ? chA : null;
+        }
+
+        // Re-render UI
+        if (activeConfigChannel === chA || activeConfigChannel === partnerIdx) {
+            if (activeConfigTab === 'etc' && typeof renderRouting === 'function') {
+                renderRouting(activeConfigChannel);
+            }
+        }
+        
+        // Dispara re-inicialização do grid de faders para aplicar o layout unificado
+        if (typeof initUI === 'function') {
+            console.log("♻️ [SOCKET] Re-inicializando UI devido a mudança de Pair");
+            initUI(); 
+        }
+    }
 });
 
 function updateSceneDisplay() {
