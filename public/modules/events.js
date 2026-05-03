@@ -13,8 +13,9 @@ function updateConfigUIForChannel(ch) {
     let displayTitle = `${ch + 1}`;
 
     if (ch >= 0 && ch <= 31) {
+        const s = channelStates[ch];
         targetId = `name${ch}`;
-        displayTitle = `CH ${ch + 1}`;
+        displayTitle = (s && s.paired) ? `CH ${ch + 1} + ${ch + 2}` : `CH ${ch + 1}`;
     } else if (ch >= 36 && ch <= 43) {
         targetId = `namem${ch - 36}`;
         displayTitle = `MIX ${ch - 35}`;
@@ -83,15 +84,27 @@ function updateConfigUIForChannel(ch) {
 }
 
 function changeConfigChannel(delta) {
-    let nextCh = activeConfigChannel + delta;
+    let nextCh = activeConfigChannel;
     
-    // Pula o "gap" entre 32 e 36
-    if (nextCh > 31 && nextCh < 36 && delta > 0) nextCh = 36;
-    if (nextCh > 31 && nextCh < 36 && delta < 0) nextCh = 31;
+    // Loop para encontrar o próximo canal válido, pulando parceiros pareados
+    let safetyCounter = 0;
+    do {
+        nextCh += delta;
+        
+        // Pula o "gap" entre 32 e 36
+        if (nextCh > 31 && nextCh < 36 && delta > 0) nextCh = 36;
+        if (nextCh > 31 && nextCh < 36 && delta < 0) nextCh = 31;
 
-    // Limites
-    if (nextCh < 0) nextCh = 52;
-    if (nextCh > 52) nextCh = 0;
+        // Limites circulares
+        if (nextCh < 0) nextCh = 52;
+        if (nextCh > 52) nextCh = 0;
+        
+        // Se for um input (0-31) e for o canal PAR de um par ativo, continuamos buscando
+        const s = (nextCh >= 0 && nextCh <= 31) ? channelStates[nextCh] : null;
+        if (!s || !s.paired || nextCh % 2 === 0) break;
+        
+        safetyCounter++;
+    } while (nextCh !== activeConfigChannel && safetyCounter < 53);
 
     activeConfigChannel = nextCh;
     updateConfigUIForChannel(nextCh);

@@ -2589,11 +2589,10 @@ input:checked + .slider:before {
 }
 
 /* === FADER CARD PAREADO === */
-
-/* Desktop: ocupa espaço de dois canais */
+.fader-card.fader-card-paired,
 .fader-card-desktop.fader-card-paired {
-    flex: 2 !important;
-    min-width: 130px !important;
+    min-width: 110px !important;
+    width: 110px !important;
     border: 1px solid #34c759 !important;
     background: linear-gradient(180deg, #0a1f10 0%, #111 100%) !important;
     position: relative;
@@ -2616,11 +2615,57 @@ input:checked + .slider:before {
     letter-spacing: 0;
 }
 
-/* Mobile: largura de dois cards + gap */
-.fader-card.fader-card-paired {
-    min-width: calc(85px * 2 + 8px) !important;
-    border: 1px solid #34c759 !important;
-    background: linear-gradient(180deg, #0a1f10 0%, #111 100%) !important;
+/* Estilos do Seletor de Patch (Responsivo) */
+.patch-category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 52px);
+    gap: 8px;
+    justify-content: center;
+}
+
+.patch-opt-btn {
+    width: 52px;
+    min-width: 52px; /* Garante que não esmague */
+    height: 34px;
+    flex-shrink: 0;   /* Garante que não encolha */
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: all 0.2s;
+    padding: 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: -0.5px;
+}
+
+.patch-opt-btn.active {
+    background: #5cacee !important;
+    border: 1px solid #87cefa !important;
+    color: #000 !important;
+    font-weight: bold;
+}
+
+/* Responsividade Mobile */
+@media (max-width: 768px) {
+    .patch-category-grid {
+        grid-template-columns: repeat(3, 1fr); /* Ocupa a largura disponível */
+        gap: 10px;
+        width: 100%;
+        max-width: 300px; /* Limita para não ficar gigante em tablets */
+    }
+    
+    .patch-opt-btn {
+        width: 100%; /* Segue o 1fr do grid */
+        height: 48px; /* Mais alto para facilitar o toque */
+        font-size: 16px; /* Letras maiores */
+    }
 }
 
 /* Botões do Modal de Pair */

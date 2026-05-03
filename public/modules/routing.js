@@ -8,14 +8,30 @@ window.renderRouting = function(chIdx) {
             <!-- Seção de Patch -->
             <div class="routing-section">
                 <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Entrada do Canal (Patch)</p>
-                <div class="patch-display-box" onclick="openPatchSelector(${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 12px; color: #888;">FONTE ATUAL:</span>
-                        <span id="currentPatchName" style="font-size: 20px; font-weight: bold; color: #5cacee;">${getPatchName(patchVal)}</span>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Patch do Canal Principal -->
+                    <div class="patch-display-box" onclick="openPatchSelector(${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 10px; color: #888;">${chData.paired ? `PATCH CH ${chIdx+1}:` : 'FONTE ATUAL:'}</span>
+                            <span id="currentPatchName" style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(chData.patch || 0)}</span>
+                        </div>
+                        <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                        </div>
                     </div>
-                    <div style="background: #333; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+
+                    ${chData.paired ? `
+                    <!-- Patch do Canal Parceiro -->
+                    <div class="patch-display-box" onclick="openPatchSelector(${chData.pairedWith})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 10px; color: #888;">PATCH CH ${chData.pairedWith + 1}:</span>
+                            <span style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[chData.pairedWith].patch || 0)}</span>
+                        </div>
+                        <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                        </div>
                     </div>
+                    ` : ''}
                 </div>
             </div>
 
@@ -122,6 +138,10 @@ function getPatchName(val) {
 window.openPatchSelector = function(chIdx) {
     const grid = document.getElementById('patchGrid');
     grid.innerHTML = '';
+    grid.style.cssText = `
+        display: flex; flex-wrap: wrap; gap: 4px; padding: 5px;
+        justify-content: flex-start; align-items: flex-start;
+    `;
     
     // Categorias Finais (Slot movido pro final apenas visualmente)
     const categories = [
@@ -158,52 +178,58 @@ window.openPatchSelector = function(chIdx) {
     categories.forEach(cat => {
         if (cat.options.length === 0) return;
 
+        const catDiv = document.createElement('div');
+        catDiv.style.cssText = `
+            flex: 1; padding: 0 4px; min-width: 180px;
+            margin-bottom: 25px;
+            display: flex; flex-direction: column; align-items: center;
+        `;
+
         const header = document.createElement('div');
-        header.style.gridColumn = '1 / -1';
-        header.style.padding = '15px 5px 5px 5px';
-        header.style.fontSize = '9px';
-        header.style.fontWeight = 'bold';
-        header.style.color = '#555';
-        header.style.textTransform = 'uppercase';
-        header.style.borderBottom = '1px solid #333';
-        grid.appendChild(header);
+        header.style.cssText = `
+            padding: 10px 5px; font-size: 10px; font-weight: bold; 
+            color: #666; text-transform: uppercase; border-bottom: 1px solid #333;
+            margin-bottom: 10px; width: 100%; text-align: center;
+        `;
         header.innerText = cat.name;
+        catDiv.appendChild(header);
+
+        const btnGrid = document.createElement('div');
+        btnGrid.className = 'patch-category-grid';
 
         cat.options.forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = 'patch-opt-btn';
+            const isActive = (channelStates[chIdx].patch === opt.id);
+            btn.className = `patch-opt-btn ${isActive ? 'active' : ''}`;
             btn.innerText = opt.name;
-            btn.style.height = '45px';
-            btn.style.background = (channelStates[chIdx].patch === opt.id) ? '#28a745' : '#2a2a2a';
-            btn.style.color = (channelStates[chIdx].patch === opt.id) ? '#fff' : '#ccc';
-            btn.style.border = '1px solid #444';
-            btn.style.borderRadius = '5px';
-            btn.style.fontSize = '10px';
-            btn.style.cursor = 'pointer';
-            btn.onclick = () => {
-                selectPatch(chIdx, opt.id);
-                document.getElementById('patchSelectorModal').style.display = 'none';
-            };
-            grid.appendChild(btn);
+            btn.onclick = () => selectPatch(chIdx, opt.id);
+            btnGrid.appendChild(btn);
         });
+        
+        catDiv.appendChild(btnGrid);
+        grid.appendChild(catDiv);
     });
-
+    
     document.getElementById('patchSelectorModal').style.display = 'flex';
 };
 
 function selectPatch(chIdx, patchId) {
     if (!appReady) return;
-    console.log(`[FRONT] Mudando Canal ${chIdx + 1} para Patch ${patchId}`);
+    
+    console.log(`[PATCH] Canal ${chIdx+1} -> ID ${patchId} (${getPatchName(patchId)})`);
+    
     socket.emit('control', {
         type: 'kChannelInput/kChannelIn',
         channel: chIdx,
         value: patchId
     });
     
-    // UI Local
     channelStates[chIdx].patch = patchId;
-    const nameEl = document.getElementById('currentPatchName');
-    if (nameEl) nameEl.innerText = getPatchName(patchId);
+    document.getElementById('patchSelectorModal').style.display = 'none';
+    
+    // IMPORTANTE: Se o canal for parte de um par, precisamos re-renderizar a aba
+    // para mostrar os dois patches atualizados.
+    renderRouting(channelStates[chIdx].paired ? (chIdx % 2 === 0 ? chIdx : chIdx - 1) : chIdx);
 }
 
 

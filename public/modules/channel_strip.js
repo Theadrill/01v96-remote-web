@@ -140,7 +140,10 @@ function createDesktopStrip(config) {
         ids = {},        // Overrides de IDs (ex: { f: 'aux_f_1' })
         val = 0,         // Valor inicial do fader
         dbLabel = "-∞",  // Texto inicial do dB
-        isOn = false     // Estado ON/OFF inicial
+        isOn = false,    // Estado ON/OFF inicial
+        isPaired = false,
+        partnerId = null,
+        dataCh = ""      // Canal real para meters
     } = config;
 
     const pfx = config.idPrefix || "";
@@ -157,7 +160,7 @@ function createDesktopStrip(config) {
     const inputCall = `${onInputAction}(event, ${evtCh})`;
 
     return `
-        <div class="fader-card-desktop ${customClass}" id="${elId || `${pfx}card${id}`}">
+        <div class="fader-card-desktop ${customClass}" id="${ids.card || `${pfx}card${id}`}" ${dataCh ? `data-ch="${dataCh}"` : ''}>
             <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${isMaster ? '' : configAction}">${title}</div>
             
             ${hasSolo ?
@@ -186,8 +189,15 @@ function createDesktopStrip(config) {
                 ${type === 'main' ? `
                 <div class="desk-meter-container" style="display: flex; flex-direction: column; align-items: center; margin-left: 2px; height: 100%;">
                     <div id="${pId}" class="desk-peak-led"></div>
-                    <div class="desk-meter-wrap" style="margin-left: 0; margin-top: 5px; flex: 1; max-height: 92%;">
-                        <div class="desk-meter-curtain" id="${mId}"></div>
+                    <div style="display: flex; gap: 2px; flex: 1; width: 100%; justify-content: center;">
+                        <div class="desk-meter-wrap" style="margin-top: 5px; flex: 0 0 4px; height: 92%;">
+                            <div class="desk-meter-curtain" id="${mId}"></div>
+                        </div>
+                        ${isPaired ? `
+                        <div class="desk-meter-wrap" style="margin-top: 5px; flex: 0 0 4px; height: 92%;">
+                            <div class="desk-meter-curtain" id="m${partnerId}"></div>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>` : ''}
             </div>
@@ -203,12 +213,21 @@ function createDesktopStrip(config) {
 
 function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
     const s = isMaster ? masterState : channelStates[i];
-    const title = isMaster ? "MASTER" : `${i + 1}`;
+    let title = isMaster ? "MASTER" : `${i + 1}`;
+    
+    // Se estiver pareado, o título mostra os dois canais (ex: 1 + 2)
+    if (!isMaster && s.paired) {
+        title = `${i + 1} + ${i + 2}`;
+    }
+
     const nameDiv = isMaster ? (s.name || "MASTER") : (s.name || "...");
     let customClass = isMaster ? "master-card-desktop" : "";
     if (!isMaster) {
         if (i < 16) customClass += " fader-group-1";
         else if (i < 32) customClass += " fader-group-2";
+        
+        // Aplica classe de largura dupla se estiver pareado
+        if (s.paired) customClass += " fader-card-paired";
     }
 
     let val = s.value;
@@ -241,7 +260,10 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         solo,
         dbLabel: rawToDb(val, false, isMaster),
         configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${isMaster ? 52 : i})`), // Evita recursão no mini-fader
-        type: "main"
+        type: "main",
+        isPaired: !isMaster && s.paired,
+        partnerId: !isMaster && s.paired ? s.pairedWith : null,
+        dataCh: isMaster ? "master" : i
     });
 }
 
@@ -266,7 +288,8 @@ function createMobileStrip(config) {
         ids = {},
         val = 0,
         dbLabel = "-∞",
-        isOn = false
+        isOn = false,
+        dataCh = ""
     } = config;
 
     const pfx = config.idPrefix || "";
@@ -280,7 +303,7 @@ function createMobileStrip(config) {
     const inputCall = `${onInputAction}(event, ${evtCh})`;
 
     return `
-        <div class="fader-card ${customClass}" id="${cardId}">
+        <div class="fader-card ${customClass}" id="${cardId}" ${dataCh ? `data-ch="${dataCh}"` : ''}>
             ${getMobileScaleHTML()}
             <div class="ch-clickable-zone" onclick="${isMaster ? '' : configAction}">
                 <h2 class="card-title">${title}</h2>
@@ -313,13 +336,22 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         return createDesktopChannelStrip(i, isMaster, idPrefix);
     }
 
-    const title = isMaster ? "STEREO" : `CH ${i + 1}`;
     const s = isMaster ? masterState : channelStates[i];
+    let title = isMaster ? "STEREO" : `CH ${i + 1}`;
+    
+    // Mobile title para pareado
+    if (!isMaster && s.paired) {
+        title = `CH ${i + 1} + ${i + 2}`;
+    }
+
     const nameDiv = isMaster ? "MASTER" : (s.name || "...");
     let customClass = isMaster ? "master-card" : "";
     if (!isMaster) {
         if (i < 16) customClass = "fader-group-1";
         else if (i < 32) customClass = "fader-group-2";
+        
+        // Aplica largura dupla no mobile
+        if (s.paired) customClass += " fader-card-paired";
     }
 
     let val = s.value;
@@ -348,7 +380,8 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         val,
         isOn,
         dbLabel: rawToDb(val, true, isMaster),
-        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`)
+        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`),
+        dataCh: isMaster ? "master" : i
     });
 }
 
@@ -523,6 +556,11 @@ function initUI() {
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'bus');
     } else {
         for (let i = 0; i < NUM_CHANNELS; i++) {
+            const state = channelStates[i];
+            // Se estiver pareado, pulamos a renderização do canal PAR (o segundo do par)
+            if (state && state.paired && i % 2 !== 0) {
+                continue; 
+            }
             html += createChannelStrip(i, false);
         }
     }

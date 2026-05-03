@@ -480,9 +480,11 @@ socket.on('meterData', (levels) => {
                 if (!card) continue;
 
                 let levelIdx = -1;
-                if (i < 8) levelIdx = 34 + i;       // Mix 1-8
+                const dataCh = card.getAttribute('data-ch');
+                if (dataCh === 'master') levelIdx = 32;
+                else if (i < 8) levelIdx = 34 + i;       // Mix 1-8
                 else if (i < 16) levelIdx = 42 + (i - 8); // Bus 1-8
-                else levelIdx = 32;                 // Stereo Master
+                else levelIdx = parseInt(dataCh);
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
                     const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
@@ -516,8 +518,8 @@ socket.on('meterData', (levels) => {
                 const card = faderCardsCache[i];
                 if (!card) continue;
 
-                let levelIdx = i;
-                if (i >= NUM_CHANNELS) levelIdx = 32; // Stereo Master encostado no fim
+                const dataCh = card.getAttribute('data-ch');
+                let levelIdx = (dataCh === 'master') ? 32 : parseInt(dataCh);
 
                 if (levelIdx >= 0 && levelIdx < (levels ? levels.length : 0)) {
                     const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
