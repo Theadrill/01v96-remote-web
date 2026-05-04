@@ -514,58 +514,54 @@ socket.on('meterData', (levels) => {
             }
         } else {
             // Modo normal: 0-31 Canais, e o último card é o Stereo Master se existir
-            for (let i = 0; i < faderCardsCache.length; i++) {
-                const card = faderCardsCache[i];
-                if (!card) continue;
+            // Processamento robusto: Iteramos por todos os níveis de sinal possíveis
+            for (let chIdx = 0; chIdx < levels.length; chIdx++) {
+                const level = levels[chIdx];
+                if (level === undefined) continue;
 
-                const dataCh = card.getAttribute('data-ch');
-                const partnerCh = card.getAttribute('data-partner-ch');
-                let levelIdx = (dataCh === 'master') ? 32 : parseInt(dataCh);
+                // 1. Calcular percentual final com suavização
+                const isMaster = (chIdx === 32);
+                const targetPercent = calibrateStep(level, isMaster);
+                smoothedLevels[chIdx] = (smoothedLevels[chIdx] * 0.2) + (targetPercent * 0.8);
+                const finalPercent = smoothedLevels[chIdx];
+                const now = Date.now();
 
-                if (levelIdx >= 0 && levelIdx < (levels ? levels.length : 0)) {
-                    // Update main level
-                    const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
-                    smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.2) + (targetPercent * 0.8);
-                    const finalPercent = smoothedLevels[levelIdx];
+                // 2. Atualizar curtains por ID (Funciona para Desktop unificado ou normal)
+                // IDs padrão: m0, m1, m2... mmaster
+                const curtainId = isMaster ? 'mmaster' : `m${chIdx}`;
+                const curtain = document.getElementById(curtainId);
+                if (curtain) {
+                    curtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                }
 
-                    // Determine peak state (main OR partner)
-                    let isPeaking = finalPercent >= 98;
-                    let partnerPercent = 0;
+                // 3. Atualizar Peak LED e Glow no Card
+                // Em canais pareados, o card de CH2 não existe, então buscamos o card do dono
+                let targetCh = chIdx;
+                if (!isMaster && channelStates[chIdx] && channelStates[chIdx].paired) {
+                    // Se for o canal PAR do par (ex: CH2, CH4...), o card físico é do canal anterior (ímpar)
+                    if (chIdx % 2 !== 0) targetCh = chIdx - 1;
+                }
 
-                    // Support for dual meters (Paired channels)
-                    const curtains = card.querySelectorAll('.desk-meter-curtain');
-                    if (curtains.length > 0) {
-                        // Main curtain
-                        curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
-                        
-                        // Check if channel is paired via channelStates
-                        const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                        if (s && s.paired && s.pairedWith !== null && curtains.length > 1) {
-                            const pIdx = s.pairedWith;
-                            if (pIdx < levels.length) {
-                                const pTarget = calibrateStep(levels[pIdx], false);
-                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
-                                partnerPercent = smoothedLevels[pIdx];
-                                curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
-                                if (partnerPercent >= 98) isPeaking = true;
-                            }
-                        }
-                    } else {
-                        // Mobile layout (background-based meter)
-                        if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-                        card.style.backgroundSize = `100% ${finalPercent}%`;
-                    }
-
-                    // Peak LED and Glow handling
+                const cardId = isMaster ? 'cardmaster' : `card${targetCh}`;
+                const card = document.getElementById(cardId);
+                
+                if (card) {
+                    // Peak LED e Glow (se algum dos canais do par pikar, o card brilha)
                     const peakLed = card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led');
-                    const now = Date.now();
-                    if (isPeaking) {
-                        lastPeakTime[levelIdx] = now;
+                    
+                    if (finalPercent >= 98) {
+                        lastPeakTime[targetCh] = now;
                         if (peakLed) peakLed.classList.add('active');
                         card.classList.add('peak-glow');
-                    } else if (now - lastPeakTime[levelIdx] > 1000) {
+                    } else if (now - lastPeakTime[targetCh] > 1000) {
                         if (peakLed) peakLed.classList.remove('active');
                         card.classList.remove('peak-glow');
+                    }
+
+                    // Layout Mobile (background-based meter) - apenas se não houver curtains no card
+                    if (card.classList.contains('fader-card')) {
+                        if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
+                        card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
                 }
             }
