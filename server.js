@@ -1064,23 +1064,48 @@ function startDmxApp(force = false) {
 function resetDmxSystem() {
     console.log('🚀 [DMX] Iniciando procedimento de reset de hardware (USB) e software...');
 
-    // 1. Matar o processo para liberar o handle do USB
-    exec('taskkill /F /IM ArtNetToDMX.exe', () => {
-        // 2. Delay para o Windows processar o fechamento
-        setTimeout(() => {
-            console.log('🔧 [DMX] Executando reset USB elevado via PowerShell (pnputil)...');
-            const psCommand = `powershell -Command "Start-Process powershell -ArgumentList '-NoProfile -Command $dev = Get-PnpDevice | Where-Object { $_.InstanceId -like ''*VID_0403&PID_6001*'' -or $_.FriendlyName -like ''*USB Serial Converter*'' } | Select-Object -First 1; if ($dev) { pnputil /restart-device $dev.InstanceId }' -Verb RunAs -WindowStyle Hidden"`;
-            
-            exec(psCommand, (psErr) => {
-                if (psErr) console.error('❌ [DMX] Erro ao disparar reset elevado:', psErr.message);
-                else console.log('✅ [DMX] Comando de reset enviado para o Windows.');
+    // 1. Matar o LumikitSHOW.exe
+    exec('taskkill /F /IM LumikitSHOW.exe', () => {
+        // 2. Matar o ArtNetToDMX.exe
+        exec('taskkill /F /IM ArtNetToDMX.exe', () => {
+            // 3. Delay para o Windows processar o fechamento
+            setTimeout(() => {
+                console.log('🔧 [DMX] Executando reset USB elevado via PowerShell (pnputil)...');
+                // Adicionado -Wait para o exec() só terminar quando o reset físico for concluído.
+                const psCommand = `powershell -Command "Start-Process powershell -ArgumentList '-NoProfile -Command $dev = Get-PnpDevice | Where-Object { $_.InstanceId -like ''*VID_0403&PID_6001*'' -or $_.FriendlyName -like ''*USB Serial Converter*'' } | Select-Object -First 1; if ($dev) { pnputil /restart-device $dev.InstanceId }' -Verb RunAs -WindowStyle Hidden -Wait"`;
+                
+                exec(psCommand, (psErr) => {
+                    if (psErr) console.error('❌ [DMX] Erro ao disparar reset elevado:', psErr.message);
+                    else console.log('✅ [DMX] Comando de reset enviado para o Windows e concluído.');
 
-                // 3. Reabrir o app após o reset do hardware
-                setTimeout(() => {
-                    startDmxApp(true); // 'true' para garantir que ele abra mesmo que o tasklist demore a atualizar
-                }, 1500);
-            });
-        }, 1000);
+                    // 4. Aguarda 3s para o Windows re-enumerar o dispositivo USB
+                    setTimeout(() => {
+                        console.log('🎬 [DMX] Iniciando ArtNetToDMX...');
+                        startDmxApp(true); // 'true' garante que ele force caso tenha sobrado algum zumbi
+                        
+                        // 5. Aguarda mais 3s para o ArtNetToDMX carregar e escutar a porta 6454
+                        setTimeout(() => {
+                            const lumikitPath = "C:\\Program Files\\Lumikit\\LumikitSHOW.exe";
+                            if (fs.existsSync(lumikitPath)) {
+                                console.log('🎬 [DMX] Iniciando LumikitSHOW...');
+                                try {
+                                    const child = spawn(lumikitPath, [], {
+                                        cwd: path.dirname(lumikitPath),
+                                        detached: true,
+                                        stdio: 'ignore'
+                                    });
+                                    child.unref(); 
+                                } catch (e) {
+                                    console.error('❌ [DMX] Erro ao abrir Lumikit:', e.message);
+                                }
+                            } else {
+                                console.error('❌ [DMX] Executável Lumikit não encontrado em', lumikitPath);
+                            }
+                        }, 3000); 
+                    }, 3000); 
+                });
+            }, 1000);
+        });
     });
 }
 
