@@ -289,7 +289,8 @@ function createMobileStrip(config) {
         val = 0,
         dbLabel = "-∞",
         isOn = false,
-        dataCh = ""
+        dataCh = "",
+        onTop = false   // Se true, renderiza o botão ON antes do título/fader
     } = config;
 
     const pfx = config.idPrefix || "";
@@ -301,17 +302,19 @@ function createMobileStrip(config) {
     const cardId = ids.card || `${pfx}card${id}`;
 
     const inputCall = `${onInputAction}(event, ${evtCh})`;
+    const onBtn = `<button id="${onId}" class="btn-state ${isOn ? 'on-active' : ''}" onclick="${onAction}">On</button>`;
 
     return `
         <div class="fader-card ${customClass}" id="${cardId}" ${dataCh ? `data-ch="${dataCh}"` : ''}>
             ${getMobileScaleHTML()}
+            ${onTop ? onBtn : ''}
             <div class="ch-clickable-zone" onclick="${isMaster ? '' : configAction}">
                 <h2 class="card-title">${title}</h2>
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
             
             ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
-            <button id="${onId}" class="btn-state ${isOn ? 'on-active' : ''}" onclick="${onAction}">On</button>
+            ${!onTop ? onBtn : ''}
 
             <div class="nudge-zone" onpointerdown="${onNudgeStartAction}(${evtCh}, 1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                 <button class="btn-nudge pointer-none">+</button>
@@ -381,7 +384,8 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         isOn,
         dbLabel: rawToDb(val, true, isMaster),
         configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`),
-        dataCh: isMaster ? "master" : i
+        dataCh: isMaster ? "master" : i,
+        onTop: musicianMode  // Botão ON no topo apenas no modo músico
     });
 }
 

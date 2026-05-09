@@ -60,7 +60,8 @@ function renderAuxs(ch) {
                 dbLabel: rawToDb(currentVal),
                 isOn: isOn,
                 evtCh: `${ch}, ${i}`,
-                ids: { f: `aux_f_${i}`, v: `aux_v_${i}`, on: `aux_on_${i}`, name: `aux_name_display_${i}` }
+                ids: { f: `aux_f_${i}`, v: `aux_v_${i}`, on: `aux_on_${i}`, name: `aux_name_display_${i}` },
+                onTop: layoutMode !== 'desktop' // Botão ON no topo apenas no modo mobile
             };
             html += (layoutMode === 'desktop') ? createDesktopStrip(config) : createMobileStrip(config);
         }
