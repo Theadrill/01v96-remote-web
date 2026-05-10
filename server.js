@@ -734,9 +734,15 @@ io.on('connection', (socket) => {
                     currentScene: sceneManager.getCurrentScene()
                 });
 
-                // Manda sync para recarregar todos os faders na nova view
-                // Usamos o tipo 'is_scene' para que a UI bloqueie interações
-                triggerSync(null, false, 'is_scene');
+                // ⚠️ Usamos fireParamsOnly() e NÃO triggerSync() aqui.
+                // As cenas já estão em cache — um fetchScenes() aqui competiria com os
+                // requests de parâmetros no scheduler MIDI, causando gargalo e pulando
+                // os primeiros canais (bug: sync começava no canal 12).
+                if (syncManager) {
+                    isSyncing = true;
+                    isFullySynced = false;
+                    syncManager.fireParamsOnly(null, false, 'is_scene');
+                }
             }
         }, configConstants.scene_recall_delay_ms);
     });

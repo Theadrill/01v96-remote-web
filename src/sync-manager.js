@@ -31,6 +31,22 @@ class SyncManager {
         this._queueAllParams(forceNames, targetSocket);
     }
 
+    // Sync apenas de parâmetros de canal — NÃO baixa a biblioteca de cenas.
+    // Usar após recall de cena, onde as cenas já estão em cache e um novo
+    // fetchScenes() criaria um gargalo MIDI competindo com os requests de canal.
+    fireParamsOnly(targetSocket = null, forceNames = false, type = 'is_scene') {
+        if (this.isSyncing) return;
+
+        this.isSyncing = true;
+        this.isFullySynced = false;
+
+        if (this.io) {
+            this.io.emit('syncStatus', { active: true, type: type });
+        }
+
+        this._queueAllParams(forceNames, targetSocket);
+    }
+
     _queueAllParams(forceNames, targetSocket) {
         const priority = 1;
 
