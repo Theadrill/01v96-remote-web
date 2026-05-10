@@ -831,6 +831,16 @@ io.on('connection', (socket) => {
             }
 
             io.emit('scenesUpdated', sceneManager.getState());
+
+            // Re-lê a biblioteca da mesa para garantir que o slot salvo apareça corretamente
+            // (mesmo sem rename, o slot pode ter sido sobrescrito ou estar em posição diferente)
+            setTimeout(() => {
+                if (typeof sceneManager.fetchScenes === 'function' && midiEngine) {
+                    sceneManager.fetchScenes(midiEngine).catch(err => {
+                        console.log('⚠️ [SCENE] Falha ao re-sincronizar cenas após save:', err && err.message ? err.message : err);
+                    });
+                }
+            }, configConstants.scene_resync_delay_ms);
         }
     });
 
