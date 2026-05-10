@@ -1,6 +1,13 @@
 # 🚀 Plano de Otimização de Performance – 01v96-remote-web
 
-Este plano detalha os gargalos identificados através de análise estática de código e rastreamento de performance (Chrome Performance Trace), apresentando observações técnicas e sugestões de implementação.
+Este plano consolida os gargalos identificados via análise estática de código + rastreamento de performance (Chrome Performance Trace) + varredura profunda de Maio/2026. Todas as otimizações respeitam as restrições: **zero mudança em lógica de sync**, **zero mudança de layout visual**.
+
+---
+
+## 🔒 Restrições Invioláveis
+
+- **ZERO mudanças em lógica de sync**: listeners `sync`, `update`, `dynamicsState`, `meterData`, `syncStatus`, `connectionState` e qualquer `socket.emit` de controle são intocáveis.
+- **ZERO mudanças de layout**: o visual final deve ser idêntico ao atual.
 
 ---
 
@@ -9,144 +16,357 @@ Este plano detalha os gargalos identificados através de análise estática de c
 Com base na análise do arquivo `Trace-20260505T230058.json` (246MB), identificamos problemas críticos de responsividade e renderização.
 
 ### 1. Interaction to Next Paint (INP) - Crítico
-Sua interação mais longa foi um **clique (MouseUp)** que gerou uma tarefa de **141,3 ms**, aproximando-se do limite de "Precisa de Melhorias" (200 ms).
+A interação mais longa foi um **clique (MouseUp)** que gerou uma tarefa de **141,3 ms**, aproximando-se do limite de "Precisa de Melhorias" (200 ms).
 
 *   **🔍 Causa Raiz**: O clique dispara `closeChannelConfig` (`events.js`), que invoca `initUI` (`channel_strip.js`). Esta função reconstrói grandes partes da interface usando `innerHTML`.
 *   **📊 Detalhamento Técnico (Trace)**:
     *   **Volume de Dados**: O navegador registra **6.761 nós no DOM** e **1.043 listeners de eventos**. Processar isso via `innerHTML` é extremamente lento.
     *   **Parsing e Layout**: As chamadas de `innerHTML` forçam o navegador a analisar o HTML (Parse HTML - 53ms) e disparar **Recálculo de Estilo (46ms)** e **Layout (13ms)** imediatos.
-*   **💡 Sugestão**: Substituir o `innerHTML` por atualizações granulares. Atualize apenas `textContent` ou `classList` de elementos existentes em vez de destruir e recriar o DOM.
+*   **💡 Sugestão**: Substituir o `innerHTML` por atualizações granulares. Atualize apenas `textContent` ou `classList` de elementos existentes em vez de destruir e recriar o DOM. *(Médio prazo — arquitetura complexa)*
 
 ### 2. Layerize e Custos de Renderização (8,5 segundos)
 O "Layerize" (gerenciamento de camadas) consumiu impressionantes **8.496 ms** do tempo total do trace, enquanto o **Recálculo de Estilo** acumulou **1.729 ms**.
 
-*   **🔍 Causa Raiz**: O arquivo `socket.js` (linha 469) utiliza `requestAnimationFrame` para atualizar os medidores (meters) via transformações CSS.
-*   **📊 Detalhamento Técnico (Código)**:
-    *   **Loop Ineficiente**: Dentro do `requestAnimationFrame`, o código executa `querySelectorAll` e `querySelector` repetidamente para cada canal (32+) a cada frame.
-    *   **Layout Thrashing**: Buscar elementos no DOM enquanto se altera o estilo de outros no mesmo loop impede que o navegador otimize a renderização.
-*   **💡 Sugestão**: 
-    *   **Cache de Seletores**: Armazene as referências dos elementos (`curtains`, `leds`) em um array durante o `initUI`. Nunca use `querySelector` dentro de um loop de animação.
-    *   **Throttling de Meters**: Limite a atualização visual dos medidores (ex: máximo 30fps) ou atualize apenas se a mudança for significativa (> 2%).
+*   **🔍 Causa Raiz**: O arquivo `socket.js` utiliza `requestAnimationFrame` para atualizar os medidores (meters) via transformações CSS, com `querySelector` repetido por canal por frame.
+*   **💡 Solução imediata**: Cache de elementos + CSS `contain` + remoção de `backdrop-filter` e `box-shadow` pesados (ver seções abaixo).
 
 ---
 
-## 🛠️ Outros Gargalos Identificados
+## 🔴 Gargalos Críticos — Implementação Imediata
 
-1.  **Atualizações frequentes do DOM com `innerHTML`**: Em `auxs_sends.js`, a função `renderAuxs()` reconstrói toda a lista de envios a cada chamada.
-2.  **Listeners de roda e arrasto**: Em `scroll.js`, o listener de `wheel` é registrado com `{ passive: false }`, impedindo otimizações nativas.
-3.  **Conversões de dB**: Funções `rawToDb()` e `dbToRaw()` percorrem arrays em loops frequentes.
-4.  **Múltiplas chamadas a `window.enableDragScroll`**: Acúmulo de listeners ao abrir/fechar modais.
+### A. Cache de elementos dos meters (socket.js + channel_strip.js)
 
----
+**Problema:** Dentro do `requestAnimationFrame` de `meterData` (socket.js ~linha 469), o código executa a cada frame (60Hz):
+- `card.querySelectorAll('.desk-meter-curtain')` — até 32× por frame
+- `card.querySelector('.desk-peak-led')` — até 32× por frame
+- `card.getAttribute('data-ch')` e `data-partner-ch` — até 64× por frame
+- `document.getElementById('mini-card...')` + `querySelector` filhos — por frame
 
-## 💡 Estratégias de Melhoria Propostas
+**Total: ~130+ leituras DOM a cada 16ms. Devastador em dispositivos lentos.**
 
-### 🟢 Curto Prazo (Impacto Imediato)
-*   **Cache de DOM no `socket.js`**: Implementar um objeto global `meterElements` para evitar buscas repetitivas.
-*   **CSS `contain: strict`**: Aplicar nos containers de faders para isolar o custo de "Layerize".
-*   **Passive Listeners**: Alterar eventos de scroll para `{ passive: true }`.
-
-### 🟡 Médio Prazo (Arquitetura)
-*   **Refatoração do `initUI`**: Migrar de `innerHTML` para templates ou manipulação direta de nós.
-*   **Virtualização**: Renderizar apenas os canais visíveis no grid.
-
-### 🔵 Esquema de economia de energia baseado em foco/visibilidade
-Para reduzir o processamento quando a janela ou aba não está em primeiro plano, podemos usar a Page Visibility API.
-
-#### Código sugerido (salvar como `public/modules/visibility.js`)
+**Solução:** Criar `meterElementsCache` populado no `buildMeterCache()` chamado após `initUI()` e invalidado no `resetFaderCache()`.
 
 ```javascript
-(function () {
-  let isPageVisible = true;
-  let isWindowFocused = true;
+// Em socket.js — estrutura do cache por índice de card
+let meterElementsCache = null;
 
-  function enterLowPowerMode() {
-    if (!isPageVisible || !isWindowFocused) return;
-    isPageVisible = false;
-    isWindowFocused = false;
-    console.log('[Visibilidade] Modo economia ativado – pausando atualizações pesadas');
-
-    if (window.socket && typeof socket.emit === 'function') {
-      window._originalSocketEmit = socket.emit;
-      socket.emit = function () { /* pausa emissões */ };
+function buildMeterCache() {
+    if (!faderCardsCache || !faderCardsCache.length) { meterElementsCache = null; return; }
+    meterElementsCache = new Array(faderCardsCache.length);
+    for (let i = 0; i < faderCardsCache.length; i++) {
+        const card = faderCardsCache[i];
+        meterElementsCache[i] = {
+            card,
+            dataCh: card.getAttribute('data-ch'),
+            partnerCh: card.getAttribute('data-partner-ch'),
+            curtains: Array.from(card.querySelectorAll('.desk-meter-curtain')),
+            peakLed: card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led')
+        };
     }
-
-    if (window.disableDragScrollListeners) window.disableDragScrollListeners();
-    document.documentElement.setAttribute('data-low-power', 'true');
-  }
-
-  function exitLowPowerMode() {
-    if (isPageVisible && isWindowFocused) return;
-    isPageVisible = true;
-    isWindowFocused = true;
-    console.log('[Visibilidade] Modo normal retomado');
-
-    if (window._originalSocketEmit) {
-      socket.emit = window._originalSocketEmit;
-      window._originalSocketEmit = null;
-    }
-
-    if (window.enableDragScrollListeners) window.enableDragScrollListeners();
-    document.documentElement.removeAttribute('data-low-power');
-  }
-
-  // Page Visibility API
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      enterLowPowerMode();
-    } else {
-      exitLowPowerMode();
-    }
-  });
-
-  // Window focus/blur
-  window.addEventListener('focus', () => {
-    isWindowFocused = true;
-    if (isPageVisible) exitLowPowerMode();
-  });
-  window.addEventListener('blur', () => {
-    isWindowFocused = false;
-    if (!document.hidden) enterLowPowerMode();
-  });
-
-  // Initialize
-  if (document.hidden || !document.hasFocus()) {
-    enterLowPowerMode();
-  }
-})();
+}
 ```
+
+No `resetFaderCache()` (channel_strip.js): também zerar `meterElementsCache = null`.
+Chamar `buildMeterCache()` logo após preencher `faderCardsCache` no início do handler `meterData`.
+
+**Impacto:** Reduz ~130 queries DOM/frame para **0 dentro do loop**.
 
 ---
 
-## 🛠️ Sugestões Adicionais
+### B. Throttle do canvas EQ para ~20fps (eq.js)
 
-1. **Debounce / Throttle em eventos de alta frequência**
-   - Aplicar `debounce` (ex: 100 ms) em listeners de `wheel`, `mousemove` e `touchmove` que acionam atualizações de UI ou cálculos de dB.
-   - Para atualizações de medidores, usar `throttle` no `requestAnimationFrame` para garantir no máximo 30 fps, já sugerido, mas deixar explícito onde aplicar.
+**Problema:** `startEQAnimation()` roda um loop `requestAnimationFrame` a 60fps enquanto o EQ estiver aberto, calculando resposta de frequência em `Float32Array` (4 filtros × até 400 steps), gradientes, arcos e posição do bubble — em paralelo com o loop de meters.
 
-2. **Uso de `requestIdleCallback` para tarefas de baixo prioridade**
-   - Funções como conversões de dB em grandes arrays ou atualizações de caches podem ser agendadas com `requestIdleCallback` (ou polyfill) para não bloquear a renderização.
+**Solução:** Throttle simples via timestamp:
 
-3. **Web Workers para processamento pesado**
-   - Mover as funções `rawToDb()` e `dbToRaw()` (ou qualquer outro cálculo intensivo) para um Web Worker, liberando a thread principal para interações do usuário.
+```javascript
+let lastEQDrawTime = 0;
+const EQ_FRAME_INTERVAL = 50; // ~20fps — suficiente para drag suave
 
-4. **IntersectionObserver para elementos fora da tela**
-   - Ao renderizar listas grandes (por exemplo, lista de auxiliares ou envios), usar `IntersectionObserver` para atualizar apenas os itens visíveis, reduzindo manipulações de DOM.
+function startEQAnimation() {
+    if (eqAnimationId) cancelAnimationFrame(eqAnimationId);
+    const run = (now) => {
+        if (!eqCanvas || !eqCtx) return;
+        eqAnimationId = requestAnimationFrame(run);
+        if (now - lastEQDrawTime < EQ_FRAME_INTERVAL) return;
+        lastEQDrawTime = now;
+        // ... código de render atual, sem mudanças ...
+    };
+    eqAnimationId = requestAnimationFrame(run);
+}
+```
 
-5. **CSS `will-change` e `transform` para animações de faders**
-   - Em vez de alterar `top`/`left`, usar `transform: translateY()` nos elementos de fader e adicionar `will-change: transform` para permitir que o navegador otimize a camada de composição.
+Também reduzir steps da curva em telas pequenas: `Math.min(w, 400)` → `Math.min(w, 200)` quando `w < 600`.
 
-6. **Contenção de layout com `contain: strict` em containers de canal**
-   - Já mencionado aplicar `contain: strict` nos containers de faders; vale reforçar que isso também reduz o custo de recálculo de estilo e layout em subárvores isoladas.
+**Impacto:** Reduz carga de canvas em ~66% quando EQ está aberto.
 
-7. **Evitar leituras síncronas de layout (layout thrashing)**
-   - Sempre agrupar leituras de propriedades de layout (ex: `offsetHeight`, `getComputedStyle`) antes de fazer gravações (ex: `style.transform`). Pode-se usar técnicas de "read‑then‑write" ou bibliotecas como `fastdom`.
+---
 
-8. **Uso de `passive: true` em todos os listeners de scroll e touch**
-   - Além do `wheel` em `scroll.js`, verificar se há outros listeners de `touchmove` ou `pointermove` que também podem ser marcados como passivos.
+### C. Throttle dos meters para ~30fps (socket.js)
 
-9. **Cache de seletores além do `socket.js`**
-   - Estender o padrão de cache de elementos (como já proposto para `meterElements`) a outros módulos que fazem `querySelectorAll` em loops (por exemplo, `auxs_sends.js`, `channel_strip.js`).
+**Problema:** Cada pacote `meterData` do socket dispara um `requestAnimationFrame`. Se o servidor envia a 60Hz, são 60 renders/segundo de UI.
 
-10. **Monitoramento de performance em produção**
-    - Incluir um pequeno script que coleta métricas de INP, FID e FCP via a API `PerformanceObserver` e envia para um endpoint de logs, permitindo validar o impacto das otimizações em campo.
+**Solução:** Throttle no topo do handler, **sem tocar na lógica de sync**:
+
+```javascript
+let lastMeterRenderTime = 0;
+const METER_RENDER_INTERVAL = 33; // ~30fps
+
+socket.on('meterData', (levels) => {
+    if (musicianMode) return;
+
+    // Cache preenchido na primeira vez ou após resetFaderCache
+    if (!faderCardsCache) {
+        faderCardsCache = document.querySelectorAll(
+            '.faders-area > .fader-card, .faders-area > .fader-card-desktop, ' +
+            '#master-container .fader-card-desktop, #master-container .fader-card'
+        );
+        buildMeterCache();
+    }
+
+    const now = performance.now();
+    if (now - lastMeterRenderTime < METER_RENDER_INTERVAL) return;
+    lastMeterRenderTime = now;
+
+    requestAnimationFrame(() => {
+        // ... código existente, lendo de meterElementsCache em vez de querySelector ...
+    });
+});
+```
+
+> ⚠️ O throttle atua **apenas na renderização visual**. Os dados do socket continuam sendo recebidos normalmente — zero impacto em sync.
+
+**Impacto:** Reduz processamento de meters em ~50% (30fps vs 60fps).
+
+---
+
+### D. `Date.now()` fora do loop de canais (socket.js)
+
+**Problema:** `const now = Date.now()` está dentro do loop `for (let i = 0; ...)` (linha ~561), chamando o relógio do sistema N vezes por frame.
+
+**Solução:** Mover para fora do loop, uma única chamada por frame:
+
+```javascript
+// Fora do loop:
+const now = Date.now();
+for (let i = 0; i < faderCardsCache.length; i++) {
+    // ... usa 'now' já calculado
+}
+```
+
+**Impacto:** Elimina N chamadas de sistema desnecessárias por frame.
+
+---
+
+## 🟡 Gargalos Altos — CSS (style.css + index.html)
+
+### E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css)
+
+**Problema:** `.ch-name` usa `backdrop-filter: blur(3px)` — são **32+ instâncias permanentes** na tela principal. Cada `backdrop-filter` força o browser a criar uma camada GPU separada, renderizar tudo abaixo dela e aplicar blur. Em dispositivos com GPU integrada/fraca, é catastrófico.
+
+```css
+/* ANTES */
+.ch-name {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(3px);
+    ...
+}
+
+/* DEPOIS — opacidade mais alta compensa visualmente */
+.ch-name {
+    background: rgba(0, 0, 0, 0.65);
+    /* backdrop-filter removido */
+}
+```
+
+**Impacto:** Elimina 32+ camadas de composição GPU permanentes.
+
+---
+
+### F. Substituir `box-shadow inset` dos fader groups por `border` lateral (style.css)
+
+**Problema:** `.fader-group-1` e `.fader-group-2` usam `box-shadow` com `inset` + sombra externa. Com 32 cards sofrendo repaint frequente (meters), o custo de renderizar `box-shadow inset` se multiplica.
+
+**Decisão:** Manter segmentação visual com `border` lateral colorido (sem custo de composição), removendo o `box-shadow`:
+
+```css
+/* ANTES */
+.fader-group-1 {
+    border-top: 3px solid #00adef !important;
+    box-shadow: 0 -5px 15px rgba(0, 173, 239, 0.2) inset, 0 0 5px rgba(0, 173, 239, 0.1);
+}
+.fader-group-2 {
+    border-top: 3px solid #00ff88 !important;
+    box-shadow: 0 -5px 15px rgba(0, 255, 136, 0.2) inset, 0 0 5px rgba(0, 255, 136, 0.1);
+}
+
+/* DEPOIS — segmentação por border lateral esquerdo colorido */
+.fader-group-1 {
+    border-top: 3px solid #00adef !important;
+    border-left: 3px solid rgba(0, 173, 239, 0.5) !important;
+    box-shadow: none;
+}
+.fader-group-2 {
+    border-top: 3px solid #00ff88 !important;
+    border-left: 3px solid rgba(0, 255, 136, 0.5) !important;
+    box-shadow: none;
+}
+```
+
+**Impacto:** Remove custo de repaint de sombras em 32 elementos durante updates de meter.
+
+---
+
+### G. Remover `transition` dos fader cards (style.css)
+
+**Problema:**
+- `.fader-card { transition: border-color 0.2s, box-shadow 0.2s; }` — força interpolação CSS quando `.peak-glow` é adicionado/removido, em paralelo com o rAF.
+- `.fader-card.has-meter { transition: background-size 0.05s linear; }` — cria interpolação CSS duplicada com o rAF de meters mobile (double-rendering).
+
+**Decisão:** Remover ambas as transições. O `.peak-glow` simplesmente fica vermelho instantâneo quando clip — comportamento mais correto para uso ao vivo.
+
+```css
+/* ANTES */
+.fader-card { transition: border-color 0.2s, box-shadow 0.2s; }
+.fader-card.has-meter { transition: background-size 0.05s linear; }
+
+/* DEPOIS */
+.fader-card { transition: none; }
+.fader-card.has-meter { transition: none; }
+```
+
+**Impacto:** Elimina interpolação CSS em 32 elementos a cada frame de meter e a cada evento de peak.
+
+---
+
+### H. Simplificar `text-shadow` em `.fader-card.has-meter > *` (style.css)
+
+**Problema:** `text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9)` — dois blurs em todos os filhos de 32 cards. Quando `background-size` muda (meter mobile), o browser repinta os textos com blur computado.
+
+```css
+/* ANTES */
+.fader-card.has-meter>* {
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9);
+}
+
+/* DEPOIS — sombra sólida, sem blur */
+.fader-card.has-meter>* {
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
+}
+```
+
+**Impacto:** Elimina blur computado em N × 32 elementos durante cada repaint de meter.
+
+---
+
+### I. Remover `backdrop-filter: blur()` do modal de Macros (index.html)
+
+**Problema:** O modal `#macrosModal` usa `backdrop-filter: blur(3px)` inline. Ao abrir, o browser precisa renderizar **todo o conteúdo abaixo** (32 faders + meters em execução) e aplicar blur — pico de GPU.
+
+```html
+<!-- ANTES -->
+style="... backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);"
+
+<!-- DEPOIS -->
+style="... background: rgba(0, 0, 0, 0.75);"
+```
+
+**Impacto:** Elimina pico de composição GPU ao abrir macros.
+
+---
+
+### J. Adicionar `contain: layout style paint` nos fader cards (style.css)
+
+**Problema:** Nenhum container de fader usa `contain` CSS. Quando um meter muda, o browser recalcula layout e estilo de toda a árvore DOM.
+
+```css
+/* ADICIONAR */
+.fader-card,
+.fader-card-desktop {
+    contain: layout style paint;
+}
+
+.faders-area {
+    contain: layout style;
+}
+```
+
+> ⚠️ Usar `contain: layout style paint` (não `strict`) para evitar problemas com `position: absolute` de filhos como `.mobile-db-scale-overlay` e `.desk-peak-led`.
+
+**Impacto:** Isola o custo de recálculo de estilo e layout por canal — essencial para dispositivos lentos.
+
+---
+
+### K. Adicionar `will-change: transform` nos curtains (style.css)
+
+**Problema:** `.desk-meter-curtain` recebe `style.transform = scaleY(...)` a cada frame de meter, mas sem `will-change`, o browser pode não promovê-los a camadas GPU, forçando repaint da subárvore.
+
+```css
+/* ADICIONAR */
+.desk-meter-curtain {
+    will-change: transform;
+}
+```
+
+**Impacto:** Promove curtains a camadas GPU independentes, eliminando repaint da árvore pai a cada frame.
+
+---
+
+## 🟢 Gargalos Médios
+
+### L. `passive: false` no wheel listener (events.js)
+
+O listener global de `wheel` (linha 369 de events.js) usa `{ passive: false }` pois precisa chamar `e.preventDefault()` para bloquear scroll vertical nos faders desktop. **Esse não pode ser alterado.**
+
+O `scroll.js` (linha 14) também usa `{ passive: false }` no drag scroll. Esse poderia receber uma guarda por `layoutMode`:
+
+```javascript
+el.addEventListener('wheel', handler, { passive: layoutMode !== 'desktop' });
+```
+
+Mas como o drag scroll é usado em modais (AUX sends) que rodam em qualquer layout, é uma mudança de risco médio. **Manter como está por ora.**
+
+---
+
+## 🔵 Estratégias de Médio Prazo
+
+### M. Visibility API — modo economia de energia
+
+Para reduzir o processamento quando a janela ou aba não está em primeiro plano, usar a Page Visibility API (código já elaborado no plano original — salvar como `public/modules/visibility.js`).
+
+> ⚠️ A função `socket.emit = noop` que pausa emissões **não deve pausar eventos de sync entrante** (listeners). Apenas emissões de controle do usuário ficam pausadas.
+
+### N. Refatoração do `initUI` (longo prazo)
+
+Migrar `container.innerHTML = html` para manipulação incremental de nós DOM (`createElement`, `replaceChild`). Alta complexidade, alto risco. Requer testes extensivos por envolver a feature de sync. **Não implementar sem cobertura de testes**.
+
+### O. Virtualização de canais
+
+Renderizar apenas os canais visíveis na viewport usando `IntersectionObserver`. Reduziria o DOM node count de ~6.761 para ~2.000. Alto impacto, alta complexidade.
+
+---
+
+## 📋 Sequência de Implementação Aprovada
+
+| # | Prioridade | Mudança | Arquivo | Risco Sync |
+|---|-----------|---------|---------|-----------|
+| A | 🔴 Crítico | Cache de elementos dos meters | `socket.js` + `channel_strip.js` | **Zero** |
+| B | 🔴 Crítico | Throttle EQ canvas para ~20fps | `eq.js` | **Zero** |
+| C | 🔴 Crítico | Throttle meters para ~30fps | `socket.js` | **Zero** (visual only) |
+| D | 🔴 Crítico | `Date.now()` fora do loop | `socket.js` | **Zero** |
+| E | 🟡 Alto | Remover `backdrop-filter` do `.ch-name` | `style.css` | **Zero** |
+| F | 🟡 Alto | `box-shadow` → `border` lateral nos groups | `style.css` | **Zero** |
+| G | 🟡 Alto | Remover `transition` dos fader cards | `style.css` | **Zero** |
+| H | 🟡 Alto | Simplificar `text-shadow` do `.has-meter` | `style.css` | **Zero** |
+| I | 🟡 Alto | Remover `backdrop-filter` do modal Macros | `index.html` | **Zero** |
+| J | 🟡 Alto | Adicionar `contain` nos fader cards | `style.css` | **Zero** |
+| K | 🟢 Médio | `will-change: transform` nos curtains | `style.css` | **Zero** |
+
+---
+
+## 🛠️ Sugestões Adicionais (Referência Futura)
+
+1. **Debounce / Throttle em eventos de alta frequência** — `wheel`, `mousemove`, `touchmove` com debounce de 100ms onde aplicável.
+2. **Web Workers para cálculos pesados** — mover `rawToDb()` / `dbToRaw()` para Worker se o volume crescer.
+3. **Cache de seletores além do `socket.js`** — estender o padrão `meterElementsCache` a outros módulos com loops (ex: `auxs_sends.js`).
+4. **Monitoramento de performance em produção** — `PerformanceObserver` para coletar INP, FID e FCP e enviar para endpoint de log.
