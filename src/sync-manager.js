@@ -44,6 +44,20 @@ class SyncManager {
             this.io.emit('syncStatus', { active: true, type: type });
         }
 
+        // Aquece o scheduler com 64 stop requests (~1 segundo de warmup) antes dos params.
+        // Isso garante que a CPU da mesa saiu totalmente do estado de processamento da cena.
+        for (let i = 0; i < 64; i++) {
+            this.scheduler.enqueue(masterMeter.buildStopRequest(), 1);
+        }
+
+        // REDUNDÂNCIA: Pede fader e on dos primeiros 4 canais antecipadamente.
+        // Se a mesa ainda estiver "acordando", esses podem falhar, mas o loop principal 
+        // logo abaixo tentará novamente, aumentando a chance de sucesso no Canal 1.
+        for (let i = 0; i < 4; i++) {
+            this.scheduler.enqueue(protocol.buildRequest('kInputFader/kFader', i), 1);
+            this.scheduler.enqueue(protocol.buildRequest('kInputChannelOn/kChannelOn', i), 1);
+        }
+
         this._queueAllParams(forceNames, targetSocket);
     }
 

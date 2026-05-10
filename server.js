@@ -738,11 +738,15 @@ io.on('connection', (socket) => {
                 // As cenas já estão em cache — um fetchScenes() aqui competiria com os
                 // requests de parâmetros no scheduler MIDI, causando gargalo e pulando
                 // os primeiros canais (bug: sync começava no canal 12).
-                if (syncManager) {
-                    isSyncing = true;
-                    isFullySynced = false;
-                    syncManager.fireParamsOnly(null, false, 'is_scene');
-                }
+                // +1200ms extra para garantir que a mesa não descarte o canal 1.
+                // O Canal 1 é o mais sensível pois é o primeiro da fila após o recall.
+                setTimeout(() => {
+                    if (syncManager) {
+                        isSyncing = true;
+                        isFullySynced = false;
+                        syncManager.fireParamsOnly(null, false, 'is_scene');
+                    }
+                }, 1200);
             }
         }, configConstants.scene_recall_delay_ms);
     });
