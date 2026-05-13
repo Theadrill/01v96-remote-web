@@ -160,7 +160,7 @@ for (let i = 0; i < faderCardsCache.length; i++) {
 
 ## 🟡 Gargalos Altos — CSS (style.css + index.html)
 
-### E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css)
+### E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css) ✅ FEITO
 
 **Problema:** `.ch-name` usa `backdrop-filter: blur(3px)` — são **32+ instâncias permanentes** na tela principal. Cada `backdrop-filter` força o browser a criar uma camada GPU separada, renderizar tudo abaixo dela e aplicar blur. Em dispositivos com GPU integrada/fraca, é catastrófico.
 
@@ -183,7 +183,7 @@ for (let i = 0; i < faderCardsCache.length; i++) {
 
 ---
 
-### F. Substituir `box-shadow inset` dos fader groups por `border` lateral (style.css)
+### F. Substituir `box-shadow inset` dos fader groups por `border` lateral (style.css) ✅ FEITO
 
 **Problema:** `.fader-group-1` e `.fader-group-2` usam `box-shadow` com `inset` + sombra externa. Com 32 cards sofrendo repaint frequente (meters), o custo de renderizar `box-shadow inset` se multiplica.
 
@@ -217,7 +217,7 @@ for (let i = 0; i < faderCardsCache.length; i++) {
 
 ---
 
-### G. Remover `transition` dos fader cards (style.css)
+### G. Remover `transition` dos fader cards (style.css) ✅ FEITO
 
 **Problema:**
 - `.fader-card { transition: border-color 0.2s, box-shadow 0.2s; }` — força interpolação CSS quando `.peak-glow` é adicionado/removido, em paralelo com o rAF.
@@ -239,7 +239,7 @@ for (let i = 0; i < faderCardsCache.length; i++) {
 
 ---
 
-### H. Simplificar `text-shadow` em `.fader-card.has-meter > *` (style.css)
+### H. Simplificar `text-shadow` em `.fader-card.has-meter > *` (style.css) ✅ FEITO
 
 **Problema:** `text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9)` — dois blurs em todos os filhos de 32 cards. Quando `background-size` muda (meter mobile), o browser repinta os textos com blur computado.
 
@@ -259,7 +259,7 @@ for (let i = 0; i < faderCardsCache.length; i++) {
 
 ---
 
-### I. Remover `backdrop-filter: blur()` do modal de Macros (index.html)
+### I. Remover `backdrop-filter: blur()` do modal de Macros (index.html) ✅ FEITO
 
 **Problema:** O modal `#macrosModal` usa `backdrop-filter: blur(3px)` inline. Ao abrir, o browser precisa renderizar **todo o conteúdo abaixo** (32 faders + meters em execução) e aplicar blur — pico de GPU.
 
@@ -275,7 +275,7 @@ style="... background: rgba(0, 0, 0, 0.75);"
 
 ---
 
-### J. Adicionar `contain: layout style paint` nos fader cards (style.css)
+### J. Adicionar `contain: layout style paint` nos fader cards (style.css) ✅ FEITO
 
 **Problema:** Nenhum container de fader usa `contain` CSS. Quando um meter muda, o browser recalcula layout e estilo de toda a árvore DOM.
 
@@ -297,7 +297,7 @@ style="... background: rgba(0, 0, 0, 0.75);"
 
 ---
 
-### K. Adicionar `will-change: transform` nos curtains (style.css)
+### K. Adicionar `will-change: transform` nos curtains (style.css) ✅ FEITO
 
 **Problema:** `.desk-meter-curtain` recebe `style.transform = scaleY(...)` a cada frame de meter, mas sem `will-change`, o browser pode não promovê-los a camadas GPU, forçando repaint da subárvore.
 
@@ -354,13 +354,13 @@ Renderizar apenas os canais visíveis na viewport usando `IntersectionObserver`.
 | B | 🔴 Crítico | Throttle EQ canvas para ~20fps | `eq.js` | **Zero** |
 | C | 🔴 Crítico | Throttle meters para ~30fps | `socket.js` | **Zero** (visual only) | ✅ FEITO |
 | D | 🔴 Crítico | `Date.now()` fora do loop | `socket.js` | **Zero** | ✅ FEITO |
-| E | 🟡 Alto | Remover `backdrop-filter` do `.ch-name` | `style.css` | **Zero** |
-| F | 🟡 Alto | `box-shadow` → `border` lateral nos groups | `style.css` | **Zero** |
-| G | 🟡 Alto | Remover `transition` dos fader cards | `style.css` | **Zero** |
-| H | 🟡 Alto | Simplificar `text-shadow` do `.has-meter` | `style.css` | **Zero** |
-| I | 🟡 Alto | Remover `backdrop-filter` do modal Macros | `index.html` | **Zero** |
-| J | 🟡 Alto | Adicionar `contain` nos fader cards | `style.css` | **Zero** |
-| K | 🟢 Médio | `will-change: transform` nos curtains | `style.css` | **Zero** |
+| E | 🟡 Alto | Remover `backdrop-filter` do `.ch-name` | `style.css` | **Zero** | ✅ FEITO |
+| F | 🟡 Alto | `box-shadow` → `border` lateral nos groups | `style.css` | **Zero** | ✅ FEITO |
+| G | 🟡 Alto | Remover `transition` dos fader cards | `style.css` | **Zero** | ✅ FEITO |
+| H | 🟡 Alto | Simplificar `text-shadow` do `.has-meter` | `style.css` | **Zero** | ✅ FEITO |
+| I | 🟡 Alto | Remover `backdrop-filter` do modal Macros | `index.html` | **Zero** | ✅ FEITO |
+| J | 🟡 Alto | Adicionar `contain` nos fader cards | `style.css` | **Zero** | ✅ FEITO |
+| K | 🟢 Médio | `will-change: transform` nos curtains | `style.css` | **Zero** | ✅ FEITO |
 
 ---
 

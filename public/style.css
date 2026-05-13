@@ -22,7 +22,7 @@ body.layout-horizontal {
     flex-direction: column;
 }
 
-/* ÃƒÂrea dos faders com rolagem lateral fluida */
+/* ÃƒÂ rea dos faders com rolagem lateral fluida */
 .faders-area {
     flex: 1;
     display: flex;
@@ -36,6 +36,7 @@ body.layout-horizontal {
     scrollbar-width: none;
     min-height: 0;
     touch-action: pan-x;
+    contain: layout style;
 }
 
 body.layout-horizontal .faders-area {
@@ -72,7 +73,8 @@ body.layout-horizontal .faders-area {
     cursor: default;
     min-height: 0;
     position: relative;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: none !important;
+    contain: layout style paint;
 }
 
 .fader-card.peak-glow {
@@ -90,7 +92,7 @@ body.layout-horizontal .faders-area {
     background-position: bottom;
     background-size: 100% 0%;
     background-clip: border-box;
-    transition: background-size 0.05s linear;
+    transition: none !important;
     position: relative;
     overflow: hidden;
 }
@@ -147,11 +149,11 @@ body.layout-horizontal .faders-area {
     box-shadow: 0 0 10px #ff0000;
 }
 
-.fader-card.has-meter > *:not(.mobile-paired-meter),
-.fader-card.has-paired-meter > *:not(.mobile-paired-meter) {
+.fader-card.has-meter > *:not(.mobile-paired-meter):not(.btn-state),
+.fader-card.has-paired-meter > *:not(.mobile-paired-meter):not(.btn-state) {
     position: relative;
     z-index: 2;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9), -1px -1px 3px rgba(0, 0, 0, 0.9);
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
 }
 
 .fader-card.has-paired-meter {
@@ -174,7 +176,7 @@ body.layout-horizontal .faders-area {
     background-position: bottom;
     background-size: 100% 0%;
     background-clip: border-box;
-    transition: background-size 0.05s linear;
+    transition: none !important;
     z-index: 1;
     pointer-events: none;
 }
@@ -198,12 +200,12 @@ body.layout-horizontal .faders-area {
 /* Fader Groups Outline & Glow */
 .fader-group-1 {
     border-top: 3px solid #00adef !important;
-    box-shadow: 0 -5px 15px rgba(0, 173, 239, 0.2) inset, 0 0 5px rgba(0, 173, 239, 0.1);
+    box-shadow: none;
 }
 
 .fader-group-2 {
     border-top: 3px solid #00ff88 !important;
-    box-shadow: 0 -5px 15px rgba(0, 255, 136, 0.2) inset, 0 0 5px rgba(0, 255, 136, 0.1);
+    box-shadow: none;
 }
 
 /* VersÃƒÂ£o Desktop (Glow mais horizontal no pÃƒÂ© ou topo) */
@@ -433,8 +435,7 @@ body.layout-horizontal .side-btn {
 }
 
 .ch-name {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(3px);
+    background: rgba(0, 0, 0, 0.65);
     color: #0f0;
     padding: 2px;
     border-radius: 4px;
@@ -456,13 +457,13 @@ body.layout-horizontal .side-btn {
     margin-bottom: 6px;
     border-radius: 5px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 800;
     border: 1px solid #444;
     background: #333;
     color: #666;
     cursor: pointer;
     text-transform: uppercase;
-    transition: 0.2s;
+    transition: none;
 }
 
 .solo-active {
@@ -1003,7 +1004,8 @@ body.layout-desktop .sidebar {
     border-right: 1px solid #111;
     height: 100%;
     box-sizing: border-box;
-    transition: background 0.4s ease;
+    transition: none !important;
+    contain: layout style paint;
 }
 
 .fader-card-desktop.fader-group-1.desk-on-bg {
@@ -1031,8 +1033,9 @@ body.layout-desktop .sidebar {
     z-index: 2;
 }
 
+/* Removida borda grossa a cada 8 canais no desktop para ganhar espaÃƒÂ§o */
 .fader-card-desktop:nth-child(8n) {
-    border-right: 4px solid #000;
+    border-right: 1px solid #111;
 }
 
 .master-card-desktop {
