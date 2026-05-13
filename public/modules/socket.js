@@ -452,75 +452,101 @@ window.updateOpenBrowser = function(enabled) {
     socket.emit('updateOpenBrowser', { enabled: enabled });
 };
 
-window.resetFaderCache = () => { faderCardsCache = null; };
+window.resetFaderCache = () => { 
+    faderCardsCache = null; 
+    meterElementsCache = null;
+};
 
 let smoothedLevels = new Array(64).fill(0);
 let lastPeakTime = new Array(64).fill(0);
+let meterElementsCache = null;
+
+function buildMeterCache() {
+    if (!faderCardsCache || !faderCardsCache.length) { 
+        meterElementsCache = null; 
+        return; 
+    }
+    meterElementsCache = new Array(faderCardsCache.length);
+    for (let i = 0; i < faderCardsCache.length; i++) {
+        const card = faderCardsCache[i];
+        meterElementsCache[i] = {
+            card,
+            dataCh: card.getAttribute('data-ch'),
+            partnerCh: card.getAttribute('data-partner-ch'),
+            curtains: Array.from(card.querySelectorAll('.desk-meter-curtain')),
+            peakLed: card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led'),
+            hasMeter: card.classList.contains('has-meter'),
+            isPeakActive: false
+        };
+    }
+}
 
 socket.on('meterData', (levels) => {
     if (musicianMode) return;
 
-    // faderCardsCache é preenchido na primeira execução e invalidado quando a UI é recarregada
+    // Cache preenchido na primeira vez ou após resetFaderCache
     if (!faderCardsCache) {
-        // Seleciona cards de ambos os layouts (Mobile/Desktop) e containers (Area/Master)
         faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
+        buildMeterCache();
     }
 
     requestAnimationFrame(() => {
-        if (!faderCardsCache) {
-            faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
-        }
-        if (!faderCardsCache || !faderCardsCache.length) return;
+        // Se o cache falhou por algum motivo de race condition
+        if (!meterElementsCache) return;
+
+        const now = Date.now(); // Otimização (Plano D): Date.now() chamado apenas uma vez por frame
 
         if (outsMode) {
             // No modo OUTS, mapeamos os índices recebidos para Mix/Bus/Master
-            // 34-41: Mixes, 42-49: Buses, 32: Stereo Master L
-            for (let i = 0; i < faderCardsCache.length; i++) {
-                const card = faderCardsCache[i];
-                if (!card) continue;
+            for (let i = 0; i < meterElementsCache.length; i++) {
+                const cached = meterElementsCache[i];
+                if (!cached || !cached.card) continue;
 
                 let levelIdx = -1;
-                const dataCh = card.getAttribute('data-ch');
-                if (dataCh === 'master') levelIdx = 32;
+                if (cached.dataCh === 'master') levelIdx = 32;
                 else if (i < 8) levelIdx = 34 + i;       // Mix 1-8
                 else if (i < 16) levelIdx = 42 + (i - 8); // Bus 1-8
-                else levelIdx = parseInt(dataCh);
+                else levelIdx = parseInt(cached.dataCh);
 
                 if (levelIdx >= 0 && levelIdx < levels.length) {
                     const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
                     smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.05) + (targetPercent * 0.95);
                     const finalPercent = smoothedLevels[levelIdx];
 
-                    const meterCurtain = card.querySelector('.desk-meter-curtain');
-                    const peakLed = card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led');
-                    if (meterCurtain) {
-                        meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                    if (cached.curtains && cached.curtains.length > 0) {
+                        cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
                     } else {
-                        if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-                        card.style.backgroundSize = `100% ${finalPercent}%`;
+                        if (!cached.hasMeter) {
+                            cached.card.classList.add('has-meter');
+                            cached.hasMeter = true;
+                        }
+                        cached.card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
-                    if (peakLed) {
+
+                    if (cached.peakLed) {
                         if (finalPercent >= 98) {
-                            peakLed.classList.add('active');
-                            card.classList.add('peak-glow');
+                            if (!cached.isPeakActive) {
+                                cached.peakLed.classList.add('active');
+                                cached.card.classList.add('peak-glow');
+                                cached.isPeakActive = true;
+                            }
                         } else {
-                            peakLed.classList.remove('active');
-                            card.classList.remove('peak-glow');
+                            if (cached.isPeakActive) {
+                                cached.peakLed.classList.remove('active');
+                                cached.card.classList.remove('peak-glow');
+                                cached.isPeakActive = false;
+                            }
                         }
                     }
-
-
                 }
             }
         } else {
-            // Modo normal: 0-31 Canais, e o último card é o Stereo Master se existir
-            for (let i = 0; i < faderCardsCache.length; i++) {
-                const card = faderCardsCache[i];
-                if (!card) continue;
+            // Modo normal: 0-31 Canais e Master
+            for (let i = 0; i < meterElementsCache.length; i++) {
+                const cached = meterElementsCache[i];
+                if (!cached || !cached.card) continue;
 
-                const dataCh = card.getAttribute('data-ch');
-                const partnerCh = card.getAttribute('data-partner-ch');
-                let levelIdx = (dataCh === 'master') ? 32 : parseInt(dataCh);
+                let levelIdx = (cached.dataCh === 'master') ? 32 : parseInt(cached.dataCh);
 
                 if (levelIdx >= 0 && levelIdx < (levels ? levels.length : 0)) {
                     // Update main level
@@ -528,44 +554,49 @@ socket.on('meterData', (levels) => {
                     smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.2) + (targetPercent * 0.8);
                     const finalPercent = smoothedLevels[levelIdx];
 
-                    // Determine peak state (main OR partner)
                     let isPeaking = finalPercent >= 98;
                     let partnerPercent = 0;
 
                     // Support for dual meters (Paired channels)
-                    const curtains = card.querySelectorAll('.desk-meter-curtain');
-                    if (curtains.length > 0) {
+                    if (cached.curtains && cached.curtains.length > 0) {
                         // Main curtain
-                        curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                        cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
                         
                         // Check if channel is paired via channelStates
                         const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                        if (s && s.paired && s.pairedWith !== null && curtains.length > 1) {
+                        if (s && s.paired && s.pairedWith !== null && cached.curtains.length > 1) {
                             const pIdx = s.pairedWith;
                             if (pIdx < levels.length) {
                                 const pTarget = calibrateStep(levels[pIdx], false);
                                 smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
                                 partnerPercent = smoothedLevels[pIdx];
-                                curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                                cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
                                 if (partnerPercent >= 98) isPeaking = true;
                             }
                         }
                     } else {
-                        // Mobile layout (background-based meter)
-                        if (!card.classList.contains('has-meter')) card.classList.add('has-meter');
-                        card.style.backgroundSize = `100% ${finalPercent}%`;
+                        // Mobile layout
+                        if (!cached.hasMeter) {
+                            cached.card.classList.add('has-meter');
+                            cached.hasMeter = true;
+                        }
+                        cached.card.style.backgroundSize = `100% ${finalPercent}%`;
                     }
 
-                    // Peak LED and Glow handling
-                    const peakLed = card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led');
-                    const now = Date.now();
+                    // Peak LED and Glow handling with condition logic
                     if (isPeaking) {
                         lastPeakTime[levelIdx] = now;
-                        if (peakLed) peakLed.classList.add('active');
-                        card.classList.add('peak-glow');
+                        if (!cached.isPeakActive) {
+                            if (cached.peakLed) cached.peakLed.classList.add('active');
+                            cached.card.classList.add('peak-glow');
+                            cached.isPeakActive = true;
+                        }
                     } else if (now - lastPeakTime[levelIdx] > 1000) {
-                        if (peakLed) peakLed.classList.remove('active');
-                        card.classList.remove('peak-glow');
+                        if (cached.isPeakActive) {
+                            if (cached.peakLed) cached.peakLed.classList.remove('active');
+                            cached.card.classList.remove('peak-glow');
+                            cached.isPeakActive = false;
+                        }
                     }
                 }
             }
@@ -576,8 +607,6 @@ socket.on('meterData', (levels) => {
             const miniCard = document.getElementById(`mini-card${activeConfigChannel}`);
             if (miniCard) {
                 const levelIdx = activeConfigChannel;
-                const targetPercent = calibrateStep(levels[levelIdx], false);
-                // Usamos o mesmo array de suavização para manter a consistência
                 const finalPercent = smoothedLevels[levelIdx];
 
                 const meterCurtain = miniCard.querySelector('.desk-meter-curtain');
@@ -587,7 +616,7 @@ socket.on('meterData', (levels) => {
                     meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
                 } else {
                     if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
-                    miniCard.style.backgroundSize = `100% ${finalPercent}%`; // Layout Mobile
+                    miniCard.style.backgroundSize = `100% ${finalPercent}%`;
                 }
 
                 if (finalPercent >= 98) {

@@ -95,10 +95,8 @@ const loadConfigConstants = () => {
   try {
     if (fs.existsSync(configFile)) {
       const loadedConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-      // Extrair apenas as constantes de configuração (excluindo as configurações de conexão)
       configConstants = {
-        meter_throttle_demo_ms: loadedConfig.meter_throttle_demo_ms || 33,
-        meter_throttle_real_ms: loadedConfig.meter_throttle_real_ms || 50,
+        meter_fps: loadedConfig.meter_fps !== undefined ? loadedConfig.meter_fps : 20,
         watchdog_timeout_ms: loadedConfig.watchdog_timeout_ms || 5000,
         meter_poll_interval_ms: loadedConfig.meter_poll_interval_ms || 41,
         name_save_debounce_ms: loadedConfig.name_save_debounce_ms || 1000,
@@ -111,10 +109,8 @@ const loadConfigConstants = () => {
         dmx_boot_delay_ms: loadedConfig.dmx_boot_delay_ms || 3000
       };
     } else {
-      // Valores padrão se o arquivo não existir
       configConstants = {
-        meter_throttle_demo_ms: 33,
-        meter_throttle_real_ms: 50,
+        meter_fps: 20,
         watchdog_timeout_ms: 5000,
         meter_poll_interval_ms: 41,
         name_save_debounce_ms: 1000,
@@ -129,10 +125,8 @@ const loadConfigConstants = () => {
     }
   } catch (err) {
     console.error('❌ [SERVER] Erro ao carregar config.json para constantes:', err.message);
-    // Valores padrão em caso de erro
     configConstants = {
-      meter_throttle_demo_ms: 33,
-      meter_throttle_real_ms: 50,
+      meter_fps: 20,
       watchdog_timeout_ms: 5000,
       meter_poll_interval_ms: 41,
       name_save_debounce_ms: 1000,
@@ -195,10 +189,12 @@ const handleMIDIData = (midiData, rawMessage = null) => {
             }
         }
 
-        // Emissão Throttled para a Web: METER_THROTTLE_DEMO_MS (~30fps) em demo, METER_THROTTLE_REAL_MS (~20fps) com mesa real
+        // Emissão Dinâmica baseada em FPS (config.json)
+        if (configConstants.meter_fps <= 0) return;
+        const throttleMs = 1000 / configConstants.meter_fps;
+
         const now = Date.now();
-        const throttleMs = isDemoMode ? configConstants.meter_throttle_demo_ms : configConstants.meter_throttle_real_ms;
-        if (now - lastMeterTime > throttleMs) {
+        if (now - lastMeterTime >= throttleMs) {
             io.emit('meterData', meterDataBuffer);
             lastMeterTime = now;
         }
