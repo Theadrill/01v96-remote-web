@@ -96,7 +96,7 @@ const loadConfigConstants = () => {
     if (fs.existsSync(configFile)) {
       const loadedConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
       configConstants = {
-        meter_fps: loadedConfig.meter_fps !== undefined ? loadedConfig.meter_fps : 20,
+        meter_fps_desktop: loadedConfig.meter_fps_desktop !== undefined ? loadedConfig.meter_fps_desktop : 30,
         watchdog_timeout_ms: loadedConfig.watchdog_timeout_ms || 5000,
         meter_poll_interval_ms: loadedConfig.meter_poll_interval_ms || 41,
         name_save_debounce_ms: loadedConfig.name_save_debounce_ms || 1000,
@@ -110,7 +110,7 @@ const loadConfigConstants = () => {
       };
     } else {
       configConstants = {
-        meter_fps: 20,
+        meter_fps_desktop: 30,
         watchdog_timeout_ms: 5000,
         meter_poll_interval_ms: 41,
         name_save_debounce_ms: 1000,
@@ -126,7 +126,7 @@ const loadConfigConstants = () => {
   } catch (err) {
     console.error('❌ [SERVER] Erro ao carregar config.json para constantes:', err.message);
     configConstants = {
-      meter_fps: 20,
+      meter_fps_desktop: 30,
       watchdog_timeout_ms: 5000,
       meter_poll_interval_ms: 41,
       name_save_debounce_ms: 1000,
@@ -190,8 +190,8 @@ const handleMIDIData = (midiData, rawMessage = null) => {
         }
 
         // Emissão Dinâmica baseada em FPS (config.json)
-        if (configConstants.meter_fps <= 0) return;
-        const throttleMs = 1000 / configConstants.meter_fps;
+        if (configConstants.meter_fps_desktop <= 0) return;
+        const throttleMs = 1000 / configConstants.meter_fps_desktop;
 
         const now = Date.now();
         if (now - lastMeterTime >= throttleMs) {

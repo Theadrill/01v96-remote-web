@@ -428,6 +428,11 @@ socket.on('portsList', (data) => {
 
     if (data.savedConfig) {
         window.isDemoMode = !!data.savedConfig.demo_mode;
+        
+        const fpsMobile = data.savedConfig.meter_fps_mobile || 15;
+        const fpsDesktop = data.savedConfig.meter_fps_desktop || 30;
+        currentMeterFPS = isMobileAgent ? fpsMobile : fpsDesktop;
+        
         if (demoBtn) {
             const isDemo = !!data.savedConfig.demo_mode;
             demoBtn.innerText = isDemo ? 'DEMO OFF' : 'DEMO ON';
@@ -461,6 +466,10 @@ let smoothedLevels = new Array(64).fill(0);
 let lastPeakTime = new Array(64).fill(0);
 let meterElementsCache = null;
 
+let lastMeterRenderTime = 0;
+let currentMeterFPS = 30;
+const isMobileAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 function buildMeterCache() {
     if (!faderCardsCache || !faderCardsCache.length) { 
         meterElementsCache = null; 
@@ -484,6 +493,13 @@ function buildMeterCache() {
 
 socket.on('meterData', (levels) => {
     if (musicianMode) return;
+
+    if (currentMeterFPS > 0) {
+        const now = performance.now();
+        const renderInterval = 1000 / currentMeterFPS;
+        if (now - lastMeterRenderTime < renderInterval) return;
+        lastMeterRenderTime = now;
+    }
 
     // Cache preenchido na primeira vez ou após resetFaderCache
     if (!faderCardsCache) {

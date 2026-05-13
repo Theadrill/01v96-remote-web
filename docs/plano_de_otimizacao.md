@@ -34,7 +34,7 @@ O "Layerize" (gerenciamento de camadas) consumiu impressionantes **8.496 ms** do
 
 ## 🔴 Gargalos Críticos — Implementação Imediata
 
-### A. Cache de elementos dos meters (socket.js + channel_strip.js)
+### A. Cache de elementos dos meters (socket.js + channel_strip.js) ✅ FEITO
 
 **Problema:** Dentro do `requestAnimationFrame` de `meterData` (socket.js ~linha 469), o código executa a cada frame (60Hz):
 - `card.querySelectorAll('.desk-meter-curtain')` — até 32× por frame
@@ -102,7 +102,7 @@ Também reduzir steps da curva em telas pequenas: `Math.min(w, 400)` → `Math.m
 
 ---
 
-### C. Throttle dos meters para ~30fps (socket.js)
+### C. Throttle dos meters para ~30fps/15fps (socket.js) ✅ FEITO
 
 **Problema:** Cada pacote `meterData` do socket dispara um `requestAnimationFrame`. Se o servidor envia a 60Hz, são 60 renders/segundo de UI.
 
@@ -140,7 +140,7 @@ socket.on('meterData', (levels) => {
 
 ---
 
-### D. `Date.now()` fora do loop de canais (socket.js)
+### D. `Date.now()` fora do loop de canais (socket.js) ✅ FEITO
 
 **Problema:** `const now = Date.now()` está dentro do loop `for (let i = 0; ...)` (linha ~561), chamando o relógio do sistema N vezes por frame.
 
@@ -350,10 +350,10 @@ Renderizar apenas os canais visíveis na viewport usando `IntersectionObserver`.
 
 | # | Prioridade | Mudança | Arquivo | Risco Sync |
 |---|-----------|---------|---------|-----------|
-| A | 🔴 Crítico | Cache de elementos dos meters | `socket.js` + `channel_strip.js` | **Zero** |
+| A | 🔴 Crítico | Cache de elementos dos meters | `socket.js` + `channel_strip.js` | **Zero** | ✅ FEITO |
 | B | 🔴 Crítico | Throttle EQ canvas para ~20fps | `eq.js` | **Zero** |
-| C | 🔴 Crítico | Throttle meters para ~30fps | `socket.js` | **Zero** (visual only) |
-| D | 🔴 Crítico | `Date.now()` fora do loop | `socket.js` | **Zero** |
+| C | 🔴 Crítico | Throttle meters para ~30fps | `socket.js` | **Zero** (visual only) | ✅ FEITO |
+| D | 🔴 Crítico | `Date.now()` fora do loop | `socket.js` | **Zero** | ✅ FEITO |
 | E | 🟡 Alto | Remover `backdrop-filter` do `.ch-name` | `style.css` | **Zero** |
 | F | 🟡 Alto | `box-shadow` → `border` lateral nos groups | `style.css` | **Zero** |
 | G | 🟡 Alto | Remover `transition` dos fader cards | `style.css` | **Zero** |

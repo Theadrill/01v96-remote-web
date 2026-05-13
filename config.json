@@ -8,7 +8,8 @@
     "192.168.15.99",
     "192.168.1.111"
   ],
-  "meter_fps": 30,
+  "meter_fps_desktop": 30,
+  "meter_fps_mobile": 10,
   "watchdog_timeout_ms": 5000,
   "meter_poll_interval_ms": 33,
   "name_save_debounce_ms": 1000,
