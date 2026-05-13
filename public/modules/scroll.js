@@ -5,13 +5,15 @@ function enableDragScroll(el) {
     let isDragging = false;
     let startX, startScrollLeft;
 
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     // Mouse Wheel
     el.addEventListener('wheel', (evt) => {
         if (evt.deltaY !== 0) {
-            evt.preventDefault();
+            if (!isMobile) evt.preventDefault();
             el.scrollLeft += evt.deltaY * 1.0;
         }
-    }, { passive: false });
+    }, { passive: isMobile });
 
     // Drag to scroll
     el.addEventListener('mousedown', (e) => {

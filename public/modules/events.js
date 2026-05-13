@@ -330,6 +330,8 @@ function handleWheelFader(e, ch, auxIdx) {
 }
 
 // Bloqueio de scroll por roda do mouse no modo Desktop e manipulação global de sliders
+const isMobileEvents = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 window.addEventListener('wheel', (e) => {
     if (layoutMode !== 'desktop') return;
 
@@ -341,7 +343,7 @@ window.addEventListener('wheel', (e) => {
         const parentWithWheel = input.parentElement.closest('[onwheel]');
         if (parentWithWheel && parentWithWheel.getAttribute('onwheel').includes('handleWheelFader')) return;
 
-        e.preventDefault();
+        if (!isMobileEvents) e.preventDefault();
         e.stopPropagation();
 
         const dir = e.deltaY < 0 ? 1 : -1;
@@ -363,10 +365,10 @@ window.addEventListener('wheel', (e) => {
     // Bloqueio de scroll na área dos faders (permitindo apenas horizontal via grab)
     const area = document.getElementById('faders-container');
     if (area && (area === e.target || area.contains(e.target))) {
-        e.preventDefault();
+        if (!isMobileEvents) e.preventDefault();
         e.stopPropagation();
     }
-}, { passive: false });
+}, { passive: isMobileEvents });
 
 // Logica de Arrastar para Scroll (Grab to Scroll) no Desktop
 let isMouseDown = false;
