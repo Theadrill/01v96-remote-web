@@ -147,10 +147,44 @@ body.layout-horizontal .faders-area {
     box-shadow: 0 0 10px #ff0000;
 }
 
-.fader-card.has-meter>* {
+.fader-card.has-meter > *:not(.mobile-paired-meter),
+.fader-card.has-paired-meter > *:not(.mobile-paired-meter) {
     position: relative;
     z-index: 2;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9), -1px -1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.fader-card.has-paired-meter {
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-paired-meter {
+    position: absolute !important;
+    top: 0;
+    bottom: 0;
+    width: 50% !important;
+    height: 100% !important;
+    background-image: linear-gradient(to top,
+            rgba(0, 255, 0, var(--meter-opacity, 0.4)) 0%,
+            rgba(100, 255, 0, var(--meter-opacity, 0.4)) 60%,
+            rgba(255, 221, 0, var(--meter-opacity, 0.5)) 85%,
+            rgba(255, 0, 0, var(--meter-opacity, 0.55)) 100%);
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 100% 0%;
+    background-clip: border-box;
+    transition: background-size 0.05s linear;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.mobile-paired-meter.left {
+    left: 0;
+}
+
+.mobile-paired-meter.right {
+    right: 0;
 }
 
 /* Master Fader Rule */

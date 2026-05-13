@@ -474,8 +474,9 @@ function buildMeterCache() {
             dataCh: card.getAttribute('data-ch'),
             partnerCh: card.getAttribute('data-partner-ch'),
             curtains: Array.from(card.querySelectorAll('.desk-meter-curtain')),
+            mobileBgs: Array.from(card.querySelectorAll('.mobile-paired-meter')),
             peakLed: card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led'),
-            hasMeter: card.classList.contains('has-meter'),
+            hasMeter: card.classList.contains('has-meter') || card.classList.contains('has-paired-meter'),
             isPeakActive: false
         };
     }
@@ -574,8 +575,25 @@ socket.on('meterData', (levels) => {
                                 if (partnerPercent >= 98) isPeaking = true;
                             }
                         }
+                    } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
+                        if (!cached.card.classList.contains('has-paired-meter')) {
+                            cached.card.classList.add('has-paired-meter');
+                        }
+                        cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
+                        
+                        const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
+                        if (s && s.paired && s.pairedWith !== null && cached.mobileBgs.length > 1) {
+                            const pIdx = s.pairedWith;
+                            if (pIdx < levels.length) {
+                                const pTarget = calibrateStep(levels[pIdx], false);
+                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
+                                partnerPercent = smoothedLevels[pIdx];
+                                cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
+                                if (partnerPercent >= 98) isPeaking = true;
+                            }
+                        }
                     } else {
-                        // Mobile layout
+                        // Mobile layout regular
                         if (!cached.hasMeter) {
                             cached.card.classList.add('has-meter');
                             cached.hasMeter = true;

@@ -290,7 +290,9 @@ function createMobileStrip(config) {
         dbLabel = "-∞",
         isOn = false,
         dataCh = "",
-        onTop = false   // Se true, renderiza o botão ON antes do título/fader
+        onTop = false,   // Se true, renderiza o botão ON antes do título/fader
+        isPaired = false,
+        partnerId = null
     } = config;
 
     const pfx = config.idPrefix || "";
@@ -305,7 +307,11 @@ function createMobileStrip(config) {
     const onBtn = `<button id="${onId}" class="btn-state ${isOn ? 'on-active' : ''}" onclick="${onAction}">On</button>`;
 
     return `
-        <div class="fader-card ${customClass}" id="${cardId}" ${dataCh ? `data-ch="${dataCh}"` : ''}>
+        <div class="fader-card ${customClass}" id="${cardId}" ${dataCh ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
+            ${isPaired ? `
+            <div class="mobile-paired-meter left"></div>
+            <div class="mobile-paired-meter right"></div>
+            ` : ''}
             ${getMobileScaleHTML()}
             ${onTop ? onBtn : ''}
             <div class="ch-clickable-zone" onclick="${isMaster ? '' : configAction}">
@@ -385,7 +391,9 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         dbLabel: rawToDb(val, true, isMaster),
         configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`),
         dataCh: isMaster ? "master" : i,
-        onTop: musicianMode  // Botão ON no topo apenas no modo músico
+        onTop: musicianMode,  // Botão ON no topo apenas no modo músico
+        isPaired: !isMaster && s.paired,
+        partnerId: !isMaster && s.paired ? s.pairedWith : null
     });
 }
 
