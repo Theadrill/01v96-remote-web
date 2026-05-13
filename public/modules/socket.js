@@ -470,12 +470,35 @@ let lastMeterRenderTime = 0;
 let currentMeterFPS = 30;
 const isMobileAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+let meterVisibilityObserver = null;
+
+function setupMeterObserver() {
+    if (meterVisibilityObserver) meterVisibilityObserver.disconnect();
+    
+    meterVisibilityObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (meterElementsCache) {
+                const cached = meterElementsCache.find(c => c && c.card === entry.target);
+                if (cached) cached.isVisible = entry.isIntersecting;
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: '150px', // Renderiza um pouco antes de entrar na tela
+        threshold: 0.01
+    });
+}
+
 function buildMeterCache() {
     if (!faderCardsCache || !faderCardsCache.length) { 
         meterElementsCache = null; 
         return; 
     }
     meterElementsCache = new Array(faderCardsCache.length);
+    
+    if (!meterVisibilityObserver) setupMeterObserver();
+    else meterVisibilityObserver.disconnect(); // Reseta os observadores antigos
+    
     for (let i = 0; i < faderCardsCache.length; i++) {
         const card = faderCardsCache[i];
         meterElementsCache[i] = {
@@ -486,8 +509,11 @@ function buildMeterCache() {
             mobileBgs: Array.from(card.querySelectorAll('.mobile-paired-meter')),
             peakLed: card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led'),
             hasMeter: card.classList.contains('has-meter') || card.classList.contains('has-paired-meter'),
-            isPeakActive: false
+            isPeakActive: false,
+            isVisible: true // Inicialmente true, o observer atualiza log em seguida
         };
+        
+        if (meterVisibilityObserver) meterVisibilityObserver.observe(card);
     }
 }
 
@@ -517,7 +543,7 @@ socket.on('meterData', (levels) => {
             // No modo OUTS, mapeamos os índices recebidos para Mix/Bus/Master
             for (let i = 0; i < meterElementsCache.length; i++) {
                 const cached = meterElementsCache[i];
-                if (!cached || !cached.card) continue;
+                if (!cached || !cached.card || !cached.isVisible) continue;
 
                 let levelIdx = -1;
                 if (cached.dataCh === 'master') levelIdx = 32;
@@ -561,7 +587,7 @@ socket.on('meterData', (levels) => {
             // Modo normal: 0-31 Canais e Master
             for (let i = 0; i < meterElementsCache.length; i++) {
                 const cached = meterElementsCache[i];
-                if (!cached || !cached.card) continue;
+                if (!cached || !cached.card || !cached.isVisible) continue;
 
                 let levelIdx = (cached.dataCh === 'master') ? 32 : parseInt(cached.dataCh);
 
