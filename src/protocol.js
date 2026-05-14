@@ -52,7 +52,8 @@ function buildChange(commandName, channelIndex, value, converterFunc) {
     // Tradução de Canal Global -> Local
     let localIndex = channelIndex;
     if (typeof channelIndex === 'number') {
-        if (commandName.includes('kAUX') && channelIndex >= 36) localIndex = channelIndex - 36;
+        if (channelIndex >= 60 && channelIndex <= 67) localIndex = 32 + (channelIndex - 60);
+        else if (commandName.includes('kAUX') && channelIndex >= 36) localIndex = channelIndex - 36;
         else if (commandName.includes('kBus') && channelIndex >= 44) localIndex = channelIndex - 44;
         else if (commandName.includes('kMatrix') && channelIndex >= 52) localIndex = channelIndex - 52;
         else if (commandName.includes('kStereo')) localIndex = 0;
@@ -70,7 +71,8 @@ function buildRequest(commandName, channelIndex) {
 
     let localIndex = channelIndex;
     if (typeof channelIndex === 'number') {
-        if (commandName.includes('kAUX') && channelIndex >= 36) localIndex = channelIndex - 36;
+        if (channelIndex >= 60 && channelIndex <= 67) localIndex = 32 + (channelIndex - 60);
+        else if (commandName.includes('kAUX') && channelIndex >= 36) localIndex = channelIndex - 36;
         else if (commandName.includes('kBus') && channelIndex >= 44) localIndex = channelIndex - 44;
         else if (commandName.includes('kMatrix') && channelIndex >= 52) localIndex = channelIndex - 52;
         else if (commandName.includes('kStereo')) localIndex = 0;
@@ -86,7 +88,10 @@ function buildNameRequest(channelIndex, charIndex) {
     let element = 4;
     let localCh = channelIndex;
 
-    if (channelIndex >= 36 && channelIndex <= 43) {
+    if (channelIndex >= 60 && channelIndex <= 67) {
+        element = 23;
+        localCh = Math.floor((channelIndex - 60) / 2);
+    } else if (channelIndex >= 36 && channelIndex <= 43) {
         element = 16;
         localCh = channelIndex - 36;
     } else if (channelIndex >= 44 && channelIndex <= 51) {
@@ -181,25 +186,28 @@ function parseIncoming(message) {
 
         // --- PRIORIDADE 1: NOMES DE CANAIS E CENAS ---
         // Se o elemento for um dos IDs de nome (4, 15, 16, 18) e o parâmetro estiver no range de caracteres (4-19)
-        if ([4, 15, 16, 18].includes(element) && parameter >= 4 && parameter <= 19) {
+        // Se o elemento for um dos IDs de nome (4, 15, 16, 18, 23) e o parâmetro estiver no range de caracteres (4-19)
+        if ([4, 15, 16, 18, 23].includes(element) && parameter >= 4 && parameter <= 19) {
             const charIndex = parameter - 4;
             const charCode = dataBytes[dataBytes.length - 1];
             const char = String.fromCharCode(charCode);
 
             // Traduz o canal local do módulo de volta para o ID global do sistema
-            let globalCh = channel;
-            if (element === 16) globalCh = 36 + channel;      // Mixes
-            else if (element === 15) globalCh = 44 + channel; // Buses
-            else if (element === 18) globalCh = 52;           // Stereo Master
+            let channelIndex = channel;
+            if (element === 4) channelIndex = channel; // 0-31 (CH1-32)
+            else if (element === 23) channelIndex = 60 + (channel * 2); // ST IN 1-4
+            else if (element === 16) channelIndex = 36 + channel; // AUX 1-8
+            else if (element === 15) channelIndex = 44 + channel; // BUS 1-8
+            else if (element === 18) channelIndex = 52; // MASTER
 
             // 🚨 [STRICT CHECK] Apenas Seção 13 (Current) e Grupo 2 contêm nomes de canais nesta estrutura de elemento/parâmetro
             if (message[4] !== 13 || group !== 2) return null;
 
-            // console.log(`✅ [NAME PARSED] Sec:${message[4]} Grp:${group} Elm:${element} Ch:${channel} -> Global:${globalCh} Pos:${charIndex} Char:'${char}' (Code:${charCode})`);
+            // console.log(`✅ [NAME PARSED] Sec:${message[4]} Grp:${group} Elm:${element} Ch:${channel} -> Global:${channelIndex} Pos:${charIndex} Char:'${char}' (Code:${charCode})`);
 
             return {
                 type: 'updateNameChar',
-                channel: globalCh,
+                channel: channelIndex,
                 charIndex: charIndex,
                 char: char
             };
@@ -300,10 +308,14 @@ function parseIncoming(message) {
             return { type: 'kSceneNumber', value: val };
         }
 
+        // Tradução de Canal para Faders/On (ST IN mapping)
+        let finalCh = channel;
+        if (channel >= 32 && channel <= 39) finalCh = 60 + (channel - 32);
+
         // Input Faders / On / Solo / Name / Attenuator etc
-        if (element === 28) return { type: 'kInputFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };
-        if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
-        if (element === 29) return { type: 'kInputAttenuator/kAtt', channel, value: CONVERTERS.bytesToSigned(dataBytes) };
+        if (element === 28) return { type: 'kInputFader/kFader', channel: finalCh, value: CONVERTERS.bytesToFader(dataBytes) };
+        if (element === 26) return { type: 'kInputChannelOn/kChannelOn', channel: finalCh, value: CONVERTERS.bytesToOn(dataBytes) };
+        if (element === 29) return { type: 'kInputAttenuator/kAtt', channel: finalCh, value: CONVERTERS.bytesToSigned(dataBytes) };
 
         // Mix (AUX) Master Faders / ON
         if (element === 57) return { type: 'kAUXFader/kFader', channel, value: CONVERTERS.bytesToFader(dataBytes) };

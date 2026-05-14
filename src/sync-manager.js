@@ -57,6 +57,12 @@ class SyncManager {
             this.scheduler.enqueue(protocol.buildRequest('kInputFader/kFader', i), 1);
             this.scheduler.enqueue(protocol.buildRequest('kInputChannelOn/kChannelOn', i), 1);
         }
+        
+        // ST IN (60-67)
+        for (let i = 60; i <= 67; i++) {
+            this.scheduler.enqueue(protocol.buildRequest('kInputFader/kFader', i), 1);
+            this.scheduler.enqueue(protocol.buildRequest('kInputChannelOn/kChannelOn', i), 1);
+        }
 
         this._queueAllParams(forceNames, targetSocket);
     }
@@ -121,6 +127,22 @@ class SyncManager {
             if (forceNames || !this.hasSyncedNamesThisSession) {
                 for (let c = 0; c < 4; c++) {
                     this.scheduler.enqueue(protocol.buildNameRequest(i, c), priority);
+                }
+            }
+        }
+        
+        // ST IN 1-4 (Canais 32-39)
+        for (let i = 32; i < 40; i++) {
+            this.scheduler.enqueue(protocol.buildRequest('kInputFader/kFader', i), priority);
+            this.scheduler.enqueue(protocol.buildRequest('kInputChannelOn/kChannelOn', i), priority);
+        }
+        
+        // Nomes dos ST IN (60, 62, 64, 66)
+        if (forceNames || !this.hasSyncedNamesThisSession) {
+            for (let i = 0; i < 4; i++) {
+                const globalId = 60 + (i * 2);
+                for (let c = 0; c < 4; c++) {
+                    this.scheduler.enqueue(protocol.buildNameRequest(globalId, c), priority);
                 }
             }
         }
@@ -234,6 +256,14 @@ class SyncManager {
         for (let i = 0; i < 32; i++) {
             for (let c = 0; c < 4; c++) {
                 this.scheduler.enqueue(protocol.buildNameRequest(i, c), 1);
+            }
+        }
+
+        // Nomes dos ST IN (60, 62, 64, 66)
+        for (let i = 0; i < 4; i++) {
+            const globalId = 60 + (i * 2);
+            for (let c = 0; c < 4; c++) {
+                this.scheduler.enqueue(protocol.buildNameRequest(globalId, c), 1);
             }
         }
 

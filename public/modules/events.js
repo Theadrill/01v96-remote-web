@@ -85,12 +85,12 @@ function updateConfigUIForChannel(ch) {
 
 function changeConfigChannel(delta) {
     let nextCh = activeConfigChannel;
-    
+
     // Loop para encontrar o próximo canal válido, pulando parceiros pareados
     let safetyCounter = 0;
     do {
         nextCh += delta;
-        
+
         // Pula o "gap" entre 32 e 36
         if (nextCh > 31 && nextCh < 36 && delta > 0) nextCh = 36;
         if (nextCh > 31 && nextCh < 36 && delta < 0) nextCh = 31;
@@ -98,11 +98,11 @@ function changeConfigChannel(delta) {
         // Limites circulares
         if (nextCh < 0) nextCh = 52;
         if (nextCh > 52) nextCh = 0;
-        
+
         // Se for um input (0-31) e for o canal PAR de um par ativo, continuamos buscando
         const s = (nextCh >= 0 && nextCh <= 31) ? channelStates[nextCh] : null;
         if (!s || !s.paired || nextCh % 2 === 0) break;
-        
+
         safetyCounter++;
     } while (nextCh !== activeConfigChannel && safetyCounter < 53);
 
@@ -152,19 +152,9 @@ function closeChannelConfig() {
 
 function toggleState(type, ch) {
     let val = false;
-    let s;
+    const s = getChannelStateById(ch);
+    if (!s) return;
     let actualType = type;
-
-    if (ch === 'master' || ch === 52) s = masterState;
-    else if ((typeof ch === 'string' && ch.startsWith('m')) || (ch >= 36 && ch <= 43)) {
-        const idx = typeof ch === 'string' ? ch.substring(1) : (ch - 36);
-        s = mixesState[idx];
-    }
-    else if ((typeof ch === 'string' && ch.startsWith('b')) || (ch >= 44 && ch <= 51)) {
-        const idx = typeof ch === 'string' ? ch.substring(1) : (ch - 44);
-        s = busesState[idx];
-    }
-    else s = channelStates[ch];
 
     // Se no modo músico ou técnico editando mix, o tipo base recebido (kInputChannelOn) vira o AUX ativo
     if ((musicianMode || technicianMixMode) && typeof ch === 'number' && type === 'kInputChannelOn/kChannelOn') {
@@ -193,7 +183,9 @@ function toggleState(type, ch) {
     // Para Mix/Bus, o canal emitido é o número após m/b. 
     // Importante: verificar 'master' primeiro para não confundir com Mixes (que começam com 'm')
     if (!appReady) return;
-    const emitCh = (ch === 'master') ? 0 : ((typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b'))) ? parseInt(ch.substring(1)) : ch);
+    let emitCh = ch;
+    if (ch === 'master' || ch === 52) emitCh = 0;
+    else if (typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b'))) emitCh = parseInt(ch.substring(1));
     socket.emit('control', { type: actualType, channel: emitCh, value: val ? 1 : 0 });
 }
 
@@ -219,11 +211,8 @@ function stopNudge() {
 }
 
 function nudgeFader(ch, dir) {
-    let s;
-    if (ch === 'master') s = masterState;
-    else if (typeof ch === 'string' && ch.startsWith('m')) s = mixesState[ch.substring(1)];
-    else if (typeof ch === 'string' && ch.startsWith('b')) s = busesState[ch.substring(1)];
-    else s = channelStates[ch];
+    const s = getChannelStateById(ch);
+    if (!s) return;
 
     let currentVal = ((musicianMode || technicianMixMode) && typeof ch === 'number') ? (s[`aux${activeMix}`] || 0) : s.value;
 
@@ -237,36 +226,48 @@ function nudgeFader(ch, dir) {
     if (nRaw < 0) nRaw = 0; if (nRaw > 1023) nRaw = 1023;
     updateUI(ch, nRaw, undefined, undefined);
 
-    const isMaster = ch === 'master';
-    const isMixOrBus = typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b')) && !isMaster;
+    const isMaster = ch === 'master' || ch === 52;
+    const isMix = (typeof ch === 'string' && ch.startsWith('m')) || (typeof ch === 'number' && ch >= 36 && ch <= 43);
+    const isBus = (typeof ch === 'string' && ch.startsWith('b')) || (typeof ch === 'number' && ch >= 44 && ch <= 51);
+    const isStIn = typeof ch === 'number' && ch >= 60 && ch <= 67;
 
     let typeFader;
     if (isMaster) typeFader = 'kStereoFader/kFader';
-    else if ((musicianMode || technicianMixMode) && typeof ch === 'number') typeFader = `kInputAUX/kAUX${activeMix}Level`;
-    else if (typeof ch === 'string' && ch.startsWith('m')) typeFader = 'kAUXFader/kFader';
-    else if (typeof ch === 'string' && ch.startsWith('b')) typeFader = 'kBusFader/kFader';
+    else if ((musicianMode || technicianMixMode) && typeof ch === 'number' && ch < 32) typeFader = `kInputAUX/kAUX${activeMix}Level`;
+    else if (isMix) typeFader = 'kAUXFader/kFader';
+    else if (isBus) typeFader = 'kBusFader/kFader';
     else typeFader = 'kInputFader/kFader';
 
     if (!appReady) return;
-    const emitCh = isMaster ? 0 : (isMixOrBus ? parseInt(ch.substring(1)) : ch);
+
+    let emitCh = ch;
+    if (isMaster) emitCh = 0;
+    else if (typeof ch === 'string') emitCh = parseInt(ch.substring(1));
+
     socket.emit('control', { type: typeFader, channel: emitCh, value: nRaw });
 }
 
 function commitFaderChange(ch, v) {
     updateUI(ch, v, undefined, undefined);
 
-    const isMaster = ch === 'master';
-    const isMixOrBus = typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b')) && !isMaster;
+    const isMaster = ch === 'master' || ch === 52;
+    const isMix = (typeof ch === 'string' && ch.startsWith('m')) || (typeof ch === 'number' && ch >= 36 && ch <= 43);
+    const isBus = (typeof ch === 'string' && ch.startsWith('b')) || (typeof ch === 'number' && ch >= 44 && ch <= 51);
+    const isStIn = typeof ch === 'number' && ch >= 60 && ch <= 67;
 
     let typeFader;
     if (isMaster) typeFader = 'kStereoFader/kFader';
-    else if ((musicianMode || technicianMixMode) && typeof ch === 'number') typeFader = `kInputAUX/kAUX${activeMix}Level`;
-    else if (typeof ch === 'string' && ch.startsWith('m')) typeFader = 'kAUXFader/kFader';
-    else if (typeof ch === 'string' && ch.startsWith('b')) typeFader = 'kBusFader/kFader';
+    else if ((musicianMode || technicianMixMode) && typeof ch === 'number' && ch < 32) typeFader = `kInputAUX/kAUX${activeMix}Level`;
+    else if (isMix) typeFader = 'kAUXFader/kFader';
+    else if (isBus) typeFader = 'kBusFader/kFader';
     else typeFader = 'kInputFader/kFader';
 
     if (!appReady) return;
-    const emitCh = isMaster ? 0 : (isMixOrBus ? parseInt(ch.substring(1)) : ch);
+
+    let emitCh = ch;
+    if (isMaster) emitCh = 0;
+    else if (typeof ch === 'string') emitCh = parseInt(ch.substring(1));
+
     socket.emit('control', { type: typeFader, channel: emitCh, value: v });
 }
 
@@ -293,7 +294,7 @@ function handleWheelFader(e, ch, auxIdx) {
         const currentRaw = state[`aux${auxIdx}`] || 0;
         // Sempre 0.5dB para envios auxiliares/músico conforme pedido ("0.5db nos demais")
         const nRaw = getSteppedRaw(currentRaw, dir, 0.5);
-        
+
         if (typeof updateAuxManual === 'function') {
             updateAuxManual(ch, auxIdx, nRaw);
             socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });

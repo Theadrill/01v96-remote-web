@@ -1321,6 +1321,14 @@ body.layout-desktop .sidebar .btn-outs {
     background: #1b5e20;
 }
 
+.fader-group-st {
+    border-left: 2px solid #8e24aa !important;
+}
+
+.fader-group-st .card-title {
+    color: #e1bee7 !important;
+}
+
 body.layout-desktop .sidebar .btn-sync {
     background: #004d99;
 }

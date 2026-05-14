@@ -4,7 +4,7 @@ const socket = io();
 let appReady = false; 
 const NUM_CHANNELS = 32;
 let channelStates = [];
-for (let i = 0; i < NUM_CHANNELS; i++) {
+for (let i = 0; i < 40; i++) {
     channelStates.push({ 
         value: 0, 
         on: false, 
@@ -93,6 +93,7 @@ function getChannelStateById(id) {
     }
 
     if (id >= 0 && id <= 31) return channelStates[id];
+    if (id >= 60 && id <= 67) return channelStates[32 + (id - 60)];
     if (id >= 36 && id <= 43) return mixesState[id - 36];
     if (id >= 44 && id <= 51) return busesState[id - 44];
     return null;
@@ -110,6 +111,7 @@ function getChannelParamPrefix(id) {
     }
 
     if (id >= 0 && id <= 31) return 'kInput';
+    if (id >= 60 && id <= 67) return 'kInput';
     if (id >= 36 && id <= 43) return 'kAUX';
     if (id >= 44 && id <= 51) return 'kBus';
     return 'kInput'; // Fallback
@@ -167,6 +169,10 @@ window.updateNameUI = function(channel, name) {
     if (channel >= 0 && channel <= 31) {
         baseId = `name${channel}`;
         displayTitle = `${channel + 1}`;
+    } else if (channel >= 60 && channel <= 67) {
+        const stNum = Math.floor((channel - 60) / 2) + 1;
+        baseId = `namest${stNum - 1}`;
+        displayTitle = `ST IN ${stNum}`;
     } else if (channel >= 36 && channel <= 43) {
         baseId = `namem${channel - 36}`;
         displayTitle = `MIX ${channel - 35}`;

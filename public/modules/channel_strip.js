@@ -55,22 +55,33 @@ function updateUI(ch, val, onState, soloState) {
 
     const isMaster = ch === 'master';
     let stateRef;
-    if (isMaster) stateRef = masterState;
-    else if (typeof ch === 'string' && ch.startsWith('m')) stateRef = mixesState[ch.substring(1)];
-    else if (typeof ch === 'string' && ch.startsWith('b')) stateRef = busesState[ch.substring(1)];
-    else stateRef = channelStates[ch];
+    let uiId = ch;
+    
+    if (isMaster) {
+        stateRef = masterState;
+    } else if (typeof ch === 'string' && ch.startsWith('m')) {
+        stateRef = mixesState[ch.substring(1)];
+    } else if (typeof ch === 'string' && ch.startsWith('b')) {
+        stateRef = busesState[ch.substring(1)];
+    } else if (typeof ch === 'number' && ch >= 60 && ch <= 67) {
+        stateRef = channelStates[32 + (ch - 60)];
+        const stIndex = Math.floor((ch - 60) / 2);
+        uiId = `st${stIndex}`;
+    } else {
+        stateRef = channelStates[ch];
+    }
 
     if (!stateRef) return;
 
     if (val !== undefined && val !== null) {
-        const elF = document.getElementById(`f${ch}`);
+        const elF = document.getElementById(`f${uiId}`);
         if (elF) elF.value = val;
-        const elFMini = document.getElementById(`mini-f${ch}`);
+        const elFMini = document.getElementById(`mini-f${uiId}`);
         if (elFMini) elFMini.value = val;
 
-        const elV = document.getElementById(`v${ch}`);
+        const elV = document.getElementById(`v${uiId}`);
         if (elV) elV.innerText = rawToDb(val, layoutMode !== 'desktop', isMaster);
-        const elVMini = document.getElementById(`mini-v${ch}`);
+        const elVMini = document.getElementById(`mini-v${uiId}`);
         if (elVMini) elVMini.innerText = rawToDb(val, false, isMaster);
 
         // Se no modo músico ou modo técnico editando mix, salvamos no AUX correspondente
@@ -86,28 +97,28 @@ function updateUI(ch, val, onState, soloState) {
         } else {
             stateRef.on = onState;
         }
-        const elOn = document.getElementById(`on${ch}`);
+        const elOn = document.getElementById(`on${uiId}`);
         if (elOn) elOn.classList.toggle('on-active', onState);
-        const elOnMini = document.getElementById(`mini-on${ch}`);
+        const elOnMini = document.getElementById(`mini-on${uiId}`);
         if (elOnMini) elOnMini.classList.toggle('on-active', onState);
 
         // Novo: Subtle yellow background for desktop layout when channel is ON
-        const elCard = document.getElementById(`card${ch}`);
+        const elCard = document.getElementById(`card${uiId}`);
         if (elCard && layoutMode === 'desktop') elCard.classList.toggle('desk-on-bg', onState);
-        const elCardMini = document.getElementById(`mini-card${ch}`);
+        const elCardMini = document.getElementById(`mini-card${uiId}`);
         if (elCardMini) elCardMini.classList.toggle('desk-on-bg', onState);
 
         // Novo: Colorized Label background
-        const elLabel = document.getElementById(`label${ch}`);
+        const elLabel = document.getElementById(`label${uiId}`);
         if (elLabel && layoutMode === 'desktop') elLabel.classList.toggle('label-on', onState);
-        const elLabelMini = document.getElementById(`mini-label${ch}`);
+        const elLabelMini = document.getElementById(`mini-label${uiId}`);
         if (elLabelMini) elLabelMini.classList.toggle('label-on', onState);
     }
     if (typeof ch === 'number' && soloState !== undefined && soloState !== null) {
         if (stateRef) stateRef.solo = soloState;
-        const elSolo = document.getElementById(`solo${ch}`);
+        const elSolo = document.getElementById(`solo${uiId}`);
         if (elSolo) elSolo.classList.toggle('solo-active', soloState);
-        const elSoloMini = document.getElementById(`mini-solo${ch}`);
+        const elSoloMini = document.getElementById(`mini-solo${uiId}`);
         if (elSoloMini) elSoloMini.classList.toggle('solo-active', soloState);
         // Atualiza o indicador de SOLO no master sempre que qualquer solo muda
         checkMasterSoloIndicator();
@@ -398,58 +409,104 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
 }
 
 function createDesktopOutputStrip(i, type) {
-    const prefix = type === 'mix' ? 'm' : 'b';
-    const title = type === 'mix' ? `MIX ${i + 1}` : `BUS ${i + 1}`;
-    const cmdPrefix = type === 'mix' ? 'kAUX' : 'kBus';
-    const customClass = type === 'mix' ? "fader-group-mix" : "fader-group-bus";
+    let prefix, title, cmdPrefix, customClass, configId, ch;
+    
+    if (type === 'mix') {
+        prefix = 'm';
+        title = `MIX ${i + 1}`;
+        cmdPrefix = 'kAUX';
+        customClass = "fader-group-mix";
+        configId = 36 + i;
+        ch = `'m${i}'`;
+    } else if (type === 'bus') {
+        prefix = 'b';
+        title = `BUS ${i + 1}`;
+        cmdPrefix = 'kBus';
+        customClass = "fader-group-bus";
+        configId = 44 + i;
+        ch = `'b${i}'`;
+    } else if (type === 'stIn') {
+        prefix = 'st';
+        title = `ST IN ${i + 1}`;
+        cmdPrefix = 'kInput';
+        customClass = "fader-group-st";
+        configId = 60 + (i * 2);
+        ch = 32 + (i * 2);
+    }
 
-    const stateRef = type === 'mix' ? mixesState[i] : busesState[i];
+    const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
     const nameDiv = stateRef ? stateRef.name : title;
+    const actionCh = type === 'stIn' ? configId : ch;
 
     return createDesktopStrip({
         id: prefix + i,
-        evtCh: `'${prefix}${i}'`,
+        evtCh: actionCh,
         title,
         name: nameDiv,
         customClass,
-        onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', '${prefix}${i}')`,
-        configAction: `openChannelConfig(event, ${type === 'mix' ? 36 + i : 44 + i})`,
-        type: "output"
+        onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})`,
+        configAction: `openChannelConfig(event, ${configId})`,
+        type: "output",
+        isPaired: type === 'stIn',
+        partnerId: type === 'stIn' ? configId + 1 : null,
+        dataCh: configId
     });
 }
 
 function createOutputStrip(i, type) {
     if (layoutMode === 'desktop') return createDesktopOutputStrip(i, type);
 
-    const prefix = type === 'mix' ? 'm' : 'b';
-    const title = type === 'mix' ? `MIX ${i + 1}` : `BUS ${i + 1}`;
-    const cmdPrefix = type === 'mix' ? 'kAUX' : 'kBus';
+    let prefix, title, cmdPrefix, customClass, configId, ch;
+    
+    if (type === 'mix') {
+        prefix = 'm';
+        title = `MIX ${i + 1}`;
+        cmdPrefix = 'kAUX';
+        customClass = "fader-group-mix";
+        configId = 36 + i;
+        ch = `'m${i}'`;
+    } else if (type === 'bus') {
+        prefix = 'b';
+        title = `BUS ${i + 1}`;
+        cmdPrefix = 'kBus';
+        customClass = "fader-group-bus";
+        configId = 44 + i;
+        ch = `'b${i}'`;
+    } else if (type === 'stIn') {
+        prefix = 'st';
+        title = `ST IN ${i + 1}`;
+        cmdPrefix = 'kInput';
+        customClass = "fader-group-st";
+        configId = 60 + (i * 2);
+        ch = 32 + (i * 2);
+    }
 
-    let customClass = type === 'mix' ? "fader-group-mix" : "fader-group-bus";
-    let onAction = `toggleState('${cmdPrefix}ChannelOn/kChannelOn', '${prefix}${i}')`;
-    const evtCh = `'${prefix}${i}'`;
-
-    const stateRef = type === 'mix' ? mixesState[i] : busesState[i];
+    const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
     const nameDiv = stateRef ? stateRef.name : title;
+    const actionCh = type === 'stIn' ? configId : ch;
 
     return `
-        <div class="fader-card ${customClass}">
+        <div class="fader-card ${customClass}" ${type === 'stIn' ? `data-ch="${configId}" data-partner-ch="${configId + 1}"` : ''}>
+            ${type === 'stIn' ? `
+            <div class="mobile-paired-meter left"></div>
+            <div class="mobile-paired-meter right"></div>
+            ` : ''}
             ${getMobileScaleHTML()}
-            <div class="ch-clickable-zone" onclick="openChannelConfig(event, ${type === 'mix' ? 36 + i : 44 + i})">
-                <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : '#00ffcc'}">${title}</h2>
+            <div class="ch-clickable-zone" onclick="openChannelConfig(event, ${configId})">
+                <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : type === 'bus' ? '#00ffcc' : '#ff00ff'}">${title}</h2>
                 <div id="name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>
             
-            <button id="on${prefix}${i}" class="btn-state" onclick="${onAction}">On</button>
+            <button id="on${prefix}${i}" class="btn-state" onclick="toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})">On</button>
 
-            <div class="nudge-zone" onpointerdown="startNudge(${evtCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
+            <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                 <button class="btn-nudge pointer-none">+</button>
             </div>
             
-            <input type="range" id="f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${evtCh})" onclick="event.stopPropagation()">
+            <input type="range" id="f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${actionCh})" onclick="event.stopPropagation()">
             
             <div class="ch-clickable-zone mt-auto" onclick="${type === 'mix' ? `enterTechnicianMixMode(${i})` : ''}">
-                <div class="nudge-zone" onpointerdown="startNudge(${evtCh}, -1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
+                <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, -1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                     <button class="btn-nudge pointer-none">-</button>
                     <h1 id="v${prefix}${i}" class="fader-val">-∞</h1>
                 </div>
@@ -566,6 +623,7 @@ function initUI() {
     if (outsMode && !musicianMode && !technicianMixMode) {
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'mix');
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'bus');
+        for (let i = 0; i < 4; i++) html += createOutputStrip(i, 'stIn');
     } else {
         for (let i = 0; i < NUM_CHANNELS; i++) {
             const state = channelStates[i];
@@ -603,6 +661,12 @@ function initUI() {
         for (let i = 0; i < 8; i++) {
             updateUI(`m${i}`, mixesState[i].value, mixesState[i].on, undefined);
             updateUI(`b${i}`, busesState[i].value, busesState[i].on, undefined);
+        }
+        for (let i = 0; i < 4; i++) {
+            const stCh = 32 + (i * 2);
+            const globalId = 60 + (i * 2);
+            const state = channelStates[stCh];
+            if (state) updateUI(globalId, state.value, state.on, undefined);
         }
     } else {
         for (let i = 0; i < NUM_CHANNELS; i++) {

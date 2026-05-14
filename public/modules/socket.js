@@ -8,7 +8,7 @@ let faderCardsCache = null;
 socket.on('syncStatus', (data) => {
     const shield = document.getElementById('syncShield');
     const blocker = document.getElementById('blockingOverlay');
-    
+
     // Suporte para formato antigo (boolean) ou novo (object)
     const isActive = (typeof data === 'object') ? data.active : data;
     const isScene = (typeof data === 'object') ? (data.type === 'is_scene') : false;
@@ -43,7 +43,7 @@ socket.on('update', (d) => {
         return;
     }
 
-    if (typeof d.channel === 'number' && d.channel < NUM_CHANNELS) {
+    if (typeof d.channel === 'number' && (d.channel < NUM_CHANNELS || (d.channel >= 60 && d.channel <= 67))) {
         // No modo músico ou técnico mix, ignoramos updates dos faders principais para não bagunçar a visão do AUX
         if (!musicianMode && !technicianMixMode) {
             if (d.type === 'kInputFader/kFader') updateUI(d.channel, d.value, undefined, undefined);
@@ -52,12 +52,14 @@ socket.on('update', (d) => {
         if (d.type === 'kSetupSoloChOn/kSoloChOn') updateUI(d.channel, undefined, undefined, isTrue);
 
         if (d.type === 'kInputPhase/kPhase') {
-            channelStates[d.channel].phase = d.value;
+            const state = getChannelStateById(d.channel);
+            if (state) state.phase = d.value;
             if (activeConfigChannel === d.channel && window.updatePhaseUI) updatePhaseUI(d.channel, d.value);
         }
 
         if (d.type === 'kInputAttenuator/kAtt') {
-            channelStates[d.channel].att = d.value;
+            const state = getChannelStateById(d.channel);
+            if (state) state.att = d.value;
             if (activeConfigChannel === d.channel && window.updateATTUI) window.updateATTUI(d.value);
         }
 
@@ -74,33 +76,34 @@ socket.on('update', (d) => {
             }
         }
 
-      if (d.type === 'updateState') {
-        const prefixMatch = d.typeParam.match(/^(kInput|kAUX|kBus|kStereo)(EQ|Comp|Gate)\/(.*)/);
-        if (prefixMatch) {
-            const module = prefixMatch[2]; // EQ, Comp, Gate
-            const param = prefixMatch[3];  // Ex: kEQOn, kCompThreshold
-            
-            if (module === 'EQ' && typeof updateEQFromSocket === 'function') {
-                updateEQFromSocket(d.channel, param, d.value);
-            } else if (module === 'Comp' && typeof updateCompFromSocket === 'function') {
-                updateCompFromSocket(d.channel, param, d.value);
-            } else if (module === 'Gate' && typeof updateGateFromSocket === 'function') {
-                updateGateFromSocket(d.channel, param, d.value);
-            }
-            return;
-        }
+        if (d.type === 'updateState') {
+            const prefixMatch = d.typeParam.match(/^(kInput|kAUX|kBus|kStereo)(EQ|Comp|Gate)\/(.*)/);
+            if (prefixMatch) {
+                const module = prefixMatch[2]; // EQ, Comp, Gate
+                const param = prefixMatch[3];  // Ex: kEQOn, kCompThreshold
 
-        if (d.typeParam.startsWith('kInputAUX/')) {
-            if (typeof updateAuxFromSocket === 'function') {
-                updateAuxFromSocket(d.channel, d.typeParam, d.value);
+                if (module === 'EQ' && typeof updateEQFromSocket === 'function') {
+                    updateEQFromSocket(d.channel, param, d.value);
+                } else if (module === 'Comp' && typeof updateCompFromSocket === 'function') {
+                    updateCompFromSocket(d.channel, param, d.value);
+                } else if (module === 'Gate' && typeof updateGateFromSocket === 'function') {
+                    updateGateFromSocket(d.channel, param, d.value);
+                }
+                return;
             }
+
+            if (d.typeParam.startsWith('kInputAUX/')) {
+                if (typeof updateAuxFromSocket === 'function') {
+                    updateAuxFromSocket(d.channel, d.typeParam, d.value);
+                }
+            }
+            // ... restante do updateState (Phase, Patch, Buses, Stereo On)
         }
-        // ... restante do updateState (Phase, Patch, Buses, Stereo On)
-    }
 
         // Suporte a Patch (ETC)
         if (d.type === 'kChannelInput/kChannelIn') {
-            channelStates[d.channel].patch = d.value;
+            const state = getChannelStateById(d.channel);
+            if (state) state.patch = d.value;
             if (activeConfigChannel === d.channel) {
                 const nameEl = document.getElementById('currentPatchName');
                 if (nameEl && typeof window.getPatchName === 'function') {
@@ -111,12 +114,15 @@ socket.on('update', (d) => {
 
         // Suporte a BUS / STEREO (ETC)
         if (d.type && d.type.startsWith('kInputBus/k')) {
-            if (d.type === 'kInputBus/kStereo') {
-                channelStates[d.channel].stereo = !!d.value;
-            } else {
-                const busIdx = parseInt(d.type.replace('kInputBus/kBus', '')) - 1;
-                if (!channelStates[d.channel].buses) channelStates[d.channel].buses = new Array(8).fill(false);
-                channelStates[d.channel].buses[busIdx] = !!d.value;
+            const state = getChannelStateById(d.channel);
+            if (state) {
+                if (d.type === 'kInputBus/kStereo') {
+                    state.stereo = !!d.value;
+                } else {
+                    const busIdx = parseInt(d.type.replace('kInputBus/kBus', '')) - 1;
+                    if (!state.buses) state.buses = new Array(8).fill(false);
+                    state.buses[busIdx] = !!d.value;
+                }
             }
 
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
@@ -173,10 +179,10 @@ socket.on('update', (d) => {
         }
         stateObj.nameChars[d.charIndex] = d.char;
         const newName = stateObj.nameChars.join('').trim();
-        
+
         // Mantém sicronia do nome
         stateObj.name = newName;
-        
+
         if (typeof updateNameUI === 'function') {
             updateNameUI(d.channel, newName);
         }
@@ -201,7 +207,7 @@ socket.on('update', (d) => {
         const partnerIdx = chA % 2 === 0 ? chA + 1 : chA - 1;
         const isPaired = !!d.value;
 
-        console.log(`🔗 [SOCKET] Atualização de Pair: CH ${chA+1} + ${partnerIdx+1} = ${isPaired}`);
+        console.log(`🔗 [SOCKET] Atualização de Pair: CH ${chA + 1} + ${partnerIdx + 1} = ${isPaired}`);
 
         // Update State
         if (channelStates[chA]) {
@@ -219,11 +225,11 @@ socket.on('update', (d) => {
                 renderRouting(activeConfigChannel);
             }
         }
-        
+
         // Dispara re-inicialização do grid de faders para aplicar o layout unificado
         if (typeof initUI === 'function') {
             console.log("♻️ [SOCKET] Re-inicializando UI devido a mudança de Pair");
-            initUI(); 
+            initUI();
         }
     }
 });
@@ -309,7 +315,7 @@ socket.on('dynamicsDebugLog', (data) => {
 
 socket.on('sync', (s) => {
     if (s.channels) {
-        for (let i = 0; i < NUM_CHANNELS; i++) {
+        for (let i = 0; i < 40; i++) {
             if (s.channels[i]) {
                 Object.assign(channelStates[i], s.channels[i]);
 
@@ -323,12 +329,12 @@ socket.on('sync', (s) => {
 
                 const soloBool = !!s.channels[i].solo;
                 const onBool = !!o;
+                const globalId = (i >= 32 && i <= 39) ? (i - 32 + 60) : i;
 
-                updateUI(i, v, onBool, soloBool);
-                const elN = document.getElementById(`name${i}`);
-                const newName = s.channels[i].name || `CH ${i + 1}`;
-                if (elN && elN.innerText !== newName) {
-                    elN.innerText = newName;
+                updateUI(globalId, v, onBool, soloBool);
+                const newName = s.channels[i].name || (i < 32 ? `CH ${i + 1}` : `ST IN ${Math.floor((i - 32) / 2) + 1}`);
+                if (typeof updateNameUI === 'function') {
+                    updateNameUI(globalId, newName);
                 }
             }
         }
@@ -428,11 +434,11 @@ socket.on('portsList', (data) => {
 
     if (data.savedConfig) {
         window.isDemoMode = !!data.savedConfig.demo_mode;
-        
+
         const fpsMobile = data.savedConfig.meter_fps_mobile || 15;
         const fpsDesktop = data.savedConfig.meter_fps_desktop || 30;
         currentMeterFPS = isMobileAgent ? fpsMobile : fpsDesktop;
-        
+
         if (demoBtn) {
             const isDemo = !!data.savedConfig.demo_mode;
             demoBtn.innerText = isDemo ? 'DEMO OFF' : 'DEMO ON';
@@ -453,12 +459,12 @@ socket.on('portsList', (data) => {
     }
 });
 
-window.updateOpenBrowser = function(enabled) {
+window.updateOpenBrowser = function (enabled) {
     socket.emit('updateOpenBrowser', { enabled: enabled });
 };
 
-window.resetFaderCache = () => { 
-    faderCardsCache = null; 
+window.resetFaderCache = () => {
+    faderCardsCache = null;
     meterElementsCache = null;
 };
 
@@ -474,7 +480,7 @@ let meterVisibilityObserver = null;
 
 function setupMeterObserver() {
     if (meterVisibilityObserver) meterVisibilityObserver.disconnect();
-    
+
     meterVisibilityObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (meterElementsCache) {
@@ -490,15 +496,15 @@ function setupMeterObserver() {
 }
 
 function buildMeterCache() {
-    if (!faderCardsCache || !faderCardsCache.length) { 
-        meterElementsCache = null; 
-        return; 
+    if (!faderCardsCache || !faderCardsCache.length) {
+        meterElementsCache = null;
+        return;
     }
     meterElementsCache = new Array(faderCardsCache.length);
-    
+
     if (!meterVisibilityObserver) setupMeterObserver();
     else meterVisibilityObserver.disconnect(); // Reseta os observadores antigos
-    
+
     for (let i = 0; i < faderCardsCache.length; i++) {
         const card = faderCardsCache[i];
         meterElementsCache[i] = {
@@ -512,7 +518,7 @@ function buildMeterCache() {
             isPeakActive: false,
             isVisible: true // Inicialmente true, o observer atualiza log em seguida
         };
-        
+
         if (meterVisibilityObserver) meterVisibilityObserver.observe(card);
     }
 }
@@ -604,7 +610,7 @@ socket.on('meterData', (levels) => {
                     if (cached.curtains && cached.curtains.length > 0) {
                         // Main curtain
                         cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
-                        
+
                         // Check if channel is paired via channelStates
                         const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                         if (s && s.paired && s.pairedWith !== null && cached.curtains.length > 1) {
@@ -622,7 +628,7 @@ socket.on('meterData', (levels) => {
                             cached.card.classList.add('has-paired-meter');
                         }
                         cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
-                        
+
                         const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                         if (s && s.paired && s.pairedWith !== null && cached.mobileBgs.length > 1) {
                             const pIdx = s.pairedWith;

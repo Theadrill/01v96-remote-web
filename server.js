@@ -390,6 +390,8 @@ function saveNames() {
         const names = {};
         // Inputs (0-31)
         for (let i = 0; i < 32; i++) { names[i] = s.channels[i].name; }
+        // ST INs (60-67)
+        for (let i = 0; i < 8; i++) { names[60 + i] = s.channels[32 + i].name; }
         // Mixes (36-43)
         for (let i = 0; i < 8; i++) { if (s.mixes[i]) names[36 + i] = s.mixes[i].name; }
         // Buses (44-51)

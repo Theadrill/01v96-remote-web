@@ -24,7 +24,7 @@ const state = {
 // 🚨 [CRITICAL SYNC LOGIC] - ESTRUTURA DO ESTADO
 // Os nomes das chaves em 'gate' e 'comp' (ex: thresh, range, attack) devem ser MANTIDOS EXATAMENTE.
 // O frontend e os reducers do socket dependem desses nomes específicos para injetar dados via dynamicsState.
-for (let i = 0; i < 32; i++) {
+for (let i = 0; i < 40; i++) {
     state.channels[i] = {
         value: 0,
         on: false,
@@ -212,32 +212,32 @@ function updateState(d) {
         return;
     }
 
-    if (!state.channels[channel]) return;
-    if (type === 'kInputFader/kFader') state.channels[channel].value = value;
-    if (type === 'kInputChannelOn/kChannelOn') state.channels[channel].on = value;
-    if (type === 'kSetupSoloChOn/kSoloChOn') state.channels[channel].solo = value;
-    if (type === 'kInputPhase/kPhase') state.channels[channel].phase = value;
-    if (type === 'kInputAttenuator/kAtt') state.channels[channel].att = value;
-    if (type === 'kChannelInput/kChannelIn') state.channels[channel].patch = value;
+    const stateObj = getChannelStateById(channel);
+    if (!stateObj) return;
+
+    if (type === 'kInputFader/kFader') stateObj.value = value;
+    if (type === 'kInputChannelOn/kChannelOn') stateObj.on = value;
+    if (type === 'kSetupSoloChOn/kSoloChOn') stateObj.solo = value;
+    if (type === 'kInputPhase/kPhase') stateObj.phase = value;
+    if (type === 'kInputAttenuator/kAtt') stateObj.att = value;
+    if (type === 'kChannelInput/kChannelIn') stateObj.patch = value;
 
     if (type.includes('kInputAUX/kAUX')) {
         const auxMatch = type.match(/kInputAUX\/kAUX(\d+)(Level|On)/);
         if (auxMatch) {
             const auxIdx = auxMatch[1];
-            if (auxMatch[2] === 'Level') state.channels[channel][`aux${auxIdx}`] = value;
-            if (auxMatch[2] === 'On') state.channels[channel][`aux${auxIdx}On`] = value;
+            if (auxMatch[2] === 'Level') stateObj[`aux${auxIdx}`] = value;
+            if (auxMatch[2] === 'On') stateObj[`aux${auxIdx}On`] = value;
         }
     }
 
     // Suporte a BUS / STEREO Assignments (Apenas Inputs)
     if (type.startsWith('kInputBus/k')) {
         if (type === 'kInputBus/kStereo') {
-            if (state.channels[channel]) state.channels[channel].stereo = !!value;
+            stateObj.stereo = !!value;
         } else {
             const busIdx = parseInt(type.replace('kInputBus/kBus', '')) - 1;
-            if (state.channels[channel]) {
-                state.channels[channel].buses[busIdx] = !!value;
-            }
+            stateObj.buses[busIdx] = !!value;
         }
     }
 
@@ -279,6 +279,7 @@ function setChannelName(channel, name) {
 
 function getChannelStateById(id) {
     if (id >= 0 && id <= 31) return state.channels[id];
+    if (id >= 60 && id <= 67) return state.channels[32 + (id - 60)];
     if (id >= 36 && id <= 43) return state.mixes[id - 36];
     if (id >= 44 && id <= 51) return state.buses[id - 44];
     if (id === 52) return state.master;
