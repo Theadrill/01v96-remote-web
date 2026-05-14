@@ -330,6 +330,114 @@ function handleWheelFader(e, ch, auxIdx) {
     commitFaderChange(ch, newVal);
 }
 
+function handleWheelPan(e, ch) {
+    if (layoutMode !== 'desktop') return;
+
+    // Interromper scroll da tela
+    e.preventDefault();
+    e.stopPropagation();
+
+    const state = getChannelStateById(ch);
+    if (!state) return;
+
+    // Valor atual ou 0 (Centro)
+    let currentPan = (state.pan !== undefined) ? state.pan : 0;
+    
+    // Roda para cima (negativo deltaY) incrementa (move para R)
+    // Roda para baixo (positivo deltaY) decrementa (move para L)
+    const dir = e.deltaY < 0 ? 1 : -1;
+    let newPan = currentPan + dir;
+
+    // Limites da Yamaha 01V96 (-63 a +63)
+    if (newPan < -63) newPan = -63;
+    if (newPan > 63) newPan = 63;
+
+    // Feedback imediato na UI
+    if (typeof updatePanIndicator === 'function') {
+        updatePanIndicator(ch, newPan);
+    }
+
+    // Atualiza estado local para consistência
+    state.pan = newPan;
+
+    // Emite para o servidor
+    if (appReady) {
+        socket.emit('setPan', { channel: ch, value: newPan });
+    }
+}
+
+function resetPan(e, ch) {
+    if (layoutMode !== 'desktop') return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const state = getChannelStateById(ch);
+    if (!state) return;
+
+    const centerValue = 0;
+
+    // Feedback imediato na UI
+    if (typeof updatePanIndicator === 'function') {
+        updatePanIndicator(ch, centerValue);
+    }
+
+    // Atualiza estado local
+    state.pan = centerValue;
+
+    // Emite para o servidor
+    if (appReady) {
+        socket.emit('setPan', { channel: ch, value: centerValue });
+    }
+}
+
+let panLongPressTimeout = null;
+
+function startPanLongPress(e, ch) {
+    if (layoutMode !== 'desktop') return;
+    
+    stopPanLongPress();
+
+    const clientX = e.clientX;
+    const target = e.currentTarget;
+
+    panLongPressTimeout = setTimeout(() => {
+        jumpPanToPosition(target, clientX, ch);
+    }, 400); // 400ms para toque longo
+}
+
+function stopPanLongPress() {
+    if (panLongPressTimeout) clearTimeout(panLongPressTimeout);
+    panLongPressTimeout = null;
+}
+
+function jumpPanToPosition(container, clickX, ch) {
+    const track = container.querySelector('.desk-pan-track');
+    if (!track) return;
+
+    const rect = track.getBoundingClientRect();
+    const width = rect.width;
+    const offsetX = clickX - rect.left;
+
+    let pct = offsetX / width;
+    if (pct < 0) pct = 0;
+    if (pct > 1) pct = 1;
+
+    // -63 a 63
+    let newPan = Math.round((pct * 126) - 63);
+
+    if (typeof updatePanIndicator === 'function') {
+        updatePanIndicator(ch, newPan);
+    }
+
+    const state = getChannelStateById(ch);
+    if (state) state.pan = newPan;
+
+    if (appReady) {
+        socket.emit('setPan', { channel: ch, value: newPan });
+    }
+}
+
 // Bloqueio de scroll por roda do mouse no modo Desktop e manipulação global de sliders
 const isMobileEvents = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 

@@ -217,7 +217,14 @@ function createDesktopStrip(config) {
                 <button class="btn-nudge-desk">-</button>
             </div>
             
-            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}">
+            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}" 
+                 ${layoutMode === 'desktop' ? `
+                    onwheel="handleWheelPan(event, ${evtCh})" 
+                    ondblclick="resetPan(event, ${evtCh})"
+                    onpointerdown="startPanLongPress(event, ${evtCh})"
+                    onpointerup="stopPanLongPress()"
+                    onpointerleave="stopPanLongPress()"
+                    onpointercancel="stopPanLongPress()"` : ''}>
                 <span class="desk-pan-l">L</span>
                 <div class="desk-pan-track">
                     <div class="desk-pan-center-tick"></div>
