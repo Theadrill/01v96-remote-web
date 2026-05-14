@@ -382,6 +382,41 @@ function setupSocketHandlers() {
             ctx.midiEngine.send(rawBytes);
         });
 
+        // --- PAN ---
+        // Evento: { channel: <globalId>, value: <-63..+63> }
+        socket.on('setPan', (data) => {
+            const { channel, value } = data || {};
+            if (value === undefined || channel === undefined) return;
+
+            const panModule = require('../midi/pan');
+
+            // 1. Atualiza o estado no servidor
+            ctx.stateManager.updateState({ type: 'kPan', channel, value });
+
+            // 2. Broadcast para todos os clientes (inclui quem enviou para feedback imediato)
+            ctx.io.emit('update', { type: 'kPan', channel, value });
+
+            // 3. Envia para a mesa física (se conectada)
+            if (ctx.isConnected) {
+                const sysex = panModule.buildPanChange(channel, value);
+                if (sysex) {
+                    console.log(`🎛️ [PAN] CH:${channel} Val:${value}`);
+                    ctx.midiEngine.send(sysex);
+                }
+            }
+        });
+
+        // Solicita leitura de todos os pans na sincronização manual
+        socket.on('syncPan', () => {
+            if (!ctx.isConnected) return;
+            const panModule = require('../midi/pan');
+            const requests = panModule.buildPanSyncRequests();
+            console.log(`🔄 [PAN SYNC] Enviando ${requests.length} requests de Pan...`);
+            requests.forEach((req, i) => {
+                setTimeout(() => ctx.midiEngine.send(req), i * 20); // 20ms entre cada request
+            });
+        });
+
         // --- CONTROLE MIDI (FADERS, EQ, DYNAMICS, PAN, ETC.) ---
         socket.on('control', (data) => {
             if (data && data.type !== 'HEARTBEAT') {
