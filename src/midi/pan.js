@@ -36,10 +36,10 @@ const PAN_GROUP   = 0x01;
 const PAN_ELEMENT = 0x1B;  // 27
 const PAN_PARAM   = 0x00;
 
-// Endereço do Pan do Master (Stereo Out) — seção diferente
-const MASTER_SECTION = 0x4E;
-const MASTER_GROUP   = 0x00;
-const MASTER_ELEMENT = 0x01;
+// Endereço do Pan do Master (Stereo Out)
+const MASTER_SECTION = 0x7F; // 127
+const MASTER_GROUP   = 0x01;
+const MASTER_ELEMENT = 0x4E; // 78
 const MASTER_PARAM   = 0x00;
 
 // -------------------------------------------------------------------
@@ -104,8 +104,8 @@ function bytesToPanValue(bytes) {
  * @returns {{ isMaster: boolean, channelIdx: number } | null}
  */
 function globalChannelToPanIndex(globalChannel) {
-    if (globalChannel === 'master') {
-        return { isMaster: true, channelIdx: 0 };
+    if (globalChannel === 'master' || Number(globalChannel) === 52) {
+        return { isMaster: true, channelIdx: 1 };
     }
 
     const ch = Number(globalChannel);
@@ -146,7 +146,7 @@ function buildPanChange(globalChannel, panValue) {
         return [
             ...HEADER, 0x10, MODEL,
             MASTER_SECTION, MASTER_GROUP, MASTER_ELEMENT, MASTER_PARAM,
-            0x00,
+            mapped.channelIdx,
             ...bytes,
             ...FOOTER
         ];
@@ -175,7 +175,7 @@ function buildPanRequest(globalChannel) {
         return [
             ...HEADER, 0x30, MODEL,
             MASTER_SECTION, MASTER_GROUP, MASTER_ELEMENT, MASTER_PARAM,
-            0x00,
+            mapped.channelIdx,
             ...FOOTER
         ];
     }
@@ -231,7 +231,7 @@ function parsePanMessage(message) {
     }
 
     // Pan do Master (Stereo Out)
-    if (sec === MASTER_SECTION && grp === MASTER_GROUP && elem === MASTER_ELEMENT && prm === MASTER_PARAM) {
+    if (sec === MASTER_SECTION && grp === MASTER_GROUP && elem === MASTER_ELEMENT && prm === MASTER_PARAM && chIdx === 0x01) {
         const panValue = bytesToPanValue(dataBytes);
         return { type: 'kPan', channel: 'master', value: panValue };
     }

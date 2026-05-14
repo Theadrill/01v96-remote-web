@@ -15,6 +15,7 @@
 // ============================================================================
 
 const Buffer = require('buffer').Buffer;
+const panModule = require('../midi/pan');
 
 let ctx;
 
