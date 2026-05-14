@@ -60,13 +60,16 @@ function findPorts() {
 
 const ports = findPorts();
 
-if (ports.yamahaInIdx === -1 || ports.yamahaOutIdx === -1) {
-    console.log('\n❌ Yamaha não encontrada. Verifique driver e cabo USB.');
-    process.exit(1);
-}
-if (ports.monitorInIdx === -1 || ports.monitorOutIdx === -1) {
+const yamahaFound = ports.yamahaInIdx !== -1 && ports.yamahaOutIdx !== -1;
+const monitorFound = ports.monitorInIdx !== -1 && ports.monitorOutIdx !== -1;
+
+if (!monitorFound) {
     console.log('\n❌ Porta "monitor" não encontrada. Crie no loopMIDI.');
     process.exit(1);
+}
+
+if (!yamahaFound) {
+    console.log('\n⚠️ Yamaha não encontrada. Entrando em modo "Somente Monitor" (Apenas escutando Studio Manager).');
 }
 
 const yamahaIn = new midi.Input();
@@ -74,17 +77,23 @@ const yamahaOut = new midi.Output();
 const monitorIn = new midi.Input();
 const monitorOut = new midi.Output();
 
-yamahaIn.openPort(ports.yamahaInIdx);
-yamahaOut.openPort(ports.yamahaOutIdx);
+if (yamahaFound) {
+    yamahaIn.openPort(ports.yamahaInIdx);
+    yamahaOut.openPort(ports.yamahaOutIdx);
+    yamahaIn.ignoreTypes(false, false, false);
+}
+
 monitorIn.openPort(ports.monitorInIdx);
 monitorOut.openPort(ports.monitorOutIdx);
-
-yamahaIn.ignoreTypes(false, false, false);
 monitorIn.ignoreTypes(false, false, false);
 
 console.log('\n====================================================');
-console.log('🚀 BRIDGE MIDI ATIVO (SysEx Reassembly)');
-console.log(`   YAMAHA  IN:${ports.yamahaInIdx}  OUT:${ports.yamahaOutIdx}`);
+console.log(`🚀 BRIDGE MIDI ATIVO ${yamahaFound ? '(Full Bridge)' : '(Modo Monitor)'}`);
+if (yamahaFound) {
+    console.log(`   YAMAHA  IN:${ports.yamahaInIdx}  OUT:${ports.yamahaOutIdx}`);
+} else {
+    console.log(`   YAMAHA  Não conectada`);
+}
 console.log(`   MONITOR IN:${ports.monitorInIdx}  OUT:${ports.monitorOutIdx}`);
 console.log('====================================================\n');
 
@@ -97,7 +106,7 @@ let y2s = 0, s2y = 0, reassembled = 0, errors = 0;
 // Uso: const handler = createSysExHandler(outputPort)
 //      handler(message)  ← chame para cada msg recebida
 // ============================================================
-function createSysExHandler(outputPort, direction) {
+function createSysExHandler(outputPort) {
     let sysexBuffer = null;
 
     return function (message) {
@@ -109,7 +118,7 @@ function createSysExHandler(outputPort, direction) {
             // Enviar direto (Note On, CC, Program Change, etc.)
             if (message[0] & 0x80) { // tem status byte válido
                 try { outputPort.sendMessage(message); }
-                catch (e) { errors++; }
+                catch { errors++; }
             }
             return;
         }
@@ -121,7 +130,7 @@ function createSysExHandler(outputPort, direction) {
                 sysexBuffer = null;
             }
             try { outputPort.sendMessage(message); }
-            catch (e) { errors++; }
+            catch { errors++; }
             return;
         }
 
@@ -142,7 +151,7 @@ function createSysExHandler(outputPort, direction) {
             if (endsWithF7) {
                 reassembled++;
                 try { outputPort.sendMessage(sysexBuffer); }
-                catch (e) { errors++; }
+                catch { errors++; }
                 sysexBuffer = null;
             }
             // Se não termina com F7, continuar acumulando
@@ -280,8 +289,10 @@ monitorIn.on('message', (deltaTime, message) => {
     }
 
     // Mensagem genuína: encaminhar à Yamaha
-    forwardToYamaha(message);
-    s2y++;
+    if (yamahaFound) {
+        forwardToYamaha(message);
+        s2y++;
+    }
 
     // [BACKUP] Original filter - to re-enable, uncomment below:
     if (isMeterRequest(message) || matchesCustomFilter(message)) { 
@@ -313,8 +324,10 @@ setInterval(() => {
 process.stdin.resume();
 process.on('SIGINT', () => {
     console.log('\nEncerrando monitor...');
-    yamahaIn.closePort();
-    yamahaOut.closePort();
+    if (yamahaFound) {
+        yamahaIn.closePort();
+        yamahaOut.closePort();
+    }
     monitorIn.closePort();
     monitorOut.closePort();
     process.exit();
