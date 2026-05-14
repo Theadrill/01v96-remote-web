@@ -1,5 +1,4 @@
 const { COMMAND_BYTES } = require('./dictionary');
-const propertyMap = require('./property-map');
 
 const CONVERTERS = {
     faderToBytes: (value) => [0, 0, (value >> 7) & 0x07, value & 0x7F],
@@ -133,7 +132,6 @@ function parseIncoming(message) {
     // Isso evita processar nossos próprios pedidos (Requests 0x3n) que o loopMIDI ecoa de volta.
     if ((message[2] & 0xF0) !== 0x10) return null;
 
-    const section = message[4];
     const group = message[5];
     const parameter = message[7];
     const channel = message[8];

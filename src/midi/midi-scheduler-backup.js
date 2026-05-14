@@ -132,7 +132,6 @@ class MidiScheduler {
             isRunning: this.isRunning
         };
     }
-}
 
     /**
      * Atualiza o intervalo de tick do scheduler

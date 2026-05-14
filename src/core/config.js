@@ -82,7 +82,7 @@ function initConfig(ctx) {
             try {
                 const loaded = JSON.parse(fs.readFileSync(configFile, 'utf8'));
                 config = { ...config, ...loaded };
-            } catch (err) {
+            } catch {
                 // Ignora erro de parsing
             }
         }
@@ -90,7 +90,7 @@ function initConfig(ctx) {
     }
 
     function saveConfig(configData) {
-        try { fs.writeFileSync(configFile, JSON.stringify(configData, null, 2)); } catch (err) {
+        try { fs.writeFileSync(configFile, JSON.stringify(configData, null, 2)); } catch {
             // Ignora erro de escrita
         }
     }

@@ -34,7 +34,6 @@ function triggerGitSync() {
     console.log(`🚀 [NINJA SYNC] Iniciando sync: ${msg}`);
     
     exec(cmd, { cwd: ROOT_DIR }, (error, stdout, stderr) => {
-        const currentQueue = Array.from(gitSyncQueue);
         gitSyncQueue.clear();
         gitSyncMessage = null; 
         
@@ -165,7 +164,7 @@ router.post('/macros/slots', express.json(), (req, res) => {
             gitSyncTimer = setTimeout(triggerGitSync, 10000);
         }
         res.json({ success: true, preset, synced: syncShared });
-    } catch (e) {
+    } catch {
         res.status(500).json({ error: 'Erro ao salvar perfil' });
     }
 });
@@ -187,7 +186,9 @@ router.post('/macros/swap', express.json(), (req, res) => {
                 if (tTo) config[fromIndex] = tTo;
                 if (tFrom) config[toIndex] = tFrom;
                 fs.writeFileSync(pPath, JSON.stringify(config, null, 2));
-            } catch (e) {}
+            } catch {
+                // Ignore empty catch
+            }
         }
     };
 
@@ -280,7 +281,7 @@ router.delete('/macros/slots', (req, res) => {
         if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
         if (fs.existsSync(sharedPath)) fs.unlinkSync(sharedPath);
         res.json({ success: true, deleted: preset });
-    } catch (e) {
+    } catch {
         res.status(500).json({ error: 'Erro ao deletar perfil' });
     }
 });
@@ -322,7 +323,7 @@ router.post('/macros/config/:modId', express.json(), (req, res) => {
             gitSyncTimer = setTimeout(triggerGitSync, 10000);
         }
         res.json({ success: true, mod: modId, preset, synced: syncShared });
-    } catch (e) {
+    } catch {
         res.status(500).json({ error: 'Erro ao salvar config do mod' });
     }
 });
@@ -336,7 +337,7 @@ router.post('/macros/proxy/http', express.json(), async (req, res) => {
         const response = await fetch(url, options);
         let rawData = await response.text();
         let data;
-        try { data = JSON.parse(rawData); } catch (e) { data = rawData; }
+        try { data = JSON.parse(rawData); } catch { data = rawData; }
         res.json({ status: response.status, data });
     } catch (e) {
         res.status(500).json({ error: e.message });

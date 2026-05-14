@@ -157,8 +157,8 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
                         ctx.isFullySynced = true;
                         ctx.isSyncing = false;
                         ctx.saveNames();
-                        try { ctx.io.emit('sync', ctx.stateManager.getState()); } catch (e) { }
-                        try { ctx.io.emit('syncStatus', { active: false }); } catch (e) { }
+                        try { ctx.io.emit('sync', ctx.stateManager.getState()); } catch { }
+                        try { ctx.io.emit('syncStatus', { active: false }); } catch { }
                         console.log('✅ [SERVER] SyncManager sinalizou conclusão (Cenas + Parâmetros + Nomes).');
                     };
                 }
@@ -221,7 +221,7 @@ function handleDisconnection(retry = true) {
     // Tenta enviar o comando de parada de meter para limpar o tráfego na mesa física (se ainda houver conexão física)
     try {
         ctx.midiEngine.send(ctx.masterMeter.buildStopRequest());
-    } catch (err) {
+    } catch {
         // Ignora erro de envio no disconnect
     }
 
