@@ -1,6 +1,6 @@
 const midi = require('midi');
 const protocol = require('./protocol');
-const syncCounter = require('./sync-counter');
+const syncCounter = require('../network/sync-counter');
 const MidiAssembler = require('./midi-assembler');
 const MidiScheduler = require('./midi-scheduler');
 

@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { exec } = require('child_process');
-const stateManager = require('../state-manager');
+const stateManager = require('../state/state-manager');
 
 // Raiz do projeto (dois níveis acima de src/api/)
 const ROOT_DIR = path.join(__dirname, '..', '..');

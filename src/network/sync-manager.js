@@ -1,6 +1,6 @@
-const protocol = require('./protocol');
-const stateManager = require('./state-manager');
-const masterMeter = require('./master-meter');
+const protocol = require('../midi/protocol');
+const stateManager = require('../state/state-manager');
+const masterMeter = require('../state/master-meter');
 
 class SyncManager {
     constructor(scheduler, io, sceneManager) {
