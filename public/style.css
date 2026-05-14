@@ -1308,16 +1308,26 @@ body.layout-desktop .sidebar {
 
 /* ---- PAN INDICATOR (Desktop only) ---- */
 .desk-pan-indicator {
-    height: 25px;
+    min-height: 25px;
     background: #0d0d0d;
     border-top: 1px solid #1a1a1a;
     display: flex;
     align-items: center;
-    padding: 0 5px;
+    padding: 2px 0;
     box-sizing: border-box;
     position: relative;
-    cursor: pointer;
+    cursor: default;
     user-select: none;
+}
+
+.desk-pan-tracks-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+    margin: 0 6px;
+    height: 100%;
 }
 
 .desk-pan-track {
@@ -1327,6 +1337,7 @@ body.layout-desktop .sidebar {
     background: #222;
     border-radius: 2px;
     overflow: visible;
+    cursor: pointer;
 }
 
 /* L / C / R tick marks */

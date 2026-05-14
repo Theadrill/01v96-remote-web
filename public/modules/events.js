@@ -392,27 +392,53 @@ function resetPan(e, ch) {
 }
 
 let panLongPressTimeout = null;
+let isPanDragging = false;
+let activePanChannel = null;
+let activePanTrack = null;
 
 function startPanLongPress(e, ch) {
     if (layoutMode !== 'desktop') return;
+    e.stopPropagation();
+    e.preventDefault(); // Impede o disparo de mousedown legado
     
-    stopPanLongPress();
+    stopPanLongPress(e);
 
-    const clientX = e.clientX;
     const target = e.currentTarget;
+    const clientX = e.clientX;
+    
+    activePanChannel = ch;
+    activePanTrack = target;
 
     panLongPressTimeout = setTimeout(() => {
-        jumpPanToPosition(target, clientX, ch);
-    }, 400); // 400ms para toque longo
+        isPanDragging = true;
+        // Salto inicial ao ativar o modo drag
+        jumpPanToPosition(activePanTrack, clientX, activePanChannel);
+        // Captura o ponteiro para permitir arrastar fora da área da barra
+        if (target.setPointerCapture) target.setPointerCapture(e.pointerId);
+    }, 350); // 350ms para disparar o modo de arrasto
 }
 
-function stopPanLongPress() {
+function handlePanPointerMove(e) {
+    if (!isPanDragging || activePanChannel === null || !activePanTrack) return;
+    
+    e.preventDefault();
+    jumpPanToPosition(activePanTrack, e.clientX, activePanChannel);
+}
+
+function stopPanLongPress(e) {
     if (panLongPressTimeout) clearTimeout(panLongPressTimeout);
     panLongPressTimeout = null;
+    
+    if (isPanDragging && activePanTrack && e && e.pointerId) {
+        if (activePanTrack.releasePointerCapture) activePanTrack.releasePointerCapture(e.pointerId);
+    }
+    
+    isPanDragging = false;
+    activePanChannel = null;
+    activePanTrack = null;
 }
 
-function jumpPanToPosition(container, clickX, ch) {
-    const track = container.querySelector('.desk-pan-track');
+function jumpPanToPosition(track, clickX, ch) {
     if (!track) return;
 
     const rect = track.getBoundingClientRect();
@@ -487,7 +513,7 @@ let scrollLeft;
 document.addEventListener('mousedown', (e) => {
     if (layoutMode !== 'desktop') return;
     const area = e.target.closest('.faders-area');
-    if (area && !e.target.closest('input') && !e.target.closest('button')) {
+    if (area && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('.desk-pan-indicator')) {
         isMouseDown = true;
         area.classList.add('is-grabbing');
         startX = e.pageX - area.offsetLeft;

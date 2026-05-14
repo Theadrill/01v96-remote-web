@@ -217,18 +217,35 @@ function createDesktopStrip(config) {
                 <button class="btn-nudge-desk">-</button>
             </div>
             
-            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}" 
-                 ${layoutMode === 'desktop' ? `
-                    onwheel="handleWheelPan(event, ${evtCh})" 
-                    ondblclick="resetPan(event, ${evtCh})"
-                    onpointerdown="startPanLongPress(event, ${evtCh})"
-                    onpointerup="stopPanLongPress()"
-                    onpointerleave="stopPanLongPress()"
-                    onpointercancel="stopPanLongPress()"` : ''}>
+            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}">
                 <span class="desk-pan-l">L</span>
-                <div class="desk-pan-track">
-                    <div class="desk-pan-center-tick"></div>
-                    <div class="desk-pan-thumb pan-center" style="left:50%"></div>
+                <div class="desk-pan-tracks-container">
+                    <div class="desk-pan-track" data-pan-ch="${evtCh}"
+                         ${layoutMode === 'desktop' ? `
+                            onwheel="handleWheelPan(event, ${evtCh})" 
+                            ondblclick="resetPan(event, ${evtCh})"
+                            onpointerdown="startPanLongPress(event, ${evtCh})"
+                            onpointermove="handlePanPointerMove(event)"
+                            onpointerup="stopPanLongPress(event)"
+                            onpointerleave="stopPanLongPress(event)"
+                            onpointercancel="stopPanLongPress(event)"` : ''}>
+                        <div class="desk-pan-center-tick"></div>
+                        <div class="desk-pan-thumb pan-center" style="left:50%"></div>
+                    </div>
+                    ${isPaired && partnerId !== null ? `
+                    <div class="desk-pan-track" data-pan-ch="${partnerId}"
+                         ${layoutMode === 'desktop' ? `
+                            onwheel="handleWheelPan(event, ${partnerId})" 
+                            ondblclick="resetPan(event, ${partnerId})"
+                            onpointerdown="startPanLongPress(event, ${partnerId})"
+                            onpointermove="handlePanPointerMove(event)"
+                            onpointerup="stopPanLongPress(event)"
+                            onpointerleave="stopPanLongPress(event)"
+                            onpointercancel="stopPanLongPress(event)"` : ''}>
+                        <div class="desk-pan-center-tick"></div>
+                        <div class="desk-pan-thumb pan-center" style="left:50%"></div>
+                    </div>
+                    ` : ''}
                 </div>
                 <span class="desk-pan-r">R</span>
             </div>
@@ -253,14 +270,24 @@ function updatePanIndicator(channel, panValue) {
         cardId = `card${channel}`;
     }
 
-    const card = document.getElementById(cardId);
+    let card = document.getElementById(cardId);
+    if (!card && typeof channel === 'number') {
+        // Se não achou o card pelo ID direto, pode ser um canal linkado (o card fica no canal A)
+        const s = channelStates[channel];
+        if (s && s.paired && s.pairedWith !== null) {
+            // Se o canal atual for o "B" do par (índice ímpar), o card real é o do canal A
+            const masterIdx = Math.min(channel, s.pairedWith);
+            card = document.getElementById(`card${masterIdx}`);
+        }
+    }
+
     if (!card) return;
 
-    // O indicador é um elemento filho direto com a classe desk-pan-indicator
-    const indicator = card.querySelector('.desk-pan-indicator');
-    if (!indicator) return;
+    // Busca a trilha específica do canal dentro do card (ou a primeira se não houver data-pan-ch)
+    const track = card.querySelector(`.desk-pan-track[data-pan-ch="${channel}"]`) || card.querySelector('.desk-pan-track');
+    if (!track) return;
 
-    const thumb = indicator.querySelector('.desk-pan-thumb');
+    const thumb = track.querySelector('.desk-pan-thumb');
     if (!thumb) return;
 
     // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%
