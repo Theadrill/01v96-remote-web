@@ -25,6 +25,22 @@ socket.on('syncStatus', (data) => {
 });
 socket.on('update', (d) => {
     const isTrue = (d.value === 1 || d.value === true);
+
+    // --- PAN ---
+    if (d.type === 'kPan') {
+        // Atualiza estado local
+        const s = d.channel === 'master'
+            ? masterState
+            : (typeof getChannelStateById === 'function' ? getChannelStateById(d.channel) : null);
+        if (s) s.pan = d.value;
+
+        // Atualiza o indicador visual (apenas no layout desktop)
+        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function') {
+            updatePanIndicator(d.channel, d.value);
+        }
+        return;
+    }
+
     if (d.channel === 'master' || d.type.startsWith('kStereo')) {
         if (d.type === 'kStereoFader/kFader') updateUI('master', d.value, undefined, undefined);
         if (d.type === 'kStereoChannelOn/kChannelOn') updateUI('master', undefined, isTrue, undefined);
@@ -359,6 +375,18 @@ socket.on('sync', (s) => {
     if (s.master) {
         Object.assign(masterState, s.master);
         updateUI('master', s.master.value, !!s.master.on, undefined);
+        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function' && s.master.pan !== undefined) {
+            updatePanIndicator('master', s.master.pan);
+        }
+    }
+
+    // Atualiza os indicadores de Pan após o sync completo (desktop apenas)
+    if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function' && s.channels) {
+        for (let i = 0; i < 40; i++) {
+            if (!s.channels[i] || s.channels[i].pan === undefined) continue;
+            const globalId = (i >= 32 && i <= 39) ? (60 + (i - 32) * 2) : i;
+            updatePanIndicator(globalId, s.channels[i].pan);
+        }
     }
 });
 

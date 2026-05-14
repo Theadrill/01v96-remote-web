@@ -1306,6 +1306,95 @@ body.layout-desktop .sidebar {
     font-weight: bold;
 }
 
+/* ---- PAN INDICATOR (Desktop only) ---- */
+.desk-pan-indicator {
+    height: 25px;
+    background: #0d0d0d;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    box-sizing: border-box;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.desk-pan-track {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background: #222;
+    border-radius: 2px;
+    overflow: visible;
+}
+
+/* L / C / R tick marks */
+.desk-pan-track::before,
+.desk-pan-track::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    width: 1px;
+    height: 10px;
+    background: #333;
+}
+.desk-pan-track::before { left: 0; }       /* L tick */
+.desk-pan-track::after  { right: 0; }      /* R tick */
+
+/* Center tick */
+.desk-pan-center-tick {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    width: 1px;
+    height: 10px;
+    background: #3a3a3a;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+/* L and R mini-labels */
+.desk-pan-l,
+.desk-pan-r {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 7px;
+    font-weight: bold;
+    color: #333;
+    letter-spacing: 0;
+    pointer-events: none;
+    line-height: 1;
+}
+.desk-pan-l { left: 1px; }
+.desk-pan-r { right: 1px; }
+
+/* The moving thumb */
+.desk-pan-thumb {
+    position: absolute;
+    top: 50%;
+    width: 2px;
+    height: 14px;
+    background: #a855f7;
+    border-radius: 1px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: left 0.08s ease, background 0.15s ease;
+    box-shadow: 0 0 4px rgba(168, 85, 247, 0.5);
+}
+
+/* Center = dimmer color */
+.desk-pan-thumb.pan-center {
+    background: #4a4a5a;
+    box-shadow: none;
+}
+
+/* Active / hover glow */
+.desk-pan-indicator:hover .desk-pan-thumb {
+    box-shadow: 0 0 7px rgba(168, 85, 247, 0.8);
+}
+
 body.layout-desktop .sidebar .side-btn {
     height: 60px;
     font-size: 14px;

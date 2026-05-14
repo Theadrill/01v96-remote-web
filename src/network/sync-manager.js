@@ -1,6 +1,7 @@
 const protocol = require('../midi/protocol');
 const stateManager = require('../state/state-manager');
 const masterMeter = require('../state/master-meter');
+const panModule = require('../midi/pan');
 
 class SyncManager {
     constructor(scheduler, io, sceneManager) {
@@ -209,6 +210,12 @@ class SyncManager {
         }
 
         this.hasSyncedNamesThisSession = true;
+
+        // Pan de todos os canais de input, ST IN e Master
+        const panRequests = panModule.buildPanSyncRequests();
+        for (const req of panRequests) {
+            this.scheduler.enqueue(req, priority);
+        }
 
         // Registra callback para quando a q1 esvaziar
         this.scheduler.onQ1Empty = () => {

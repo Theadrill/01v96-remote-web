@@ -217,9 +217,55 @@ function createDesktopStrip(config) {
                 <button class="btn-nudge-desk">-</button>
             </div>
             
-            <div class="desk-footer-label">${title}</div>
+            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}">
+                <span class="desk-pan-l">L</span>
+                <div class="desk-pan-track">
+                    <div class="desk-pan-center-tick"></div>
+                    <div class="desk-pan-thumb pan-center" style="left:50%"></div>
+                </div>
+                <span class="desk-pan-r">R</span>
+            </div>
         </div>
     `;
+}
+
+/**
+ * Atualiza o indicador visual de Pan no fader desktop.
+ * @param {number|string} channel  ID global do canal (0-31, 60-67, ou 'master')
+ * @param {number}        panValue Valor entre -63 (L) e +63 (R)
+ */
+function updatePanIndicator(channel, panValue) {
+    // Resolve o ID do card da mesma forma que createDesktopChannelStrip / createDesktopOutputStrip
+    let cardId;
+    if (channel === 'master') {
+        cardId = 'cardmaster';
+    } else if (typeof channel === 'number' && channel >= 60 && channel <= 67) {
+        const stIndex = Math.floor((channel - 60) / 2);
+        cardId = `cardst${stIndex}`;
+    } else {
+        cardId = `card${channel}`;
+    }
+
+    const card = document.getElementById(cardId);
+    if (!card) return;
+
+    // O indicador é um elemento filho direto com a classe desk-pan-indicator
+    const indicator = card.querySelector('.desk-pan-indicator');
+    if (!indicator) return;
+
+    const thumb = indicator.querySelector('.desk-pan-thumb');
+    if (!thumb) return;
+
+    // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%
+    const pct = ((panValue + 63) / 126) * 100;
+    thumb.style.left = `${pct}%`;
+
+    // Cor: centro = cinza, qualquer lado = roxo
+    if (panValue === 0) {
+        thumb.classList.add('pan-center');
+    } else {
+        thumb.classList.remove('pan-center');
+    }
 }
 
 function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
@@ -684,6 +730,21 @@ function initUI() {
     if (!technicianMixMode || !outsMode) {
         updateUI('master', masterState.value, masterState.on, undefined);
     }
+
+    // Inicializa os indicadores de Pan (apenas no layout desktop)
+    if (layoutMode === 'desktop') {
+        for (let i = 0; i < NUM_CHANNELS; i++) {
+            const s = channelStates[i];
+            if (s && s.pan !== undefined) updatePanIndicator(i, s.pan);
+        }
+        // ST IN (globais 60-66)
+        for (let stGlobal = 60; stGlobal <= 66; stGlobal += 2) {
+            const s = channelStates[32 + ((stGlobal - 60) / 2)];
+            if (s && s.pan !== undefined) updatePanIndicator(stGlobal, s.pan);
+        }
+        if (masterState.pan !== undefined) updatePanIndicator('master', masterState.pan);
+    }
+
     // Verifica estado inicial dos solos após renderizar a UI
     checkMasterSoloIndicator();
 }
