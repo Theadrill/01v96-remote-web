@@ -334,7 +334,10 @@ socket.on('sync', (s) => {
                 updateUI(globalId, v, onBool, soloBool);
                 const newName = s.channels[i].name || (i < 32 ? `CH ${i + 1}` : `ST IN ${Math.floor((i - 32) / 2) + 1}`);
                 if (typeof updateNameUI === 'function') {
-                    updateNameUI(globalId, newName);
+                    // Apenas atualiza o nome se for um canal normal (<32) ou o L de um Stereo IN (par: 32, 34, 36, 38)
+                    if (i < 32 || i % 2 === 0) {
+                        updateNameUI(globalId, newName);
+                    }
                 }
             }
         }

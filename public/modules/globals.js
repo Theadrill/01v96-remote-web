@@ -170,6 +170,10 @@ window.updateNameUI = function(channel, name) {
         baseId = `name${channel}`;
         displayTitle = `${channel + 1}`;
     } else if (channel >= 60 && channel <= 67) {
+        // Para ST IN, apenas o canal "L" (par: 60, 62, 64, 66) deve atualizar o visor,
+        // pois eles compartilham o mesmo strip físico na interface.
+        if (channel % 2 !== 0) return; 
+
         const stNum = Math.floor((channel - 60) / 2) + 1;
         baseId = `namest${stNum - 1}`;
         displayTitle = `ST IN ${stNum}`;
