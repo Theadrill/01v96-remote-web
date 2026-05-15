@@ -330,12 +330,20 @@ function handleWheelFader(e, ch, auxIdx) {
     commitFaderChange(ch, newVal);
 }
 
-function handleWheelPan(e, ch) {
+function handleWheelPan(e, ch1, ch2) {
     if (layoutMode !== 'desktop') return;
 
     // Interromper scroll da tela
     e.preventDefault();
     e.stopPropagation();
+
+    // Decide qual canal usar (se houver dois)
+    let ch = ch1;
+    if (ch2 !== undefined && ch2 !== null) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const mid = rect.top + (rect.height / 2);
+        if (e.clientY > mid) ch = ch2;
+    }
 
     const state = getChannelStateById(ch);
     if (!state) return;
@@ -366,11 +374,19 @@ function handleWheelPan(e, ch) {
     }
 }
 
-function resetPan(e, ch) {
+function resetPan(e, ch1, ch2) {
     if (layoutMode !== 'desktop') return;
 
     e.preventDefault();
     e.stopPropagation();
+
+    // Decide qual canal usar (se houver dois)
+    let ch = ch1;
+    if (ch2 !== undefined && ch2 !== null) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const mid = rect.top + (rect.height / 2);
+        if (e.clientY > mid) ch = ch2;
+    }
 
     const state = getChannelStateById(ch);
     if (!state) return;
@@ -396,7 +412,7 @@ let isPanDragging = false;
 let activePanChannel = null;
 let activePanTrack = null;
 
-function startPanLongPress(e, ch) {
+function startPanLongPress(e, ch1, ch2) {
     if (layoutMode !== 'desktop') return;
     e.stopPropagation();
     e.preventDefault(); // Impede o disparo de mousedown legado
@@ -405,7 +421,16 @@ function startPanLongPress(e, ch) {
 
     const target = e.currentTarget;
     const clientX = e.clientX;
+    const clientY = e.clientY;
     
+    // Decide qual canal usar (se houver dois)
+    let ch = ch1;
+    if (ch2 !== undefined && ch2 !== null) {
+        const rect = target.getBoundingClientRect();
+        const mid = rect.top + (rect.height / 2);
+        if (clientY > mid) ch = ch2;
+    }
+
     activePanChannel = ch;
     activePanTrack = target;
 

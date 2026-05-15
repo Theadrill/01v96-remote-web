@@ -218,15 +218,21 @@ function createDesktopStrip(config) {
                 <button class="btn-nudge-desk">-</button>
             </div>
             
-            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}">
+            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}"
+                 ${layoutMode === 'desktop' && hasPan ? `
+                    onwheel="handleWheelPan(event, ${evtCh}, ${partnerId})" 
+                    ondblclick="resetPan(event, ${evtCh}, ${partnerId})"
+                    onpointerdown="startPanLongPress(event, ${evtCh}, ${partnerId})"
+                    onpointermove="handlePanPointerMove(event)"
+                    onpointerup="stopPanLongPress(event)"
+                    onpointerleave="stopPanLongPress(event)"
+                    onpointercancel="stopPanLongPress(event)"` : ''}>
                 ${hasPan ? `
                 <span class="desk-pan-l">L</span>
                 <div class="desk-pan-tracks-container">
                     ${(() => {
-                        // Função auxiliar para gerar o HTML de uma trilha de Pan com valor inicial
                         const getPanTrackHTML = (ch) => {
                             let panVal = 0;
-                            // Usa a função global getChannelStateById para pegar o estado (já lida com mapeamento 60 -> 32)
                             const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
                             if (stateRef && stateRef.pan !== undefined) {
                                 panVal = stateRef.pan;
@@ -238,15 +244,7 @@ function createDesktopStrip(config) {
                             if (panVal > 0) panClass = "pan-right";
 
                             return `
-                                <div class="desk-pan-track" data-pan-ch="${ch}"
-                                     ${layoutMode === 'desktop' ? `
-                                        onwheel="handleWheelPan(event, ${ch})" 
-                                        ondblclick="resetPan(event, ${ch})"
-                                        onpointerdown="startPanLongPress(event, ${ch})"
-                                        onpointermove="handlePanPointerMove(event)"
-                                        onpointerup="stopPanLongPress(event)"
-                                        onpointerleave="stopPanLongPress(event)"
-                                        onpointercancel="stopPanLongPress(event)"` : ''}>
+                                <div class="desk-pan-track" data-pan-ch="${ch}">
                                     <div class="desk-pan-center-tick"></div>
                                     <div class="desk-pan-thumb ${panClass}" style="left:${percent}%"></div>
                                 </div>
