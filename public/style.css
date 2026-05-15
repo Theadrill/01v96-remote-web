@@ -29,7 +29,7 @@ body.layout-horizontal {
     padding: 10px 20px;
     overflow-x: auto;
     overflow-y: hidden;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 15px;
     order: 1;

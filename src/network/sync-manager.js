@@ -74,6 +74,12 @@ class SyncManager {
         // Para os meters antes do sync
         this.scheduler.enqueue(masterMeter.buildStopRequest(), priority);
 
+        // [PRIORIDADE] Pan de todos os canais de input, ST IN e Master
+        const panRequests = panModule.buildPanSyncRequests();
+        for (const req of panRequests) {
+            this.scheduler.enqueue(req, priority);
+        }
+
         // Fader e On do Stereo Master
         this.scheduler.enqueue(protocol.buildRequest('kStereoFader/kFader', 0), priority);
 
@@ -210,12 +216,6 @@ class SyncManager {
         }
 
         this.hasSyncedNamesThisSession = true;
-
-        // Pan de todos os canais de input, ST IN e Master
-        const panRequests = panModule.buildPanSyncRequests();
-        for (const req of panRequests) {
-            this.scheduler.enqueue(req, priority);
-        }
 
         // Registra callback para quando a q1 esvaziar
         this.scheduler.onQ1Empty = () => {

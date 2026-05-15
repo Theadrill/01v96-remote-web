@@ -9,7 +9,7 @@
 //
 //  CH_IDX (índice linear 0-based):
 //    CH 1-32    → 0x00–0x1F
-//    ST IN 1-4  → 0x20–0x23
+//    ST IN 1-4  → 0x20, 0x22, 0x24, 0x26
 //    MASTER     → usa endereço diferente: 4E 00 01 (não usa 1B)
 //
 //  VALOR (4 bytes, 28-bit signed, leitura big-endian de 7 bits cada):
@@ -115,10 +115,10 @@ function globalChannelToPanIndex(globalChannel) {
         return { isMaster: false, channelIdx: ch };
     }
 
-    // ST IN 1-4 (índices globais 60, 62, 64, 66 → local 32, 33, 34, 35 = 0x20–0x23)
+    // ST IN 1-4 (índices globais 60, 62, 64, 66 → local 32, 34, 36, 38 = 0x20, 0x22, 0x24, 0x26)
     if (ch >= 60 && ch <= 67) {
         const stIdx = Math.floor((ch - 60) / 2); // 0-3
-        return { isMaster: false, channelIdx: 0x20 + stIdx };
+        return { isMaster: false, channelIdx: 0x20 + (stIdx * 2) };
     }
 
     // AUX, BUS, MATRIX: não têm Pan independente de canal
@@ -220,9 +220,10 @@ function parsePanMessage(message) {
         if (chIdx >= 0x00 && chIdx <= 0x1F) {
             // CH 1-32
             globalChannel = chIdx;
-        } else if (chIdx >= 0x20 && chIdx <= 0x23) {
-            // ST IN 1-4
-            globalChannel = 60 + ((chIdx - 0x20) * 2);
+        } else if (chIdx >= 0x20 && chIdx <= 0x27) {
+            // ST IN 1-4 (mapeados nos índices pares 32, 34, 36, 38)
+            const stIdx = Math.floor((chIdx - 0x20) / 2);
+            globalChannel = 60 + (stIdx * 2);
         } else {
             return null;
         }

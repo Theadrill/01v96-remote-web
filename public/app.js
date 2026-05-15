@@ -11,26 +11,17 @@ setTimeout(() => {
 
 // --- Otimização de Performance: Page Visibility & Focus API ---
 // Pausa todas as atualizações de interface quando a janela perde o foco ou fica oculta.
-const handlePause = () => {
-    if (typeof socket !== 'undefined' && socket.connected) {
-        console.log("⏸️ Janela fora de foco. Desconectando socket para poupar CPU.");
-        socket.disconnect();
-    }
-};
-
-const handleResume = () => {
-    if (typeof socket !== 'undefined' && socket.disconnected) {
-        console.log("▶️ Janela focada. Reconectando socket e sincronizando estado.");
-        socket.connect();
-    }
-};
-
 // Eventos de Visibilidade (Troca de aba/Minimizar)
 document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === 'hidden') handlePause();
-    else handleResume();
+    if (document.visibilityState === 'hidden') {
+        if (typeof socket !== 'undefined' && socket.connected) {
+            console.log("⏸️ Aba oculta. Desconectando socket para poupar recursos.");
+            socket.disconnect();
+        }
+    } else {
+        if (typeof socket !== 'undefined' && socket.disconnected) {
+            console.log("▶️ Aba visível. Reconectando socket.");
+            socket.connect();
+        }
+    }
 });
-
-// Eventos de Foco (Clicar em outra janela/aplicativo)
-window.addEventListener("blur", handlePause);
-window.addEventListener("focus", handleResume);

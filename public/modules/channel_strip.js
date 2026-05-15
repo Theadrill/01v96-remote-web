@@ -154,6 +154,7 @@ function createDesktopStrip(config) {
         isOn = false,    // Estado ON/OFF inicial
         isPaired = false,
         partnerId = null,
+        hasPan = true,    // Define se exibe o indicador de Pan
         dataCh = ""      // Canal real para meters
     } = config;
 
@@ -218,36 +219,48 @@ function createDesktopStrip(config) {
             </div>
             
             <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}">
+                ${hasPan ? `
                 <span class="desk-pan-l">L</span>
                 <div class="desk-pan-tracks-container">
-                    <div class="desk-pan-track" data-pan-ch="${evtCh}"
-                         ${layoutMode === 'desktop' ? `
-                            onwheel="handleWheelPan(event, ${evtCh})" 
-                            ondblclick="resetPan(event, ${evtCh})"
-                            onpointerdown="startPanLongPress(event, ${evtCh})"
-                            onpointermove="handlePanPointerMove(event)"
-                            onpointerup="stopPanLongPress(event)"
-                            onpointerleave="stopPanLongPress(event)"
-                            onpointercancel="stopPanLongPress(event)"` : ''}>
-                        <div class="desk-pan-center-tick"></div>
-                        <div class="desk-pan-thumb pan-center" style="left:50%"></div>
-                    </div>
-                    ${isPaired && partnerId !== null ? `
-                    <div class="desk-pan-track" data-pan-ch="${partnerId}"
-                         ${layoutMode === 'desktop' ? `
-                            onwheel="handleWheelPan(event, ${partnerId})" 
-                            ondblclick="resetPan(event, ${partnerId})"
-                            onpointerdown="startPanLongPress(event, ${partnerId})"
-                            onpointermove="handlePanPointerMove(event)"
-                            onpointerup="stopPanLongPress(event)"
-                            onpointerleave="stopPanLongPress(event)"
-                            onpointercancel="stopPanLongPress(event)"` : ''}>
-                        <div class="desk-pan-center-tick"></div>
-                        <div class="desk-pan-thumb pan-center" style="left:50%"></div>
-                    </div>
-                    ` : ''}
+                    ${(() => {
+                        // Função auxiliar para gerar o HTML de uma trilha de Pan com valor inicial
+                        const getPanTrackHTML = (ch) => {
+                            let panVal = 0;
+                            // Usa a função global getChannelStateById para pegar o estado (já lida com mapeamento 60 -> 32)
+                            const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+                            if (stateRef && stateRef.pan !== undefined) {
+                                panVal = stateRef.pan;
+                            }
+                            
+                            const percent = ((panVal + 63) / 126) * 100;
+                            let panClass = "pan-center";
+                            if (panVal < 0) panClass = "pan-left";
+                            if (panVal > 0) panClass = "pan-right";
+
+                            return `
+                                <div class="desk-pan-track" data-pan-ch="${ch}"
+                                     ${layoutMode === 'desktop' ? `
+                                        onwheel="handleWheelPan(event, ${ch})" 
+                                        ondblclick="resetPan(event, ${ch})"
+                                        onpointerdown="startPanLongPress(event, ${ch})"
+                                        onpointermove="handlePanPointerMove(event)"
+                                        onpointerup="stopPanLongPress(event)"
+                                        onpointerleave="stopPanLongPress(event)"
+                                        onpointercancel="stopPanLongPress(event)"` : ''}>
+                                    <div class="desk-pan-center-tick"></div>
+                                    <div class="desk-pan-thumb ${panClass}" style="left:${percent}%"></div>
+                                </div>
+                            `;
+                        };
+
+                        let tracksHTML = getPanTrackHTML(evtCh);
+                        if (isPaired && partnerId !== null) {
+                            tracksHTML += getPanTrackHTML(partnerId);
+                        }
+                        return tracksHTML;
+                    })()}
                 </div>
-                <span class="desk-pan-r">R</span>
+                <span class="desk-pan-r">R</span>` : ''}
             </div>
         </div>
     `;
@@ -527,8 +540,9 @@ function createDesktopOutputStrip(i, type) {
         onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})`,
         configAction: `openChannelConfig(event, ${configId})`,
         type: "output",
-        isPaired: type === 'stIn',
-        partnerId: type === 'stIn' ? configId + 1 : null,
+        isPaired: false,
+        partnerId: null,
+        hasPan: type === 'stIn', // Apenas ST IN tem Pan nas saídas
         dataCh: configId
     });
 }
@@ -773,7 +787,7 @@ function initUI() {
         }
         // ST IN (globais 60-66)
         for (let stGlobal = 60; stGlobal <= 66; stGlobal += 2) {
-            const s = channelStates[32 + ((stGlobal - 60) / 2)];
+            const s = channelStates[32 + (stGlobal - 60)];
             if (s && s.pan !== undefined) updatePanIndicator(stGlobal, s.pan);
         }
         if (masterState.pan !== undefined) updatePanIndicator('master', masterState.pan);
