@@ -45,6 +45,7 @@ Tabela de 1/12 oitava usada por HPF/LPF:
 
 ### 3.1. Reverb Standard (IDs 0, 1, 2, 3)
 *Abrange: Hall, Room, Stage, Plate.*
+*   **Status de Calibração:** ✅ **PRONTO PARA IMPLEMENTAÇÃO** (HOLD/DECAY Verificados)
 
 | Parâmetro | Hex | Nome | Lógica de Conversão |
 |---|---|---|---|
