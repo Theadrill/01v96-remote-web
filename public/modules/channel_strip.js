@@ -172,7 +172,7 @@ function createDesktopStrip(config) {
     const inputCall = `${onInputAction}(event, ${evtCh})`;
 
     return `
-        <div class="fader-card-desktop ${customClass}" id="${ids.card || `${pfx}card${id}`}" ${dataCh ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
+        <div class="fader-card-desktop ${customClass}" id="${ids.card || `${pfx}card${id}`}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
             <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${isMaster ? '' : configAction}">${title}</div>
             
             ${hasSolo ?
@@ -409,7 +409,7 @@ function createMobileStrip(config) {
     const onBtn = `<button id="${onId}" class="btn-state ${isOn ? 'on-active' : ''}" onclick="${onAction}">On</button>`;
 
     return `
-        <div class="fader-card ${customClass}" id="${cardId}" ${dataCh ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
+        <div class="fader-card ${customClass}" id="${cardId}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
             ${isPaired ? `
             <div class="mobile-paired-meter left"></div>
             <div class="mobile-paired-meter right"></div>
