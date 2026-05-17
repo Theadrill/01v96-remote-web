@@ -171,7 +171,7 @@ function _openConfirmModal(scene, action, gridModal) {
         confirmTitle.style.color  = '#dc3545';
         confirmText.innerHTML     = `Deseja SALVAR a mixagem atual no slot <b>${scene.index}</b>?`;
         renameContainer.style.display = 'block';
-        renameInput.value = window.currentSceneName || scene.name || '';
+        renameInput.value = (!scene.isEmpty && scene.name) ? scene.name : (window.currentSceneName || '');
         actionBtn.style.background = '#dc3545';
         actionBtn.innerText = 'SIM, SALVAR';
         actionBtn.onclick = () => {
