@@ -1,5 +1,5 @@
 const { COMMAND_BYTES } = require('./dictionary');
-const propertyMap = require('./property-map');
+const panModule = require('./pan');
 
 const CONVERTERS = {
     faderToBytes: (value) => [0, 0, (value >> 7) & 0x07, value & 0x7F],
@@ -129,22 +129,19 @@ function buildNameChange(channelIndex, charIndex, charCode) {
 function parseIncoming(message) {
     if (!message || message.length < 8) return null;
 
-    // Ignora se não for uma mensagem de dados/mudança (0x1n). 
+    // Ignora se não for uma mensagem de dados/mudança (0x1n).
     // Isso evita processar nossos próprios pedidos (Requests 0x3n) que o loopMIDI ecoa de volta.
     if ((message[2] & 0xF0) !== 0x10) return null;
 
-    const section = message[4];
+    // --- PRIORIDADE 0: PAN ---
+    // Intercepta antes de qualquer outro parser pois usa seção 0x7F / 0x4E
+    // que não faz parte das seções padrão (13, 26, 127, 1).
+    const panResult = panModule.parsePanMessage(message);
+    if (panResult) return panResult;
+
     const group = message[5];
     const parameter = message[7];
     const channel = message[8];
-
-    // Debug para nomes (Section 13, Group 2)
-    /*
-    if (section === 13 && group === 2 && message[6] >= 4) {
-        const hex = Buffer.from(message).toString('hex').toUpperCase();
-        console.log(`🧐 [PROTOCOL DEBUG] Sec:${section} Grp:${group} Elm:${message[6]} Prm:${parameter} Ch:${channel} Hex:${hex}`);
-    }
-    */
 
     const element = message[6];
 
@@ -152,24 +149,20 @@ function parseIncoming(message) {
     // Captura mensagens de Metering Universal (Seções 13, 26, 127) da Yamaha 01V96.
     // Para os canais 1-32, a Yamaha envia mensagens longas (>20 bytes) com os "steps" (0-31) no High Byte de cada canal.
     const isMasterMeter = (message.length === 14) && (message[4] === 13) && (message[5] === 33) && (message[6] === 4);
-    const isUniversalMeter = (message.length > 20) && 
-                    (message[4] === 13 || message[4] === 26 || message[4] === 127) && 
+    const isUniversalMeter = (message.length > 20) &&
+                    (message[4] === 13 || message[4] === 26 || message[4] === 127) &&
                     (group === 33 || group === 32 || group === 82);
 
     if (isMasterMeter || isUniversalMeter) {
         let levels = {};
         const dataStart = 9;
-        // Stereo Master (Point 4 no comando 0x21) tem 2 canais (L/R)
-        // Se a mensagem for curta (14 bytes), é provavelmente o Master Meter.
         const isMasterPoint = (message[6] === 4);
         
-        // Determina quantos canais de meter existem nesta mensagem (High Byte de cada par)
         const dataBytesAvailable = (message.length - 1) - dataStart;
         const numChannelsInMessage = Math.floor(dataBytesAvailable / 2);
 
         for (let i = 0; i < numChannelsInMessage; i++) {
             const idx = dataStart + (i * 2);
-            // Usamos objeto esparso com o offset do canal (byte 8)
             levels[channel + i] = message[idx] || 0;
         }
         return { type: 'METER_DATA', levels, group: message[5], isMaster: isMasterPoint };
@@ -178,14 +171,12 @@ function parseIncoming(message) {
     if (message[4] === 13 && message[5] === 127) return null;
 
     const dataBytes = message.slice(9, -1);
-    // canal e parameter já declarados no topo para debug
 
     // 🚨 [CRITICAL SYNC LOGIC] - PARAMETER CHANGES
     // Suporta ID 13, 26 e 127 (Universal) que são os comandos de mudança de parâmetro da 01V96.
     if (message[4] === 13 || message[4] === 127 || message[4] === 26 || message[4] === 1) {
 
         // --- PRIORIDADE 1: NOMES DE CANAIS E CENAS ---
-        // Se o elemento for um dos IDs de nome (4, 15, 16, 18) e o parâmetro estiver no range de caracteres (4-19)
         // Se o elemento for um dos IDs de nome (4, 15, 16, 18, 23) e o parâmetro estiver no range de caracteres (4-19)
         if ([4, 15, 16, 18, 23].includes(element) && parameter >= 4 && parameter <= 19) {
             const charIndex = parameter - 4;
@@ -202,8 +193,6 @@ function parseIncoming(message) {
 
             // 🚨 [STRICT CHECK] Apenas Seção 13 (Current) e Grupo 2 contêm nomes de canais nesta estrutura de elemento/parâmetro
             if (message[4] !== 13 || group !== 2) return null;
-
-            // console.log(`✅ [NAME PARSED] Sec:${message[4]} Grp:${group} Elm:${element} Ch:${channel} -> Global:${channelIndex} Pos:${charIndex} Char:'${char}' (Code:${charCode})`);
 
             return {
                 type: 'updateNameChar',
@@ -265,7 +254,7 @@ function parseIncoming(message) {
             let globalCh = channel;
             if (prefix === 'kAUX') globalCh = 36 + channel;
             else if (prefix === 'kBus') globalCh = 44 + channel;
-            else if (prefix === 'kMatrix') globalCh = 52 + channel; // Matrix starts at 52? Check project global index.
+            else if (prefix === 'kMatrix') globalCh = 52 + channel;
             else if (prefix === 'kStereo') globalCh = 'master';
 
             return { type: `${prefix}Comp/${key}`, channel: globalCh, value: converter(dataBytes) };
@@ -337,7 +326,6 @@ function parseIncoming(message) {
             if (offset === 2) return { type: `kInputAUX/kAUX${auxIdx}Level`, channel, value: CONVERTERS.bytesToFader(dataBytes) };
         }
 
-
         // Solo
         if (message[5] === 3 && element === 46) {
             return { type: 'kSetupSoloChOn/kSoloChOn', channel, value: CONVERTERS.bytesToOn(dataBytes) };
@@ -353,7 +341,6 @@ function parseIncoming(message) {
             return { type: 'kInputPair/kPair', channel, value: dataBytes[dataBytes.length - 1] };
         }
     }
-
 
     return null;
 }

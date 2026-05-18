@@ -154,6 +154,7 @@ function createDesktopStrip(config) {
         isOn = false,    // Estado ON/OFF inicial
         isPaired = false,
         partnerId = null,
+        hasPan = true,    // Define se exibe o indicador de Pan
         dataCh = ""      // Canal real para meters
     } = config;
 
@@ -171,7 +172,7 @@ function createDesktopStrip(config) {
     const inputCall = `${onInputAction}(event, ${evtCh})`;
 
     return `
-        <div class="fader-card-desktop ${customClass}" id="${ids.card || `${pfx}card${id}`}" ${dataCh ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
+        <div class="fader-card-desktop ${customClass}" id="${ids.card || `${pfx}card${id}`}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
             <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${isMaster ? '' : configAction}">${title}</div>
             
             ${hasSolo ?
@@ -217,9 +218,99 @@ function createDesktopStrip(config) {
                 <button class="btn-nudge-desk">-</button>
             </div>
             
-            <div class="desk-footer-label">${title}</div>
+            <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}"
+                 ${layoutMode === 'desktop' && hasPan ? `
+                    onwheel="handleWheelPan(event, ${evtCh}, ${partnerId})" 
+                    ondblclick="resetPan(event, ${evtCh}, ${partnerId})"
+                    onpointerdown="startPanLongPress(event, ${evtCh}, ${partnerId})"
+                    onpointermove="handlePanPointerMove(event)"
+                    onpointerup="stopPanLongPress(event)"
+                    onpointerleave="stopPanLongPress(event)"
+                    onpointercancel="stopPanLongPress(event)"` : ''}>
+                ${hasPan ? `
+                <span class="desk-pan-l">L</span>
+                <div class="desk-pan-tracks-container">
+                    ${(() => {
+                        const getPanTrackHTML = (ch) => {
+                            let panVal = 0;
+                            const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+                            if (stateRef && stateRef.pan !== undefined) {
+                                panVal = stateRef.pan;
+                            }
+                            
+                            const percent = ((panVal + 63) / 126) * 100;
+                            let panClass = "pan-center";
+                            if (panVal < 0) panClass = "pan-left";
+                            if (panVal > 0) panClass = "pan-right";
+
+                            return `
+                                <div class="desk-pan-track" data-pan-ch="${ch}">
+                                    <div class="desk-pan-center-tick"></div>
+                                    <div class="desk-pan-thumb ${panClass}" style="left:${percent}%"></div>
+                                </div>
+                            `;
+                        };
+
+                        let tracksHTML = getPanTrackHTML(evtCh);
+                        if (isPaired && partnerId !== null) {
+                            tracksHTML += getPanTrackHTML(partnerId);
+                        }
+                        return tracksHTML;
+                    })()}
+                </div>
+                <span class="desk-pan-r">R</span>` : ''}
+            </div>
         </div>
     `;
+}
+
+/**
+ * Atualiza o indicador visual de Pan no fader desktop.
+ * @param {number|string} channel  ID global do canal (0-31, 60-67, ou 'master')
+ * @param {number}        panValue Valor entre -63 (L) e +63 (R)
+ */
+function updatePanIndicator(channel, panValue) {
+    // Resolve o ID do card da mesma forma que createDesktopChannelStrip / createDesktopOutputStrip
+    let cardId;
+    if (channel === 'master') {
+        cardId = 'cardmaster';
+    } else if (typeof channel === 'number' && channel >= 60 && channel <= 67) {
+        const stIndex = Math.floor((channel - 60) / 2);
+        cardId = `cardst${stIndex}`;
+    } else {
+        cardId = `card${channel}`;
+    }
+
+    let card = document.getElementById(cardId);
+    if (!card && typeof channel === 'number') {
+        // Se não achou o card pelo ID direto, pode ser um canal linkado (o card fica no canal A)
+        const s = channelStates[channel];
+        if (s && s.paired && s.pairedWith !== null) {
+            // Se o canal atual for o "B" do par (índice ímpar), o card real é o do canal A
+            const masterIdx = Math.min(channel, s.pairedWith);
+            card = document.getElementById(`card${masterIdx}`);
+        }
+    }
+
+    if (!card) return;
+
+    // Busca a trilha específica do canal dentro do card (ou a primeira se não houver data-pan-ch)
+    const track = card.querySelector(`.desk-pan-track[data-pan-ch="${channel}"]`) || card.querySelector('.desk-pan-track');
+    if (!track) return;
+
+    const thumb = track.querySelector('.desk-pan-thumb');
+    if (!thumb) return;
+
+    // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%
+    const pct = ((panValue + 63) / 126) * 100;
+    thumb.style.left = `${pct}%`;
+
+    // Cor: centro = cinza, qualquer lado = roxo
+    if (panValue === 0) {
+        thumb.classList.add('pan-center');
+    } else {
+        thumb.classList.remove('pan-center');
+    }
 }
 
 function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
@@ -318,7 +409,7 @@ function createMobileStrip(config) {
     const onBtn = `<button id="${onId}" class="btn-state ${isOn ? 'on-active' : ''}" onclick="${onAction}">On</button>`;
 
     return `
-        <div class="fader-card ${customClass}" id="${cardId}" ${dataCh ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
+        <div class="fader-card ${customClass}" id="${cardId}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
             ${isPaired ? `
             <div class="mobile-paired-meter left"></div>
             <div class="mobile-paired-meter right"></div>
@@ -447,8 +538,9 @@ function createDesktopOutputStrip(i, type) {
         onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})`,
         configAction: `openChannelConfig(event, ${configId})`,
         type: "output",
-        isPaired: type === 'stIn',
-        partnerId: type === 'stIn' ? configId + 1 : null,
+        isPaired: false,
+        partnerId: null,
+        hasPan: type === 'stIn', // Apenas ST IN tem Pan nas saídas
         dataCh: configId
     });
 }
@@ -684,6 +776,21 @@ function initUI() {
     if (!technicianMixMode || !outsMode) {
         updateUI('master', masterState.value, masterState.on, undefined);
     }
+
+    // Inicializa os indicadores de Pan (apenas no layout desktop)
+    if (layoutMode === 'desktop') {
+        for (let i = 0; i < NUM_CHANNELS; i++) {
+            const s = channelStates[i];
+            if (s && s.pan !== undefined) updatePanIndicator(i, s.pan);
+        }
+        // ST IN (globais 60-66)
+        for (let stGlobal = 60; stGlobal <= 66; stGlobal += 2) {
+            const s = channelStates[32 + (stGlobal - 60)];
+            if (s && s.pan !== undefined) updatePanIndicator(stGlobal, s.pan);
+        }
+        if (masterState.pan !== undefined) updatePanIndicator('master', masterState.pan);
+    }
+
     // Verifica estado inicial dos solos após renderizar a UI
     checkMasterSoloIndicator();
 }

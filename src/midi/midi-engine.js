@@ -1,6 +1,6 @@
 const midi = require('midi');
 const protocol = require('./protocol');
-const syncCounter = require('./sync-counter');
+const syncCounter = require('../network/sync-counter');
 const MidiAssembler = require('./midi-assembler');
 const MidiScheduler = require('./midi-scheduler');
 
@@ -52,9 +52,9 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         }
 
         // Se já existirem instâncias abertas mas as portas mudaram, limpamos tudo primeiro
-        if (input) { try { input.closePort(); } catch(e){} }
+        if (input) { try { input.closePort(); } catch {} }
         assembler = null;
-        if (output) { try { output.closePort(); } catch(e){} }
+        if (output) { try { output.closePort(); } catch {} }
         syncCounter.reset(); // Zera os pendentes
 
 
@@ -87,7 +87,7 @@ function connectPorts(inputIdx, outputIdx, onMessageCallback) {
         // Instancia o MidiScheduler responsável por controlar todo o envio
         if (!scheduler) {
             scheduler = new MidiScheduler({ send: (msg) => sendDirect(msg) }, 15); // padrão 15ms
-            try { scheduler.start(); } catch (e) {}
+            try { scheduler.start(); } catch {}
         }
 
         // Escuta as mensagens vindas da mesa física e passa para o assembler

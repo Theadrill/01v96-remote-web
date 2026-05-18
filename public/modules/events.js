@@ -330,6 +330,165 @@ function handleWheelFader(e, ch, auxIdx) {
     commitFaderChange(ch, newVal);
 }
 
+function handleWheelPan(e, ch1, ch2) {
+    if (layoutMode !== 'desktop') return;
+
+    // Interromper scroll da tela
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Decide qual canal usar (se houver dois)
+    let ch = ch1;
+    if (ch2 !== undefined && ch2 !== null) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const mid = rect.top + (rect.height / 2);
+        if (e.clientY > mid) ch = ch2;
+    }
+
+    const state = getChannelStateById(ch);
+    if (!state) return;
+
+    // Valor atual ou 0 (Centro)
+    let currentPan = (state.pan !== undefined) ? state.pan : 0;
+    
+    // Roda para cima (negativo deltaY) incrementa (move para R)
+    // Roda para baixo (positivo deltaY) decrementa (move para L)
+    const dir = e.deltaY < 0 ? 1 : -1;
+    let newPan = currentPan + dir;
+
+    // Limites da Yamaha 01V96 (-63 a +63)
+    if (newPan < -63) newPan = -63;
+    if (newPan > 63) newPan = 63;
+
+    // Feedback imediato na UI
+    if (typeof updatePanIndicator === 'function') {
+        updatePanIndicator(ch, newPan);
+    }
+
+    // Atualiza estado local para consistência
+    state.pan = newPan;
+
+    // Emite para o servidor
+    if (appReady) {
+        socket.emit('setPan', { channel: ch, value: newPan });
+    }
+}
+
+function resetPan(e, ch1, ch2) {
+    if (layoutMode !== 'desktop') return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Decide qual canal usar (se houver dois)
+    let ch = ch1;
+    if (ch2 !== undefined && ch2 !== null) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const mid = rect.top + (rect.height / 2);
+        if (e.clientY > mid) ch = ch2;
+    }
+
+    const state = getChannelStateById(ch);
+    if (!state) return;
+
+    const centerValue = 0;
+
+    // Feedback imediato na UI
+    if (typeof updatePanIndicator === 'function') {
+        updatePanIndicator(ch, centerValue);
+    }
+
+    // Atualiza estado local
+    state.pan = centerValue;
+
+    // Emite para o servidor
+    if (appReady) {
+        socket.emit('setPan', { channel: ch, value: centerValue });
+    }
+}
+
+let panLongPressTimeout = null;
+let isPanDragging = false;
+let activePanChannel = null;
+let activePanTrack = null;
+
+function startPanLongPress(e, ch1, ch2) {
+    if (layoutMode !== 'desktop') return;
+    e.stopPropagation();
+    e.preventDefault(); // Impede o disparo de mousedown legado
+    
+    stopPanLongPress(e);
+
+    const target = e.currentTarget;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    
+    // Decide qual canal usar (se houver dois)
+    let ch = ch1;
+    if (ch2 !== undefined && ch2 !== null) {
+        const rect = target.getBoundingClientRect();
+        const mid = rect.top + (rect.height / 2);
+        if (clientY > mid) ch = ch2;
+    }
+
+    activePanChannel = ch;
+    activePanTrack = target;
+
+    panLongPressTimeout = setTimeout(() => {
+        isPanDragging = true;
+        // Salto inicial ao ativar o modo drag
+        jumpPanToPosition(activePanTrack, clientX, activePanChannel);
+        // Captura o ponteiro para permitir arrastar fora da área da barra
+        if (target.setPointerCapture) target.setPointerCapture(e.pointerId);
+    }, 350); // 350ms para disparar o modo de arrasto
+}
+
+function handlePanPointerMove(e) {
+    if (!isPanDragging || activePanChannel === null || !activePanTrack) return;
+    
+    e.preventDefault();
+    jumpPanToPosition(activePanTrack, e.clientX, activePanChannel);
+}
+
+function stopPanLongPress(e) {
+    if (panLongPressTimeout) clearTimeout(panLongPressTimeout);
+    panLongPressTimeout = null;
+    
+    if (isPanDragging && activePanTrack && e && e.pointerId) {
+        if (activePanTrack.releasePointerCapture) activePanTrack.releasePointerCapture(e.pointerId);
+    }
+    
+    isPanDragging = false;
+    activePanChannel = null;
+    activePanTrack = null;
+}
+
+function jumpPanToPosition(track, clickX, ch) {
+    if (!track) return;
+
+    const rect = track.getBoundingClientRect();
+    const width = rect.width;
+    const offsetX = clickX - rect.left;
+
+    let pct = offsetX / width;
+    if (pct < 0) pct = 0;
+    if (pct > 1) pct = 1;
+
+    // -63 a 63
+    let newPan = Math.round((pct * 126) - 63);
+
+    if (typeof updatePanIndicator === 'function') {
+        updatePanIndicator(ch, newPan);
+    }
+
+    const state = getChannelStateById(ch);
+    if (state) state.pan = newPan;
+
+    if (appReady) {
+        socket.emit('setPan', { channel: ch, value: newPan });
+    }
+}
+
 // Bloqueio de scroll por roda do mouse no modo Desktop e manipulação global de sliders
 const isMobileEvents = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -379,7 +538,7 @@ let scrollLeft;
 document.addEventListener('mousedown', (e) => {
     if (layoutMode !== 'desktop') return;
     const area = e.target.closest('.faders-area');
-    if (area && !e.target.closest('input') && !e.target.closest('button')) {
+    if (area && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('.desk-pan-indicator')) {
         isMouseDown = true;
         area.classList.add('is-grabbing');
         startX = e.pageX - area.offsetLeft;

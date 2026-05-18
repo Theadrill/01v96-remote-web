@@ -25,6 +25,22 @@ socket.on('syncStatus', (data) => {
 });
 socket.on('update', (d) => {
     const isTrue = (d.value === 1 || d.value === true);
+
+    // --- PAN ---
+    if (d.type === 'kPan') {
+        // Atualiza estado local
+        const s = d.channel === 'master'
+            ? masterState
+            : (typeof getChannelStateById === 'function' ? getChannelStateById(d.channel) : null);
+        if (s) s.pan = d.value;
+
+        // Atualiza o indicador visual (apenas no layout desktop)
+        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function') {
+            updatePanIndicator(d.channel, d.value);
+        }
+        return;
+    }
+
     if (d.channel === 'master' || d.type.startsWith('kStereo')) {
         if (d.type === 'kStereoFader/kFader') updateUI('master', d.value, undefined, undefined);
         if (d.type === 'kStereoChannelOn/kChannelOn') updateUI('master', undefined, isTrue, undefined);
@@ -132,6 +148,15 @@ socket.on('update', (d) => {
     } // FIM DO BLOCO DE INPUTS (0-31)
 
     // --- HANDLERS UNIVERSAIS (INPUTS E OUTS) ---
+    
+    // Suporte a Pan em Tempo Real
+    if (d.type === 'kPan') {
+        const s = getChannelStateById(d.channel);
+        if (s) s.pan = d.value;
+        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function') {
+            updatePanIndicator(d.channel, d.value);
+        }
+    }
 
     // Suporte Universal a EQ
     if (d.type.includes('EQ/kEQ')) {
@@ -329,7 +354,12 @@ socket.on('sync', (s) => {
 
                 const soloBool = !!s.channels[i].solo;
                 const onBool = !!o;
-                const globalId = (i >= 32 && i <= 39) ? (i - 32 + 60) : i;
+
+                // Pular índices ímpares dos ST IN (33, 35, 37, 39) para evitar confusão de UI
+                if (i >= 32 && i % 2 !== 0) continue;
+
+                // Canais 0-31 mantêm o ID. ST IN (32-39) mapeiam para 60-67.
+                const globalId = (i >= 32) ? (60 + (i - 32)) : i;
 
                 updateUI(globalId, v, onBool, soloBool);
                 const newName = s.channels[i].name || (i < 32 ? `CH ${i + 1}` : `ST IN ${Math.floor((i - 32) / 2) + 1}`);
@@ -362,6 +392,23 @@ socket.on('sync', (s) => {
     if (s.master) {
         Object.assign(masterState, s.master);
         updateUI('master', s.master.value, !!s.master.on, undefined);
+        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function' && s.master.pan !== undefined) {
+            updatePanIndicator('master', s.master.pan);
+        }
+    }
+
+    // Atualiza os indicadores de Pan após o sync completo (desktop apenas)
+    if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function' && s.channels) {
+        for (let i = 0; i < 40; i++) {
+            if (!s.channels[i] || s.channels[i].pan === undefined) continue;
+            
+            // Pular índices ímpares dos ST IN (33, 35, 37, 39) pois compartilham a barra com os pares
+            if (i >= 32 && i % 2 !== 0) continue;
+
+            // Canais 0-31 mantêm o ID. ST IN (32-39) mapeiam para 60-67.
+            const globalId = (i >= 32) ? (60 + (i - 32)) : i;
+            updatePanIndicator(globalId, s.channels[i].pan);
+        }
     }
 });
 

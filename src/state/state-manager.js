@@ -8,6 +8,7 @@ const state = {
     master: {
         value: 0,
         on: false,
+        pan: 0,           // –63 (L) a 0 (C) a +63 (R)
         name: "MASTER",
         comp: { on: false, thresh: -80, ratio: 7, attack: 30, release: 250, gain: 0, knee: 2 },
         eq: {
@@ -31,6 +32,7 @@ for (let i = 0; i < 40; i++) {
         solo: false,
         phase: 0,
         att: 0,
+        pan: 0,           // –63 (L) a 0 (C) a +63 (R)
         patch: 1, // AD1 default
         nameChars: Array(4).fill(' '), // 4 espaços para as letras
         name: `CH ${i + 1}`,
@@ -108,7 +110,12 @@ function updateState(d) {
         return;
     }
 
-
+    // --- PAN ---
+    if (type === 'kPan') {
+        const s = channel === 'master' ? state.master : getChannelStateById(channel);
+        if (s) s.pan = value;
+        return;
+    }
 
     // Suporte ao Master (Stereo)
     if (channel === 'master' || type.startsWith('kStereo')) {
