@@ -145,9 +145,20 @@ ctx.loadConfigConstants();
 
 ctx.loadStepsCalibration();
 
-// 2. Bandeja do sistema (ícone no tray do Windows)
-const { initSystray } = require('./src/utils/systray');
-initSystray(ctx);
+// 2. Bandeja do sistema (ícone no tray do Windows/Linux Desktop)
+const isAndroid = process.env.PROOT_DISTRO_VERSION || process.env.TERMUX_VERSION;
+
+if (!isAndroid) {
+    try {
+        const { initSystray } = require('./src/utils/systray');
+        initSystray(ctx);
+    } catch (error) {
+        console.log('⚠️ [SYSTRAY] Falha ao carregar a bandeja do sistema:', error.message);
+    }
+} else {
+    console.log('ℹ️ [SERVER] Ambiente Android/Termux detectado. Ignorando ícone da bandeja (Systray).');
+}
+
 
 // 3. Handler de dados MIDI (callback do midiEngine + modo demo)
 const { initMidiHandler } = require('./src/midi/midi-handler');
