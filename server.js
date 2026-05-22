@@ -1,4 +1,4 @@
-
+// Termux workaround
 const os = require('os');
 os.networkInterfaces = () => {
   return {
@@ -146,10 +146,9 @@ ctx.loadConfigConstants();
 ctx.loadStepsCalibration();
 
 // 2. Bandeja do sistema (ícone no tray do Windows/Linux Desktop)
-const osModule = require('os');
-const isAndroid = osModule.release().toLowerCase().includes('android');
+const disableSystray = process.env.DISABLE_SYSTRAY === 'true';
 
-if (!isAndroid) {
+if (!disableSystray) {
     try {
         const { initSystray } = require('./src/utils/systray');
         initSystray(ctx);
@@ -157,8 +156,9 @@ if (!isAndroid) {
         console.log('⚠️ [SYSTRAY] Falha ao carregar a bandeja do sistema:', error.message);
     }
 } else {
-    console.log('ℹ️ [SERVER] Ambiente Android detectado via Kernel. Ignorando ícone da bandeja (Systray) com segurança.');
+    console.log('ℹ️ [SERVER] Systray desativada manualmente. Ignorando ícone da bandeja.');
 }
+
 
 
 
