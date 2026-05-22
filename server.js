@@ -231,10 +231,15 @@ server.listen(PORT, '0.0.0.0', () => {
         setTimeout(() => ctx.iniciarBuscaAutomatica(), ctx.configConstants.boot_delay_ms);
 
         // --- AUTO-START DMX (INTELIGENTE) ---
-        // Apenas abre o app se ele não estiver rodando. Não mexe no USB no boot.
-        setTimeout(() => {
-            console.log('💡 [BOOT] Verificando sistema de iluminação...');
-            ctx.startDmxApp(false);
-        }, ctx.configConstants.dmx_boot_delay_ms);
+// Verifica se a propriedade "sistema_iluminacao" está ativa no arquivo de configuração.
+if (config.sistema_iluminacao === true) {
+    setTimeout(() => {
+        console.log('💡 [BOOT] Verificando sistema de iluminação...');
+        ctx.startDmxApp(false);
+    }, ctx.configConstants.dmx_boot_delay_ms);
+} else {
+    console.log('ℹ️ [DMX] "sistema_iluminacao" desligado ou ausente no config.json. Ignorando inicialização do DMX.');
+}
+
     }
 });
