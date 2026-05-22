@@ -38,7 +38,6 @@ os.networkInterfaces = () => {
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const os = require('os');
 const path = require('path');
 const { exec } = require('child_process');
 
