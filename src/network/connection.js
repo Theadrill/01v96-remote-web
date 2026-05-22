@@ -19,8 +19,8 @@ let ctx;
 // Para quando encontra e conecta, ou se já estiver conectado.
 function iniciarBuscaAutomatica() {
     if (ctx.buscaInterval) clearInterval(ctx.buscaInterval);
+    ctx.atualizarMenuTray?.(); // <--- Adicionado o ?.
 
-    ctx.atualizarMenuTray();
 
     console.log("");
 
