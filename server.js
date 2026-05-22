@@ -146,7 +146,8 @@ ctx.loadConfigConstants();
 ctx.loadStepsCalibration();
 
 // 2. Bandeja do sistema (ícone no tray do Windows/Linux Desktop)
-const isAndroid = process.env.PROOT_DISTRO_VERSION || process.env.TERMUX_VERSION;
+const osModule = require('os');
+const isAndroid = osModule.release().toLowerCase().includes('android');
 
 if (!isAndroid) {
     try {
@@ -156,8 +157,9 @@ if (!isAndroid) {
         console.log('⚠️ [SYSTRAY] Falha ao carregar a bandeja do sistema:', error.message);
     }
 } else {
-    console.log('ℹ️ [SERVER] Ambiente Android/Termux detectado. Ignorando ícone da bandeja (Systray).');
+    console.log('ℹ️ [SERVER] Ambiente Android detectado via Kernel. Ignorando ícone da bandeja (Systray) com segurança.');
 }
+
 
 
 // 3. Handler de dados MIDI (callback do midiEngine + modo demo)
