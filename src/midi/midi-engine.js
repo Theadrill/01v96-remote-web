@@ -1,10 +1,33 @@
+const fs = require('fs');
 const midi = require('midi');
 const protocol = require('./protocol');
 const syncCounter = require('../network/sync-counter');
 const MidiAssembler = require('./midi-assembler');
 const MidiScheduler = require('./midi-scheduler');
 
+// --- Detecção de suporte a MIDI nativo ---
+// Windows: winmm (sempre disponível)
+// macOS: CoreMIDI (sempre disponível)
+// Linux: requer ALSA sequencer (/dev/snd/seq)
+const isWindows = process.platform === 'win32';
+const isMac = process.platform === 'darwin';
+let midiSupported = true;
 
+if (!isWindows && !isMac) {
+    if (process.platform === 'linux') {
+        try {
+            midiSupported = fs.existsSync('/dev/snd/seq');
+        } catch {
+            midiSupported = false;
+        }
+    } else {
+        midiSupported = false;
+    }
+}
+
+if (!midiSupported) {
+    console.log('ℹ️ [MIDI] MIDI nativo indisponível (sem ALSA). Portas MIDI serão ignoradas.');
+}
 
 // Deixamos as variáveis globais, mas sem instanciar o 'new' ainda
 let input = null;
@@ -14,6 +37,7 @@ let scheduler = null;
 
 
 function getAvailablePorts() {
+    if (!midiSupported) return { inputs: [], outputs: [] };
     const inputs = [];
     const outputs = [];
     try {
@@ -40,7 +64,10 @@ function getAvailablePorts() {
 let currentInIdx = -1;
 let currentOutIdx = -1;
 
+function isMidiSupported() { return midiSupported; }
+
 function connectPorts(inputIdx, outputIdx, onMessageCallback) {
+    if (!midiSupported) return { success: false, error: 'MIDI não suportado nesta plataforma' };
     try {
         const inIdx = parseInt(inputIdx);
         const outIdx = parseInt(outputIdx);
@@ -140,4 +167,4 @@ function setSchedulerTickMs(tickMs) {
     return false;
 }
 
-module.exports = { getAvailablePorts, connectPorts, send, getScheduler, setSchedulerTickMs };
+module.exports = { getAvailablePorts, connectPorts, send, getScheduler, setSchedulerTickMs, isMidiSupported };

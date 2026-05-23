@@ -18,6 +18,10 @@ let ctx;
 // Radar automático: varre portas MIDI a cada 1s procurando Yamaha ou loopMIDI.
 // Para quando encontra e conecta, ou se já estiver conectado.
 function iniciarBuscaAutomatica() {
+    if (!ctx.midiEngine.isMidiSupported()) {
+        console.log('ℹ️ [SCAN] MIDI não suportado. Busca automática desativada.');
+        return;
+    }
     if (ctx.buscaInterval) clearInterval(ctx.buscaInterval);
     ctx.atualizarMenuTray?.(); // <--- Adicionado o ?.
 
