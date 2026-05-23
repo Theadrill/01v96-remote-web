@@ -247,3 +247,12 @@ function resetDmx() {
         document.getElementById('configModal').style.display = 'none';
     };
 }
+
+function restartServer() {
+    document.getElementById('serverRestartConfirmModal').style.display = 'flex';
+    document.getElementById('serverRestartConfirmBtn').onclick = () => {
+        socket.emit('restartServer');
+        document.getElementById('serverRestartConfirmModal').style.display = 'none';
+        document.getElementById('configModal').style.display = 'none';
+    };
+}

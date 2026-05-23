@@ -11,6 +11,7 @@
 // - Configurações: updateMeterConfig, updateOpenBrowser
 // - Controle MIDI: control (faders, EQ, dynamics, etc.), sysex (raw)
 // - DMX: resetDmx
+// - Servidor: restartServer
 // - Consultas: requestDynamics, requestEqAtt
 // ============================================================================
 
@@ -305,6 +306,13 @@ function setupSocketHandlers() {
             const config = ctx.loadConfig();
             config.open_browser_startup = data.enabled;
             ctx.saveConfig(config);
+        });
+
+        socket.on('restartServer', () => {
+            console.log('🔁 [SERVER] Reinício solicitado via interface WEB.');
+            if (typeof ctx.restartServer === 'function') {
+                ctx.restartServer('interface WEB');
+            }
         });
 
         // --- NOMES ---

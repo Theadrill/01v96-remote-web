@@ -39,7 +39,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 
 // --- INICIALIZAÇÃO DO LOGGER ---
 const { setupLogger, overrideConsole } = require('./src/utils/logger');
@@ -89,6 +89,7 @@ const ctx = {
 
     // Servidor Web
     io,
+    httpServer: server,
 
     // Variáveis Globais de Estado
     isConnected: false,          // Conexão MIDI ativa com a mesa
@@ -133,6 +134,69 @@ const ctx = {
 };
 
 process.title = "01V96-BRIDGE-SERVER";
+
+let restartInProgress = false;
+
+function restartServer(source = 'desconhecida') {
+    if (restartInProgress) return;
+    restartInProgress = true;
+
+    console.log(`\n🔁 [SERVER] Reinício solicitado via ${source}. Subindo novo processo...`);
+    ctx.io.emit('serverRestarting');
+
+    let replacementStarted = false;
+
+    const startReplacementProcess = () => {
+        if (replacementStarted) return;
+        replacementStarted = true;
+
+        const isWindows = process.platform === 'win32';
+        const command = isWindows ? 'wscript.exe' : process.execPath;
+        const args = isWindows
+            ? ['//B', '//Nologo', path.join(ctx.rootDir, 'run_hidden.vbs')]
+            : [path.join(ctx.rootDir, 'server.js')];
+
+        const child = spawn(command, args, {
+            cwd: ctx.rootDir,
+            detached: true,
+            stdio: 'ignore',
+            env: process.env,
+            windowsHide: true
+        });
+        child.unref();
+    };
+
+    const exitCurrentProcess = () => {
+        try {
+            if (ctx.midiEngine && ctx.midiEngine.close) ctx.midiEngine.close();
+        } catch (error) {
+            console.log('⚠️ [SERVER] Falha ao fechar MIDI durante reinício:', error.message);
+        }
+
+        try {
+            if (ctx.systrayInstance && ctx.systrayInstance.kill) ctx.systrayInstance.kill();
+        } catch (error) {
+            console.log('⚠️ [SERVER] Falha ao fechar systray durante reinício:', error.message);
+        }
+
+        process.exit(0);
+    };
+
+    ctx.io.close(() => {
+        ctx.httpServer.close(() => {
+            console.log('✅ [SERVER] HTTP encerrado. Finalizando processo antigo.');
+            startReplacementProcess();
+            exitCurrentProcess();
+        });
+    });
+
+    setTimeout(() => {
+        startReplacementProcess();
+        exitCurrentProcess();
+    }, 3000);
+}
+
+ctx.restartServer = restartServer;
 
 // --- INICIALIZAÇÃO DOS SUBSISTEMAS (ordem importa!) ---
 

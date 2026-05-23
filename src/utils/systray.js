@@ -32,6 +32,10 @@ function gerarConfigMenu() {
                     title: "🌐 Abrir no Navegador",
                     enabled: true
                 },
+                {
+                    title: "Reiniciar Servidor",
+                    enabled: true
+                },
                 { title: "---", enabled: false },
                 {
                     title: "❌ Sair e Encerrar",
@@ -78,6 +82,10 @@ function initSystray(appCtx) {
                 console.log("\n▶️ Comando Recebido: Abrindo Navegador");
                 const url = `http://${os.hostname()}.local:4000`;
                 exec(`start ${url}`);
+            }
+            else if (tituloClicado.includes("Reiniciar Servidor")) {
+                console.log("\nComando Recebido: Reiniciando o Servidor");
+                if (typeof ctx.restartServer === 'function') ctx.restartServer('tray');
             }
             else if (tituloClicado.includes("Sair e Encerrar")) {
                 console.log("\n▶️ Comando Recebido: Encerrando o Servidor");
