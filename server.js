@@ -145,23 +145,6 @@ ctx.loadConfigConstants();
 
 ctx.loadStepsCalibration();
 
-// 2. Bandeja do sistema (ícone no tray do Windows/Linux Desktop)
-const disableSystray = process.env.DISABLE_SYSTRAY === 'true';
-
-if (!disableSystray) {
-    try {
-        const { initSystray } = require('./src/utils/systray');
-        initSystray(ctx);
-    } catch (error) {
-        console.log('⚠️ [SYSTRAY] Falha ao carregar a bandeja do sistema:', error.message);
-    }
-} else {
-    console.log('ℹ️ [SERVER] Systray desativada manualmente. Ignorando ícone da bandeja.');
-}
-
-
-
-
 // 3. Handler de dados MIDI (callback do midiEngine + modo demo)
 const { initMidiHandler } = require('./src/midi/midi-handler');
 initMidiHandler(ctx);
@@ -241,5 +224,17 @@ if (config.sistema_iluminacao === true) {
     console.log('ℹ️ [DMX] "sistema_iluminacao" desligado ou ausente no config.json. Ignorando inicialização do DMX.');
 }
 
+    }
+
+    // Bandeja do sistema (ícone no tray do Windows/Linux Desktop)
+    if (config.disable_systray !== true) {
+        try {
+            const { initSystray } = require('./src/utils/systray');
+            initSystray(ctx);
+        } catch (error) {
+            console.log('⚠️ [SYSTRAY] Falha ao carregar a bandeja do sistema:', error.message);
+        }
+    } else {
+        console.log('ℹ️ [SERVER] Systray desativada manualmente no config.json. Ignorando ícone da bandeja.');
     }
 });
