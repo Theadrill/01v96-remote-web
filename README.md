@@ -75,6 +75,7 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 - [ ] Implementação de Meters GPU-Accelerated (Curtain Rendering).
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
 - [ ] Fazer o meter do master funcionar.
+- [ ] **MIDI Bridge over Network**: Substituir dependência de MIDI nativo (`node-midi` / ALSA) por listener de rede genérico (TCP/UDP/WebSocket), permitindo que o servidor receba SysEx de qualquer fonte na rede — bridge Windows com mesa física, app Android USB-OTG, ou outro Termux. Essencial para rodar em ambientes sem suporte a MIDI físico (ex: Android/Termux via proot).
 
 
 ---
