@@ -4,29 +4,12 @@ const protocol = require('./protocol');
 const syncCounter = require('../network/sync-counter');
 const MidiAssembler = require('./midi-assembler');
 const MidiScheduler = require('./midi-scheduler');
+const platform = require('../utils/platform');
 
-// --- Detecção de suporte a MIDI nativo ---
-// Windows: winmm (sempre disponível)
-// macOS: CoreMIDI (sempre disponível)
-// Linux: requer ALSA sequencer (/dev/snd/seq)
-const isWindows = process.platform === 'win32';
-const isMac = process.platform === 'darwin';
-let midiSupported = true;
-
-if (!isWindows && !isMac) {
-    if (process.platform === 'linux') {
-        try {
-            midiSupported = fs.existsSync('/dev/snd/seq');
-        } catch {
-            midiSupported = false;
-        }
-    } else {
-        midiSupported = false;
-    }
-}
+const midiSupported = platform.hasNativeMidi;
 
 if (!midiSupported) {
-    console.log('ℹ️ [MIDI] MIDI nativo indisponível (sem ALSA). Portas MIDI serão ignoradas.');
+    console.log('ℹ️ [MIDI] MIDI nativo indisponível. Portas MIDI serão ignoradas.');
 }
 
 // Deixamos as variáveis globais, mas sem instanciar o 'new' ainda

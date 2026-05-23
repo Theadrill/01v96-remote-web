@@ -53,6 +53,9 @@ overrideConsole(logInfo, logError);
 console.log('🚀 [SERVER] Iniciando servidor e sistema de logs...');
 console.log('📂 [SERVER] Log gravando em:', path.join(__dirname, 'log', 'server_log.txt'));
 
+// --- DETECÇÃO DE PLATAFORMA ---
+const platform = require('./src/utils/platform');
+
 // --- IMPORTAÇÃO DOS MÓDULOS CORE ---
 // MidiPipeline legacy removed — use SyncManager instead
 const midiEngine = require('./src/midi/midi-engine');
@@ -193,14 +196,28 @@ server.listen(PORT, '0.0.0.0', () => {
 
     const config = ctx.loadConfig();
 
-    // Abrir o navegador automaticamente apenas se a flag estiver ativa
-    if (config.open_browser_startup !== false) {
-        const url = `http://localhost:${PORT}`;
-        exec(`start ${url}`);
-    } else {
-        console.log(`ℹ️ [CONFIG] Auto-abertura do navegador desativada. Acesse manualmente: http://localhost:${PORT}`);
+    // --- PLATFORM OVERRIDES ---
+    // DMX: desabilitar se plataforma não suporta, mesmo que config esteja true
+    let dmxEnabled = config.sistema_iluminacao === true;
+    if (dmxEnabled && !platform.supportsDmx) {
+        console.log(`ℹ️ [PLATFORM] DMX não suportado nesta plataforma. Ignorando.`);
+        dmxEnabled = false;
     }
 
+    // Systray: desabilitar se plataforma não suporta, mesmo que config esteja habilitando
+    let systrayEnabled = config.disable_systray !== true;
+    if (systrayEnabled && !platform.supportsSystray) {
+        console.log(`ℹ️ [PLATFORM] Systray não suportado nesta plataforma. Ignorando.`);
+        systrayEnabled = false;
+    }
+
+    // MIDI nativo: apenas avisa se não houver suporte, sem forçar demo mode
+    if (!platform.hasNativeMidi) {
+        console.log(`ℹ️ [PLATFORM] MIDI nativo indisponível nesta plataforma.`);
+        console.log(`ℹ️ [PLATFORM] Use demo_mode:true no config.json para simular, ou aguarde a ponte MIDI over Network.`);
+    }
+
+    // --- APLICA DECISÕES ---
     if (config.demo_mode) {
         ctx.isDemoMode = true;
         ctx.iniciarDummy();
@@ -214,20 +231,18 @@ server.listen(PORT, '0.0.0.0', () => {
         setTimeout(() => ctx.iniciarBuscaAutomatica(), ctx.configConstants.boot_delay_ms);
 
         // --- AUTO-START DMX (INTELIGENTE) ---
-// Verifica se a propriedade "sistema_iluminacao" está ativa no arquivo de configuração.
-if (config.sistema_iluminacao === true) {
-    setTimeout(() => {
-        console.log('💡 [BOOT] Verificando sistema de iluminação...');
-        ctx.startDmxApp(false);
-    }, ctx.configConstants.dmx_boot_delay_ms);
-} else {
-    console.log('ℹ️ [DMX] "sistema_iluminacao" desligado ou ausente no config.json. Ignorando inicialização do DMX.');
-}
-
+        if (dmxEnabled) {
+            setTimeout(() => {
+                console.log('💡 [BOOT] Verificando sistema de iluminação...');
+                ctx.startDmxApp(false);
+            }, ctx.configConstants.dmx_boot_delay_ms);
+        } else {
+            console.log('ℹ️ [DMX] Iluminação desligada (config ou plataforma não suporta).');
+        }
     }
 
-    // Bandeja do sistema (ícone no tray do Windows/Linux Desktop)
-    if (config.disable_systray !== true) {
+    // Bandeja do sistema (ícone no tray)
+    if (systrayEnabled) {
         try {
             const { initSystray } = require('./src/utils/systray');
             initSystray(ctx);
@@ -235,6 +250,14 @@ if (config.sistema_iluminacao === true) {
             console.log('⚠️ [SYSTRAY] Falha ao carregar a bandeja do sistema:', error.message);
         }
     } else {
-        console.log('ℹ️ [SERVER] Systray desativada manualmente no config.json. Ignorando ícone da bandeja.');
+        console.log('ℹ️ [SERVER] Systray desativada (config ou plataforma não suporta).');
+    }
+
+    // Abrir o navegador automaticamente apenas se a flag estiver ativa
+    if (config.open_browser_startup !== false) {
+        const url = `http://localhost:${PORT}`;
+        exec(`start ${url}`);
+    } else {
+        console.log(`ℹ️ [CONFIG] Auto-abertura do navegador desativada. Acesse manualmente: http://localhost:${PORT}`);
     }
 });
