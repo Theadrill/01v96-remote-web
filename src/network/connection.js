@@ -139,7 +139,7 @@ function executarConexao(inIdx, outIdx, targetSocket = null) {
     if (result.success) {
         ctx.isConnected = true;
         console.log(`✅ Conexão MIDI estabelecida com sucesso! (${inName})`);
-        ctx.atualizarMenuTray();
+        ctx.atualizarMenuTray?.();
 
         // --- COOLDOWN ESTRATÉGICO E SINCRONIA GERAL ---
         // Aguardamos 5s para os buffers residuais assentarem antes de iniciar a carga massiva

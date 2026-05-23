@@ -20,6 +20,6 @@
   "scheduler_tick_ms": 8,
   "boot_delay_ms": 1500,
   "dmx_boot_delay_ms": 3000,
-  "sistema_iluminacao" : false,
-  "disable_systray" : true
+  "sistema_iluminacao": false,
+  "disable_systray": false
 }
