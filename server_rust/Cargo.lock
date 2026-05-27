@@ -1729,6 +1729,7 @@ name = "server_rust"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "lazy_static",
  "midir",
  "serde",
  "serde_json",

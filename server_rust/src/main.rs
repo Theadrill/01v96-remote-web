@@ -1,3 +1,7 @@
+mod config;
+mod midi;
+
+
 use axum::Router;
 use socketioxide::SocketIo;
 use tower_http::services::ServeDir;
@@ -12,8 +16,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .finish();
     tracing::subscriber::set_global_default(subscriber)?;
 
-    info!("🚀 Iniciando servidor Rust (Fase 1)");
+    info!("🚀 Iniciando servidor Rust (Fase 2)");
 
+    // Carrega configurações dinâmicas
+    let app_config = config::AppConfig::load();
+    info!("⚙️  Configurações carregadas: MIDI In: {}, MIDI Out: {}", app_config.in_idx, app_config.out_idx);
     // Inicializa a camada do Socket.IO
     let (layer, io) = SocketIo::new_layer();
 
