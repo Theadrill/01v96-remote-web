@@ -1,4 +1,4 @@
-﻿use axum::{
+use axum::{
     Json,
     extract::{Path, Query, State},
     response::IntoResponse,
@@ -106,6 +106,7 @@ async fn enqueue_git_sync(files: Vec<String>, message: String, delay_ms: u64) {
 pub fn router(state: Arc<RwLock<crate::state::GlobalState>>) -> axum::Router {
     axum::Router::new()
         .route("/names", axum::routing::get(get_names))
+        .route("/macros", axum::routing::get(list_macros))
         .route("/macros/hosts", axum::routing::get(get_hosts))
         .route(
             "/macros/slots",
@@ -128,11 +129,30 @@ pub fn router(state: Arc<RwLock<crate::state::GlobalState>>) -> axum::Router {
 }
 
 fn root_dir() -> PathBuf {
-    std::env::current_dir()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf()
+    // Para simplificar, assumimos que o server_rust e public estao lado a lado (em 01v96-remote-web)
+    PathBuf::from("..")
+}
+
+async fn list_macros() -> Json<Value> {
+    let mut macros = Vec::new();
+    let dir = root_dir().join("public").join("modules").join("macros");
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            if let Ok(file_type) = entry.file_type() {
+                if file_type.is_file() {
+                    let file_name = entry.file_name().to_string_lossy().to_string();
+                    if file_name.ends_with(".js")
+                        && !file_name.ends_with(".server.js")
+                        && file_name != "core.js"
+                        && file_name != "macros.js"
+                    {
+                        macros.push(file_name.replace(".js", ""));
+                    }
+                }
+            }
+        }
+    }
+    Json(json!(macros))
 }
 
 async fn get_names(
