@@ -1,4 +1,4 @@
-use lazy_static::lazy_static;
+﻿use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 lazy_static! {
@@ -145,4 +145,85 @@ mod tests {
         assert_eq!(convert_to_bytes(1.0, &Converter::DynOn), vec![0, 0, 0, 0]);
         assert_eq!(convert_to_bytes(0.0, &Converter::DynOn), vec![0, 0, 0, 1]);
     }
+}
+#[derive(Debug, Clone, serde::Serialize)]
+pub enum ParsedMidi {
+    ControlChange { msg_type: String, channel: usize, value: f64 },
+    MeterData { is_master: bool, group: u8, levels: std::collections::HashMap<usize, u8> },
+    SceneNumber(u8),
+    UpdateNameChar { channel: usize, char_index: usize, char: String },
+    UpdateSceneChar { char_index: usize, char: String },
+}
+
+pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
+    if message.len() < 8 { return None; }
+    
+    // Ignora se não for uma mensagem de dados/mudança (0x1n).
+    if (message[2] & 0xF0) != 0x10 { return None; }
+
+    let group = message[5];
+    let element = message[6];
+    let parameter = message[7];
+    let channel = message[8] as usize;
+
+    let is_master_meter = message.len() == 14 && message[4] == 13 && message[5] == 33 && message[6] == 4;
+    let is_universal_meter = message.len() > 20 && (message[4] == 13 || message[4] == 26 || message[4] == 127) && (group == 33 || group == 32 || group == 82);
+
+    if is_master_meter || is_universal_meter {
+        let mut levels = std::collections::HashMap::new();
+        let data_start = 9;
+        let is_master = message[6] == 4;
+        let data_bytes_available = (message.len() - 1).saturating_sub(data_start);
+        let num_channels = data_bytes_available / 2;
+
+        for i in 0..num_channels {
+            let idx = data_start + (i * 2);
+            levels.insert(channel + i, message[idx]);
+        }
+        return Some(ParsedMidi::MeterData { is_master, group, levels });
+    }
+
+    if message[4] == 13 && message[5] == 127 { return None; }
+
+    let data_bytes = &message[9..message.len()-1];
+    
+    if message[4] == 13 || message[4] == 127 || message[4] == 26 || message[4] == 1 {
+        // Nomes de canais
+        if [4, 15, 16, 18, 23].contains(&element) && parameter >= 4 && parameter <= 19 {
+            let char_index = (parameter - 4) as usize;
+            let char_code = *data_bytes.last().unwrap_or(&32);
+            let char_str = String::from_utf8_lossy(&[char_code]).to_string();
+            
+            let mut channel_index = channel;
+            if element == 4 { channel_index = channel; }
+            else if element == 23 { channel_index = 60 + (channel * 2); }
+            else if element == 16 { channel_index = 36 + channel; }
+            else if element == 15 { channel_index = 44 + channel; }
+            else if element == 18 { channel_index = 52; }
+            
+            if message[4] != 13 || group != 2 { return None; }
+            return Some(ParsedMidi::UpdateNameChar { channel: channel_index, char_index, char: char_str });
+        }
+        
+        // Faders / On / Solo / Name / Attenuator etc
+        let mut final_ch = channel;
+        if channel >= 32 && channel <= 39 { final_ch = 60 + (channel - 32); }
+        
+        if element == 28 { return Some(ParsedMidi::ControlChange { msg_type: "kInputFader/kFader".to_string(), channel: final_ch, value: bytes_to_fader(data_bytes) as f64 }); }
+        if element == 26 { return Some(ParsedMidi::ControlChange { msg_type: "kInputChannelOn/kChannelOn".to_string(), channel: final_ch, value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 } }); }
+        
+        // Mix (AUX) Master Faders / ON
+        if element == 57 { return Some(ParsedMidi::ControlChange { msg_type: "kAUXFader/kFader".to_string(), channel, value: bytes_to_fader(data_bytes) as f64 }); }
+        if element == 54 { return Some(ParsedMidi::ControlChange { msg_type: "kAUXChannelOn/kChannelOn".to_string(), channel, value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 } }); }
+        
+        // Bus Master Faders / ON
+        if element == 43 { return Some(ParsedMidi::ControlChange { msg_type: "kBusFader/kFader".to_string(), channel, value: bytes_to_fader(data_bytes) as f64 }); }
+        if element == 41 { return Some(ParsedMidi::ControlChange { msg_type: "kBusChannelOn/kChannelOn".to_string(), channel, value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 } }); }
+        
+        // Master (Stereo) Fader e ON
+        if element == 79 && parameter == 0 { return Some(ParsedMidi::ControlChange { msg_type: "kStereoFader/kFader".to_string(), channel: 0, value: bytes_to_fader(data_bytes) as f64 }); }
+        if element == 77 && parameter == 0 { return Some(ParsedMidi::ControlChange { msg_type: "kStereoChannelOn/kChannelOn".to_string(), channel: 0, value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 } }); }
+    }
+    
+    None
 }

@@ -58,14 +58,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     // Spawn para ler mensagens MIDI vindas da mesa e atualizar o estado (Mock por enquanto)
+        let (layer, io) = SocketIo::new_layer();
+
+    let io_clone = io.clone();
+    let state_arc_in = global_state.clone();
     tokio::spawn(async move {
-        while let Some(_msg) = midi_in_rx.recv().await {
-            // TODO: Assembler e State updates
+        let mut assembler = midi::MidiAssembler::new();
+        while let Some(msg) = midi_in_rx.recv().await {
+            let packets = assembler.process_input(&msg);
+            for packet in packets {
+                if let Some(parsed) = midi::protocol::parse_message(&packet) {
+                    let mut state = state_arc_in.write().await;
+                    state.apply_midi(&parsed);
+                    
+                    match parsed {
+                        midi::protocol::ParsedMidi::MeterData { levels, .. } => {
+                            let mut meter_buffer = vec![0; 40];
+                            for (ch, val) in levels.iter() {
+                                if *ch < 40 {
+                                    meter_buffer[*ch] = *val;
+                                }
+                            }
+                            let _ = io_clone.emit("meterData", &meter_buffer);
+                        }
+                        midi::protocol::ParsedMidi::ControlChange { ref msg_type, channel, value } => {
+                            let json = serde_json::json!({
+                                "type": msg_type,
+                                "channel": channel,
+                                "value": value
+                            });
+                            let _ = io_clone.emit("update", &json);
+                        }
+                        _ => {}
+                    }
+                }
+            }
         }
     });
-
-    // Inicializa a camada do Socket.IO
-    let (layer, io) = SocketIo::new_layer();
 
     // Configura os handlers básicos
     let scheduler_socket = scheduler.clone();

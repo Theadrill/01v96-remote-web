@@ -185,4 +185,47 @@ impl GlobalState {
             },
         }
     }
+    pub fn apply_midi(&mut self, parsed: &crate::midi::protocol::ParsedMidi) {
+        match parsed {
+            crate::midi::protocol::ParsedMidi::ControlChange { msg_type, channel, value } => {
+                if msg_type == "kInputFader/kFader" {
+                    if let Some(ch) = self.channels.get_mut(channel) { ch.value = *value; }
+                } else if msg_type == "kInputChannelOn/kChannelOn" {
+                    if let Some(ch) = self.channels.get_mut(channel) { ch.on = *value > 0.0; }
+                } else if msg_type == "kStereoFader/kFader" {
+                    self.master.value = *value;
+                } else if msg_type == "kStereoChannelOn/kChannelOn" {
+                    self.master.on = *value > 0.0;
+                } else if msg_type == "kAUXFader/kFader" {
+                    if let Some(mix) = self.mixes.get_mut(channel) { mix.value = *value; }
+                } else if msg_type == "kAUXChannelOn/kChannelOn" {
+                    if let Some(mix) = self.mixes.get_mut(channel) { mix.on = *value > 0.0; }
+                } else if msg_type == "kBusFader/kFader" {
+                    if let Some(bus) = self.buses.get_mut(channel) { bus.value = *value; }
+                } else if msg_type == "kBusChannelOn/kChannelOn" {
+                    if let Some(bus) = self.buses.get_mut(channel) { bus.on = *value > 0.0; }
+                }
+            }
+            crate::midi::protocol::ParsedMidi::MeterData { .. } => {}
+            crate::midi::protocol::ParsedMidi::SceneNumber(scene) => {
+                self.scene_number = *scene as usize;
+            }
+            crate::midi::protocol::ParsedMidi::UpdateNameChar { channel, char_index, char } => {
+                if *channel < 40 {
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        if *char_index < ch.name_chars.len() {
+                            ch.name_chars[*char_index] = char.clone();
+                            ch.name = ch.name_chars.join("").trim().to_string();
+                        }
+                    }
+                }
+            }
+            crate::midi::protocol::ParsedMidi::UpdateSceneChar { char_index, char } => {
+                if *char_index < self.scene_chars.len() {
+                    self.scene_chars[*char_index] = char.clone();
+                    self.scene_name = self.scene_chars.join("").trim().to_string();
+                }
+            }
+        }
+    }
 }
