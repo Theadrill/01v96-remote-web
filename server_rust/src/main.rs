@@ -1,4 +1,4 @@
-﻿mod api;
+mod api;
 mod config;
 pub mod dmx;
 mod midi;
@@ -44,10 +44,10 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     // Estado global da mesa
     let global_state = Arc::new(RwLock::new(state::GlobalState::new()));
 
-    // Carrega configuraÃ§Ãµes dinÃ¢micas
+    // Carrega configurações dinâmicas
     let app_config = config::AppConfig::load();
     info!(
-        "ðŸŽ§ ConfiguraÃ§Ãµes carregadas: MIDI In: {}, MIDI Out: {}",
+        "🎧 Configurações carregadas: MIDI In: {}, MIDI Out: {}",
         app_config.in_idx, app_config.out_idx
     );
 
@@ -128,7 +128,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    // Configura os handlers bÃ¡sicos
+    // Configura os handlers básicos
     let scheduler_socket = scheduler.clone();
     let global_state_api = global_state.clone();
     let global_state_socket = global_state.clone();
@@ -347,7 +347,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         },
     );
 
-    // Cria a rota Axum que serve os arquivos estÃ¡ticos de `../public`
+    // Cria a rota Axum que serve os arquivos estáticos de `../public`
     // e inclui a camada do Socket.IO
     let app = Router::new()
         .nest("/api", api::macros::router(global_state_api.clone()))
@@ -360,7 +360,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
 
     info!(
-        "ðŸŽ§ Servidor estÃ¡tico e WebSocket rodando em http://localhost:{}",
+        "🎧 Servidor estático e WebSocket rodando em http://localhost:{}",
         port
     );
 
