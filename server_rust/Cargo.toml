@@ -5,8 +5,11 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.9"
+gethostname = "1.1.0"
 lazy_static = "1.5.0"
 midir = "0.11.0"
+rand = "0.10.1"
+reqwest = { version = "0.13.4", features = ["json"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
 socketioxide = "0.18.3"

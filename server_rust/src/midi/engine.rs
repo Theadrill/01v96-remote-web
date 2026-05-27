@@ -56,7 +56,10 @@ impl MidiEngine {
         tx_incoming: mpsc::Sender<Vec<u8>>,
     ) -> Result<String, String> {
         if self.current_in_idx == in_idx as i32 && self.current_out_idx == out_idx as i32 {
-            info!("Portas já conectadas ({}, {}). Ignorando re-conexão.", in_idx, out_idx);
+            info!(
+                "Portas já conectadas ({}, {}). Ignorando re-conexão.",
+                in_idx, out_idx
+            );
             return Ok("Already connected".to_string());
         }
 
@@ -81,7 +84,7 @@ impl MidiEngine {
         let _out_port_name = midi_out.port_name(&out_ports[out_idx]).unwrap_or_default();
 
         let mut assembler = MidiAssembler::new();
-        
+
         let in_conn = midi_in
             .connect(
                 &in_ports[in_idx],

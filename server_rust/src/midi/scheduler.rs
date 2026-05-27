@@ -54,7 +54,11 @@ impl MidiScheduler {
         match priority {
             0 => {
                 if let Some(addr) = Self::extract_address(&bytes) {
-                    if let Some(idx) = state.q0.iter().position(|item| Self::extract_address(item) == Some(addr.clone())) {
+                    if let Some(idx) = state
+                        .q0
+                        .iter()
+                        .position(|item| Self::extract_address(item) == Some(addr.clone()))
+                    {
                         state.q0[idx] = bytes;
                         return true;
                     }
@@ -178,19 +182,19 @@ mod tests {
         // Fill Q2, Q1, Q0
         scheduler.enqueue(vec![0x02], 2).await;
         scheduler.enqueue(vec![0x01], 1).await;
-        
+
         // Mock a P0 message that can be deduplicated: F0 43 10 3E 01 02 03 04 05 F7
         let p0_msg = vec![0xF0, 0x43, 0x10, 0x3E, 0x01, 0x02, 0x03, 0x04, 0x05, 0xF7];
         scheduler.enqueue(p0_msg.clone(), 0).await;
-        
+
         // Start processing
         scheduler.start().await;
-        
+
         // Expected order: Q0, Q1, Q2
         assert_eq!(rx.recv().await.unwrap(), p0_msg);
         assert_eq!(rx.recv().await.unwrap(), vec![0x01]);
         assert_eq!(rx.recv().await.unwrap(), vec![0x02]);
-        
+
         scheduler.stop().await;
     }
 }

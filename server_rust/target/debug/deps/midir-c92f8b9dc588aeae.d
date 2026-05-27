@@ -1,0 +1,11 @@
+C:\PROJETOS\01v96-remote-web\server_rust\target\debug\deps\midir-c92f8b9dc588aeae.d: C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\lib.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\os\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\errors.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\common.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\winmm\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\winmm\handler.rs
+
+C:\PROJETOS\01v96-remote-web\server_rust\target\debug\deps\libmidir-c92f8b9dc588aeae.rmeta: C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\lib.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\os\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\errors.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\common.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\winmm\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\winmm\handler.rs
+
+C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\lib.rs:
+C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\os\mod.rs:
+C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\errors.rs:
+C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\common.rs:
+C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\mod.rs:
+C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\winmm\mod.rs:
+C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\midir-0.11.0\src\backend\winmm\handler.rs:

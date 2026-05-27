@@ -6,20 +6,20 @@ use tracing::{error, info};
 pub struct AppConfig {
     #[serde(rename = "inIdx")]
     pub in_idx: usize,
-    
+
     #[serde(rename = "outIdx")]
     pub out_idx: usize,
-    
+
     #[serde(rename = "loopmidi-monitor")]
     pub loopmidi_monitor: bool,
-    
+
     pub open_browser_startup: bool,
     pub demo_mode: bool,
     pub lumikit_ips: Vec<String>,
-    
+
     pub meter_fps_desktop: u32,
     pub meter_fps_mobile: u32,
-    
+
     pub watchdog_timeout_ms: u64,
     pub meter_poll_interval_ms: u64,
     pub name_save_debounce_ms: u64,
@@ -30,13 +30,13 @@ pub struct AppConfig {
     pub scheduler_tick_ms: u64,
     pub boot_delay_ms: u64,
     pub dmx_boot_delay_ms: u64,
-    
+
     pub sistema_iluminacao: bool,
     pub disable_systray: bool,
 
     #[serde(default = "default_tecnico_pass")]
     pub tecnico_pass: String,
-    
+
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub names: std::collections::HashMap<String, String>,
@@ -53,17 +53,18 @@ impl AppConfig {
         // Tenta ler o arquivo config.json
         let config_path = "../config.json";
         let mut config = match fs::read_to_string(config_path) {
-            Ok(contents) => {
-                match serde_json::from_str::<AppConfig>(&contents) {
-                    Ok(c) => c,
-                    Err(e) => {
-                        error!("❌ Erro ao parsear config.json: {}. Usando fallback.", e);
-                        Self::default_config()
-                    }
+            Ok(contents) => match serde_json::from_str::<AppConfig>(&contents) {
+                Ok(c) => c,
+                Err(e) => {
+                    error!("❌ Erro ao parsear config.json: {}. Usando fallback.", e);
+                    Self::default_config()
                 }
             },
             Err(e) => {
-                error!("❌ Não foi possível ler {}: {}. Usando fallback.", config_path, e);
+                error!(
+                    "❌ Não foi possível ler {}: {}. Usando fallback.",
+                    config_path, e
+                );
                 Self::default_config()
             }
         };
