@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{Mutex, mpsc};
-use tracing::{error, info};
+use tracing::error;
 
 pub struct SchedulerState {
     pub q0: Vec<Vec<u8>>,

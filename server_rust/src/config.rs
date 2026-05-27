@@ -1,6 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 use tracing::{error, info};
+
+static SAVE_NAMES_TIMER: std::sync::LazyLock<Arc<Mutex<Option<tokio::task::JoinHandle<()>>>>> =
+    std::sync::LazyLock::new(|| Arc::new(Mutex::new(None)));
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AppConfig {
@@ -37,6 +42,12 @@ pub struct AppConfig {
     #[serde(default = "default_tecnico_pass")]
     pub tecnico_pass: String,
 
+    #[serde(default = "default_port")]
+    pub port: u16,
+
+    #[serde(default = "default_meter_opacity")]
+    pub meter_opacity: f64,
+
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub names: std::collections::HashMap<String, String>,
@@ -46,6 +57,14 @@ pub struct AppConfig {
 
 fn default_tecnico_pass() -> String {
     "2107".to_string()
+}
+
+fn default_port() -> u16 {
+    4000
+}
+
+fn default_meter_opacity() -> f64 {
+    1.0
 }
 
 impl AppConfig {
@@ -88,6 +107,22 @@ impl AppConfig {
         config
     }
 
+    pub fn save(&self) {
+        let config_path = "../config.json";
+        match serde_json::to_string_pretty(self) {
+            Ok(json_str) => {
+                if let Err(e) = fs::write(config_path, json_str) {
+                    error!("❌ [CONFIG] Erro ao salvar config.json: {}", e);
+                } else {
+                    info!("💾 [CONFIG] config.json salvo com sucesso.");
+                }
+            }
+            Err(e) => {
+                error!("❌ [CONFIG] Erro ao serializar config: {}", e);
+            }
+        }
+    }
+
     fn default_config() -> Self {
         AppConfig {
             in_idx: 0,
@@ -111,8 +146,56 @@ impl AppConfig {
             sistema_iluminacao: false,
             disable_systray: false,
             tecnico_pass: default_tecnico_pass(),
+            port: default_port(),
+            meter_opacity: 1.0,
             names: std::collections::HashMap::new(),
             steps: serde_json::Value::Null,
         }
     }
+}
+
+pub fn save_names_to_disk(state: &crate::state::GlobalState, debounce_ms: u64) {
+    let state_snapshot = state.clone();
+    let timer_lock = SAVE_NAMES_TIMER.clone();
+
+    tokio::spawn(async move {
+        let mut guard = timer_lock.lock().await;
+        if let Some(handle) = guard.take() {
+            handle.abort();
+        }
+        *guard = Some(tokio::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_millis(debounce_ms)).await;
+
+            let mut names: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+            for i in 0..32 {
+                if let Some(ch) = state_snapshot.channels.get(&i) {
+                    names.insert(i.to_string(), ch.name.clone());
+                }
+            }
+            for st_idx in 0..4 {
+                let global_id = 60 + st_idx * 2;
+                let local_idx = 32 + st_idx;
+                if let Some(ch) = state_snapshot.channels.get(&local_idx) {
+                    names.insert(global_id.to_string(), ch.name.clone());
+                }
+            }
+            for (i, m) in &state_snapshot.mixes {
+                names.insert((36 + i).to_string(), m.name.clone());
+            }
+            for (i, b) in &state_snapshot.buses {
+                names.insert((44 + i).to_string(), b.name.clone());
+            }
+            names.insert("52".to_string(), state_snapshot.master.name.clone());
+
+            let names_path = "../names.json";
+            match serde_json::to_string_pretty(&names) {
+                Ok(json_str) => {
+                    if let Err(e) = fs::write(names_path, json_str) {
+                        error!("❌ [NAMES] Erro ao salvar names.json: {}", e);
+                    }
+                }
+                Err(e) => error!("❌ [NAMES] Erro ao serializar nomes: {}", e),
+            }
+        }));
+    });
 }

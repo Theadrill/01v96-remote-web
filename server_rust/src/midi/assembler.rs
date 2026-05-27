@@ -1,4 +1,3 @@
-use tracing::error;
 
 const IGNORED_BYTES: &[u8] = &[0xFE, 0xFD, 0xF8];
 

@@ -1,9 +1,8 @@
 use axum::{
     Json,
     extract::{Path, Query, State},
-    response::IntoResponse,
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::{Value, json};
 use std::collections::{HashMap, HashSet};
 use std::path::{Path as StdPath, PathBuf};
@@ -343,7 +342,7 @@ async fn swap_slots(Query(q): Query<SwapQuery>, Json(body): Json<SwapBody>) -> J
         let p_path = dir.join(format!("profile_{}.json", preset));
         if p_path.exists() {
             if let Ok(content) = std::fs::read_to_string(&p_path) {
-                if let Ok(Value::Array(mut config)) = serde_json::from_str(&content) {
+                if let Ok(Value::Array(_config)) = serde_json::from_str(&content) {
                     // ... array unhandled
                 } else if let Ok(Value::Object(mut config)) = serde_json::from_str(&content) {
                     let from_key = from_index.to_string();

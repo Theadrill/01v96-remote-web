@@ -3,10 +3,10 @@
 | Campo | Valor |
 |---|---|
 | **Versao do plano** | 4.0 |
-| **Progresso global** | ~25% |
-| **Ultima atividade** | 2026-05-27 — Insercao das Regras BASE |
-| **Ultimo passo concluido** | Nenhum (apenas diagnostico) |
-| **Proximo passo planejado** | Aguardando ordem do usuario |
+| **Progresso global** | ~30% |
+| **Ultima atividade** | 2026-05-27 — Fase 1 concluida |
+| **Ultimo passo concluido** | Fase 1: Core e Configuracoes |
+| **Proximo passo planejado** | Aguardando auditoria do usuario |
 
 Este documento e a **referencia arquitetonica tecnica definitiva** para a migracao do servidor Node.js atual para **Rust**, focado em performance absoluta e zero stutters. Ele contempla **TODAS** as funcionalidades existentes no Node.js, sem excecoes.
 
@@ -1122,7 +1122,7 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
 
 ## LOG DE EXECUCAO (Atualizado a cada passo concluido)
 
-> **Instrucao para IAs:** Ao concluir qualquer passo, adicione uma entrada abaixo com `## [DATA] — Passo X.N concluido`. Descreva o que fez, o que modificou alem do previsto e o que deve ser feito a seguir. NAO remova entradas antigas. NAO cole codigo.
+> **Instrucao para IAs:** Ao concluir qualquer passo, adicione uma entrada abaixo com `### [DATA] — Passo X concluido`. Descreva o que fez, o que modificou alem do previsto e o que deve ser feito a seguir. NAO remova entradas antigas. NAO cole codigo.
 
 ### 2026-05-27 — Sessao Inicial: Diagnostico e Regras
 - **Status**: [x] Concluido
@@ -1133,9 +1133,47 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
   - Insercao das **Regras BASE** no topo do documento
   - Adicao de header de tracking (versao, progresso, ultima atividade)
   - Adicao da secao LOG DE EXECUCAO para rastreabilidade
-- **O que foi modificado alem do previsto**:
-  - Nada — apenas documentacao
-- **Pendencias**:
-  - Nenhuma
-- **Proximo passo**:
-  - Aguardando usuario decidir qual fase atacar primeiro
+- **Modificacoes alem do previsto**: Nenhuma — apenas documentacao
+- **Pendencias**: Nenhuma
+- **Proximo passo**: Aguardando usuario decidir qual fase atacar primeiro
+
+### 2026-05-27 — Fase 1 concluida: Core e Configuracoes
+- **Status**: [x] Concluido
+- **O que foi feito**:
+  - **1.1 saveConfig()**: Adicionado metodo `AppConfig::save()` em `config.rs` que serializa e escreve em `../config.json`
+  - **1.2 saveNames() com debounce**: Adicionada funcao `save_names_to_disk()` em `config.rs` que:
+    - Usa `std::sync::LazyLock` com `Arc<Mutex<Option<JoinHandle>>>` para debounce de 1s
+    - Extrai nomes de channels (0-31), ST IN (60-67), mixes (36-43), buses (44-51), master (52)
+    - Escreve `names.json` com nomes formatados
+  - **1.3 MasterMeter**: Criado `midi/master_meter.rs` com:
+    - `set_steps()`: carrega tabela de calibracao do `steps.json`
+    - `build_request()`: F0 43 30 3E 0D 21 04 00 7F 00 01 F7
+    - `build_stop_request()`: F0 43 30 3E 0D 21 7F 00 00 00 00 F7
+    - `parse()`: extrai L/R, unstuff 14-bit, converte para step via tabela de calibracao
+  - **1.4 inject_names_into_state()**: Adicionado metodo `GlobalState::inject_names()` em `state.rs` que:
+    - Itera `HashMap<String,String>` de nomes
+    - Injeta em channels (0-31), ST IN (60-67→local 32-39), mixes (36-43), buses (44-51), master (52)
+    - Corta nomes em 16 chars, preenche name_chars para cada tipo
+  - **1.5 Porta configuravel**: `AppConfig` agora tem campo `port: u16` (default 4000). `async_main()` usa `app_config.port` ao inves de hardcoded 3001
+  - **1.6 cargo build**: Compilou com 0 erros. 30 warnings pre-existentes (codigo a ser conectado em fases futuras)
+  - **Bonus**: Corrigida emissao `portsList` no on-connect — agora chama `MidiEngine::get_available_ports()` em vez de enviar arrays vazios
+  - **Bonus**: Adicionadas emissoes `scenesUpdated` e `connectionState` no on-connect (antes estavam faltando)
+  - **Bonus**: Removido codigo morto: 3 handlers nao usados em main.rs (linhas 381-391)
+  - **Bonus**: Corrigido unused Result em `main()` (linha 34)
+- **Modificacoes alem do previsto**:
+  - `config.rs`: Adicionado campo `port` e `meter_opacity` ao struct AppConfig
+  - `config.rs`: Movido `app_config` clone antes do closure `io.ns()` para evitar move-after-use
+  - `midi/mod.rs`: Adicionado `pub mod master_meter` e seu `pub use`
+  - `main.rs`: Reestruturado boot para: config load → inject names → init master meter → MIDI → socket
+- **Pendencias**: Nenhuma. Fase 1 100% concluida.
+- **Proximo passo**: Aguardando auditoria do usuario, depois iniciar Fase 2 (expandir parse_message)
+
+### 2026-05-27 — Hotfix: serde default para campos novos do config.json
+- **Status**: [x] Concluido
+- **O que foi feito**:
+  - Adicionado `#[serde(default = "default_port")]` ao campo `port` em `AppConfig`
+  - Adicionado `#[serde(default = "default_meter_opacity")]` ao campo `meter_opacity` em `AppConfig`
+  - Adicionada funcao `default_meter_opacity()` retornando `1.0`
+  - Corrigido: se campo nao existir no config.json, Serde usa o default sem quebrar o parse dos outros campos
+- **Pendencias**: Nenhuma
+- **Proximo passo**: Aguardando auditoria do usuario

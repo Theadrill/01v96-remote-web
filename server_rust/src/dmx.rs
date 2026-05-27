@@ -1,7 +1,6 @@
-use std::env;
 use std::path::Path;
 use std::process::{Command, Stdio};
-use std::{fs, thread, time};
+use std::time;
 
 pub fn start_dmx_app(force: bool, root_dir: &str) {
     let exe_path_str = format!("{}\\ArtNetToDMX_FTDI\\ArtNetToDMX.exe", root_dir);
@@ -101,7 +100,7 @@ pub fn reset_dmx_system(root_dir: String) {
     });
 }
 
-pub fn update_lumikit_config(root_dir: &str) {
+pub fn update_lumikit_config(_root_dir: &str) {
     // Basic port to avoid local network parsing for now - requires specific crate like local-ip-address
     println!("Update lumikit config called - needs actual IP config reading");
 }

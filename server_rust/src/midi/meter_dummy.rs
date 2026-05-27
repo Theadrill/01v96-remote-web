@@ -1,4 +1,3 @@
-use rand::Rng;
 use rand::RngExt;
 use std::time::Duration;
 use tokio::time::interval;
@@ -10,13 +9,13 @@ where
     println!("Ys? [DEMO] Simulaǜo de Meters Iniciada (Stress Mode - 32ch + Master @ 30fps)");
 
     let mut rng = rand::rng();
-    let mut phases: Vec<f64> = (0..32)
+    let phases: Vec<f64> = (0..32)
         .map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0))
         .collect();
-    let mut phases2: Vec<f64> = (0..32)
+    let phases2: Vec<f64> = (0..32)
         .map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0))
         .collect();
-    let mut speeds: Vec<f64> = (0..32).map(|_| 0.8 + rng.random_range(0.0..4.0)).collect();
+    let speeds: Vec<f64> = (0..32).map(|_| 0.8 + rng.random_range(0.0..4.0)).collect();
 
     let bases = [
         26.0, 24.0, 22.0, 23.0, 25.0, 23.0, 21.0, 20.0, 26.0, 24.0, 19.0, 18.0, 20.0, 21.0, 17.0,
@@ -50,7 +49,7 @@ where
                 let noise = (rng.random::<f64>() - 0.5) * 3.0;
 
                 let level = (bases[i] * energy) + ((w1 + w2 + w3) * 9.0 * energy) + noise;
-                let mut clamped = level.min(31.0).max(0.0) as u8;
+                let clamped = level.min(31.0).max(0.0) as u8;
 
                 sysex.push(clamped);
                 sysex.push(0x7F);

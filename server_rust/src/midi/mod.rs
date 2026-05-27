@@ -7,4 +7,5 @@ pub use assembler::MidiAssembler;
 pub use engine::MidiEngine;
 pub use scheduler::MidiScheduler;
 
+pub mod master_meter;
 pub mod meter_dummy;

@@ -298,6 +298,55 @@ impl GlobalState {
         self.scene_manager.handle_midi_data(message)
     }
 
+    pub fn inject_names(&mut self, names: &std::collections::HashMap<String, String>) {
+        for (key, name) in names {
+            if let Ok(idx) = key.parse::<usize>() {
+                let limited = if name.len() > 16 { &name[..16] } else { name };
+                let padded = format!("{: <16}", limited);
+                let chars: Vec<String> = padded.chars().take(16).map(|c| c.to_string()).collect();
+
+                if idx <= 31 {
+                    if let Some(ch) = self.channels.get_mut(&idx) {
+                        ch.name = limited.to_string();
+                        if ch.name_chars.len() < 4 {
+                            ch.name_chars.resize(4, " ".to_string());
+                        }
+                        for (i, c) in chars.iter().take(4).enumerate() {
+                            ch.name_chars[i] = c.clone();
+                        }
+                    }
+                } else if (60..=67).contains(&idx) {
+                    let local = 32 + (idx - 60) / 2;
+                    if let Some(ch) = self.channels.get_mut(&local) {
+                        ch.name = limited.to_string();
+                        if ch.name_chars.len() < 4 {
+                            ch.name_chars.resize(4, " ".to_string());
+                        }
+                        for (i, c) in chars.iter().take(4).enumerate() {
+                            ch.name_chars[i] = c.clone();
+                        }
+                    }
+                } else if (36..=43).contains(&idx) {
+                    let local = idx - 36;
+                    if let Some(m) = self.mixes.get_mut(&local) {
+                        m.name = limited.to_string();
+                        m.name_chars = chars;
+                    }
+                } else if (44..=51).contains(&idx) {
+                    let local = idx - 44;
+                    if let Some(b) = self.buses.get_mut(&local) {
+                        b.name = limited.to_string();
+                        b.name_chars = chars;
+                    }
+                } else if idx == 52 {
+                    self.master.name = limited.to_string();
+                    self.master.name_chars = chars;
+                }
+            }
+        }
+        tracing::info!("✅ [NAMES] {} nomes injetados no GlobalState.", names.len());
+    }
+
     pub fn apply_midi(&mut self, parsed: &crate::midi::protocol::ParsedMidi) {
         match parsed {
             crate::midi::protocol::ParsedMidi::ControlChange {

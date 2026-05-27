@@ -9,7 +9,6 @@ use axum::Router;
 use socketioxide::SocketIo;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tower_http::services::ServeDir;
 use tracing::info;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -31,25 +30,35 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let tray_app = tray::TrayApp::new()?;
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
-        rt.block_on(async_main());
+        let _ = rt.block_on(async_main());
     });
     tray_app.run_message_loop();
     Ok(())
 }
 
 async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
-    // Inicializa o logger
     tracing_subscriber::fmt::init();
 
-    // Estado global da mesa
     let global_state = Arc::new(RwLock::new(state::GlobalState::new()));
 
-    // Carrega configurações dinâmicas
     let app_config = config::AppConfig::load();
     info!(
-        "🎧 Configurações carregadas: MIDI In: {}, MIDI Out: {}",
+        "🎧 Configuracoes carregadas: MIDI In: {}, MIDI Out: {}",
         app_config.in_idx, app_config.out_idx
     );
+
+    {
+        let mut state = global_state.write().await;
+        state.inject_names(&app_config.names);
+    }
+
+    let master_meter = Arc::new(RwLock::new(midi::master_meter::MasterMeter::new()));
+    {
+        let mut mm = master_meter.write().await;
+        if let Some(steps) = app_config.steps.get("master") {
+            mm.set_steps(steps);
+        }
+    }
 
     // Inicializa Engine e Scheduler MIDI
     let (midi_out_tx, mut midi_out_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(100);
@@ -128,34 +137,63 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    // Configura os handlers básicos
+    // Configura os handlers basicos
     let scheduler_socket = scheduler.clone();
     let global_state_api = global_state.clone();
     let global_state_socket = global_state.clone();
+    let app_config_clone = app_config.clone();
     io.ns(
         "/",
         move |socket: socketioxide::extract::SocketRef| async move {
             info!("Cliente web conectado: {}", socket.id);
 
             let state_arc_connect = global_state_socket.clone();
-            let config_arc = app_config.clone();
+            let config_arc = app_config_clone.clone();
             let socket_initial = socket.clone();
             tokio::spawn(async move {
                 let current_state = state_arc_connect.read().await;
                 if let Ok(state_json) = serde_json::to_value(&*current_state) {
-                    // Send initial state directly on connect like Node.js
                     socket_initial.emit("sync", &state_json).ok();
-                    
-                    socket_initial.emit("portsList", &serde_json::json!({
-                        "available": {
-                            "inputs": [],
-                            "outputs": []
-                        },
-                        "savedConfig": config_arc
-                    })).ok();
-                    
-                    // We don't have SceneManager state ready here but emitting an empty array might be needed, or not
-                    socket_initial.emit("syncStatus", &serde_json::json!({ "active": false })).ok();
+
+                    let (inputs, outputs) = midi::MidiEngine::get_available_ports();
+                    let inputs_json: Vec<serde_json::Value> = inputs
+                        .into_iter()
+                        .map(|(id, name)| serde_json::json!({ "id": id, "name": name }))
+                        .collect();
+                    let outputs_json: Vec<serde_json::Value> = outputs
+                        .into_iter()
+                        .map(|(id, name)| serde_json::json!({ "id": id, "name": name }))
+                        .collect();
+                    socket_initial
+                        .emit(
+                            "portsList",
+                            &serde_json::json!({
+                                "available": {
+                                    "inputs": inputs_json,
+                                    "outputs": outputs_json
+                                },
+                                "savedConfig": config_arc
+                            }),
+                        )
+                        .ok();
+
+                    socket_initial
+                        .emit("scenesUpdated", &current_state.scene_manager.get_state())
+                        .ok();
+
+                    socket_initial
+                        .emit("syncStatus", &serde_json::json!({ "active": false }))
+                        .ok();
+
+                    socket_initial
+                        .emit(
+                            "connectionState",
+                            &serde_json::json!({
+                                "connected": false,
+                                "demo_mode": config_arc.demo_mode
+                            }),
+                        )
+                        .ok();
                 }
             });
 
@@ -356,38 +394,24 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         },
     );
 
-    // Cria a rota Axum que serve os arquivos estáticos de `../public`
+    // Cria a rota Axum que serve os arquivos estaticos de `../public`
     // e inclui a camada do Socket.IO
     let app = Router::new()
         .nest("/api", api::macros::router(global_state_api.clone()))
         .fallback_service(tower_http::services::ServeDir::new("../public"))
         .layer(layer);
 
-    // TODO: Ler config.json para pegar a porta, mas para teste vamos usar 3001
-    // (O NodeJS original deve estar na 3000)
-    let port = 3001;
+    let port = app_config.port;
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
 
     info!(
-        "🎧 Servidor estático e WebSocket rodando em http://localhost:{}",
+        "🎧 Servidor estatico e WebSocket rodando em http://localhost:{}",
         port
     );
 
     axum::serve(listener, app).await?;
 
     Ok(())
-}
-
-async fn macros_hosts_handler() -> axum::Json<serde_json::Value> {
-    axum::Json(serde_json::json!([]))
-}
-
-async fn macros_handler() -> axum::Json<serde_json::Value> {
-    axum::Json(serde_json::json!({}))
-}
-
-async fn macros_slots_handler() -> axum::Json<serde_json::Value> {
-    axum::Json(serde_json::json!([]))
 }
 
 
