@@ -64,6 +64,47 @@ Estas regras devem ser seguidas **em TODAS as sessoes** por qualquer agente/IA q
 - Mantenha o estilo compativel com `cargo fmt` e `cargo clippy`.
 - Motivo: consistencia facilita a leitura por outras IAs.
 
+### Regra 7 — Sequencia de Sync Inicial (CRITICA)
+- O servidor Rust DEVE replicar EXATAMENTE a sequencia de boot e sync do `server.js`.
+- **Ordem de boot do server.js:**
+  1. Logger init
+  2. Import modulos (midiEngine, protocol, stateManager, etc)
+  3. Express + HTTP + Socket.IO
+  4. Montar ctx com estado global compartilhado
+  5. `initConfig(ctx)` — gerenciamento de config/nomes/steps
+  6. `ctx.loadNames()` — injetar nomes salvos no State (mesmo antes da mesa conectar)
+  7. `ctx.loadConfigConstants()` — carregar timings do config.json
+  8. `ctx.loadStepsCalibration()` — calibrar Master Meter
+  9. `initMidiHandler(ctx)` — registrar callback handleMIDIData
+  10. `initConnection(ctx)` — registrar funcoes de busca/conexao/sync
+  11. `initSocketHandler(ctx)` — registrar handlers socket.io
+  12. `initDmx(ctx)` — registrar DMX
+  13. Rotas Express + `ctx.setupSocketHandlers()`
+  14. Subir HTTP na porta configurada
+  15. Se `demo_mode` → `iniciarDummy()`
+  16. Se NAO `demo_mode` → `setTimeout(iniciarBuscaAutomatica, boot_delay_ms)`
+  17. Se `dmxEnabled` → `setTimeout(startDmxApp, dmx_boot_delay_ms)`
+  18. Systray (se suportado)
+  19. Auto-open browser (se habilitado)
+- **Sequencia de sync apos conexao MIDI (`executarConexao`):**
+  1. `isConnected = true`
+  2. Emitir `connectionState { connected: true, demo_mode }`
+  3. **Cooldown de 5 segundos** (obrigatorio — hardware precisa respirar)
+  4. Criar SyncManager se nao existe
+  5. Configurar scheduler tick rate
+  6. `isFullySynced = false`, `isSyncing = true`
+  7. Configurar callback `onSyncComplete`: limpa flags, salva nomes, emite `sync` + `syncStatus`
+  8. Chamar `syncManager.fire(targetSocket)`:
+     - Emitir `syncStatus { active: true }`
+     - `sceneManager.fetchScenes()` PRIMEIRO (100 cenas, 50ms entre cada, aguardar 2s)
+     - `_queueAllParams()` DEPOIS (enfileirar TODOS os requests de parametros)
+     - Quando Q1 esvaziar → `_finishSync()` (syncStatus false, emitir sync state, callback)
+  9. Iniciar loop de meters (heartbeat) — so roda se `isFullySynced`
+- **NUNCA** envie requests de parametros antes de baixar as cenas.
+- **NUNCA** pule o cooldown de 5s.
+- **NUNCA** emita meters antes de `isFullySynced`.
+- Motivo: a CPU da 01V96 ignora SysEx enquanto processa cenas. Atropelar essa ordem causa perda de dados e estado inconsistente.
+
 ---
 
 ## Indice

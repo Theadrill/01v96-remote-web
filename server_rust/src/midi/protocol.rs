@@ -180,26 +180,31 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         return None;
     }
 
-    // Ignora se não for uma mensagem de dados/mudança (0x1n).
     if (message[2] & 0xF0) != 0x10 {
         return None;
     }
 
+    // --- PRIORITY 0: PAN ---
+    if let Some(pan) = parse_pan_message(message) {
+        return Some(pan);
+    }
+
+    let section = message[4];
     let group = message[5];
     let element = message[6];
     let parameter = message[7];
     let channel = message[8] as usize;
 
-    let is_master_meter =
-        message.len() == 14 && message[4] == 13 && message[5] == 33 && message[6] == 4;
+    // --- METER DATA ---
+    let is_master_meter = message.len() == 14 && section == 13 && group == 33 && element == 4;
     let is_universal_meter = message.len() > 20
-        && (message[4] == 13 || message[4] == 26 || message[4] == 127)
+        && (section == 13 || section == 26 || section == 127)
         && (group == 33 || group == 32 || group == 82);
 
     if is_master_meter || is_universal_meter {
         let mut levels = std::collections::HashMap::new();
         let data_start = 9;
-        let is_master = message[6] == 4;
+        let is_master = element == 4;
         let data_bytes_available = (message.len() - 1).saturating_sub(data_start);
         let num_channels = data_bytes_available / 2;
 
@@ -214,14 +219,14 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         });
     }
 
-    if message[4] == 13 && message[5] == 127 {
+    if section == 13 && group == 127 {
         return None;
     }
 
     let data_bytes = &message[9..message.len() - 1];
 
-    if message[4] == 13 || message[4] == 127 || message[4] == 26 || message[4] == 1 {
-        // Nomes de canais
+    if section == 13 || section == 127 || section == 26 || section == 1 {
+        // --- NAMES ---
         if [4, 15, 16, 18, 23].contains(&element) && parameter >= 4 && parameter <= 19 {
             let char_index = (parameter - 4) as usize;
             let char_code = *data_bytes.last().unwrap_or(&32);
@@ -240,7 +245,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 channel_index = 52;
             }
 
-            if message[4] != 13 || group != 2 {
+            if section != 13 || group != 2 {
                 return None;
             }
             return Some(ParsedMidi::UpdateNameChar {
@@ -250,75 +255,314 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             });
         }
 
-        // Faders / On / Solo / Name / Attenuator etc
+        // --- EQ PARSING (elements: 32=InputEQ, 33=InputEQ, 46=BusEQ group=1, 60=AUXEQ, 82=StereoEQ) ---
+        let eq_map: std::collections::HashMap<u8, &str> = [
+            (32, "kInput"), (33, "kInput"), (46, "kBus"), (60, "kAUX"), (82, "kStereo"),
+        ].into_iter().collect();
+
+        if eq_map.contains_key(&element) && parameter <= 15 && group == 1 {
+            let eq_keys = [
+                "kEQMode", "kEQLowQ", "kEQLowF", "kEQLowG", "kEQHPFOn",
+                "kEQLowMidQ", "kEQLowMidF", "kEQLowMidG",
+                "kEQHiMidQ", "kEQHiMidF", "kEQHiMidG",
+                "kEQHiQ", "kEQHiF", "kEQHiG",
+                "kEQLPFOn", "kEQOn",
+            ];
+            let key = eq_keys[parameter as usize];
+            let prefix = eq_map[&element];
+            let value = if key.ends_with('G') {
+                bytes_to_signed(data_bytes) as f64
+            } else {
+                bytes_to_fader(data_bytes) as f64
+            };
+
+            let global_ch: Box<dyn ToChannelId> = match prefix {
+                "kAUX" => Box::new(36 + channel) as Box<dyn ToChannelId>,
+                "kBus" => Box::new(44 + channel),
+                "kStereo" => Box::new("master".to_string()),
+                _ => Box::new(channel),
+            };
+
+            return Some(ParsedMidi::ControlChange {
+                msg_type: format!("{}EQ/{}", prefix, key),
+                channel: global_ch.to_id(),
+                value,
+            });
+        }
+
+        // --- GATE PARSING (element 30) ---
+        if element == 30 {
+            let gate_keys = [
+                "kGateOn", "kGateLink", "kGateKeyIn", "kGateKeyAUX", "kGateKeyCh",
+                "kGateType", "kGateAttack", "kGateRange", "kGateHold", "kGateDecay", "kGateThreshold",
+            ];
+            if (parameter as usize) < gate_keys.len() {
+                let key = gate_keys[parameter as usize];
+                let value = if key == "kGateThreshold" || key == "kGateRange" {
+                    bytes_to_signed(data_bytes) as f64
+                } else if key == "kGateOn" || key == "kGateLink" {
+                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 }
+                } else {
+                    bytes_to_fader(data_bytes) as f64
+                };
+                return Some(ParsedMidi::ControlChange {
+                    msg_type: format!("kInputGate/{}", key),
+                    channel,
+                    value,
+                });
+            }
+        }
+
+        // --- COMP PARSING (elements: 31=Input, 45=Bus, 59=AUX, 71=Matrix, 81=Stereo) ---
+        let comp_map: std::collections::HashMap<u8, &str> = [
+            (31, "kInput"), (45, "kBus"), (59, "kAUX"), (71, "kMatrix"), (81, "kStereo"),
+        ].into_iter().collect();
+
+        if comp_map.contains_key(&element) {
+            let comp_keys = [
+                "kCompLocComp", "kCompOn", "kCompLink", "kCompType",
+                "kCompAttack", "kCompRelease", "kCompRatio", "kCompGain", "kCompKnee", "kCompThreshold",
+            ];
+            if (parameter as usize) < comp_keys.len() {
+                let key = comp_keys[parameter as usize];
+                let prefix = comp_map[&element];
+                let value = if key == "kCompThreshold" {
+                    bytes_to_signed(data_bytes) as f64
+                } else if key == "kCompOn" || key == "kCompLink" {
+                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 }
+                } else {
+                    bytes_to_fader(data_bytes) as f64
+                };
+
+                let global_ch = match prefix {
+                    "kAUX" => 36 + channel,
+                    "kBus" => 44 + channel,
+                    "kMatrix" => 52 + channel,
+                    "kStereo" => 0,
+                    _ => channel,
+                };
+
+                return Some(ParsedMidi::ControlChange {
+                    msg_type: format!("{}Comp/{}", prefix, key),
+                    channel: global_ch,
+                    value,
+                });
+            }
+        }
+
+        // --- BUS ASSIGN (element 34) ---
+        if element == 34 {
+            if parameter == 0 {
+                return Some(ParsedMidi::ControlChange {
+                    msg_type: "kInputBus/kStereo".to_string(),
+                    channel,
+                    value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+                });
+            }
+            if parameter >= 3 && parameter <= 10 {
+                return Some(ParsedMidi::ControlChange {
+                    msg_type: format!("kInputBus/kBus{}", parameter - 2),
+                    channel,
+                    value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+                });
+            }
+        }
+
+        // --- SCENE (Section 127, Group 1) ---
+        if section == 127 && group == 1 {
+            if element == 0 && parameter == 0 {
+                let val = *data_bytes.last().unwrap_or(&0);
+                return Some(ParsedMidi::SceneNumber(val));
+            }
+            if element == 1 && parameter <= 15 {
+                let char_code = *data_bytes.last().unwrap_or(&32);
+                let char_str = String::from_utf8_lossy(&[char_code]).to_string();
+                return Some(ParsedMidi::UpdateSceneChar {
+                    char_index: parameter as usize,
+                    char: char_str,
+                });
+            }
+        }
+
+        // --- SCENE NUMBER (Section 13 fallback) ---
+        if section == 13 && group == 4 && element == 10 && parameter == 0 {
+            let val = *data_bytes.last().unwrap_or(&0);
+            return Some(ParsedMidi::SceneNumber(val));
+        }
+
+        // --- ST IN channel remap for faders/on ---
         let mut final_ch = channel;
         if channel >= 32 && channel <= 39 {
             final_ch = 60 + (channel - 32);
         }
 
+        // Input Faders / On / Attenuator
         if element == 28 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kInputFader/kFader".to_string(),
-                channel: final_ch,
-                value: bytes_to_fader(data_bytes) as f64,
-            });
+            return cc("kInputFader/kFader", final_ch, bytes_to_fader(data_bytes) as f64);
         }
         if element == 26 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kInputChannelOn/kChannelOn".to_string(),
-                channel: final_ch,
-                value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
-            });
+            return cc("kInputChannelOn/kChannelOn", final_ch, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+        }
+        if element == 29 {
+            return cc("kInputAttenuator/kAtt", final_ch, bytes_to_signed(data_bytes) as f64);
         }
 
         // Mix (AUX) Master Faders / ON
         if element == 57 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kAUXFader/kFader".to_string(),
-                channel,
-                value: bytes_to_fader(data_bytes) as f64,
-            });
+            return cc("kAUXFader/kFader", channel, bytes_to_fader(data_bytes) as f64);
         }
         if element == 54 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kAUXChannelOn/kChannelOn".to_string(),
-                channel,
-                value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
-            });
+            return cc("kAUXChannelOn/kChannelOn", channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
         }
 
         // Bus Master Faders / ON
         if element == 43 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kBusFader/kFader".to_string(),
-                channel,
-                value: bytes_to_fader(data_bytes) as f64,
-            });
+            return cc("kBusFader/kFader", channel, bytes_to_fader(data_bytes) as f64);
         }
         if element == 41 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kBusChannelOn/kChannelOn".to_string(),
-                channel,
-                value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
-            });
+            return cc("kBusChannelOn/kChannelOn", channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
         }
 
-        // Master (Stereo) Fader e ON
+        // Master (Stereo) Fader / ON
         if element == 79 && parameter == 0 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kStereoFader/kFader".to_string(),
-                channel: 0,
-                value: bytes_to_fader(data_bytes) as f64,
-            });
+            return cc("kStereoFader/kFader", 0, bytes_to_fader(data_bytes) as f64);
         }
         if element == 77 && parameter == 0 {
-            return Some(ParsedMidi::ControlChange {
-                msg_type: "kStereoChannelOn/kChannelOn".to_string(),
-                channel: 0,
-                value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
-            });
+            return cc("kStereoChannelOn/kChannelOn", 0, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+        }
+
+        // --- AUX SENDS (element 35) ---
+        if element == 35 {
+            let aux_idx = (parameter / 3) + 1;
+            let offset = parameter % 3;
+            if offset == 0 {
+                return cc(&format!("kInputAUX/kAUX{}On", aux_idx), channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+            }
+            if offset == 2 {
+                return cc(&format!("kInputAUX/kAUX{}Level", aux_idx), channel, bytes_to_fader(data_bytes) as f64);
+            }
+        }
+
+        // --- SOLO (group 3, element 46) ---
+        if group == 3 && element == 46 {
+            return cc("kSetupSoloChOn/kSoloChOn", channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+        }
+
+        // --- PATCH (section 13, group 2, element 1, parameter 0) ---
+        if section == 13 && group == 2 && element == 1 && parameter == 0 {
+            return cc("kChannelInput/kChannelIn", channel, bytes_to_fader(data_bytes) as f64);
+        }
+
+        // --- PAIR (element 24, parameter 0) ---
+        if element == 24 && parameter == 0 {
+            let val = *data_bytes.last().unwrap_or(&0);
+            return cc("kInputPair/kPair", channel, val as f64);
         }
     }
 
     None
+}
+
+fn cc(msg_type: &str, channel: usize, value: f64) -> Option<ParsedMidi> {
+    Some(ParsedMidi::ControlChange {
+        msg_type: msg_type.to_string(),
+        channel,
+        value,
+    })
+}
+
+fn parse_pan_message(message: &[u8]) -> Option<ParsedMidi> {
+    if message.len() != 14 {
+        return None;
+    }
+    if message[0] != 0xF0 || message[1] != 0x43 || message[2] != 0x10 || message[3] != 0x3E {
+        return None;
+    }
+
+    let sec = message[4];
+    let grp = message[5];
+    let elem = message[6];
+    let _prm = message[7];
+    let ch_idx = message[8] as usize;
+    let data = &[message[9], message[10], message[11], message[12]];
+
+    let pan_value = bytes_to_pan(data);
+
+    // Input pan (CH 1-32 + ST IN)
+    if sec == 0x7F && grp == 0x01 && elem == 0x1B {
+        let global_ch = if ch_idx <= 0x1F {
+            ch_idx
+        } else if ch_idx >= 0x20 && ch_idx <= 0x27 {
+            60 + ((ch_idx - 0x20) / 2)
+        } else {
+            return None;
+        };
+        return cc("kPan", global_ch, pan_value);
+    }
+
+    // Master pan
+    if sec == 0x7F && grp == 0x01 && elem == 0x4E && ch_idx == 1 {
+        return cc("kPan", 52, pan_value);
+    }
+
+    None
+}
+
+fn bytes_to_pan(bytes: &[u8]) -> f64 {
+    let raw = ((bytes[0] as i64 & 0x7F) << 21)
+        | ((bytes[1] as i64 & 0x7F) << 14)
+        | ((bytes[2] as i64 & 0x7F) << 7)
+        | (bytes[3] as i64 & 0x7F);
+
+    let sign_bit = 1 << 27;
+    let mask = (1 << 28) - 1;
+    let signed = if (raw & sign_bit) != 0 { raw - mask - 1 } else { raw };
+    signed.clamp(-63, 63) as f64
+}
+
+trait ToChannelId {
+    fn to_id(&self) -> usize;
+}
+impl ToChannelId for usize {
+    fn to_id(&self) -> usize { *self }
+}
+impl ToChannelId for String {
+    fn to_id(&self) -> usize {
+        if self == "master" { 52 } else { 0 }
+    }
+}
+
+pub fn build_name_request(channel: u8, char_index: u8) -> Option<Vec<u8>> {
+    let (element, local_ch) = name_channel_mapping(channel);
+    let parameter = 4 + char_index;
+    let mut packet = vec![
+        HEADER[0], HEADER[1], 0x30, MODEL_ID, 13, 2, element, parameter, local_ch,
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
+pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Option<Vec<u8>> {
+    let (element, local_ch) = name_channel_mapping(channel);
+    let parameter = 4 + char_index;
+    let mut packet = vec![
+        HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, parameter, local_ch,
+        0, 0, 0, char_code,
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
+fn name_channel_mapping(channel: u8) -> (u8, u8) {
+    if channel >= 60 && channel <= 67 {
+        (23, (channel - 60) / 2)
+    } else if channel >= 36 && channel <= 43 {
+        (16, channel - 36)
+    } else if channel >= 44 && channel <= 51 {
+        (15, channel - 44)
+    } else if channel == 52 {
+        (18, 0)
+    } else {
+        (4, channel)
+    }
 }

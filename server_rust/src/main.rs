@@ -60,7 +60,6 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // Inicializa Engine e Scheduler MIDI
     let (midi_out_tx, mut midi_out_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(100);
     let scheduler = Arc::new(midi::MidiScheduler::new(
         app_config.scheduler_tick_ms,
@@ -68,73 +67,148 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     ));
     scheduler.start().await;
 
-    // Fila para receber dados do MIDI (Midi Engine)
     let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(100);
 
-    // Spawn da Engine MIDI (Consumer da fila do Scheduler)
-    let in_idx = app_config.in_idx;
-    let out_idx = app_config.out_idx;
-    tokio::spawn(async move {
-        let mut engine = midi::MidiEngine::new();
-        if let Err(e) = engine.connect_ports(in_idx, out_idx, midi_in_tx) {
-            tracing::error!("Erro ao conectar portas MIDI: {}", e);
-        }
-
-        while let Some(msg) = midi_out_rx.recv().await {
-            engine.send(&msg);
-        }
-    });
-
-    // Spawn para ler mensagens MIDI vindas da mesa e atualizar o estado (Mock por enquanto)
     let (layer, io) = SocketIo::new_layer();
+
+    if app_config.demo_mode {
+        info!("ℹ️ [DEMO] Modo Demo ativo — MIDI real desabilitado, usando simulacao.");
+        let demo_io = io.clone();
+        tokio::spawn(async move {
+            use tokio::time::{interval, Duration};
+            use rand::RngExt;
+
+            let phases: Vec<f64>; let phases2: Vec<f64>; let speeds: Vec<f64>;
+            {
+                let mut rng = rand::rng();
+                phases = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
+                phases2 = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
+                speeds = (0..32).map(|_| 0.8 + rng.random_range(0.0..4.0)).collect();
+            }
+            let bases: [f64; 32] = [
+                26.0, 24.0, 22.0, 23.0, 25.0, 23.0, 21.0, 20.0, 26.0, 24.0, 19.0, 18.0, 20.0, 21.0, 17.0, 18.0,
+                22.0, 19.0, 20.0, 18.0, 18.0, 20.0, 17.0, 21.0, 22.0, 19.0, 20.0, 18.0, 16.0, 21.0, 19.0, 17.0,
+            ];
+
+            let mut t: f64 = 0.0;
+            let mut energy: f64 = 0.9;
+            let mut energy_target: f64 = 0.9;
+            let mut ticker = interval(Duration::from_millis(33));
+            let mut meter_buffer: Vec<f64> = vec![0.0; 64];
+            let mut last_emit_time = std::time::Instant::now();
+
+            info!("🚀 [DEMO] Simulacao de Meters iniciada (32ch + Master @ 30fps)");
+
+            loop {
+                ticker.tick().await;
+                t += 0.15;
+
+                {
+                    let mut rng = rand::rng();
+                    if rng.random::<f64>() < 0.008 {
+                        energy_target = 0.7 + rng.random_range(0.0..0.3);
+                    }
+                    energy += (energy_target - energy) * 0.03;
+
+                    for i in 0..32 {
+                        let s = speeds[i];
+                        let w1 = (t * s + phases[i]).sin();
+                        let w2 = (t * s * 2.3 + phases2[i]).sin() * 0.35;
+                        let w3 = (t * s * 0.4 + phases[i] * 0.7).sin() * 0.25;
+                        let noise = (rng.random::<f64>() - 0.5) * 3.0;
+                        let level = (bases[i] * energy) + ((w1 + w2 + w3) * 9.0 * energy) + noise;
+                        meter_buffer[i] = (level.min(31.0).max(0.0)).round();
+                    }
+
+                    let mw = (t * 0.9).sin() * 2.5 + (t * 1.7).sin() * 2.0;
+                    let master_level = (26.0 * energy + mw + (rng.random::<f64>() - 0.5) * 2.0)
+                        .min(31.0).max(0.0);
+                    meter_buffer[32] = master_level.round();
+                }
+
+                let now = std::time::Instant::now();
+                if now.duration_since(last_emit_time).as_millis() >= 30 {
+                    if let Err(e) = demo_io.emit("meterData", &meter_buffer[..33]).await {
+                        tracing::error!("Erro ao emitir meterData: {:?}", e);
+                    }
+                    last_emit_time = now;
+                }
+            }
+        });
+    } else {
+        info!("ℹ️ [INFO] Modo Demo desativado. Aguardando conexao fisica com Yamaha...");
+
+        let in_idx = app_config.in_idx;
+        let out_idx = app_config.out_idx;
+        tokio::spawn(async move {
+            let mut engine = midi::MidiEngine::new();
+            if let Err(e) = engine.connect_ports(in_idx, out_idx, midi_in_tx) {
+                tracing::error!("Erro ao conectar portas MIDI: {}", e);
+            }
+
+            while let Some(msg) = midi_out_rx.recv().await {
+                engine.send(&msg);
+            }
+        });
+    }
 
     let io_clone = io.clone();
     let state_arc_in = global_state.clone();
     tokio::spawn(async move {
-        let mut assembler = midi::MidiAssembler::new();
-        while let Some(msg) = midi_in_rx.recv().await {
-            let packets = assembler.process_input(&msg);
-            for packet in packets {
-                let mut state = state_arc_in.write().await;
+            let mut assembler = midi::MidiAssembler::new();
+            while let Some(msg) = midi_in_rx.recv().await {
+                let packets = assembler.process_input(&msg);
+                for packet in packets {
+                    // Process state and collect emissions to send after releasing lock
+                    let mut emission: Option<(&str, serde_json::Value)> = None;
+                    let mut meter_emission: Option<Vec<u8>> = None;
+                    let mut scenes_emission: Option<serde_json::Value> = None;
+                    let mut current_scene_emission: Option<serde_json::Value> = None;
 
-                if state.handle_raw_midi(&packet) {
-                    let _ = io_clone.emit("scenesUpdated", &state.scene_manager.get_state());
-                    if let Some(ref cs) = state.scene_manager.current_scene {
-                        let _ = io_clone.emit("currentScene", cs);
-                    }
-                    continue;
-                }
+                    {
+                        let mut state = state_arc_in.write().await;
 
-                if let Some(parsed) = midi::protocol::parse_message(&packet) {
-                    state.apply_midi(&parsed);
+                        if state.handle_raw_midi(&packet) {
+                            scenes_emission = Some(serde_json::to_value(state.scene_manager.get_state()).unwrap_or_default());
+                            current_scene_emission = state.scene_manager.current_scene.as_ref()
+                                .and_then(|cs| serde_json::to_value(cs).ok());
+                        } else if let Some(parsed) = midi::protocol::parse_message(&packet) {
+                            state.apply_midi(&parsed);
 
-                    match parsed {
-                        midi::protocol::ParsedMidi::MeterData { levels, .. } => {
-                            let mut meter_buffer = vec![0; 40];
-                            for (ch, val) in levels.iter() {
-                                if *ch < 40 {
-                                    meter_buffer[*ch] = *val;
+                            match parsed {
+                                midi::protocol::ParsedMidi::MeterData { levels, .. } => {
+                                    let mut buf = vec![0u8; 40];
+                                    for (ch, val) in levels.iter() {
+                                        if *ch < 40 { buf[*ch] = *val; }
+                                    }
+                                    meter_emission = Some(buf);
                                 }
+                                midi::protocol::ParsedMidi::ControlChange { msg_type, channel, value } => {
+                                    emission = Some(("update", serde_json::json!({
+                                        "type": msg_type,
+                                        "channel": channel,
+                                        "value": value
+                                    })));
+                                }
+                                _ => {}
                             }
-                            let _ = io_clone.emit("meterData", &meter_buffer);
                         }
-                        midi::protocol::ParsedMidi::ControlChange {
-                            ref msg_type,
-                            channel,
-                            value,
-                        } => {
-                            let json = serde_json::json!({
-                                "type": msg_type,
-                                "channel": channel,
-                                "value": value
-                            });
-                            let _ = io_clone.emit("update", &json);
-                        }
-                        _ => {}
+                    } // state lock released here
+
+                    if let Some(v) = scenes_emission {
+                        let _ = io_clone.emit("scenesUpdated", &v).await;
+                    }
+                    if let Some(v) = current_scene_emission {
+                        let _ = io_clone.emit("currentScene", &v).await;
+                    }
+                    if let Some((event, data)) = emission {
+                        let _ = io_clone.emit(event, &data).await;
+                    }
+                    if let Some(buf) = meter_emission {
+                        let _ = io_clone.emit("meterData", &buf).await;
                     }
                 }
             }
-        }
     });
 
     // Configura os handlers basicos
