@@ -1,4 +1,4 @@
-mod api;
+﻿mod api;
 mod config;
 pub mod dmx;
 mod midi;
@@ -26,18 +26,28 @@ struct PanData {
     value: f64,
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+mod tray;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let tray_app = tray::TrayApp::new()?;
+    std::thread::spawn(move || {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        rt.block_on(async_main());
+    });
+    tray_app.run_message_loop();
+    Ok(())
+}
+
+async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     // Inicializa o logger
     tracing_subscriber::fmt::init();
 
     // Estado global da mesa
     let global_state = Arc::new(RwLock::new(state::GlobalState::new()));
 
-    // Carrega configurações dinâmicas
+    // Carrega configuraÃ§Ãµes dinÃ¢micas
     let app_config = config::AppConfig::load();
     info!(
-        "🎧 Configurações carregadas: MIDI In: {}, MIDI Out: {}",
+        "ðŸŽ§ ConfiguraÃ§Ãµes carregadas: MIDI In: {}, MIDI Out: {}",
         app_config.in_idx, app_config.out_idx
     );
 
@@ -118,7 +128,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    // Configura os handlers básicos
+    // Configura os handlers bÃ¡sicos
     let scheduler_socket = scheduler.clone();
     let global_state_api = global_state.clone();
     let global_state_socket = global_state.clone();
@@ -337,7 +347,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
     );
 
-    // Cria a rota Axum que serve os arquivos estáticos de `../public`
+    // Cria a rota Axum que serve os arquivos estÃ¡ticos de `../public`
     // e inclui a camada do Socket.IO
     let app = Router::new()
         .nest("/api", api::macros::router(global_state_api.clone()))
@@ -350,7 +360,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
 
     info!(
-        "🎧 Servidor estático e WebSocket rodando em http://localhost:{}",
+        "ðŸŽ§ Servidor estÃ¡tico e WebSocket rodando em http://localhost:{}",
         port
     );
 
@@ -370,3 +380,5 @@ async fn macros_handler() -> axum::Json<serde_json::Value> {
 async fn macros_slots_handler() -> axum::Json<serde_json::Value> {
     axum::Json(serde_json::json!([]))
 }
+
+
