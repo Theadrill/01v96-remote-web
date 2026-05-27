@@ -1,5 +1,7 @@
 pub mod assembler;
 pub mod engine;
+pub mod pair;
+pub mod pan;
 pub mod protocol;
 pub mod scheduler;
 

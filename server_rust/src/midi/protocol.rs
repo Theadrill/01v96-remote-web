@@ -185,7 +185,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
     }
 
     // --- PRIORITY 0: PAN ---
-    if let Some(pan) = parse_pan_message(message) {
+    if let Some(pan) = super::pan::parse_pan_message(message) {
         return Some(pan);
     }
 
@@ -276,16 +276,16 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 bytes_to_fader(data_bytes) as f64
             };
 
-            let global_ch: Box<dyn ToChannelId> = match prefix {
-                "kAUX" => Box::new(36 + channel) as Box<dyn ToChannelId>,
-                "kBus" => Box::new(44 + channel),
-                "kStereo" => Box::new("master".to_string()),
-                _ => Box::new(channel),
+            let global_ch: usize = match prefix {
+                "kAUX" => 36 + channel,
+                "kBus" => 44 + channel,
+                "kStereo" => 52, // master channel id
+                _ => channel,
             };
 
             return Some(ParsedMidi::ControlChange {
                 msg_type: format!("{}EQ/{}", prefix, key),
-                channel: global_ch.to_id(),
+                channel: global_ch,
                 value,
             });
         }
@@ -463,73 +463,12 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
     None
 }
 
-fn cc(msg_type: &str, channel: usize, value: f64) -> Option<ParsedMidi> {
+pub fn cc(msg_type: &str, channel: usize, value: f64) -> Option<ParsedMidi> {
     Some(ParsedMidi::ControlChange {
         msg_type: msg_type.to_string(),
         channel,
         value,
     })
-}
-
-fn parse_pan_message(message: &[u8]) -> Option<ParsedMidi> {
-    if message.len() != 14 {
-        return None;
-    }
-    if message[0] != 0xF0 || message[1] != 0x43 || message[2] != 0x10 || message[3] != 0x3E {
-        return None;
-    }
-
-    let sec = message[4];
-    let grp = message[5];
-    let elem = message[6];
-    let _prm = message[7];
-    let ch_idx = message[8] as usize;
-    let data = &[message[9], message[10], message[11], message[12]];
-
-    let pan_value = bytes_to_pan(data);
-
-    // Input pan (CH 1-32 + ST IN)
-    if sec == 0x7F && grp == 0x01 && elem == 0x1B {
-        let global_ch = if ch_idx <= 0x1F {
-            ch_idx
-        } else if ch_idx >= 0x20 && ch_idx <= 0x27 {
-            60 + ((ch_idx - 0x20) / 2)
-        } else {
-            return None;
-        };
-        return cc("kPan", global_ch, pan_value);
-    }
-
-    // Master pan
-    if sec == 0x7F && grp == 0x01 && elem == 0x4E && ch_idx == 1 {
-        return cc("kPan", 52, pan_value);
-    }
-
-    None
-}
-
-fn bytes_to_pan(bytes: &[u8]) -> f64 {
-    let raw = ((bytes[0] as i64 & 0x7F) << 21)
-        | ((bytes[1] as i64 & 0x7F) << 14)
-        | ((bytes[2] as i64 & 0x7F) << 7)
-        | (bytes[3] as i64 & 0x7F);
-
-    let sign_bit = 1 << 27;
-    let mask = (1 << 28) - 1;
-    let signed = if (raw & sign_bit) != 0 { raw - mask - 1 } else { raw };
-    signed.clamp(-63, 63) as f64
-}
-
-trait ToChannelId {
-    fn to_id(&self) -> usize;
-}
-impl ToChannelId for usize {
-    fn to_id(&self) -> usize { *self }
-}
-impl ToChannelId for String {
-    fn to_id(&self) -> usize {
-        if self == "master" { 52 } else { 0 }
-    }
 }
 
 pub fn build_name_request(channel: u8, char_index: u8) -> Option<Vec<u8>> {

@@ -136,10 +136,32 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
     } else {
-        info!("ℹ️ [INFO] Modo Demo desativado. Aguardando conexao fisica com Yamaha...");
+        info!("ℹ️ [INFO] Modo Demo desativado. Buscando porta MIDI...");
 
-        let in_idx = app_config.in_idx;
-        let out_idx = app_config.out_idx;
+        let (inputs, outputs) = midi::MidiEngine::get_available_ports();
+        let search_monitor = app_config.loopmidi_monitor;
+
+        let find_port = |ports: &[(usize, String)]| -> Option<usize> {
+            for (idx, name) in ports {
+                let lower = name.to_lowercase();
+                if search_monitor {
+                    if lower.contains("monitor") { return Some(*idx); }
+                } else {
+                    if lower.contains("yamaha") && lower.contains("-1") { return Some(*idx); }
+                }
+            }
+            None
+        };
+
+        let in_idx = find_port(&inputs).unwrap_or(app_config.in_idx);
+        let out_idx = find_port(&outputs).unwrap_or(app_config.out_idx);
+
+        if search_monitor {
+            info!("🔍 [MONITOR] Usando porta loopMIDI: IN={}, OUT={}", in_idx, out_idx);
+        } else {
+            info!("🔍 [USB] Buscando Yamaha 01V96: IN={}, OUT={}", in_idx, out_idx);
+        }
+
         tokio::spawn(async move {
             let mut engine = midi::MidiEngine::new();
             if let Err(e) = engine.connect_ports(in_idx, out_idx, midi_in_tx) {
@@ -325,36 +347,113 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             );
 
             let scheduler_pan = scheduler_socket.clone();
+            let state_pan = global_state_socket.clone();
             socket.on(
                 "setPan",
                 move |socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<PanData>| async move {
-                    info!("Pan recebido: {:?}", *data);
-                    if let Ok(val) = serde_json::to_value(&*data) {
-                        socket.emit("updatePan", &val).ok();
-                        socket.broadcast().emit("updatePan", &val).await.ok();
+                    info!("Pan recebido: CH={} Val={}", data.channel, data.value);
+
+                    // Update state
+                    {
+                        let mut state = state_pan.write().await;
+                        let parsed = midi::protocol::ParsedMidi::ControlChange {
+                            msg_type: "kPan".to_string(),
+                            channel: data.channel as usize,
+                            value: data.value,
+                        };
+                        state.apply_midi(&parsed);
                     }
-                    if let Some(sysex) = midi::protocol::build_change(
-                        "kInputPan/kPan",
-                        data.channel as u8,
-                        data.value,
-                        midi::protocol::Converter::Fader,
-                    ) {
+
+                    // Broadcast to all clients (matching Node.js format)
+                    let update = serde_json::json!({
+                        "type": "kPan",
+                        "channel": data.channel,
+                        "value": data.value
+                    });
+                    socket.emit("update", &update).ok();
+                    socket.broadcast().emit("update", &update).await.ok();
+
+                    // Send to mesa via pan module
+                    if let Some(sysex) =
+                        midi::pan::build_pan_change(data.channel as i64, data.value)
+                    {
                         scheduler_pan.enqueue(sysex, 1).await;
                     }
                 },
             );
 
-            let scheduler_dyn = scheduler_socket.clone();
+            // --- PAREAMENTO DE CANAIS (stereo link) ---
+            let scheduler_pair = scheduler_socket.clone();
+            let state_pair = global_state_socket.clone();
             socket.on(
-                "requestDynamics",
+                "pairChannel",
                 move |_socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    let action = data.get("action").and_then(|v| v.as_str()).unwrap_or("");
+                    let ch_a = data.get("chA").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+                    let ch_b = data.get("chB").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+                    let source_ch = data.get("sourceCh").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+
+                    match action {
+                        "pair" => {
+                            let (aux, state) = midi::pair::build_pair(ch_a, ch_b, source_ch);
+                            scheduler_pair.enqueue(aux, 1).await;
+                            scheduler_pair.enqueue(state, 1).await;
+                            let mut s = state_pair.write().await;
+                            let p = midi::protocol::ParsedMidi::ControlChange {
+                                msg_type: "kInputPair/kPair".to_string(),
+                                channel: ch_a as usize, value: 1.0,
+                            };
+                            s.apply_midi(&p);
+                        }
+                        "unpair" => {
+                            let state = midi::pair::build_unpair(ch_a, ch_b);
+                            scheduler_pair.enqueue(state, 1).await;
+                            let mut s = state_pair.write().await;
+                            let p = midi::protocol::ParsedMidi::ControlChange {
+                                msg_type: "kInputPair/kPair".to_string(),
+                                channel: ch_a as usize, value: 0.0,
+                            };
+                            s.apply_midi(&p);
+                        }
+                        "reset" => {
+                            let (aux, state) = midi::pair::build_reset(ch_a, ch_b);
+                            scheduler_pair.enqueue(aux, 1).await;
+                            scheduler_pair.enqueue(state, 1).await;
+                            let mut s = state_pair.write().await;
+                            let p = midi::protocol::ParsedMidi::ControlChange {
+                                msg_type: "kInputPair/kPair".to_string(),
+                                channel: ch_a as usize, value: 1.0,
+                            };
+                            s.apply_midi(&p);
+                        }
+                        _ => {}
+                    }
+                },
+            );
+
+            let state_dyn = global_state_socket.clone();
+            socket.on(
+                "requestDynamics",
+                move |socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<serde_json::Value>| async move {
                     if let Some(ch) = data.get("channel").and_then(|v| v.as_u64()) {
-                        if let Some(sysex) =
-                            midi::protocol::build_request("kInputDyn1/kDynOn", ch as u8)
-                        {
-                            scheduler_dyn.enqueue(sysex, 2).await;
+                        let ch = ch as usize;
+                        let state = state_dyn.read().await;
+                        let ch_state = if ch <= 31 {
+                            state.channels.get(&ch)
+                        } else if (60..=67).contains(&ch) {
+                            state.channels.get(&(32 + (ch - 60) / 2))
+                        } else {
+                            None
+                        };
+                        if let Some(cs) = ch_state {
+                            let _ = socket.emit("dynamicsState", &serde_json::json!({
+                                "channel": ch,
+                                "gate": cs.gate,
+                                "comp": cs.comp
+                            }));
                         }
                     }
                 },
@@ -455,6 +554,29 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                                     name: name_str,
                                 });
                         }
+                    }
+                },
+            );
+
+            // --- SYSEX RAW INJECTOR ---
+            let scheduler_sysex = scheduler_socket.clone();
+            socket.on(
+                "sysex",
+                move |_socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<Vec<u8>>| async move {
+                    scheduler_sysex.enqueue(data.0, 1).await;
+                },
+            );
+
+            // --- SYNC PAN ---
+            let scheduler_syncpan = scheduler_socket.clone();
+            socket.on(
+                "syncPan",
+                move |_socket: socketioxide::extract::SocketRef,
+                      _data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    let requests = midi::pan::build_pan_sync_requests();
+                    for req in requests {
+                        scheduler_syncpan.enqueue(req, 1).await;
                     }
                 },
             );
