@@ -1,4 +1,4 @@
-use axum::{
+﻿use axum::{
     Json,
     extract::{Path, Query, State},
     response::IntoResponse,
@@ -58,7 +58,7 @@ async fn trigger_git_sync() {
             files_str, escaped_msg
         );
 
-        println!("🚀 [NINJA SYNC] Iniciando sync: {}", commit_msg);
+        println!("ðŸš€ [NINJA SYNC] Iniciando sync: {}", commit_msg);
 
         #[cfg(target_os = "windows")]
         let mut child = tokio::process::Command::new("cmd")
@@ -78,9 +78,9 @@ async fn trigger_git_sync() {
 
         if let Ok(status) = child.wait().await {
             if status.success() {
-                println!("🌐 [NINJA SYNC] GitHub Atualizado com Sucesso!");
+                println!("ðŸŒ [NINJA SYNC] GitHub Atualizado com Sucesso!");
             } else {
-                eprintln!("❌ [NINJA SYNC] Falha no comando Git! Status: {}", status);
+                eprintln!("âŒ [NINJA SYNC] Falha no comando Git! Status: {}", status);
             }
         }
     });
@@ -119,7 +119,7 @@ pub fn router(state: Arc<RwLock<crate::state::GlobalState>>) -> axum::Router {
             axum::routing::post(sync_preset).delete(delete_preset),
         )
         .route(
-            "/macros/config/:mod_id",
+            "/macros/config/{mod_id}",
             axum::routing::get(get_mod_config).post(save_mod_config),
         )
         .route("/macros/proxy/http", axum::routing::post(proxy_http))
@@ -612,3 +612,4 @@ async fn proxy_udp(Json(req): Json<ProxyUdpReq>) -> Json<Value> {
         Err(e) => Json(json!({ "error": e.to_string() })),
     }
 }
+
