@@ -1,9 +1,0 @@
-C:\PROJETOS\01v96-remote-web\server_rust\target\debug\deps\socketioxide_core-ab023134e3fb8a3f.d: C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\lib.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\adapter\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\adapter\errors.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\packet.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\parser.rs
-
-C:\PROJETOS\01v96-remote-web\server_rust\target\debug\deps\libsocketioxide_core-ab023134e3fb8a3f.rmeta: C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\lib.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\adapter\mod.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\adapter\errors.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\packet.rs C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\parser.rs
-
-C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\lib.rs:
-C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\adapter\mod.rs:
-C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\adapter\errors.rs:
-C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\packet.rs:
-C:\Users\rodri\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socketioxide-core-0.18.1\src\parser.rs:

@@ -139,40 +139,48 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
             let state_arc_connect = global_state_socket.clone();
             let config_arc = app_config.clone();
-            socket.on(
-                "requestConnect",
-                move |socket: socketioxide::extract::SocketRef,
-                      _data: socketioxide::extract::Data<serde_json::Value>| async move {
-                    let state_arc = state_arc_connect.clone();
-                    let app_config_inner = config_arc.clone();
-                    tokio::spawn(async move {
-                        let current_state = state_arc.read().await;
-                        if let Ok(state_json) = serde_json::to_value(&*current_state) {
-                            let response = serde_json::json!({
-                                "success": true,
-                                "state": state_json,
-                                "savedConfig": app_config_inner,
-                                "available": {
-                                    "inputs": [],
-                                    "outputs": []
-                                }
-                            });
-                            if let Err(e) = socket.emit("connectResult", &response) {
-                                tracing::error!("Erro ao enviar connectResult: {}", e);
-                            }
-                        }
-                    });
-                },
-            );
+            let socket_initial = socket.clone();
+            tokio::spawn(async move {
+                let current_state = state_arc_connect.read().await;
+                if let Ok(state_json) = serde_json::to_value(&*current_state) {
+                    // Send initial state directly on connect like Node.js
+                    socket_initial.emit("sync", &state_json).ok();
+                    
+                    socket_initial.emit("portsList", &serde_json::json!({
+                        "available": {
+                            "inputs": [],
+                            "outputs": []
+                        },
+                        "savedConfig": config_arc
+                    })).ok();
+                    
+                    // We don't have SceneManager state ready here but emitting an empty array might be needed, or not
+                    socket_initial.emit("syncStatus", &serde_json::json!({ "active": false })).ok();
+                }
+            });
 
             let scheduler_control = scheduler_socket.clone();
+            let state_arc_control = global_state_socket.clone();
             socket.on(
                 "control",
                 move |socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<ControlData>| async move {
                     info!("Controle recebido: {:?}", *data);
-                    // Broadcast para os outros clientes UI
+                    
+                    // Atualiza o estado interno
+                    {
+                        let mut state = state_arc_control.write().await;
+                        let parsed = crate::midi::protocol::ParsedMidi::ControlChange {
+                            msg_type: data.msg_type.clone(),
+                            channel: data.channel as usize,
+                            value: data.value,
+                        };
+                        state.apply_midi(&parsed);
+                    }
+
+                    // Broadcast para TODOS os clientes (incluindo o enviador) para macros funcionarem corretamente
                     if let Ok(val) = serde_json::to_value(&*data) {
+                        socket.emit("update", &val).ok();
                         socket.broadcast().emit("update", &val).await.ok();
                     }
 
@@ -211,6 +219,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                       data: socketioxide::extract::Data<PanData>| async move {
                     info!("Pan recebido: {:?}", *data);
                     if let Ok(val) = serde_json::to_value(&*data) {
+                        socket.emit("updatePan", &val).ok();
                         socket.broadcast().emit("updatePan", &val).await.ok();
                     }
                     if let Some(sysex) = midi::protocol::build_change(

@@ -2,6 +2,9 @@ node_modules/
 prints/
 01v96-remote-web.zip
 
+# Rust build artifacts
+server_rust/target/
+
 
 # Pasta Local de Profiles (Não sincroniza com a nuvem)
 public/modules/macros/profiles/local/*
