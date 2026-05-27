@@ -33,12 +33,19 @@ pub struct AppConfig {
     
     pub sistema_iluminacao: bool,
     pub disable_systray: bool,
+
+    #[serde(default = "default_tecnico_pass")]
+    pub tecnico_pass: String,
     
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub names: std::collections::HashMap<String, String>,
     #[serde(skip)]
     pub steps: serde_json::Value,
+}
+
+fn default_tecnico_pass() -> String {
+    "2107".to_string()
 }
 
 impl AppConfig {
@@ -102,6 +109,7 @@ impl AppConfig {
             dmx_boot_delay_ms: 3000,
             sistema_iluminacao: false,
             disable_systray: false,
+            tecnico_pass: default_tecnico_pass(),
             names: std::collections::HashMap::new(),
             steps: serde_json::Value::Null,
         }
