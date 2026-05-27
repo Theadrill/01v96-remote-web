@@ -208,10 +208,13 @@
 
             <!-- Seção DMX (Reset) -->
             <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px; text-align: center;">
-                <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">SISTEMA DE ILUMINAÇÃO</p>
+                <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">SISTEMA DE ILUMINAÇÃO
+                </p>
                 <button class="btn-connect" onclick="resetDmx()"
-                    style="width: 100%; margin: 0; background: #6a1b9a; font-size: 12px; font-weight: bold; height: 45px;">RESETAR LUZ</button>
-                <p style="font-size: 9px; color: #555; margin-top: 8px;">Mata processo, reseta USB e reinicia ArtNetToDMX</p>
+                    style="width: 100%; margin: 0; background: #6a1b9a; font-size: 12px; font-weight: bold; height: 45px;">RESETAR
+                    LUZ</button>
+                <p style="font-size: 9px; color: #555; margin-top: 8px;">Mata processo, reseta USB e reinicia
+                    ArtNetToDMX</p>
             </div>
 
 
@@ -349,8 +352,7 @@
     </div>
 
     <!-- Modal de Macros Dinâmico -->
-    <div id="macrosModal" class="modal-overlay"
-        style="z-index:13000; display:none; background: rgba(0,0,0,0.75);">
+    <div id="macrosModal" class="modal-overlay" style="z-index:13000; display:none; background: rgba(0,0,0,0.75);">
         <div class="modal-content"
             style="max-width:550px; display:flex; flex-direction:column; overflow:hidden; background:rgba(26, 26, 26, 0.85); border:2px solid #6a1b9a; border-radius:15px; padding:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
             <div
@@ -637,7 +639,8 @@
                 Atenção!</p>
             <h3 style="margin-top:0; color:#ffcc00; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
                 RESETAR ILUMINAÇÃO?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente resetar o sistema DMX? O hardware USB e o ArtNetToDMX serão reiniciados.</p>
+            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente resetar o
+                sistema DMX? O hardware USB e o ArtNetToDMX serão reiniciados.</p>
             <div style="display:flex; gap:15px;">
                 <button id="dmxResetConfirmBtn" class="btn-connect"
                     style="flex:1; margin:0; height:45px; background:#6a1b9a;">SIM, RESETAR</button>
@@ -670,10 +673,13 @@
     <!-- Sync Shield Overlay (Movido para o fim para garantir z-index no topo) -->
     <!-- Modal de Pair (Seleção de Direção) -->
     <div id="pairModal" class="modal-overlay" style="z-index:20500; display:none;">
-        <div class="modal-content" style="max-width:340px; background:#111; border:1px solid #5cacee; border-radius:15px; padding:25px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:10px; letter-spacing:1px;">Pair de Canais</p>
-            <h3 id="pairModalSubtitle" style="margin:0 0 25px 0; color:#5cacee; font-size:20px; letter-spacing:1px;">CH X + CH Y</h3>
-            
+        <div class="modal-content"
+            style="max-width:340px; background:#111; border:1px solid #5cacee; border-radius:15px; padding:25px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:10px; letter-spacing:1px;">
+                Pair de Canais</p>
+            <h3 id="pairModalSubtitle" style="margin:0 0 25px 0; color:#5cacee; font-size:20px; letter-spacing:1px;">CH
+                X + CH Y</h3>
+
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <button id="pairBtn_AtoB" onclick="confirmPairDirection('a_to_b')" class="pair-direction-btn">
                     CH X → CH Y
@@ -681,26 +687,33 @@
                 <button id="pairBtn_BtoA" onclick="confirmPairDirection('b_to_a')" class="pair-direction-btn">
                     CH Y → CH X
                 </button>
-                <button id="pairBtn_Reset" onclick="confirmPairDirection('reset')" class="pair-direction-btn" style="border-color: #ffa726; color: #ffa726;">
+                <button id="pairBtn_Reset" onclick="confirmPairDirection('reset')" class="pair-direction-btn"
+                    style="border-color: #ffa726; color: #ffa726;">
                     RESETAR E PAREAR AMBOS<br>
                     <small style="font-size:10px; opacity:0.7;">Limpa as configs e ativa o Pair</small>
                 </button>
             </div>
-            
-            <button onclick="document.getElementById('pairModal').style.display='none'" class="btn-close" 
+
+            <button onclick="document.getElementById('pairModal').style.display='none'" class="btn-close"
                 style="width:100%; height:45px; margin-top:20px; background:#444;">CANCELAR</button>
         </div>
     </div>
 
     <!-- Modal de Confirmação de Pair -->
     <div id="pairConfirmModal" class="modal-overlay" style="z-index:21000; display:none;">
-        <div class="modal-content" style="max-width:340px; background:#111; border:1px solid #28a745; border-radius:15px; padding:30px; text-align:center; box-shadow:0 10px 50px rgba(0,0,0,0.9);">
-            <p id="pairConfirmTitle" style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">Confirmar Pair</p>
-            <p id="pairConfirmText" style="color:#fff; font-size:15px; line-height:1.5; margin-bottom:30px;">Parear canal X + Y, copiando as informações do canal X</p>
-            
+        <div class="modal-content"
+            style="max-width:340px; background:#111; border:1px solid #28a745; border-radius:15px; padding:30px; text-align:center; box-shadow:0 10px 50px rgba(0,0,0,0.9);">
+            <p id="pairConfirmTitle"
+                style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Confirmar Pair</p>
+            <p id="pairConfirmText" style="color:#fff; font-size:15px; line-height:1.5; margin-bottom:30px;">Parear
+                canal X + Y, copiando as informações do canal X</p>
+
             <div style="display:flex; gap:15px;">
-                <button id="pairConfirmOkBtn" class="btn-connect" style="flex:1; height:50px; background:#28a745; margin:0;">CONFIRMAR</button>
-                <button onclick="document.getElementById('pairConfirmModal').style.display='none'" class="btn-close" style="flex:1; height:50px; margin:0; background:#444;">CANCELAR</button>
+                <button id="pairConfirmOkBtn" class="btn-connect"
+                    style="flex:1; height:50px; background:#28a745; margin:0;">CONFIRMAR</button>
+                <button onclick="document.getElementById('pairConfirmModal').style.display='none'" class="btn-close"
+                    style="flex:1; height:50px; margin:0; background:#444;">CANCELAR</button>
             </div>
         </div>
     </div>

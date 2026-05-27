@@ -1,7 +1,12 @@
 {
   "inIdx": 0,
+<<<<<<< Updated upstream
   "outIdx": 1,
   "loopmidi-monitor": false,
+=======
+  "outIdx": 0,
+  "loopmidi-monitor": true,
+>>>>>>> Stashed changes
   "open_browser_startup": false,
   "demo_mode": false,
   "lumikit_ips": [

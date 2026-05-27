@@ -1,0 +1,472 @@
+[FX 1] Param 1D | Combined: 158 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1E F7
+[FX 1] Param 1D | Combined: 158 -> 40.90s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1E F7
+[FX 1] Param 1D | Combined: 159 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1F F7
+[FX 1] Param 1D | Combined: 159 -> 42.30s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1F F7
+[FX 1] Param 1D | Combined: 158 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1E F7
+[FX 1] Param 1D | Combined: 158 -> 40.90s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1E F7
+[FX 1] Param 1D | Combined: 157 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1D F7
+[FX 1] Param 1D | Combined: 157 -> 39.50s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1D F7
+[FX 1] Param 1D | Combined: 156 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1C F7
+[FX 1] Param 1D | Combined: 156 -> 38.20s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1C F7
+[FX 1] Param 1D | Combined: 155 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1B F7
+[FX 1] Param 1D | Combined: 155 -> 36.80s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1B F7
+[FX 1] Param 1D | Combined: 154 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1A F7
+[FX 1] Param 1D | Combined: 154 -> 35.40s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 1A F7
+[FX 1] Param 1D | Combined: 153 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 19 F7
+[FX 1] Param 1D | Combined: 153 -> 34.10s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 19 F7
+[FX 1] Param 1D | Combined: 152 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 18 F7
+[FX 1] Param 1D | Combined: 152 -> 32.70s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 18 F7
+[FX 1] Param 1D | Combined: 151 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 17 F7
+[FX 1] Param 1D | Combined: 151 -> 31.40s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 17 F7
+[FX 1] Param 1D | Combined: 150 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 16 F7
+[FX 1] Param 1D | Combined: 150 -> 30.00s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 16 F7
+[FX 1] Param 1D | Combined: 149 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 15 F7
+[FX 1] Param 1D | Combined: 149 -> 28.60s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 15 F7
+[FX 1] Param 1D | Combined: 148 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 14 F7
+[FX 1] Param 1D | Combined: 148 -> 27.30s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 14 F7
+[FX 1] Param 1D | Combined: 147 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 13 F7
+[FX 1] Param 1D | Combined: 147 -> 25.90s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 13 F7
+[FX 1] Param 1D | Combined: 146 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 12 F7
+[FX 1] Param 1D | Combined: 146 -> 24.50s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 12 F7
+[FX 1] Param 1D | Combined: 145 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 11 F7
+[FX 1] Param 1D | Combined: 145 -> 23.20s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 11 F7
+[FX 1] Param 1D | Combined: 144 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 10 F7
+[FX 1] Param 1D | Combined: 144 -> 21.80s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 10 F7
+[FX 1] Param 1D | Combined: 143 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0F F7
+[FX 1] Param 1D | Combined: 143 -> 21.10s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0F F7
+[FX 1] Param 1D | Combined: 142 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0E F7
+[FX 1] Param 1D | Combined: 142 -> 20.40s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0E F7
+[FX 1] Param 1D | Combined: 141 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0D F7
+[FX 1] Param 1D | Combined: 141 -> 19.70s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0D F7
+[FX 1] Param 1D | Combined: 140 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0C F7
+[FX 1] Param 1D | Combined: 140 -> 19.10s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0C F7
+[FX 1] Param 1D | Combined: 139 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0B F7
+[FX 1] Param 1D | Combined: 139 -> 18.40s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0B F7
+[FX 1] Param 1D | Combined: 138 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0A F7
+[FX 1] Param 1D | Combined: 138 -> 17.70s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 0A F7
+[FX 1] Param 1D | Combined: 137 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 09 F7
+[FX 1] Param 1D | Combined: 137 -> 17.00s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 09 F7
+[FX 1] Param 1D | Combined: 136 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 08 F7
+[FX 1] Param 1D | Combined: 136 -> 16.30s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 08 F7
+[FX 1] Param 1D | Combined: 135 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 07 F7
+[FX 1] Param 1D | Combined: 135 -> 15.70s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 07 F7
+[FX 1] Param 1D | Combined: 134 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 06 F7
+[FX 1] Param 1D | Combined: 134 -> 15.00s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 06 F7
+[FX 1] Param 1D | Combined: 133 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 05 F7
+[FX 1] Param 1D | Combined: 133 -> 14.30s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 05 F7
+[FX 1] Param 1D | Combined: 132 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 04 F7
+[FX 1] Param 1D | Combined: 132 -> 13.60s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 04 F7
+[FX 1] Param 1D | Combined: 131 -> 12.90s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 03 F7
+[FX 1] Param 1D | Combined: 131 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 03 F7
+[FX 1] Param 1D | Combined: 130 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 02 F7
+[FX 1] Param 1D | Combined: 130 -> 12.20s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 02 F7
+[FX 1] Param 1D | Combined: 129 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 01 F7
+[FX 1] Param 1D | Combined: 129 -> 11.60s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 01 F7
+[FX 1] Param 1D | Combined: 128 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 00 F7
+[FX 1] Param 1D | Combined: 128 -> 10.90s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 01 00 F7
+[FX 1] Param 1D | Combined: 127 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7F F7
+[FX 1] Param 1D | Combined: 127 -> 10.50s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7F F7
+[FX 1] Param 1D | Combined: 126 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7E F7
+[FX 1] Param 1D | Combined: 126 -> 10.20s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7E F7
+[FX 1] Param 1D | Combined: 125 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7D F7
+[FX 1] Param 1D | Combined: 125 -> 9.90s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7D F7
+[FX 1] Param 1D | Combined: 124 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7C F7
+[FX 1] Param 1D | Combined: 124 -> 9.56s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7C F7
+[FX 1] Param 1D | Combined: 123 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7B F7
+[FX 1] Param 1D | Combined: 123 -> 9.21s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7B F7
+[FX 1] Param 1D | Combined: 122 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7A F7
+[FX 1] Param 1D | Combined: 122 -> 8.87s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 7A F7
+[FX 1] Param 1D | Combined: 121 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 79 F7
+[FX 1] Param 1D | Combined: 121 -> 8.53s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 79 F7
+[FX 1] Param 1D | Combined: 120 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 78 F7
+[FX 1] Param 1D | Combined: 120 -> 8.19s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 78 F7
+[FX 1] Param 1D | Combined: 119 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 77 F7
+[FX 1] Param 1D | Combined: 119 -> 7.85s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 77 F7
+[FX 1] Param 1D | Combined: 118 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 76 F7
+[FX 1] Param 1D | Combined: 118 -> 7.51s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 76 F7
+[FX 1] Param 1D | Combined: 117 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 75 F7
+[FX 1] Param 1D | Combined: 117 -> 7.17s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 75 F7
+[FX 1] Param 1D | Combined: 116 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 74 F7
+[FX 1] Param 1D | Combined: 116 -> 6.83s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 74 F7
+[FX 1] Param 1D | Combined: 115 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 73 F7
+[FX 1] Param 1D | Combined: 115 -> 6.48s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 73 F7
+[FX 1] Param 1D | Combined: 114 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 72 F7
+[FX 1] Param 1D | Combined: 114 -> 6.14s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 72 F7
+[FX 1] Param 1D | Combined: 113 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 71 F7
+[FX 1] Param 1D | Combined: 113 -> 5.80s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 71 F7
+[FX 1] Param 1D | Combined: 112 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 70 F7
+[FX 1] Param 1D | Combined: 112 -> 5.46s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 70 F7
+[FX 1] Param 1D | Combined: 111 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6F F7
+[FX 1] Param 1D | Combined: 111 -> 5.29s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6F F7
+[FX 1] Param 1D | Combined: 110 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6E F7
+[FX 1] Param 1D | Combined: 110 -> 5.12s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6E F7
+[FX 1] Param 1D | Combined: 109 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6D F7
+[FX 1] Param 1D | Combined: 109 -> 4.95s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6D F7
+[FX 1] Param 1D | Combined: 108 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6C F7
+[FX 1] Param 1D | Combined: 108 -> 4.78s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6C F7
+[FX 1] Param 1D | Combined: 107 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6B F7
+[FX 1] Param 1D | Combined: 107 -> 4.61s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6B F7
+[FX 1] Param 1D | Combined: 106 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6A F7
+[FX 1] Param 1D | Combined: 106 -> 4.44s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 6A F7
+[FX 1] Param 1D | Combined: 105 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 69 F7
+[FX 1] Param 1D | Combined: 105 -> 4.27s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 69 F7
+[FX 1] Param 1D | Combined: 104 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 68 F7
+[FX 1] Param 1D | Combined: 104 -> 4.10s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 68 F7
+[FX 1] Param 1D | Combined: 103 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 67 F7
+[FX 1] Param 1D | Combined: 103 -> 3.93s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 67 F7
+[FX 1] Param 1D | Combined: 102 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 66 F7
+[FX 1] Param 1D | Combined: 102 -> 3.75s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 66 F7
+[FX 1] Param 1D | Combined: 101 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 65 F7
+[FX 1] Param 1D | Combined: 101 -> 3.58s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 65 F7
+[FX 1] Param 1D | Combined: 100 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 64 F7
+[FX 1] Param 1D | Combined: 100 -> 3.41s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 64 F7
+[FX 1] Param 1D | Combined: 99 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 63 F7
+[FX 1] Param 1D | Combined: 99 -> 3.24s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 63 F7
+[FX 1] Param 1D | Combined: 98 -> 3.07s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 62 F7
+[FX 1] Param 1D | Combined: 98 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 62 F7
+[FX 1] Param 1D | Combined: 97 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 61 F7
+[FX 1] Param 1D | Combined: 97 -> 2.90s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 61 F7
+[FX 1] Param 1D | Combined: 96 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 60 F7
+[FX 1] Param 1D | Combined: 96 -> 2.73s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 60 F7
+[FX 1] Param 1D | Combined: 95 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5F F7
+[FX 1] Param 1D | Combined: 95 -> 2.65s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5F F7
+[FX 1] Param 1D | Combined: 94 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5E F7
+[FX 1] Param 1D | Combined: 94 -> 2.56s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5E F7
+[FX 1] Param 1D | Combined: 93 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5D F7
+[FX 1] Param 1D | Combined: 93 -> 2.47s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5D F7
+[FX 1] Param 1D | Combined: 92 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5C F7
+[FX 1] Param 1D | Combined: 92 -> 2.39s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5C F7
+[FX 1] Param 1D | Combined: 91 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5B F7
+[FX 1] Param 1D | Combined: 91 -> 2.30s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5B F7
+[FX 1] Param 1D | Combined: 90 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5A F7
+[FX 1] Param 1D | Combined: 90 -> 2.22s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 5A F7
+[FX 1] Param 1D | Combined: 89 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 59 F7
+[FX 1] Param 1D | Combined: 89 -> 2.13s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 59 F7
+[FX 1] Param 1D | Combined: 88 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 58 F7
+[FX 1] Param 1D | Combined: 88 -> 2.05s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 58 F7
+[FX 1] Param 1D | Combined: 87 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 57 F7
+[FX 1] Param 1D | Combined: 87 -> 1.96s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 57 F7
+[FX 1] Param 1D | Combined: 86 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 56 F7
+[FX 1] Param 1D | Combined: 86 -> 1.88s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 56 F7
+[FX 1] Param 1D | Combined: 85 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 55 F7
+[FX 1] Param 1D | Combined: 85 -> 1.79s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 55 F7
+[FX 1] Param 1D | Combined: 84 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 54 F7
+[FX 1] Param 1D | Combined: 84 -> 1.71s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 54 F7
+[FX 1] Param 1D | Combined: 83 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 53 F7
+[FX 1] Param 1D | Combined: 83 -> 1.62s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 53 F7
+[FX 1] Param 1D | Combined: 82 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 52 F7
+[FX 1] Param 1D | Combined: 82 -> 1.54s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 52 F7
+[FX 1] Param 1D | Combined: 81 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 51 F7
+[FX 1] Param 1D | Combined: 81 -> 1.45s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 51 F7
+[FX 1] Param 1D | Combined: 80 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 50 F7
+[FX 1] Param 1D | Combined: 80 -> 1.37s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 50 F7
+[FX 1] Param 1D | Combined: 79 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4F F7
+[FX 1] Param 1D | Combined: 79 -> 1.32s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4F F7
+[FX 1] Param 1D | Combined: 78 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4E F7
+[FX 1] Param 1D | Combined: 78 -> 1.28s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4E F7
+[FX 1] Param 1D | Combined: 77 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4D F7
+[FX 1] Param 1D | Combined: 77 -> 1.24s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4D F7
+[FX 1] Param 1D | Combined: 76 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4C F7
+[FX 1] Param 1D | Combined: 76 -> 1.20s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4C F7
+[FX 1] Param 1D | Combined: 75 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4B F7
+[FX 1] Param 1D | Combined: 75 -> 1.15s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4B F7
+[FX 1] Param 1D | Combined: 74 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4A F7
+[FX 1] Param 1D | Combined: 74 -> 1.11s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 4A F7
+[FX 1] Param 1D | Combined: 73 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 49 F7
+[FX 1] Param 1D | Combined: 73 -> 1.07s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 49 F7
+[FX 1] Param 1D | Combined: 72 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 48 F7
+[FX 1] Param 1D | Combined: 72 -> 1.02s | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 48 F7
+[FX 1] Param 1D | Combined: 71 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 47 F7
+[FX 1] Param 1D | Combined: 71 -> 986ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 47 F7
+[FX 1] Param 1D | Combined: 70 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 46 F7
+[FX 1] Param 1D | Combined: 70 -> 944ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 46 F7
+[FX 1] Param 1D | Combined: 69 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 45 F7
+[FX 1] Param 1D | Combined: 69 -> 901ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 45 F7
+[FX 1] Param 1D | Combined: 68 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 44 F7
+[FX 1] Param 1D | Combined: 68 -> 858ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 44 F7
+[FX 1] Param 1D | Combined: 67 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 43 F7
+[FX 1] Param 1D | Combined: 67 -> 816ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 43 F7
+[FX 1] Param 1D | Combined: 66 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 42 F7
+[FX 1] Param 1D | Combined: 66 -> 773ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 42 F7
+[FX 1] Param 1D | Combined: 65 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 41 F7
+[FX 1] Param 1D | Combined: 65 -> 730ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 41 F7
+[FX 1] Param 1D | Combined: 64 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 40 F7
+[FX 1] Param 1D | Combined: 64 -> 688ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 40 F7
+[FX 1] Param 1D | Combined: 63 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3F F7
+[FX 1] Param 1D | Combined: 63 -> 667ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3F F7
+[FX 1] Param 1D | Combined: 62 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3E F7
+[FX 1] Param 1D | Combined: 62 -> 645ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3E F7
+[FX 1] Param 1D | Combined: 61 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3D F7
+[FX 1] Param 1D | Combined: 61 -> 624ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3D F7
+[FX 1] Param 1D | Combined: 60 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3C F7
+[FX 1] Param 1D | Combined: 60 -> 603ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3C F7
+[FX 1] Param 1D | Combined: 59 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3B F7
+[FX 1] Param 1D | Combined: 59 -> 581ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3B F7
+[FX 1] Param 1D | Combined: 58 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3A F7
+[FX 1] Param 1D | Combined: 58 -> 560ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 3A F7
+[FX 1] Param 1D | Combined: 57 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 39 F7
+[FX 1] Param 1D | Combined: 57 -> 539ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 39 F7
+[FX 1] Param 1D | Combined: 56 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 38 F7
+[FX 1] Param 1D | Combined: 56 -> 517ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 38 F7
+[FX 1] Param 1D | Combined: 55 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 37 F7
+[FX 1] Param 1D | Combined: 55 -> 496ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 37 F7
+[FX 1] Param 1D | Combined: 54 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 36 F7
+[FX 1] Param 1D | Combined: 54 -> 475ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 36 F7
+[FX 1] Param 1D | Combined: 53 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 35 F7
+[FX 1] Param 1D | Combined: 53 -> 453ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 35 F7
+[FX 1] Param 1D | Combined: 52 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 34 F7
+[FX 1] Param 1D | Combined: 52 -> 432ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 34 F7
+[FX 1] Param 1D | Combined: 51 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 33 F7
+[FX 1] Param 1D | Combined: 51 -> 411ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 33 F7
+[FX 1] Param 1D | Combined: 50 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 32 F7
+[FX 1] Param 1D | Combined: 50 -> 389ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 32 F7
+[FX 1] Param 1D | Combined: 49 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 31 F7
+[FX 1] Param 1D | Combined: 49 -> 368ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 31 F7
+[FX 1] Param 1D | Combined: 48 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 30 F7
+[FX 1] Param 1D | Combined: 48 -> 347ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 30 F7
+[FX 1] Param 1D | Combined: 47 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2F F7
+[FX 1] Param 1D | Combined: 47 -> 336ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2F F7
+[FX 1] Param 1D | Combined: 46 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2E F7
+[FX 1] Param 1D | Combined: 46 -> 325ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2E F7
+[FX 1] Param 1D | Combined: 45 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2D F7
+[FX 1] Param 1D | Combined: 45 -> 315ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2D F7
+[FX 1] Param 1D | Combined: 44 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2C F7
+[FX 1] Param 1D | Combined: 44 -> 304ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2C F7
+[FX 1] Param 1D | Combined: 43 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2B F7
+[FX 1] Param 1D | Combined: 43 -> 293ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2B F7
+[FX 1] Param 1D | Combined: 42 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2A F7
+[FX 1] Param 1D | Combined: 42 -> 283ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 2A F7
+[FX 1] Param 1D | Combined: 41 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 29 F7
+[FX 1] Param 1D | Combined: 41 -> 272ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 29 F7
+[FX 1] Param 1D | Combined: 40 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 28 F7
+[FX 1] Param 1D | Combined: 40 -> 261ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 28 F7
+[FX 1] Param 1D | Combined: 39 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 27 F7
+[FX 1] Param 1D | Combined: 39 -> 251ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 27 F7
+[FX 1] Param 1D | Combined: 38 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 26 F7
+[FX 1] Param 1D | Combined: 38 -> 240ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 26 F7
+[FX 1] Param 1D | Combined: 37 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 25 F7
+[FX 1] Param 1D | Combined: 37 -> 229ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 25 F7
+[FX 1] Param 1D | Combined: 36 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 24 F7
+[FX 1] Param 1D | Combined: 36 -> 219ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 24 F7
+[FX 1] Param 1D | Combined: 35 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 23 F7
+[FX 1] Param 1D | Combined: 35 -> 208ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 23 F7
+[FX 1] Param 1D | Combined: 34 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 22 F7
+[FX 1] Param 1D | Combined: 34 -> 197ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 22 F7
+[FX 1] Param 1D | Combined: 33 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 21 F7
+[FX 1] Param 1D | Combined: 33 -> 187ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 21 F7
+[FX 1] Param 1D | Combined: 32 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 20 F7
+[FX 1] Param 1D | Combined: 32 -> 176ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 20 F7
+[FX 1] Param 1D | Combined: 31 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1F F7
+[FX 1] Param 1D | Combined: 31 -> 171ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1F F7
+[FX 1] Param 1D | Combined: 30 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1E F7
+[FX 1] Param 1D | Combined: 30 -> 165ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1E F7
+[FX 1] Param 1D | Combined: 29 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1D F7
+[FX 1] Param 1D | Combined: 29 -> 160ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1D F7
+[FX 1] Param 1D | Combined: 28 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1C F7
+[FX 1] Param 1D | Combined: 28 -> 155ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1C F7
+[FX 1] Param 1D | Combined: 27 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1B F7
+[FX 1] Param 1D | Combined: 27 -> 149ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1B F7
+[FX 1] Param 1D | Combined: 26 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1A F7
+[FX 1] Param 1D | Combined: 26 -> 144ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 1A F7
+[FX 1] Param 1D | Combined: 25 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 19 F7
+[FX 1] Param 1D | Combined: 25 -> 139ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 19 F7
+[FX 1] Param 1D | Combined: 24 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 18 F7
+[FX 1] Param 1D | Combined: 24 -> 133ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 18 F7
+[FX 1] Param 1D | Combined: 23 -> 128ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 17 F7
+[FX 1] Param 1D | Combined: 23 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 17 F7
+[FX 1] Param 1D | Combined: 22 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 16 F7
+[FX 1] Param 1D | Combined: 22 -> 123ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 16 F7
+[FX 1] Param 1D | Combined: 21 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 15 F7
+[FX 1] Param 1D | Combined: 21 -> 117ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 15 F7
+[FX 1] Param 1D | Combined: 20 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 14 F7
+[FX 1] Param 1D | Combined: 20 -> 112ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 14 F7
+[FX 1] Param 1D | Combined: 19 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 13 F7
+[FX 1] Param 1D | Combined: 19 -> 107ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 13 F7
+[FX 1] Param 1D | Combined: 18 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 12 F7
+[FX 1] Param 1D | Combined: 18 -> 101ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 12 F7
+[FX 1] Param 1D | Combined: 17 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 11 F7
+[FX 1] Param 1D | Combined: 17 -> 96ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 11 F7
+[FX 1] Param 1D | Combined: 16 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 10 F7
+[FX 1] Param 1D | Combined: 16 -> 91ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 10 F7
+[FX 1] Param 1D | Combined: 15 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0F F7
+[FX 1] Param 1D | Combined: 15 -> 85ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0F F7
+[FX 1] Param 1D | Combined: 14 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0E F7
+[FX 1] Param 1D | Combined: 14 -> 80ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0E F7
+[FX 1] Param 1D | Combined: 13 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0D F7
+[FX 1] Param 1D | Combined: 13 -> 75ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0D F7
+[FX 1] Param 1D | Combined: 12 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0C F7
+[FX 1] Param 1D | Combined: 12 -> 69ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0C F7
+[FX 1] Param 1D | Combined: 13 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0D F7
+[FX 1] Param 1D | Combined: 13 -> 75ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0D F7
+[FX 1] Param 1D | Combined: 12 | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0C F7
+[FX 1] Param 1D | Combined: 12 -> 69ms | Hex: F0 43 10 3E 7F 01 58 1D 00 00 00 00 0C F7
+[FX 4] Param 12 | Combined: 182 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 36 F7
+[FX 4] Param 12 | Combined: 182 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 36 F7
+[FX 4] Param 11 | Combined: 29 -> 3.2s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1D F7
+[FX 4] Param 11 | Combined: 29 -> 3.2s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1D F7
+[FX 4] Param 12 | Combined: 185 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 39 F7
+[FX 4] Param 12 | Combined: 185 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 39 F7
+[FX 4] Param 12 | Combined: 187 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 3B F7
+[FX 4] Param 12 | Combined: 187 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 3B F7
+[FX 4] Param 12 | Combined: 190 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 3E F7
+[FX 4] Param 12 | Combined: 190 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 3E F7
+[FX 4] Param 12 | Combined: 192 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 40 F7
+[FX 4] Param 12 | Combined: 192 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 40 F7
+[FX 4] Param 12 | Combined: 195 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 43 F7
+[FX 4] Param 12 | Combined: 195 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 43 F7
+[FX 4] Param 12 | Combined: 200 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 48 F7
+[FX 4] Param 12 | Combined: 200 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 48 F7
+[FX 4] Param 12 | Combined: 203 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 4B F7
+[FX 4] Param 12 | Combined: 203 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 4B F7
+[FX 4] Param 12 | Combined: 208 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 50 F7
+[FX 4] Param 12 | Combined: 208 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 50 F7
+[FX 4] Param 12 | Combined: 210 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 52 F7
+[FX 4] Param 12 | Combined: 210 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 52 F7
+[FX 4] Param 12 | Combined: 213 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 55 F7
+[FX 4] Param 12 | Combined: 213 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 55 F7
+[FX 4] Param 12 | Combined: 216 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 58 F7
+[FX 4] Param 12 | Combined: 216 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 58 F7
+[FX 4] Param 12 | Combined: 218 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5A F7
+[FX 4] Param 12 | Combined: 218 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5A F7
+[FX 4] Param 12 | Combined: 221 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5D F7
+[FX 4] Param 12 | Combined: 221 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5D F7
+[FX 4] Param 12 | Combined: 223 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5F F7
+[FX 4] Param 12 | Combined: 223 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5F F7
+[FX 4] Param 12 | Combined: 226 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 62 F7
+[FX 4] Param 12 | Combined: 226 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 62 F7
+[FX 4] Param 12 | Combined: 228 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 64 F7
+[FX 4] Param 12 | Combined: 228 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 64 F7
+[FX 4] Param 12 | Combined: 231 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 67 F7
+[FX 4] Param 12 | Combined: 231 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 67 F7
+[FX 4] Param 12 | Combined: 233 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 69 F7
+[FX 4] Param 12 | Combined: 233 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 69 F7
+[FX 4] Param 12 | Combined: 236 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 6C F7
+[FX 4] Param 12 | Combined: 236 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 6C F7
+[FX 4] Param 12 | Combined: 241 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 71 F7
+[FX 4] Param 12 | Combined: 241 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 71 F7
+[FX 4] Param 12 | Combined: 244 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 74 F7
+[FX 4] Param 12 | Combined: 244 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 74 F7
+[FX 4] Param 11 | Combined: 28 -> 3.1s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1C F7
+[FX 4] Param 11 | Combined: 28 -> 3.1s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1C F7
+[FX 4] Param 12 | Combined: 246 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 76 F7
+[FX 4] Param 12 | Combined: 246 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 76 F7
+[FX 4] Param 12 | Combined: 254 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 7E F7
+[FX 4] Param 12 | Combined: 254 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 7E F7
+[FX 4] Param 12 | Combined: 257 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 01 F7
+[FX 4] Param 12 | Combined: 257 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 01 F7
+[FX 4] Param 11 | Combined: 27 -> 3.0s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1B F7
+[FX 4] Param 11 | Combined: 27 -> 3.0s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1B F7
+[FX 4] Param 12 | Combined: 259 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 03 F7
+[FX 4] Param 12 | Combined: 259 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 03 F7
+[FX 4] Param 12 | Combined: 262 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 06 F7
+[FX 4] Param 12 | Combined: 262 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 06 F7
+[FX 4] Param 12 | Combined: 264 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 08 F7
+[FX 4] Param 12 | Combined: 264 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 08 F7
+[FX 4] Param 12 | Combined: 267 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 0B F7
+[FX 4] Param 12 | Combined: 267 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 0B F7
+[FX 4] Param 12 | Combined: 272 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 10 F7
+[FX 4] Param 12 | Combined: 272 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 10 F7
+[FX 4] Param 11 | Combined: 26 -> 2.9s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1A F7
+[FX 4] Param 11 | Combined: 26 -> 2.9s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1A F7
+[FX 4] Param 12 | Combined: 277 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 15 F7
+[FX 4] Param 12 | Combined: 277 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 15 F7
+[FX 4] Param 12 | Combined: 280 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 18 F7
+[FX 4] Param 12 | Combined: 280 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 18 F7
+[FX 4] Param 11 | Combined: 25 -> 2.8s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 19 F7
+[FX 4] Param 11 | Combined: 25 -> 2.8s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 19 F7
+[FX 4] Param 12 | Combined: 275 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 13 F7
+[FX 4] Param 12 | Combined: 275 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 13 F7
+[FX 4] Param 12 | Combined: 272 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 10 F7
+[FX 4] Param 12 | Combined: 272 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 10 F7
+[FX 4] Param 12 | Combined: 270 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 0E F7
+[FX 4] Param 12 | Combined: 270 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 0E F7
+[FX 4] Param 12 | Combined: 267 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 0B F7
+[FX 4] Param 12 | Combined: 267 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 0B F7
+[FX 4] Param 12 | Combined: 262 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 06 F7
+[FX 4] Param 12 | Combined: 262 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 06 F7
+[FX 4] Param 12 | Combined: 259 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 03 F7
+[FX 4] Param 12 | Combined: 259 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 02 03 F7
+[FX 4] Param 12 | Combined: 254 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 7E F7
+[FX 4] Param 12 | Combined: 254 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 7E F7
+[FX 4] Param 12 | Combined: 249 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 79 F7
+[FX 4] Param 12 | Combined: 249 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 79 F7
+[FX 4] Param 11 | Combined: 26 -> 2.9s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1A F7
+[FX 4] Param 11 | Combined: 26 -> 2.9s | Hex: F0 43 10 3E 7F 01 58 11 03 00 00 00 1A F7
+[FX 4] Param 12 | Combined: 244 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 74 F7
+[FX 4] Param 12 | Combined: 244 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 74 F7
+[FX 4] Param 12 | Combined: 241 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 71 F7
+[FX 4] Param 12 | Combined: 241 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 71 F7
+[FX 4] Param 12 | Combined: 236 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 6C F7
+[FX 4] Param 12 | Combined: 236 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 6C F7
+[FX 4] Param 12 | Combined: 233 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 69 F7
+[FX 4] Param 12 | Combined: 233 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 69 F7
+[FX 4] Param 12 | Combined: 228 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 64 F7
+[FX 4] Param 12 | Combined: 228 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 64 F7
+[FX 4] Param 12 | Combined: 223 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5F F7
+[FX 4] Param 12 | Combined: 223 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5F F7
+[FX 4] Param 12 | Combined: 221 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5D F7
+[FX 4] Param 12 | Combined: 221 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 5D F7
+[FX 4] Param 12 | Combined: 216 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 58 F7
+[FX 4] Param 12 | Combined: 216 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 58 F7
+[FX 4] Param 12 | Combined: 208 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 50 F7
+[FX 4] Param 12 | Combined: 208 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 50 F7
+[FX 4] Param 12 | Combined: 200 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 48 F7
+[FX 4] Param 12 | Combined: 200 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 48 F7
+[FX 4] Param 12 | Combined: 192 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 40 F7
+[FX 4] Param 12 | Combined: 192 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 40 F7
+[FX 4] Param 12 | Combined: 190 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 3E F7
+[FX 4] Param 12 | Combined: 190 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 3E F7
+[FX 4] Param 12 | Combined: 182 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 36 F7
+[FX 4] Param 12 | Combined: 182 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 36 F7
+[FX 4] Param 12 | Combined: 177 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 31 F7
+[FX 4] Param 12 | Combined: 177 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 31 F7
+[FX 4] Param 12 | Combined: 172 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 2C F7
+[FX 4] Param 12 | Combined: 172 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 2C F7
+[FX 4] Param 12 | Combined: 167 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 27 F7
+[FX 4] Param 12 | Combined: 167 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 27 F7
+[FX 4] Param 12 | Combined: 156 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 1C F7
+[FX 4] Param 12 | Combined: 156 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 1C F7
+[FX 4] Param 12 | Combined: 151 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 17 F7
+[FX 4] Param 12 | Combined: 151 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 17 F7
+[FX 4] Param 12 | Combined: 146 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 12 F7
+[FX 4] Param 12 | Combined: 146 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 12 F7
+[FX 4] Param 12 | Combined: 144 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 10 F7
+[FX 4] Param 12 | Combined: 144 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 10 F7
+[FX 4] Param 12 | Combined: 138 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 0A F7
+[FX 4] Param 12 | Combined: 138 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 0A F7
+[FX 4] Param 12 | Combined: 136 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 08 F7
+[FX 4] Param 12 | Combined: 136 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 08 F7
+[FX 4] Param 12 | Combined: 131 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 03 F7
+[FX 4] Param 12 | Combined: 131 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 03 F7
+[FX 4] Param 12 | Combined: 128 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 00 F7
+[FX 4] Param 12 | Combined: 128 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 01 00 F7
+[FX 4] Param 12 | Combined: 125 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 7D F7
+[FX 4] Param 12 | Combined: 125 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 7D F7
+[FX 4] Param 12 | Combined: 123 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 7B F7
+[FX 4] Param 12 | Combined: 123 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 7B F7
+[FX 4] Param 12 | Combined: 120 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 78 F7
+[FX 4] Param 12 | Combined: 120 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 78 F7
+[FX 4] Param 12 | Combined: 118 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 76 F7
+[FX 4] Param 12 | Combined: 118 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 76 F7
+[FX 4] Param 12 | Combined: 113 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 71 F7
+[FX 4] Param 12 | Combined: 113 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 71 F7
+[FX 4] Param 12 | Combined: 110 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 6E F7
+[FX 4] Param 12 | Combined: 110 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 6E F7
+[FX 4] Param 12 | Combined: 108 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 6C F7
+[FX 4] Param 12 | Combined: 108 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 6C F7
+[FX 4] Param 12 | Combined: 105 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 69 F7
+[FX 4] Param 12 | Combined: 105 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 69 F7
+[FX 4] Param 12 | Combined: 102 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 66 F7
+[FX 4] Param 12 | Combined: 102 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 66 F7
+[FX 4] Param 12 | Combined: 100 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 64 F7
+[FX 4] Param 12 | Combined: 100 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 64 F7
+[FX 4] Param 12 | Combined: 95 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 5F F7
+[FX 4] Param 12 | Combined: 95 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 5F F7
+[FX 4] Param 12 | Combined: 92 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 5C F7
+[FX 4] Param 12 | Combined: 92 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 5C F7
+[FX 4] Param 12 | Combined: 90 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 5A F7
+[FX 4] Param 12 | Combined: 90 | Hex: F0 43 10 3E 7F 01 58 12 03 00 00 00 5A F7
+[FX 4] Param 1C | Combined: 1 -> 0.04ms | Hex: F0 43 10 3E 7F 01 58 1C 03 00 00 00 01 F7
+[FX 4] Param 1C | Combined: 1 -> 0.04ms | Hex: F0 43 10 3E 7F 01 58 1C 03 00 00 00 01 F7
+[FX 4] Param 1C | Combined: 0 -> 0.02ms | Hex: F0 43 10 3E 7F 01 58 1C 03 00 00 00 00 F7
+[FX 4] Param 1C | Combined: 0 -> 0.02ms | Hex: F0 43 10 3E 7F 01 58 1C 03 00 00 00 00 F7
