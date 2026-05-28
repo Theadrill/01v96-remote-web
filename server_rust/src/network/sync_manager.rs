@@ -392,7 +392,7 @@ async fn queue_all_params_inner(
     }
 
     // Wait a bit more for last responses to arrive
-    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+    tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
     let state_guard = state.read().await;
     if let Ok(state_json) = serde_json::to_value(&*state_guard) {
