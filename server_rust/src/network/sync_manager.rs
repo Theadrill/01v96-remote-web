@@ -385,6 +385,15 @@ async fn queue_all_params_inner(
         let hex: String = req.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ");
         info!("📦 [Sync]   [{}] {} bytes: {}", i, req.len(), hex);
     }
+    // Diagnostic: CH1 fader + on
+    if let Some(req) = midi::protocol::build_request("kInputFader/kFader", 0) {
+        let hex: String = req.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ");
+        info!("📦 [Sync] CH1 fader request: {} bytes: {}", req.len(), hex);
+    }
+    if let Some(req) = midi::protocol::build_request("kInputChannelOn/kChannelOn", 0) {
+        let hex: String = req.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ");
+        info!("📦 [Sync] CH1 on request: {} bytes: {}", req.len(), hex);
+    }
 
     // Batch enqueue — all at once (single lock), matching Node.js synchronous behavior
     sched.enqueue_batch(requests, 1).await;
