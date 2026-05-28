@@ -6,6 +6,7 @@ use tray_icon::menu::MenuEvent;
 use image::GenericImageView;
 use std::path::Path;
 use tray_icon::menu::MenuId;
+use std::sync::Mutex;
 
 pub struct TrayApp {
     pub _tray_icon: TrayIcon,
@@ -14,6 +15,7 @@ pub struct TrayApp {
     pub restart_id: MenuId,
     pub quit_id: MenuId,
     port: u16,
+    pub shutdown_tx: Mutex<Option<tokio::sync::oneshot::Sender<()>>>,
 }
 
 pub fn load_icon(path: &Path) -> Result<Icon, Box<dyn std::error::Error>> {
@@ -61,6 +63,7 @@ impl TrayApp {
             restart_id,
             quit_id,
             port,
+            shutdown_tx: Mutex::new(None),
         })
     }
 
@@ -81,6 +84,15 @@ impl TrayApp {
             println!("Reconectando à mesa...");
         } else if event.id == self.restart_id {
             println!("Reiniciando servidor...");
+            if let Ok(mut tx_guard) = self.shutdown_tx.lock() {
+                if let Some(tx) = tx_guard.take() {
+                    // Sinaliza shutdown graceful -> o async_main fecha o server,
+                    // spawna o novo processo, e so entao retorna
+                    let _ = tx.send(());
+                    return;
+                }
+            }
+            // Fallback: spawn direto
             let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
             std::process::exit(0);
         }
