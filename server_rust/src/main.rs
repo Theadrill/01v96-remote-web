@@ -67,7 +67,6 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let scheduler = Arc::new(midi::MidiScheduler::new(
         app_config.scheduler_tick_ms,
         midi_out_tx,
-        sync_counter.clone(),
     ));
     scheduler.start().await;
 

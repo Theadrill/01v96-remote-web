@@ -1,4 +1,3 @@
-use super::SyncCounter;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{Mutex, mpsc};
@@ -30,20 +29,17 @@ pub struct MidiScheduler {
     pub state: Arc<Mutex<SchedulerState>>,
     midi_out_tx: mpsc::Sender<Vec<u8>>,
     q1_empty_tx: Option<mpsc::Sender<()>>,
-    sync_counter: Arc<SyncCounter>,
 }
 
 impl MidiScheduler {
     pub fn new(
         tick_ms: u64,
         midi_out_tx: mpsc::Sender<Vec<u8>>,
-        sync_counter: Arc<SyncCounter>,
     ) -> Self {
         Self {
             state: Arc::new(Mutex::new(SchedulerState::new(tick_ms))),
             midi_out_tx,
             q1_empty_tx: None,
-            sync_counter,
         }
     }
 
@@ -117,7 +113,6 @@ impl MidiScheduler {
         let state_clone = Arc::clone(&self.state);
         let midi_out_tx = self.midi_out_tx.clone();
         let q1_empty_tx = self.q1_empty_tx.clone();
-        let sync_counter = Arc::clone(&self.sync_counter);
 
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(Duration::from_millis(tick_ms));
@@ -143,7 +138,6 @@ impl MidiScheduler {
                 }
 
                 if let Some(p) = packet {
-                    sync_counter.begin_sync();
                     if let Err(e) = midi_out_tx.send(p).await {
                         error!("MidiScheduler send error: {:?}", e);
                     }
@@ -185,8 +179,7 @@ mod tests {
     #[tokio::test]
     async fn test_scheduler_priority() {
         let (tx, mut rx) = mpsc::channel(10);
-        let sc = Arc::new(SyncCounter::new());
-        let scheduler = MidiScheduler::new(10, tx, sc);
+        let scheduler = MidiScheduler::new(10, tx);
 
         // Fill Q2, Q1, Q0
         scheduler.enqueue(vec![0x02], 2).await;
