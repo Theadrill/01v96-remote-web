@@ -71,7 +71,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     ));
     scheduler.start().await;
 
-    let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(256);
+    let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(4096);
 
     let (layer, io) = SocketIo::new_layer();
 
