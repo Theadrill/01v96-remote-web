@@ -62,13 +62,56 @@ impl SyncManager {
         let _sync_type = sync_type.to_string();
 
         tokio::spawn(async move {
-            // Fetch scenes first
+            // Phase 1: clear scene state (short lock)
             {
                 let mut state_guard = state.write().await;
-                state_guard.scene_manager.fetch_scenes(&sched, &io).await;
+                state_guard.scene_manager.scenes = vec![None; 100];
+                state_guard.scene_manager.current_scene = None;
+                state_guard.scene_manager.is_syncing = true;
             }
 
-            // Then queue all params
+            // Phase 2: send all scene requests (no lock — allows MIDI receive loop to process responses)
+            let edit_buffer = vec![
+                0xF0, 0x43, 0x20, 0x7E, 0x4C, 0x4D, 0x20, 0x20, 0x38, 0x43, 0x39, 0x33, 0x6D, 0x02, 0x00, 0xF7,
+            ];
+            sched.enqueue(edit_buffer, 1).await;
+
+            for i in 1u8..=99 {
+                let req = vec![
+                    0xF0, 0x43, 0x20, 0x7E, 0x4C, 0x4D, 0x20, 0x20, 0x38, 0x43, 0x39, 0x33, 0x6D, 0x00, i, 0xF7,
+                ];
+                sched.enqueue(req, 1).await;
+                tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+            }
+
+            // Phase 3: wait for last scene dumps to arrive (no lock)
+            tracing::info!("✅ [Scene Manager] Requisicoes enviadas, aguardando dumps...");
+            tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+
+            // Phase 4: finalize scenes (short lock)
+            {
+                let mut state_guard = state.write().await;
+                let sm = &mut state_guard.scene_manager;
+                sm.is_syncing = false;
+
+                let loaded = sm.scenes.iter().filter(|s| s.is_some()).count();
+                tracing::info!("✅ [Scene Manager] {} cenas carregadas.", loaded);
+
+                if let Some(ref current) = sm.current_scene.clone() {
+                    if let Some(m) = sm.scenes.iter().flatten().find(|s| s.name == current.name) {
+                        sm.active_scene_index = m.index;
+                        if let Some(ref mut cs) = sm.current_scene {
+                            cs.index = m.index;
+                        }
+                    }
+                }
+                let _ = io.emit("scenesUpdated", &sm.get_state());
+                if let Some(ref cs) = sm.current_scene {
+                    let _ = io.emit("currentScene", &serde_json::json!(cs));
+                }
+            }
+
+            // Phase 5: queue all params
             queue_all_params_inner(
                 sched,
                 io,
