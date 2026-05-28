@@ -289,6 +289,11 @@ impl ConnectionManager {
         self.sync_manager.sync_names_only();
     }
 
+    pub fn fire_params_only(&self, force_names: bool, sync_type: &str) {
+        self.is_fully_synced.store(false, Ordering::SeqCst);
+        self.sync_manager.fire_params_only(force_names, sync_type, self.state.clone());
+    }
+
     pub fn enable_demo(self: &Arc<Self>) {
         self.is_connected.store(true, Ordering::SeqCst);
         self.is_fully_synced.store(true, Ordering::SeqCst);
@@ -298,7 +303,7 @@ impl ConnectionManager {
         let this = self.clone();
         let handle = tokio::spawn(async move {
             let mut ticker = tokio::time::interval(std::time::Duration::from_millis(33));
-            let mut phases: Vec<f64>; let mut phases2: Vec<f64>; let mut speeds: Vec<f64>;
+            let phases: Vec<f64>; let phases2: Vec<f64>; let speeds: Vec<f64>;
             {
                 let mut rng = rand::rng();
                 use rand::RngExt;

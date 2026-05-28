@@ -576,7 +576,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
                         tokio::time::sleep(std::time::Duration::from_millis(1200)).await;
 
-                        conn_mgr_scene.trigger_sync(false, "is_scene");
+                        conn_mgr_scene.fire_params_only(false, "is_scene");
                     }
                 },
             );
@@ -701,6 +701,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             // --- UPDATE NAME ---
             let state_name = global_state_socket.clone();
             let io_name = io.clone();
+            let sched_name = scheduler_socket.clone();
             socket.on(
                 "updateName",
                 move |_socket: socketioxide::extract::SocketRef,
@@ -747,8 +748,31 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
                     let _ = io_name.emit("updateName", &serde_json::json!({
                         "channel": channel,
-                        "name": limited
+                        "name": limited.clone()
                     }));
+
+                    // MIDI write-back: send each char to the mesa with 30ms spacing
+                    let padded_bytes: Vec<u8> = padded.bytes().take(4).collect();
+                    for (ci, &code) in padded_bytes.iter().enumerate() {
+                        if let Some(req) = midi::protocol::build_name_change(channel as u8, ci as u8, code) {
+                            sched_name.enqueue(req, 1).await;
+                        }
+                        if ci < padded_bytes.len() - 1 {
+                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                        }
+                    }
+                    // Request confirmation
+                    for ci in 0..4u8 {
+                        if let Some(req) = midi::protocol::build_name_request(channel as u8, ci) {
+                            sched_name.enqueue(req, 1).await;
+                        }
+                    }
+
+                    // Save names to disk after debounce
+                    {
+                        let state = state_name.read().await;
+                        crate::config::save_names_to_disk(&state, 1000);
+                    }
                 },
             );
 

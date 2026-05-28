@@ -38,6 +38,65 @@ impl SceneManager {
         ]
     }
 
+    pub async fn fetch_scenes(
+        &mut self,
+        scheduler: &std::sync::Arc<crate::midi::MidiScheduler>,
+        io: &socketioxide::SocketIo,
+    ) {
+        if self.is_syncing {
+            return;
+        }
+        self.is_syncing = true;
+        self.scenes = vec![None; 100];
+        self.current_scene = None;
+
+        tracing::info!("📚 [Scene Manager] Iniciando sincronizacao da Biblioteca de Cenas...");
+
+        let edit_buffer = self.build_bulk_request(0x02, 0);
+        scheduler.enqueue(edit_buffer, 1).await;
+
+        for i in 1u8..=99 {
+            let req = self.build_bulk_request(0x00, i);
+            scheduler.enqueue(req, 1).await;
+            tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        }
+
+        tracing::info!("✅ [Scene Manager] Requisicoes enviadas, aguardando dumps...");
+        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+
+        self.is_syncing = false;
+
+        let loaded = self.scenes.iter().filter(|s| s.is_some()).count();
+        tracing::info!(
+            "✅ [Scene Manager] Sincronizacao concluida! {} cenas carregadas.",
+            loaded
+        );
+
+        if let Some(ref current) = self.current_scene.clone() {
+            let match_found = self
+                .scenes
+                .iter()
+                .flatten()
+                .find(|s| s.name == current.name);
+            if let Some(m) = match_found {
+                self.active_scene_index = m.index;
+                if let Some(ref mut cs) = self.current_scene {
+                    cs.index = m.index;
+                }
+                tracing::info!(
+                    "🎯 [Scene Manager] Indice inferido: {} para '{}'",
+                    m.index,
+                    current.name
+                );
+            }
+        }
+
+        let _ = io.emit("scenesUpdated", &self.get_state());
+        if let Some(ref cs) = self.current_scene {
+            let _ = io.emit("currentScene", &serde_json::json!(cs));
+        }
+    }
+
     pub fn handle_midi_data(&mut self, message: &[u8]) -> bool {
         if message.len() <= 20 {
             return false;
@@ -60,27 +119,18 @@ impl SceneManager {
                     }
                 }
                 let name = name.trim().to_uppercase();
-                let scene_data = SceneData {
-                    index,
-                    name: name.clone(),
-                };
 
                 if req_type == 0x02 {
-                    self.current_scene = Some(SceneData {
+                    let scene_data = SceneData {
                         index: self.active_scene_index,
                         name: name.clone(),
+                    };
+                    self.current_scene = Some(scene_data);
+                } else if (index as usize) < self.scenes.len() {
+                    self.scenes[index as usize] = Some(SceneData {
+                        index,
+                        name,
                     });
-                    if let Some(match_scene) = self.scenes.iter().flatten().find(|s| s.name == name)
-                    {
-                        self.active_scene_index = match_scene.index;
-                        if let Some(ref mut cs) = self.current_scene {
-                            cs.index = match_scene.index;
-                        }
-                    }
-                } else {
-                    if (index as usize) < self.scenes.len() {
-                        self.scenes[index as usize] = Some(scene_data);
-                    }
                 }
                 return true;
             }
