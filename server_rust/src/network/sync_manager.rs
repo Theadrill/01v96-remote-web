@@ -211,36 +211,30 @@ impl SyncManager {
         let is_fully_synced = self.is_fully_synced.clone();
 
         tokio::spawn(async move {
-            let stop = midi::master_meter::MasterMeter::build_stop_request();
-            sched.enqueue(stop, 1).await;
+            let mut requests: Vec<Vec<u8>> = Vec::new();
+            requests.push(midi::master_meter::MasterMeter::build_stop_request());
 
             for i in 0u8..32 {
                 for c in 0..4u8 {
-                    if let Some(req) = midi::protocol::build_name_request(i, c) {
-                        sched.enqueue(req, 1).await;
-                    }
+                    if let Some(req) = midi::protocol::build_name_request(i, c) { requests.push(req); }
                 }
             }
-
             for st in 0..4u8 {
-                let global_id = 60 + (st * 2);
+                let gid = 60 + (st * 2);
                 for c in 0..4u8 {
-                    if let Some(req) = midi::protocol::build_name_request(global_id, c) {
-                        sched.enqueue(req, 1).await;
-                    }
+                    if let Some(req) = midi::protocol::build_name_request(gid, c) { requests.push(req); }
+                }
+            }
+            let mut outs: Vec<u8> = (36..=43).collect();
+            outs.extend(44..=51);
+            outs.push(52);
+            for idx in outs {
+                for c in 0..8u8 {
+                    if let Some(req) = midi::protocol::build_name_request(idx, c) { requests.push(req); }
                 }
             }
 
-            let mut out_indices: Vec<u8> = (36..=43).collect();
-            out_indices.extend(44..=51);
-            out_indices.push(52);
-            for idx in out_indices {
-                for c in 0..8u8 {
-                    if let Some(req) = midi::protocol::build_name_request(idx, c) {
-                        sched.enqueue(req, 1).await;
-                    }
-                }
-            }
+            sched.enqueue_batch(requests, 1).await;
 
             loop {
                 tokio::time::sleep(std::time::Duration::from_millis(50)).await;
@@ -259,9 +253,9 @@ impl SyncManager {
     }
 }
 
-async fn enqueue_req(sched: &Arc<MidiScheduler>, name: &str, channel: u8, priority: u8) {
+fn push_req(requests: &mut Vec<Vec<u8>>, name: &str, channel: u8) {
     if let Some(req) = midi::protocol::build_request(name, channel) {
-        sched.enqueue(req, priority).await;
+        requests.push(req);
     }
 }
 
@@ -274,123 +268,104 @@ async fn queue_all_params_inner(
     force_names: bool,
     _has_synced_names: bool,
 ) {
-    let priority: u8 = 1;
+    let mut requests: Vec<Vec<u8>> = Vec::with_capacity(700);
 
-    let stop = midi::master_meter::MasterMeter::build_stop_request();
-    sched.enqueue(stop, priority).await;
-
-    for req in midi::pan::build_pan_sync_requests() {
-        sched.enqueue(req, priority).await;
-    }
-
-    enqueue_req(&sched, "kStereoFader/kFader", 0, priority).await;
+    requests.push(midi::master_meter::MasterMeter::build_stop_request());
+    requests.extend(midi::pan::build_pan_sync_requests());
+    push_req(&mut requests, "kStereoFader/kFader", 0);
 
     for i in 0u8..32 {
-        enqueue_req(&sched, "kInputFader/kFader", i, priority).await;
-        enqueue_req(&sched, "kInputChannelOn/kChannelOn", i, priority).await;
-        enqueue_req(&sched, "kSetupSoloChOn/kSoloChOn", i, priority).await;
-        enqueue_req(&sched, "kInputPhase/kPhase", i, priority).await;
-        enqueue_req(&sched, "kInputAttenuator/kAtt", i, priority).await;
-
-        enqueue_req(&sched, "kInputEQ/kEQOn", i, priority).await;
-        enqueue_req(&sched, "kInputEQ/kEQMode", i, priority).await;
-        enqueue_req(&sched, "kInputEQ/kEQHPFOn", i, priority).await;
-        enqueue_req(&sched, "kInputEQ/kEQLPFOn", i, priority).await;
+        push_req(&mut requests, "kInputFader/kFader", i);
+        push_req(&mut requests, "kInputChannelOn/kChannelOn", i);
+        push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", i);
+        push_req(&mut requests, "kInputPhase/kPhase", i);
+        push_req(&mut requests, "kInputAttenuator/kAtt", i);
+        push_req(&mut requests, "kInputEQ/kEQOn", i);
+        push_req(&mut requests, "kInputEQ/kEQMode", i);
+        push_req(&mut requests, "kInputEQ/kEQHPFOn", i);
+        push_req(&mut requests, "kInputEQ/kEQLPFOn", i);
         for band in &["Low", "LowMid", "HiMid", "Hi"] {
-            enqueue_req(&sched, &format!("kInputEQ/kEQ{}F", band), i, priority).await;
-            enqueue_req(&sched, &format!("kInputEQ/kEQ{}G", band), i, priority).await;
-            enqueue_req(&sched, &format!("kInputEQ/kEQ{}Q", band), i, priority).await;
+            push_req(&mut requests, &format!("kInputEQ/kEQ{}F", band), i);
+            push_req(&mut requests, &format!("kInputEQ/kEQ{}G", band), i);
+            push_req(&mut requests, &format!("kInputEQ/kEQ{}Q", band), i);
         }
-
         for a in 1..=8 {
-            enqueue_req(&sched, &format!("kInputAUX/kAUX{}Level", a), i, priority).await;
-            enqueue_req(&sched, &format!("kInputAUX/kAUX{}On", a), i, priority).await;
+            push_req(&mut requests, &format!("kInputAUX/kAUX{}Level", a), i);
+            push_req(&mut requests, &format!("kInputAUX/kAUX{}On", a), i);
         }
-
         for p in &["kGateOn", "kGateAttack", "kGateRange", "kGateHold", "kGateDecay", "kGateThreshold"] {
-            enqueue_req(&sched, &format!("kInputGate/{}", p), i, priority).await;
+            push_req(&mut requests, &format!("kInputGate/{}", p), i);
         }
-
         for p in &["kCompOn", "kCompAttack", "kCompRelease", "kCompRatio", "kCompGain", "kCompKnee", "kCompThreshold"] {
-            enqueue_req(&sched, &format!("kInputComp/{}", p), i, priority).await;
+            push_req(&mut requests, &format!("kInputComp/{}", p), i);
         }
-
-        enqueue_req(&sched, "kChannelInput/kChannelIn", i, priority).await;
-        enqueue_req(&sched, "kInputBus/kStereo", i, priority).await;
+        push_req(&mut requests, "kChannelInput/kChannelIn", i);
+        push_req(&mut requests, "kInputBus/kStereo", i);
         for b in 1..=8 {
-            enqueue_req(&sched, &format!("kInputBus/kBus{}", b), i, priority).await;
+            push_req(&mut requests, &format!("kInputBus/kBus{}", b), i);
         }
-
-        if i % 2 == 0 {
-            enqueue_req(&sched, "kInputPair/kPair", i, priority).await;
-        }
-
+        if i % 2 == 0 { push_req(&mut requests, "kInputPair/kPair", i); }
         if force_names {
             for c in 0..4u8 {
-                if let Some(req) = midi::protocol::build_name_request(i, c) {
-                    sched.enqueue(req, priority).await;
-                }
+                if let Some(req) = midi::protocol::build_name_request(i, c) { requests.push(req); }
             }
         }
     }
 
     for i in 32u8..40 {
-        enqueue_req(&sched, "kInputFader/kFader", i, priority).await;
-        enqueue_req(&sched, "kInputChannelOn/kChannelOn", i, priority).await;
+        push_req(&mut requests, "kInputFader/kFader", i);
+        push_req(&mut requests, "kInputChannelOn/kChannelOn", i);
     }
 
     if force_names {
         for st in 0..4u8 {
             let gid = 60 + (st * 2);
             for c in 0..4u8 {
-                if let Some(req) = midi::protocol::build_name_request(gid, c) {
-                    sched.enqueue(req, priority).await;
-                }
+                if let Some(req) = midi::protocol::build_name_request(gid, c) { requests.push(req); }
             }
         }
     }
 
     for i in 0u8..8 {
-        enqueue_req(&sched, "kAUXFader/kFader", i, priority).await;
-        enqueue_req(&sched, "kAUXChannelOn/kChannelOn", i, priority).await;
-        enqueue_req(&sched, "kAUXEQ/kEQOn", i, priority).await;
-        enqueue_req(&sched, "kAUXEQ/kEQHPFOn", i, priority).await;
-        enqueue_req(&sched, "kAUXEQ/kEQLPFOn", i, priority).await;
+        push_req(&mut requests, "kAUXFader/kFader", i);
+        push_req(&mut requests, "kAUXChannelOn/kChannelOn", i);
+        push_req(&mut requests, "kAUXEQ/kEQOn", i);
+        push_req(&mut requests, "kAUXEQ/kEQHPFOn", i);
+        push_req(&mut requests, "kAUXEQ/kEQLPFOn", i);
         for band in &["Low", "LowMid", "HiMid", "Hi"] {
-            enqueue_req(&sched, &format!("kAUXEQ/kEQ{}F", band), i, priority).await;
-            enqueue_req(&sched, &format!("kAUXEQ/kEQ{}G", band), i, priority).await;
-            enqueue_req(&sched, &format!("kAUXEQ/kEQ{}Q", band), i, priority).await;
+            push_req(&mut requests, &format!("kAUXEQ/kEQ{}F", band), i);
+            push_req(&mut requests, &format!("kAUXEQ/kEQ{}G", band), i);
+            push_req(&mut requests, &format!("kAUXEQ/kEQ{}Q", band), i);
         }
-        for p in &["kCompOn", "kCompAttack", "kCompRelease", "kCompRatio", "kCompGain", "kCompKnee", "kCompThreshold"] {
-            enqueue_req(&sched, &format!("kAUXComp/{}", p), i, priority).await;
+        for p in &["kCompOn","kCompAttack","kCompRelease","kCompRatio","kCompGain","kCompKnee","kCompThreshold"] {
+            push_req(&mut requests, &format!("kAUXComp/{}", p), i);
         }
-
-        enqueue_req(&sched, "kBusFader/kFader", i, priority).await;
-        enqueue_req(&sched, "kBusChannelOn/kChannelOn", i, priority).await;
-        enqueue_req(&sched, "kBusEQ/kEQOn", i, priority).await;
-        enqueue_req(&sched, "kBusEQ/kEQHPFOn", i, priority).await;
-        enqueue_req(&sched, "kBusEQ/kEQLPFOn", i, priority).await;
+        push_req(&mut requests, "kBusFader/kFader", i);
+        push_req(&mut requests, "kBusChannelOn/kChannelOn", i);
+        push_req(&mut requests, "kBusEQ/kEQOn", i);
+        push_req(&mut requests, "kBusEQ/kEQHPFOn", i);
+        push_req(&mut requests, "kBusEQ/kEQLPFOn", i);
         for band in &["Low", "LowMid", "HiMid", "Hi"] {
-            enqueue_req(&sched, &format!("kBusEQ/kEQ{}F", band), i, priority).await;
-            enqueue_req(&sched, &format!("kBusEQ/kEQ{}G", band), i, priority).await;
-            enqueue_req(&sched, &format!("kBusEQ/kEQ{}Q", band), i, priority).await;
+            push_req(&mut requests, &format!("kBusEQ/kEQ{}F", band), i);
+            push_req(&mut requests, &format!("kBusEQ/kEQ{}G", band), i);
+            push_req(&mut requests, &format!("kBusEQ/kEQ{}Q", band), i);
         }
-        for p in &["kCompOn", "kCompAttack", "kCompRelease", "kCompRatio", "kCompGain", "kCompKnee", "kCompThreshold"] {
-            enqueue_req(&sched, &format!("kBusComp/{}", p), i, priority).await;
+        for p in &["kCompOn","kCompAttack","kCompRelease","kCompRatio","kCompGain","kCompKnee","kCompThreshold"] {
+            push_req(&mut requests, &format!("kBusComp/{}", p), i);
         }
     }
 
-    enqueue_req(&sched, "kStereoFader/kFader", 0, priority).await;
-    enqueue_req(&sched, "kStereoChannelOn/kChannelOn", 0, priority).await;
-    enqueue_req(&sched, "kStereoAttenuator/kAtt", 0, priority).await;
-    enqueue_req(&sched, "kStereoEQ/kEQOn", 0, priority).await;
+    push_req(&mut requests, "kStereoFader/kFader", 0);
+    push_req(&mut requests, "kStereoChannelOn/kChannelOn", 0);
+    push_req(&mut requests, "kStereoAttenuator/kAtt", 0);
+    push_req(&mut requests, "kStereoEQ/kEQOn", 0);
     for band in &["Low", "LowMid", "HiMid", "Hi"] {
-        enqueue_req(&sched, &format!("kStereoEQ/kEQ{}F", band), 0, priority).await;
-        enqueue_req(&sched, &format!("kStereoEQ/kEQ{}G", band), 0, priority).await;
-        enqueue_req(&sched, &format!("kStereoEQ/kEQ{}Q", band), 0, priority).await;
+        push_req(&mut requests, &format!("kStereoEQ/kEQ{}F", band), 0);
+        push_req(&mut requests, &format!("kStereoEQ/kEQ{}G", band), 0);
+        push_req(&mut requests, &format!("kStereoEQ/kEQ{}Q", band), 0);
     }
-    for p in &["kCompOn", "kCompAttack", "kCompRelease", "kCompRatio", "kCompGain", "kCompKnee", "kCompThreshold"] {
-        enqueue_req(&sched, &format!("kStereoComp/{}", p), 0, priority).await;
+    for p in &["kCompOn","kCompAttack","kCompRelease","kCompRatio","kCompGain","kCompKnee","kCompThreshold"] {
+        push_req(&mut requests, &format!("kStereoComp/{}", p), 0);
     }
 
     if force_names {
@@ -399,20 +374,25 @@ async fn queue_all_params_inner(
         outs.push(52);
         for idx in outs {
             for c in 0..8u8 {
-                if let Some(req) = midi::protocol::build_name_request(idx, c) {
-                    sched.enqueue(req, priority).await;
-                }
+                if let Some(req) = midi::protocol::build_name_request(idx, c) { requests.push(req); }
             }
         }
     }
 
+    info!("📦 [Sync] {} requests preparados. Enfileirando em lote...", requests.len());
+
+    // Batch enqueue — all at once (single lock), matching Node.js synchronous behavior
+    sched.enqueue_batch(requests, 1).await;
+
+    // Wait for Q0+Q1 to drain
     loop {
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;
         let st = sched.state.lock().await;
-        if st.q0.is_empty() && st.q1.is_empty() {
-            break;
-        }
+        if st.q0.is_empty() && st.q1.is_empty() { break; }
     }
+
+    // Wait a bit more for last responses to arrive
+    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 
     let state_guard = state.read().await;
     if let Ok(state_json) = serde_json::to_value(&*state_guard) {

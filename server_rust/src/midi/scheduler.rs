@@ -47,20 +47,38 @@ impl MidiScheduler {
         self.q1_empty_tx = Some(tx);
     }
 
-    pub async fn enqueue(&self, bytes: Vec<u8>, priority: u8) -> bool {
-        if bytes.is_empty() {
-            return false;
+    pub async fn enqueue_batch(&self, items: Vec<Vec<u8>>, priority: u8) {
+        if items.is_empty() { return; }
+        let mut state = self.state.lock().await;
+        match priority {
+            0 => {
+                for bytes in items {
+                    if let Some(addr) = Self::extract_address(&bytes) {
+                        if let Some(idx) = state.q0.iter().position(|i| Self::extract_address(i) == Some(addr.clone())) {
+                            state.q0[idx] = bytes;
+                            continue;
+                        }
+                    }
+                    state.q0.push(bytes);
+                }
+            }
+            1 => { state.q1.extend(items); }
+            2 => {
+                if state.q0.is_empty() && state.q1.is_empty() {
+                    state.q2.extend(items);
+                }
+            }
+            _ => {}
         }
+    }
 
+    pub async fn enqueue(&self, bytes: Vec<u8>, priority: u8) -> bool {
+        if bytes.is_empty() { return false; }
         let mut state = self.state.lock().await;
         match priority {
             0 => {
                 if let Some(addr) = Self::extract_address(&bytes) {
-                    if let Some(idx) = state
-                        .q0
-                        .iter()
-                        .position(|item| Self::extract_address(item) == Some(addr.clone()))
-                    {
+                    if let Some(idx) = state.q0.iter().position(|i| Self::extract_address(i) == Some(addr.clone())) {
                         state.q0[idx] = bytes;
                         return true;
                     }
@@ -68,14 +86,9 @@ impl MidiScheduler {
                 state.q0.push(bytes);
                 true
             }
-            1 => {
-                state.q1.push(bytes);
-                true
-            }
+            1 => { state.q1.push(bytes); true }
             2 => {
-                if !state.q0.is_empty() || !state.q1.is_empty() {
-                    return false;
-                }
+                if !state.q0.is_empty() || !state.q1.is_empty() { return false; }
                 state.q2.push(bytes);
                 true
             }
@@ -87,14 +100,10 @@ impl MidiScheduler {
         if bytes.len() >= 6 && bytes[0] == 0xF0 && bytes[1] == 0x43 {
             let sub_status = bytes[2] & 0xF0;
             let dev = bytes[3] & 0x0F;
-
-            // Parameter Change (0x10) e Parameter Request (0x30)
             if (sub_status == 0x10 || sub_status == 0x30) && bytes.len() >= 9 {
                 let addr = &bytes[4..9];
                 return Some(format!("P-{}-{:?}", dev, addr));
             }
-
-            // Fallback para outros tipos de SysEx
             let addr = &bytes[4..7];
             return Some(format!("O-{}-{:?}", dev, addr));
         }
