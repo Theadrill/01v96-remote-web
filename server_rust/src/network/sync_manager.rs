@@ -401,15 +401,14 @@ async fn queue_all_params_inner(
 
     let state_guard = state.read().await;
     if let Ok(state_json) = serde_json::to_value(&*state_guard) {
+        let json_str = serde_json::to_string(&*state_guard).unwrap_or_default();
         // Diagnostic: log channel 1 state
         if let Some(ch) = state_guard.channels.get(&0) {
             tracing::info!("🔍 [SYNC-FINAL] CH1: fader={}, on={}, solo={}, pan={}, att={}, eq.on={}",
                 ch.value, ch.on, ch.solo, ch.pan, ch.att, ch.eq.on);
         }
-        if let Some(ch) = state_guard.channels.get(&1) {
-            tracing::info!("🔍 [SYNC-FINAL] CH2: fader={}, on={}, solo={}, pan={}, att={}",
-                ch.value, ch.on, ch.solo, ch.pan, ch.att);
-        }
+        tracing::info!("🔍 [SYNC-FINAL] JSON size: {} bytes, channels count: {}",
+            json_str.len(), state_guard.channels.len());
         let _ = io.emit("syncStatus", &serde_json::json!({ "active": false }));
         let _ = io.emit("sync", &state_json);
     }

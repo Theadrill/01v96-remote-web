@@ -363,7 +363,7 @@ impl GlobalState {
                 // Diagnostic for first few messages
                 static CC_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
                 let cc = CC_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                if cc < 10 {
+                if cc < 50 {
                     tracing::info!("🔧 [apply_midi] CC#{}: type={}, ch={}, value={}", cc, mt, channel, v);
                 }
 
