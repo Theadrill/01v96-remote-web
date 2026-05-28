@@ -22,6 +22,16 @@ socket.on('syncStatus', (data) => {
         // Perdurando enquanto o shield de sincronismo estiver ativo
         blocker.style.display = (isActive && isScene) ? 'block' : 'none';
     }
+
+    // 🔍 [DEBUG] Quando o sync termina, logar estado dos pares para diagnostico
+    if (!isActive) {
+        console.log('✅ [SYNC COMPLETO] syncStatus=false → estado atual dos pares:');
+        for (let i = 0; i < 4; i++) {
+            if (channelStates[i]) {
+                console.log(`  CH${i+1}: paired=${channelStates[i].paired}, pairedWith=${channelStates[i].pairedWith}`);
+            }
+        }
+    }
 });
 socket.on('update', (d) => {
     const isTrue = (d.value === 1 || d.value === true);
@@ -339,20 +349,25 @@ socket.on('dynamicsDebugLog', (data) => {
 // Listener de updateName consolidado acima.
 
 socket.on('sync', (s) => {
+    // 🔧 [COMPAT] O servidor Rust serializa HashMap<usize,_> com chaves STRING ("0","1"...).
+    // O Node.js antigo usava chaves numéricas. Esta função normaliza o acesso para ambos.
+    const getCh = (obj, i) => obj[i] !== undefined ? obj[i] : obj[String(i)];
+
     if (s.channels) {
         for (let i = 0; i < 40; i++) {
-            if (s.channels[i]) {
-                Object.assign(channelStates[i], s.channels[i]);
+            const ch = getCh(s.channels, i);
+            if (ch) {
+                Object.assign(channelStates[i], ch);
 
-                let v = s.channels[i].value;
-                let o = s.channels[i].on;
+                let v = ch.value;
+                let o = ch.on;
 
                 if (musicianMode || technicianMixMode) {
-                    v = s.channels[i][`aux${activeMix}`] || 0;
-                    o = s.channels[i][`aux${activeMix}On`] || false;
+                    v = ch[`aux${activeMix}`] || 0;
+                    o = ch[`aux${activeMix}On`] || false;
                 }
 
-                const soloBool = !!s.channels[i].solo;
+                const soloBool = !!ch.solo;
                 const onBool = !!o;
 
                 // Pular índices ímpares dos ST IN (33, 35, 37, 39) para evitar confusão de UI
@@ -362,7 +377,7 @@ socket.on('sync', (s) => {
                 const globalId = (i >= 32) ? (60 + (i - 32)) : i;
 
                 updateUI(globalId, v, onBool, soloBool);
-                const newName = s.channels[i].name || (i < 32 ? `CH ${i + 1}` : `ST IN ${Math.floor((i - 32) / 2) + 1}`);
+                const newName = ch.name || (i < 32 ? `CH ${i + 1}` : `ST IN ${Math.floor((i - 32) / 2) + 1}`);
                 if (typeof updateNameUI === 'function') {
                     // Apenas atualiza o nome se for um canal normal (<32) ou o L de um Stereo IN (par: 32, 34, 36, 38)
                     if (i < 32 || i % 2 === 0) {
@@ -375,17 +390,19 @@ socket.on('sync', (s) => {
     // ... rest of sync (mixes/buses)
     if (s.mixes) {
         for (let i = 0; i < 8; i++) {
-            if (s.mixes[i]) {
-                Object.assign(mixesState[i], s.mixes[i]);
-                updateUI(`m${i}`, s.mixes[i].value, !!s.mixes[i].on);
+            const mix = getCh(s.mixes, i);
+            if (mix) {
+                Object.assign(mixesState[i], mix);
+                updateUI(`m${i}`, mix.value, !!mix.on);
             }
         }
     }
     if (s.buses) {
         for (let i = 0; i < 8; i++) {
-            if (s.buses[i]) {
-                Object.assign(busesState[i], s.buses[i]);
-                updateUI(`b${i}`, s.buses[i].value, !!s.buses[i].on);
+            const bus = getCh(s.buses, i);
+            if (bus) {
+                Object.assign(busesState[i], bus);
+                updateUI(`b${i}`, bus.value, !!bus.on);
             }
         }
     }
@@ -400,22 +417,25 @@ socket.on('sync', (s) => {
     // Atualiza os indicadores de Pan após o sync completo (desktop apenas)
     if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function' && s.channels) {
         for (let i = 0; i < 40; i++) {
-            if (!s.channels[i] || s.channels[i].pan === undefined) continue;
-            
+            const ch = getCh(s.channels, i);
+            if (!ch || ch.pan === undefined) continue;
+
             // Pular índices ímpares dos ST IN (33, 35, 37, 39) pois compartilham a barra com os pares
             if (i >= 32 && i % 2 !== 0) continue;
 
             // Canais 0-31 mantêm o ID. ST IN (32-39) mapeiam para 60-67.
             const globalId = (i >= 32) ? (60 + (i - 32)) : i;
-            updatePanIndicator(globalId, s.channels[i].pan);
+            updatePanIndicator(globalId, ch.pan);
         }
     }
 
     if (typeof initUI === 'function') {
         console.log("♻️ [SOCKET] Re-inicializando UI após Sync Completo");
-        if (s.channels && s.channels[0] && s.channels[1]) {
-            console.log("🔍 [DEBUG SYNC] CH1 from server:", s.channels[0].paired, "pairedWith:", s.channels[0].pairedWith);
-            console.log("🔍 [DEBUG SYNC] CH2 from server:", s.channels[1].paired, "pairedWith:", s.channels[1].pairedWith);
+        const ch0 = getCh(s.channels || {}, 0);
+        const ch1 = getCh(s.channels || {}, 1);
+        if (ch0 && ch1) {
+            console.log("🔍 [DEBUG SYNC] CH1 from server:", ch0.paired, "pairedWith:", ch0.pairedWith);
+            console.log("🔍 [DEBUG SYNC] CH2 from server:", ch1.paired, "pairedWith:", ch1.pairedWith);
             console.log("🔍 [DEBUG SYNC] CH1 state:", channelStates[0].paired, "pairedWith:", channelStates[0].pairedWith);
             console.log("🔍 [DEBUG SYNC] CH2 state:", channelStates[1].paired, "pairedWith:", channelStates[1].pairedWith);
         }

@@ -255,16 +255,17 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             // --- PAREAMENTO DE CANAIS (stereo link) ---
             let scheduler_pair = scheduler_socket.clone();
             let state_pair = global_state_socket.clone();
+            let io_pair = io.clone();
             socket.on(
                 "pairChannel",
-                move |_socket: socketioxide::extract::SocketRef,
+                move |socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<serde_json::Value>| async move {
                     let action = data.get("action").and_then(|v| v.as_str()).unwrap_or("");
                     let ch_a = data.get("chA").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
                     let ch_b = data.get("chB").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
                     let source_ch = data.get("sourceCh").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
 
-                    match action {
+                    let (paired_value, should_broadcast) = match action {
                         "pair" => {
                             let (aux, state) = midi::pair::build_pair(ch_a, ch_b, source_ch);
                             scheduler_pair.enqueue(aux, 1).await;
@@ -275,6 +276,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                                 channel: ch_a as usize, value: 1.0,
                             };
                             s.apply_midi(&p);
+                            (1.0f64, true)
                         }
                         "unpair" => {
                             let state = midi::pair::build_unpair(ch_a, ch_b);
@@ -285,6 +287,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                                 channel: ch_a as usize, value: 0.0,
                             };
                             s.apply_midi(&p);
+                            (0.0f64, true)
                         }
                         "reset" => {
                             let (aux, state) = midi::pair::build_reset(ch_a, ch_b);
@@ -296,8 +299,31 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                                 channel: ch_a as usize, value: 1.0,
                             };
                             s.apply_midi(&p);
+                            (1.0f64, true)
                         }
-                        _ => {}
+                        _ => (0.0f64, false),
+                    };
+
+                    // Broadcast kInputPair/kPair para todos os clientes (ch_a e ch_b)
+                    if should_broadcast {
+                        let update_a = serde_json::json!({
+                            "type": "kInputPair/kPair",
+                            "channel": ch_a,
+                            "value": paired_value
+                        });
+                        let update_b = serde_json::json!({
+                            "type": "kInputPair/kPair",
+                            "channel": ch_b,
+                            "value": paired_value
+                        });
+                        socket.emit("update", &update_a).ok();
+                        socket.broadcast().emit("update", &update_a).await.ok();
+                        socket.emit("update", &update_b).ok();
+                        socket.broadcast().emit("update", &update_b).await.ok();
+
+                        // Também emite pelo io global para clientes que possam não estar no mesmo namespace
+                        let _ = io_pair.emit("update", &update_a).await;
+                        let _ = io_pair.emit("update", &update_b).await;
                     }
                 },
             );
@@ -485,6 +511,9 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                     let out_idx = data.get("outIdx").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
 
                     if conn_mgr_rcon.is_connected() {
+                        // Sempre emite o estado atual (parcial ou completo).
+                        // Se o sync MIDI ainda está em andamento, o SyncManager emitirá
+                        // outro sync completo quando terminar — sobrescrevendo este.
                         let state = state_rcon.read().await;
                         let _ = socket.emit("sync", &serde_json::to_value(&*state).unwrap_or_default());
                         let _ = socket.emit("scenesUpdated", &state.scene_manager.get_state());
