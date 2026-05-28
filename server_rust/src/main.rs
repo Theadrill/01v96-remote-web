@@ -739,6 +739,31 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         },
     );
 
+    // --- SERVIDOR HTTP SOBE PRIMEIRO (antes de conectar MIDI) ---
+    let app = Router::new()
+        .nest("/api", api::macros::router(global_state_api.clone()))
+        .fallback_service(tower_http::services::ServeDir::new("../public"))
+        .layer(layer);
+
+    let port = app_config.port;
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
+
+    info!(
+        "🎧 Servidor estatico e WebSocket rodando em http://localhost:{}",
+        port
+    );
+
+    if app_config.open_browser_startup {
+        let url = format!("http://localhost:{}", port);
+        tokio::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            let _ = std::process::Command::new("cmd")
+                .args(&["/C", "start", &url])
+                .spawn();
+        });
+    }
+
+    // --- CONEXAO MIDI (agora o servidor ja esta ouvindo) ---
     if app_config.demo_mode {
         info!("ℹ️ [DEMO] Modo Demo ativo — MIDI real desabilitado, usando simulacao.");
         // Emit connected state for demo mode
@@ -1001,32 +1026,6 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
     });
-
-
-    // Cria a rota Axum que serve os arquivos estaticos de `../public`
-    // e inclui a camada do Socket.IO
-    let app = Router::new()
-        .nest("/api", api::macros::router(global_state_api.clone()))
-        .fallback_service(tower_http::services::ServeDir::new("../public"))
-        .layer(layer);
-
-    let port = app_config.port;
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
-
-    info!(
-        "🎧 Servidor estatico e WebSocket rodando em http://localhost:{}",
-        port
-    );
-
-    if app_config.open_browser_startup {
-        let url = format!("http://localhost:{}", port);
-        tokio::spawn(async move {
-            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-            let _ = std::process::Command::new("cmd")
-                .args(&["/C", "start", &url])
-                .spawn();
-        });
-    }
 
     axum::serve(listener, app).await?;
 
