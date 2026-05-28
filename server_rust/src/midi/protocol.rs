@@ -210,9 +210,17 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         let data_bytes_available = (message.len() - 1).saturating_sub(data_start);
         let num_channels = data_bytes_available / 2;
 
+        // Determine base channel from group number (like Node.js)
+        let base_ch: usize = match group {
+            33 => 0,   // Input CH 1-32
+            32 => 32,  // Input CH 33-64? Actually ST IN and effects
+            82 => 0,   // Another meter group
+            _ => channel,
+        };
+
         for i in 0..num_channels {
             let idx = data_start + (i * 2);
-            levels.insert(channel + i, message[idx]);
+            levels.insert(base_ch + i, message[idx]);
         }
         return Some(ParsedMidi::MeterData {
             is_master,
