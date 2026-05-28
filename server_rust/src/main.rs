@@ -346,7 +346,10 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                         .ok();
 
                     socket_initial
-                        .emit("syncStatus", &serde_json::json!({ "active": false }))
+                        .emit(
+                            "syncStatus",
+                            &serde_json::json!({ "active": conn_mgr_connect.is_connected() && !conn_mgr_connect.is_fully_synced() }),
+                        )
                         .ok();
 
                     socket_initial

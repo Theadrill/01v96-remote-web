@@ -58,6 +58,10 @@ impl ConnectionManager {
         self.is_connected.load(Ordering::SeqCst)
     }
 
+    pub fn is_fully_synced(&self) -> bool {
+        self.sync_manager.is_ready() || self.is_fully_synced.load(Ordering::SeqCst)
+    }
+
     pub fn emit_connection_state(&self) {
         let connected = self.is_connected.load(Ordering::SeqCst);
         let io = self.io.clone();
