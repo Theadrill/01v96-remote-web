@@ -304,6 +304,11 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                         let _ = io_clone.emit(event, &data).await;
                     }
                     if let Some(buf) = meter_emission {
+                        static METER_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+                        let c = METER_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                        if c < 5 || c % 100 == 0 {
+                            tracing::info!("📡 emit meterData #{} ({} bytes)", c, buf.len());
+                        }
                         let _ = io_clone.emit("meterData", &buf).await;
                     }
                 }
