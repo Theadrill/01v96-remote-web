@@ -90,266 +90,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         midi_in_tx.clone(),
     );
 
-    if app_config.demo_mode {
-        info!("ℹ️ [DEMO] Modo Demo ativo — MIDI real desabilitado, usando simulacao.");
-        // Emit connected state for demo mode
-        conn_mgr.emit_connection_state();
 
-        let demo_io = io.clone();
-        tokio::spawn(async move {
-            use tokio::time::{interval, Duration};
-            use rand::RngExt;
-
-            let phases: Vec<f64>; let phases2: Vec<f64>; let speeds: Vec<f64>;
-            {
-                let mut rng = rand::rng();
-                phases = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
-                phases2 = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
-                speeds = (0..32).map(|_| 0.8 + rng.random_range(0.0..4.0)).collect();
-            }
-            let bases: [f64; 32] = [
-                26.0, 24.0, 22.0, 23.0, 25.0, 23.0, 21.0, 20.0, 26.0, 24.0, 19.0, 18.0, 20.0, 21.0, 17.0, 18.0,
-                22.0, 19.0, 20.0, 18.0, 18.0, 20.0, 17.0, 21.0, 22.0, 19.0, 20.0, 18.0, 16.0, 21.0, 19.0, 17.0,
-            ];
-
-            let mut t: f64 = 0.0;
-            let mut energy: f64 = 0.9;
-            let mut energy_target: f64 = 0.9;
-            let mut ticker = interval(Duration::from_millis(33));
-            let mut meter_buffer: Vec<f64> = vec![0.0; 64];
-            let mut last_emit_time = std::time::Instant::now();
-
-            info!("🚀 [DEMO] Simulacao de Meters iniciada (32ch + Master @ 30fps)");
-
-            loop {
-                ticker.tick().await;
-                t += 0.15;
-
-                {
-                    let mut rng = rand::rng();
-                    if rng.random::<f64>() < 0.008 {
-                        energy_target = 0.7 + rng.random_range(0.0..0.3);
-                    }
-                    energy += (energy_target - energy) * 0.03;
-
-                    for i in 0..32 {
-                        let s = speeds[i];
-                        let w1 = (t * s + phases[i]).sin();
-                        let w2 = (t * s * 2.3 + phases2[i]).sin() * 0.35;
-                        let w3 = (t * s * 0.4 + phases[i] * 0.7).sin() * 0.25;
-                        let noise = (rng.random::<f64>() - 0.5) * 3.0;
-                        let level = (bases[i] * energy) + ((w1 + w2 + w3) * 9.0 * energy) + noise;
-                        meter_buffer[i] = (level.min(31.0).max(0.0)).round();
-                    }
-
-                    let mw = (t * 0.9).sin() * 2.5 + (t * 1.7).sin() * 2.0;
-                    let master_level = (26.0 * energy + mw + (rng.random::<f64>() - 0.5) * 2.0)
-                        .min(31.0).max(0.0);
-                    meter_buffer[32] = master_level.round();
-                }
-
-                let now = std::time::Instant::now();
-                if now.duration_since(last_emit_time).as_millis() >= 30 {
-                    if let Err(e) = demo_io.emit("meterData", &meter_buffer[..33]).await {
-                        tracing::error!("Erro ao emitir meterData: {:?}", e);
-                    }
-                    last_emit_time = now;
-                }
-            }
-        });
-    } else {
-        info!("ℹ️ [INFO] Modo Demo desativado. Buscando porta MIDI...");
-
-        let (inputs, outputs) = midi::MidiEngine::get_available_ports();
-        let search_monitor = app_config.loopmidi_monitor;
-
-        info!("📋 Portas MIDI de entrada disponiveis:");
-        for (id, name) in &inputs {
-            info!("   IN [{}] = {}", id, name);
-        }
-        info!("📋 Portas MIDI de saida disponiveis:");
-        for (id, name) in &outputs {
-            info!("   OUT [{}] = {}", id, name);
-        }
-
-        let criteria = if search_monitor { "monitor" } else { "yamaha" };
-
-        let find_port = |ports: &[(usize, String)]| -> Option<usize> {
-            for (idx, name) in ports {
-                let lower = name.to_lowercase();
-                if search_monitor {
-                    if lower.contains("monitor") { return Some(*idx); }
-                } else {
-                    if lower.contains("yamaha") && lower.contains("-1") { return Some(*idx); }
-                }
-            }
-            None
-        };
-
-        let found_in = find_port(&inputs);
-        let found_out = find_port(&outputs);
-
-        if found_in.is_none() || found_out.is_none() {
-            tracing::warn!(
-                "⚠️ Nenhuma porta com \"{}\" encontrada. Iniciando radar automatico...",
-                criteria
-            );
-        } else {
-            let in_idx = found_in.unwrap();
-            let out_idx = found_out.unwrap();
-            conn_mgr
-                .try_boot_connect(in_idx, out_idx)
-                .await;
-        }
-
-        let boot_delay = app_config.boot_delay_ms;
-        let conn_mgr_radar = conn_mgr.clone();
-        tokio::spawn(async move {
-            tokio::time::sleep(std::time::Duration::from_millis(boot_delay)).await;
-            conn_mgr_radar.iniciar_busca_automatica();
-        });
-    }
-
-    // DMX boot
-    if app_config.sistema_iluminacao {
-        let root_dir = std::env::current_dir()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .to_string_lossy()
-            .to_string();
-        let dmx_delay = app_config.dmx_boot_delay_ms;
-        tokio::spawn(async move {
-            tokio::time::sleep(std::time::Duration::from_millis(dmx_delay)).await;
-            dmx::start_dmx_app(false, &root_dir);
-        });
-    }
-
-    let io_clone = io.clone();
-    let state_arc_in = global_state.clone();
-    let sync_counter_in = sync_counter.clone();
-    let conn_mgr_recv = conn_mgr.clone();
-    let master_meter_recv = master_meter.clone();
-    let recv_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
-    let parsed_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
-    let recv_count_log = recv_count.clone();
-    let parsed_count_log = parsed_count.clone();
-
-    // Meter buffer + FPS throttle (like Node.js)
-    let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> = Arc::new(std::sync::Mutex::new(vec![0.0; 64]));
-    let last_meter_emit: Arc<std::sync::Mutex<std::time::Instant>> = Arc::new(std::sync::Mutex::new(std::time::Instant::now()));
-    let meter_buffer_emit = meter_buffer.clone();
-    let last_meter_emit_clone = last_meter_emit.clone();
-    let meter_fps = app_config.meter_fps_desktop;
-
-    tokio::spawn(async move {
-        let report_interval = tokio::time::interval(std::time::Duration::from_secs(5));
-        tokio::pin!(report_interval);
-        loop {
-            tokio::select! {
-                _ = report_interval.tick() => {
-                    let r = recv_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
-                    let p = parsed_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
-                    if r > 0 {
-                        tracing::info!("📥 [RX] +{} msgs recebidos na fila, +{} parseados", r, p);
-                    }
-                }
-            }
-        }
-    });
-    tokio::spawn(async move {
-            let mut assembler = midi::MidiAssembler::new();
-            while let Some(msg) = midi_in_rx.recv().await {
-                recv_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                conn_mgr_recv.reset_activity();
-                let packets = assembler.process_input(&msg);
-                for packet in packets {
-                    if sync_counter_in.should_ignore() {
-                        continue;
-                    }
-                    // Process state and collect emissions to send after releasing lock
-                    let mut emission: Option<(&str, serde_json::Value)> = None;
-                    let mut meter_emission: Option<Vec<u8>> = None;
-                    let mut scenes_emission: Option<serde_json::Value> = None;
-                    let mut current_scene_emission: Option<serde_json::Value> = None;
-
-                    {
-                        let mut state = state_arc_in.write().await;
-
-                        if state.handle_raw_midi(&packet) {
-                            scenes_emission = Some(serde_json::to_value(state.scene_manager.get_state()).unwrap_or_default());
-                            current_scene_emission = state.scene_manager.current_scene.as_ref()
-                                .and_then(|cs| serde_json::to_value(cs).ok());
-                        } else if let Some(parsed) = midi::protocol::parse_message(&packet) {
-                            parsed_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                            state.apply_midi(&parsed);
-
-                            match parsed {
-                                midi::protocol::ParsedMidi::MeterData { levels, is_master, .. } => {
-                                    {
-                                        if is_master {
-                                            let mm = master_meter_recv.read().await;
-                                            if let Some(m_level) = mm.parse(&packet) {
-                                                let mut buf = meter_buffer_emit.lock().unwrap();
-                                                buf[32] = m_level as f64;
-                                            }
-                                        } else {
-                                            let mut buf = meter_buffer_emit.lock().unwrap();
-                                            for (ch, val) in levels.iter() {
-                                                if *ch < 64 {
-                                                    buf[*ch] = (*val as f64).min(32.0);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if conn_mgr_recv.is_fully_synced() {
-                                        let mut last = last_meter_emit_clone.lock().unwrap();
-                                        let now = std::time::Instant::now();
-                                        let throttle_ms = if meter_fps > 0 { 1000 / meter_fps as u64 } else { 33 };
-                                        if now.duration_since(*last).as_millis() >= throttle_ms as u128 {
-                                            let buf = meter_buffer_emit.lock().unwrap().clone();
-                                            meter_emission = Some(buf.into_iter().map(|v| v as u8).collect());
-                                            *last = now;
-                                        }
-                                    }
-                                }
-                                midi::protocol::ParsedMidi::ControlChange { msg_type, channel, value } => {
-                                    static UPDATE_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
-                                    let uc = UPDATE_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                                    if uc < 20 || uc % 200 == 0 {
-                                        tracing::info!("📡 [UPDATE] #{uc}: type={}, ch={}, val={}", msg_type, channel, value);
-                                    }
-                                    emission = Some(("update", serde_json::json!({
-                                        "type": msg_type,
-                                        "channel": channel,
-                                        "value": value
-                                    })));
-                                }
-                                _ => {}
-                            }
-                        }
-                    } // state lock released here
-
-                    if let Some(v) = scenes_emission {
-                        let _ = io_clone.emit("scenesUpdated", &v).await;
-                    }
-                    if let Some(v) = current_scene_emission {
-                        let _ = io_clone.emit("currentScene", &v).await;
-                    }
-                    if let Some((event, data)) = emission {
-                        let _ = io_clone.emit(event, &data).await;
-                    }
-                    if let Some(buf) = meter_emission {
-                        static METER_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
-                        let c = METER_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                        if c < 5 || c % 100 == 0 {
-                            tracing::info!("📡 emit meterData #{} ({} bytes)", c, buf.len());
-                        }
-                        let _ = io_clone.emit("meterData", &buf).await;
-                    }
-                }
-            }
-    });
 
     // Configura os handlers basicos
     let scheduler_socket = scheduler.clone();
@@ -357,9 +98,11 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let global_state_socket = global_state.clone();
     let app_config_clone = app_config.clone();
     let conn_mgr_handler = conn_mgr.clone();
+    let io_for_ns = io.clone();
     io.clone().ns(
         "/",
         move |socket: socketioxide::extract::SocketRef| async move {
+            let io = io_for_ns;
             info!("Cliente web conectado: {}", socket.id);
 
             let state_arc_connect = global_state_socket.clone();
@@ -966,6 +709,268 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             );
         },
     );
+
+    if app_config.demo_mode {
+        info!("ℹ️ [DEMO] Modo Demo ativo — MIDI real desabilitado, usando simulacao.");
+        // Emit connected state for demo mode
+        conn_mgr.emit_connection_state();
+
+        let demo_io = io.clone();
+        tokio::spawn(async move {
+            use tokio::time::{interval, Duration};
+            use rand::RngExt;
+
+            let phases: Vec<f64>; let phases2: Vec<f64>; let speeds: Vec<f64>;
+            {
+                let mut rng = rand::rng();
+                phases = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
+                phases2 = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
+                speeds = (0..32).map(|_| 0.8 + rng.random_range(0.0..4.0)).collect();
+            }
+            let bases: [f64; 32] = [
+                26.0, 24.0, 22.0, 23.0, 25.0, 23.0, 21.0, 20.0, 26.0, 24.0, 19.0, 18.0, 20.0, 21.0, 17.0, 18.0,
+                22.0, 19.0, 20.0, 18.0, 18.0, 20.0, 17.0, 21.0, 22.0, 19.0, 20.0, 18.0, 16.0, 21.0, 19.0, 17.0,
+            ];
+
+            let mut t: f64 = 0.0;
+            let mut energy: f64 = 0.9;
+            let mut energy_target: f64 = 0.9;
+            let mut ticker = interval(Duration::from_millis(33));
+            let mut meter_buffer: Vec<f64> = vec![0.0; 64];
+            let mut last_emit_time = std::time::Instant::now();
+
+            info!("🚀 [DEMO] Simulacao de Meters iniciada (32ch + Master @ 30fps)");
+
+            loop {
+                ticker.tick().await;
+                t += 0.15;
+
+                {
+                    let mut rng = rand::rng();
+                    if rng.random::<f64>() < 0.008 {
+                        energy_target = 0.7 + rng.random_range(0.0..0.3);
+                    }
+                    energy += (energy_target - energy) * 0.03;
+
+                    for i in 0..32 {
+                        let s = speeds[i];
+                        let w1 = (t * s + phases[i]).sin();
+                        let w2 = (t * s * 2.3 + phases2[i]).sin() * 0.35;
+                        let w3 = (t * s * 0.4 + phases[i] * 0.7).sin() * 0.25;
+                        let noise = (rng.random::<f64>() - 0.5) * 3.0;
+                        let level = (bases[i] * energy) + ((w1 + w2 + w3) * 9.0 * energy) + noise;
+                        meter_buffer[i] = (level.min(31.0).max(0.0)).round();
+                    }
+
+                    let mw = (t * 0.9).sin() * 2.5 + (t * 1.7).sin() * 2.0;
+                    let master_level = (26.0 * energy + mw + (rng.random::<f64>() - 0.5) * 2.0)
+                        .min(31.0).max(0.0);
+                    meter_buffer[32] = master_level.round();
+                }
+
+                let now = std::time::Instant::now();
+                if now.duration_since(last_emit_time).as_millis() >= 30 {
+                    if let Err(e) = demo_io.emit("meterData", &meter_buffer[..33]).await {
+                        tracing::error!("Erro ao emitir meterData: {:?}", e);
+                    }
+                    last_emit_time = now;
+                }
+            }
+        });
+    } else {
+        info!("ℹ️ [INFO] Modo Demo desativado. Buscando porta MIDI...");
+
+        let (inputs, outputs) = midi::MidiEngine::get_available_ports();
+        let search_monitor = app_config.loopmidi_monitor;
+
+        info!("📋 Portas MIDI de entrada disponiveis:");
+        for (id, name) in &inputs {
+            info!("   IN [{}] = {}", id, name);
+        }
+        info!("📋 Portas MIDI de saida disponiveis:");
+        for (id, name) in &outputs {
+            info!("   OUT [{}] = {}", id, name);
+        }
+
+        let criteria = if search_monitor { "monitor" } else { "yamaha" };
+
+        let find_port = |ports: &[(usize, String)]| -> Option<usize> {
+            for (idx, name) in ports {
+                let lower = name.to_lowercase();
+                if search_monitor {
+                    if lower.contains("monitor") { return Some(*idx); }
+                } else {
+                    if lower.contains("yamaha") && lower.contains("-1") { return Some(*idx); }
+                }
+            }
+            None
+        };
+
+        let found_in = find_port(&inputs);
+        let found_out = find_port(&outputs);
+
+        if found_in.is_none() || found_out.is_none() {
+            tracing::warn!(
+                "⚠️ Nenhuma porta com \"{}\" encontrada. Iniciando radar automatico...",
+                criteria
+            );
+        } else {
+            let in_idx = found_in.unwrap();
+            let out_idx = found_out.unwrap();
+            conn_mgr
+                .try_boot_connect(in_idx, out_idx)
+                .await;
+        }
+
+        let boot_delay = app_config.boot_delay_ms;
+        let conn_mgr_radar = conn_mgr.clone();
+        tokio::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_millis(boot_delay)).await;
+            conn_mgr_radar.iniciar_busca_automatica();
+        });
+    }
+
+    // DMX boot
+    if app_config.sistema_iluminacao {
+        let root_dir = std::env::current_dir()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .to_string_lossy()
+            .to_string();
+        let dmx_delay = app_config.dmx_boot_delay_ms;
+        tokio::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_millis(dmx_delay)).await;
+            dmx::start_dmx_app(false, &root_dir);
+        });
+    }
+
+    let io_clone = io.clone();
+    let state_arc_in = global_state.clone();
+    let sync_counter_in = sync_counter.clone();
+    let conn_mgr_recv = conn_mgr.clone();
+    let master_meter_recv = master_meter.clone();
+    let recv_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let parsed_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let recv_count_log = recv_count.clone();
+    let parsed_count_log = parsed_count.clone();
+
+    // Meter buffer + FPS throttle (like Node.js)
+    let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> = Arc::new(std::sync::Mutex::new(vec![0.0; 64]));
+    let last_meter_emit: Arc<std::sync::Mutex<std::time::Instant>> = Arc::new(std::sync::Mutex::new(std::time::Instant::now()));
+    let meter_buffer_emit = meter_buffer.clone();
+    let last_meter_emit_clone = last_meter_emit.clone();
+    let meter_fps = app_config.meter_fps_desktop;
+
+    tokio::spawn(async move {
+        let report_interval = tokio::time::interval(std::time::Duration::from_secs(5));
+        tokio::pin!(report_interval);
+        loop {
+            tokio::select! {
+                _ = report_interval.tick() => {
+                    let r = recv_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
+                    let p = parsed_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
+                    if r > 0 {
+                        tracing::info!("📥 [RX] +{} msgs recebidos na fila, +{} parseados", r, p);
+                    }
+                }
+            }
+        }
+    });
+    tokio::spawn(async move {
+            let mut assembler = midi::MidiAssembler::new();
+            while let Some(msg) = midi_in_rx.recv().await {
+                recv_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                conn_mgr_recv.reset_activity();
+                let packets = assembler.process_input(&msg);
+                for packet in packets {
+                    if sync_counter_in.should_ignore() {
+                        continue;
+                    }
+                    // Process state and collect emissions to send after releasing lock
+                    let mut emission: Option<(&str, serde_json::Value)> = None;
+                    let mut meter_emission: Option<Vec<u8>> = None;
+                    let mut scenes_emission: Option<serde_json::Value> = None;
+                    let mut current_scene_emission: Option<serde_json::Value> = None;
+
+                    {
+                        let mut state = state_arc_in.write().await;
+
+                        if state.handle_raw_midi(&packet) {
+                            scenes_emission = Some(serde_json::to_value(state.scene_manager.get_state()).unwrap_or_default());
+                            current_scene_emission = state.scene_manager.current_scene.as_ref()
+                                .and_then(|cs| serde_json::to_value(cs).ok());
+                        } else if let Some(parsed) = midi::protocol::parse_message(&packet) {
+                            parsed_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                            state.apply_midi(&parsed);
+
+                            match parsed {
+                                midi::protocol::ParsedMidi::MeterData { levels, is_master, .. } => {
+                                    {
+                                        if is_master {
+                                            let mm = master_meter_recv.read().await;
+                                            if let Some(m_level) = mm.parse(&packet) {
+                                                let mut buf = meter_buffer_emit.lock().unwrap();
+                                                buf[32] = m_level as f64;
+                                            }
+                                        } else {
+                                            let mut buf = meter_buffer_emit.lock().unwrap();
+                                            for (ch, val) in levels.iter() {
+                                                if *ch < 64 {
+                                                    buf[*ch] = (*val as f64).min(32.0);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if conn_mgr_recv.is_fully_synced() {
+                                        let mut last = last_meter_emit_clone.lock().unwrap();
+                                        let now = std::time::Instant::now();
+                                        let throttle_ms = if meter_fps > 0 { 1000 / meter_fps as u64 } else { 33 };
+                                        if now.duration_since(*last).as_millis() >= throttle_ms as u128 {
+                                            let buf = meter_buffer_emit.lock().unwrap().clone();
+                                            meter_emission = Some(buf.into_iter().map(|v| v as u8).collect());
+                                            *last = now;
+                                        }
+                                    }
+                                }
+                                midi::protocol::ParsedMidi::ControlChange { msg_type, channel, value } => {
+                                    static UPDATE_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+                                    let uc = UPDATE_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                                    if uc < 20 || uc % 200 == 0 {
+                                        tracing::info!("📡 [UPDATE] #{uc}: type={}, ch={}, val={}", msg_type, channel, value);
+                                    }
+                                    emission = Some(("update", serde_json::json!({
+                                        "type": msg_type,
+                                        "channel": channel,
+                                        "value": value
+                                    })));
+                                }
+                                _ => {}
+                            }
+                        }
+                    } // state lock released here
+
+                    if let Some(v) = scenes_emission {
+                        let _ = io_clone.emit("scenesUpdated", &v).await;
+                    }
+                    if let Some(v) = current_scene_emission {
+                        let _ = io_clone.emit("currentScene", &v).await;
+                    }
+                    if let Some((event, data)) = emission {
+                        let _ = io_clone.emit(event, &data).await;
+                    }
+                    if let Some(buf) = meter_emission {
+                        static METER_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+                        let c = METER_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                        if c < 5 || c % 100 == 0 {
+                            tracing::info!("📡 emit meterData #{} ({} bytes)", c, buf.len());
+                        }
+                        let _ = io_clone.emit("meterData", &buf).await;
+                    }
+                }
+            }
+    });
+
 
     // Cria a rota Axum que serve os arquivos estaticos de `../public`
     // e inclui a camada do Socket.IO

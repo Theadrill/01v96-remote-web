@@ -410,6 +410,17 @@ socket.on('sync', (s) => {
             updatePanIndicator(globalId, s.channels[i].pan);
         }
     }
+
+    if (typeof initUI === 'function') {
+        console.log("♻️ [SOCKET] Re-inicializando UI após Sync Completo");
+        if (s.channels && s.channels[0] && s.channels[1]) {
+            console.log("🔍 [DEBUG SYNC] CH1 from server:", s.channels[0].paired, "pairedWith:", s.channels[0].pairedWith);
+            console.log("🔍 [DEBUG SYNC] CH2 from server:", s.channels[1].paired, "pairedWith:", s.channels[1].pairedWith);
+            console.log("🔍 [DEBUG SYNC] CH1 state:", channelStates[0].paired, "pairedWith:", channelStates[0].pairedWith);
+            console.log("🔍 [DEBUG SYNC] CH2 state:", channelStates[1].paired, "pairedWith:", channelStates[1].pairedWith);
+        }
+        initUI();
+    }
 });
 
 socket.on('scenesUpdated', (data) => {

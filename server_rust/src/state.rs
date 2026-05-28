@@ -405,11 +405,13 @@ impl GlobalState {
                         let partner_idx = if channel % 2 == 0 { channel + 1 } else { channel - 1 };
                         ch.paired = is_paired;
                         ch.paired_with = if is_paired { Some(partner_idx) } else { None };
+                        ch.pair_source = if is_paired { Some((*channel).min(partner_idx)) } else { None };
                     }
                     let partner_idx = if channel % 2 == 0 { channel + 1 } else { channel - 1 };
                     if let Some(partner) = self.channels.get_mut(&partner_idx) {
                         partner.paired = cv;
                         partner.paired_with = if cv { Some(*channel) } else { None };
+                        partner.pair_source = if cv { Some((*channel).min(partner_idx)) } else { None };
                     }
                 // --- Bus Assign ---
                 } else if mt == "kInputBus/kStereo" {
