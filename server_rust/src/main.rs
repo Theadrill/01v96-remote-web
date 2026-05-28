@@ -315,52 +315,55 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             let conn_mgr_connect = conn_mgr_handler.clone();
             tokio::spawn(async move {
                 let current_state = state_arc_connect.read().await;
-                if let Ok(state_json) = serde_json::to_value(&*current_state) {
-                    socket_initial.emit("sync", &state_json).ok();
-
-                    let (inputs, outputs) = midi::MidiEngine::get_available_ports();
-                    let inputs_json: Vec<serde_json::Value> = inputs
-                        .into_iter()
-                        .map(|(id, name)| serde_json::json!({ "id": id, "name": name }))
-                        .collect();
-                    let outputs_json: Vec<serde_json::Value> = outputs
-                        .into_iter()
-                        .map(|(id, name)| serde_json::json!({ "id": id, "name": name }))
-                        .collect();
-                    socket_initial
-                        .emit(
-                            "portsList",
-                            &serde_json::json!({
-                                "available": {
-                                    "inputs": inputs_json,
-                                    "outputs": outputs_json
-                                },
-                                "savedConfig": config_arc
-                            }),
-                        )
-                        .ok();
-
-                    socket_initial
-                        .emit("scenesUpdated", &current_state.scene_manager.get_state())
-                        .ok();
-
-                    socket_initial
-                        .emit(
-                            "syncStatus",
-                            &serde_json::json!({ "active": conn_mgr_connect.is_connected() && !conn_mgr_connect.is_fully_synced() }),
-                        )
-                        .ok();
-
-                    socket_initial
-                        .emit(
-                            "connectionState",
-                            &serde_json::json!({
-                                "connected": conn_mgr_connect.is_connected(),
-                                "demo_mode": config_arc.demo_mode
-                            }),
-                        )
-                        .ok();
+                let is_syncing = conn_mgr_connect.is_connected() && !conn_mgr_connect.is_fully_synced();
+                if !is_syncing {
+                    if let Ok(state_json) = serde_json::to_value(&*current_state) {
+                        socket_initial.emit("sync", &state_json).ok();
+                    }
                 }
+
+                let (inputs, outputs) = midi::MidiEngine::get_available_ports();
+                let inputs_json: Vec<serde_json::Value> = inputs
+                    .into_iter()
+                    .map(|(id, name)| serde_json::json!({ "id": id, "name": name }))
+                    .collect();
+                let outputs_json: Vec<serde_json::Value> = outputs
+                    .into_iter()
+                    .map(|(id, name)| serde_json::json!({ "id": id, "name": name }))
+                    .collect();
+                socket_initial
+                    .emit(
+                        "portsList",
+                        &serde_json::json!({
+                            "available": {
+                                "inputs": inputs_json,
+                                "outputs": outputs_json
+                            },
+                            "savedConfig": config_arc
+                        }),
+                    )
+                    .ok();
+
+                socket_initial
+                    .emit("scenesUpdated", &current_state.scene_manager.get_state())
+                    .ok();
+
+                socket_initial
+                    .emit(
+                        "syncStatus",
+                        &serde_json::json!({ "active": conn_mgr_connect.is_connected() && !conn_mgr_connect.is_fully_synced() }),
+                    )
+                    .ok();
+
+                socket_initial
+                    .emit(
+                        "connectionState",
+                        &serde_json::json!({
+                            "connected": conn_mgr_connect.is_connected(),
+                            "demo_mode": config_arc.demo_mode
+                            }),
+                        )
+                        .ok();
             });
 
             let scheduler_control = scheduler_socket.clone();
