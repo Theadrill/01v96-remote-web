@@ -232,6 +232,14 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let parsed_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
     let recv_count_log = recv_count.clone();
     let parsed_count_log = parsed_count.clone();
+
+    // Meter buffer + FPS throttle (like Node.js)
+    let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> = Arc::new(std::sync::Mutex::new(vec![0.0; 64]));
+    let last_meter_emit: Arc<std::sync::Mutex<std::time::Instant>> = Arc::new(std::sync::Mutex::new(std::time::Instant::now()));
+    let meter_buffer_emit = meter_buffer.clone();
+    let last_meter_emit_clone = last_meter_emit.clone();
+    let meter_fps = app_config.meter_fps_desktop;
+
     tokio::spawn(async move {
         let report_interval = tokio::time::interval(std::time::Duration::from_secs(5));
         tokio::pin!(report_interval);
@@ -276,12 +284,23 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
                             match parsed {
                                 midi::protocol::ParsedMidi::MeterData { levels, .. } => {
-                                    if conn_mgr_recv.is_fully_synced() {
-                                        let mut buf = vec![0u8; 40];
+                                    {
+                                        let mut buf = meter_buffer_emit.lock().unwrap();
                                         for (ch, val) in levels.iter() {
-                                            if *ch < 40 { buf[*ch] = *val; }
+                                            if *ch < 64 {
+                                                buf[*ch] = (*val as f64).min(32.0);
+                                            }
                                         }
-                                        meter_emission = Some(buf);
+                                    }
+                                    if conn_mgr_recv.is_fully_synced() {
+                                        let mut last = last_meter_emit_clone.lock().unwrap();
+                                        let now = std::time::Instant::now();
+                                        let throttle_ms = if meter_fps > 0 { 1000 / meter_fps as u64 } else { 33 };
+                                        if now.duration_since(*last).as_millis() >= throttle_ms as u128 {
+                                            let buf = meter_buffer_emit.lock().unwrap().clone();
+                                            meter_emission = Some(buf.into_iter().map(|v| v as u8).collect());
+                                            *last = now;
+                                        }
                                     }
                                 }
                                 midi::protocol::ParsedMidi::ControlChange { msg_type, channel, value } => {
