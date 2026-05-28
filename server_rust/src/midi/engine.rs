@@ -82,25 +82,21 @@ impl MidiEngine {
         let in_port_name = midi_in.port_name(&in_ports[in_idx]).unwrap_or_default();
         let _out_port_name = midi_out.port_name(&out_ports[out_idx]).unwrap_or_default();
 
-        let mut assembler = MidiAssembler::new();
+        let assembler = std::sync::Arc::new(std::sync::Mutex::new(MidiAssembler::new()));
 
         let in_conn = midi_in
             .connect(
                 &in_ports[in_idx],
                 "01v96 Input",
                 move |_stamp, message, _| {
-                    // Ignora _stamp, a engine do Windows nativo no midir pode ignorar SysEx
-                    // No Rust/midir, a leitura de SysEx já vem pronta em alguns casos, mas
-                    // usamos o assembler pra garantir.
-                    let complete_messages = assembler.process_input(message);
+                    let mut ass = assembler.lock().unwrap();
+                    let complete_messages = ass.process_input(message);
+                    drop(ass);
                     for msg in complete_messages {
                         let tx = tx_incoming.clone();
-                        // Send via channel to the async runtime without blocking MIDI thread
-                        tokio::spawn(async move {
-                            if let Err(e) = tx.send(msg).await {
-                                error!("Erro ao enviar mensagem MIDI para processamento: {}", e);
-                            }
-                        });
+                        if let Err(e) = tx.blocking_send(msg) {
+                            error!("Erro ao enviar mensagem MIDI: {}", e);
+                        }
                     }
                 },
                 (),

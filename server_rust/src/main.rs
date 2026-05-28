@@ -2,6 +2,7 @@ mod api;
 mod config;
 pub mod dmx;
 mod midi;
+mod network;
 mod scene_manager;
 mod state;
 
@@ -60,19 +61,48 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    let sync_counter = Arc::new(midi::SyncCounter::new());
+
     let (midi_out_tx, mut midi_out_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(100);
     let scheduler = Arc::new(midi::MidiScheduler::new(
         app_config.scheduler_tick_ms,
         midi_out_tx,
+        sync_counter.clone(),
     ));
     scheduler.start().await;
 
-    let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(100);
+    let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(256);
+
+    let engine = Arc::new(tokio::sync::Mutex::new(midi::MidiEngine::new()));
+
+    // Forwarder: scheduler output -> engine
+    let engine_fwd = engine.clone();
+    tokio::spawn(async move {
+        while let Some(msg) = midi_out_rx.recv().await {
+            engine_fwd.lock().await.send(&msg);
+        }
+    });
 
     let (layer, io) = SocketIo::new_layer();
 
+    let sync_manager = Arc::new(network::SyncManager::new(scheduler.clone(), io.clone()));
+
+    let conn_mgr = network::ConnectionManager::new(
+        app_config.clone(),
+        io.clone(),
+        scheduler.clone(),
+        global_state.clone(),
+        sync_counter.clone(),
+        sync_manager,
+        engine.clone(),
+        midi_in_tx.clone(),
+    );
+
     if app_config.demo_mode {
         info!("ℹ️ [DEMO] Modo Demo ativo — MIDI real desabilitado, usando simulacao.");
+        // Emit connected state for demo mode
+        conn_mgr.emit_connection_state();
+
         let demo_io = io.clone();
         tokio::spawn(async move {
             use tokio::time::{interval, Duration};
@@ -141,6 +171,17 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         let (inputs, outputs) = midi::MidiEngine::get_available_ports();
         let search_monitor = app_config.loopmidi_monitor;
 
+        info!("📋 Portas MIDI de entrada disponiveis:");
+        for (id, name) in &inputs {
+            info!("   IN [{}] = {}", id, name);
+        }
+        info!("📋 Portas MIDI de saida disponiveis:");
+        for (id, name) in &outputs {
+            info!("   OUT [{}] = {}", id, name);
+        }
+
+        let criteria = if search_monitor { "monitor" } else { "yamaha" };
+
         let find_port = |ports: &[(usize, String)]| -> Option<usize> {
             for (idx, name) in ports {
                 let lower = name.to_lowercase();
@@ -153,34 +194,58 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             None
         };
 
-        let in_idx = find_port(&inputs).unwrap_or(app_config.in_idx);
-        let out_idx = find_port(&outputs).unwrap_or(app_config.out_idx);
+        let found_in = find_port(&inputs);
+        let found_out = find_port(&outputs);
 
-        if search_monitor {
-            info!("🔍 [MONITOR] Usando porta loopMIDI: IN={}, OUT={}", in_idx, out_idx);
+        if found_in.is_none() || found_out.is_none() {
+            tracing::warn!(
+                "⚠️ Nenhuma porta com \"{}\" encontrada. Iniciando radar automatico...",
+                criteria
+            );
         } else {
-            info!("🔍 [USB] Buscando Yamaha 01V96: IN={}, OUT={}", in_idx, out_idx);
+            let in_idx = found_in.unwrap();
+            let out_idx = found_out.unwrap();
+            conn_mgr
+                .try_boot_connect(in_idx, out_idx, midi_in_tx.clone())
+                .await;
         }
 
+        let boot_delay = app_config.boot_delay_ms;
+        let conn_mgr_radar = conn_mgr.clone();
         tokio::spawn(async move {
-            let mut engine = midi::MidiEngine::new();
-            if let Err(e) = engine.connect_ports(in_idx, out_idx, midi_in_tx) {
-                tracing::error!("Erro ao conectar portas MIDI: {}", e);
-            }
+            tokio::time::sleep(std::time::Duration::from_millis(boot_delay)).await;
+            conn_mgr_radar.iniciar_busca_automatica();
+        });
+    }
 
-            while let Some(msg) = midi_out_rx.recv().await {
-                engine.send(&msg);
-            }
+    // DMX boot
+    if app_config.sistema_iluminacao {
+        let root_dir = std::env::current_dir()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .to_string_lossy()
+            .to_string();
+        let dmx_delay = app_config.dmx_boot_delay_ms;
+        tokio::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_millis(dmx_delay)).await;
+            dmx::start_dmx_app(false, &root_dir);
         });
     }
 
     let io_clone = io.clone();
     let state_arc_in = global_state.clone();
+    let sync_counter_in = sync_counter.clone();
+    let conn_mgr_recv = conn_mgr.clone();
     tokio::spawn(async move {
             let mut assembler = midi::MidiAssembler::new();
             while let Some(msg) = midi_in_rx.recv().await {
+                conn_mgr_recv.reset_activity();
                 let packets = assembler.process_input(&msg);
                 for packet in packets {
+                    if sync_counter_in.should_ignore() {
+                        continue;
+                    }
                     // Process state and collect emissions to send after releasing lock
                     let mut emission: Option<(&str, serde_json::Value)> = None;
                     let mut meter_emission: Option<Vec<u8>> = None;

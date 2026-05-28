@@ -3,10 +3,10 @@
 | Campo | Valor |
 |---|---|
 | **Versao do plano** | 4.0 |
-| **Progresso global** | ~30% |
-| **Ultima atividade** | 2026-05-27 — Fase 1 concluida |
-| **Ultimo passo concluido** | Fase 1: Core e Configuracoes |
-| **Proximo passo planejado** | Aguardando auditoria do usuario |
+| **Progresso global** | ~80% |
+| **Ultima atividade** | 2026-05-28 — Fase 10 concluida |
+| **Ultimo passo concluido** | Fase 10: Connection Manager (radar, watchdog, meters) |
+| **Proximo passo planejado** | Fase 11: Handlers socket faltantes
 
 Este documento e a **referencia arquitetonica tecnica definitiva** para a migracao do servidor Node.js atual para **Rust**, focado em performance absoluta e zero stutters. Ele contempla **TODAS** as funcionalidades existentes no Node.js, sem excecoes.
 
@@ -1218,3 +1218,68 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
   - Corrigido: se campo nao existir no config.json, Serde usa o default sem quebrar o parse dos outros campos
 - **Pendencias**: Nenhuma
 - **Proximo passo**: Aguardando auditoria do usuario
+
+### 2026-05-28 — Hotfix: Panico no callback MIDI
+- **Status**: [x] Concluido
+- **O que foi feito**:
+  - Corrigido `engine.rs`: substituido `tokio::spawn()` por `blocking_send()`, pois o callback do driver MIDI roda num thread do Windows sem runtime Tokio
+  - MidiAssembler encapsulado em `Arc<Mutex<>>` para compatibilidade com `Send + Sync` do midir
+  - Corrigido `main.rs`: deteccao de portas agora lista todas as portas disponiveis, valida criterios (yamaha/-1), e avisa se nao encontrar — sem fallback silencioso para portas erradas
+- **Modificacoes alem do previsto**: Nenhuma
+- **Pendencias**: Nenhuma
+- **Proximo passo**: Fase 4 — SyncCounter
+
+### 2026-05-28 — Fase 4 concluida: SyncCounter + integracao
+- **Status**: [x] Concluido
+- **O que foi feito**:
+  - Criado `midi/sync_counter.rs` com `begin_sync()`, `should_ignore()`, `reset()` usando `AtomicUsize`
+  - Injetado `Arc<SyncCounter>` no `MidiScheduler::new()` — `begin_sync()` chamado antes de cada envio SysEx
+  - No receive loop do `main.rs`: `should_ignore()` filtra ecos (reflexo do nosso proprio envio), evitando processamento duplicado via loopMIDI
+  - Adicionado `pub use sync_counter::SyncCounter` no `midi/mod.rs`
+- **Modificacoes alem do previsto**:
+  - `scheduler.rs`: construtor `new()` agora aceita `Arc<SyncCounter>` como 3o parametro
+  - `main.rs`: criacao do `Arc<SyncCounter>` antes do scheduler e clone para o receive loop
+- **Pendencias**: Nenhuma
+- **Proximo passo**: Fase 9 — SyncManager completo
+
+### 2026-05-28 — Fase 9 concluida: SyncManager
+- **Status**: [x] Concluido
+- **O que foi feito**:
+  - Criado `src/network/mod.rs` e `src/network/sync_manager.rs`
+  - **SyncManager struct**: scheduler, io, flags (is_syncing, is_fully_synced com `Arc<AtomicBool>`, has_synced_names)
+  - **`fire()`**: emite `syncStatus {active:true}`, enfileira todos os parametros via `queue_all_params()`
+  - **`fire_params_only()`**: 64 stop requests de warmup + redundancia 4 canais + ST IN + `queue_all_params()`
+  - **`queue_all_params()`**: ~600+ requests enfileirados em Q1:
+    - Stop request, PanSync (37 requests), Master Fader
+    - 32 inputs: Fader, On, Solo, Phase, Att, EQ (4 bandas x F/G/Q + On/Mode/HPF/LPF), AUX sends (8x Level+On), Gate (6 params), Comp (7 params), Patch, Bus Assign (Stereo+8 buses), Pair (canais impares), Names (4 chars se forceNames)
+    - ST IN 1-4: Fader+On+Names
+    - 8 AUX Masters + 8 BUS Masters: Fader, On, EQ (4 bandas), Comp (7 params)
+    - Stereo Master: Fader, On, Att, EQ, Comp
+    - Output names (36-43, 44-51, 52)
+    - Polling loop aguarda Q0+Q1 esvaziarem → emite `syncStatus {active:false}` + `sync` (full state)
+  - **`sync_names_only()`**: sync apenas de nomes (inputs, ST IN, outs) com mesmo mecanismo de polling
+  - Registrado como modulo em `main.rs` (`mod network`)
+- **Modificacoes alem do previsto**: Nenhuma — replicacao exata do Node.js
+- **Pendencias**: SyncManager nao esta conectado ao fluxo de conexao ainda — sera integrado na Fase 10 (ConnectionManager)
+- **Proximo passo**: Fase 11 — Handlers socket faltantes
+
+### 2026-05-28 — Fase 10 concluida: Connection Manager
+- **Status**: [x] Concluido
+- **O que foi feito**:
+  - Criado `src/network/connection.rs` com struct `ConnectionManager` (todos campos com `Arc` para compartilhamento)
+  - **Radar**: `iniciar_busca_automatica()` — varre portas MIDI a cada 1s procurando "yamaha"+"-1" (ou "monitor"), auto-conecta ao encontrar
+  - **Conexao**: `executar_conexao()` — validacao de porta (porteiro), connect no engine, cooldown de 5s, SyncManager.fire(), iniciar loop de meters
+  - **Meter loop**: 6 requests SysEx (Master Point 4 + Groups 32/33 + Sections 26/13), priority 2 (so envia se Q0/Q1 vazias), so emite se is_fully_synced
+  - **Watchdog**: verifica `last_activity` contra `watchdog_timeout_ms` a cada ciclo, chama `handle_disconnection` se timeout
+  - **Disconnect**: stop request, para busca e meters, reseta sync_counter, emite connectionState offline, auto-retry com radar
+  - **reset_activity()**: chamado no receive loop MIDI para manter o watchdog vivo
+  - **trigger_sync() / sync_names()**: metodos publicos para uso pelos handlers socket
+  - **DMX boot**: `start_dmx_app()` chamado apos `dmx_boot_delay_ms` se `sistema_iluminacao` habilitado
+  - **Engine**: refatorado para `Arc<tokio::sync::Mutex<MidiEngine>>` compartilhado, forwarder de saida unico (scheduler→engine)
+  - **main.rs reestruturado**: boot connect → radar apos boot_delay → DMX apos dmx_boot_delay
+- **Modificacoes alem do previsto**:
+  - `engine.rs`: substituido `tokio::spawn` por `blocking_send` no callback do driver (bug corrigido anteriormente)
+  - `busca_handle` e `meter_handle` usam `std::sync::Mutex` (nao tokio) para evitar problemas de Send em futures
+  - `emit_connection_state()`, `iniciar_busca_automatica()`, `iniciar_meter_loop()`, `reset_activity()` sao metodos sincronos (spawnam tasks internamente, mas nao sao async)
+- **Pendencias**: Nenhuma. Fase 10 100% concluida.
+- **Proximo passo**: Fase 11 — Implementar handlers socket faltantes (requestConnect, updateName, forceSync, deleteScene, toggleDemo, etc.)
