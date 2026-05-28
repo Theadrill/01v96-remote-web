@@ -100,7 +100,66 @@ pub fn reset_dmx_system(root_dir: String) {
     });
 }
 
-pub fn update_lumikit_config(_root_dir: &str) {
-    // Basic port to avoid local network parsing for now - requires specific crate like local-ip-address
-    println!("Update lumikit config called - needs actual IP config reading");
+pub fn update_lumikit_config(root_dir: &str) {
+    let config = crate::config::AppConfig::load();
+    let lumikit_ips = config.lumikit_ips;
+    if lumikit_ips.is_empty() {
+        return;
+    }
+
+    let mut local_ips = Vec::new();
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(output) = Command::new("ipconfig").output() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            for line in stdout.lines() {
+                if line.contains("IPv4") {
+                    if let Some(ip_part) = line.split(':').last() {
+                        let ip = ip_part.trim();
+                        if !ip.is_empty() {
+                            local_ips.push(ip.to_string());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let found_match = lumikit_ips.iter().find(|ip| local_ips.contains(ip));
+
+    if let Some(matched_ip) = found_match {
+        let info_path = Path::new(root_dir).join("ArtNetToDMX_FTDI").join("info");
+        
+        if !info_path.exists() {
+            println!("📝 [DMX] Arquivo \"info\" nao encontrado. Criando um novo para o IP {}...", matched_ip);
+            let default_content = format!("IP: {}\nUni: 0\nOneUni: true\nAutostart: true\n", matched_ip);
+            if let Err(e) = std::fs::write(&info_path, default_content) {
+                eprintln!("❌ [DMX] Erro ao criar o arquivo info: {}", e);
+            }
+            return;
+        }
+
+        if let Ok(content) = std::fs::read_to_string(&info_path) {
+            let lines: Vec<String> = content.lines().map(|line| {
+                if line.starts_with("IP:") {
+                    format!("IP: {}", matched_ip)
+                } else {
+                    line.to_string()
+                }
+            }).collect();
+            let new_content = lines.join("\n") + "\n";
+            
+            if content != new_content {
+                if let Err(e) = std::fs::write(&info_path, new_content) {
+                    eprintln!("❌ [DMX] Erro ao atualizar o arquivo info: {}", e);
+                } else {
+                    println!("🌐 [DMX] IP configurado automaticamente no arquivo info: {}", matched_ip);
+                }
+            } else {
+                println!("🌐 [DMX] IP {} ja estava configurado corretamente.", matched_ip);
+            }
+        }
+    } else {
+        eprintln!("⚠️ [DMX] Nenhum IP da lista \"lumikit_ips\" bate com as redes ativas deste PC.");
+    }
 }

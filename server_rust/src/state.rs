@@ -615,7 +615,3 @@ fn apply_comp_fields(comp: &mut CompState, mt: &str, value: f64) {
         _ => {}
     }
 }
-
-pub fn save_names_trigger(state: &GlobalState, debounce_ms: u64) {
-    crate::config::save_names_to_disk(state, debounce_ms);
-}

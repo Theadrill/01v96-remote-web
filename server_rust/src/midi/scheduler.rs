@@ -26,24 +26,21 @@ impl SchedulerState {
 
 pub struct MidiScheduler {
     pub state: Arc<Mutex<SchedulerState>>,
-    q1_empty_tx: Option<tokio::sync::mpsc::Sender<()>>,
     engine: Arc<Mutex<super::MidiEngine>>,
+    sync_counter: Arc<super::SyncCounter>,
 }
 
 impl MidiScheduler {
     pub fn new(
         tick_ms: u64,
         engine: Arc<Mutex<super::MidiEngine>>,
+        sync_counter: Arc<super::SyncCounter>,
     ) -> Self {
         Self {
             state: Arc::new(Mutex::new(SchedulerState::new(tick_ms))),
-            q1_empty_tx: None,
             engine,
+            sync_counter,
         }
-    }
-
-    pub fn set_q1_empty_callback(&mut self, tx: tokio::sync::mpsc::Sender<()>) {
-        self.q1_empty_tx = Some(tx);
     }
 
     pub async fn enqueue_batch(&self, items: Vec<Vec<u8>>, priority: u8) {
@@ -118,11 +115,10 @@ impl MidiScheduler {
 
         let state_clone = Arc::clone(&self.state);
         let engine = Arc::clone(&self.engine);
-        let q1_empty_tx = self.q1_empty_tx.clone();
+        let sync_counter = Arc::clone(&self.sync_counter);
 
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(Duration::from_millis(tick_ms));
-            let mut q1_was_processing = false;
 
             loop {
                 interval.tick().await;
@@ -130,13 +126,16 @@ impl MidiScheduler {
                 if !state.is_running { break; }
 
                 let packet = if !state.q0.is_empty() { Some(state.q0.remove(0)) }
-                else if !state.q1.is_empty() { q1_was_processing = true; Some(state.q1.remove(0)) }
+                else if !state.q1.is_empty() { Some(state.q1.remove(0)) }
                 else if !state.q2.is_empty() { Some(state.q2.remove(0)) }
                 else { None };
 
                 match packet {
                     Some(p) => {
                         drop(state);
+                        if p.len() >= 3 && p[0] == 0xF0 && p[1] == 0x43 && p[2] == 0x10 {
+                            sync_counter.begin_sync();
+                        }
                         engine.lock().await.send(&p);
                         let mut st = state_clone.lock().await;
                         st.total_processed += 1;
@@ -145,21 +144,10 @@ impl MidiScheduler {
                                 st.total_processed, st.q0.len(), st.q1.len(), st.q2.len());
                         }
                     }
-                    None if q1_was_processing => {
-                        if let Some(ref tx) = q1_empty_tx {
-                            let _ = tx.send(()).await;
-                        }
-                        q1_was_processing = false;
-                    }
                     None => {}
                 }
             }
         });
-    }
-
-    pub async fn stop(&self) {
-        let mut state = self.state.lock().await;
-        state.is_running = false;
     }
 
     pub async fn clear(&self, priority: Option<u8>) {
@@ -184,7 +172,8 @@ mod tests {
     #[tokio::test]
     async fn test_scheduler_priority() {
         let engine = Arc::new(Mutex::new(super::super::MidiEngine::new()));
-        let scheduler = MidiScheduler::new(10, engine);
+        let sync_counter = Arc::new(super::super::SyncCounter::new());
+        let scheduler = MidiScheduler::new(10, engine, sync_counter);
 
         scheduler.enqueue(vec![0x02], 2).await;
         scheduler.enqueue(vec![0x01], 1).await;
@@ -192,6 +181,9 @@ mod tests {
 
         scheduler.start().await;
         tokio::time::sleep(Duration::from_millis(100)).await;
-        scheduler.stop().await;
+        {
+            let mut st = scheduler.state.lock().await;
+            st.is_running = false;
+        }
     }
 }

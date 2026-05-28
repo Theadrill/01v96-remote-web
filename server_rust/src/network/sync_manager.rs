@@ -49,11 +49,6 @@ impl SyncManager {
 
         self.is_fully_synced.store(false, Ordering::SeqCst);
 
-        let _ = self.io.emit(
-            "syncStatus",
-            &serde_json::json!({ "active": true, "type": sync_type }),
-        );
-
         let sched = self.scheduler.clone();
         let io = self.io.clone();
         let is_syncing = self.is_syncing.clone();
@@ -62,6 +57,11 @@ impl SyncManager {
         let _sync_type = sync_type.to_string();
 
         tokio::spawn(async move {
+            let _ = io.emit(
+                "syncStatus",
+                &serde_json::json!({ "active": true, "type": _sync_type }),
+            ).await;
+
             // Phase 1: clear scene state (short lock)
             {
                 let mut state_guard = state.write().await;
@@ -105,9 +105,9 @@ impl SyncManager {
                         }
                     }
                 }
-                let _ = io.emit("scenesUpdated", &sm.get_state());
+                let _ = io.emit("scenesUpdated", &sm.get_state()).await;
                 if let Some(ref cs) = sm.current_scene {
-                    let _ = io.emit("currentScene", &serde_json::json!(cs));
+                    let _ = io.emit("currentScene", &serde_json::json!(cs)).await;
                 }
             }
 
@@ -137,14 +137,16 @@ impl SyncManager {
 
         self.is_fully_synced.store(false, Ordering::SeqCst);
 
-        let _ = self.io.emit(
-            "syncStatus",
-            &serde_json::json!({ "active": true, "type": sync_type }),
-        );
-
         let sched = self.scheduler.clone();
+        let io = self.io.clone();
+        let _sync_type = sync_type.to_string();
 
         tokio::spawn(async move {
+            let _ = io.emit(
+                "syncStatus",
+                &serde_json::json!({ "active": true, "type": _sync_type }),
+            ).await;
+
             for _ in 0..64 {
                 let stop = midi::master_meter::MasterMeter::build_stop_request();
                 sched.enqueue(stop, 1).await;
@@ -200,17 +202,17 @@ impl SyncManager {
 
         self.is_fully_synced.store(false, Ordering::SeqCst);
 
-        let _ = self.io.emit(
-            "syncStatus",
-            &serde_json::json!({ "active": true, "type": "is_scene" }),
-        );
-
         let sched = self.scheduler.clone();
         let io = self.io.clone();
         let is_syncing = self.is_syncing.clone();
         let is_fully_synced = self.is_fully_synced.clone();
 
         tokio::spawn(async move {
+            let _ = io.emit(
+                "syncStatus",
+                &serde_json::json!({ "active": true, "type": "is_scene" }),
+            ).await;
+
             let mut requests: Vec<Vec<u8>> = Vec::new();
             requests.push(midi::master_meter::MasterMeter::build_stop_request());
 
@@ -244,7 +246,7 @@ impl SyncManager {
                 }
             }
 
-            let _ = io.emit("syncStatus", &serde_json::json!({ "active": false }));
+            let _ = io.emit("syncStatus", &serde_json::json!({ "active": false })).await;
 
             is_syncing.store(false, Ordering::SeqCst);
             is_fully_synced.store(true, Ordering::SeqCst);
@@ -418,8 +420,8 @@ async fn queue_all_params_inner(
         }
         tracing::info!("🔍 [SYNC-FINAL] JSON size: {} bytes, channels count: {}",
             json_str.len(), state_guard.channels.len());
-        let _ = io.emit("syncStatus", &serde_json::json!({ "active": false }));
-        let _ = io.emit("sync", &state_json);
+        let _ = io.emit("syncStatus", &serde_json::json!({ "active": false })).await;
+        let _ = io.emit("sync", &state_json).await;
     }
     drop(state_guard);
 

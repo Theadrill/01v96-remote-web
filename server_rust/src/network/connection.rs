@@ -62,6 +62,10 @@ impl ConnectionManager {
         self.sync_manager.is_ready() || self.is_fully_synced.load(Ordering::SeqCst)
     }
 
+    pub fn is_syncing(&self) -> bool {
+        self.is_connected() && self.sync_manager.is_busy()
+    }
+
     pub fn emit_connection_state(&self) {
         let connected = self.is_connected.load(Ordering::SeqCst);
         let io = self.io.clone();
@@ -70,7 +74,7 @@ impl ConnectionManager {
             let _ = io.emit(
                 "connectionState",
                 &serde_json::json!({ "connected": connected, "demo_mode": demo }),
-            );
+            ).await;
         });
     }
 
@@ -249,6 +253,7 @@ impl ConnectionManager {
 
         self.is_fully_synced.store(false, Ordering::SeqCst);
         info!("🔄 Iniciando sincronia completa...");
+        self.sync_manager.reset();
         self.sync_manager.fire(true, "normal", self.state.clone());
 
         self.iniciar_meter_loop();
@@ -259,6 +264,7 @@ impl ConnectionManager {
 
         let stop = midi::master_meter::MasterMeter::build_stop_request();
         self.scheduler.enqueue(stop, 0).await;
+        self.scheduler.clear(None).await;
 
         self.parar_busca();
         if let Ok(mut guard) = self.meter_handle.lock() {

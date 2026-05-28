@@ -12,4 +12,3 @@ pub use scheduler::MidiScheduler;
 pub use sync_counter::SyncCounter;
 
 pub mod master_meter;
-pub mod meter_dummy;

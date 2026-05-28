@@ -53,11 +53,6 @@ impl MidiAssembler {
 
         completed_messages
     }
-
-    pub fn reset(&mut self) {
-        self.buffer.clear();
-        self.in_sysex = false;
-    }
 }
 
 #[cfg(test)]

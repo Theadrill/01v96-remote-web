@@ -68,6 +68,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let scheduler = Arc::new(midi::MidiScheduler::new(
         app_config.scheduler_tick_ms,
         engine.clone(),
+        sync_counter.clone(),
     ));
     scheduler.start().await;
 
@@ -228,6 +229,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let state_arc_in = global_state.clone();
     let sync_counter_in = sync_counter.clone();
     let conn_mgr_recv = conn_mgr.clone();
+    let master_meter_recv = master_meter.clone();
     let recv_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
     let parsed_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
     let recv_count_log = recv_count.clone();
@@ -283,12 +285,20 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                             state.apply_midi(&parsed);
 
                             match parsed {
-                                midi::protocol::ParsedMidi::MeterData { levels, .. } => {
+                                midi::protocol::ParsedMidi::MeterData { levels, is_master, .. } => {
                                     {
-                                        let mut buf = meter_buffer_emit.lock().unwrap();
-                                        for (ch, val) in levels.iter() {
-                                            if *ch < 64 {
-                                                buf[*ch] = (*val as f64).min(32.0);
+                                        if is_master {
+                                            let mm = master_meter_recv.read().await;
+                                            if let Some(m_level) = mm.parse(&packet) {
+                                                let mut buf = meter_buffer_emit.lock().unwrap();
+                                                buf[32] = m_level as f64;
+                                            }
+                                        } else {
+                                            let mut buf = meter_buffer_emit.lock().unwrap();
+                                            for (ch, val) in levels.iter() {
+                                                if *ch < 64 {
+                                                    buf[*ch] = (*val as f64).min(32.0);
+                                                }
                                             }
                                         }
                                     }
@@ -358,7 +368,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             let conn_mgr_connect = conn_mgr_handler.clone();
             tokio::spawn(async move {
                 let current_state = state_arc_connect.read().await;
-                let is_syncing = conn_mgr_connect.is_connected() && !conn_mgr_connect.is_fully_synced();
+                let is_syncing = conn_mgr_connect.is_syncing();
                 if !is_syncing {
                     if let Ok(state_json) = serde_json::to_value(&*current_state) {
                         socket_initial.emit("sync", &state_json).ok();
@@ -394,7 +404,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                 socket_initial
                     .emit(
                         "syncStatus",
-                        &serde_json::json!({ "active": conn_mgr_connect.is_connected() && !conn_mgr_connect.is_fully_synced() }),
+                        &serde_json::json!({ "active": conn_mgr_connect.is_syncing() }),
                     )
                     .ok();
 
@@ -875,7 +885,9 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                 move |_socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<serde_json::Value>| async move {
                     if let Some(opacity) = data.get("opacity").and_then(|v| v.as_f64()) {
-                        tracing::info!("updateMeterConfig: opacity={} (config save pendente)", opacity);
+                        let mut config = crate::config::AppConfig::load();
+                        config.meter_opacity = opacity;
+                        config.save();
                     }
                 },
             );
@@ -886,7 +898,9 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                 move |_socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<serde_json::Value>| async move {
                     if let Some(enabled) = data.get("enabled").and_then(|v| v.as_bool()) {
-                        tracing::info!("updateOpenBrowser: {} (config save pendente)", enabled);
+                        let mut config = crate::config::AppConfig::load();
+                        config.open_browser_startup = enabled;
+                        config.save();
                     }
                 },
             );

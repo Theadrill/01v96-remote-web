@@ -15,9 +15,7 @@ pub const FOOTER: &[u8] = &[247]; // F7
 pub enum Converter {
     Fader,
     Signed,
-    Signed14,
     On,
-    DynOn,
 }
 
 pub fn convert_to_bytes(value: f64, converter: &Converter) -> Vec<u8> {
@@ -38,20 +36,9 @@ pub fn convert_to_bytes(value: f64, converter: &Converter) -> Vec<u8> {
                 (v & 0x7F) as u8,
             ]
         }
-        Converter::Signed14 => {
-            let mut v = value.round() as i64;
-            if v < 0 {
-                v += 0x4000;
-            }
-            vec![((v >> 7) & 0x7F) as u8, (v & 0x7F) as u8]
-        }
         Converter::On => {
             let is_on = value > 0.0;
             vec![0, 0, 0, if is_on { 1 } else { 0 }]
-        }
-        Converter::DynOn => {
-            let is_on = value > 0.0;
-            vec![0, 0, 0, if is_on { 0 } else { 1 }]
         }
     }
 }
@@ -82,9 +69,7 @@ pub fn bytes_to_on(bytes: &[u8]) -> bool {
     *bytes.last().unwrap_or(&0) != 0
 }
 
-pub fn bytes_to_dyn_on(bytes: &[u8]) -> bool {
-    *bytes.last().unwrap_or(&1) == 0
-}
+
 
 pub fn build_change(
     command_name: &str,
@@ -148,9 +133,6 @@ mod tests {
         assert_eq!(convert_to_bytes(0.0, &Converter::On), vec![0, 0, 0, 0]);
         assert_eq!(bytes_to_on(&[0, 0, 0, 1]), true);
 
-        // Test DynOn (inverted logic)
-        assert_eq!(convert_to_bytes(1.0, &Converter::DynOn), vec![0, 0, 0, 0]);
-        assert_eq!(convert_to_bytes(0.0, &Converter::DynOn), vec![0, 0, 0, 1]);
     }
 }
 #[derive(Debug, Clone, serde::Serialize)]
@@ -212,9 +194,9 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         // Determine base channel from group number (like Node.js)
         let base_ch: usize = match group {
-            33 => 0,   // Input CH 1-32
-            32 => 32,  // Input CH 33-64? Actually ST IN and effects
-            82 => 0,   // Another meter group
+            33 => channel,   // Input CH 1-32
+            32 => 32 + channel,  // Input CH 33-64? Actually ST IN and effects
+            82 => 32 + channel,  // Stereo Master
             _ => channel,
         };
 
