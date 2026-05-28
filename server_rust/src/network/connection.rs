@@ -72,7 +72,6 @@ impl ConnectionManager {
         self: &Arc<Self>,
         in_idx: usize,
         out_idx: usize,
-        midi_in_tx: mpsc::Sender<Vec<u8>>,
     ) {
         let (inputs, outputs) = MidiEngine::get_available_ports();
 
@@ -99,7 +98,7 @@ impl ConnectionManager {
             in_idx, in_name, out_idx, out_name
         );
 
-        self.executar_conexao(in_idx, out_idx, midi_in_tx).await;
+        self.executar_conexao(in_idx, out_idx).await;
     }
 
     pub fn iniciar_busca_automatica(self: &Arc<Self>) {
@@ -137,8 +136,7 @@ impl ConnectionManager {
                         if this.config.loopmidi_monitor { "loopMIDI" } else { "Yamaha 01V96" },
                         in_idx, in_name, out_idx, out_name
                     );
-                    let tx = this.midi_in_tx.clone();
-                    this.executar_conexao(in_idx, out_idx, tx).await;
+                    this.executar_conexao(in_idx, out_idx).await;
                 }
             }
         });
@@ -206,7 +204,6 @@ impl ConnectionManager {
         self: &Arc<Self>,
         in_idx: usize,
         out_idx: usize,
-        midi_in_tx: mpsc::Sender<Vec<u8>>,
     ) {
         let (inputs, outputs) = MidiEngine::get_available_ports();
 
@@ -228,7 +225,8 @@ impl ConnectionManager {
 
         {
             let mut engine = self.engine.lock().await;
-            match engine.connect_ports(in_idx, out_idx, midi_in_tx) {
+            let tx = self.midi_in_tx.clone();
+            match engine.connect_ports(in_idx, out_idx, tx) {
                 Ok(name) => info!("✅ Conexao MIDI estabelecida: {}", name),
                 Err(e) => { error!("Erro ao conectar MIDI: {}", e); self.handle_disconnection(false).await; return; }
             }

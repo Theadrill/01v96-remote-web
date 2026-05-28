@@ -86,6 +86,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let (layer, io) = SocketIo::new_layer();
 
     let sync_manager = Arc::new(network::SyncManager::new(scheduler.clone(), io.clone()));
+    let sync_manager_socket = sync_manager.clone();
 
     let conn_mgr = network::ConnectionManager::new(
         app_config.clone(),
@@ -206,7 +207,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             let in_idx = found_in.unwrap();
             let out_idx = found_out.unwrap();
             conn_mgr
-                .try_boot_connect(in_idx, out_idx, midi_in_tx.clone())
+                .try_boot_connect(in_idx, out_idx)
                 .await;
         }
 
@@ -303,7 +304,8 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let global_state_api = global_state.clone();
     let global_state_socket = global_state.clone();
     let app_config_clone = app_config.clone();
-    io.ns(
+    let conn_mgr_handler = conn_mgr.clone();
+    io.clone().ns(
         "/",
         move |socket: socketioxide::extract::SocketRef| async move {
             info!("Cliente web conectado: {}", socket.id);
@@ -311,6 +313,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             let state_arc_connect = global_state_socket.clone();
             let config_arc = app_config_clone.clone();
             let socket_initial = socket.clone();
+            let conn_mgr_connect = conn_mgr_handler.clone();
             tokio::spawn(async move {
                 let current_state = state_arc_connect.read().await;
                 if let Ok(state_json) = serde_json::to_value(&*current_state) {
@@ -350,7 +353,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                         .emit(
                             "connectionState",
                             &serde_json::json!({
-                                "connected": false,
+                                "connected": conn_mgr_connect.is_connected(),
                                 "demo_mode": config_arc.demo_mode
                             }),
                         )
@@ -541,6 +544,8 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
             let scheduler_scene = scheduler_socket.clone();
             let state_scene = global_state_socket.clone();
+            let conn_mgr_scene = conn_mgr_handler.clone();
+            let io_scene = io.clone();
             socket.on(
                 "recallScene",
                 move |_socket: socketioxide::extract::SocketRef,
@@ -548,78 +553,294 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                     if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
                         tracing::info!("SCENE Comando recebido: RECALL Cena {}", index);
                         let sysex = vec![
-                            0xF0,
-                            0x43,
-                            0x10,
-                            0x3E,
-                            0x7F,
-                            0x10,
-                            0x00,
-                            0x00,
-                            index as u8,
-                            0x02,
-                            0x00,
-                            0xF7,
+                            0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x00, 0x00, index as u8, 0x02, 0x00, 0xF7,
                         ];
                         scheduler_scene.enqueue(sysex, 1).await;
 
-                        let mut state = state_scene.write().await;
-                        state.scene_manager.set_active_scene(index as u8);
+                        {
+                            let mut state = state_scene.write().await;
+                            state.scene_manager.set_active_scene(index as u8);
+                        }
+
+                        tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
+
+                        {
+                            let state = state_scene.read().await;
+                            let _ = io_scene.emit("scenesUpdated", &state.scene_manager.get_state());
+                            if let Some(ref cs) = state.scene_manager.current_scene {
+                                let _ = io_scene.emit("currentScene", &serde_json::json!(cs));
+                            }
+                        }
+
+                        tokio::time::sleep(std::time::Duration::from_millis(1200)).await;
+
+                        conn_mgr_scene.trigger_sync(false, "is_scene");
                     }
                 },
             );
 
             let scheduler_save = scheduler_socket.clone();
             let state_save = global_state_socket.clone();
+            let io_save = io.clone();
             socket.on(
                 "saveScene",
                 move |_socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<serde_json::Value>| async move {
                     if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
-                        let sysex = vec![
-                            0xF0,
-                            0x43,
-                            0x10,
-                            0x3E,
-                            0x7F,
-                            0x10,
-                            0x20,
-                            0x00,
-                            index as u8,
-                            0x02,
-                            0x00,
-                            0xF7,
+                        let index = index as u8;
+                        let store_sysex = vec![
+                            0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x20, 0x00, index, 0x02, 0x00, 0xF7,
                         ];
-                        scheduler_save.enqueue(sysex, 1).await;
+                        scheduler_save.enqueue(store_sysex, 1).await;
 
-                        let mut state = state_save.write().await;
-                        if let Some(new_name) = data.get("newName").and_then(|v| v.as_str()) {
-                            let mut name_bytes = new_name.as_bytes().to_vec();
-                            name_bytes.resize(16, 32);
+                        let original_name = {
+                            let state = state_save.read().await;
+                            state.scene_manager.scenes[index as usize]
+                                .as_ref()
+                                .map(|s| s.name.clone())
+                                .unwrap_or_default()
+                        };
+
+                        let target_name = data
+                            .get("newName")
+                            .and_then(|v| v.as_str())
+                            .map(|n| n.trim().to_uppercase())
+                            .unwrap_or(original_name.clone())
+                            .chars()
+                            .take(16)
+                            .collect::<String>();
+                        let target_name_padded = format!("{: <16}", target_name);
+
+                        if target_name_padded.trim().to_uppercase() != original_name.trim().to_uppercase() {
+                            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
                             let mut rename_sysex = vec![
-                                0xF0,
-                                0x43,
-                                0x10,
-                                0x3E,
-                                0x7F,
-                                0x10,
-                                0x00,
-                                0x00,
-                                index as u8,
-                                0x02,
-                                0x00,
+                                0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x40, 0x00, index,
                             ];
-                            rename_sysex.extend_from_slice(&name_bytes);
+                            rename_sysex.extend_from_slice(target_name_padded.as_bytes());
                             rename_sysex.push(0xF7);
+                            scheduler_save.enqueue(rename_sysex, 1).await;
 
-                            let name_str = String::from_utf8_lossy(&name_bytes).into_owned();
-                            state.scene_manager.scenes[index as usize] =
-                                Some(crate::scene_manager::SceneData {
-                                    index: index as u8,
-                                    name: name_str,
-                                });
+                            {
+                                let mut state = state_save.write().await;
+                                state.scene_manager.scenes[index as usize] =
+                                    Some(crate::scene_manager::SceneData {
+                                        index,
+                                        name: target_name,
+                                    });
+                                state.scene_manager.set_active_scene(index);
+                                let _ = io_save.emit(
+                                    "currentScene",
+                                    &state.scene_manager.current_scene,
+                                );
+                                let _ = io_save.emit(
+                                    "scenesUpdated",
+                                    &state.scene_manager.get_state(),
+                                );
+                            }
+
+                            tokio::time::sleep(std::time::Duration::from_millis(700)).await;
+                        }
+
+                        // Re-emit scenes state for consistency
+                        {
+                            let state = state_save.read().await;
+                            let _ = io_save.emit("currentScene", &state.scene_manager.current_scene);
+                            let _ = io_save.emit("scenesUpdated", &state.scene_manager.get_state());
                         }
                     }
+                },
+            );
+
+            // --- DELETE SCENE ---
+            let scheduler_delete = scheduler_socket.clone();
+            let state_delete = global_state_socket.clone();
+            let io_delete = io.clone();
+            socket.on(
+                "deleteScene",
+                move |_socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
+                        let delete_sysex = vec![
+                            0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x60, 0x00, index as u8, 0xF7,
+                        ];
+                        scheduler_delete.enqueue(delete_sysex, 1).await;
+
+                        let mut state = state_delete.write().await;
+                        state.scene_manager.scenes[index as usize] = None;
+                        let _ = io_delete.emit("scenesUpdated", &state.scene_manager.get_state());
+                    }
+                },
+            );
+
+            // --- REQUEST CONNECT ---
+            let conn_mgr_rcon = conn_mgr_handler.clone();
+            let state_rcon = global_state_socket.clone();
+            socket.on(
+                "requestConnect",
+                move |socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    let in_idx = data.get("inIdx").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
+                    let out_idx = data.get("outIdx").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
+
+                    if conn_mgr_rcon.is_connected() {
+                        let state = state_rcon.read().await;
+                        let _ = socket.emit("sync", &serde_json::to_value(&*state).unwrap_or_default());
+                        let _ = socket.emit("scenesUpdated", &state.scene_manager.get_state());
+                        let _ = socket.emit("connectResult", &serde_json::json!({ "success": true }));
+                        return;
+                    }
+
+                    conn_mgr_rcon.executar_conexao(in_idx, out_idx).await;
+                    let _ = socket.emit("connectResult", &serde_json::json!({ "success": true }));
+                },
+            );
+
+            // --- UPDATE NAME ---
+            let state_name = global_state_socket.clone();
+            let io_name = io.clone();
+            socket.on(
+                "updateName",
+                move |_socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    let channel = data.get("channel").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
+                    let name = data.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                    let limited = if name.len() > 4 { name[..4].to_string() } else { name };
+                    let padded = format!("{: <4}", limited);
+                    let chars: Vec<String> = padded.chars().map(|c| c.to_string()).collect();
+
+                    {
+                        let mut state = state_name.write().await;
+                        if channel <= 31 {
+                            if let Some(ch) = state.channels.get_mut(&channel) {
+                                ch.name = limited.clone();
+                                ch.name_chars = chars.clone();
+                            }
+                        } else if (60..=67).contains(&channel) {
+                            let local = 32 + (channel - 60) / 2;
+                            if let Some(ch) = state.channels.get_mut(&local) {
+                                ch.name = limited.clone();
+                                if ch.name_chars.len() < 4 { ch.name_chars.resize(4, " ".to_string()); }
+                                for (i, c) in chars.iter().take(4).enumerate() {
+                                    ch.name_chars[i] = c.clone();
+                                }
+                            }
+                        } else if (36..=43).contains(&channel) {
+                            let local = channel - 36;
+                            if let Some(m) = state.mixes.get_mut(&local) {
+                                m.name = limited.clone();
+                                m.name_chars = chars.clone();
+                            }
+                        } else if (44..=51).contains(&channel) {
+                            let local = channel - 44;
+                            if let Some(b) = state.buses.get_mut(&local) {
+                                b.name = limited.clone();
+                                b.name_chars = chars.clone();
+                            }
+                        } else if channel == 52 {
+                            state.master.name = limited.clone();
+                            state.master.name_chars = chars;
+                        }
+                    }
+
+                    let _ = io_name.emit("updateName", &serde_json::json!({
+                        "channel": channel,
+                        "name": limited
+                    }));
+                },
+            );
+
+            // --- FORCE SYNC ---
+            let conn_mgr_fsync = conn_mgr_handler.clone();
+            socket.on(
+                "forceSync",
+                move |_socket: socketioxide::extract::SocketRef,
+                      _data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    conn_mgr_fsync.trigger_sync(true, "is_scene");
+                },
+            );
+
+            // --- REFRESH NAMES ---
+            let conn_mgr_rname = conn_mgr_handler.clone();
+            socket.on(
+                "refreshNames",
+                move |_socket: socketioxide::extract::SocketRef,
+                      _data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    conn_mgr_rname.sync_names();
+                },
+            );
+
+            // --- SYNC NAMES ONLY ---
+            let sync_mgr_names = sync_manager_socket.clone();
+            socket.on(
+                "syncNamesOnly",
+                move |_socket: socketioxide::extract::SocketRef,
+                      _data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    sync_mgr_names.sync_names_only();
+                },
+            );
+
+            // --- TOGGLE DEMO ---
+            let _conn_mgr_demo = conn_mgr_handler.clone();
+            socket.on(
+                "toggleDemo",
+                move |_socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    if let Some(enabled) = data.get("enabled").and_then(|v| v.as_bool()) {
+                        tracing::info!("toggleDemo: {} (implementar)", enabled);
+                    }
+                },
+            );
+
+            // --- UPDATE METER CONFIG ---
+            socket.on(
+                "updateMeterConfig",
+                move |_socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    if let Some(opacity) = data.get("opacity").and_then(|v| v.as_f64()) {
+                        tracing::info!("updateMeterConfig: opacity={} (config save pendente)", opacity);
+                    }
+                },
+            );
+
+            // --- UPDATE OPEN BROWSER ---
+            socket.on(
+                "updateOpenBrowser",
+                move |_socket: socketioxide::extract::SocketRef,
+                      data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    if let Some(enabled) = data.get("enabled").and_then(|v| v.as_bool()) {
+                        tracing::info!("updateOpenBrowser: {} (config save pendente)", enabled);
+                    }
+                },
+            );
+
+            // --- RESTART SERVER ---
+            socket.on(
+                "restartServer",
+                move |_socket: socketioxide::extract::SocketRef,
+                      _data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    info!("🔄 Reiniciando servidor...");
+                    if let Ok(exe) = std::env::current_exe() {
+                        if let Err(e) = std::process::Command::new(exe).spawn() {
+                            tracing::error!("Falha ao reiniciar: {}", e);
+                        }
+                    }
+                    std::process::exit(0);
+                },
+            );
+
+            // --- RESET DMX ---
+            socket.on(
+                "resetDmx",
+                move |_socket: socketioxide::extract::SocketRef,
+                      _data: socketioxide::extract::Data<serde_json::Value>| async move {
+                    let root = std::env::current_dir()
+                        .unwrap()
+                        .parent()
+                        .unwrap()
+                        .to_string_lossy()
+                        .to_string();
+                    dmx::reset_dmx_system(root);
                 },
             );
 
