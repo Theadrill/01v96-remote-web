@@ -380,6 +380,11 @@ async fn queue_all_params_inner(
     }
 
     info!("📦 [Sync] {} requests preparados. Enfileirando em lote...", requests.len());
+    info!("📦 [Sync] Primeiros 5 requests:");
+    for (i, req) in requests.iter().take(5).enumerate() {
+        let hex: String = req.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ");
+        info!("📦 [Sync]   [{}] {} bytes: {}", i, req.len(), hex);
+    }
 
     // Batch enqueue — all at once (single lock), matching Node.js synchronous behavior
     sched.enqueue_batch(requests, 1).await;
