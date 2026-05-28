@@ -846,6 +846,8 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             let in_idx = found_in.unwrap();
             let out_idx = found_out.unwrap();
+            // Delay para garantir que portas MIDI foram liberadas pelo processo anterior (restart)
+            tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
             conn_mgr
                 .try_boot_connect(in_idx, out_idx)
                 .await;

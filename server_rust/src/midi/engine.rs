@@ -1,6 +1,7 @@
 use midir::{MidiInput, MidiInputConnection, MidiOutput, MidiOutputConnection};
+use std::time::Instant;
 use tokio::sync::mpsc;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use super::assembler::MidiAssembler;
 
@@ -9,6 +10,7 @@ pub struct MidiEngine {
     output_conn: Option<MidiOutputConnection>,
     pub current_in_idx: i32,
     pub current_out_idx: i32,
+    last_send_error: Option<Instant>,
 }
 
 impl MidiEngine {
@@ -18,6 +20,7 @@ impl MidiEngine {
             output_conn: None,
             current_in_idx: -1,
             current_out_idx: -1,
+            last_send_error: None,
         }
     }
 
@@ -93,9 +96,10 @@ impl MidiEngine {
                     let complete_messages = ass.process_input(message);
                     drop(ass);
                     for msg in complete_messages {
-                        let tx = tx_incoming.clone();
-                        if let Err(e) = tx.blocking_send(msg) {
-                            error!("Erro ao enviar mensagem MIDI: {}", e);
+                        match tx_incoming.try_send(msg) {
+                            Ok(()) => {}
+                            Err(mpsc::error::TrySendError::Full(_)) => {}
+                            Err(mpsc::error::TrySendError::Closed(_)) => {}
                         }
                     }
                 },
@@ -120,7 +124,14 @@ impl MidiEngine {
     pub fn send(&mut self, message: &[u8]) {
         if let Some(out) = &mut self.output_conn {
             if let Err(e) = out.send(message) {
-                error!("Erro ao enviar mensagem MIDI: {}", e);
+                let now = Instant::now();
+                let should_log = self.last_send_error
+                    .map(|t| now.duration_since(t).as_secs() >= 3)
+                    .unwrap_or(true);
+                if should_log {
+                    warn!("Erro ao enviar MIDI (throttled): {}", e);
+                    self.last_send_error = Some(now);
+                }
             }
         }
     }
