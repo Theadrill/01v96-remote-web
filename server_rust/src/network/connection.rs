@@ -189,7 +189,8 @@ impl ConnectionManager {
                     }
                 }
 
-                if !this.is_fully_synced.load(Ordering::SeqCst) { continue; }
+                let synced = this.sync_manager.is_ready();
+                if !synced { continue; }
 
                 this.scheduler.enqueue(midi::master_meter::MasterMeter::build_request(), 2).await;
                 this.scheduler.enqueue(vec![240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247], 2).await;
