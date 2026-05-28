@@ -228,9 +228,29 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let state_arc_in = global_state.clone();
     let sync_counter_in = sync_counter.clone();
     let conn_mgr_recv = conn_mgr.clone();
+    let recv_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let parsed_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let recv_count_log = recv_count.clone();
+    let parsed_count_log = parsed_count.clone();
+    tokio::spawn(async move {
+        let report_interval = tokio::time::interval(std::time::Duration::from_secs(5));
+        tokio::pin!(report_interval);
+        loop {
+            tokio::select! {
+                _ = report_interval.tick() => {
+                    let r = recv_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
+                    let p = parsed_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
+                    if r > 0 {
+                        tracing::info!("📥 [RX] +{} msgs recebidos na fila, +{} parseados", r, p);
+                    }
+                }
+            }
+        }
+    });
     tokio::spawn(async move {
             let mut assembler = midi::MidiAssembler::new();
             while let Some(msg) = midi_in_rx.recv().await {
+                recv_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                 conn_mgr_recv.reset_activity();
                 let packets = assembler.process_input(&msg);
                 for packet in packets {
@@ -251,6 +271,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
                             current_scene_emission = state.scene_manager.current_scene.as_ref()
                                 .and_then(|cs| serde_json::to_value(cs).ok());
                         } else if let Some(parsed) = midi::protocol::parse_message(&packet) {
+                            parsed_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                             state.apply_midi(&parsed);
 
                             match parsed {
