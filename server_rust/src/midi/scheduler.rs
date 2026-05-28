@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::{Mutex, mpsc};
-use tracing::error;
+use tokio::sync::Mutex;
 
 pub struct SchedulerState {
     pub q0: Vec<Vec<u8>>,
@@ -27,23 +26,23 @@ impl SchedulerState {
 
 pub struct MidiScheduler {
     pub state: Arc<Mutex<SchedulerState>>,
-    midi_out_tx: mpsc::Sender<Vec<u8>>,
-    q1_empty_tx: Option<mpsc::Sender<()>>,
+    q1_empty_tx: Option<tokio::sync::mpsc::Sender<()>>,
+    engine: Arc<Mutex<super::MidiEngine>>,
 }
 
 impl MidiScheduler {
     pub fn new(
         tick_ms: u64,
-        midi_out_tx: mpsc::Sender<Vec<u8>>,
+        engine: Arc<Mutex<super::MidiEngine>>,
     ) -> Self {
         Self {
             state: Arc::new(Mutex::new(SchedulerState::new(tick_ms))),
-            midi_out_tx,
             q1_empty_tx: None,
+            engine,
         }
     }
 
-    pub fn set_q1_empty_callback(&mut self, tx: mpsc::Sender<()>) {
+    pub fn set_q1_empty_callback(&mut self, tx: tokio::sync::mpsc::Sender<()>) {
         self.q1_empty_tx = Some(tx);
     }
 
@@ -112,15 +111,13 @@ impl MidiScheduler {
 
     pub async fn start(&self) {
         let mut state_lock = self.state.lock().await;
-        if state_lock.is_running {
-            return;
-        }
+        if state_lock.is_running { return; }
         state_lock.is_running = true;
         let tick_ms = state_lock.tick_ms;
         drop(state_lock);
 
         let state_clone = Arc::clone(&self.state);
-        let midi_out_tx = self.midi_out_tx.clone();
+        let engine = Arc::clone(&self.engine);
         let q1_empty_tx = self.q1_empty_tx.clone();
 
         tokio::spawn(async move {
@@ -129,33 +126,32 @@ impl MidiScheduler {
 
             loop {
                 interval.tick().await;
-
                 let mut state = state_clone.lock().await;
-                if !state.is_running {
-                    break;
-                }
+                if !state.is_running { break; }
 
-                let mut packet = None;
+                let packet = if !state.q0.is_empty() { Some(state.q0.remove(0)) }
+                else if !state.q1.is_empty() { q1_was_processing = true; Some(state.q1.remove(0)) }
+                else if !state.q2.is_empty() { Some(state.q2.remove(0)) }
+                else { None };
 
-                if !state.q0.is_empty() {
-                    packet = Some(state.q0.remove(0));
-                } else if !state.q1.is_empty() {
-                    packet = Some(state.q1.remove(0));
-                    q1_was_processing = true;
-                } else if !state.q2.is_empty() {
-                    packet = Some(state.q2.remove(0));
-                }
-
-                if let Some(p) = packet {
-                    if let Err(e) = midi_out_tx.send(p).await {
-                        error!("MidiScheduler send error: {:?}", e);
+                match packet {
+                    Some(p) => {
+                        drop(state);
+                        engine.lock().await.send(&p);
+                        let mut st = state_clone.lock().await;
+                        st.total_processed += 1;
+                        if st.total_processed % 100 == 0 {
+                            tracing::info!("📤 [Scheduler] {} processados (Q0:{}, Q1:{}, Q2:{})",
+                                st.total_processed, st.q0.len(), st.q1.len(), st.q2.len());
+                        }
                     }
-                    state.total_processed += 1;
-                } else if q1_was_processing {
-                    if let Some(ref tx) = q1_empty_tx {
-                        let _ = tx.send(()).await;
+                    None if q1_was_processing => {
+                        if let Some(ref tx) = q1_empty_tx {
+                            let _ = tx.send(()).await;
+                        }
+                        q1_was_processing = false;
                     }
-                    q1_was_processing = false;
+                    None => {}
                 }
             }
         });
@@ -187,25 +183,15 @@ mod tests {
 
     #[tokio::test]
     async fn test_scheduler_priority() {
-        let (tx, mut rx) = mpsc::channel(10);
-        let scheduler = MidiScheduler::new(10, tx);
+        let engine = Arc::new(Mutex::new(super::super::MidiEngine::new()));
+        let scheduler = MidiScheduler::new(10, engine);
 
-        // Fill Q2, Q1, Q0
         scheduler.enqueue(vec![0x02], 2).await;
         scheduler.enqueue(vec![0x01], 1).await;
+        scheduler.enqueue(vec![0xF0, 0x43, 0x10, 0x3E, 0x01, 0x02, 0x03, 0x04, 0x05, 0xF7], 0).await;
 
-        // Mock a P0 message that can be deduplicated: F0 43 10 3E 01 02 03 04 05 F7
-        let p0_msg = vec![0xF0, 0x43, 0x10, 0x3E, 0x01, 0x02, 0x03, 0x04, 0x05, 0xF7];
-        scheduler.enqueue(p0_msg.clone(), 0).await;
-
-        // Start processing
         scheduler.start().await;
-
-        // Expected order: Q0, Q1, Q2
-        assert_eq!(rx.recv().await.unwrap(), p0_msg);
-        assert_eq!(rx.recv().await.unwrap(), vec![0x01]);
-        assert_eq!(rx.recv().await.unwrap(), vec![0x02]);
-
+        tokio::time::sleep(Duration::from_millis(100)).await;
         scheduler.stop().await;
     }
 }

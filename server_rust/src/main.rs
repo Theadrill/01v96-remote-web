@@ -63,24 +63,15 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
     let sync_counter = Arc::new(midi::SyncCounter::new());
 
-    let (midi_out_tx, mut midi_out_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(100);
+    let engine = Arc::new(tokio::sync::Mutex::new(midi::MidiEngine::new()));
+
     let scheduler = Arc::new(midi::MidiScheduler::new(
         app_config.scheduler_tick_ms,
-        midi_out_tx,
+        engine.clone(),
     ));
     scheduler.start().await;
 
     let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(256);
-
-    let engine = Arc::new(tokio::sync::Mutex::new(midi::MidiEngine::new()));
-
-    // Forwarder: scheduler output -> engine
-    let engine_fwd = engine.clone();
-    tokio::spawn(async move {
-        while let Some(msg) = midi_out_rx.recv().await {
-            engine_fwd.lock().await.send(&msg);
-        }
-    });
 
     let (layer, io) = SocketIo::new_layer();
 
