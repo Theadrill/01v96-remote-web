@@ -57,6 +57,7 @@ impl SyncManager {
         let _sync_type = sync_type.to_string();
 
         tokio::spawn(async move {
+            tracing::info!("🔄 [SyncManager] Task de sync iniciada");
             let _ = io.emit(
                 "syncStatus",
                 &serde_json::json!({ "active": true, "type": _sync_type }),
@@ -81,6 +82,9 @@ impl SyncManager {
                     0xF0, 0x43, 0x20, 0x7E, 0x4C, 0x4D, 0x20, 0x20, 0x38, 0x43, 0x39, 0x33, 0x6D, 0x00, i, 0xF7,
                 ];
                 sched.enqueue(req, 1).await;
+                if i % 20 == 0 {
+                    tracing::info!("⏳ [Scene Manager] Progresso: {}/100...", i);
+                }
                 tokio::time::sleep(std::time::Duration::from_millis(50)).await;
             }
 
@@ -238,11 +242,15 @@ impl SyncManager {
 
             sched.enqueue_batch(requests, 1).await;
 
+            let mut last_log = 0u32;
             loop {
-                tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+                tokio::time::sleep(std::time::Duration::from_millis(500)).await;
                 let st = sched.state.lock().await;
-                if st.q0.is_empty() && st.q1.is_empty() {
-                    break;
+                let remaining = st.q0.len() + st.q1.len();
+                if remaining == 0 { break; }
+                if last_log != remaining as u32 {
+                    tracing::info!("⏳ [SyncNames] Aguardando {} requests...", remaining);
+                    last_log = remaining as u32;
                 }
             }
 
@@ -401,10 +409,16 @@ async fn queue_all_params_inner(
     sched.enqueue_batch(requests, 1).await;
 
     // Wait for Q0+Q1 to drain
+    let mut last_log = 0u32;
     loop {
-        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
         let st = sched.state.lock().await;
-        if st.q0.is_empty() && st.q1.is_empty() { break; }
+        let remaining = st.q0.len() + st.q1.len();
+        if remaining == 0 { break; }
+        if last_log != remaining as u32 {
+            tracing::info!("⏳ [Sync] Aguardando {} requests na fila...", remaining);
+            last_log = remaining as u32;
+        }
     }
 
     // Wait a bit more for last responses to arrive
