@@ -276,13 +276,20 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
                             match parsed {
                                 midi::protocol::ParsedMidi::MeterData { levels, .. } => {
-                                    let mut buf = vec![0u8; 40];
-                                    for (ch, val) in levels.iter() {
-                                        if *ch < 40 { buf[*ch] = *val; }
+                                    if conn_mgr_recv.is_fully_synced() {
+                                        let mut buf = vec![0u8; 40];
+                                        for (ch, val) in levels.iter() {
+                                            if *ch < 40 { buf[*ch] = *val; }
+                                        }
+                                        meter_emission = Some(buf);
                                     }
-                                    meter_emission = Some(buf);
                                 }
                                 midi::protocol::ParsedMidi::ControlChange { msg_type, channel, value } => {
+                                    static UPDATE_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+                                    let uc = UPDATE_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                                    if uc < 20 || uc % 200 == 0 {
+                                        tracing::info!("📡 [UPDATE] #{uc}: type={}, ch={}, val={}", msg_type, channel, value);
+                                    }
                                     emission = Some(("update", serde_json::json!({
                                         "type": msg_type,
                                         "channel": channel,
