@@ -101,7 +101,8 @@ pub fn build_change(
     packet.push(coords[0]);
     packet.push(coords[1]);
     packet.push(coords[2]);
-    packet.push(coords[3] + channel);
+    packet.push(coords[3]);
+    packet.push(channel);
 
     let data_bytes = convert_to_bytes(value, &converter);
     packet.extend_from_slice(&data_bytes);
@@ -120,7 +121,8 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     packet.push(coords[0]);
     packet.push(coords[1]);
     packet.push(coords[2]);
-    packet.push(coords[3] + channel);
+    packet.push(coords[3]);
+    packet.push(channel);
 
     packet.extend_from_slice(FOOTER);
     Some(packet)
