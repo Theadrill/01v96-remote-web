@@ -205,7 +205,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
     if is_master_meter || is_universal_meter {
         let mut levels = std::collections::HashMap::new();
-        let data_start: usize = if is_master_meter { 9 } else { 8 };
+        let data_start = 9;
         let is_master = element == 4;
         let data_bytes_available = (message.len() - 1).saturating_sub(data_start);
         let num_channels = data_bytes_available / 2;
