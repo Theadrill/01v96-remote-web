@@ -746,7 +746,26 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         .layer(layer);
 
     let port = app_config.port;
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
+    let listener = {
+        let mut retries = 0;
+        loop {
+            match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await {
+                Ok(l) => break l,
+                Err(e) if retries < 10 => {
+                    retries += 1;
+                    tracing::warn!(
+                        "⚠️ Porta {} ocupada (tentativa {}/10): {}. Aguardando 1s...",
+                        port, retries, e
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                }
+                Err(e) => {
+                    tracing::error!("❌ Falha ao abrir porta {}: {}", port, e);
+                    return Err(e.into());
+                }
+            }
+        }
+    };
 
     info!(
         "🎧 Servidor estatico e WebSocket rodando em http://localhost:{}",
