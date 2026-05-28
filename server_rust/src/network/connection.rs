@@ -251,6 +251,9 @@ impl ConnectionManager {
 
         if !self.is_connected() { return; }
 
+        // Aguarda o MIDI reader processar o backlog acumulado durante o cooldown
+        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
         self.is_fully_synced.store(false, Ordering::SeqCst);
         info!("🔄 Iniciando sincronia completa...");
         self.sync_manager.reset();

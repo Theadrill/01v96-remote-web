@@ -63,12 +63,21 @@ impl SyncManager {
                 &serde_json::json!({ "active": true, "type": _sync_type }),
             ).await;
 
-            // Phase 1: clear scene state (short lock)
+            // Phase 1: clear scene state (short lock, with timeout)
             {
-                let mut state_guard = state.write().await;
-                state_guard.scene_manager.scenes = vec![None; 100];
-                state_guard.scene_manager.current_scene = None;
-                state_guard.scene_manager.is_syncing = true;
+                match tokio::time::timeout(
+                    std::time::Duration::from_secs(3),
+                    state.write()
+                ).await {
+                    Ok(mut state_guard) => {
+                        state_guard.scene_manager.scenes = vec![None; 100];
+                        state_guard.scene_manager.current_scene = None;
+                        state_guard.scene_manager.is_syncing = true;
+                    }
+                    Err(_) => {
+                        tracing::warn!("⚠️ [SyncManager] Timeout ao adquirir write lock para Phase 1 — continuando sem limpar cenas");
+                    }
+                }
             }
 
             // Phase 2: send all scene requests (no lock — allows MIDI receive loop to process responses)
