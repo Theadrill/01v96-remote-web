@@ -13,6 +13,7 @@ pub struct TrayApp {
     pub browser_id: MenuId,
     pub restart_id: MenuId,
     pub quit_id: MenuId,
+    port: u16,
 }
 
 pub fn load_icon(path: &Path) -> Result<Icon, Box<dyn std::error::Error>> {
@@ -23,7 +24,7 @@ pub fn load_icon(path: &Path) -> Result<Icon, Box<dyn std::error::Error>> {
 }
 
 impl TrayApp {
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn new(port: u16) -> Result<Self, Box<dyn std::error::Error>> {
         let icon_path = Path::new("..").join("public").join("favicon.ico");
         let icon = load_icon(&icon_path).unwrap_or_else(|_| {
             Icon::from_rgba(vec![0; 4 * 16 * 16], 16, 16).unwrap()
@@ -49,7 +50,7 @@ impl TrayApp {
 
         let tray_icon = TrayIconBuilder::new()
             .with_menu(Box::new(tray_menu))
-            .with_tooltip("01V96 Control - Conectado à 01V96")
+            .with_tooltip("01V96 Control")
             .with_icon(icon)
             .build()?;
 
@@ -59,6 +60,7 @@ impl TrayApp {
             browser_id,
             restart_id,
             quit_id,
+            port,
         })
     }
 
@@ -67,16 +69,16 @@ impl TrayApp {
             println!("Saindo...");
             std::process::exit(0);
         } else if event.id == self.browser_id {
-            println!("Abrindo navegador...");
+            let url = format!("http://localhost:{}", self.port);
+            println!("Abrindo navegador: {}", url);
             #[cfg(target_os = "windows")]
-            let _ = std::process::Command::new("cmd").args(&["/C", "start", "http://localhost:3001"]).spawn();
+            let _ = std::process::Command::new("cmd").args(&["/C", "start", &url]).spawn();
             #[cfg(target_os = "macos")]
-            let _ = std::process::Command::new("open").arg("http://localhost:3001").spawn();
+            let _ = std::process::Command::new("open").arg(&url).spawn();
             #[cfg(target_os = "linux")]
-            let _ = std::process::Command::new("xdg-open").arg("http://localhost:3001").spawn();
+            let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
         } else if event.id == self.connect_id {
             println!("Reconectando à mesa...");
-            // Ideally we pass a channel sender to notify the tokio thread
         } else if event.id == self.restart_id {
             println!("Reiniciando servidor...");
             let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
@@ -114,4 +116,3 @@ impl TrayApp {
         }
     }
 }
-

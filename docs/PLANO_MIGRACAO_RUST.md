@@ -3,10 +3,10 @@
 | Campo | Valor |
 |---|---|
 | **Versao do plano** | 4.0 |
-| **Progresso global** | ~80% |
-| **Ultima atividade** | 2026-05-28 — Fase 10 concluida |
-| **Ultimo passo concluido** | Fase 10: Connection Manager (radar, watchdog, meters) |
-| **Proximo passo planejado** | Fase 11: Handlers socket faltantes
+| **Progresso global** | ~90% |
+| **Ultima atividade** | 2026-05-28 — Fase 15 concluida (parcial) |
+| **Ultimo passo concluido** | Fase 12: Modo Demo + Fase 11: Handlers + Fase 15: Tray |
+| **Proximo passo planejado** | Fase 16: Limpeza final (warnings, clippy)
 
 Este documento e a **referencia arquitetonica tecnica definitiva** para a migracao do servidor Node.js atual para **Rust**, focado em performance absoluta e zero stutters. Ele contempla **TODAS** as funcionalidades existentes no Node.js, sem excecoes.
 

@@ -28,7 +28,7 @@ struct PanData {
 
 mod tray;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let tray_app = tray::TrayApp::new()?;
+    let tray_app = tray::TrayApp::new(4000)?;
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
         let _ = rt.block_on(async_main());
@@ -781,13 +781,18 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
             );
 
             // --- TOGGLE DEMO ---
-            let _conn_mgr_demo = conn_mgr_handler.clone();
+            let conn_mgr_demo = conn_mgr_handler.clone();
             socket.on(
                 "toggleDemo",
                 move |_socket: socketioxide::extract::SocketRef,
                       data: socketioxide::extract::Data<serde_json::Value>| async move {
                     if let Some(enabled) = data.get("enabled").and_then(|v| v.as_bool()) {
-                        tracing::info!("toggleDemo: {} (implementar)", enabled);
+                        if enabled {
+                            conn_mgr_demo.enable_demo();
+                        } else {
+                            conn_mgr_demo.disable_demo();
+                            conn_mgr_demo.iniciar_busca_automatica();
+                        }
                     }
                 },
             );
@@ -890,6 +895,16 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         "🎧 Servidor estatico e WebSocket rodando em http://localhost:{}",
         port
     );
+
+    if app_config.open_browser_startup {
+        let url = format!("http://localhost:{}", port);
+        tokio::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            let _ = std::process::Command::new("cmd")
+                .args(&["/C", "start", &url])
+                .spawn();
+        });
+    }
 
     axum::serve(listener, app).await?;
 

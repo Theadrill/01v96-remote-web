@@ -22,6 +22,7 @@ pub struct ConnectionManager {
     last_activity: Arc<std::sync::Mutex<u64>>,
     busca_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
     meter_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
+    demo_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
 }
 
 impl ConnectionManager {
@@ -49,6 +50,7 @@ impl ConnectionManager {
             last_activity: Arc::new(std::sync::Mutex::new(0)),
             busca_handle: Arc::new(std::sync::Mutex::new(None)),
             meter_handle: Arc::new(std::sync::Mutex::new(None)),
+            demo_handle: Arc::new(std::sync::Mutex::new(None)),
         })
     }
 
@@ -281,6 +283,79 @@ impl ConnectionManager {
     pub fn sync_names(&self) {
         self.is_fully_synced.store(false, Ordering::SeqCst);
         self.sync_manager.sync_names_only();
+    }
+
+    pub fn enable_demo(self: &Arc<Self>) {
+        self.is_connected.store(true, Ordering::SeqCst);
+        self.is_fully_synced.store(true, Ordering::SeqCst);
+        self.emit_connection_state();
+
+        let this_spawn = self.clone();
+        let this = self.clone();
+        let handle = tokio::spawn(async move {
+            let mut ticker = tokio::time::interval(std::time::Duration::from_millis(33));
+            let mut phases: Vec<f64>; let mut phases2: Vec<f64>; let mut speeds: Vec<f64>;
+            {
+                let mut rng = rand::rng();
+                use rand::RngExt;
+                phases = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
+                phases2 = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
+                speeds = (0..32).map(|_| 0.8 + rng.random_range(0.0..4.0)).collect();
+            }
+            let bases: [f64; 32] = [
+                26.0,24.0,22.0,23.0,25.0,23.0,21.0,20.0,26.0,24.0,19.0,18.0,20.0,21.0,17.0,18.0,
+                22.0,19.0,20.0,18.0,18.0,20.0,17.0,21.0,22.0,19.0,20.0,18.0,16.0,21.0,19.0,17.0,
+            ];
+            let mut t: f64 = 0.0;
+            let mut energy: f64 = 0.9;
+            let mut energy_target: f64 = 0.9;
+            let mut last_emit = std::time::Instant::now();
+            let io = this_spawn.io.clone();
+
+            loop {
+                ticker.tick().await;
+                t += 0.15;
+
+                let buf = {
+                    let mut rng = rand::rng();
+                    use rand::RngExt;
+                    if rng.random::<f64>() < 0.008 { energy_target = 0.7 + rng.random_range(0.0..0.3); }
+                    energy += (energy_target - energy) * 0.03;
+                    let mut buf = vec![0.0; 33];
+                    for i in 0..32 {
+                        let s = speeds[i];
+                        let w1 = (t * s + phases[i]).sin();
+                        let w2 = (t * s * 2.3 + phases2[i]).sin() * 0.35;
+                        let w3 = (t * s * 0.4 + phases[i] * 0.7).sin() * 0.25;
+                        let noise = (rng.random::<f64>() - 0.5) * 3.0;
+                        let level = (bases[i] * energy) + ((w1+w2+w3) * 9.0 * energy) + noise;
+                        buf[i] = (level.min(31.0).max(0.0)).round();
+                    }
+                    let mw = (t * 0.9).sin() * 2.5 + (t * 1.7).sin() * 2.0;
+                    let mlevel = (26.0 * energy + mw + (rng.random::<f64>() - 0.5) * 2.0).min(31.0).max(0.0);
+                    buf[32] = mlevel.round();
+                    buf
+                };
+                let now = std::time::Instant::now();
+                if now.duration_since(last_emit).as_millis() >= 30 {
+                    let _ = io.emit("meterData", &buf).await;
+                    last_emit = now;
+                }
+            }
+        });
+
+        if let Ok(mut guard) = this.demo_handle.lock() {
+            if let Some(old) = guard.take() { old.abort(); }
+            *guard = Some(handle);
+        }
+    }
+
+    pub fn disable_demo(self: &Arc<Self>) {
+        self.is_connected.store(false, Ordering::SeqCst);
+        if let Ok(mut guard) = self.demo_handle.lock() {
+            if let Some(h) = guard.take() { h.abort(); }
+        }
+        self.emit_connection_state();
     }
 
     fn now_ms() -> u64 {
