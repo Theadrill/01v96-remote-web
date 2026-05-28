@@ -747,20 +747,35 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
     let port = app_config.port;
     let listener = {
+        use socket2::{Domain, Protocol, Socket, Type};
         let mut retries = 0;
         loop {
-            match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await {
-                Ok(l) => break l,
-                Err(e) if retries < 10 => {
-                    retries += 1;
-                    tracing::warn!(
-                        "⚠️ Porta {} ocupada (tentativa {}/10): {}. Aguardando 1s...",
-                        port, retries, e
-                    );
-                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            match Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::TCP)) {
+                Ok(socket) => {
+                    let _ = socket.set_reuse_address(true);
+                    match socket.bind(&socket2::SockAddr::from(
+                        format!("0.0.0.0:{}", port).parse::<std::net::SocketAddr>().unwrap()
+                    )) {
+                        Ok(()) => {
+                            let _ = socket.listen(1024);
+                            break tokio::net::TcpListener::from_std(socket.into()).unwrap();
+                        }
+                        Err(e) if retries < 10 => {
+                            retries += 1;
+                            tracing::warn!(
+                                "⚠️ Porta {} ocupada (tentativa {}/10): {}. Aguardando 1s...",
+                                port, retries, e
+                            );
+                            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                        }
+                        Err(e) => {
+                            tracing::error!("❌ Falha ao abrir porta {}: {}", port, e);
+                            return Err(e.into());
+                        }
+                    }
                 }
                 Err(e) => {
-                    tracing::error!("❌ Falha ao abrir porta {}: {}", port, e);
+                    tracing::error!("❌ Falha ao criar socket: {}", e);
                     return Err(e.into());
                 }
             }

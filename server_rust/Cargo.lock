@@ -2834,6 +2834,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "socket2",
  "socketioxide",
  "tokio",
  "tower-http",
