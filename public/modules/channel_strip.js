@@ -728,7 +728,9 @@ function initUI() {
     }
 
     let masterHtml = '';
-    if (!musicianMode && !technicianMixMode) {
+    if (technicianMixMode) {
+        masterHtml = createOutputStrip(activeMix - 1, 'mix');
+    } else if (!musicianMode) {
         masterHtml = createChannelStrip(0, true);
     }
 
@@ -740,7 +742,7 @@ function initUI() {
     }
 
     const masterContainer = document.getElementById('master-container');
-    if (layoutMode === 'desktop' && !musicianMode && !technicianMixMode) {
+    if (layoutMode === 'desktop' && !musicianMode) {
         container.innerHTML = html;
         if (masterContainer) masterContainer.innerHTML = masterHtml;
     } else {
@@ -772,6 +774,12 @@ function initUI() {
             const nameEl = document.getElementById(`name${i}`);
             if (nameEl) nameEl.innerText = state.name || `CH ${i + 1}`;
         }
+    }
+
+    // CORREÇÃO: Atualiza o fader master do Mix se estivermos em modo Mix
+    if (technicianMixMode || musicianMode) {
+        const mixIdx = activeMix - 1;
+        updateUI(`m${mixIdx}`, mixesState[mixIdx].value, mixesState[mixIdx].on, undefined);
     }
     if (!technicianMixMode || !outsMode) {
         updateUI('master', masterState.value, masterState.on, undefined);

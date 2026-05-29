@@ -10,6 +10,8 @@ body {
     background: #111;
     color: #fff;
     height: 100dvh;
+    width: 100vw;
+    min-width: 100vw;
     overflow: hidden;
     display: flex;
     -webkit-touch-callout: none;
@@ -35,6 +37,7 @@ body.layout-horizontal {
     order: 1;
     scrollbar-width: none;
     min-height: 0;
+    min-width: 0;
     touch-action: pan-x;
     contain: layout style;
 }
@@ -964,6 +967,8 @@ body.layout-desktop .faders-area {
     user-select: none;
     scrollbar-width: thin;
     scrollbar-color: #4a90e2 #1a1a1a;
+    flex: 1 1 0%;
+    min-width: 0;
 }
 
 body.layout-desktop .faders-area.is-grabbing {
