@@ -10,7 +10,10 @@
     // 1. Execução (Recebe config do slot e config global do plugin)
     async function execute(slotIndex, slotConfig, globalConfig) {
         const actions = slotConfig || { scenes: [], extras: [] };
-        const host = globalConfig || { ip: '127.0.0.1', port: 5000 };
+        const host = {
+            ip: (globalConfig && globalConfig.ip && globalConfig.ip !== 'undefined') ? globalConfig.ip : '127.0.0.1',
+            port: (globalConfig && globalConfig.port && !isNaN(globalConfig.port)) ? globalConfig.port : 5000
+        };
         const baseUrl = `http://${host.ip}:${host.port}`;
 
         // Executa todas cenas ativadas no slot
@@ -70,7 +73,10 @@
             scenes: (slotConfig && Array.isArray(slotConfig.scenes)) ? [...slotConfig.scenes] : [],
             extras: (slotConfig && Array.isArray(slotConfig.extras)) ? [...slotConfig.extras] : []
         };
-        activeGlobalConfig = JSON.parse(JSON.stringify(globalConfig || { ip: '127.0.0.1', port: 5000 }));
+        activeGlobalConfig = {
+            ip: (globalConfig && globalConfig.ip && globalConfig.ip !== 'undefined') ? globalConfig.ip : '127.0.0.1',
+            port: (globalConfig && globalConfig.port && !isNaN(globalConfig.port)) ? globalConfig.port : 5000
+        };
 
         const grid = document.getElementById('macroSettingsGrid');
         const title = document.getElementById('settingsMacroTitle');
@@ -81,14 +87,7 @@
         title.innerText = `Configurar Lumikit - Slot ${slotIndex + 1}`;
         grid.innerHTML = '<p style="grid-column: 1 / -1; color:#666; font-size:11px; text-align:center; width:100%;">Preparando dados...</p>';
 
-        async function fetchLumikitData(syncMode = false) {
-            if (syncMode) {
-                const ipInput = document.getElementById('lumiIp');
-                const portInput = document.getElementById('lumiPort');
-                if (ipInput) activeGlobalConfig.ip = ipInput.value.trim() || '127.0.0.1';
-                if (portInput) activeGlobalConfig.port = parseInt(portInput.value) || 5000;
-            }
-
+        async function fetchLumikitData() {
             const baseUrl = `http://${activeGlobalConfig.ip}:${activeGlobalConfig.port}`;
             let passCounter = 0;
             const checkRender = () => { passCounter++; if (passCounter >= 3) renderUI(slotIndex); };
@@ -117,7 +116,7 @@
             setTimeout(() => { if (passCounter < 3) { passCounter = 99; renderUI(slotIndex); } }, 3000);
         }
 
-        fetchLumikitData(false);
+        fetchLumikitData();
     }
 
     function renderUI(slotIndex) {
@@ -130,12 +129,26 @@
                 <div style="display:flex; flex-wrap:wrap; gap:10px; width:100%;">
                     <input type="text" id="lumiIp" value="${activeGlobalConfig.ip}" placeholder="IP" style="flex:2; min-width:120px; background:#222; border:1px solid #444; color:#fff; padding:10px; border-radius:8px; font-size:14px; outline:none; box-sizing:border-box;">
                     <input type="number" id="lumiPort" value="${activeGlobalConfig.port}" placeholder="Porta" style="flex:1; min-width:70px; background:#222; border:1px solid #444; color:#fff; padding:10px; border-radius:8px; font-size:14px; outline:none; box-sizing:border-box;">
-                    <button id="lumiSyncBtn" style="flex:1; min-width:80px; background:#444; color:#fff; border:none; border-radius:8px; padding:10px; font-size:13px; font-weight:bold; cursor:pointer; text-transform:uppercase;">SYNC</button>
+                    <button id="lumiSyncBtn" style="flex:1; min-width:80px; background:#28a745; color:#fff; border:none; border-radius:8px; padding:10px; font-size:13px; font-weight:bold; cursor:pointer; text-transform:uppercase;">SALVAR</button>
                 </div>
             </div>
         `;
 
-        document.getElementById('lumiSyncBtn').onclick = () => onConfigure(slotIndex, internalSlotConfig, activeGlobalConfig);
+        document.getElementById('lumiSyncBtn').onclick = async () => {
+            const ipInput = document.getElementById('lumiIp');
+            const ipVal = ipInput ? ipInput.value.trim() : '';
+            activeGlobalConfig.ip = (ipVal && ipVal !== 'undefined') ? ipVal : '127.0.0.1';
+
+            const portInput = document.getElementById('lumiPort');
+            const portVal = portInput ? parseInt(portInput.value) : NaN;
+            activeGlobalConfig.port = (!isNaN(portVal)) ? portVal : 5000;
+
+            // Salva a configuração atual de IP/Porta global no JSON do preset atual no servidor
+            await MixerAPI.saveConfig(ID, slotIndex, internalSlotConfig, activeGlobalConfig);
+
+            // Sincroniza e recarrega os dados com as novas credenciais
+            onConfigure(slotIndex, internalSlotConfig, activeGlobalConfig);
+        };
 
         renderSec(grid, "CENAS - PÁGINA 1", "#ff5722");
         renderBtns(grid, slotIndex, 0, currentCenasP1);
@@ -191,9 +204,12 @@
 
     async function onSave(slotIndex) {
         const ipInput = document.getElementById('lumiIp');
-        if (ipInput) activeGlobalConfig.ip = ipInput.value.trim();
+        const ipVal = ipInput ? ipInput.value.trim() : '';
+        activeGlobalConfig.ip = (ipVal && ipVal !== 'undefined') ? ipVal : '127.0.0.1';
+
         const portInput = document.getElementById('lumiPort');
-        if (portInput) activeGlobalConfig.port = parseInt(portInput.value);
+        const portVal = portInput ? parseInt(portInput.value) : NaN;
+        activeGlobalConfig.port = (!isNaN(portVal)) ? portVal : 5000;
 
         await MixerAPI.saveConfig(ID, slotIndex, internalSlotConfig, activeGlobalConfig);
         document.getElementById('macroSettingsModal').style.display = 'none';

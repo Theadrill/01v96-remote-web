@@ -318,7 +318,7 @@ function loadExternalScripts() {
 function loadMacroScript(id) {
     if (!id || !availableScripts.includes(id) || document.getElementById(`script-macro-${id}`)) return;
     const script = document.createElement('script'); script.id = `script-macro-${id}`;
-    script.src = `modules/macros/${id}.js`; document.body.appendChild(script);
+    script.src = `modules/macros/${id}.js?t=${Date.now()}`; document.body.appendChild(script);
 }
 function renderMacros() {
     const grid = document.getElementById('macroSlotsGrid'); if (!grid) return; grid.innerHTML = '';

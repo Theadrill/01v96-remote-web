@@ -30,7 +30,9 @@
             internalSlotConfig = JSON.parse(JSON.stringify(slotConfig));
         } else {
             internalSlotConfig = []; // fallback seguro
-            console.warn(`[TOGGLER] slotConfig não é um array:`, slotConfig);
+            if (slotConfig && Object.keys(slotConfig).length > 0) {
+                console.warn(`[TOGGLER] slotConfig não é um array:`, slotConfig);
+            }
         }
         renderUI(slotIndex);
     }
@@ -48,11 +50,31 @@
 
         grid.innerHTML = '';
         for (let i = 0; i < 32; i++) {
-            const chName = namesMap[i] || (window.channelStates && window.channelStates[i] ? window.channelStates[i].name : `CH ${i+1}`);
+            const chName = namesMap[i] || (typeof channelStates !== 'undefined' && channelStates[i] ? channelStates[i].name : `CH ${i+1}`);
             const isSelected = internalSlotConfig.includes(i);
+            const isOnMixer = (typeof channelStates !== 'undefined' && channelStates[i] && channelStates[i].on === true);
+
             const btn = document.createElement('button');
             btn.className = 'btn-connect';
-            btn.style.cssText = `background: ${isSelected? '#2e7d32':'#333'}; height: 50px; margin: 0; font-size: 10px; border: 1px solid ${isSelected? '#4caf50':'#444'}; color: ${isSelected? '#fff':'#888'}; text-transform: uppercase; border-radius:8px;`;
+            
+            // Base styles and conditional background/colors
+            btn.style.height = '50px';
+            btn.style.margin = '0';
+            btn.style.fontSize = '10px';
+            btn.style.textTransform = 'uppercase';
+            btn.style.borderRadius = '8px';
+            btn.style.background = isSelected ? '#2e7d32' : '#333';
+            btn.style.color = isSelected ? '#fff' : (isOnMixer ? '#fff' : '#888');
+
+            // Apply yellow border if channel is ON on the physical/virtual console
+            if (isOnMixer) {
+                btn.style.border = '2px solid #ffcc00';
+                btn.style.boxShadow = 'inset 0 0 5px rgba(255, 204, 0, 0.5)';
+            } else {
+                btn.style.border = `1px solid ${isSelected ? '#4caf50' : '#444'}`;
+                btn.style.boxShadow = 'none';
+            }
+
             btn.innerHTML = `<span style="display:block; font-size:8px; opacity:0.5;">${i+1}</span> ${chName}`;
             btn.onclick = () => {
                 const idx = internalSlotConfig.indexOf(i);
