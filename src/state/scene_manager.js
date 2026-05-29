@@ -88,6 +88,10 @@ class SceneManager {
 
         // Header: F0 43 00 7E ... (Type Response=00) ... 6D
         if (message[0] === 0xF0 && message[1] === 0x43 && message[14] === 0x6D) {
+            // Verifica assinatura "LM  8C93" nos bytes 6 a 13 para evitar falsos positivos
+            const hasSig = SIGNATURE.every((byte, idx) => message[6 + idx] === byte);
+            if (!hasSig) return false;
+
             const type = message[15];
             const index = message[16];
 

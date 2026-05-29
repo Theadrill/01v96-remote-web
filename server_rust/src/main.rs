@@ -1039,8 +1039,6 @@ async fn async_main(shutdown_rx: tokio::sync::oneshot::Receiver<()>) -> Result<(
     // Shutdown: spawna novo processo e sai (porta ja liberada)
     let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
     std::process::exit(0);
-
-    Ok(())
 }
 
 

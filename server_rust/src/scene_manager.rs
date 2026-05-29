@@ -37,6 +37,12 @@ impl SceneManager {
         }
 
         if message[0] == 0xF0 && message[1] == 0x43 && message[14] == 0x6D {
+            // Verifica assinatura "LM  8C93" nos bytes 6 a 13 para evitar falsos positivos
+            let signature = [0x4C, 0x4D, 0x20, 0x20, 0x38, 0x43, 0x39, 0x33];
+            if message[6..14] != signature {
+                return false;
+            }
+
             let req_type = message[15];
             let index = message[16];
 
