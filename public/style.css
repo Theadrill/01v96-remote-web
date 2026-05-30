@@ -599,6 +599,19 @@ body.layout-horizontal .side-btn {
     padding: 0 !important;
 }
 
+html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
+    -webkit-appearance: none !important;
+    writing-mode: horizontal-tb !important; 
+    direction: ltr !important;
+    /* Rotaciona o slider horizontal normal para ficar vertical, centralizado via absoluto */
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) rotate(270deg) !important;
+    transform-origin: center center !important;
+    background: linear-gradient(to right, #555, #555) no-repeat center / 100% 6px !important;
+}
+
 .fader-card input[type=range]:disabled {
     opacity: 1 !important;
 }

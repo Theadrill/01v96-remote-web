@@ -8,6 +8,36 @@
     <link rel="stylesheet" href="style.css">
     <!-- UI UPDATE: 2026-04-12 -->
     <script src="/vendor/socket.io.min.js"></script>
+    <script>
+        // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
+        document.addEventListener('DOMContentLoaded', function() {
+            var ua = navigator.userAgent;
+            var isOldIOS = /OS (1[0-6])_/.test(ua) && /AppleWebKit/.test(ua);
+            var isOldSafari = /^((?!chrome|android).)*safari/i.test(ua) && /Version\/1[0-6]/.test(ua);
+            if (isOldIOS || isOldSafari) {
+                document.documentElement.classList.add('legacy-ios');
+                
+                function fixLegacySliders() {
+                    if (document.body.classList.contains('layout-horizontal')) return;
+                    var containers = document.querySelectorAll('.fader-rotated-container');
+                    containers.forEach(function(c) {
+                        var input = c.querySelector('input[type=range]');
+                        if (input) {
+                            var h = c.clientHeight;
+                            if (h > 50) {
+                                input.style.setProperty('width', h + 'px', 'important');
+                                input.style.setProperty('height', '48px', 'important');
+                            }
+                        }
+                    });
+                }
+                
+                window.addEventListener('resize', fixLegacySliders);
+                // Roda periodicamente caso a UI mude dinamicamente (ex: abas ou faders renderizados dps)
+                setInterval(fixLegacySliders, 1000);
+            }
+        });
+    </script>
 </head>
 
 <body>
