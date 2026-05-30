@@ -65,6 +65,38 @@ pub struct ChannelState {
     pub paired_with: Option<usize>,
     #[serde(rename = "pairSource")]
     pub pair_source: Option<usize>,
+    #[serde(rename = "aux1")]
+    pub aux1: f64,
+    #[serde(rename = "aux1On")]
+    pub aux1_on: bool,
+    #[serde(rename = "aux2")]
+    pub aux2: f64,
+    #[serde(rename = "aux2On")]
+    pub aux2_on: bool,
+    #[serde(rename = "aux3")]
+    pub aux3: f64,
+    #[serde(rename = "aux3On")]
+    pub aux3_on: bool,
+    #[serde(rename = "aux4")]
+    pub aux4: f64,
+    #[serde(rename = "aux4On")]
+    pub aux4_on: bool,
+    #[serde(rename = "aux5")]
+    pub aux5: f64,
+    #[serde(rename = "aux5On")]
+    pub aux5_on: bool,
+    #[serde(rename = "aux6")]
+    pub aux6: f64,
+    #[serde(rename = "aux6On")]
+    pub aux6_on: bool,
+    #[serde(rename = "aux7")]
+    pub aux7: f64,
+    #[serde(rename = "aux7On")]
+    pub aux7_on: bool,
+    #[serde(rename = "aux8")]
+    pub aux8: f64,
+    #[serde(rename = "aux8On")]
+    pub aux8_on: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -177,6 +209,22 @@ impl GlobalState {
                     paired: false,
                     paired_with: None,
                     pair_source: None,
+                    aux1: 0.0,
+                    aux1_on: false,
+                    aux2: 0.0,
+                    aux2_on: false,
+                    aux3: 0.0,
+                    aux3_on: false,
+                    aux4: 0.0,
+                    aux4_on: false,
+                    aux5: 0.0,
+                    aux5_on: false,
+                    aux6: 0.0,
+                    aux6_on: false,
+                    aux7: 0.0,
+                    aux7_on: false,
+                    aux8: 0.0,
+                    aux8_on: false,
                 },
             );
         }
@@ -426,7 +474,50 @@ impl GlobalState {
                     }
                 // --- AUX Sends ---
                 } else if mt.starts_with("kInputAUX/") {
-                    // level or on, parsed by suffix
+                    let target_ch_idx = if *channel <= 31 {
+                        Some(*channel)
+                    } else if (60..=67).contains(channel) {
+                        Some(32 + (channel - 60) / 2)
+                    } else {
+                        None
+                    };
+                    if let Some(ch_idx) = target_ch_idx {
+                        if let Some(ch) = self.channels.get_mut(&ch_idx) {
+                            if mt.ends_with("Level") {
+                                if let Some(aux_num_str) = mt.strip_prefix("kInputAUX/kAUX").and_then(|s| s.strip_suffix("Level")) {
+                                    if let Ok(aux_num) = aux_num_str.parse::<usize>() {
+                                        match aux_num {
+                                            1 => ch.aux1 = v,
+                                            2 => ch.aux2 = v,
+                                            3 => ch.aux3 = v,
+                                            4 => ch.aux4 = v,
+                                            5 => ch.aux5 = v,
+                                            6 => ch.aux6 = v,
+                                            7 => ch.aux7 = v,
+                                            8 => ch.aux8 = v,
+                                            _ => {}
+                                        }
+                                    }
+                                }
+                            } else if mt.ends_with("On") {
+                                if let Some(aux_num_str) = mt.strip_prefix("kInputAUX/kAUX").and_then(|s| s.strip_suffix("On")) {
+                                    if let Ok(aux_num) = aux_num_str.parse::<usize>() {
+                                        match aux_num {
+                                            1 => ch.aux1_on = cv,
+                                            2 => ch.aux2_on = cv,
+                                            3 => ch.aux3_on = cv,
+                                            4 => ch.aux4_on = cv,
+                                            5 => ch.aux5_on = cv,
+                                            6 => ch.aux6_on = cv,
+                                            7 => ch.aux7_on = cv,
+                                            8 => ch.aux8_on = cv,
+                                            _ => {}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 // --- EQ ---
                 } else if mt.contains("EQ/") {
                     self.apply_eq(mt, *channel, v);
