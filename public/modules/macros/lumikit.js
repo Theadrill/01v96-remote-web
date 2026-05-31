@@ -16,7 +16,7 @@
         };
         const baseUrl = `http://${host.ip}:${host.port}`;
 
-        // Executa todas cenas ativadas no slot
+        // Executa todas cenas ativadas no slot (fire-and-forget, direto do browser)
         if (actions.scenes && actions.scenes.length > 0) {
             for (let scene of actions.scenes) {
                 try {
@@ -25,40 +25,37 @@
                         const parts = scene.split(':');
                         p = parseInt(parts[0]); s = parseInt(parts[1]);
                     }
-                    // Usa a Proxy API para evitar CORS
-                    MixerAPI.network.fetch(`${baseUrl}/services/edmx_change_scene/${p}/${s}`, { mode: 'no-cors' });
+                    window.fetch(`${baseUrl}/services/edmx_change_scene/${p}/${s}`, { mode: 'no-cors' }).catch(() => {});
                 } catch (e) { }
             }
         }
 
-        // Delay para toggle de extras
-        setTimeout(async () => {
-            if (actions.extras && actions.extras.length > 0) {
-                let efStatus = [];
-                try {
-                    const stRes = await MixerAPI.network.fetch(`${baseUrl}/services/main_get_ef_status`);
-                    // Ajuste: O Proxy retorna { status, data }, e o Lumikit retorna { data: [...] }
-                    if (stRes && stRes.data && stRes.data.data && stRes.data.data[0] && stRes.data.data[0].items) {
-                        efStatus = stRes.data.data[0].items;
-                    } else {
-                        console.warn("[LUMIKIT DEBUG] Estrutura de status desconhecida:", stRes);
-                    }
-                } catch (err) { console.error("[LUMIKIT] Erro na checagem de status:", err); }
-
-                for (let extra of actions.extras) {
-                    try {
-                        const item = efStatus[extra] || {};
-                        let isActive = (String(item.active) === "true");
-
-                        console.log(`[LUMIKIT DEBUG] Item F${extra + 1}:`, item);
-                        console.log(`[LUMIKIT DEBUG] Status Final: ${isActive ? 'ON' : 'OFF'}. Enviando: ${isActive ? 'liberar' : 'pressionar'}`);
-
-                        const actionType = isActive ? "release" : "press";
-                        await MixerAPI.network.fetch(`${baseUrl}/services/main_${actionType}_ef/${extra}`, { mode: 'no-cors' });
-                    } catch (e) { console.error("[LUMIKIT] Falha ao alternar extra:", e); }
+        // Toggle de extras (status check precisa da resposta via proxy, press/release direto do browser)
+        if (actions.extras && actions.extras.length > 0) {
+            let efStatus = [];
+            try {
+                const stRes = await MixerAPI.network.fetch(`${baseUrl}/services/main_get_ef_status`);
+                // Ajuste: O Proxy retorna { status, data }, e o Lumikit retorna { data: [...] }
+                if (stRes && stRes.data && stRes.data.data && stRes.data.data[0] && stRes.data.data[0].items) {
+                    efStatus = stRes.data.data[0].items;
+                } else {
+                    console.warn("[LUMIKIT DEBUG] Estrutura de status desconhecida:", stRes);
                 }
+            } catch (err) { console.error("[LUMIKIT] Erro na checagem de status:", err); }
+
+            for (let extra of actions.extras) {
+                try {
+                    const item = efStatus[extra] || {};
+                    let isActive = (String(item.active) === "true");
+
+                    console.log(`[LUMIKIT DEBUG] Item F${extra + 1}:`, item);
+                    console.log(`[LUMIKIT DEBUG] Status Final: ${isActive ? 'ON' : 'OFF'}. Enviando: ${isActive ? 'liberar' : 'pressionar'}`);
+
+                    const actionType = isActive ? "release" : "press";
+                    window.fetch(`${baseUrl}/services/main_${actionType}_ef/${extra}`, { mode: 'no-cors' }).catch(() => {});
+                } catch (e) { console.error("[LUMIKIT] Falha ao alternar extra:", e); }
             }
-        }, 100);
+        }
     }
 
     // 2. Configuração

@@ -40,10 +40,11 @@ window.MixerAPI = {
     // 🌐 COMUNICAÇÃO EXTERNA
     network: {
         fetch: async (url, options = {}) => {
+            const { fireAndForget, ...httpOptions } = options;
             const res = await fetch('/api/macros/proxy/http', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, options })
+                body: JSON.stringify({ url, options: httpOptions, fireAndForget: !!fireAndForget })
             });
             return res.json();
         },

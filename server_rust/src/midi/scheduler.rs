@@ -140,8 +140,8 @@ impl MidiScheduler {
                         let mut st = state_clone.lock().await;
                         st.total_processed += 1;
                         if st.total_processed % 100 == 0 {
-                            tracing::info!("📤 [Scheduler] {} processados (Q0:{}, Q1:{}, Q2:{})",
-                                st.total_processed, st.q0.len(), st.q1.len(), st.q2.len());
+                            // tracing::info!("📤 [Scheduler] {} processados (Q0:{}, Q1:{}, Q2:{})",
+                            //    st.total_processed, st.q0.len(), st.q1.len(), st.q2.len());
                         }
                     }
                     None => {}

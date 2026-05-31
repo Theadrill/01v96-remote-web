@@ -16,6 +16,11 @@ lazy_static::lazy_static! {
         message: None,
         task: None,
     }));
+    static ref HTTP_CLIENT: reqwest::Client = reqwest::Client::builder()
+        .no_proxy()
+        .local_address(std::net::IpAddr::V4(std::net::Ipv4Addr::new(0, 0, 0, 0)))
+        .build()
+        .unwrap_or_else(|_| reqwest::Client::new());
 }
 
 struct GitSyncState {
@@ -563,14 +568,21 @@ async fn save_mod_config(
 struct ProxyHttpReq {
     url: String,
     options: Option<serde_json::Value>,
+    #[serde(rename = "fireAndForget")]
+    fire_and_forget: Option<bool>,
 }
 
 async fn proxy_http(Json(req): Json<ProxyHttpReq>) -> Json<Value> {
+    let start_time = std::time::Instant::now();
+    let fire_and_forget = req.fire_and_forget.unwrap_or(false);
+    
+    tracing::info!("⏱️ [PROXY] Iniciando chamada para: {} (fireAndForget: {})", req.url, fire_and_forget);
+
     if req.url.starts_with("file://") {
         return Json(json!({ "error": "Acesso a arquivos locais negado" }));
     }
 
-    let client = reqwest::Client::new();
+    let client = &*HTTP_CLIENT;
     let mut request = client.request(reqwest::Method::GET, &req.url);
 
     if let Some(opt) = req.options {
@@ -593,14 +605,40 @@ async fn proxy_http(Json(req): Json<ProxyHttpReq>) -> Json<Value> {
         }
     }
 
+    if fire_and_forget {
+        tracing::info!("⏱️ [PROXY] Retornando imediato pro frontend em {}ms. Request rodando em background.", start_time.elapsed().as_millis());
+        tokio::spawn(async move {
+            let send_start = std::time::Instant::now();
+            tracing::info!("⏱️ [PROXY-BG] Iniciando send() no background...");
+            match request.send().await {
+                Ok(resp) => {
+                    tracing::info!("⏱️ [PROXY-BG] Headers recebidos em {}ms", send_start.elapsed().as_millis());
+                    let _ = resp.bytes().await;
+                    tracing::info!("⏱️ [PROXY-BG] Conexão liberada de volta pro pool em {}ms totais", send_start.elapsed().as_millis());
+                }
+                Err(e) => {
+                    tracing::error!("⏱️ [PROXY-BG] Falha no send() em {}ms: {:?}", send_start.elapsed().as_millis(), e);
+                }
+            }
+        });
+        return Json(json!({ "success": true }));
+    }
+
+    let send_start = std::time::Instant::now();
+    tracing::info!("⏱️ [PROXY-SYNC] Iniciando send()...");
     match request.send().await {
         Ok(resp) => {
+            tracing::info!("⏱️ [PROXY-SYNC] Headers recebidos em {}ms. Lendo body...", send_start.elapsed().as_millis());
             let status = resp.status().as_u16();
             let raw_data = resp.text().await.unwrap_or_default();
+            tracing::info!("⏱️ [PROXY-SYNC] Body finalizado. Tempo total proxy_http: {}ms", start_time.elapsed().as_millis());
             let data: Value = serde_json::from_str(&raw_data).unwrap_or(Value::String(raw_data));
             Json(json!({ "status": status, "data": data }))
         }
-        Err(e) => Json(json!({ "error": e.to_string() })),
+        Err(e) => {
+            tracing::error!("⏱️ [PROXY-SYNC] Falha no send() em {}ms totais: {:?}", start_time.elapsed().as_millis(), e);
+            Json(json!({ "error": e.to_string() }))
+        }
     }
 }
 
