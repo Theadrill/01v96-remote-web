@@ -73,6 +73,7 @@ impl SyncManager {
                         state_guard.scene_manager.scenes = vec![None; 100];
                         state_guard.scene_manager.current_scene = None;
                         state_guard.scene_manager.is_syncing = true;
+                        state_guard.scene_number = 0;
                     }
                     Err(_) => {
                         tracing::warn!("⚠️ [SyncManager] Timeout ao adquirir write lock para Phase 1 — continuando sem limpar cenas");
@@ -85,6 +86,16 @@ impl SyncManager {
                 0xF0, 0x43, 0x20, 0x7E, 0x4C, 0x4D, 0x20, 0x20, 0x38, 0x43, 0x39, 0x33, 0x6D, 0x02, 0x00, 0xF7,
             ];
             sched.enqueue(edit_buffer, 1).await;
+
+            let scene_id_req1 = vec![
+                0xF0, 0x43, 0x30, 0x3E, 127, 1, 0, 0, 0, 0xF7,
+            ];
+            sched.enqueue(scene_id_req1, 1).await;
+            
+            let scene_id_req2 = vec![
+                0xF0, 0x43, 0x30, 0x3E, 13, 4, 10, 0, 0, 0xF7,
+            ];
+            sched.enqueue(scene_id_req2, 1).await;
 
             for i in 1u8..=99 {
                 let req = vec![
@@ -104,13 +115,21 @@ impl SyncManager {
             // Phase 4: finalize scenes (short lock)
             {
                 let mut state_guard = state.write().await;
+                let current_scene_num = state_guard.scene_number;
+                
                 let sm = &mut state_guard.scene_manager;
                 sm.is_syncing = false;
 
                 let loaded = sm.scenes.iter().filter(|s| s.is_some()).count();
                 tracing::info!("✅ [Scene Manager] {} cenas carregadas.", loaded);
 
-                if let Some(ref current) = sm.current_scene.clone() {
+                if current_scene_num > 0 {
+                    let adjusted_id = (current_scene_num - 1) as u8;
+                    sm.active_scene_index = adjusted_id;
+                    if let Some(ref mut cs) = sm.current_scene {
+                        cs.index = adjusted_id;
+                    }
+                } else if let Some(ref current) = sm.current_scene.clone() {
                     if let Some(m) = sm.scenes.iter().flatten().find(|s| s.name == current.name) {
                         sm.active_scene_index = m.index;
                         if let Some(ref mut cs) = sm.current_scene {

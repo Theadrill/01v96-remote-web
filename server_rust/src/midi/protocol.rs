@@ -157,6 +157,8 @@ pub enum ParsedMidi {
         char_index: usize,
         char: String,
     },
+    PhysicalSceneRecall(u8),
+    PhysicalSceneStore(u8),
 }
 
 pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
@@ -166,6 +168,17 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
     if (message[2] & 0xF0) != 0x10 {
         return None;
+    }
+
+    // --- PHYSICAL SCENE RECALL / STORE ---
+    if message.len() >= 12 && message[3] == 0x3E && message[4] == 0x7F && message[5] == 0x10 {
+        let action = message[6];
+        let scene_idx = message[8];
+        if action == 0x00 {
+            return Some(ParsedMidi::PhysicalSceneRecall(scene_idx));
+        } else if action == 0x20 {
+            return Some(ParsedMidi::PhysicalSceneStore(scene_idx));
+        }
     }
 
     // --- PRIORITY 0: PAN ---

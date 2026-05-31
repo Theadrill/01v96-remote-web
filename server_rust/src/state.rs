@@ -560,6 +560,8 @@ impl GlobalState {
                     self.scene_name = self.scene_chars.join("").trim().to_string();
                 }
             }
+            crate::midi::protocol::ParsedMidi::PhysicalSceneRecall(_) => {}
+            crate::midi::protocol::ParsedMidi::PhysicalSceneStore(_) => {}
         }
     }
 

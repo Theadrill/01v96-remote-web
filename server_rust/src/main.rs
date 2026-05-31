@@ -1003,6 +1003,17 @@ async fn async_main(shutdown_rx: tokio::sync::oneshot::Receiver<()>) -> Result<(
                                         "value": value
                                     })));
                                 }
+                                midi::protocol::ParsedMidi::PhysicalSceneRecall(idx) => {
+                                    tracing::info!("🎹 [FÍSICO] Cena {} foi CARREGADA na mesa!", idx);
+                                    conn_mgr_recv.trigger_sync(true, "is_scene");
+                                }
+                                midi::protocol::ParsedMidi::PhysicalSceneStore(idx) => {
+                                    tracing::info!("🎹 [FÍSICO] Cena {} foi SALVA na mesa!", idx);
+                                    state.scene_manager.set_active_scene(idx);
+                                    scenes_emission = Some(serde_json::to_value(state.scene_manager.get_state()).unwrap_or_default());
+                                    current_scene_emission = state.scene_manager.current_scene.as_ref()
+                                        .and_then(|cs| serde_json::to_value(cs).ok());
+                                }
                                 _ => {}
                             }
                         }
