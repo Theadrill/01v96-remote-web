@@ -6,7 +6,7 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 ![Status](https://img.shields.io/badge/Status-Active%20Development-success?style=for-the-badge)
 
 > [!IMPORTANT]
-> **Aviso de Migração**: O core do servidor foi migrado para a linguagem **Rust** (`server_rust`), que agora é o foco principal do desenvolvimento visando performance máxima, estabilidade e baixíssima latência. O servidor legado em **Node.js** continua funcional, porém possui menos features e em breve será considerado obsoleto.
+> **Aviso de Migração**: O core do servidor foi migrado para a linguagem **Rust** (`server_rust`), que agora é o foco principal do desenvolvimento visando performance máxima, estabilidade e baixíssima latência. O servidor legado em **Node.js** continua funcional, porém possui menos features e em breve será considerado obsoleto. O frontendcontinua em Vanilla JS.
 
 ---
 
@@ -35,6 +35,7 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 *   **Mini Server Tray**: O servidor remoto de MIDI também possui sua própria aplicação de bandeja minimalista, permitindo reiniciar ou encerrar o serviço sem necessidade de terminal ativo.
 
 ### 🌐 Remote MIDI over Network (Bridge de Rede)
+*   **Conexão remota a mesa**: Agora você pode rodar o mini-servidor `remote_midi_server` do computador local onde a mesa está conectada fisicamente e o servidor principal rodar em outro computador, na mesma rede, ou até mesmo em uma VM.
 *   **Arquitetura Client-Server**: Separação física entre o hardware da mesa e o servidor principal de aplicação. O mini-servidor `remote_midi_server` age como gateway de rede TCP (porta `4200`) e despacha pacotes SysEx e MIDI brutos.
 *   **Reconexão Robusta & Heartbeat**: Mecanismo ativo de batimento cardíaco (Heartbeat) a cada 3 segundos com timeout para detecção imediata de quedas de rede e auto-recuperação sem criar conexões órfãs.
 *   **Redundância**: Suporte para definição de um array de IPs/Hosts (`remote_midi_networks`) no `config.json` para tentativa de conexão fallback sequencial.
