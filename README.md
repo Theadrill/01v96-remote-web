@@ -2,9 +2,11 @@
 
 Uma interface web ultra-responsiva, de baixa latência e rica em recursos para controle remoto total da mesa digital **Yamaha 01V96**. Projetada para técnicos de som e músicos que buscam mobilidade, agilidade e automação avançada.
 
-![Project Preview](https://img.shields.io/badge/Aesthetics-Premium-blueviolet?style=for-the-badge)
-![Tech Stack](https://img.shields.io/badge/Stack-Node.js%20|%20Socket.io%20|%20Express-blue?style=for-the-badge)
+![Tech Stack](https://img.shields.io/badge/Stack-Rust%20|%20Node.js%20|%20Socket.io-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active%20Development-success?style=for-the-badge)
+
+> [!IMPORTANT]
+> **Aviso de Migração**: O core do servidor foi migrado para a linguagem **Rust** (`server_rust`), que agora é o foco principal do desenvolvimento visando performance máxima, estabilidade e baixíssima latência. O servidor legado em **Node.js** continua funcional, porém possui menos features e em breve será considerado obsoleto.
 
 ---
 
@@ -29,24 +31,32 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 
 ### 🖥️ Windows Tray Application
 *   **Acesso Rápido**: Gerencie conexões MIDI e abra a interface no navegador diretamente da bandeja do sistema Windows.
-*   **Auto-Connect**: Identificação automática da mesa Yamaha via USB.
+*   **Auto-Connect & Auto-Reload**: Identificação automática da mesa Yamaha via USB e facilidade para reiniciar o servidor em segundo plano.
+*   **Mini Server Tray**: O servidor remoto de MIDI também possui sua própria aplicação de bandeja minimalista, permitindo reiniciar ou encerrar o serviço sem necessidade de terminal ativo.
+
+### 🌐 Remote MIDI over Network (Bridge de Rede)
+*   **Arquitetura Client-Server**: Separação física entre o hardware da mesa e o servidor principal de aplicação. O mini-servidor `remote_midi_server` age como gateway de rede TCP (porta `4200`) e despacha pacotes SysEx e MIDI brutos.
+*   **Reconexão Robusta & Heartbeat**: Mecanismo ativo de batimento cardíaco (Heartbeat) a cada 3 segundos com timeout para detecção imediata de quedas de rede e auto-recuperação sem criar conexões órfãs.
+*   **Redundância**: Suporte para definição de um array de IPs/Hosts (`remote_midi_networks`) no `config.json` para tentativa de conexão fallback sequencial.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-*   **Backend**: Node.js com Express para o servidor web.
-*   **Comunicação**: Socket.io para troca de mensagens SysEx de baixa latência.
-*   **MIDI Bridge**: `easymidi` para interface direta com o hardware Yamaha.
+*   **Backend Principal (Rust)**: Desenvolvido em Rust (`server_rust`) utilizando `tokio` para E/S assíncrona, `axum` para servir páginas e `socket.io-parser` para comunicação via WebSockets.
+*   **Remote MIDI Bridge (Rust)**: Mini-servidor portátil (`remote_midi_server`) e crate comum `midi_common` para gerenciamento de pacotes MIDI/SysEx em rede TCP de alto desempenho.
+*   **Backend Legado (Node.js)**: Servidor Node.js com Express e Socket.io (opcional).
+*   **MIDI Bridge Física**: `midir` (em Rust) e `easymidi` (em Node.js) para interface direta com o driver USB da Yamaha.
 *   **Frontend**: Vanilla JS (ES6+), CSS3 Moderno (Glassmorphism), HTML5 Semantic.
-*   **Automação**: Integração Git via `child_process` para o Ninja Sync.
+*   **Automação**: Integração Git via subprocesso para o Ninja Sync.
 
 ---
 
 ## 🚀 Como Iniciar
 
 1.  **Pré-requisitos**:
-    *   Node.js instalado.
+    *   Ambiente Rust instalado (se for rodar o servidor Rust moderno).
+    *   Node.js instalado (se for rodar o front ou servidor legados).
     *   Driver MIDI da Yamaha instalado e mesa conectada via USB.
     *   Git configurado (para as funções de Auto-Sync).
 
@@ -54,15 +64,19 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
     ```bash
     git clone https://github.com/Theadrill/01v96-remote-web.git
     cd 01v96-remote-web
+    # Instalação das dependências do painel e servidor node
     npm install
     ```
 
-3.  **Execução**:
-    ```bash
-    npm start
-    ```
-    *   O servidor iniciará na porta `4000`.
-    *   Acesse `http://localhost:4000` ou `http://[seu-ip]:4000`.
+3.  **Execução (Servidor Rust Moderno)**:
+    *   Acesse a pasta `server_rust` e inicie:
+        ```bash
+        cargo run --release
+        ```
+    *   Para o servidor de rede MIDI física (caso a mesa esteja em outro PC):
+        ```bash
+        cargo run --bin remote_midi_server --release
+        ```
 
 ---
 
@@ -72,10 +86,10 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 - [x] Sistema de Multi-Presets com detecção de Host.
 - [x] Modo "Sends on Faders" para Mixes.
 - [x] Ninja Sync (Auto-Git push/pull).
+- [x] **MIDI Bridge over Network**: Bridge de rede TCP ultra-rápida (com heartbeat, reconnect dinâmico e tray autônomo).
 - [ ] Implementação de Meters GPU-Accelerated (Curtain Rendering).
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
 - [ ] Fazer o meter do master funcionar.
-- [ ] **MIDI Bridge over Network**: Substituir dependência de MIDI nativo (`node-midi` / ALSA) por listener de rede genérico (TCP/UDP/WebSocket), permitindo que o servidor receba SysEx de qualquer fonte na rede — bridge Windows com mesa física, app Android USB-OTG, ou outro Termux. Essencial para rodar em ambientes sem suporte a MIDI físico (ex: Android/Termux via proot).
 
 
 ---

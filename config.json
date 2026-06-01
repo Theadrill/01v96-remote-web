@@ -22,7 +22,7 @@
   "dmx_boot_delay_ms": 3000,
   "sistema_iluminacao": false,
   "disable_systray": false,
-  "remote_midi": false,
+  "remote_midi": true,
   "remote_midi_networks": [
     "pcmaria",
     "pcfavela",
