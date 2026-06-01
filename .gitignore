@@ -4,6 +4,7 @@ prints/
 
 # Rust build artifacts
 server_rust/target/
+remote_midi_server/target/
 
 
 # Pasta Local de Profiles (Não sincroniza com a nuvem)

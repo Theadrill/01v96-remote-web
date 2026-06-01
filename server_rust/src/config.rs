@@ -39,6 +39,18 @@ pub struct AppConfig {
     pub sistema_iluminacao: bool,
     pub disable_systray: bool,
 
+    #[serde(default)]
+    pub remote_midi: bool,
+
+    #[serde(default)]
+    pub remote_midi_networks: Vec<String>,
+
+    #[serde(default = "default_remote_midi_port")]
+    pub remote_midi_port: u16,
+
+    #[serde(default)]
+    pub remote_midi_last_host: String,
+
     #[serde(default = "default_tecnico_pass")]
     pub tecnico_pass: String,
 
@@ -67,7 +79,16 @@ fn default_meter_opacity() -> f64 {
     1.0
 }
 
+fn default_remote_midi_port() -> u16 {
+    4200
+}
+
 impl AppConfig {
+    pub fn save_last_remote_host(&mut self, host: &str) {
+        self.remote_midi_last_host = host.to_string();
+        self.save();
+    }
+
     pub fn load() -> Self {
         // Tenta ler o arquivo config.json
         let config_path = "../config.json";
@@ -145,6 +166,10 @@ impl AppConfig {
             dmx_boot_delay_ms: 3000,
             sistema_iluminacao: false,
             disable_systray: false,
+            remote_midi: false,
+            remote_midi_networks: vec![],
+            remote_midi_port: default_remote_midi_port(),
+            remote_midi_last_host: "".to_string(),
             tecnico_pass: default_tecnico_pass(),
             port: default_port(),
             meter_opacity: 1.0,

@@ -1,9 +1,9 @@
-use midir::{MidiInput, MidiInputConnection, MidiOutput, MidiOutputConnection};
+use midir::{MidiInput, MidiInputConnection, MidiOutput as MidirMidiOutput, MidiOutputConnection};
 use std::time::Instant;
 use tokio::sync::mpsc;
 use tracing::{error, info, warn};
 
-use super::assembler::MidiAssembler;
+use midi_common::assembler::MidiAssembler;
 
 pub struct MidiEngine {
     input_conn: Option<MidiInputConnection<()>>,
@@ -38,7 +38,7 @@ impl MidiEngine {
             error!("Não foi possível inicializar MidiInput.");
         }
 
-        if let Ok(midi_out) = MidiOutput::new("01v96 Remote Out") {
+        if let Ok(midi_out) = MidirMidiOutput::new("01v96 Remote Out") {
             for (i, port) in midi_out.ports().iter().enumerate() {
                 if let Ok(name) = midi_out.port_name(port) {
                     outputs.push((i, name));
@@ -70,7 +70,7 @@ impl MidiEngine {
         self.output_conn = None;
 
         let midi_in = MidiInput::new("01v96 Remote In").map_err(|e| e.to_string())?;
-        let midi_out = MidiOutput::new("01v96 Remote Out").map_err(|e| e.to_string())?;
+        let midi_out = MidirMidiOutput::new("01v96 Remote Out").map_err(|e| e.to_string())?;
 
         let in_ports = midi_in.ports();
         let out_ports = midi_out.ports();
@@ -136,6 +136,22 @@ impl MidiEngine {
         }
     }
 }
+
+#[derive(Clone)]
+pub enum MidiOutput {
+    Local(std::sync::Arc<tokio::sync::Mutex<MidiEngine>>),
+    Remote(std::sync::Arc<super::remote_client::RemoteClient>),
+}
+
+impl MidiOutput {
+    pub async fn send(&self, data: &[u8]) {
+        match self {
+            MidiOutput::Local(engine) => engine.lock().await.send(data),
+            MidiOutput::Remote(client) => client.send(data),
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

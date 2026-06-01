@@ -26,19 +26,19 @@ impl SchedulerState {
 
 pub struct MidiScheduler {
     pub state: Arc<Mutex<SchedulerState>>,
-    engine: Arc<Mutex<super::MidiEngine>>,
+    output: super::MidiOutput,
     sync_counter: Arc<super::SyncCounter>,
 }
 
 impl MidiScheduler {
     pub fn new(
         tick_ms: u64,
-        engine: Arc<Mutex<super::MidiEngine>>,
+        output: super::MidiOutput,
         sync_counter: Arc<super::SyncCounter>,
     ) -> Self {
         Self {
             state: Arc::new(Mutex::new(SchedulerState::new(tick_ms))),
-            engine,
+            output,
             sync_counter,
         }
     }
@@ -114,7 +114,7 @@ impl MidiScheduler {
         drop(state_lock);
 
         let state_clone = Arc::clone(&self.state);
-        let engine = Arc::clone(&self.engine);
+        let output = self.output.clone();
         let sync_counter = Arc::clone(&self.sync_counter);
 
         tokio::spawn(async move {
@@ -136,7 +136,7 @@ impl MidiScheduler {
                         if p.len() >= 3 && p[0] == 0xF0 && p[1] == 0x43 && p[2] == 0x10 {
                             sync_counter.begin_sync();
                         }
-                        engine.lock().await.send(&p);
+                        output.send(&p).await;
                         let mut st = state_clone.lock().await;
                         st.total_processed += 1;
                         if st.total_processed % 100 == 0 {
@@ -172,8 +172,9 @@ mod tests {
     #[tokio::test]
     async fn test_scheduler_priority() {
         let engine = Arc::new(Mutex::new(super::super::MidiEngine::new()));
+        let output = super::super::MidiOutput::Local(engine);
         let sync_counter = Arc::new(super::super::SyncCounter::new());
-        let scheduler = MidiScheduler::new(10, engine, sync_counter);
+        let scheduler = MidiScheduler::new(10, output, sync_counter);
 
         scheduler.enqueue(vec![0x02], 2).await;
         scheduler.enqueue(vec![0x01], 1).await;

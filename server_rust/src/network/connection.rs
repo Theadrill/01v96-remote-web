@@ -15,7 +15,8 @@ pub struct ConnectionManager {
     state: Arc<RwLock<GlobalState>>,
     sync_counter: Arc<SyncCounter>,
     sync_manager: Arc<SyncManager>,
-    engine: Arc<tokio::sync::Mutex<MidiEngine>>,
+    engine: Option<Arc<tokio::sync::Mutex<MidiEngine>>>,
+    remote_client: Option<Arc<midi::RemoteClient>>,
     midi_in_tx: mpsc::Sender<Vec<u8>>,
     is_connected: Arc<AtomicBool>,
     is_fully_synced: Arc<AtomicBool>,
@@ -33,7 +34,8 @@ impl ConnectionManager {
         state: Arc<RwLock<GlobalState>>,
         sync_counter: Arc<SyncCounter>,
         sync_manager: Arc<SyncManager>,
-        engine: Arc<tokio::sync::Mutex<MidiEngine>>,
+        engine: Option<Arc<tokio::sync::Mutex<MidiEngine>>>,
+        remote_client: Option<Arc<midi::RemoteClient>>,
         midi_in_tx: mpsc::Sender<Vec<u8>>,
     ) -> Arc<Self> {
         Arc::new(Self {
@@ -44,6 +46,7 @@ impl ConnectionManager {
             sync_counter,
             sync_manager,
             engine,
+            remote_client,
             midi_in_tx,
             is_connected: Arc::new(AtomicBool::new(false)),
             is_fully_synced: Arc::new(AtomicBool::new(false)),
@@ -55,7 +58,15 @@ impl ConnectionManager {
     }
 
     pub fn is_connected(&self) -> bool {
-        self.is_connected.load(Ordering::SeqCst)
+        if self.config.remote_midi {
+            if let Some(ref client) = self.remote_client {
+                client.is_connected()
+            } else {
+                false
+            }
+        } else {
+            self.is_connected.load(Ordering::SeqCst)
+        }
     }
 
     pub fn is_fully_synced(&self) -> bool {
@@ -67,7 +78,7 @@ impl ConnectionManager {
     }
 
     pub fn emit_connection_state(&self) {
-        let connected = self.is_connected.load(Ordering::SeqCst);
+        let connected = self.is_connected();
         let io = self.io.clone();
         let demo = self.config.demo_mode;
         tokio::spawn(async move {
@@ -83,6 +94,12 @@ impl ConnectionManager {
         in_idx: usize,
         out_idx: usize,
     ) {
+        if self.config.remote_midi {
+            info!("🌐 Remoto MIDI ativo. Inicializando monitor de conexão de rede.");
+            self.iniciar_busca_automatica();
+            return;
+        }
+
         let (inputs, outputs) = MidiEngine::get_available_ports();
 
         let validate = |name: &str| -> bool {
@@ -113,6 +130,11 @@ impl ConnectionManager {
 
     pub fn iniciar_busca_automatica(self: &Arc<Self>) {
         if self.is_connected() {
+            return;
+        }
+
+        if self.config.remote_midi {
+            self.iniciar_monitor_conexao_remota();
             return;
         }
 
@@ -157,6 +179,50 @@ impl ConnectionManager {
         }
     }
 
+    pub fn iniciar_monitor_conexao_remota(self: &Arc<Self>) {
+        let this = self.clone();
+        let handle = tokio::spawn(async move {
+            let mut last_state = false;
+            let mut interval = tokio::time::interval(std::time::Duration::from_millis(500));
+            loop {
+                interval.tick().await;
+                let current_state = this.is_connected();
+                if current_state != last_state {
+                    last_state = current_state;
+                    if current_state {
+                        info!("🌐 [Conexão Remota] Status alterado para CONECTADO.");
+                        this.is_connected.store(true, Ordering::SeqCst);
+                        this.emit_connection_state();
+                        
+                        info!("⏳ [Conexão Remota] Cooldown de 5s antes de sincronizar...");
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                        
+                        if !this.is_connected() {
+                            last_state = false;
+                            this.is_connected.store(false, Ordering::SeqCst);
+                            this.emit_connection_state();
+                            continue;
+                        }
+
+                        this.is_fully_synced.store(false, Ordering::SeqCst);
+                        info!("🔄 [Conexão Remota] Iniciando sincronia completa...");
+                        this.sync_manager.reset();
+                        this.sync_manager.fire(true, "normal", this.state.clone());
+                        this.iniciar_meter_loop();
+                    } else {
+                        info!("🌐 [Conexão Remota] Status alterado para DESCONECTADO.");
+                        this.handle_disconnection(false).await;
+                    }
+                }
+            }
+        });
+
+        if let Ok(mut guard) = self.busca_handle.lock() {
+            if let Some(old) = guard.take() { old.abort(); }
+            *guard = Some(handle);
+        }
+    }
+
     pub fn parar_busca(&self) {
         if let Ok(mut guard) = self.busca_handle.lock() {
             if let Some(h) = guard.take() { h.abort(); }
@@ -181,7 +247,7 @@ impl ConnectionManager {
 
                 if !this.is_connected() { break; }
 
-                {
+                if !this.config.remote_midi {
                     let expired = {
                         let last = this.last_activity.lock().unwrap();
                         Self::now_ms() - *last > watchdog_timeout
@@ -234,10 +300,10 @@ impl ConnectionManager {
 
         if self.is_connected() { return; }
 
-        {
-            let mut engine = self.engine.lock().await;
+        if let Some(ref engine) = self.engine {
+            let mut engine_guard = engine.lock().await;
             let tx = self.midi_in_tx.clone();
-            match engine.connect_ports(in_idx, out_idx, tx) {
+            match engine_guard.connect_ports(in_idx, out_idx, tx) {
                 Ok(name) => info!("✅ Conexao MIDI estabelecida: {}", name),
                 Err(e) => { error!("Erro ao conectar MIDI: {}", e); self.handle_disconnection(false).await; return; }
             }
@@ -277,7 +343,7 @@ impl ConnectionManager {
         self.sync_counter.reset();
         self.emit_connection_state();
 
-        if retry {
+        if retry && !self.config.remote_midi {
             info!("❌ Conexao perdida. Tentando reconectar...");
             self.iniciar_busca_automatica();
         }

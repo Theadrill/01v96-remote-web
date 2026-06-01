@@ -65,16 +65,33 @@ async fn async_main(shutdown_rx: tokio::sync::oneshot::Receiver<()>) -> Result<(
 
     let sync_counter = Arc::new(midi::SyncCounter::new());
 
-    let engine = Arc::new(tokio::sync::Mutex::new(midi::MidiEngine::new()));
+    let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(4096);
+
+    let engine: Option<Arc<tokio::sync::Mutex<midi::MidiEngine>>>;
+    let remote_client: Option<Arc<midi::RemoteClient>>;
+    let midi_output: midi::MidiOutput;
+
+    if app_config.remote_midi {
+        info!("🌐 Inicializando cliente MIDI remoto...");
+        let client = Arc::new(midi::RemoteClient::new(app_config.clone(), midi_in_tx.clone()));
+        client.start();
+        midi_output = midi::MidiOutput::Remote(client.clone());
+        remote_client = Some(client);
+        engine = None;
+    } else {
+        info!("🔌 Inicializando motor MIDI local...");
+        let local_engine = Arc::new(tokio::sync::Mutex::new(midi::MidiEngine::new()));
+        midi_output = midi::MidiOutput::Local(local_engine.clone());
+        engine = Some(local_engine);
+        remote_client = None;
+    }
 
     let scheduler = Arc::new(midi::MidiScheduler::new(
         app_config.scheduler_tick_ms,
-        engine.clone(),
+        midi_output,
         sync_counter.clone(),
     ));
     scheduler.start().await;
-
-    let (midi_in_tx, mut midi_in_rx) = tokio::sync::mpsc::channel::<Vec<u8>>(4096);
 
     let (layer, io) = SocketIo::new_layer();
 
@@ -88,7 +105,8 @@ async fn async_main(shutdown_rx: tokio::sync::oneshot::Receiver<()>) -> Result<(
         global_state.clone(),
         sync_counter.clone(),
         sync_manager,
-        engine.clone(),
+        engine,
+        remote_client,
         midi_in_tx.clone(),
     );
 
@@ -935,12 +953,17 @@ async fn async_main(shutdown_rx: tokio::sync::oneshot::Receiver<()>) -> Result<(
             }
         }
     });
+    let is_remote_midi = app_config.remote_midi;
     tokio::spawn(async move {
             let mut assembler = midi::MidiAssembler::new();
             while let Some(msg) = midi_in_rx.recv().await {
                 recv_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                 conn_mgr_recv.reset_activity();
-                let packets = assembler.process_input(&msg);
+                let packets = if is_remote_midi {
+                    vec![msg]
+                } else {
+                    assembler.process_input(&msg)
+                };
                 for packet in packets {
                     if sync_counter_in.should_ignore() {
                         continue;

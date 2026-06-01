@@ -21,5 +21,14 @@
   "boot_delay_ms": 1500,
   "dmx_boot_delay_ms": 3000,
   "sistema_iluminacao": false,
-  "disable_systray": false
+  "disable_systray": false,
+  "remote_midi": false,
+  "remote_midi_networks": [
+    "pcmaria",
+    "pcfavela",
+    "192.168.15.99",
+    "192.168.1.111"
+  ],
+  "remote_midi_port": 4200,
+  "remote_midi_last_host": ""
 }
