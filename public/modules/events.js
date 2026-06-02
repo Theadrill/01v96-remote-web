@@ -25,6 +25,9 @@ function updateConfigUIForChannel(ch) {
     } else if (ch === 52) {
         targetId = `namemaster`;
         displayTitle = `MASTER`;
+    } else if (ch >= 60 && ch <= 63) {
+        targetId = `namest${ch - 60}`;
+        displayTitle = `ST IN ${ch - 59}`;
     }
 
     const nameEl = document.getElementById(targetId);
@@ -42,6 +45,16 @@ function updateConfigUIForChannel(ch) {
     const techCtx = document.getElementById('techMixContext');
     if (techCtx) techCtx.style.display = 'none';
 
+    // Ocultar aba DYN para canais ST IN (não possuem Dynamics na 01v96)
+    const dynTabBtn = document.querySelectorAll('#chNav .side-btn.btn-tab')[1];
+    if (dynTabBtn) {
+        if (ch >= 60 && ch <= 63) {
+            dynTabBtn.style.display = 'none';
+        } else {
+            dynTabBtn.style.display = 'block';
+        }
+    }
+
     const miniFader = document.getElementById('miniFaderContext');
     if (miniFader && typeof createChannelStrip === 'function') {
         const isM = ch === 52;
@@ -50,7 +63,10 @@ function updateConfigUIForChannel(ch) {
         else if (isOut) {
             const type = (ch <= 43) ? 'mix' : 'bus';
             const idx = (ch <= 43) ? (ch - 36) : (ch - 44);
-            miniFader.innerHTML = createOutputStrip(idx, type);
+            miniFader.innerHTML = createOutputStrip(idx, type, "mini-");
+        }
+        else if (ch >= 60 && ch <= 63) {
+            miniFader.innerHTML = createOutputStrip(ch - 60, 'stIn', "mini-");
         }
         else miniFader.innerHTML = createChannelStrip(ch, false, "mini-");
     }
@@ -78,6 +94,9 @@ function updateConfigUIForChannel(ch) {
         currentCard = document.querySelectorAll('.fader-group-bus')[idx];
     } else if (ch === 52) {
         currentCard = document.querySelector('.master-card');
+    } else if (ch >= 60 && ch <= 63) {
+        const idx = ch - 60;
+        currentCard = document.querySelectorAll('.fader-group-st')[idx];
     }
 
     if (currentCard) currentCard.style.background = '#15304d';

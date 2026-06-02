@@ -1,6 +1,6 @@
 {
   "inIdx": 0,
   "outIdx": 1,
-  "loopmidi-monitor": false,
+  "loopmidi-monitor": true,
   "demo_mode": false
 }

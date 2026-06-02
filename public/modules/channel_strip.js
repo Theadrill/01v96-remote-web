@@ -499,7 +499,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
     });
 }
 
-function createDesktopOutputStrip(i, type) {
+function createDesktopOutputStrip(i, type, idPrefix = "") {
     let prefix, title, cmdPrefix, customClass, configId, ch;
     
     if (type === 'mix') {
@@ -521,8 +521,8 @@ function createDesktopOutputStrip(i, type) {
         title = `ST IN ${i + 1}`;
         cmdPrefix = 'kInput';
         customClass = "fader-group-st";
-        configId = 60 + (i * 2);
-        ch = 32 + (i * 2);
+        configId = 60 + i;
+        ch = 32 + i;
     }
 
     const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
@@ -535,6 +535,7 @@ function createDesktopOutputStrip(i, type) {
         title,
         name: nameDiv,
         customClass,
+        idPrefix,
         onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})`,
         configAction: `openChannelConfig(event, ${configId})`,
         type: "output",
@@ -545,8 +546,8 @@ function createDesktopOutputStrip(i, type) {
     });
 }
 
-function createOutputStrip(i, type) {
-    if (layoutMode === 'desktop') return createDesktopOutputStrip(i, type);
+function createOutputStrip(i, type, idPrefix = "") {
+    if (layoutMode === 'desktop') return createDesktopOutputStrip(i, type, idPrefix);
 
     let prefix, title, cmdPrefix, customClass, configId, ch;
     
@@ -569,38 +570,39 @@ function createOutputStrip(i, type) {
         title = `ST IN ${i + 1}`;
         cmdPrefix = 'kInput';
         customClass = "fader-group-st";
-        configId = 60 + (i * 2);
-        ch = 32 + (i * 2);
+        configId = 60 + i;
+        ch = 32 + i;
     }
 
     const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
     const nameDiv = stateRef ? stateRef.name : title;
     const actionCh = type === 'stIn' ? configId : ch;
 
+    const pfx = idPrefix || "";
     return `
-        <div class="fader-card ${customClass}" ${type === 'stIn' ? `data-ch="${configId}" data-partner-ch="${configId + 1}"` : ''}>
+        <div class="fader-card ${customClass}" id="${pfx}card${prefix}${i}" ${type === 'stIn' ? `data-ch="${configId}" data-partner-ch="${configId + 1}"` : ''}>
             ${type === 'stIn' ? `
             <div class="mobile-paired-meter left"></div>
             <div class="mobile-paired-meter right"></div>
             ` : ''}
             ${getMobileScaleHTML()}
-            <div class="ch-clickable-zone" onclick="openChannelConfig(event, ${configId})">
+            <div class="ch-clickable-zone" onclick="${idPrefix ? "" : `openChannelConfig(event, ${configId})`}">
                 <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : type === 'bus' ? '#00ffcc' : '#ff00ff'}">${title}</h2>
-                <div id="name${prefix}${i}" class="ch-name">${nameDiv}</div>
+                <div id="${pfx}name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>
             
-            <button id="on${prefix}${i}" class="btn-state" onclick="toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})">On</button>
+            <button id="${pfx}on${prefix}${i}" class="btn-state" onclick="toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})">On</button>
 
             <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                 <button class="btn-nudge pointer-none">+</button>
             </div>
             
-            <input type="range" id="f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${actionCh})" onclick="event.stopPropagation()">
+            <input type="range" id="${pfx}f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${actionCh})" onclick="event.stopPropagation()">
             
-            <div class="ch-clickable-zone mt-auto" onclick="${type === 'mix' ? `enterTechnicianMixMode(${i})` : ''}">
+            <div class="ch-clickable-zone mt-auto" onclick="${type === 'mix' && !idPrefix ? `enterTechnicianMixMode(${i})` : ''}">
                 <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, -1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                     <button class="btn-nudge pointer-none">-</button>
-                    <h1 id="v${prefix}${i}" class="fader-val">-∞</h1>
+                    <h1 id="${pfx}v${prefix}${i}" class="fader-val">-∞</h1>
                 </div>
             </div>
         </div>
@@ -791,8 +793,8 @@ function initUI() {
             const s = channelStates[i];
             if (s && s.pan !== undefined) updatePanIndicator(i, s.pan);
         }
-        // ST IN (globais 60-66)
-        for (let stGlobal = 60; stGlobal <= 66; stGlobal += 2) {
+        // ST IN (globais 60-63)
+        for (let stGlobal = 60; stGlobal <= 63; stGlobal++) {
             const s = channelStates[32 + (stGlobal - 60)];
             if (s && s.pan !== undefined) updatePanIndicator(stGlobal, s.pan);
         }

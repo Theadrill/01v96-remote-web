@@ -32,7 +32,7 @@ for (let i = 0; i < 8; i++) {
     busesState.push({ value: 0, on: false, name: `BUS ${i+1}`, eq: DEFAULT_OUT_EQ() });
 }
 
-let masterState = { value: 0, on: false };
+let masterState = { value: 0, on: false, eq: DEFAULT_OUT_EQ() };
 let activeConfigChannel = null;
 let activeConfigTab = "aux"; // Auxiliares por padrão
 let appOrientation = 'vertical';
@@ -84,18 +84,20 @@ function dbToRaw(db) {
  * IDs: 0-31 (Inputs), 36-43 (Mixes), 44-51 (Buses), 52 (Master)
  */
 function getChannelStateById(id) {
-    if (id === 'master' || id === 52) return masterState;
-
-    // Se for string no formato 'm0' (Mix) ou 'b0' (Bus)
-    if (typeof id === 'string') {
-        if (id.startsWith('m')) return mixesState[parseInt(id.substring(1))];
-        if (id.startsWith('b')) return busesState[parseInt(id.substring(1))];
+    if (typeof id === 'string' && id.startsWith('st')) {
+        const num = parseInt(id.replace('st', ''), 10);
+        return channelStates[32 + num];
     }
-
-    if (id >= 0 && id <= 31) return channelStates[id];
-    if (id >= 60 && id <= 67) return channelStates[32 + (id - 60)];
-    if (id >= 36 && id <= 43) return mixesState[id - 36];
-    if (id >= 44 && id <= 51) return busesState[id - 44];
+    if (id === 'master' || id === 52) return masterState;
+    if (typeof id === 'string' && id.startsWith('m')) return mixesState[parseInt(id.substring(1), 10)];
+    if (typeof id === 'string' && id.startsWith('b')) return busesState[parseInt(id.substring(1), 10)];
+    
+    if (typeof id === 'number') {
+        if (id >= 0 && id <= 31) return channelStates[id];
+        if (id >= 36 && id <= 43) return mixesState[id - 36];
+        if (id >= 44 && id <= 51) return busesState[id - 44];
+        if (id >= 60 && id <= 67) return channelStates[32 + (id - 60)];
+    }
     return null;
 }
 

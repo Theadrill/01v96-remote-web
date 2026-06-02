@@ -365,8 +365,8 @@ impl GlobalState {
                             ch.name_chars[i] = c.clone();
                         }
                     }
-                } else if (60..=67).contains(&idx) {
-                    let local = 32 + (idx - 60) / 2;
+                } else if (60..=63).contains(&idx) {
+                    let local = 32 + (idx - 60);
                     if let Some(ch) = self.channels.get_mut(&local) {
                         ch.name = limited.to_string();
                         if ch.name_chars.len() < 4 {
@@ -423,12 +423,18 @@ impl GlobalState {
                 }
 
                 // --- Faders / On ---
+                let local_ch = if (60..=67).contains(channel) {
+                    32 + (channel - 60) / 2
+                } else {
+                    *channel
+                };
+
                 if mt == "kInputFader/kFader" {
-                    if let Some(ch) = self.channels.get_mut(channel) {
+                    if let Some(ch) = self.channels.get_mut(&local_ch) {
                         ch.value = v;
                     }
                 } else if mt == "kInputChannelOn/kChannelOn" {
-                    if let Some(ch) = self.channels.get_mut(channel) {
+                    if let Some(ch) = self.channels.get_mut(&local_ch) {
                         ch.on = cv;
                     }
                 } else if mt == "kStereoFader/kFader" {
@@ -623,8 +629,8 @@ impl GlobalState {
         if mt.starts_with("kInput") || mt == "kPan" {
             if channel <= 31 {
                 return self.channels.get_mut(&channel).map(|c| c as &mut dyn ChannelLike);
-            } else if (60..=67).contains(&channel) {
-                let local = 32 + (channel - 60) / 2;
+            } else if (60..=63).contains(&channel) {
+                let local = 32 + (channel - 60);
                 return self.channels.get_mut(&local).map(|c| c as &mut dyn ChannelLike);
             }
         } else if mt.starts_with("kAUX") {
@@ -647,8 +653,8 @@ impl GlobalState {
                     ch.name = ch.name_chars.join("").trim().to_string();
                 }
             }
-        } else if (60..=67).contains(&channel) {
-            let local = 32 + (channel - 60) / 2;
+        } else if (60..=63).contains(&channel) {
+            let local = 32 + (channel - 60);
             if let Some(ch) = self.channels.get_mut(&local) {
                 if ch.name_chars.len() < 4 {
                     ch.name_chars.resize(4, " ".to_string());

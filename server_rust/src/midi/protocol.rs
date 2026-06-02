@@ -120,6 +120,12 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     packet.push(coords[3]);
 
     let mut final_channel = channel;
+    
+    // Map ST IN channels for any Input command
+    if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
+        final_channel = 32 + ((channel - 60) * 2);
+    }
+    
     if command_name.contains("EQ/") || command_name.contains("Comp/") || command_name == "kInputAttenuator/kAtt" {
         if command_name.starts_with("kAUX") && channel >= 36 && channel <= 43 {
             final_channel = channel - 36;
@@ -127,8 +133,6 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
             final_channel = channel - 44;
         } else if command_name.starts_with("kStereo") && channel == 52 {
             final_channel = 0;
-        } else if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
-            final_channel = 32 + (channel - 60);
         }
     }
     packet.push(final_channel);
@@ -264,7 +268,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             if element == 4 {
                 channel_index = channel;
             } else if element == 23 {
-                channel_index = 60 + (channel * 2);
+                channel_index = 60 + channel;
             } else if element == 16 {
                 channel_index = 36 + channel;
             } else if element == 15 {
@@ -461,7 +465,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         // --- ST IN channel remap for faders/on ---
         let mut final_ch = channel;
         if channel >= 32 && channel <= 39 {
-            final_ch = 60 + (channel - 32);
+            final_ch = 60 + ((channel - 32) / 2);
         }
 
         // Input Faders / On / Attenuator
@@ -610,7 +614,7 @@ pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Option<V
 
 fn name_channel_mapping(channel: u8) -> (u8, u8) {
     if channel >= 60 && channel <= 67 {
-        (23, (channel - 60) / 2)
+        (23, channel - 60)
     } else if channel >= 36 && channel <= 43 {
         (16, channel - 36)
     } else if channel >= 44 && channel <= 51 {

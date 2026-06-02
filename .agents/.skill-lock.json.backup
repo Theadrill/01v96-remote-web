@@ -1,0 +1,64 @@
+{
+  "version": 2,
+  "skills": {
+    "coding-guidelines": {
+      "name": "coding-guidelines",
+      "source": "local",
+      "contentHash": "28a414c715d3c41aae28a25e2f109813ec3f246f76b5567c1e7d6a128cd289ff",
+      "installedAt": "2026-06-02T18:00:14.508Z",
+      "updatedAt": "2026-06-02T18:00:14.692Z",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "roo",
+        "opencode"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "docs-writer": {
+      "name": "docs-writer",
+      "source": "local",
+      "contentHash": "c49827c59d2e27d313731dfd36314cfde0e8dbf15be0e8f813d2f8b751546b0c",
+      "installedAt": "2026-06-02T18:00:14.519Z",
+      "updatedAt": "2026-06-02T18:00:14.698Z",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "roo",
+        "opencode"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "gh-address-comments": {
+      "name": "gh-address-comments",
+      "source": "local",
+      "contentHash": "a1808fb136b7118a7bdac65415e9a40a7982953f8b3339c97087fc0807865d88",
+      "installedAt": "2026-06-02T18:00:14.527Z",
+      "updatedAt": "2026-06-02T18:00:14.686Z",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "cline",
+        "codex",
+        "gemini",
+        "antigravity",
+        "roo"
+      ],
+      "method": "copy",
+      "global": false
+    }
+  }
+}

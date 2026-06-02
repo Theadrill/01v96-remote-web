@@ -370,19 +370,13 @@ socket.on('sync', (s) => {
                 const soloBool = !!ch.solo;
                 const onBool = !!o;
 
-                // Pular índices ímpares dos ST IN (33, 35, 37, 39) para evitar confusão de UI
-                if (i >= 32 && i % 2 !== 0) continue;
-
-                // Canais 0-31 mantêm o ID. ST IN (32-39) mapeiam para 60-67.
+                // Canais 0-31 mantêm o ID. ST IN (32-35) mapeiam para 60-63.
                 const globalId = (i >= 32) ? (60 + (i - 32)) : i;
 
                 updateUI(globalId, v, onBool, soloBool);
-                const newName = ch.name || (i < 32 ? `CH ${i + 1}` : `ST IN ${Math.floor((i - 32) / 2) + 1}`);
+                const newName = ch.name || (i < 32 ? `CH ${i + 1}` : `ST IN ${i - 32 + 1}`);
                 if (typeof updateNameUI === 'function') {
-                    // Apenas atualiza o nome se for um canal normal (<32) ou o L de um Stereo IN (par: 32, 34, 36, 38)
-                    if (i < 32 || i % 2 === 0) {
-                        updateNameUI(globalId, newName);
-                    }
+                    updateNameUI(globalId, newName);
                 }
             }
         }

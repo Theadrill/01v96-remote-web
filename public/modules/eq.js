@@ -534,8 +534,8 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     }
 
     let hMode = 'peaking';
-    const hqRaw = sysexToVal(eq.high?.q);
-    const hlpfOn = sysexToVal(eq.high?.lpfOn);
+    const hqRaw = sysexToVal(eq.high?.q ?? eq.hi?.q);
+    const hlpfOn = sysexToVal(eq.high?.lpfOn ?? eq.hi?.lpfOn);
     
     if (hqRaw === 41 || hqRaw === 42) {
         hMode = 'highshelf';

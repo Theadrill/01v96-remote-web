@@ -254,7 +254,7 @@ impl SyncManager {
                 }
             }
             for st in 0..4u8 {
-                let gid = 60 + (st * 2);
+                let gid = 60 + st;
                 for c in 0..4u8 {
                     if let Some(req) = midi::protocol::build_name_request(gid, c) {
                         requests.push(req);
@@ -384,7 +384,7 @@ async fn queue_all_params_inner(
 
     if force_names {
         for st in 0..4u8 {
-            let gid = 60 + (st * 2);
+            let gid = 60 + st;
             for c in 0..4u8 {
                 if let Some(req) = midi::protocol::build_name_request(gid, c) {
                     requests.push(req);

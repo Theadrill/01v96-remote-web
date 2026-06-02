@@ -1,6 +1,17 @@
 window.renderRouting = function(chIdx) {
     const container = document.querySelector('.ch-modal-body');
-    const chData = channelStates[chIdx];
+    const chData = getChannelStateById(chIdx) || {};
+    
+    // Master (52), Buses (44-51), Mixes (36-43) não têm essa tela de routing na 01V96
+    if ((chIdx >= 36 && chIdx <= 52) && !(chIdx >= 60 && chIdx <= 63)) {
+        container.innerHTML = `
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#666; padding:20px; text-align:center;">
+                <div style="font-size:48px; margin-bottom:15px; opacity:0.3;"><i class="fas fa-route"></i></div>
+                <div style="font-size:14px; font-weight:bold; text-transform:uppercase;">Routing Não Disponível</div>
+            </div>`;
+        return;
+    }
+
     const patchVal = chData.patch || 0; 
     
     container.innerHTML = `
