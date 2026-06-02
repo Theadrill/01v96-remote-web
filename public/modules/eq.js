@@ -88,35 +88,26 @@ function initEQEngine(ch) {
     let lowMode = 'peaking';
     const lowQRaw = sysexToVal(lowData.q);
     const lowHPFOn = sysexToVal(lowData.hpfOn);
-    // Se q > 40 e hpfOn=0: o estado ainda tem o código de modo do HPF.
-    // Nesse caso o tipo era HPF (que tem gain=0). Replicamos esse comportamento do caminho real-time.
-    const lowWasHPFMode = (lowHPFOn !== 1 && lowQRaw > 40);
-    if (lowHPFOn === 1) {
-        if (lowQRaw === 44) lowMode = 'highpass';
-        else if (lowQRaw === 41) lowMode = 'lowshelf';
-        else lowMode = 'peaking';
+    
+    if (lowQRaw === 41) {
+        lowMode = 'lowshelf';
+    } else if (lowQRaw >= 42 || lowHPFOn === 1) {
+        lowMode = 'highpass';
     }
-    // Q seguro para peaking: códigos de modo (>=41) são ignorados quando HPF está OFF
-    const safeInitLowQ = lowWasHPFMode ? 20 : lowQRaw;
+    const lowWasHPFMode = (lowMode === 'highpass');
+    const safeInitLowQ = (lowQRaw > 40) ? 20 : lowQRaw;
     
     let highMode = 'peaking';
     const highQRaw = sysexToVal(highData.q);
     const highLPFOn = sysexToVal(highData.lpfOn);
-    const highWasLPFMode = (highLPFOn !== 1 && highQRaw > 40);
-    if (highLPFOn === 1) {
-        if (highQRaw === 43) {
-            highMode = 'lowpass';
-        } else if (highQRaw === 42 || highQRaw === 44) {
-            highMode = 'highshelf';
-        }
-    }
-    // Q seguro para peaking: códigos de modo (>=41) são ignorados quando LPF está OFF
-    const safeInitHighQ = highWasLPFMode ? 20 : highQRaw;
     
-    // Calibração Final: Só força highshelf se lpfOn=1 E o Q for um código de modo (>40).
-    // Se lpfOn=1 mas Q está no range peaking normal (0-40), mantém peaking.
-    // (Evita shelf incorreto em transições de modo onde lpfOn=1 mas Q ainda é peaking)
-    if (highLPFOn === 1 && highMode === 'peaking' && highQRaw > 40) highMode = 'highshelf';
+    if (highQRaw === 41 || highQRaw === 42) {
+        highMode = 'highshelf';
+    } else if (highQRaw >= 43 || highLPFOn === 1) {
+        highMode = 'lowpass';
+    }
+    const highWasLPFMode = (highMode === 'lowpass');
+    const safeInitHighQ = (highQRaw > 40) ? 20 : highQRaw;
 
     const mapping = [
         { key: 'low', type: lowMode, color: '#ff4d4d', defaultF: 32 }, // 100Hz
@@ -379,13 +370,12 @@ function setBandMode(bandIdx, mode) {
 
     if (mode === 'peaking') {
         switchOn = 0;
+    } else if (mode.includes('shelf')) {
+        switchOn = 0; // Shelf não liga o HPF/LPF
+        qValue = isLow ? 41 : 42;
     } else {
-        switchOn = 1;
-        if (isLow) {
-            qValue = (mode === 'highpass') ? 44 : 41;
-        } else {
-            qValue = (mode === 'lowpass') ? 43 : 42;
-        }
+        switchOn = 1; // Highpass/Lowpass liga o HPF/LPF
+        qValue = isLow ? 44 : 43;
     }
 
     // Persiste no state local para evitar flicker
@@ -526,34 +516,36 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     
     // Sincroniza Tipos de Filtro na UI
     let lMode = 'peaking';
+    const lqRaw = sysexToVal(eq.low?.q);
     const lhpfOn = sysexToVal(eq.low?.hpfOn);
-    if (lhpfOn === 1) {
-        const lq = sysexToVal(eq.low?.q);
-        if (lq === 44) lMode = 'highpass';
-        else if (lq === 41) lMode = 'lowshelf';
+    
+    if (lqRaw === 41) {
+        lMode = 'lowshelf';
+    } else if (lqRaw >= 42 || lhpfOn === 1) {
+        lMode = 'highpass';
     }
+
     if (eqBands[0]) {
         eqBands[0].filter.type = lMode;
-        // Se HPF/Shelf OFF, garante Q válido para peaking (não usa código de modo >= 41)
         if (lMode === 'peaking') {
-            const lqRaw = sysexToVal(eq.low?.q);
             const safeLQ = (lqRaw > 40) ? 20 : (lqRaw ?? 20);
             eqBands[0].filter.Q.value = rawToQ(safeLQ);
         }
     }
 
     let hMode = 'peaking';
+    const hqRaw = sysexToVal(eq.high?.q);
     const hlpfOn = sysexToVal(eq.high?.lpfOn);
-    if (hlpfOn === 1) {
-        const hq = sysexToVal(eq.high?.q);
-        if (hq === 43) hMode = 'lowpass';
-        else if (hq === 42 || hq === 44) hMode = 'highshelf';
+    
+    if (hqRaw === 41 || hqRaw === 42) {
+        hMode = 'highshelf';
+    } else if (hqRaw >= 43 || hlpfOn === 1) {
+        hMode = 'lowpass';
     }
+
     if (eqBands[3]) {
         eqBands[3].filter.type = hMode;
-        // Se LPF/Shelf OFF, garante Q válido para peaking (não usa código de modo >= 41)
         if (hMode === 'peaking') {
-            const hqRaw = sysexToVal(eq.high?.q);
             const safeHQ = (hqRaw > 40) ? 20 : (hqRaw ?? 20);
             eqBands[3].filter.Q.value = rawToQ(safeHQ);
         }
