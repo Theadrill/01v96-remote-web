@@ -526,7 +526,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
     }
 
     const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
-    const nameDiv = stateRef ? stateRef.name : title;
+    const nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
     const actionCh = type === 'stIn' ? configId : ch;
 
     return createDesktopStrip({
@@ -575,7 +575,7 @@ function createOutputStrip(i, type, idPrefix = "") {
     }
 
     const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
-    const nameDiv = stateRef ? stateRef.name : title;
+    const nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
     const actionCh = type === 'stIn' ? configId : ch;
 
     const pfx = idPrefix || "";

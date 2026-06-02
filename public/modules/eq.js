@@ -869,7 +869,8 @@ function nudgeQ(dir) {
     // Na 01V96, apenas o modo PEAKING (Normal) permite ajuste de Q
     if (b.filter.type !== 'peaking') return;
     
-    const chEq = channelStates[ch].eq;
+    const state = getChannelStateById(ch);
+    const chEq = state ? state.eq : null;
     if (!chEq || !chEq[b.key]) return;
 
     let v = sysexToVal(chEq[b.key].q);
@@ -909,7 +910,8 @@ function nudgeFreq(dir) {
     if (selectedBandIdx === -1) return;
     const ch = activeConfigChannel;
     const b = eqBands[selectedBandIdx];
-    const chEq = channelStates[ch].eq;
+    const state = getChannelStateById(ch);
+    const chEq = state ? state.eq : null;
     if (!chEq || !chEq[b.key]) return;
 
     let v = sysexToVal(chEq[b.key].f);
@@ -953,7 +955,8 @@ function nudgeGain(dir) {
     const b = eqBands[selectedBandIdx];
     if (b.filter.type === 'highpass' || b.filter.type === 'lowpass') return;
 
-    const chEq = channelStates[ch].eq;
+    const state = getChannelStateById(ch);
+    const chEq = state ? state.eq : null;
     if (!chEq || !chEq[b.key]) return;
 
     let v = sysexToVal(chEq[b.key].g);
@@ -985,7 +988,8 @@ function nudgeGain(dir) {
 
 // Funções de Cópia e Cola
 window.copyEQ = function(ch) {
-    const s = channelStates[ch].eq;
+    const state = getChannelStateById(ch);
+    const s = state ? state.eq : null;
     if (!s) return console.warn(`Sem dados de EQ para o canal ${ch + 1}`);
     
     eqClipboard = JSON.parse(JSON.stringify(s));
@@ -1083,7 +1087,7 @@ window.eqGainInput = function(e) {
     b.filter.gain.value = newG;
     
     // Atualiza Estado Local
-    const chState = channelStates[ch];
+    const chState = getChannelStateById(ch);
     if (chState && chState.eq && chState.eq[b.key]) {
         chState.eq[b.key].g = rawG;
     }
@@ -1116,7 +1120,7 @@ window.eqFreqInput = function(e) {
     b.filter.frequency.value = newF;
     
     // Atualiza Estado Local
-    const chState = channelStates[ch];
+    const chState = getChannelStateById(ch);
     if (chState && chState.eq && chState.eq[b.key]) {
         chState.eq[b.key].f = rawF;
     }
@@ -1148,7 +1152,7 @@ window.stopATTNudge = function() {
 };
 function nudgeATT(dir) {
     const ch = activeConfigChannel;
-    const state = channelStates[ch];
+    const state = getChannelStateById(ch);
     if (!state) return;
 
     let v = state.att !== undefined ? state.att : (state.eq && state.eq.att !== undefined ? state.eq.att : 0);
@@ -1242,7 +1246,7 @@ window.toggleATTModal = function(show) {
     if (show) {
         // Inicializa com o valor atual (puxado do channelStates)
         const ch = activeConfigChannel;
-        const state = channelStates[ch] || {};
+        const state = getChannelStateById(ch) || {};
         const att = (state.att !== undefined) ? state.att : 0;
         
         const input = document.getElementById('eqATTInput');
@@ -1276,8 +1280,8 @@ window.eqATTInput = function(e) {
     if (valEl) valEl.innerText = (dbValue > 0 ? '+' : '') + dbValue.toFixed(1) + ' dB';
     
     // Atualiza Estado Local
-    if (!channelStates[ch]) channelStates[ch] = {};
-    channelStates[ch].att = rawVal;
+    const state = getChannelStateById(ch);
+    if (state) state.att = rawVal;
     
     // Envia para mesa
     socket.emit('control', { type: 'kInputAttenuator/kAtt', channel: ch, value: rawVal });

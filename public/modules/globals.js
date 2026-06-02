@@ -158,7 +158,14 @@ function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
  */
 window.updateNameUI = function(channel, name) {
     const limitedName = (name || '').substring(0, 16).trim(); // Armazenamos até 16, mas exibimos 4 no visor
-    const displayName = limitedName.substring(0, 4) || (channel < 32 ? `CH ${channel + 1}` : '');
+    let defaultShortName = '';
+    if (channel >= 0 && channel <= 31) defaultShortName = `CH ${channel + 1}`;
+    else if (channel >= 60 && channel <= 67) defaultShortName = `ST ${Math.floor((channel - 60) / 2) + 1}`;
+    else if (channel >= 36 && channel <= 43) defaultShortName = `AUX${channel - 35}`;
+    else if (channel >= 44 && channel <= 51) defaultShortName = `BUS${channel - 43}`;
+    else if (channel === 52) defaultShortName = `MSTR`;
+
+    const displayName = limitedName.substring(0, 4) || defaultShortName;
     
     // 1. Atualiza o estado local para consistência
     const stateObj = getChannelStateById(channel);

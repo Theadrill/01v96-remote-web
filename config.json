@@ -1,7 +1,7 @@
 {
   "inIdx": 0,
   "outIdx": 1,
-  "loopmidi-monitor": true,
+  "loopmidi-monitor": false,
   "open_browser_startup": false,
   "demo_mode": false,
   "lumikit_ips": [
