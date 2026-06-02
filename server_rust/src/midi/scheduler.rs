@@ -44,13 +44,19 @@ impl MidiScheduler {
     }
 
     pub async fn enqueue_batch(&self, items: Vec<Vec<u8>>, priority: u8) {
-        if items.is_empty() { return; }
+        if items.is_empty() {
+            return;
+        }
         let mut state = self.state.lock().await;
         match priority {
             0 => {
                 for bytes in items {
                     if let Some(addr) = Self::extract_address(&bytes) {
-                        if let Some(idx) = state.q0.iter().position(|i| Self::extract_address(i) == Some(addr.clone())) {
+                        if let Some(idx) = state
+                            .q0
+                            .iter()
+                            .position(|i| Self::extract_address(i) == Some(addr.clone()))
+                        {
                             state.q0[idx] = bytes;
                             continue;
                         }
@@ -58,7 +64,9 @@ impl MidiScheduler {
                     state.q0.push(bytes);
                 }
             }
-            1 => { state.q1.extend(items); }
+            1 => {
+                state.q1.extend(items);
+            }
             2 => {
                 if state.q0.is_empty() && state.q1.is_empty() {
                     state.q2.extend(items);
@@ -69,12 +77,18 @@ impl MidiScheduler {
     }
 
     pub async fn enqueue(&self, bytes: Vec<u8>, priority: u8) -> bool {
-        if bytes.is_empty() { return false; }
+        if bytes.is_empty() {
+            return false;
+        }
         let mut state = self.state.lock().await;
         match priority {
             0 => {
                 if let Some(addr) = Self::extract_address(&bytes) {
-                    if let Some(idx) = state.q0.iter().position(|i| Self::extract_address(i) == Some(addr.clone())) {
+                    if let Some(idx) = state
+                        .q0
+                        .iter()
+                        .position(|i| Self::extract_address(i) == Some(addr.clone()))
+                    {
                         state.q0[idx] = bytes;
                         return true;
                     }
@@ -82,9 +96,14 @@ impl MidiScheduler {
                 state.q0.push(bytes);
                 true
             }
-            1 => { state.q1.push(bytes); true }
+            1 => {
+                state.q1.push(bytes);
+                true
+            }
             2 => {
-                if !state.q0.is_empty() || !state.q1.is_empty() { return false; }
+                if !state.q0.is_empty() || !state.q1.is_empty() {
+                    return false;
+                }
                 state.q2.push(bytes);
                 true
             }
@@ -108,7 +127,9 @@ impl MidiScheduler {
 
     pub async fn start(&self) {
         let mut state_lock = self.state.lock().await;
-        if state_lock.is_running { return; }
+        if state_lock.is_running {
+            return;
+        }
         state_lock.is_running = true;
         let tick_ms = state_lock.tick_ms;
         drop(state_lock);
@@ -123,12 +144,19 @@ impl MidiScheduler {
             loop {
                 interval.tick().await;
                 let mut state = state_clone.lock().await;
-                if !state.is_running { break; }
+                if !state.is_running {
+                    break;
+                }
 
-                let packet = if !state.q0.is_empty() { Some(state.q0.remove(0)) }
-                else if !state.q1.is_empty() { Some(state.q1.remove(0)) }
-                else if !state.q2.is_empty() { Some(state.q2.remove(0)) }
-                else { None };
+                let packet = if !state.q0.is_empty() {
+                    Some(state.q0.remove(0))
+                } else if !state.q1.is_empty() {
+                    Some(state.q1.remove(0))
+                } else if !state.q2.is_empty() {
+                    Some(state.q2.remove(0))
+                } else {
+                    None
+                };
 
                 match packet {
                     Some(p) => {
@@ -178,7 +206,12 @@ mod tests {
 
         scheduler.enqueue(vec![0x02], 2).await;
         scheduler.enqueue(vec![0x01], 1).await;
-        scheduler.enqueue(vec![0xF0, 0x43, 0x10, 0x3E, 0x01, 0x02, 0x03, 0x04, 0x05, 0xF7], 0).await;
+        scheduler
+            .enqueue(
+                vec![0xF0, 0x43, 0x10, 0x3E, 0x01, 0x02, 0x03, 0x04, 0x05, 0xF7],
+                0,
+            )
+            .await;
 
         scheduler.start().await;
         tokio::time::sleep(Duration::from_millis(100)).await;

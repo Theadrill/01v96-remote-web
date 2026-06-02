@@ -409,39 +409,64 @@ impl GlobalState {
                 let cv = v > 0.0;
 
                 // Diagnostic for first few messages
-                static CC_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+                static CC_COUNT: std::sync::atomic::AtomicUsize =
+                    std::sync::atomic::AtomicUsize::new(0);
                 let cc = CC_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                 if cc < 50 {
-                    tracing::info!("🔧 [apply_midi] CC#{}: type={}, ch={}, value={}", cc, mt, channel, v);
+                    tracing::info!(
+                        "🔧 [apply_midi] CC#{}: type={}, ch={}, value={}",
+                        cc,
+                        mt,
+                        channel,
+                        v
+                    );
                 }
 
                 // --- Faders / On ---
                 if mt == "kInputFader/kFader" {
-                    if let Some(ch) = self.channels.get_mut(channel) { ch.value = v; }
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.value = v;
+                    }
                 } else if mt == "kInputChannelOn/kChannelOn" {
-                    if let Some(ch) = self.channels.get_mut(channel) { ch.on = cv; }
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.on = cv;
+                    }
                 } else if mt == "kStereoFader/kFader" {
                     self.master.value = v;
                 } else if mt == "kStereoChannelOn/kChannelOn" {
                     self.master.on = cv;
                 } else if mt == "kAUXFader/kFader" {
-                    if let Some(mix) = self.mixes.get_mut(channel) { mix.value = v; }
+                    if let Some(mix) = self.mixes.get_mut(channel) {
+                        mix.value = v;
+                    }
                 } else if mt == "kAUXChannelOn/kChannelOn" {
-                    if let Some(mix) = self.mixes.get_mut(channel) { mix.on = cv; }
+                    if let Some(mix) = self.mixes.get_mut(channel) {
+                        mix.on = cv;
+                    }
                 } else if mt == "kBusFader/kFader" {
-                    if let Some(bus) = self.buses.get_mut(channel) { bus.value = v; }
+                    if let Some(bus) = self.buses.get_mut(channel) {
+                        bus.value = v;
+                    }
                 } else if mt == "kBusChannelOn/kChannelOn" {
-                    if let Some(bus) = self.buses.get_mut(channel) { bus.on = cv; }
+                    if let Some(bus) = self.buses.get_mut(channel) {
+                        bus.on = cv;
+                    }
                 // --- Solo / Phase / Att / Patch ---
                 } else if mt == "kSetupSoloChOn/kSoloChOn" {
-                    if let Some(ch) = self.channels.get_mut(channel) { ch.solo = cv; }
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.solo = cv;
+                    }
                 } else if mt == "kInputPhase/kPhase" {
-                    if let Some(ch) = self.channels.get_mut(channel) { ch.phase = v; }
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.phase = v;
+                    }
                 } else if mt == "kInputAttenuator/kAtt" {
                     let s: &mut dyn ChannelLike = self.get_channel_like(*channel);
                     s.set_att(v);
                 } else if mt == "kChannelInput/kChannelIn" {
-                    if let Some(ch) = self.channels.get_mut(channel) { ch.patch = v; }
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.patch = v;
+                    }
                 // --- Pan ---
                 } else if mt == "kPan" {
                     let s = self.get_channel_like(*channel);
@@ -450,20 +475,38 @@ impl GlobalState {
                 } else if mt == "kInputPair/kPair" {
                     if let Some(ch) = self.channels.get_mut(channel) {
                         let is_paired = cv;
-                        let partner_idx = if channel % 2 == 0 { channel + 1 } else { channel - 1 };
+                        let partner_idx = if channel % 2 == 0 {
+                            channel + 1
+                        } else {
+                            channel - 1
+                        };
                         ch.paired = is_paired;
                         ch.paired_with = if is_paired { Some(partner_idx) } else { None };
-                        ch.pair_source = if is_paired { Some((*channel).min(partner_idx)) } else { None };
+                        ch.pair_source = if is_paired {
+                            Some((*channel).min(partner_idx))
+                        } else {
+                            None
+                        };
                     }
-                    let partner_idx = if channel % 2 == 0 { channel + 1 } else { channel - 1 };
+                    let partner_idx = if channel % 2 == 0 {
+                        channel + 1
+                    } else {
+                        channel - 1
+                    };
                     if let Some(partner) = self.channels.get_mut(&partner_idx) {
                         partner.paired = cv;
                         partner.paired_with = if cv { Some(*channel) } else { None };
-                        partner.pair_source = if cv { Some((*channel).min(partner_idx)) } else { None };
+                        partner.pair_source = if cv {
+                            Some((*channel).min(partner_idx))
+                        } else {
+                            None
+                        };
                     }
                 // --- Bus Assign ---
                 } else if mt == "kInputBus/kStereo" {
-                    if let Some(ch) = self.channels.get_mut(channel) { ch.stereo = cv; }
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.stereo = cv;
+                    }
                 } else if mt.starts_with("kInputBus/kBus") {
                     if let Ok(bus_num) = mt.replace("kInputBus/kBus", "").parse::<usize>() {
                         if bus_num >= 1 && bus_num <= 8 {
@@ -484,7 +527,10 @@ impl GlobalState {
                     if let Some(ch_idx) = target_ch_idx {
                         if let Some(ch) = self.channels.get_mut(&ch_idx) {
                             if mt.ends_with("Level") {
-                                if let Some(aux_num_str) = mt.strip_prefix("kInputAUX/kAUX").and_then(|s| s.strip_suffix("Level")) {
+                                if let Some(aux_num_str) = mt
+                                    .strip_prefix("kInputAUX/kAUX")
+                                    .and_then(|s| s.strip_suffix("Level"))
+                                {
                                     if let Ok(aux_num) = aux_num_str.parse::<usize>() {
                                         match aux_num {
                                             1 => ch.aux1 = v,
@@ -500,7 +546,10 @@ impl GlobalState {
                                     }
                                 }
                             } else if mt.ends_with("On") {
-                                if let Some(aux_num_str) = mt.strip_prefix("kInputAUX/kAUX").and_then(|s| s.strip_suffix("On")) {
+                                if let Some(aux_num_str) = mt
+                                    .strip_prefix("kInputAUX/kAUX")
+                                    .and_then(|s| s.strip_suffix("On"))
+                                {
                                     if let Ok(aux_num) = aux_num_str.parse::<usize>() {
                                         match aux_num {
                                             1 => ch.aux1_on = cv,
@@ -567,16 +616,24 @@ impl GlobalState {
 
     fn get_channel_like(&mut self, id: usize) -> &mut dyn ChannelLike {
         if id <= 31 {
-            if let Some(ch) = self.channels.get_mut(&id) { return ch; }
+            if let Some(ch) = self.channels.get_mut(&id) {
+                return ch;
+            }
         } else if (60..=67).contains(&id) {
             let local = 32 + (id - 60) / 2;
-            if let Some(ch) = self.channels.get_mut(&local) { return ch; }
+            if let Some(ch) = self.channels.get_mut(&local) {
+                return ch;
+            }
         } else if (36..=43).contains(&id) {
             let local = id - 36;
-            if let Some(m) = self.mixes.get_mut(&local) { return m; }
+            if let Some(m) = self.mixes.get_mut(&local) {
+                return m;
+            }
         } else if (44..=51).contains(&id) {
             let local = id - 44;
-            if let Some(b) = self.buses.get_mut(&local) { return b; }
+            if let Some(b) = self.buses.get_mut(&local) {
+                return b;
+            }
         } else if id == 52 {
             return &mut self.master;
         }
@@ -594,7 +651,9 @@ impl GlobalState {
         } else if (60..=67).contains(&channel) {
             let local = 32 + (channel - 60) / 2;
             if let Some(ch) = self.channels.get_mut(&local) {
-                if ch.name_chars.len() < 4 { ch.name_chars.resize(4, " ".to_string()); }
+                if ch.name_chars.len() < 4 {
+                    ch.name_chars.resize(4, " ".to_string());
+                }
                 if char_index < ch.name_chars.len() {
                     ch.name_chars[char_index] = char.to_string();
                     ch.name = ch.name_chars.join("").trim().to_string();
@@ -626,14 +685,27 @@ impl GlobalState {
 
     fn apply_eq(&mut self, mt: &str, channel: usize, value: f64) {
         let parts: Vec<&str> = mt.splitn(2, "EQ/").collect();
-        if parts.len() < 2 { return; }
+        if parts.len() < 2 {
+            return;
+        }
         let key = parts[1];
         let eq_keys = [
-            "kEQMode", "kEQLowQ", "kEQLowF", "kEQLowG", "kEQHPFOn",
-            "kEQLowMidQ", "kEQLowMidF", "kEQLowMidG",
-            "kEQHiMidQ", "kEQHiMidF", "kEQHiMidG",
-            "kEQHiQ", "kEQHiF", "kEQHiG",
-            "kEQLPFOn", "kEQOn",
+            "kEQMode",
+            "kEQLowQ",
+            "kEQLowF",
+            "kEQLowG",
+            "kEQHPFOn",
+            "kEQLowMidQ",
+            "kEQLowMidF",
+            "kEQLowMidG",
+            "kEQHiMidQ",
+            "kEQHiMidF",
+            "kEQHiMidG",
+            "kEQHiQ",
+            "kEQHiF",
+            "kEQHiG",
+            "kEQLPFOn",
+            "kEQOn",
         ];
         let found = eq_keys.iter().position(|&k| k == key);
 
@@ -670,12 +742,18 @@ trait ChannelLike {
 }
 
 impl ChannelLike for ChannelState {
-    fn set_att(&mut self, v: f64) { self.att = v; }
-    fn set_pan(&mut self, v: f64) { self.pan = v; }
+    fn set_att(&mut self, v: f64) {
+        self.att = v;
+    }
+    fn set_pan(&mut self, v: f64) {
+        self.pan = v;
+    }
     fn apply_comp(&mut self, mt: &str, v: f64) {
         apply_comp_fields(&mut self.comp, mt, v);
     }
-    fn eq_mut(&mut self) -> &mut EqState { &mut self.eq }
+    fn eq_mut(&mut self) -> &mut EqState {
+        &mut self.eq
+    }
 }
 
 impl ChannelLike for MixBusState {
@@ -684,21 +762,31 @@ impl ChannelLike for MixBusState {
     fn apply_comp(&mut self, mt: &str, v: f64) {
         apply_comp_fields(&mut self.comp, mt, v);
     }
-    fn eq_mut(&mut self) -> &mut EqState { &mut self.eq }
+    fn eq_mut(&mut self) -> &mut EqState {
+        &mut self.eq
+    }
 }
 
 impl ChannelLike for MasterState {
-    fn set_att(&mut self, v: f64) { self.att = v; }
-    fn set_pan(&mut self, v: f64) { self.pan = v; }
+    fn set_att(&mut self, v: f64) {
+        self.att = v;
+    }
+    fn set_pan(&mut self, v: f64) {
+        self.pan = v;
+    }
     fn apply_comp(&mut self, mt: &str, v: f64) {
         apply_comp_fields(&mut self.comp, mt, v);
     }
-    fn eq_mut(&mut self) -> &mut EqState { &mut self.eq }
+    fn eq_mut(&mut self) -> &mut EqState {
+        &mut self.eq
+    }
 }
 
 fn apply_comp_fields(comp: &mut CompState, mt: &str, value: f64) {
     let parts: Vec<&str> = mt.splitn(2, "Comp/").collect();
-    if parts.len() < 2 { return; }
+    if parts.len() < 2 {
+        return;
+    }
     match parts[1] {
         "kCompOn" => comp.on = value > 0.0,
         "kCompThreshold" => comp.thresh = value,

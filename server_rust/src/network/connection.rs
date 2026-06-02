@@ -3,9 +3,9 @@ use crate::midi::{self, MidiEngine, MidiScheduler, SyncCounter};
 use crate::network::SyncManager;
 use crate::state::GlobalState;
 use socketioxide::SocketIo;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use tokio::sync::{mpsc, RwLock};
+use std::sync::atomic::{AtomicBool, Ordering};
+use tokio::sync::{RwLock, mpsc};
 use tracing::{error, info, warn};
 
 pub struct ConnectionManager {
@@ -82,18 +82,16 @@ impl ConnectionManager {
         let io = self.io.clone();
         let demo = self.config.demo_mode;
         tokio::spawn(async move {
-            let _ = io.emit(
-                "connectionState",
-                &serde_json::json!({ "connected": connected, "demo_mode": demo }),
-            ).await;
+            let _ = io
+                .emit(
+                    "connectionState",
+                    &serde_json::json!({ "connected": connected, "demo_mode": demo }),
+                )
+                .await;
         });
     }
 
-    pub async fn try_boot_connect(
-        self: &Arc<Self>,
-        in_idx: usize,
-        out_idx: usize,
-    ) {
+    pub async fn try_boot_connect(self: &Arc<Self>, in_idx: usize, out_idx: usize) {
         if self.config.remote_midi {
             info!("🌐 Remoto MIDI ativo. Inicializando monitor de conexão de rede.");
             self.iniciar_busca_automatica();
@@ -111,8 +109,16 @@ impl ConnectionManager {
             }
         };
 
-        let in_name = inputs.iter().find(|(i, _)| *i == in_idx).map(|(_, n)| n.clone()).unwrap_or_default();
-        let out_name = outputs.iter().find(|(i, _)| *i == out_idx).map(|(_, n)| n.clone()).unwrap_or_default();
+        let in_name = inputs
+            .iter()
+            .find(|(i, _)| *i == in_idx)
+            .map(|(_, n)| n.clone())
+            .unwrap_or_default();
+        let out_name = outputs
+            .iter()
+            .find(|(i, _)| *i == out_idx)
+            .map(|(_, n)| n.clone())
+            .unwrap_or_default();
 
         if !validate(&in_name) || !validate(&out_name) {
             warn!("🚫 Conexao bloqueada no boot: porta nao atende criterios");
@@ -121,8 +127,15 @@ impl ConnectionManager {
 
         info!(
             "🎯 {} encontrada no boot: IN[{}]=\"{}\"  OUT[{}]=\"{}\"",
-            if self.config.loopmidi_monitor { "loopMIDI" } else { "Yamaha 01V96" },
-            in_idx, in_name, out_idx, out_name
+            if self.config.loopmidi_monitor {
+                "loopMIDI"
+            } else {
+                "Yamaha 01V96"
+            },
+            in_idx,
+            in_name,
+            out_idx,
+            out_name
         );
 
         self.executar_conexao(in_idx, out_idx).await;
@@ -157,16 +170,27 @@ impl ConnectionManager {
                         } else {
                             lower.contains("yamaha") && lower.contains("-1")
                         };
-                        if m { return Some((*idx, name.clone())); }
+                        if m {
+                            return Some((*idx, name.clone()));
+                        }
                     }
                     None
                 };
 
-                if let (Some((in_idx, in_name)), Some((out_idx, out_name))) = (find_port(&inputs), find_port(&outputs)) {
+                if let (Some((in_idx, in_name)), Some((out_idx, out_name))) =
+                    (find_port(&inputs), find_port(&outputs))
+                {
                     info!(
                         "🎯 {} encontrada: IN[{}]=\"{}\"  OUT[{}]=\"{}\"",
-                        if this.config.loopmidi_monitor { "loopMIDI" } else { "Yamaha 01V96" },
-                        in_idx, in_name, out_idx, out_name
+                        if this.config.loopmidi_monitor {
+                            "loopMIDI"
+                        } else {
+                            "Yamaha 01V96"
+                        },
+                        in_idx,
+                        in_name,
+                        out_idx,
+                        out_name
                     );
                     this.executar_conexao(in_idx, out_idx).await;
                 }
@@ -174,7 +198,9 @@ impl ConnectionManager {
         });
 
         if let Ok(mut guard) = self.busca_handle.lock() {
-            if let Some(old) = guard.take() { old.abort(); }
+            if let Some(old) = guard.take() {
+                old.abort();
+            }
             *guard = Some(handle);
         }
     }
@@ -193,10 +219,10 @@ impl ConnectionManager {
                         info!("🌐 [Conexão Remota] Status alterado para CONECTADO.");
                         this.is_connected.store(true, Ordering::SeqCst);
                         this.emit_connection_state();
-                        
+
                         info!("⏳ [Conexão Remota] Cooldown de 5s antes de sincronizar...");
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                        
+
                         if !this.is_connected() {
                             last_state = false;
                             this.is_connected.store(false, Ordering::SeqCst);
@@ -218,14 +244,18 @@ impl ConnectionManager {
         });
 
         if let Ok(mut guard) = self.busca_handle.lock() {
-            if let Some(old) = guard.take() { old.abort(); }
+            if let Some(old) = guard.take() {
+                old.abort();
+            }
             *guard = Some(handle);
         }
     }
 
     pub fn parar_busca(&self) {
         if let Ok(mut guard) = self.busca_handle.lock() {
-            if let Some(h) = guard.take() { h.abort(); }
+            if let Some(h) = guard.take() {
+                h.abort();
+            }
         }
     }
 
@@ -245,7 +275,9 @@ impl ConnectionManager {
             loop {
                 interval.tick().await;
 
-                if !this.is_connected() { break; }
+                if !this.is_connected() {
+                    break;
+                }
 
                 if !this.config.remote_midi {
                     let expired = {
@@ -260,52 +292,81 @@ impl ConnectionManager {
                 }
 
                 let synced = this.sync_manager.is_ready();
-                if !synced { continue; }
+                if !synced {
+                    continue;
+                }
 
-                this.scheduler.enqueue(midi::master_meter::MasterMeter::build_request(), 2).await;
-                this.scheduler.enqueue(vec![240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247], 2).await;
-                this.scheduler.enqueue(vec![240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247], 2).await;
-                this.scheduler.enqueue(vec![240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247], 2).await;
-                this.scheduler.enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247], 2).await;
-                this.scheduler.enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247], 2).await;
+                this.scheduler
+                    .enqueue(midi::master_meter::MasterMeter::build_request(), 2)
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247], 2)
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247], 2)
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247], 2)
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247], 2)
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247], 2)
+                    .await;
             }
         });
 
         if let Ok(mut guard) = self.meter_handle.lock() {
-            if let Some(old) = guard.take() { old.abort(); }
+            if let Some(old) = guard.take() {
+                old.abort();
+            }
             *guard = Some(handle);
         }
     }
 
-    pub async fn executar_conexao(
-        self: &Arc<Self>,
-        in_idx: usize,
-        out_idx: usize,
-    ) {
+    pub async fn executar_conexao(self: &Arc<Self>, in_idx: usize, out_idx: usize) {
         let (inputs, outputs) = MidiEngine::get_available_ports();
 
         let validate = |name: &str| -> bool {
             let lower = name.to_lowercase();
-            if self.config.loopmidi_monitor { lower.contains("monitor") }
-            else { lower.contains("yamaha") && lower.contains("-1") }
+            if self.config.loopmidi_monitor {
+                lower.contains("monitor")
+            } else {
+                lower.contains("yamaha") && lower.contains("-1")
+            }
         };
 
-        let in_name = inputs.iter().find(|(i,_)| *i==in_idx).map(|(_,n)| n.clone()).unwrap_or_default();
-        let out_name = outputs.iter().find(|(i,_)| *i==out_idx).map(|(_,n)| n.clone()).unwrap_or_default();
+        let in_name = inputs
+            .iter()
+            .find(|(i, _)| *i == in_idx)
+            .map(|(_, n)| n.clone())
+            .unwrap_or_default();
+        let out_name = outputs
+            .iter()
+            .find(|(i, _)| *i == out_idx)
+            .map(|(_, n)| n.clone())
+            .unwrap_or_default();
 
         if !validate(&in_name) || !validate(&out_name) {
             warn!("🚫 Conexao bloqueada: porta nao atende criterios");
             return;
         }
 
-        if self.is_connected() { return; }
+        if self.is_connected() {
+            return;
+        }
 
         if let Some(ref engine) = self.engine {
             let mut engine_guard = engine.lock().await;
             let tx = self.midi_in_tx.clone();
             match engine_guard.connect_ports(in_idx, out_idx, tx) {
                 Ok(name) => info!("✅ Conexao MIDI estabelecida: {}", name),
-                Err(e) => { error!("Erro ao conectar MIDI: {}", e); self.handle_disconnection(false).await; return; }
+                Err(e) => {
+                    error!("Erro ao conectar MIDI: {}", e);
+                    self.handle_disconnection(false).await;
+                    return;
+                }
             }
         }
 
@@ -315,7 +376,9 @@ impl ConnectionManager {
         info!("⏳ Cooldown de 5s antes da sincronia...");
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
-        if !self.is_connected() { return; }
+        if !self.is_connected() {
+            return;
+        }
 
         // Aguarda o MIDI reader processar o backlog acumulado durante o cooldown
         tokio::time::sleep(std::time::Duration::from_millis(500)).await;
@@ -329,7 +392,9 @@ impl ConnectionManager {
     }
 
     pub async fn handle_disconnection(self: &Arc<Self>, retry: bool) {
-        if !self.is_connected.swap(false, Ordering::SeqCst) && retry { return; }
+        if !self.is_connected.swap(false, Ordering::SeqCst) && retry {
+            return;
+        }
 
         let stop = midi::master_meter::MasterMeter::build_stop_request();
         self.scheduler.enqueue(stop, 0).await;
@@ -337,7 +402,9 @@ impl ConnectionManager {
 
         self.parar_busca();
         if let Ok(mut guard) = self.meter_handle.lock() {
-            if let Some(h) = guard.take() { h.abort(); }
+            if let Some(h) = guard.take() {
+                h.abort();
+            }
         }
 
         self.sync_counter.reset();
@@ -357,7 +424,8 @@ impl ConnectionManager {
 
     pub fn trigger_sync(&self, force_names: bool, sync_type: &str) {
         self.is_fully_synced.store(false, Ordering::SeqCst);
-        self.sync_manager.fire(force_names, sync_type, self.state.clone());
+        self.sync_manager
+            .fire(force_names, sync_type, self.state.clone());
     }
 
     pub fn sync_names(&self) {
@@ -367,7 +435,8 @@ impl ConnectionManager {
 
     pub fn fire_params_only(&self, force_names: bool, sync_type: &str) {
         self.is_fully_synced.store(false, Ordering::SeqCst);
-        self.sync_manager.fire_params_only(force_names, sync_type, self.state.clone());
+        self.sync_manager
+            .fire_params_only(force_names, sync_type, self.state.clone());
     }
 
     pub fn enable_demo(self: &Arc<Self>) {
@@ -375,62 +444,12 @@ impl ConnectionManager {
         self.is_fully_synced.store(true, Ordering::SeqCst);
         self.emit_connection_state();
 
-        let this_spawn = self.clone();
-        let this = self.clone();
-        let handle = tokio::spawn(async move {
-            let mut ticker = tokio::time::interval(std::time::Duration::from_millis(33));
-            let phases: Vec<f64>; let phases2: Vec<f64>; let speeds: Vec<f64>;
-            {
-                let mut rng = rand::rng();
-                use rand::RngExt;
-                phases = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
-                phases2 = (0..32).map(|_| rng.random_range(0.0..std::f64::consts::PI * 2.0)).collect();
-                speeds = (0..32).map(|_| 0.8 + rng.random_range(0.0..4.0)).collect();
+        let handle = crate::midi::meter_dummy::start_meter_simulation(self.io.clone());
+
+        if let Ok(mut guard) = self.demo_handle.lock() {
+            if let Some(old) = guard.take() {
+                old.abort();
             }
-            let bases: [f64; 32] = [
-                26.0,24.0,22.0,23.0,25.0,23.0,21.0,20.0,26.0,24.0,19.0,18.0,20.0,21.0,17.0,18.0,
-                22.0,19.0,20.0,18.0,18.0,20.0,17.0,21.0,22.0,19.0,20.0,18.0,16.0,21.0,19.0,17.0,
-            ];
-            let mut t: f64 = 0.0;
-            let mut energy: f64 = 0.9;
-            let mut energy_target: f64 = 0.9;
-            let mut last_emit = std::time::Instant::now();
-            let io = this_spawn.io.clone();
-
-            loop {
-                ticker.tick().await;
-                t += 0.15;
-
-                let buf = {
-                    let mut rng = rand::rng();
-                    use rand::RngExt;
-                    if rng.random::<f64>() < 0.008 { energy_target = 0.7 + rng.random_range(0.0..0.3); }
-                    energy += (energy_target - energy) * 0.03;
-                    let mut buf = vec![0.0; 33];
-                    for i in 0..32 {
-                        let s = speeds[i];
-                        let w1 = (t * s + phases[i]).sin();
-                        let w2 = (t * s * 2.3 + phases2[i]).sin() * 0.35;
-                        let w3 = (t * s * 0.4 + phases[i] * 0.7).sin() * 0.25;
-                        let noise = (rng.random::<f64>() - 0.5) * 3.0;
-                        let level = (bases[i] * energy) + ((w1+w2+w3) * 9.0 * energy) + noise;
-                        buf[i] = (level.min(31.0).max(0.0)).round();
-                    }
-                    let mw = (t * 0.9).sin() * 2.5 + (t * 1.7).sin() * 2.0;
-                    let mlevel = (26.0 * energy + mw + (rng.random::<f64>() - 0.5) * 2.0).min(31.0).max(0.0);
-                    buf[32] = mlevel.round();
-                    buf
-                };
-                let now = std::time::Instant::now();
-                if now.duration_since(last_emit).as_millis() >= 30 {
-                    let _ = io.emit("meterData", &buf).await;
-                    last_emit = now;
-                }
-            }
-        });
-
-        if let Ok(mut guard) = this.demo_handle.lock() {
-            if let Some(old) = guard.take() { old.abort(); }
             *guard = Some(handle);
         }
     }
@@ -438,7 +457,9 @@ impl ConnectionManager {
     pub fn disable_demo(self: &Arc<Self>) {
         self.is_connected.store(false, Ordering::SeqCst);
         if let Ok(mut guard) = self.demo_handle.lock() {
-            if let Some(h) = guard.take() { h.abort(); }
+            if let Some(h) = guard.take() {
+                h.abort();
+            }
         }
         self.emit_connection_state();
     }

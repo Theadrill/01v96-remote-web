@@ -67,10 +67,7 @@ impl SceneManager {
                     };
                     self.current_scene = Some(scene_data);
                 } else if (index as usize) < self.scenes.len() {
-                    self.scenes[index as usize] = Some(SceneData {
-                        index,
-                        name,
-                    });
+                    self.scenes[index as usize] = Some(SceneData { index, name });
                 }
                 return true;
             }

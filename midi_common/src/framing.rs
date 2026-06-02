@@ -1,6 +1,6 @@
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use std::io;
 use std::time::Duration;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 pub const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(3);
 pub const HEARTBEAT_TIMEOUT: Duration = Duration::from_secs(10);
@@ -30,7 +30,10 @@ where
     reader.read_exact(&mut len_buf).await?;
     let len = u32::from_le_bytes(len_buf) as usize;
     if len > 65536 {
-        return Err(io::Error::new(io::ErrorKind::InvalidData, "frame too large"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "frame too large",
+        ));
     }
     let mut buf = vec![0u8; len];
     reader.read_exact(&mut buf).await?;

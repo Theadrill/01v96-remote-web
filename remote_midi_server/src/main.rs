@@ -44,14 +44,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("🚀 Inicializando Remote MIDI Server...");
 
     // 2. Ler config.json
-    let config_path = "../config.json";
-    let config: MiniConfig = match fs::read_to_string(config_path) {
+    let config_path = get_project_root().join("config.json");
+    let config: MiniConfig = match fs::read_to_string(&config_path) {
         Ok(contents) => serde_json::from_str(&contents).unwrap_or_else(|e| {
             warn!("⚠️ Erro ao parsear config.json: {}. Usando defaults.", e);
             serde_json::from_str("{}").unwrap()
         }),
         Err(e) => {
-            warn!("⚠️ Não foi possível ler {}: {}. Usando defaults.", config_path, e);
+            warn!("⚠️ Não foi possível ler {:?}: {}. Usando defaults.", config_path, e);
             serde_json::from_str("{}").unwrap()
         }
     };
@@ -366,4 +366,28 @@ async fn establish_midi(
         _in_conn: in_conn,
         out_conn,
     })
+}
+
+fn get_project_root() -> std::path::PathBuf {
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            // Candidato 1: exe na raiz (config.json está ao lado)
+            if exe_dir.join("config.json").exists() {
+                return exe_dir.to_path_buf();
+            }
+            // Candidato 2: exe em subpastas de build (sobe até 4 níveis para achar config.json)
+            let mut current = exe_dir.to_path_buf();
+            for _ in 0..4 {
+                if let Some(parent) = current.parent() {
+                    current = parent.to_path_buf();
+                    if current.join("config.json").exists() {
+                        return current;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    std::path::PathBuf::from("..")
 }

@@ -17,7 +17,10 @@ fn get_ch_byte(ch_a: u8, ch_b: u8) -> u8 {
 pub fn build_pair(ch_a: u8, ch_b: u8, source_ch: u8) -> (Vec<u8>, Vec<u8>) {
     let target_ch = if source_ch == ch_a { ch_b } else { ch_a };
     let ch_byte = get_ch_byte(ch_a, ch_b);
-    (build_aux_msg(0x00, source_ch, target_ch), build_state_msg(ch_byte, 0x01))
+    (
+        build_aux_msg(0x00, source_ch, target_ch),
+        build_state_msg(ch_byte, 0x01),
+    )
 }
 
 pub fn build_unpair(ch_a: u8, ch_b: u8) -> Vec<u8> {
@@ -27,5 +30,8 @@ pub fn build_unpair(ch_a: u8, ch_b: u8) -> Vec<u8> {
 
 pub fn build_reset(ch_a: u8, ch_b: u8) -> (Vec<u8>, Vec<u8>) {
     let ch_byte = get_ch_byte(ch_a, ch_b);
-    (build_aux_msg(0x01, ch_a, ch_b), build_state_msg(ch_byte, 0x01))
+    (
+        build_aux_msg(0x01, ch_a, ch_b),
+        build_state_msg(ch_byte, 0x01),
+    )
 }

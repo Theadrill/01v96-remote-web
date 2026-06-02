@@ -129,10 +129,16 @@ pub fn update_lumikit_config(root_dir: &str) {
 
     if let Some(matched_ip) = found_match {
         let info_path = Path::new(root_dir).join("ArtNetToDMX_FTDI").join("info");
-        
+
         if !info_path.exists() {
-            println!("📝 [DMX] Arquivo \"info\" nao encontrado. Criando um novo para o IP {}...", matched_ip);
-            let default_content = format!("IP: {}\nUni: 0\nOneUni: true\nAutostart: true\n", matched_ip);
+            println!(
+                "📝 [DMX] Arquivo \"info\" nao encontrado. Criando um novo para o IP {}...",
+                matched_ip
+            );
+            let default_content = format!(
+                "IP: {}\nUni: 0\nOneUni: true\nAutostart: true\n",
+                matched_ip
+            );
             if let Err(e) = std::fs::write(&info_path, default_content) {
                 eprintln!("❌ [DMX] Erro ao criar o arquivo info: {}", e);
             }
@@ -140,23 +146,32 @@ pub fn update_lumikit_config(root_dir: &str) {
         }
 
         if let Ok(content) = std::fs::read_to_string(&info_path) {
-            let lines: Vec<String> = content.lines().map(|line| {
-                if line.starts_with("IP:") {
-                    format!("IP: {}", matched_ip)
-                } else {
-                    line.to_string()
-                }
-            }).collect();
+            let lines: Vec<String> = content
+                .lines()
+                .map(|line| {
+                    if line.starts_with("IP:") {
+                        format!("IP: {}", matched_ip)
+                    } else {
+                        line.to_string()
+                    }
+                })
+                .collect();
             let new_content = lines.join("\n") + "\n";
-            
+
             if content != new_content {
                 if let Err(e) = std::fs::write(&info_path, new_content) {
                     eprintln!("❌ [DMX] Erro ao atualizar o arquivo info: {}", e);
                 } else {
-                    println!("🌐 [DMX] IP configurado automaticamente no arquivo info: {}", matched_ip);
+                    println!(
+                        "🌐 [DMX] IP configurado automaticamente no arquivo info: {}",
+                        matched_ip
+                    );
                 }
             } else {
-                println!("🌐 [DMX] IP {} ja estava configurado corretamente.", matched_ip);
+                println!(
+                    "🌐 [DMX] IP {} ja estava configurado corretamente.",
+                    matched_ip
+                );
             }
         }
     } else {

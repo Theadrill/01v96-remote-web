@@ -125,7 +125,8 @@ impl MidiEngine {
         if let Some(out) = &mut self.output_conn {
             if let Err(e) = out.send(message) {
                 let now = Instant::now();
-                let should_log = self.last_send_error
+                let should_log = self
+                    .last_send_error
                     .map(|t| now.duration_since(t).as_secs() >= 3)
                     .unwrap_or(true);
                 if should_log {
@@ -151,7 +152,6 @@ impl MidiOutput {
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {

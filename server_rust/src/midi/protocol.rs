@@ -69,8 +69,6 @@ pub fn bytes_to_on(bytes: &[u8]) -> bool {
     *bytes.last().unwrap_or(&0) != 0
 }
 
-
-
 pub fn build_change(
     command_name: &str,
     channel: u8,
@@ -132,7 +130,6 @@ mod tests {
         assert_eq!(convert_to_bytes(1.0, &Converter::On), vec![0, 0, 0, 1]);
         assert_eq!(convert_to_bytes(0.0, &Converter::On), vec![0, 0, 0, 0]);
         assert_eq!(bytes_to_on(&[0, 0, 0, 1]), true);
-
     }
 }
 #[derive(Debug, Clone, serde::Serialize)]
@@ -207,9 +204,9 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         // Determine base channel from group number (like Node.js)
         let base_ch: usize = match group {
-            33 => channel,   // Input CH 1-32
-            32 => 32 + channel,  // Input CH 33-64? Actually ST IN and effects
-            82 => 32 + channel,  // Stereo Master
+            33 => channel,      // Input CH 1-32
+            32 => 32 + channel, // Input CH 33-64? Actually ST IN and effects
+            82 => 32 + channel, // Stereo Master
             _ => channel,
         };
 
@@ -262,16 +259,33 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         // --- EQ PARSING (elements: 32=InputEQ, 33=InputEQ, 46=BusEQ group=1, 60=AUXEQ, 82=StereoEQ) ---
         let eq_map: std::collections::HashMap<u8, &str> = [
-            (32, "kInput"), (33, "kInput"), (46, "kBus"), (60, "kAUX"), (82, "kStereo"),
-        ].into_iter().collect();
+            (32, "kInput"),
+            (33, "kInput"),
+            (46, "kBus"),
+            (60, "kAUX"),
+            (82, "kStereo"),
+        ]
+        .into_iter()
+        .collect();
 
         if eq_map.contains_key(&element) && parameter <= 15 && group == 1 {
             let eq_keys = [
-                "kEQMode", "kEQLowQ", "kEQLowF", "kEQLowG", "kEQHPFOn",
-                "kEQLowMidQ", "kEQLowMidF", "kEQLowMidG",
-                "kEQHiMidQ", "kEQHiMidF", "kEQHiMidG",
-                "kEQHiQ", "kEQHiF", "kEQHiG",
-                "kEQLPFOn", "kEQOn",
+                "kEQMode",
+                "kEQLowQ",
+                "kEQLowF",
+                "kEQLowG",
+                "kEQHPFOn",
+                "kEQLowMidQ",
+                "kEQLowMidF",
+                "kEQLowMidG",
+                "kEQHiMidQ",
+                "kEQHiMidF",
+                "kEQHiMidG",
+                "kEQHiQ",
+                "kEQHiF",
+                "kEQHiG",
+                "kEQLPFOn",
+                "kEQOn",
             ];
             let key = eq_keys[parameter as usize];
             let prefix = eq_map[&element];
@@ -298,8 +312,17 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         // --- GATE PARSING (element 30) ---
         if element == 30 {
             let gate_keys = [
-                "kGateOn", "kGateLink", "kGateKeyIn", "kGateKeyAUX", "kGateKeyCh",
-                "kGateType", "kGateAttack", "kGateRange", "kGateHold", "kGateDecay", "kGateThreshold",
+                "kGateOn",
+                "kGateLink",
+                "kGateKeyIn",
+                "kGateKeyAUX",
+                "kGateKeyCh",
+                "kGateType",
+                "kGateAttack",
+                "kGateRange",
+                "kGateHold",
+                "kGateDecay",
+                "kGateThreshold",
             ];
             if (parameter as usize) < gate_keys.len() {
                 let key = gate_keys[parameter as usize];
@@ -320,13 +343,27 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         // --- COMP PARSING (elements: 31=Input, 45=Bus, 59=AUX, 71=Matrix, 81=Stereo) ---
         let comp_map: std::collections::HashMap<u8, &str> = [
-            (31, "kInput"), (45, "kBus"), (59, "kAUX"), (71, "kMatrix"), (81, "kStereo"),
-        ].into_iter().collect();
+            (31, "kInput"),
+            (45, "kBus"),
+            (59, "kAUX"),
+            (71, "kMatrix"),
+            (81, "kStereo"),
+        ]
+        .into_iter()
+        .collect();
 
         if comp_map.contains_key(&element) {
             let comp_keys = [
-                "kCompLocComp", "kCompOn", "kCompLink", "kCompType",
-                "kCompAttack", "kCompRelease", "kCompRatio", "kCompGain", "kCompKnee", "kCompThreshold",
+                "kCompLocComp",
+                "kCompOn",
+                "kCompLink",
+                "kCompType",
+                "kCompAttack",
+                "kCompRelease",
+                "kCompRatio",
+                "kCompGain",
+                "kCompKnee",
+                "kCompThreshold",
             ];
             if (parameter as usize) < comp_keys.len() {
                 let key = comp_keys[parameter as usize];
@@ -403,29 +440,57 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         // Input Faders / On / Attenuator
         if element == 28 {
-            return cc("kInputFader/kFader", final_ch, bytes_to_fader(data_bytes) as f64);
+            return cc(
+                "kInputFader/kFader",
+                final_ch,
+                bytes_to_fader(data_bytes) as f64,
+            );
         }
         if element == 26 {
-            return cc("kInputChannelOn/kChannelOn", final_ch, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+            return cc(
+                "kInputChannelOn/kChannelOn",
+                final_ch,
+                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+            );
         }
         if element == 29 {
-            return cc("kInputAttenuator/kAtt", final_ch, bytes_to_signed(data_bytes) as f64);
+            return cc(
+                "kInputAttenuator/kAtt",
+                final_ch,
+                bytes_to_signed(data_bytes) as f64,
+            );
         }
 
         // Mix (AUX) Master Faders / ON
         if element == 57 {
-            return cc("kAUXFader/kFader", channel, bytes_to_fader(data_bytes) as f64);
+            return cc(
+                "kAUXFader/kFader",
+                channel,
+                bytes_to_fader(data_bytes) as f64,
+            );
         }
         if element == 54 {
-            return cc("kAUXChannelOn/kChannelOn", channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+            return cc(
+                "kAUXChannelOn/kChannelOn",
+                channel,
+                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+            );
         }
 
         // Bus Master Faders / ON
         if element == 43 {
-            return cc("kBusFader/kFader", channel, bytes_to_fader(data_bytes) as f64);
+            return cc(
+                "kBusFader/kFader",
+                channel,
+                bytes_to_fader(data_bytes) as f64,
+            );
         }
         if element == 41 {
-            return cc("kBusChannelOn/kChannelOn", channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+            return cc(
+                "kBusChannelOn/kChannelOn",
+                channel,
+                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+            );
         }
 
         // Master (Stereo) Fader / ON
@@ -433,7 +498,11 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             return cc("kStereoFader/kFader", 0, bytes_to_fader(data_bytes) as f64);
         }
         if element == 77 && parameter == 0 {
-            return cc("kStereoChannelOn/kChannelOn", 0, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+            return cc(
+                "kStereoChannelOn/kChannelOn",
+                0,
+                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+            );
         }
 
         // --- AUX SENDS (element 35) ---
@@ -441,21 +510,37 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             let aux_idx = (parameter / 3) + 1;
             let offset = parameter % 3;
             if offset == 0 {
-                return cc(&format!("kInputAUX/kAUX{}On", aux_idx), channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+                return cc(
+                    &format!("kInputAUX/kAUX{}On", aux_idx),
+                    channel,
+                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+                );
             }
             if offset == 2 {
-                return cc(&format!("kInputAUX/kAUX{}Level", aux_idx), channel, bytes_to_fader(data_bytes) as f64);
+                return cc(
+                    &format!("kInputAUX/kAUX{}Level", aux_idx),
+                    channel,
+                    bytes_to_fader(data_bytes) as f64,
+                );
             }
         }
 
         // --- SOLO (group 3, element 46) ---
         if group == 3 && element == 46 {
-            return cc("kSetupSoloChOn/kSoloChOn", channel, if bytes_to_on(data_bytes) { 1.0 } else { 0.0 });
+            return cc(
+                "kSetupSoloChOn/kSoloChOn",
+                channel,
+                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+            );
         }
 
         // --- PATCH (section 13, group 2, element 1, parameter 0) ---
         if section == 13 && group == 2 && element == 1 && parameter == 0 {
-            return cc("kChannelInput/kChannelIn", channel, bytes_to_fader(data_bytes) as f64);
+            return cc(
+                "kChannelInput/kChannelIn",
+                channel,
+                bytes_to_fader(data_bytes) as f64,
+            );
         }
 
         // --- PAIR (element 24, parameter 0) ---
@@ -490,8 +575,8 @@ pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Option<V
     let (element, local_ch) = name_channel_mapping(channel);
     let parameter = 4 + char_index;
     let mut packet = vec![
-        HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, parameter, local_ch,
-        0, 0, 0, char_code,
+        HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, parameter, local_ch, 0, 0, 0,
+        char_code,
     ];
     packet.extend_from_slice(FOOTER);
     Some(packet)

@@ -1,4 +1,4 @@
-use super::protocol::{ParsedMidi, FOOTER, HEADER, MODEL_ID};
+use super::protocol::{FOOTER, HEADER, MODEL_ID, ParsedMidi};
 
 const PAN_SECTION: u8 = 0x7F;
 const PAN_GROUP: u8 = 0x01;
@@ -31,7 +31,11 @@ pub fn bytes_to_pan_value(bytes: &[u8]) -> f64 {
         | (bytes[3] as i64 & 0x7F);
     let sign_bit = 1 << 27;
     let mask = (1 << 28) - 1;
-    let signed = if (raw & sign_bit) != 0 { raw - mask - 1 } else { raw };
+    let signed = if (raw & sign_bit) != 0 {
+        raw - mask - 1
+    } else {
+        raw
+    };
     signed.clamp(-63, 63) as f64
 }
 

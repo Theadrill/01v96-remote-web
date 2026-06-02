@@ -1,0 +1,200 @@
+use socketioxide::SocketIo;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use tokio::sync::mpsc;
+
+use crate::midi::SyncCounter;
+use crate::midi::master_meter::MasterMeter;
+use crate::network::ConnectionManager;
+use crate::state::GlobalState;
+
+pub fn start_rx_loop(
+    mut midi_in_rx: mpsc::Receiver<Vec<u8>>,
+    io: SocketIo,
+    global_state: Arc<RwLock<GlobalState>>,
+    sync_counter: Arc<SyncCounter>,
+    conn_mgr: Arc<ConnectionManager>,
+    master_meter: Arc<RwLock<MasterMeter>>,
+    meter_fps: u32,
+    is_remote_midi: bool,
+) {
+    let io_clone = io.clone();
+    let state_arc_in = global_state.clone();
+    let sync_counter_in = sync_counter.clone();
+    let conn_mgr_recv = conn_mgr.clone();
+    let master_meter_recv = master_meter.clone();
+    let recv_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let parsed_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let recv_count_log = recv_count.clone();
+    let parsed_count_log = parsed_count.clone();
+
+    // Meter buffer + FPS throttle (like Node.js)
+    let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> =
+        Arc::new(std::sync::Mutex::new(vec![0.0; 64]));
+    let last_meter_emit: Arc<std::sync::Mutex<std::time::Instant>> =
+        Arc::new(std::sync::Mutex::new(std::time::Instant::now()));
+    let meter_buffer_emit = meter_buffer.clone();
+    let last_meter_emit_clone = last_meter_emit.clone();
+
+    tokio::spawn(async move {
+        let report_interval = tokio::time::interval(std::time::Duration::from_secs(5));
+        tokio::pin!(report_interval);
+        loop {
+            tokio::select! {
+                _ = report_interval.tick() => {
+                    let r = recv_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
+                    let _p = parsed_count_log.swap(0, std::sync::atomic::Ordering::SeqCst);
+                    if r > 0 {
+                        // tracing::info!("📥 [RX] +{} msgs recebidos na fila, +{} parseados", r, p);
+                    }
+                }
+            }
+        }
+    });
+
+    tokio::spawn(async move {
+        let mut assembler = crate::midi::MidiAssembler::new();
+        while let Some(msg) = midi_in_rx.recv().await {
+            recv_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            conn_mgr_recv.reset_activity();
+            let packets = if is_remote_midi {
+                vec![msg]
+            } else {
+                assembler.process_input(&msg)
+            };
+            for packet in packets {
+                if sync_counter_in.should_ignore() {
+                    continue;
+                }
+                // Process state and collect emissions to send after releasing lock
+                let mut emission: Option<(&str, serde_json::Value)> = None;
+                let mut meter_emission: Option<Vec<u8>> = None;
+                let mut scenes_emission: Option<serde_json::Value> = None;
+                let mut current_scene_emission: Option<serde_json::Value> = None;
+
+                {
+                    let mut state = state_arc_in.write().await;
+
+                    if state.handle_raw_midi(&packet) {
+                        scenes_emission = Some(
+                            serde_json::to_value(state.scene_manager.get_state())
+                                .unwrap_or_default(),
+                        );
+                        current_scene_emission = state
+                            .scene_manager
+                            .current_scene
+                            .as_ref()
+                            .and_then(|cs| serde_json::to_value(cs).ok());
+                    } else if let Some(parsed) = crate::midi::protocol::parse_message(&packet) {
+                        parsed_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                        state.apply_midi(&parsed);
+
+                        match parsed {
+                            crate::midi::protocol::ParsedMidi::MeterData {
+                                levels,
+                                is_master,
+                                ..
+                            } => {
+                                {
+                                    if is_master {
+                                        let mm = master_meter_recv.read().await;
+                                        if let Some(m_level) = mm.parse(&packet) {
+                                            let mut buf = meter_buffer_emit.lock().unwrap();
+                                            buf[32] = m_level as f64;
+                                        }
+                                    } else {
+                                        let mut buf = meter_buffer_emit.lock().unwrap();
+                                        for (ch, val) in levels.iter() {
+                                            if *ch < 64 {
+                                                buf[*ch] = (*val as f64).min(32.0);
+                                            }
+                                        }
+                                    }
+                                }
+                                if conn_mgr_recv.is_fully_synced() {
+                                    let mut last = last_meter_emit_clone.lock().unwrap();
+                                    let now = std::time::Instant::now();
+                                    let throttle_ms = if meter_fps > 0 {
+                                        1000 / meter_fps as u64
+                                    } else {
+                                        33
+                                    };
+                                    if now.duration_since(*last).as_millis() >= throttle_ms as u128
+                                    {
+                                        let buf = meter_buffer_emit.lock().unwrap().clone();
+                                        meter_emission =
+                                            Some(buf.into_iter().map(|v| v as u8).collect());
+                                        *last = now;
+                                    }
+                                }
+                            }
+                            crate::midi::protocol::ParsedMidi::ControlChange {
+                                msg_type,
+                                channel,
+                                value,
+                            } => {
+                                static UPDATE_COUNT: std::sync::atomic::AtomicUsize =
+                                    std::sync::atomic::AtomicUsize::new(0);
+                                let uc =
+                                    UPDATE_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                                if uc < 20 || uc % 200 == 0 {
+                                    tracing::info!(
+                                        "📡 [UPDATE] #{uc}: type={}, ch={}, val={}",
+                                        msg_type,
+                                        channel,
+                                        value
+                                    );
+                                }
+                                emission = Some((
+                                    "update",
+                                    serde_json::json!({
+                                        "type": msg_type,
+                                        "channel": channel,
+                                        "value": value
+                                    }),
+                                ));
+                            }
+                            crate::midi::protocol::ParsedMidi::PhysicalSceneRecall(idx) => {
+                                tracing::info!("🎹 [FÍSICO] Cena {} foi CARREGADA na mesa!", idx);
+                                conn_mgr_recv.trigger_sync(true, "is_scene");
+                            }
+                            crate::midi::protocol::ParsedMidi::PhysicalSceneStore(idx) => {
+                                tracing::info!("🎹 [FÍSICO] Cena {} foi SALVA na mesa!", idx);
+                                state.scene_manager.set_active_scene(idx);
+                                scenes_emission = Some(
+                                    serde_json::to_value(state.scene_manager.get_state())
+                                        .unwrap_or_default(),
+                                );
+                                current_scene_emission = state
+                                    .scene_manager
+                                    .current_scene
+                                    .as_ref()
+                                    .and_then(|cs| serde_json::to_value(cs).ok());
+                            }
+                            _ => {}
+                        }
+                    }
+                } // state lock released here
+
+                if let Some(v) = scenes_emission {
+                    let _ = io_clone.emit("scenesUpdated", &v).await;
+                }
+                if let Some(v) = current_scene_emission {
+                    let _ = io_clone.emit("currentScene", &v).await;
+                }
+                if let Some((event, data)) = emission {
+                    let _ = io_clone.emit(event, &data).await;
+                }
+                if let Some(buf) = meter_emission {
+                    static METER_COUNT: std::sync::atomic::AtomicUsize =
+                        std::sync::atomic::AtomicUsize::new(0);
+                    let c = METER_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                    if c < 5 || c % 100 == 0 {
+                        // tracing::info!("📡 emit meterData #{} ({} bytes)", c, buf.len());
+                    }
+                    let _ = io_clone.emit("meterData", &buf).await;
+                }
+            }
+        }
+    });
+}

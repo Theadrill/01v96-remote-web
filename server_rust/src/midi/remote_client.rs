@@ -1,12 +1,12 @@
+use crate::config::AppConfig;
+use midi_common::framing::{HEARTBEAT_TIMEOUT, is_heartbeat, read_frame, write_frame};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
-use tokio::sync::{mpsc, Mutex};
 use tokio::net::TcpStream;
+use tokio::sync::{Mutex, mpsc};
 use tokio::time::timeout;
-use tracing::{info, warn, error};
-use crate::config::AppConfig;
-use midi_common::framing::{read_frame, write_frame, is_heartbeat, HEARTBEAT_TIMEOUT};
+use tracing::{error, info, warn};
 
 pub struct RemoteClient {
     config: AppConfig,
@@ -47,10 +47,15 @@ impl RemoteClient {
                         this.connected.store(true, Ordering::SeqCst);
                         this.run_bridge(stream).await;
                         this.connected.store(false, Ordering::SeqCst);
-                        warn!("🌐 Conexão com o Remote MIDI Server perdida. Tentando reconectar em 2s...");
+                        warn!(
+                            "🌐 Conexão com o Remote MIDI Server perdida. Tentando reconectar em 2s..."
+                        );
                     }
                     Err(e) => {
-                        error!("❌ Falha ao conectar ao Remote MIDI Server: {}. Nova tentativa em 2s...", e);
+                        error!(
+                            "❌ Falha ao conectar ao Remote MIDI Server: {}. Nova tentativa em 2s...",
+                            e
+                        );
                     }
                 }
                 tokio::time::sleep(Duration::from_secs(2)).await;
@@ -66,7 +71,8 @@ impl RemoteClient {
         if !last_host.is_empty() {
             let addr = format!("{}:{}", last_host, port);
             info!("🌐 Tentando último host conhecido: {}", addr);
-            if let Ok(Ok(stream)) = timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await {
+            if let Ok(Ok(stream)) = timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await
+            {
                 return Ok(stream);
             }
             warn!("🌐 Último host conhecido ({}) falhou.", addr);
@@ -79,7 +85,8 @@ impl RemoteClient {
             }
             let addr = format!("{}:{}", host, port);
             info!("🌐 Tentando host da lista: {}", addr);
-            if let Ok(Ok(stream)) = timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await {
+            if let Ok(Ok(stream)) = timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await
+            {
                 // Atualiza e salva como último host de sucesso
                 let mut cfg = AppConfig::load();
                 cfg.save_last_remote_host(host);
@@ -91,7 +98,8 @@ impl RemoteClient {
         if self.config.remote_midi_networks.is_empty() && last_host.is_empty() {
             let addr = format!("127.0.0.1:{}", port);
             info!("🌐 Lista de redes vazia. Tentando localhost: {}", addr);
-            if let Ok(Ok(stream)) = timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await {
+            if let Ok(Ok(stream)) = timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await
+            {
                 return Ok(stream);
             }
         }

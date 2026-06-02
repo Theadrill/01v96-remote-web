@@ -91,8 +91,9 @@ impl AppConfig {
 
     pub fn load() -> Self {
         // Tenta ler o arquivo config.json
-        let config_path = "../config.json";
-        let mut config = match fs::read_to_string(config_path) {
+        let root = get_project_root();
+        let config_path = root.join("config.json");
+        let mut config = match fs::read_to_string(&config_path) {
             Ok(contents) => match serde_json::from_str::<AppConfig>(&contents) {
                 Ok(c) => c,
                 Err(e) => {
@@ -102,7 +103,7 @@ impl AppConfig {
             },
             Err(e) => {
                 error!(
-                    "❌ Não foi possível ler {}: {}. Usando fallback.",
+                    "❌ Não foi possível ler {:?}: {}. Usando fallback.",
                     config_path, e
                 );
                 Self::default_config()
@@ -110,7 +111,8 @@ impl AppConfig {
         };
 
         // Ler names.json
-        if let Ok(contents) = fs::read_to_string("../names.json") {
+        let names_path = root.join("names.json");
+        if let Ok(contents) = fs::read_to_string(&names_path) {
             if let Ok(names) = serde_json::from_str(&contents) {
                 config.names = names;
                 info!("✅ names.json carregado.");
@@ -118,7 +120,8 @@ impl AppConfig {
         }
 
         // Ler steps.json
-        if let Ok(contents) = fs::read_to_string("../public/steps.json") {
+        let steps_path = root.join("public/steps.json");
+        if let Ok(contents) = fs::read_to_string(&steps_path) {
             if let Ok(steps) = serde_json::from_str(&contents) {
                 config.steps = steps;
                 info!("✅ steps.json carregado.");
@@ -129,10 +132,10 @@ impl AppConfig {
     }
 
     pub fn save(&self) {
-        let config_path = "../config.json";
+        let config_path = get_project_root().join("config.json");
         match serde_json::to_string_pretty(self) {
             Ok(json_str) => {
-                if let Err(e) = fs::write(config_path, json_str) {
+                if let Err(e) = fs::write(&config_path, json_str) {
                     error!("❌ [CONFIG] Erro ao salvar config.json: {}", e);
                 } else {
                     info!("💾 [CONFIG] config.json salvo com sucesso.");
@@ -191,7 +194,8 @@ pub fn save_names_to_disk(state: &crate::state::GlobalState, debounce_ms: u64) {
         *guard = Some(tokio::spawn(async move {
             tokio::time::sleep(std::time::Duration::from_millis(debounce_ms)).await;
 
-            let mut names: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+            let mut names: std::collections::HashMap<String, String> =
+                std::collections::HashMap::new();
             for i in 0..32 {
                 if let Some(ch) = state_snapshot.channels.get(&i) {
                     names.insert(i.to_string(), ch.name.clone());
@@ -212,10 +216,10 @@ pub fn save_names_to_disk(state: &crate::state::GlobalState, debounce_ms: u64) {
             }
             names.insert("52".to_string(), state_snapshot.master.name.clone());
 
-            let names_path = "../names.json";
+            let names_path = get_project_root().join("names.json");
             match serde_json::to_string_pretty(&names) {
                 Ok(json_str) => {
-                    if let Err(e) = fs::write(names_path, json_str) {
+                    if let Err(e) = fs::write(&names_path, json_str) {
                         error!("❌ [NAMES] Erro ao salvar names.json: {}", e);
                     }
                 }
@@ -223,4 +227,28 @@ pub fn save_names_to_disk(state: &crate::state::GlobalState, debounce_ms: u64) {
             }
         }));
     });
+}
+
+fn get_project_root() -> std::path::PathBuf {
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            // Candidato 1: exe na raiz (config.json está ao lado)
+            if exe_dir.join("config.json").exists() {
+                return exe_dir.to_path_buf();
+            }
+            // Candidato 2: exe em subpastas de build (sobe até 4 níveis para achar config.json)
+            let mut current = exe_dir.to_path_buf();
+            for _ in 0..4 {
+                if let Some(parent) = current.parent() {
+                    current = parent.to_path_buf();
+                    if current.join("config.json").exists() {
+                        return current;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    std::path::PathBuf::from("..")
 }
