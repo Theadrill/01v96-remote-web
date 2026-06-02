@@ -254,7 +254,7 @@ impl SyncManager {
                 }
             }
             for st in 0..4u8 {
-                let gid = 60 + st;
+                let gid = 60 + (st * 2);
                 for c in 0..4u8 {
                     if let Some(req) = midi::protocol::build_name_request(gid, c) {
                         requests.push(req);
@@ -380,11 +380,18 @@ async fn queue_all_params_inner(
     for i in 32u8..40 {
         push_req(&mut requests, "kInputFader/kFader", i);
         push_req(&mut requests, "kInputChannelOn/kChannelOn", i);
+        push_req(&mut requests, "kInputAttenuator/kAtt", i);
+        push_req(&mut requests, "kInputEQ/kEQOn", i);
+        for band in &["Low", "LowMid", "HiMid", "Hi"] {
+            push_req(&mut requests, &format!("kInputEQ/kEQ{}F", band), i);
+            push_req(&mut requests, &format!("kInputEQ/kEQ{}G", band), i);
+            push_req(&mut requests, &format!("kInputEQ/kEQ{}Q", band), i);
+        }
     }
 
     if force_names {
         for st in 0..4u8 {
-            let gid = 60 + st;
+            let gid = 60 + (st * 2);
             for c in 0..4u8 {
                 if let Some(req) = midi::protocol::build_name_request(gid, c) {
                     requests.push(req);

@@ -49,7 +49,7 @@ pub fn global_channel_to_pan_index(global_channel: i64) -> Option<PanTarget> {
     }
     if (60..=67).contains(&ch) {
         let st_idx = ((ch - 60) / 2) as usize;
-        return Some(PanTarget::Input(0x20 + st_idx * 2));
+        return Some(PanTarget::Input(0x20 + st_idx));
     }
     None
 }
@@ -134,7 +134,7 @@ pub fn parse_pan_message(message: &[u8]) -> Option<ParsedMidi> {
         let global_ch = if ch_idx <= 0x1F {
             ch_idx as i64
         } else if ch_idx >= 0x20 && ch_idx <= 0x27 {
-            60 + ((ch_idx - 0x20) / 2) as i64
+            60 + ((ch_idx - 0x20) * 2) as i64
         } else {
             return None;
         };

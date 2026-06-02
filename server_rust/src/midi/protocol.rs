@@ -97,6 +97,8 @@ pub fn build_change(
         } else if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
             final_channel = 32 + (channel - 60);
         }
+    } else if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
+        final_channel = 32 + (channel - 60);
     }
     packet.push(final_channel);
 
@@ -123,7 +125,7 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     
     // Map ST IN channels for any Input command
     if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
-        final_channel = 32 + ((channel - 60) * 2);
+        final_channel = 32 + (channel - 60);
     }
     
     if command_name.contains("EQ/") || command_name.contains("Comp/") || command_name == "kInputAttenuator/kAtt" {
@@ -268,7 +270,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             if element == 4 {
                 channel_index = channel;
             } else if element == 23 {
-                channel_index = 60 + channel;
+                channel_index = 60 + (channel * 2);
             } else if element == 16 {
                 channel_index = 36 + channel;
             } else if element == 15 {
@@ -328,8 +330,14 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             let global_ch: usize = match prefix {
                 "kAUX" => 36 + channel,
                 "kBus" => 44 + channel,
-                "kStereo" => 52, // master channel id
-                _ => channel,
+                "kStereo" => 52,
+                _ => {
+                    if channel >= 32 && channel <= 39 {
+                        60 + (channel - 32)
+                    } else {
+                        channel
+                    }
+                },
             };
 
             return Some(ParsedMidi::ControlChange {
@@ -465,7 +473,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         // --- ST IN channel remap for faders/on ---
         let mut final_ch = channel;
         if channel >= 32 && channel <= 39 {
-            final_ch = 60 + ((channel - 32) / 2);
+            final_ch = 60 + (channel - 32);
         }
 
         // Input Faders / On / Attenuator
@@ -614,7 +622,7 @@ pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Option<V
 
 fn name_channel_mapping(channel: u8) -> (u8, u8) {
     if channel >= 60 && channel <= 67 {
-        (23, channel - 60)
+        (23, (channel - 60) / 2)
     } else if channel >= 36 && channel <= 43 {
         (16, channel - 36)
     } else if channel >= 44 && channel <= 51 {

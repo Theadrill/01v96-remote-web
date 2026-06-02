@@ -275,7 +275,7 @@ pub fn register_handlers(
                     let ch_state = if ch <= 31 {
                         state.channels.get(&ch)
                     } else if (60..=67).contains(&ch) {
-                        state.channels.get(&(32 + (ch - 60) / 2))
+                        state.channels.get(&(32 + (ch - 60)))
                     } else {
                         None
                     };
@@ -505,7 +505,7 @@ pub fn register_handlers(
                             ch.name_chars = chars.clone();
                         }
                     } else if (60..=67).contains(&channel) {
-                        let local = 32 + (channel - 60) / 2;
+                        let local = 32 + (channel - 60);
                         if let Some(ch) = state.channels.get_mut(&local) {
                             ch.name = limited.clone();
                             if ch.name_chars.len() < 4 {

@@ -521,8 +521,8 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         title = `ST IN ${i + 1}`;
         cmdPrefix = 'kInput';
         customClass = "fader-group-st";
-        configId = 60 + i;
-        ch = 32 + i;
+        configId = 60 + (i * 2);
+        ch = 32 + (i * 2);
     }
 
     const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
@@ -570,8 +570,8 @@ function createOutputStrip(i, type, idPrefix = "") {
         title = `ST IN ${i + 1}`;
         cmdPrefix = 'kInput';
         customClass = "fader-group-st";
-        configId = 60 + i;
-        ch = 32 + i;
+        configId = 60 + (i * 2);
+        ch = 32 + (i * 2);
     }
 
     const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);

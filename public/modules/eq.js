@@ -1023,6 +1023,8 @@ window.pasteEQ = function(ch) {
     showCustomConfirm(`Deseja colar as definições de EQ para o Canal ${ch + 1}?`, () => {
         console.log(`\n📥 [COLAR] Aplicando no Canal ${ch + 1}...`);
     
+    const prefix = getChannelParamPrefix(ch);
+
     // Mapeamento necessário para os nomes de comando da 01V96
     const bMap = [
         { key: 'low', label: 'Low' },
@@ -1036,23 +1038,23 @@ window.pasteEQ = function(ch) {
         if (!data) return;
 
         // Frequência, Ganho e Q - Garantindo que enviamos números decimais (decodificados do SysEx se necessário)
-        if (data.f !== undefined) socket.emit('control', { type: `kInputEQ/kEQ${b.label}F`, channel: ch, value: sysexToVal(data.f) });
-        if (data.g !== undefined) socket.emit('control', { type: `kInputEQ/kEQ${b.label}G`, channel: ch, value: sysexToVal(data.g) });
-        if (data.q !== undefined) socket.emit('control', { type: `kInputEQ/kEQ${b.label}Q`, channel: ch, value: sysexToVal(data.q) });
+        if (data.f !== undefined) socket.emit('control', { type: `${prefix}EQ/kEQ${b.label}F`, channel: ch, value: sysexToVal(data.f) });
+        if (data.g !== undefined) socket.emit('control', { type: `${prefix}EQ/kEQ${b.label}G`, channel: ch, value: sysexToVal(data.g) });
+        if (data.q !== undefined) socket.emit('control', { type: `${prefix}EQ/kEQ${b.label}Q`, channel: ch, value: sysexToVal(data.q) });
 
         // HPF On (apenas banda Low)
         if (b.key === 'low' && data.hpfOn !== undefined) {
-            socket.emit('control', { type: 'kInputEQ/kEQHPFOn', channel: ch, value: sysexToVal(data.hpfOn) });
+            socket.emit('control', { type: `${prefix}EQ/kEQHPFOn`, channel: ch, value: sysexToVal(data.hpfOn) });
         }
         // LPF On (apenas banda High)
         if (b.key === 'high' && data.lpfOn !== undefined) {
-            socket.emit('control', { type: 'kInputEQ/kEQLPFOn', channel: ch, value: sysexToVal(data.lpfOn) });
+            socket.emit('control', { type: `${prefix}EQ/kEQLPFOn`, channel: ch, value: sysexToVal(data.lpfOn) });
         }
     });
 
     // EQ Global ON/OFF
     if (eqClipboard.on !== undefined) {
-        socket.emit('control', { type: 'kInputEQ/kEQOn', channel: ch, value: (eqClipboard.on === 1 || eqClipboard.on === true) ? 1 : 0 });
+        socket.emit('control', { type: `${prefix}EQ/kEQOn`, channel: ch, value: (eqClipboard.on === 1 || eqClipboard.on === true) ? 1 : 0 });
     }
 
     // Opcional: atualização visual imediata se estivemos vendo o canal colado

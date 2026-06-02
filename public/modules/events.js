@@ -25,9 +25,10 @@ function updateConfigUIForChannel(ch) {
     } else if (ch === 52) {
         targetId = `namemaster`;
         displayTitle = `MASTER`;
-    } else if (ch >= 60 && ch <= 63) {
-        targetId = `namest${ch - 60}`;
-        displayTitle = `ST IN ${ch - 59}`;
+    } else if (ch >= 60 && ch <= 67) {
+        const stIdx = (ch - 60) / 2;
+        targetId = `namest${stIdx}`;
+        displayTitle = `ST IN ${stIdx + 1}`;
     }
 
     const nameEl = document.getElementById(targetId);
@@ -48,7 +49,7 @@ function updateConfigUIForChannel(ch) {
     // Ocultar aba DYN para canais ST IN (não possuem Dynamics na 01v96)
     const dynTabBtn = document.querySelectorAll('#chNav .side-btn.btn-tab')[1];
     if (dynTabBtn) {
-        if (ch >= 60 && ch <= 63) {
+        if (ch >= 60 && ch <= 67) {
             dynTabBtn.style.display = 'none';
         } else {
             dynTabBtn.style.display = 'block';
@@ -65,8 +66,8 @@ function updateConfigUIForChannel(ch) {
             const idx = (ch <= 43) ? (ch - 36) : (ch - 44);
             miniFader.innerHTML = createOutputStrip(idx, type, "mini-");
         }
-        else if (ch >= 60 && ch <= 63) {
-            miniFader.innerHTML = createOutputStrip(ch - 60, 'stIn', "mini-");
+        else if (ch >= 60 && ch <= 67) {
+            miniFader.innerHTML = createOutputStrip((ch - 60) / 2, 'stIn', "mini-");
         }
         else miniFader.innerHTML = createChannelStrip(ch, false, "mini-");
     }
@@ -94,8 +95,8 @@ function updateConfigUIForChannel(ch) {
         currentCard = document.querySelectorAll('.fader-group-bus')[idx];
     } else if (ch === 52) {
         currentCard = document.querySelector('.master-card');
-    } else if (ch >= 60 && ch <= 63) {
-        const idx = ch - 60;
+    } else if (ch >= 60 && ch <= 67) {
+        const idx = (ch - 60) / 2;
         currentCard = document.querySelectorAll('.fader-group-st')[idx];
     }
 
@@ -105,25 +106,28 @@ function updateConfigUIForChannel(ch) {
 function changeConfigChannel(delta) {
     let nextCh = activeConfigChannel;
 
-    // Loop para encontrar o próximo canal válido, pulando parceiros pareados
     let safetyCounter = 0;
     do {
-        nextCh += delta;
+        if (nextCh >= 60 && nextCh <= 67) {
+            nextCh += delta * 2;
+        } else {
+            nextCh += delta;
+        }
 
-        // Pula o "gap" entre 32 e 36
         if (nextCh > 31 && nextCh < 36 && delta > 0) nextCh = 36;
         if (nextCh > 31 && nextCh < 36 && delta < 0) nextCh = 31;
 
-        // Limites circulares
-        if (nextCh < 0) nextCh = 52;
-        if (nextCh > 52) nextCh = 0;
+        if (nextCh > 52 && nextCh < 60 && delta > 0) nextCh = 60;
+        if (nextCh > 52 && nextCh < 60 && delta < 0) nextCh = 52;
 
-        // Se for um input (0-31) e for o canal PAR de um par ativo, continuamos buscando
+        if (nextCh < 0) nextCh = 66;
+        if (nextCh > 66) nextCh = 0;
+
         const s = (nextCh >= 0 && nextCh <= 31) ? channelStates[nextCh] : null;
         if (!s || !s.paired || nextCh % 2 === 0) break;
 
         safetyCounter++;
-    } while (nextCh !== activeConfigChannel && safetyCounter < 53);
+    } while (nextCh !== activeConfigChannel && safetyCounter < 100);
 
     activeConfigChannel = nextCh;
     updateConfigUIForChannel(nextCh);
