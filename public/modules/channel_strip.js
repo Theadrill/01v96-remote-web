@@ -491,7 +491,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         val,
         isOn,
         dbLabel: rawToDb(val, true, isMaster),
-        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${i})`),
+        configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${isMaster ? 52 : i})`),
         dataCh: isMaster ? "master" : i,
         onTop: musicianMode,  // Botão ON no topo apenas no modo músico
         isPaired: !isMaster && s.paired,
