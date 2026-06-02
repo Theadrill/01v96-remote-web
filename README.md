@@ -55,29 +55,47 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 
 ## 🚀 Como Iniciar
 
-1.  **Pré-requisitos**:
-    *   Ambiente Rust instalado (se for rodar o servidor Rust moderno).
-    *   Node.js instalado (se for rodar o front ou servidor legados).
-    *   Driver MIDI da Yamaha instalado e mesa conectada via USB.
-    *   Git configurado (para as funções de Auto-Sync).
+### 🦀 Rust (Recomendado)
 
-2.  **Instalação**:
-    ```bash
-    git clone https://github.com/Theadrill/01v96-remote-web.git
-    cd 01v96-remote-web
-    # Instalação das dependências do painel e servidor node
-    npm install
-    ```
+O servidor em Rust oferece performance superior, baixíssima latência e é o foco principal do desenvolvimento atual.
 
-3.  **Execução (Servidor Rust Moderno)**:
-    *   Acesse a pasta `server_rust` e inicie:
-        ```bash
-        cargo run --release
-        ```
-    *   Para o servidor de rede MIDI física (caso a mesa esteja em outro PC):
-        ```bash
-        cargo run --bin remote_midi_server --release
-        ```
+**Pré-requisitos:**
+* **Ambiente Rust** instalado.
+* **Driver MIDI da Yamaha** instalado e a mesa conectada via USB.
+* **Git** configurado (para as funções de Auto-Sync/Ninja Sync).
+
+**Passos para Execução:**
+1. **Inicie o servidor principal**:
+   Acesse a pasta `server_rust` e execute:
+   ```bash
+   cd server_rust
+   cargo run --release
+   ```
+2. **Inicie o servidor de rede MIDI física (opcional)**:
+   Se a mesa estiver conectada fisicamente em outro PC na mesma rede, execute no computador da mesa:
+   ```bash
+   cd server_rust
+   cargo run --bin remote_midi_server --release
+   ```
+
+### 🟢 Node.js (Obsoleto)
+
+O servidor legado em Node.js continua funcional para testes básicos, mas possui menos recursos e não recebe novas atualizações.
+
+**Pré-requisitos:**
+* **Node.js** instalado.
+* **Driver MIDI da Yamaha** instalado e a mesa conectada via USB.
+* **Git** configurado (para as funções de Auto-Sync/Ninja Sync).
+
+**Passos para Execução:**
+1. **Instale as dependências na raiz do projeto**:
+   ```bash
+   npm install
+   ```
+2. **Inicie o servidor legado**:
+   ```bash
+   npm start
+   ```
 
 ---
 
@@ -90,7 +108,7 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 - [x] **MIDI Bridge over Network**: Bridge de rede TCP ultra-rápida (com heartbeat, reconnect dinâmico e tray autônomo).
 - [ ] Implementação de Meters GPU-Accelerated (Curtain Rendering).
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
-- [ ] Fazer o meter do master funcionar.
+- [x] Fazer o meter do master funcionar.
 
 
 ---
