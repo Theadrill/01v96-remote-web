@@ -461,16 +461,18 @@ impl GlobalState {
                         ch.phase = v;
                     }
                 } else if mt == "kInputAttenuator/kAtt" {
-                    let s: &mut dyn ChannelLike = self.get_channel_like(*channel);
-                    s.set_att(v);
+                    if let Some(s) = self.get_target_for_mt(mt, *channel) {
+                        s.set_att(v);
+                    }
                 } else if mt == "kChannelInput/kChannelIn" {
                     if let Some(ch) = self.channels.get_mut(channel) {
                         ch.patch = v;
                     }
                 // --- Pan ---
                 } else if mt == "kPan" {
-                    let s = self.get_channel_like(*channel);
-                    s.set_pan(v);
+                    if let Some(s) = self.get_target_for_mt(mt, *channel) {
+                        s.set_pan(v);
+                    }
                 // --- Pair ---
                 } else if mt == "kInputPair/kPair" {
                     if let Some(ch) = self.channels.get_mut(channel) {
@@ -572,24 +574,27 @@ impl GlobalState {
                     self.apply_eq(mt, *channel, v);
                 // --- Gate ---
                 } else if mt.contains("Gate/") {
-                    if let Some(ch) = self.channels.get_mut(channel) {
-                        let parts: Vec<&str> = mt.splitn(2, "Gate/").collect();
-                        if parts.len() == 2 {
-                            match parts[1] {
-                                "kGateOn" => ch.gate.on = cv,
-                                "kGateThreshold" => ch.gate.thresh = v,
-                                "kGateAttack" => ch.gate.attack = v,
-                                "kGateRange" => ch.gate.range = v,
-                                "kGateHold" => ch.gate.hold = v,
-                                "kGateDecay" => ch.gate.decay = v,
-                                _ => {}
+                    if let Some(s) = self.get_target_for_mt(mt, *channel) {
+                        if let Some(gate) = s.gate_mut() {
+                            let parts: Vec<&str> = mt.splitn(2, "Gate/").collect();
+                            if parts.len() == 2 {
+                                match parts[1] {
+                                    "kGateOn" => gate.on = cv,
+                                    "kGateThreshold" => gate.thresh = v,
+                                    "kGateAttack" => gate.attack = v,
+                                    "kGateRange" => gate.range = v,
+                                    "kGateHold" => gate.hold = v,
+                                    "kGateDecay" => gate.decay = v,
+                                    _ => {}
+                                }
                             }
                         }
                     }
                 // --- Comp ---
                 } else if mt.contains("Comp/") {
-                    let s: &mut dyn ChannelLike = self.get_channel_like(*channel);
-                    s.apply_comp(mt, v);
+                    if let Some(s) = self.get_target_for_mt(mt, *channel) {
+                        s.apply_comp(mt, v);
+                    }
                 }
             }
             crate::midi::protocol::ParsedMidi::MeterData { .. } => {}
@@ -614,30 +619,24 @@ impl GlobalState {
         }
     }
 
-    fn get_channel_like(&mut self, id: usize) -> &mut dyn ChannelLike {
-        if id <= 31 {
-            if let Some(ch) = self.channels.get_mut(&id) {
-                return ch;
+    fn get_target_for_mt(&mut self, mt: &str, channel: usize) -> Option<&mut dyn ChannelLike> {
+        if mt.starts_with("kInput") || mt == "kPan" {
+            if channel <= 31 {
+                return self.channels.get_mut(&channel).map(|c| c as &mut dyn ChannelLike);
+            } else if (60..=67).contains(&channel) {
+                let local = 32 + (channel - 60) / 2;
+                return self.channels.get_mut(&local).map(|c| c as &mut dyn ChannelLike);
             }
-        } else if (60..=67).contains(&id) {
-            let local = 32 + (id - 60) / 2;
-            if let Some(ch) = self.channels.get_mut(&local) {
-                return ch;
-            }
-        } else if (36..=43).contains(&id) {
-            let local = id - 36;
-            if let Some(m) = self.mixes.get_mut(&local) {
-                return m;
-            }
-        } else if (44..=51).contains(&id) {
-            let local = id - 44;
-            if let Some(b) = self.buses.get_mut(&local) {
-                return b;
-            }
-        } else if id == 52 {
-            return &mut self.master;
+        } else if mt.starts_with("kAUX") {
+            let local = if (36..=43).contains(&channel) { channel - 36 } else { channel };
+            return self.mixes.get_mut(&local).map(|c| c as &mut dyn ChannelLike);
+        } else if mt.starts_with("kBus") {
+            let local = if (44..=51).contains(&channel) { channel - 44 } else { channel };
+            return self.buses.get_mut(&local).map(|c| c as &mut dyn ChannelLike);
+        } else if mt.starts_with("kStereo") {
+            return Some(&mut self.master as &mut dyn ChannelLike);
         }
-        &mut self.master
+        None
     }
 
     fn apply_name_char(&mut self, channel: usize, char_index: usize, char: &str) {
@@ -709,26 +708,27 @@ impl GlobalState {
         ];
         let found = eq_keys.iter().position(|&k| k == key);
 
-        let s: &mut dyn ChannelLike = self.get_channel_like(channel);
-        if let Some(idx) = found {
-            match idx {
-                0 => s.eq_mut().mode = value,
-                1 => s.eq_mut().low.q = value,
-                2 => s.eq_mut().low.f = value,
-                3 => s.eq_mut().low.g = value,
-                4 => s.eq_mut().low.hpf_on = Some(value),
-                5 => s.eq_mut().lowmid.q = value,
-                6 => s.eq_mut().lowmid.f = value,
-                7 => s.eq_mut().lowmid.g = value,
-                8 => s.eq_mut().himid.q = value,
-                9 => s.eq_mut().himid.f = value,
-                10 => s.eq_mut().himid.g = value,
-                11 => s.eq_mut().high.q = value,
-                12 => s.eq_mut().high.f = value,
-                13 => s.eq_mut().high.g = value,
-                14 => s.eq_mut().high.lpf_on = Some(value),
-                15 => s.eq_mut().on = value > 0.0,
-                _ => {}
+        if let Some(s) = self.get_target_for_mt(mt, channel) {
+            if let Some(idx) = found {
+                match idx {
+                    0 => s.eq_mut().mode = value,
+                    1 => s.eq_mut().low.q = value,
+                    2 => s.eq_mut().low.f = value,
+                    3 => s.eq_mut().low.g = value,
+                    4 => s.eq_mut().low.hpf_on = Some(value),
+                    5 => s.eq_mut().lowmid.q = value,
+                    6 => s.eq_mut().lowmid.f = value,
+                    7 => s.eq_mut().lowmid.g = value,
+                    8 => s.eq_mut().himid.q = value,
+                    9 => s.eq_mut().himid.f = value,
+                    10 => s.eq_mut().himid.g = value,
+                    11 => s.eq_mut().high.q = value,
+                    12 => s.eq_mut().high.f = value,
+                    13 => s.eq_mut().high.g = value,
+                    14 => s.eq_mut().high.lpf_on = Some(value),
+                    15 => s.eq_mut().on = value > 0.0,
+                    _ => {}
+                }
             }
         }
     }
@@ -739,6 +739,7 @@ trait ChannelLike {
     fn set_pan(&mut self, v: f64);
     fn apply_comp(&mut self, mt: &str, v: f64);
     fn eq_mut(&mut self) -> &mut EqState;
+    fn gate_mut(&mut self) -> Option<&mut GateState> { None }
 }
 
 impl ChannelLike for ChannelState {
@@ -753,6 +754,9 @@ impl ChannelLike for ChannelState {
     }
     fn eq_mut(&mut self) -> &mut EqState {
         &mut self.eq
+    }
+    fn gate_mut(&mut self) -> Option<&mut GateState> {
+        Some(&mut self.gate)
     }
 }
 

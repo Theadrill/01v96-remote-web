@@ -85,7 +85,20 @@ pub fn build_change(
     packet.push(coords[1]);
     packet.push(coords[2]);
     packet.push(coords[3]);
-    packet.push(channel);
+
+    let mut final_channel = channel;
+    if command_name.contains("EQ/") || command_name.contains("Comp/") || command_name == "kInputAttenuator/kAtt" {
+        if command_name.starts_with("kAUX") && channel >= 36 && channel <= 43 {
+            final_channel = channel - 36;
+        } else if command_name.starts_with("kBus") && channel >= 44 && channel <= 51 {
+            final_channel = channel - 44;
+        } else if command_name.starts_with("kStereo") && channel == 52 {
+            final_channel = 0;
+        } else if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
+            final_channel = 32 + (channel - 60);
+        }
+    }
+    packet.push(final_channel);
 
     let data_bytes = convert_to_bytes(value, &converter);
     packet.extend_from_slice(&data_bytes);
@@ -105,7 +118,20 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     packet.push(coords[1]);
     packet.push(coords[2]);
     packet.push(coords[3]);
-    packet.push(channel);
+
+    let mut final_channel = channel;
+    if command_name.contains("EQ/") || command_name.contains("Comp/") || command_name == "kInputAttenuator/kAtt" {
+        if command_name.starts_with("kAUX") && channel >= 36 && channel <= 43 {
+            final_channel = channel - 36;
+        } else if command_name.starts_with("kBus") && channel >= 44 && channel <= 51 {
+            final_channel = channel - 44;
+        } else if command_name.starts_with("kStereo") && channel == 52 {
+            final_channel = 0;
+        } else if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
+            final_channel = 32 + (channel - 60);
+        }
+    }
+    packet.push(final_channel);
 
     packet.extend_from_slice(FOOTER);
     Some(packet)
