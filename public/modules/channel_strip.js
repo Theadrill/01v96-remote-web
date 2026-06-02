@@ -173,7 +173,7 @@ function createDesktopStrip(config) {
 
     return `
         <div class="fader-card-desktop ${customClass}" id="${ids.card || `${pfx}card${id}`}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
-            <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${isMaster ? '' : configAction}">${title}</div>
+            <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${configAction}">${title}</div>
             
             ${hasSolo ?
             `<button id="solo${id}" class="btn-cue" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">SOLO</button>` :
@@ -181,7 +181,7 @@ function createDesktopStrip(config) {
             `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
             `<div class="btn-cue-placeholder"></div>`}
             
-            <div class="desk-ch-name-zone" onclick="${isMaster ? '' : configAction}">
+            <div class="desk-ch-name-zone" onclick="${configAction}">
                 <div id="${nameId}" class="desk-ch-name">${name}</div>
             </div>
 
@@ -416,7 +416,7 @@ function createMobileStrip(config) {
             ` : ''}
             ${getMobileScaleHTML()}
             ${onTop ? onBtn : ''}
-            <div class="ch-clickable-zone" onclick="${isMaster ? '' : configAction}">
+            <div class="ch-clickable-zone" onclick="${configAction}">
                 <h2 class="card-title">${title}</h2>
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
@@ -432,7 +432,7 @@ function createMobileStrip(config) {
                 <input type="range" id="${fId}" min="0" max="1023" value="${val}" orient="vertical" oninput="${inputCall}" onclick="event.stopPropagation()">
             </div>
             
-            <div class="ch-clickable-zone mt-auto" onclick="${isMaster ? '' : configAction}">
+            <div class="ch-clickable-zone mt-auto" onclick="${configAction}">
                 <div class="nudge-zone" onpointerdown="${onNudgeStartAction}(${evtCh}, -1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                     <button class="btn-nudge pointer-none">-</button>
                     <h1 id="${vId}" class="fader-val">${dbLabel}</h1>
