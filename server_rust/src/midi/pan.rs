@@ -48,8 +48,7 @@ pub fn global_channel_to_pan_index(global_channel: i64) -> Option<PanTarget> {
         return Some(PanTarget::Input(ch as usize));
     }
     if (60..=67).contains(&ch) {
-        let st_idx = ((ch - 60) / 2) as usize;
-        return Some(PanTarget::Input(0x20 + st_idx));
+        return Some(PanTarget::Input(0x20 + (ch - 60) as usize));
     }
     None
 }
@@ -134,7 +133,7 @@ pub fn parse_pan_message(message: &[u8]) -> Option<ParsedMidi> {
         let global_ch = if ch_idx <= 0x1F {
             ch_idx as i64
         } else if ch_idx >= 0x20 && ch_idx <= 0x27 {
-            60 + ((ch_idx - 0x20) * 2) as i64
+            60 + (ch_idx - 0x20) as i64
         } else {
             return None;
         };
@@ -155,7 +154,7 @@ pub fn build_pan_sync_requests() -> Vec<Vec<u8>> {
             requests.push(req);
         }
     }
-    for st_global in (60..=66).step_by(2) {
+    for st_global in 60..=67 {
         if let Some(req) = build_pan_request(st_global) {
             requests.push(req);
         }

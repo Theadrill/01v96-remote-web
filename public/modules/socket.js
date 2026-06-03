@@ -45,8 +45,8 @@ socket.on('update', (d) => {
         if (s) s.pan = d.value;
 
         // Atualiza o indicador visual (apenas no layout desktop)
-        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function') {
-            updatePanIndicator(d.channel, d.value);
+        if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function') {
+            window.updatePanIndicator(d.channel, d.value);
         }
         return;
     }
@@ -163,8 +163,8 @@ socket.on('update', (d) => {
     if (d.type === 'kPan') {
         const s = getChannelStateById(d.channel);
         if (s) s.pan = d.value;
-        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function') {
-            updatePanIndicator(d.channel, d.value);
+        if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function') {
+            window.updatePanIndicator(d.channel, d.value);
         }
     }
 
@@ -218,8 +218,8 @@ socket.on('update', (d) => {
         // Mantém sicronia do nome
         stateObj.name = newName;
 
-        if (typeof updateNameUI === 'function') {
-            updateNameUI(d.channel, newName);
+        if (typeof window.updateNameUI === 'function') {
+            window.updateNameUI(d.channel, newName);
         }
         return;
     }
@@ -291,12 +291,12 @@ function updateSceneDisplay() {
 }
 
 socket.on('updateName', (data) => {
-    if (typeof updateNameUI === 'function') {
+    if (typeof window.updateNameUI === 'function') {
         const stateObj = getChannelStateById(data.channel);
         if (stateObj) {
             stateObj.nameChars = (data.name || '').padEnd(16, ' ').substring(0, 16).split('');
         }
-        updateNameUI(data.channel, data.name);
+        window.updateNameUI(data.channel, data.name);
     }
 });
 
@@ -375,8 +375,8 @@ socket.on('sync', (s) => {
 
                 updateUI(globalId, v, onBool, soloBool);
                 const newName = ch.name || (i < 32 ? `CH ${i + 1}` : `ST IN ${i - 32 + 1}`);
-                if (typeof updateNameUI === 'function') {
-                    updateNameUI(globalId, newName);
+                if (typeof window.updateNameUI === 'function') {
+                    window.updateNameUI(globalId, newName);
                 }
             }
         }
@@ -403,13 +403,13 @@ socket.on('sync', (s) => {
     if (s.master) {
         Object.assign(masterState, s.master);
         updateUI('master', s.master.value, !!s.master.on, undefined);
-        if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function' && s.master.pan !== undefined) {
-            updatePanIndicator('master', s.master.pan);
+        if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function' && s.master.pan !== undefined) {
+            window.updatePanIndicator('master', s.master.pan);
         }
     }
 
     // Atualiza os indicadores de Pan após o sync completo (desktop apenas)
-    if (layoutMode === 'desktop' && typeof updatePanIndicator === 'function' && s.channels) {
+    if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function' && s.channels) {
         for (let i = 0; i < 40; i++) {
             const ch = getCh(s.channels, i);
             if (!ch || ch.pan === undefined) continue;
@@ -419,7 +419,7 @@ socket.on('sync', (s) => {
 
             // Canais 0-31 mantêm o ID. ST IN (32-39) mapeiam para 60-67.
             const globalId = (i >= 32) ? (60 + (i - 32)) : i;
-            updatePanIndicator(globalId, ch.pan);
+            window.updatePanIndicator(globalId, ch.pan);
         }
     }
 

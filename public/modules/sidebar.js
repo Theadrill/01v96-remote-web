@@ -218,8 +218,8 @@ window.saveChannelName = function() {
     socket.emit('updateName', { channel: ch, name: newName });
     
     // Feedback visual imediato usando a função unificada
-    if (typeof updateNameUI === 'function') {
-        updateNameUI(ch, newName);
+    if (typeof window.updateNameUI === 'function') {
+        window.updateNameUI(ch, newName);
     }
     
     document.getElementById('nameEditorModal').style.display = 'none';

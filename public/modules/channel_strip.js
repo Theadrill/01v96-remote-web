@@ -539,8 +539,8 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})`,
         configAction: `openChannelConfig(event, ${configId})`,
         type: "output",
-        isPaired: false,
-        partnerId: null,
+        isPaired: type === 'stIn',
+        partnerId: type === 'stIn' ? configId + 1 : null,
         hasPan: type === 'stIn', // Apenas ST IN tem Pan nas saídas
         dataCh: configId
     });
@@ -793,8 +793,8 @@ function initUI() {
             const s = channelStates[i];
             if (s && s.pan !== undefined) updatePanIndicator(i, s.pan);
         }
-        // ST IN (globais 60-63)
-        for (let stGlobal = 60; stGlobal <= 63; stGlobal++) {
+        // ST IN (globais 60-67)
+        for (let stGlobal = 60; stGlobal <= 67; stGlobal++) {
             const s = channelStates[32 + (stGlobal - 60)];
             if (s && s.pan !== undefined) updatePanIndicator(stGlobal, s.pan);
         }
