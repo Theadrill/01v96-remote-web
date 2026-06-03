@@ -342,3 +342,119 @@ function restartServer() {
         document.getElementById('configModal').style.display = 'none';
     };
 }
+
+function setServerConfigStatus(msg, color) {
+    const el = document.getElementById('serverConfigStatus');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = color || '#aaa';
+}
+
+function refreshServerNameDisplay() {
+    const el = document.getElementById('configServerNameDisplay');
+    const input = document.getElementById('inputServerName');
+    const name = window.serverName || '01V96';
+    if (el) el.textContent = name;
+    if (input && (!input.value || input.value === window.serverName)) {
+        input.value = name;
+    }
+}
+
+window.saveServerName = function () {
+    const input = document.getElementById('inputServerName');
+    if (!input) return;
+    const newName = input.value.trim();
+    if (!newName) {
+        setServerConfigStatus('Digite um nome.', '#ff6b6b');
+        input.focus();
+        return;
+    }
+    if (!/^[a-z0-9-]+$/.test(newName)) {
+        setServerConfigStatus('Use apenas letras minúsculas, números e hífen.', '#ff6b6b');
+        input.focus();
+        return;
+    }
+    if (newName.length < 3 || newName.length > 30) {
+        setServerConfigStatus('Nome deve ter entre 3 e 30 caracteres.', '#ff6b6b');
+        input.focus();
+        return;
+    }
+    if (typeof socket === 'undefined' || !socket.connected) {
+        setServerConfigStatus('Sem conexão com o servidor.', '#ff6b6b');
+        return;
+    }
+    socket.emit('renameServer', { new_name: newName });
+    setServerConfigStatus('Salvando...', '#aaa');
+};
+
+window.confirmResetConfig = function () {
+    document.getElementById('resetConfigConfirmModal').style.display = 'flex';
+    document.getElementById('resetConfigConfirmBtn').onclick = () => {
+        if (typeof socket !== 'undefined' && socket.connected) {
+            socket.emit('resetConfig');
+        }
+        document.getElementById('resetConfigConfirmModal').style.display = 'none';
+        document.getElementById('configModal').style.display = 'none';
+    };
+};
+
+window.onRenameResult = function (data) {
+    if (!data) return;
+    if (data.success) {
+        setServerConfigStatus('Nome atualizado.', '#5cacee');
+        window.serverName = data.server_name || window.serverName;
+        refreshServerNameDisplay();
+        // Re-busca para garantir consistência
+        if (typeof socket !== 'undefined') socket.emit('getServerName');
+    } else {
+        setServerConfigStatus(data.error || 'Erro ao renomear.', '#ff6b6b');
+    }
+};
+
+window.onServerRenamed = function (data) {
+    if (data && data.server_name) {
+        window.serverName = data.server_name;
+        refreshServerNameDisplay();
+    }
+};
+
+window.onResetResult = function (data) {
+    if (data && data.success) {
+        // Espera o configReset broadcast chegar para redirecionar
+    } else if (data && data.error) {
+        setServerConfigStatus('Erro ao resetar: ' + data.error, '#ff6b6b');
+    }
+};
+
+window.onConfigReset = function () {
+    window.envStatus = 'not_found';
+    window.serverName = null;
+    try {
+        localStorage.removeItem('01v96_role');
+        localStorage.removeItem('01v96_mix');
+    } catch (e) { /* localStorage indisponível */ }
+    if (typeof window.showSetupScreen === 'function') {
+        const splash = document.getElementById('splashScreen');
+        if (splash) {
+            splash.style.display = 'flex';
+            splash.style.opacity = '1';
+            splash.style.transform = 'scale(1)';
+            splash.style.pointerEvents = 'auto';
+        }
+        window.showSetupScreen();
+    }
+    // Fecha qualquer modal aberto
+    document.querySelectorAll('.modal-overlay').forEach(m => { m.style.display = 'none'; });
+};
+
+// Atualiza o display do nome do servidor sempre que o configModal abrir
+document.addEventListener('DOMContentLoaded', () => {
+    const configModal = document.getElementById('configModal');
+    if (!configModal) return;
+    const observer = new MutationObserver(() => {
+        if (configModal.style.display === 'flex') {
+            refreshServerNameDisplay();
+        }
+    });
+    observer.observe(configModal, { attributes: true, attributeFilter: ['style'] });
+});

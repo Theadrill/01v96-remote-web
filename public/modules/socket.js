@@ -1,5 +1,54 @@
 let faderCardsCache = null;
 
+// Decide o que fazer com a splash screen baseado no status do .env no servidor.
+// Chamado pelo listener de 'portsList' e 'setupStatus' (via 'connect' → 'checkSetupStatus').
+// - envStatus !== 'complete': limpa localStorage e mostra tela de cadastro
+// - envStatus === 'complete': auto-login se houver role salva
+function applySetupStatus(data) {
+    if (!data) return;
+    if (data.env_status) window.envStatus = data.env_status;
+    if (data.server_name) window.serverName = data.server_name;
+    if (data.env_status && data.env_status !== 'complete') {
+        try {
+            localStorage.removeItem('01v96_role');
+            localStorage.removeItem('01v96_mix');
+        } catch (e) { /* localStorage indisponível */ }
+        const splash = document.getElementById('splashScreen');
+        if (splash && splash.style.display !== 'none') {
+            if (typeof window.showSetupScreen === 'function') window.showSetupScreen();
+        }
+    } else if (data.env_status === 'complete') {
+        try {
+            const savedRole = localStorage.getItem('01v96_role');
+            const splash = document.getElementById('splashScreen');
+            const isSplashVisible = splash && splash.style.display !== 'none';
+            if (savedRole === 'technician' && isSplashVisible) {
+                splash.style.display = 'none';
+            } else if (savedRole === 'musician') {
+                const savedMix = localStorage.getItem('01v96_mix');
+                if (savedMix && isSplashVisible) {
+                    splash.style.display = 'none';
+                    if (typeof enterMusicianMode === 'function') {
+                        enterMusicianMode(parseInt(savedMix));
+                    }
+                }
+            }
+        } catch (e) { /* localStorage indisponível */ }
+    }
+}
+
+// Garante que o frontend SEMPRE pergunte ao servidor o estado do .env
+// (no boot, em reconexões, e se o módulo carregar após o socket já estar conectado).
+function requestSetupStatus() {
+    if (typeof socket !== 'undefined' && socket.connected) {
+        socket.emit('checkSetupStatus');
+    }
+}
+socket.on('connect', requestSetupStatus);
+if (typeof socket !== 'undefined' && socket.connected) {
+    requestSetupStatus();
+}
+
 // 🚨 [CRITICAL SYNC LOGIC] - LISTENER DE UPDATES E DINÂMICAS
 // Este módulo depende do objeto 'socket' global (definido em globals.js).
 // Os handlers 'update', 'dynamicsState' e 'meterData' garantem que a UI reflita a mesa física em tempo real.
@@ -463,11 +512,12 @@ socket.on('connectionState', (state) => {
     window.isDemoMode = !!state.demo_mode;
     document.body.classList.toggle('is-offline', !state.connected);
     const scn = document.getElementById('scn');
+    const baseName = window.serverName || '01V96';
     if (state.connected) {
-        scn.innerText = '01V96';
+        scn.innerText = baseName;
         scn.style.color = '#0f0';
     } else {
-        scn.innerText = state.demo_mode ? '01V96 (demo)' : '01V96 (offline)';
+        scn.innerText = state.demo_mode ? `${baseName} (demo)` : `${baseName} (offline)`;
         scn.style.color = state.demo_mode ? '#ffc107' : '#dc3545';
     }
     const overlay = document.getElementById('offlineOverlay');
@@ -488,8 +538,23 @@ socket.on('connectionState', (state) => {
 });
 
 socket.on('portsList', (data) => {
-    if (data.savedConfig && data.savedConfig.tecnico_pass) {
-        tecnicoPassword = data.savedConfig.tecnico_pass;
+    if (data.tecnicoPassword) {
+        tecnicoPassword = data.tecnicoPassword;
+        window.tecnicoPassword = data.tecnicoPassword;
+    } else {
+        // A senha TÉCNICO vem APENAS do .env (serverPassword). Nunca de config.json.
+        tecnicoPassword = null;
+        window.tecnicoPassword = null;
+    }
+    if (data.serverName) {
+        window.serverName = data.serverName;
+    }
+    if (data.envStatus) {
+        window.envStatus = data.envStatus;
+        applySetupStatus({
+            env_status: data.envStatus,
+            server_name: data.serverName,
+        });
     }
 
     const sinEl = document.getElementById('sin');
@@ -787,4 +852,74 @@ socket.on('meterData', (levels) => {
         }
 
     }
+});
+
+socket.on('setupResult', (data) => {
+    if (typeof window.onSetupResult === 'function') {
+        window.onSetupResult(data);
+    } else {
+        console.warn('[SETUP] setupResult recebido mas onSetupResult não está pronto', data);
+    }
+});
+
+socket.on('setupCompleted', (data) => {
+    window.envStatus = 'complete';
+    window.serverName = (data && data.server_name) || window.serverName;
+    if (typeof window.onSetupCompleted === 'function') window.onSetupCompleted(data);
+});
+
+socket.on('setupRequired', (data) => {
+    window.envStatus = (data && data.env_status) || 'not_found';
+    const splash = document.getElementById('splashScreen');
+    if (splash && splash.style.display === 'none') {
+        if (typeof window.showSetupScreen === 'function') window.showSetupScreen();
+    }
+});
+
+socket.on('setupStatus', (data) => {
+    applySetupStatus(data);
+});
+
+socket.on('serverName', (data) => {
+    if (!data) return;
+    if (data.server_name) {
+        window.serverName = data.server_name;
+        // Atualiza o sidebar mesmo se isDemoMode ainda não foi definido
+        // (a próxima connectionState/portsList vai re-aplicar com o estado correto).
+        if (window.isDemoMode !== undefined) {
+            applyServerNameToSidebar(data.server_name);
+        }
+        if (typeof window.onServerRenamed === 'function') window.onServerRenamed(data);
+    }
+});
+
+socket.on('renameResult', (data) => {
+    if (typeof window.onRenameResult === 'function') window.onRenameResult(data);
+});
+
+function applyServerNameToSidebar(serverName) {
+    const scn = document.getElementById('scn');
+    if (!scn) return;
+    const baseName = serverName || '01V96';
+    if (document.body.classList.contains('is-offline')) {
+        scn.innerText = window.isDemoMode ? `${baseName} (demo)` : `${baseName} (offline)`;
+    } else {
+        scn.innerText = baseName;
+    }
+}
+
+socket.on('serverRenamed', (data) => {
+    if (data && data.server_name) {
+        window.serverName = data.server_name;
+        applyServerNameToSidebar(data.server_name);
+        if (typeof window.onServerRenamed === 'function') window.onServerRenamed(data);
+    }
+});
+
+socket.on('resetResult', (data) => {
+    if (typeof window.onResetResult === 'function') window.onResetResult(data);
+});
+
+socket.on('configReset', () => {
+    if (typeof window.onConfigReset === 'function') window.onConfigReset();
 });

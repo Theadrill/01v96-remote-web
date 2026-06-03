@@ -2,25 +2,44 @@ function showSplashStep(step) {
     const splashInitial = document.getElementById('splashInitial');
     const splashTecnico = document.getElementById('splashTecnico');
     const splashMusico = document.getElementById('splashMusico');
+    const splashSetup = document.getElementById('splashSetup');
     const tecnicoPass = document.getElementById('tecnicoPass');
 
-    splashInitial.style.display = 'none';
-    splashTecnico.style.display = 'none';
-    splashMusico.style.display = 'none';
+    if (splashInitial) splashInitial.style.display = 'none';
+    if (splashTecnico) splashTecnico.style.display = 'none';
+    if (splashMusico) splashMusico.style.display = 'none';
+    if (splashSetup) splashSetup.style.display = 'none';
 
     if (step === 'initial') {
         splashInitial.style.display = 'flex';
     } else if (step === 'tecnico') {
+        const status = (typeof window !== 'undefined' && window.envStatus) || 'not_found';
+        if (status !== 'complete') {
+            if (typeof window.showSetupScreen === 'function') {
+                window.showSetupScreen();
+                return;
+            }
+        }
         splashTecnico.style.display = 'flex';
         tecnicoPass.value = '';
         setTimeout(() => tecnicoPass.focus(), 150);
     } else if (step === 'musico') {
         splashMusico.style.display = 'flex';
+    } else if (step === 'setup') {
+        if (typeof window.showSetupScreen === 'function') {
+            window.showSetupScreen();
+        }
     }
 }
 
 function checkTecnicoPass() {
     const pass = document.getElementById('tecnicoPass').value;
+    if (!tecnicoPassword) {
+        alert('SENHA NÃO CONFIGURADA — faça a configuração inicial primeiro.');
+        document.getElementById('tecnicoPass').value = '';
+        document.getElementById('tecnicoPass').focus();
+        return;
+    }
     if (pass === tecnicoPassword) {
         localStorage.setItem('01v96_role', 'technician');
         const splash = document.getElementById('splashScreen');
@@ -83,16 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lógica de Auto-Login
-    const savedRole = localStorage.getItem('01v96_role');
-    if (savedRole === 'technician') {
-        document.getElementById('splashScreen').style.display = 'none';
-        // O app inicia por padrão como técnico no app.js
-    } else if (savedRole === 'musician') {
-        const savedMix = localStorage.getItem('01v96_mix');
-        if (savedMix) {
-            document.getElementById('splashScreen').style.display = 'none';
-            enterMusicianMode(parseInt(savedMix));
-        }
+    // A decisão de mostrar tela de cadastro vs. auto-login é tomada pelo socket.js
+    // quando o `setupStatus` (via `socket.on('connect')` → `checkSetupStatus`) ou o
+    // `portsList` chega com o envStatus real. Apenas garantimos que a splash está
+    // visível (caso o socket ainda não tenha conectado) e deixamos o usuário
+    // escolher TÉCNICO/MÚSICO pela splash normal.
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        // Mantém splash visível (CSS já é display:flex). socket.js vai trocar para
+        // showSetupScreen ou auto-login quando o setupStatus/portsList chegar.
+        splash.style.display = 'flex';
     }
 });

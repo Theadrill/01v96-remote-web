@@ -1,33 +1,23 @@
 # Plano de Features
 
-## 1. Sistema de Cenas de Nomes Customizados
+Guia de implementação passo a passo para agentes de IA.
 
-Permite salvar nomes customizados como cenas e vinculá-los às cenas físicas
-da mesa Yamaha 01V96. No app, os nomes podem ter até 10 caracteres — a mesa
-continua limitada a 4.
+---
 
-### 1.1. Funcionamento
+## Feature 1: Cenas de Nomes Customizados
+
+Permite criar e vincular cenas de nomes customizados (até 10 caracteres) às
+cenas físicas da mesa (limite de 4 caracteres), com sincronização via Ninja
+Sync e comparação inteligente para minimizar tráfego MIDI.
 
 | Local           | Limite         | Exemplo      |
 |-----------------|----------------|--------------|
 | Mesa (hardware) | 4 caracteres   | `MAUR`       |
 | App (interface) | 10 caracteres  | `MAURICIO`   |
 
-As cenas de nomes customizados são arquivos JSON salvos localmente e
-sincronizados via Ninja Sync (Git). Ao carregar uma cena física na mesa, o
-servidor localiza a custom scene correspondente, compara canal por canal e
-envia apenas os nomes que divergem — evitando tráfego MIDI desnecessário.
+### Estrutura de dados
 
-O algoritmo de comparação usa os 4 primeiros caracteres de cada nome
-customizado contra o nome atual do canal na mesa. Se os valores coincidirem,
-o canal é pulado. Se divergirem, o servidor emite o comando de rename apenas
-para aquele canal, com delay de 30ms entre comandos.
-
-### 1.2. Estrutura de arquivos
-
-#### `custom_names_scenes-{nome_da_mesa}.json`
-
-Arquivo central de registro. Mapeia cada custom scene a uma cena física.
+#### Registro central: `custom_names_scenes-{nome_da_mesa}.json`
 
 ```json
 {
@@ -37,11 +27,6 @@ Arquivo central de registro. Mapeia cada custom scene a uma cena física.
       "physical_scene": "carlos",
       "physical_id": 8,
       "file": "custom_names_scene-carlos-igreja-central.json"
-    },
-    {
-      "physical_scene": "joao",
-      "physical_id": 15,
-      "file": "custom_names_scene-joao-igreja-central.json"
     }
   ]
 }
@@ -49,26 +34,21 @@ Arquivo central de registro. Mapeia cada custom scene a uma cena física.
 
 | Campo                      | Tipo   | Descrição                              |
 |----------------------------|--------|----------------------------------------|
-| `mesa_nome`                | string | Nome do servidor/mesa (vindo do `.env`)|
+| `mesa_nome`                | string | Nome do servidor (vindo do `.env`)     |
 | `scenes[].physical_scene`  | string | Nome da cena física na mesa            |
-| `scenes[].physical_id`     | number | ID numérico da cena na mesa (1-99)     |
+| `scenes[].physical_id`     | number | ID da cena na mesa (1-99)              |
 | `scenes[].file`            | string | Arquivo JSON com os nomes customizados |
 
-#### `custom_names_scene-{nome_cena}-{nome_da_mesa}.json`
-
-Arquivo com os nomes estendidos por canal. O sufixo `{nome_da_mesa}` evita
-colisão quando múltiplos servidores compartilham o mesmo repositório Ninja
-Sync e possuem cenas físicas com nomes iguais.
+#### Cena individual: `custom_names_scene-{nome}-{nome_da_mesa}.json`
 
 ```json
 {
   "scene_name": "carlos",
   "scene_id": 8,
-  "description": "Música 1 - Carlos",
+  "description": "",
   "channels": {
     "1":  { "name": "MAURICIO", "short": "MAUR" },
     "2":  { "name": "VIOLAO",   "short": "VIOL" },
-    "3":  { "name": "GUITARRA", "short": "GUIT" },
     "32": { "name": "BATERIA",  "short": "BATE" },
     "33": { "name": "ST IN 1",  "short": "ST1 " },
     "35": { "name": "ST IN 2",  "short": "ST2 " },
@@ -79,355 +59,486 @@ Sync e possuem cenas físicas com nomes iguais.
 }
 ```
 
-| Chave      | Cobertura                     |
-|------------|-------------------------------|
-| `1` a `32` | Canais mono (inputs 1-32)     |
-| `33`       | ST IN 1 L                     |
-| `34`       | ST IN 1 R                     |
-| `35`       | ST IN 2 L                     |
-| `36`       | ST IN 2 R                     |
-| `37`       | ST IN 3 L                     |
-| `38`       | ST IN 3 R                     |
-| `39`       | ST IN 4 L                     |
-| `40`       | ST IN 4 R                     |
-| `master`   | Canal master                  |
+| Chave      | Cobertura                 |
+|------------|---------------------------|
+| `1` a `32` | Canais mono (inputs 1-32) |
+| `33`       | ST IN 1 L                 |
+| `34`       | ST IN 1 R                 |
+| `35`       | ST IN 2 L                 |
+| `36`       | ST IN 2 R                 |
+| `37`       | ST IN 3 L                 |
+| `38`       | ST IN 3 R                 |
+| `39`       | ST IN 4 L                 |
+| `40`       | ST IN 4 R                 |
+| `master`   | Canal master              |
 
-O índice no JSON começa em **1** (canal 1 = primeiro canal físico). A mesa
-usa índice baseado em zero. O servidor converte:
-`json_id = mesa_channel + 1`.
+> O JSON usa índice baseado em 1 (canal 1 = primeiro canal físico). A mesa
+> usa índice baseado em zero. Conversão: `json_id = mesa_channel + 1`.
 
-### 1.3. Cena default
+#### Cena default: `custom_names_scene-default-{nome_da_mesa}.json`
 
-O arquivo `custom_names_scene-default-{nome_da_mesa}.json` atua como falback.
-Ele é aplicado automaticamente a qualquer cena física que não tenha uma
-custom scene própria. Assim, se várias cenas compartilham os mesmos nomes, o
-operador mantém apenas a default — sem duplicar arquivos.
-
-Ordem de busca ao carregar uma cena:
-
-1. Procura custom scene vinculada por `physical_id`.
-2. Se não encontrar, busca por `physical_scene`.
-3. Se ainda não encontrar, tenta `custom_names_scene-default.json`.
-4. Se nenhuma existir, encerra sem carregar nomes customizados.
-
-### 1.4. Criação de nomes customizados
-
-#### 1.4.1. Acessar a edição
-
-1. Na tela principal, toque no canal desejado.
-2. A tela de configuração do canal abre.
-3. Clique no nome do canal (visor atual de 4 caracteres).
-
-#### 1.4.2. Modal de edição
-
-O modal exibe:
-
-- **Input de texto** com o nome atual do canal.
-- **Checkbox** `"Criar nome customizado"` (desmarcada por padrão).
-- **Preview em tempo real** com duas linhas que atualizam a cada caractere:
-
-  ```
-  App:  MAURICIO
-  Mesa: MAUR
-  ```
-
-**Caso 1 — Checkbox desmarcada:**
-
-- Fluxo legado mantido. O input tem limite de 4 caracteres.
-- Ao salvar, o nome é enviado diretamente para a mesa via MIDI.
-- Nenhum arquivo de custom scene é criado ou alterado.
-
-**Caso 2 — Checkbox marcada:**
-
-- O limite do input sobe para **10 caracteres**.
-- Validação em tempo real:
-  - Permite letras (A-Z, a-z), números e underline.
-  - Acentos são normalizados automaticamente
-    (ex: `MÚSICA` se torna `MUSICA`).
-  - Símbolos especiais são removidos.
-  - O input mostra borda vermelha se houver caracteres inválidos.
-- Se o `.env` não define o nome do servidor, o sistema exige o
-  cadastro primeiro (ver Feature 2).
-- Ao confirmar:
-
-#### 1.4.3. Salvamento
-
-1. **Descobre a cena física ativa**: o servidor lê `sceneName` e
-   `sceneNumber` do `GlobalState`.
-2. **Extrai o nome base da cena**: se a cena se chama `"08 - carlos"`,
-   extrai `"carlos"`. O sistema usa o texto após o primeiro `" - "` se
-   existir; caso contrário, usa o nome completo.
-3. **Cria o arquivo** `custom_names_scene-{nome_base}-{nome_da_mesa}.json`
-   (se não existir):
-   - Varre todos os canais do `GlobalState` e coleta os nomes atuais de 4
-     caracteres.
-   - Para o canal editado, salva o nome estendido (até 10 caracteres) e
-     calcula o `short` com os 4 primeiros caracteres, maiúsculo, completando
-     com espaços se o nome for menor que 4.
-4. **Atribuição automática**: se a cena física atual ainda não está vinculada
-   a nenhuma custom scene, o sistema já faz o vínculo automaticamente,
-   adicionando o registro no `custom_names_scenes-{nome_da_mesa}.json`. O
-   operador não precisa acessar a tela de gerenciamento para isso.
-5. **Envia para a mesa**: o `short` (4 caracteres) é transmitido via
-   `build_name_change`.
-
-### 1.5. Tela de gerenciamento
-
-#### 1.5.1. Lista de cenas
-
-Exibe todas as custom scenes encontradas localmente (`custom_names_scene-*.json`),
-com:
-
-- Nome da custom scene.
-- Cena física vinculada (se houver).
-- Data da última modificação.
-
-#### 1.5.2. Modal de atribuição
-
-Ao clicar em uma custom scene, abre um modal com:
-
-- **Lista de cenas físicas** detectadas na mesa (nome + ID), obtidas do
-  `SceneManager`.
-- O usuário seleciona **apenas uma** cena para vincular.
-- Botões: **Confirmar** / **Cancelar**.
-
-#### 1.5.3. Tabela de comparação
-
-Ao abrir os detalhes de uma custom scene, exiba uma tabela com três colunas:
-
-| Canal | Nome Customizado | Nome Atual na Mesa |
-|-------|------------------|--------------------|
-| 1     | MAURICIO         | MAUR               |
-| 2     | VIOLAO           | VIOL               |
-| 3     | GUIT             | GUIT               |
-
-Linhas onde os nomes diferem ficam destacadas (fundo amarelo). O operador
-identifica rapidamente quais canais serão alterados ao carregar aquela
-custom scene.
-
-#### 1.5.4. Remover canal individual
-
-No modal de edição de nome (item 1.4.2), quando o canal já possui um nome
-customizado salvo, adicione um botão **Remover nome customizado**. Ao clicar:
-
-- Remove a chave `channels[id]` do JSON da custom scene.
-- O canal volta a usar o nome padrão da mesa.
-- Se todos os canais forem removidos, o arquivo da custom scene é deletado e
-  o registro no `custom_names_scenes-{nome_da_mesa}.json` é removido.
-
-### 1.6. Carregamento ao trocar cena na mesa
-
-Quando o servidor detecta o carregamento de uma cena física (`SceneNumber`
-ou `PhysicalSceneRecall`):
-
-1. **Aguarda** o dump completo da cena (delay de ~2s).
-2. **Localiza** a custom scene nesta ordem:
-   1. Busca por `physical_id` no `custom_names_scenes-{nome_da_mesa}.json`.
-   2. Se não encontrar, busca por `physical_scene`.
-   3. Se ainda não encontrar, tenta
-      `custom_names_scene-default-{nome_da_mesa}.json`.
-   4. Se nenhuma for encontrada, encerra.
-3. **Carrega** o arquivo JSON da custom scene.
-4. **Compara e sincroniza**:
-
-   ```
-   PARA CADA canal no JSON:
-       esperado = short (4 chars, maiúsculo, preenchido com espaços)
-       atual = mesa.getChannelName(canal)
-
-       SE esperado != atual:
-           build_name_change(canal, esperado)
-           delay 30ms
-       SENÃO:
-           pula
-   ```
-
-5. **Atualiza o frontend**: emite `"updateName"` para todos os clientes com
-   o `name` completo de cada canal modificado.
-
-### 1.7. Indicador visual de custom scene ativa
-
-Quando uma custom scene está carregada, a interface exibe um indicador
-(ícone, badge ou texto) informando ao operador que os nomes são
-customizados.
-
-> **ATENÇÃO**: O local exato do indicador **deve ser perguntado
-> obrigatoriamente ao usuário** antes da implementação. Esta é a última
-> etapa do desenvolvimento da feature — o usuário definirá o posicionamento
-> nesse momento.
-
-### 1.8. Integração com Ninja Sync
-
-Os arquivos `custom_names_scene-*.json` e `custom_names_scenes-*.json`
-integram o fluxo do Ninja Sync (Git auto push/pull):
-
-- **Pull automático**: na inicialização do servidor, sincroniza do remoto.
-- **Push automático**: após qualquer alteração, faz commit e push.
-
-Isso mantém as cenas de nomes disponíveis em todos os dispositivos.
-
-### 1.9. Casos de borda
-
-| Situação                                         | Comportamento                                                            |
-|--------------------------------------------------|--------------------------------------------------------------------------|
-| Cena física renomeada na mesa                    | O `physical_id` é a chave principal. O nome é fallback.                  |
-| Canal não encontrado no JSON                     | Mantém o nome atual da mesa (não altera).                                |
-| JSON mal formatado ou ausente                    | Log de erro. Segue sem custom scene. Nenhum nome é alterado.             |
-| Nome estendido menor que 4 caracteres            | Preenche com espaços. Ex: `"AX"` se torna `"AX  "`.                      |
-| Usuário desmarca checkbox com nome > 4 chars     | Input volta a 4 chars e trunca o valor. Salvamento segue fluxo legado.   |
-| Múltiplas cenas físicas com mesmo nome           | Match primeiro por `physical_id`, depois por `physical_scene`.           |
-| Todos os canais removidos da custom scene        | Arquivo deletado. Registro removido do `custom_names_scenes-*.json`.     |
+Mesmo formato da cena individual. Atua como fallback: qualquer cena física
+sem custom scene própria herda os nomes da default.
 
 ---
 
-## 2. Atribuição de Nome ao Servidor/Mesa
+### Passo 1: Módulo Rust de custom scenes
 
-Sistema de cadastro que identifica unicamente cada servidor/mesa, vinculando
-configurações (como custom scenes) a uma mesa específica.
+**Onde:** `server_rust/src/custom_scenes.rs` (novo arquivo)
 
-### 2.1. Motivação
+Módulo responsável por todas as operações de leitura, escrita e
+sincronização dos arquivos JSON de custom scenes. Deve conter:
 
-Com suporte a múltiplas mesas (igrejas, eventos, locais diferentes), cada
-servidor precisa de uma identidade única para:
+1. **`struct CustomSceneRegistry`** — representa `custom_names_scenes-{nome}.json`
+   - Campos: `mesa_nome: String`, `scenes: Vec<SceneEntry>`
+   - `SceneEntry`: `physical_scene: String`, `physical_id: u8`,
+     `file: String`
 
-- Vincular custom scenes à mesa correta (sufixo no nome do arquivo).
-- Evitar conflitos no Ninja Sync (cada mesa tem seu próprio
-  `custom_names_scenes-{nome}.json`).
-- Exibir na interface qual mesa está sendo controlada.
+2. **`struct CustomScene`** — representa `custom_names_scene-{nome}-{mesa}.json`
+   - Campos: `scene_name: String`, `scene_id: u8`,
+     `channels: HashMap<String, ChannelNameEntry>`
+   - `ChannelNameEntry`: `name: String`, `short: String`
 
-### 2.2. Estrutura do `.env`
+3. **`fn load_registry(mesa_nome: &str) -> CustomSceneRegistry`**
+   - Carrega `custom_names_scenes-{mesa_nome}.json` do disco.
+   - Se não existir, retorna registro vazio.
 
-Arquivo na raiz do projeto:
+4. **`fn save_registry(mesa_nome: &str, registry: &CustomSceneRegistry)`**
+   - Salva o registro no disco.
 
-```env
-SERVER_PASSWORD=2107
-SERVER_NAME=igreja-central
+5. **`fn load_scene(filename: &str) -> Option<CustomScene>`**
+   - Carrega uma cena individual do disco.
+   - Se o arquivo não existir ou estiver mal formatado, loga erro e retorna
+     `None`.
+
+6. **`fn save_scene(filename: &str, scene: &CustomScene)`**
+   - Salva a cena individual no disco.
+   - Usa `serde_json::to_string_pretty` para facilitar edição manual.
+
+7. **`fn find_scene_for_physical(registry: &CustomSceneRegistry, physical_id: u8, physical_scene: &str, mesa_nome: &str) -> Option<CustomScene>`**
+   - Ordem de busca (primeiro match vence):
+     1. `physical_id` no registro.
+     2. `physical_scene` no registro.
+     3. Tenta `custom_names_scene-default-{mesa_nome}.json`.
+     4. Nenhum encontrado: retorna `None`.
+
+8. **`fn ensure_registry_entry(registry: &mut CustomSceneRegistry, physical_scene: &str, physical_id: u8, file: &str)`**
+   - Se já existe entrada com mesmo `physical_id`, atualiza `file`.
+   - Senão, adiciona nova entrada.
+
+9. **`fn remove_channel(scene: &mut CustomScene, channel_id: &str)`**
+   - Remove `channels[channel_id]` da cena.
+   - Se `channels` ficar vazio, retorna `true` (indica que o arquivo deve ser
+     deletado).
+
+10. **`fn normalize_name(input: &str) -> String`**
+    - Converte para maiúsculo.
+    - Remove acentos (substitui por equivalente sem acento).
+    - Remove símbolos especiais.
+    - Trunca em 10 caracteres.
+
+11. **`fn to_short_name(name: &str) -> String`**
+    - Pega os 4 primeiros caracteres, maiúsculo.
+    - Se menor que 4, preenche com espaços à direita.
+
+**Verificação:** Teste unitário para cada função pública.
+
+---
+
+### Passo 2: Integração com troca de cena da mesa
+
+**Onde:** `server_rust/src/state.rs` e `server_rust/src/midi/protocol.rs`
+
+Quando o servidor detecta que uma cena física foi carregada (evento
+`PhysicalSceneRecall` ou mudança de `SceneNumber` no `apply_midi`):
+
+1. Adicione um callback/hook no `GlobalState` que é chamado quando
+   `scene_number` muda para um valor > 0. O callback:
+   a. Aguarda 2 segundos (tempo para o dump MIDI da cena terminar).
+   b. Lê `SERVER_NAME` do `.env`.
+   c. Chama `load_registry(mesa_nome)`.
+   d. Chama `find_scene_for_physical(...)` para localizar a custom scene.
+   e. Se encontrada, itera sobre `scene.channels` e para cada canal:
+      - Lê o nome atual da mesa via `self.channels.get(&local_ch).name_chars`.
+      - Compara com `entry.short` (4 primeiros caracteres da custom scene,
+        maiúsculo, com espaços).
+      - Se diferente, emite `build_name_change(local_ch, char_index, code)`.
+      - Delay de 30ms entre comandos para não sobrecarregar a mesa.
+   f. Emite evento Socket.io `"customSceneLoaded"` para o frontend com
+      `{ active: true, scene_name: "...", mesa_nome: "..." }`.
+
+2. Casos de borda:
+   - Canal do JSON não encontrado no `self.channels`: pula (não altera).
+   - JSON mal formatado: loga erro, encerra sem alterar nomes.
+   - Nome `short` menor que 4 chars: preenche com espaços (ex: `"AX"` →
+     `"AX  "`).
+   - `physical_id` é a chave principal de matching; `physical_scene` é
+     fallback.
+
+**Verificação:** Trocar cena na mesa, verificar que os nomes customizados
+são aplicados apenas nos canais divergentes. Logs mostram quais canais foram
+alterados e quais foram pulados.
+
+---
+
+### Passo 3: Salvamento de nome customizado
+
+**Onde:** `server_rust/src/socket_handlers.rs` — novo handler ou extensão do
+handler `updateName`
+
+Modifique ou crie um handler para o evento `"saveCustomName"` que o frontend
+emitirá ao salvar um nome com a checkbox "Criar nome customizado" marcada.
+
+**Dados recebidos do frontend:**
+```json
+{
+  "channel": 2,
+  "name": "MAURICIO",
+  "short": "MAUR"
+}
 ```
 
-| Variável          | Obrigatório | Descrição                                      |
-|-------------------|-------------|------------------------------------------------|
-| `SERVER_PASSWORD` | Sim         | Senha de 4 dígitos para acesso modo Técnico    |
-| `SERVER_NAME`     | Sim         | Nome amigável do servidor/mesa                 |
+**Handler:**
 
-### 2.3. Fluxo de cadastro
+1. Lê `sceneName` e `sceneNumber` do `GlobalState`.
+2. Extrai o nome base da cena:
+   - Se `sceneName` contém `" - "`, usa o texto após o primeiro `" - "`.
+   - Senão, usa o nome completo.
+3. Determina o nome do arquivo:
+   `custom_names_scene-{nome_base}-{SERVER_NAME}.json`.
+4. Verifica se o `.env` tem `SERVER_NAME`. Se não, retorna erro exigindo
+   cadastro (Feature 2).
+5. Carrega ou cria `CustomScene`:
+   - Se o arquivo já existe, carrega.
+   - Se não, varre `GlobalState.channels` (índices 0-39) e `master`,
+     coleta os nomes atuais de 4 caracteres de cada canal, e preenche o
+     `channels` com `name` = nome atual e `short` = nome atual.
+6. Atualiza `channels["{channel}"]` com os novos `name` e `short`.
+7. Salva a cena no disco.
+8. Carrega o registro, chama `ensure_registry_entry(...)` com
+   `physical_scene`, `physical_id` e `file`, salva o registro.
+9. Se `short != nome atual na mesa`, emite `build_name_change` para a mesa.
+10. Emite `"updateName"` para todos os clientes com o `name` completo.
 
-#### 2.3.1. Detecção
+**Verificação:** Editar nome de um canal com checkbox marcada, verificar que
+o arquivo JSON é criado/atualizado corretamente e o registro é mantido.
 
-Na inicialização do servidor, verifique a situação do `.env`:
+---
 
-1. `.env` **não existe** — cadastro completo obrigatório.
-2. `.env` existe mas **faltam** `SERVER_PASSWORD` ou `SERVER_NAME` —
-   cadastro parcial (apenas o que falta).
-3. `.env` está completo — segue direto para a splash screen.
+### Passo 4: Frontend — Modal de edição de nome
 
-#### 2.3.2. Tela de cadastro
+**Onde:** `public/modules/events.js` e `public/modules/channel_strip.js`
 
-Exibida na splash screen **após** clicar em **TÉCNICO**, somente quando o
-cadastro é necessário.
+Extenda o fluxo existente de edição de nome. Atualmente, ao clicar no nome
+do canal, o sistema já está preparado para edição. Adicione:
 
-**Cenário 1 — Cadastro completo** (`.env` não existe):
+1. **Checkbox "Criar nome customizado":**
+   - Renderizada abaixo do input de nome no modal de edição.
+   - Desmarcada por padrão.
+   - Ao marcar:
+     - O atributo `maxlength` do input muda de 4 para 10.
+     - O preview em tempo real aparece abaixo do input:
+       ```
+       <div id="namePreview">
+         <span>App: MAURICIO</span>
+         <span>Mesa: MAUR</span>
+       </div>
+       ```
+     - Aplica validação em tempo real:
+       - Remove acentos automaticamente (`normalize_name` no frontend,
+         espelhando a lógica do Rust).
+       - Remove símbolos especiais.
+       - Borda do input fica vermelha se houver caracteres inválidos.
+   - Ao desmarcar:
+     - Se o nome atual tem > 4 chars, trunca para 4.
+     - `maxlength` volta a 4.
+     - Preview some.
 
-```
-+----------------------------------+
-|  CONFIGURAÇÃO INICIAL DO SERVIDOR |
-|                                  |
-|  Nome do servidor/mesa:          |
-|  [___________________________]   |
-|  placeholder: "ex: mesa-do-joao"|
-|                                  |
-|  Senha de acesso (4 dígitos):    |
-|  [____]                          |
-|                                  |
-|  Confirmar senha:                |
-|  [____]                          |
-|                                  |
-|  [ CONTINUAR ]                   |
-+----------------------------------+
-```
+2. **Preview em tempo real:**
+   - Evento `oninput` no campo de nome.
+   - Linha "App" mostra o nome normalizado (até 10 chars).
+   - Linha "Mesa" mostra os 4 primeiros caracteres, maiúsculo, com espaços
+     se necessário.
 
-- O campo de nome inicia com o placeholder `ex: mesa-do-joao` (texto cinza).
-- Ao clicar no input, o placeholder some e o campo fica em branco.
-- Se o operador **não clicar** e tentar continuar, o placeholder é tratado
-  como valor inválido: o sistema exibe o erro `"Digite um nome para o
-  servidor"` e foca automaticamente no input.
-- O campo é **obrigatório** — não pode ficar vazio nem conter o placeholder
-  como valor final.
+3. **Botão "Remover nome customizado":**
+   - Visível apenas se o canal atual já tem uma entrada na custom scene
+     da cena física ativa.
+   - Ao clicar, emite `"removeCustomName"` para o servidor com
+     `{ channel: id }`.
+   - O servidor remove a chave do JSON. Se o JSON ficar vazio, deleta o
+     arquivo e remove do registro.
 
-**Cenário 2 — Cadastro parcial** (`.env` existe mas falta campo):
+4. **Fluxo de salvamento:**
+   - Se checkbox desmarcada: fluxo legado (`updateName`).
+   - Se checkbox marcada: emite `"saveCustomName"` com `channel`, `name`
+     (normalizado, até 10 chars), e `short` (4 chars).
 
-- Apenas os campos faltantes são exibidos.
-- Os campos já preenchidos aparecem como texto somente leitura.
+**Verificação:**
+- Digitar "MÚSICA!" → App mostra "MUSICA", Mesa mostra "MUSI".
+- Desmarcar checkbox com nome "MAURICIO" → input trunca para "MAUR".
+- Salvar com checkbox desmarcada → nome de 4 chars vai para a mesa (fluxo
+  legado).
+- Salvar com checkbox marcada → arquivo JSON criado/atualizado, nome de 4
+  chars enviado para a mesa.
 
-#### 2.3.3. Validações
+---
 
-| Campo             | Regra                                                                   |
-|-------------------|-------------------------------------------------------------------------|
-| Nome do servidor  | Mínimo 3, máximo 30 caracteres. Letras minúsculas, números e hífen.     |
-| Senha             | Exatamente 4 dígitos numéricos (0-9).                                   |
-| Confirmar senha   | Deve ser idêntica à senha.                                              |
+### Passo 5: Frontend — Tela de gerenciamento
 
-#### 2.3.4. Salvamento
+**Onde:** `public/modules/custom_scenes.js` (novo) + HTML/CSS
 
-Ao confirmar, o servidor:
+Nova tela acessível pelo menu principal. Exibe a lista de custom scenes e
+permite atribuí-las a cenas físicas.
 
-1. Cria ou atualiza o `.env` na raiz do projeto.
-2. Recarrega as configurações em memória.
-3. Redireciona para a tela principal de mixagem (modo técnico).
+1. **Lista de cenas:**
+   - Emite `"listCustomScenes"` para o servidor.
+   - Servidor retorna `{ scenes: [{ name, file, physical_scene, physical_id, modified }] }`.
+   - Exibe cada cena com: nome, cena física vinculada (se houver), data de
+     modificação.
 
-#### 2.3.5. Bloqueio de acesso
+2. **Modal de atribuição:**
+   - Ao clicar em uma custom scene, abre modal.
+   - Mostra lista de cenas físicas detectadas na mesa (obtidas do
+     `SceneManager`).
+   - O usuário seleciona uma (radio button, seleção única).
+   - Botões **Confirmar** e **Cancelar**.
+   - Ao confirmar, emite `"assignCustomScene"` com
+     `{ file, physical_id, physical_scene }`.
 
-Enquanto o cadastro não estiver concluído:
+3. **Handler `"assignCustomScene"` no servidor:**
+   - Carrega o registro, chama `ensure_registry_entry(...)`, salva.
+   - Responde com `{ success: true }`.
 
-- O botão **TÉCNICO** redireciona para a tela de cadastro.
-- O modo **Músico** (sem senha) permanece acessível.
+4. **Tabela de comparação (dentro do modal de detalhes):**
+   - Ao clicar em "Ver detalhes" em uma custom scene, abre sub-modal com
+     tabela de 3 colunas: Canal | Nome Customizado | Nome Atual na Mesa.
+   - Linhas com nomes divergentes: fundo amarelo.
+   - Dados obtidos via evento `"previewCustomScene"` — o servidor carrega a
+     cena e retorna `{ channels: { "1": { name, short, mesa_name }, ... } }`
+     com o nome atual de cada canal lido do `GlobalState`.
 
-### 2.4. Edição do nome pós-setup
+**Verificação:** Listar cenas, atribuir uma a uma cena física, ver detalhes
+com tabela de comparação, confirmar que a atribuição persiste após reload.
 
-O operador pode alterar o `SERVER_NAME` pela tela de configurações.
-Ao renomear:
+---
 
-1. O novo nome é validado pelas mesmas regras (item 2.3.3).
-2. O sistema varre `custom_names_scenes-{nome_antigo}.json` e coleta todas
-   as custom scenes vinculadas.
-3. Para cada custom scene:
-   - Atualiza o campo `mesa_nome` no JSON de registro.
-   - Renomeia o arquivo físico (ex:
-     `custom_names_scene-carlos-casa_antiga.json` →
-     `custom_names_scene-carlos-casa_nova.json`).
-   - Atualiza o campo `file` no registro para refletir o novo nome.
-4. Se existir, renomeia
-   `custom_names_scenes-{nome_antigo}.json` para
-   `custom_names_scenes-{nome_novo}.json`.
-5. Atualiza o `.env` com o novo `SERVER_NAME`.
+### Passo 6: Backend — Renomeação de servidor
 
-### 2.5. Exibição na interface
+**Onde:** `server_rust/src/socket_handlers.rs` — handler `"renameServer"`
 
-O `SERVER_NAME` substitui o texto **01V96** na sidebar da interface
-principal. Isso dá identidade visual à mesa controlada e ajuda o operador a
-identificar imediatamente qual servidor está ativo — especialmente útil com
-Ninja Sync entre múltiplos dispositivos.
+Handler que propaga a renomeação do servidor para todos os arquivos de
+custom scenes:
 
-### 2.6. Reset de configuração
+1. Recebe `{ old_name: "casa-antiga", new_name: "casa-nova" }`.
+2. Valida `new_name` (mesmas regras de 2.3.3).
+3. Carrega `custom_names_scenes-{old_name}.json`.
+4. Para cada `scene` no registro:
+   a. Lê o arquivo `{scene.file}`.
+   b. Atualiza `scene_name` e `scene_id` se necessário.
+   c. Salva com o novo nome:
+      `custom_names_scene-{scene.physical_scene}-{new_name}.json`.
+   d. Atualiza `scene.file` no registro para o novo nome.
+   e. Remove o arquivo antigo.
+5. Salva o registro como `custom_names_scenes-{new_name}.json`.
+6. Remove o registro antigo.
+7. Atualiza o `.env` com `SERVER_NAME={new_name}`.
+8. Se existir `custom_names_scene-default-{old_name}.json`, renomeia para
+   `custom_names_scene-default-{new_name}.json`.
 
-Um botão **Resetar configuração** na tela de configurações:
+**Verificação:** Renomear servidor, verificar que todos os arquivos foram
+renomeados e o registro atualizado.
 
-1. Apaga o arquivo `.env`.
-2. Redireciona para a splash screen.
-3. Força o fluxo de cadastro completo novamente.
+---
 
-Útil para testes, mudança definitiva de máquina ou correção de erros de
-digitação.
+### Passo 7: Integração Ninja Sync
 
-### 2.7. Impacto
+**Onde:** `server_rust/src/network/sync_manager.rs` ou módulo existente de
+Git sync
 
-| Feature                            | Relação                                                                 |
-|------------------------------------|-------------------------------------------------------------------------|
-| Custom scenes                      | `SERVER_NAME` é sufixo do arquivo `custom_names_scenes-{name}.json`.    |
-| Ninja Sync                         | Múltiplas mesas no mesmo repositório Git sem conflito de nomes.         |
-| Interface                          | `SERVER_NAME` substitui **01V96** na sidebar.                           |
+Adicione os arquivos de custom scenes ao fluxo de auto push/pull:
 
-### 2.8. Segurança
+1. **Pull:** na inicialização do servidor, após o pull Git, recarrega o
+   registro e todas as custom scenes em memória (cache para acesso rápido).
+2. **Push:** após qualquer `save_scene`, `save_registry`, ou
+   `remove_channel` (com deleção de arquivo), agenda um commit e push.
+   - Use debounce de 5 segundos (acumula múltiplas alterações em um único
+     commit).
+   - Mensagem de commit: `"custom_scenes: update {filename}"`.
 
-- O `.env` deve ser incluído no `.gitignore` — a senha não pode vazar em
-  repositórios públicos.
-- `SERVER_NAME` não contém informação sensível e pode ser versionado.
+**Verificação:** Criar uma custom scene, verificar que após 5s o Git push é
+executado. Em outro dispositivo, fazer pull e verificar que a cena aparece.
+
+---
+
+### Passo 8: Frontend — Indicador visual de custom scene ativa
+
+**Onde:** `public/modules/custom_scenes.js` e sidebar/header HTML
+
+Quando uma custom scene está carregada (evento `"customSceneLoaded"`),
+exiba um indicador visual (ícone, badge ou texto) na interface.
+
+> **IMPORTANTE:** O local exato do indicador **deve ser perguntado ao
+> usuário** antes da implementação. Esta é a última etapa — implemente
+> somente após receber a resposta do usuário sobre o posicionamento.
+
+**Verificação:** Carregar uma custom scene, verificar que o indicador
+aparece. Trocar para uma cena sem custom scene, verificar que o indicador
+some.
+
+---
+
+## Feature 2: Atribuição de Nome ao Servidor/Mesa
+
+Sistema de cadastro que identifica unicamente cada servidor/mesa. O nome e a
+senha ficam no `.env` e são usados para vincular configurações (como custom
+scenes) a uma mesa específica.
+
+### Passo 1: Backend — Detecção e validação do `.env`
+
+**Onde:** `server_rust/src/config.rs` (estender módulo existente)
+
+1. **`fn detect_env_status() -> EnvStatus`:**
+   - Retorna enum: `Complete`, `MissingPassword`, `MissingName`,
+     `MissingBoth`, `NotFound`.
+   - `NotFound`: arquivo `.env` não existe na raiz do projeto.
+   - `MissingPassword`: arquivo existe mas `SERVER_PASSWORD` está ausente
+     ou vazio.
+   - `MissingName`: arquivo existe mas `SERVER_NAME` está ausente ou vazio.
+   - `MissingBoth`: ambos ausentes.
+   - `Complete`: tudo presente.
+
+2. **`fn validate_server_name(name: &str) -> Result<(), String>`:**
+   - Mínimo 3, máximo 30 caracteres.
+   - Apenas letras minúsculas, números e hífen.
+   - Sem espaços, acentos ou símbolos.
+
+3. **`fn validate_password(password: &str) -> Result<(), String>`:**
+   - Exatamente 4 dígitos numéricos (0-9).
+
+4. **`fn save_env(name: &str, password: &str)`:**
+   - Cria ou atualiza o `.env` com `SERVER_NAME={name}` e
+     `SERVER_PASSWORD={password}`.
+
+5. **`fn load_server_name() -> Option<String>`:**
+   - Lê `SERVER_NAME` do `.env`.
+
+6. **`fn load_password() -> Option<String>`:**
+   - Lê `SERVER_PASSWORD` do `.env`.
+
+**Verificação:** Testar cada cenário de `detect_env_status` com `.env`
+presente, ausente, e com campos faltando.
+
+---
+
+### Passo 2: Backend — Bloqueio de acesso ao modo Técnico
+
+**Onde:** `server_rust/src/main.rs` ou `server_rust/src/socket_handlers.rs`
+
+Na conexão do cliente, após a splash screen:
+
+1. O frontend emite `"checkSetupStatus"` ao conectar.
+2. O servidor responde com `{ env_status: "complete" | "missing_password" | "missing_name" | "missing_both" | "not_found" }`.
+3. O servidor armazena o status em memória.
+4. Qualquer evento que exija modo Técnico (`control`, `setPan`, etc.) é
+   rejeitado com erro se o status não for `"complete"`.
+
+**Verificação:** Remover o `.env`, conectar, verificar que comandos de
+controle são rejeitados.
+
+---
+
+### Passo 3: Frontend — Tela de cadastro
+
+**Onde:** `public/index.html` e `public/modules/setup.js` (novo)
+
+Tela exibida na splash screen após clicar em **TÉCNICO** quando o cadastro
+é necessário.
+
+1. **Estrutura HTML:**
+   - Container centralizado com título "CONFIGURAÇÃO INICIAL DO SERVIDOR".
+   - Campo de texto para nome do servidor.
+   - Campo de senha (type="password", 4 dígitos).
+   - Campo de confirmação de senha.
+   - Botão **CONTINUAR**.
+
+2. **Comportamento do campo de nome:**
+   - Placeholder inicial: `ex: mesa-do-joao` (texto cinza).
+   - Ao clicar no input, o placeholder é removido e o campo fica em branco.
+   - Se o usuário não digitar nada e clicar em **CONTINUAR**, o sistema
+     exibe erro `"Digite um nome para o servidor"`, foca no input, e não
+     avança.
+   - O campo é obrigatório.
+
+3. **Comportamento do campo de senha:**
+   - `maxlength="4"`, `inputmode="numeric"`, `pattern="[0-9]{4}"`.
+   - Confirmação deve ser idêntica.
+
+4. **Validação no frontend (antes de enviar):**
+   - Nome do servidor: mesma validação do backend (mínimo 3, máximo 30,
+     letras minúsculas, números, hífen).
+   - Senha: exatamente 4 dígitos.
+   - Confirmação igual à senha.
+
+5. **Envio:**
+   - Emite `"setupServer"` com `{ name, password }`.
+   - Servidor valida, salva o `.env`, responde `{ success: true }`.
+   - Frontend redireciona para a tela principal de mixagem.
+   - Se falhar, exibe mensagem de erro.
+
+6. **Cadastro parcial:**
+   - Se o `.env` já existe mas falta algum campo (ex: senha definida mas
+     sem nome), a tela mostra apenas o campo faltante.
+   - Campos já preenchidos aparecem como texto somente leitura.
+
+**Verificação:** Apagar `.env`, abrir app, clicar em TÉCNICO, preencher
+formulário, confirmar que `.env` foi criado e a tela principal abre.
+Testar também com dados inválidos e campos faltantes.
+
+---
+
+### Passo 4: Frontend — Exibição do nome na sidebar
+
+**Onde:** `public/modules/sidebar.js` e `public/index.html`
+
+1. Ao carregar a interface, emita `"getServerName"` para obter o
+   `SERVER_NAME` do `.env.
+2. Substitua o texto **01V96** na sidebar pelo `SERVER_NAME`.
+3. Se `SERVER_NAME` não existir, mantenha **01V96**.
+
+**Verificação:** Com `.env` definido, a sidebar mostra o nome do servidor.
+Sem `.env`, mostra "01V96".
+
+---
+
+### Passo 5: Frontend + Backend — Configurações e reset
+
+**Onde:** `public/modules/settings.js` (estender ou criar) e
+`server_rust/src/socket_handlers.rs`
+
+1. **Tela de configurações:**
+   - Adicione seção "Servidor" com:
+     - Campo para editar `SERVER_NAME`.
+     - Botão **Resetar configuração**.
+
+2. **Handler `"renameServer"` no backend:**
+   - Já descrito no Passo 6 da Feature 1 (renomeação propaga para custom
+     scenes).
+   - Se não houver custom scenes, apenas atualiza o `.env`.
+
+3. **Handler `"resetConfig"` no backend:**
+   - Apaga o arquivo `.env`.
+   - Emite `"configReset"` para o frontend.
+   - Frontend redireciona para a splash screen.
+
+**Verificação:** Alterar nome nas configurações, verificar `.env`
+atualizado. Clicar em reset, verificar que `.env` foi removido e splash
+screen reaparece.
+
+---
+
+### Passo 6: Segurança
+
+1. Adicione `.env` ao `.gitignore` do projeto.
+2. O `SERVER_NAME` pode ser versionado (não contém senha).
+
+**Verificação:** `git status` não mostra `.env` como arquivo modificado.

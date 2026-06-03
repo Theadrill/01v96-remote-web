@@ -1,6 +1,6 @@
 {
-  "inIdx": 0,
-  "outIdx": 1,
+  "inIdx": 2,
+  "outIdx": 3,
   "loopmidi-monitor": false,
   "open_browser_startup": false,
   "demo_mode": false,
@@ -31,7 +31,6 @@
   ],
   "remote_midi_port": 4200,
   "remote_midi_last_host": "",
-  "tecnico_pass": "2107",
   "port": 4000,
-  "meter_opacity": 1.0
+  "meter_opacity": 1
 }

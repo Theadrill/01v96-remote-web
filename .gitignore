@@ -26,8 +26,15 @@ reverse_dll_project/AirFader/
 reverse_dll_project/ghidra_12.0.4_PUBLIC/
 reverse_dll_project/inspect_dll/
 
+# Graphify cache (mantém graph.html, GRAPH_REPORT.md, graph.json versionados)
+graphify-out/cache/
+
 # Configurações de Estado Local
 names.json
+
+# Credenciais locais (Feature 2: Atribuição de Nome ao Servidor/Mesa)
+# Contém SERVER_NAME e SERVER_PASSWORD — não versionar
+.env
 
 
 

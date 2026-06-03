@@ -1,0 +1,1382 @@
+{
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\ui-ux-pro-max\\scripts\\core.py": {
+    "mtime": 1777017802.8015587,
+    "ast_hash": "f2438d23c79e31780fcb6742d68601a1",
+    "semantic_hash": "f2438d23c79e31780fcb6742d68601a1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\ui-ux-pro-max\\scripts\\design_system.py": {
+    "mtime": 1777017802.8015587,
+    "ast_hash": "d39fb252f4adf5fed6359483dbe7d590",
+    "semantic_hash": "d39fb252f4adf5fed6359483dbe7d590"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\ui-ux-pro-max\\scripts\\search.py": {
+    "mtime": 1777017802.802562,
+    "ast_hash": "800e6cb41a93e4c8e918dcd1847252f8",
+    "semantic_hash": "800e6cb41a93e4c8e918dcd1847252f8"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agents\\.skill-lock.json": {
+    "mtime": 1780423214.7056258,
+    "ast_hash": "7bfb32972e022c102e30ccdfae5744cc",
+    "semantic_hash": "7bfb32972e022c102e30ccdfae5744cc"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.junie\\memory\\language.json": {
+    "mtime": 1777317538.8815114,
+    "ast_hash": "d751713988987e9331980363e24189ce",
+    "semantic_hash": "d751713988987e9331980363e24189ce"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.openclaude\\settings.local.json": {
+    "mtime": 1777447896.8358233,
+    "ast_hash": "2d2fc245f83a69e34d6e60cb6065226a",
+    "semantic_hash": "2d2fc245f83a69e34d6e60cb6065226a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\opencode.json": {
+    "mtime": 1780475334.7264855,
+    "ast_hash": "1efe24ecf938911d4f23e4b1c6ec91f7",
+    "semantic_hash": "1efe24ecf938911d4f23e4b1c6ec91f7"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\package.json": {
+    "mtime": 1780426664.7354198,
+    "ast_hash": "9da2b87294a22da9e79bad08ba9aa53e",
+    "semantic_hash": "9da2b87294a22da9e79bad08ba9aa53e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\plugins\\graphify.js": {
+    "mtime": 1780475298.5505328,
+    "ast_hash": "32b67963417a30cb80544e0b2a56a98d",
+    "semantic_hash": "32b67963417a30cb80544e0b2a56a98d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\coding-guidelines\\.skill-meta.json": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
+    "semantic_hash": "bce7e428fee2d74f00097e45b4b0066e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\docs-writer\\.skill-meta.json": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
+    "semantic_hash": "f961c252b334569ed7a6083d79d948f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\gh-address-comments\\.skill-meta.json": {
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
+    "semantic_hash": "4a61b973faf4e526ebd3d66892b9ca1c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\gh-address-comments\\scripts\\fetch_comments.py": {
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
+    "semantic_hash": "a86abd5451a6aa00cfd42c790fdbfa21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\ui-ux-pro-max\\scripts\\core.py": {
+    "mtime": 1777017802.8015587,
+    "ast_hash": "f2438d23c79e31780fcb6742d68601a1",
+    "semantic_hash": "f2438d23c79e31780fcb6742d68601a1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\ui-ux-pro-max\\scripts\\design_system.py": {
+    "mtime": 1777017802.8015587,
+    "ast_hash": "d39fb252f4adf5fed6359483dbe7d590",
+    "semantic_hash": "d39fb252f4adf5fed6359483dbe7d590"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\ui-ux-pro-max\\scripts\\search.py": {
+    "mtime": 1777017802.802562,
+    "ast_hash": "800e6cb41a93e4c8e918dcd1847252f8",
+    "semantic_hash": "800e6cb41a93e4c8e918dcd1847252f8"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.vscode\\.opencode\\opencode.json": {
+    "mtime": 1780475474.482263,
+    "ast_hash": "1efe24ecf938911d4f23e4b1c6ec91f7",
+    "semantic_hash": "1efe24ecf938911d4f23e4b1c6ec91f7"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.vscode\\.opencode\\package.json": {
+    "mtime": 1780475484.5258825,
+    "ast_hash": "d3ab821609ec487b22aa5b0027f5f400",
+    "semantic_hash": "d3ab821609ec487b22aa5b0027f5f400"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.vscode\\.opencode\\plugins\\graphify.js": {
+    "mtime": 1780475439.2864797,
+    "ast_hash": "32b67963417a30cb80544e0b2a56a98d",
+    "semantic_hash": "32b67963417a30cb80544e0b2a56a98d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.vscode\\settings.json": {
+    "mtime": 1776142598.9031985,
+    "ast_hash": "090bc5301aace90820d967084b047552",
+    "semantic_hash": "090bc5301aace90820d967084b047552"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\ArtNetToDMX_FTDI\\ArtNetToDMX.runtimeconfig.json": {
+    "mtime": 1777329792.9000974,
+    "ast_hash": "d94cf983fba9ab1bb8a6cb3ad4a48f50",
+    "semantic_hash": "d94cf983fba9ab1bb8a6cb3ad4a48f50"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\capture-steps.js": {
+    "mtime": 1776142598.9502761,
+    "ast_hash": "751bc615c842ce96217802fd3513d810",
+    "semantic_hash": "751bc615c842ce96217802fd3513d810"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\config.json": {
+    "mtime": 1780474109.9863174,
+    "ast_hash": "c733979cced15765441951bb2233117a",
+    "semantic_hash": "c733979cced15765441951bb2233117a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\eslint.config.mjs": {
+    "mtime": 1777019209.1621375,
+    "ast_hash": "b8c8c9ac23843b7ce588d7f555428451",
+    "semantic_hash": "b8c8c9ac23843b7ce588d7f555428451"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\filter.json": {
+    "mtime": 1777020161.8121834,
+    "ast_hash": "f244f04560d19061cab53108ae1f8eaa",
+    "semantic_hash": "f244f04560d19061cab53108ae1f8eaa"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\list-midi.js": {
+    "mtime": 1776142598.9527962,
+    "ast_hash": "668795bbcfeeb12fefb4ade4148f16df",
+    "semantic_hash": "668795bbcfeeb12fefb4ade4148f16df"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\midi_common\\src\\assembler.rs": {
+    "mtime": 1780411835.5391872,
+    "ast_hash": "b306c5245a084d7be017ec0211a9be21",
+    "semantic_hash": "b306c5245a084d7be017ec0211a9be21"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\midi_common\\src\\framing.rs": {
+    "mtime": 1780413645.6511943,
+    "ast_hash": "51fb1db737437892a975d6a78355b436",
+    "semantic_hash": "51fb1db737437892a975d6a78355b436"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\midi_common\\src\\lib.rs": {
+    "mtime": 1780411835.5401895,
+    "ast_hash": "fd54765e3bf014e5bec266ee114e1841",
+    "semantic_hash": "fd54765e3bf014e5bec266ee114e1841"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\monitor.js": {
+    "mtime": 1778791485.5105505,
+    "ast_hash": "8a4ac221e66792455e8b4619b5fc9da8",
+    "semantic_hash": "8a4ac221e66792455e8b4619b5fc9da8"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\package.json": {
+    "mtime": 1777329792.9030979,
+    "ast_hash": "c32a0ac66c7157f633a0f6d79bc8ad71",
+    "semantic_hash": "c32a0ac66c7157f633a0f6d79bc8ad71"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\app.js": {
+    "mtime": 1778799880.1936386,
+    "ast_hash": "d4e252a259293bc3cc61d2cf95e28cda",
+    "semantic_hash": "d4e252a259293bc3cc61d2cf95e28cda"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\auxs_sends.js": {
+    "mtime": 1778389035.4904585,
+    "ast_hash": "8be840fec1003892f7fe18720c33966a",
+    "semantic_hash": "8be840fec1003892f7fe18720c33966a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\channel_strip.js": {
+    "mtime": 1780474109.9895253,
+    "ast_hash": "1635880323d12e0d8a3b97459f2a44b5",
+    "semantic_hash": "1635880323d12e0d8a3b97459f2a44b5"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\compressor.js": {
+    "mtime": 1777020161.8156943,
+    "ast_hash": "908041cc909b795f5d7d3fbf4209a14e",
+    "semantic_hash": "908041cc909b795f5d7d3fbf4209a14e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\dynamics.js": {
+    "mtime": 1777020161.8156943,
+    "ast_hash": "083d7ccffa37d6b98c74ebc6d3a27654",
+    "semantic_hash": "083d7ccffa37d6b98c74ebc6d3a27654"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\eq.js": {
+    "mtime": 1780474109.991104,
+    "ast_hash": "cab5a23702e3ef3b9322d0e255ddd70c",
+    "semantic_hash": "cab5a23702e3ef3b9322d0e255ddd70c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\events.js": {
+    "mtime": 1780474109.9927032,
+    "ast_hash": "78565a9b0d39d3e00f8482b16f0a6d0e",
+    "semantic_hash": "78565a9b0d39d3e00f8482b16f0a6d0e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\gate.js": {
+    "mtime": 1777020161.8172276,
+    "ast_hash": "45046ffccb510e01c9a9f5a0fdc0e116",
+    "semantic_hash": "45046ffccb510e01c9a9f5a0fdc0e116"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\globals.js": {
+    "mtime": 1780474109.993233,
+    "ast_hash": "658d0c410932e60a4e4b927d841f98a3",
+    "semantic_hash": "658d0c410932e60a4e4b927d841f98a3"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macro_fader.js": {
+    "mtime": 1778056913.4788876,
+    "ast_hash": "05eda86023922fd1ed8b3704163a1d6c",
+    "semantic_hash": "05eda86023922fd1ed8b3704163a1d6c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros.js": {
+    "mtime": 1780019465.6603775,
+    "ast_hash": "9e01e779c2f683e2f0b52fbe6dde50f1",
+    "semantic_hash": "9e01e779c2f683e2f0b52fbe6dde50f1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros\\channel_toggler.js": {
+    "mtime": 1780020106.9704356,
+    "ast_hash": "05b3ba903d2373711614ce552fd80ea7",
+    "semantic_hash": "05b3ba903d2373711614ce552fd80ea7"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros\\core.js": {
+    "mtime": 1780411835.5411906,
+    "ast_hash": "d466be5c1fcb043b39b098408fed9769",
+    "semantic_hash": "d466be5c1fcb043b39b098408fed9769"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros\\hosts.json": {
+    "mtime": 1776142598.9603834,
+    "ast_hash": "74627c6e61813c2c5c7f135c66317eb1",
+    "semantic_hash": "74627c6e61813c2c5c7f135c66317eb1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros\\lumikit.js": {
+    "mtime": 1780411835.5421906,
+    "ast_hash": "c50619d46b80c8f2a18f8408c7b71ebf",
+    "semantic_hash": "c50619d46b80c8f2a18f8408c7b71ebf"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros\\profiles\\shared\\profile_pcfavela.json": {
+    "mtime": 1777329792.9045973,
+    "ast_hash": "3c844d0335d07282029363cb72a34638",
+    "semantic_hash": "3c844d0335d07282029363cb72a34638"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros\\profiles\\shared\\profile_pcmaria.json": {
+    "mtime": 1779871506.817931,
+    "ast_hash": "f0291a8da1216ce946564e0f5237cd56",
+    "semantic_hash": "f0291a8da1216ce946564e0f5237cd56"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\macros\\profiles\\shared\\profile_teste.json": {
+    "mtime": 1776383098.592949,
+    "ast_hash": "b6d0a9fae9495c034d008e7e68bac1ef",
+    "semantic_hash": "b6d0a9fae9495c034d008e7e68bac1ef"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\routing.js": {
+    "mtime": 1780474109.9952395,
+    "ast_hash": "299946ad45572f46971fdb3e0f5e0fd0",
+    "semantic_hash": "299946ad45572f46971fdb3e0f5e0fd0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\scene_grid.js": {
+    "mtime": 1779871506.8189304,
+    "ast_hash": "348a432389037fbbb72992b8b7a3c39a",
+    "semantic_hash": "348a432389037fbbb72992b8b7a3c39a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\scroll.js": {
+    "mtime": 1778654314.9292562,
+    "ast_hash": "3cf944d3152cfbb8afb47e94eea3d70f",
+    "semantic_hash": "3cf944d3152cfbb8afb47e94eea3d70f"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\search.js": {
+    "mtime": 1778389035.491965,
+    "ast_hash": "5274f3dfda990e19bf6f8927fa007327",
+    "semantic_hash": "5274f3dfda990e19bf6f8927fa007327"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\sidebar.js": {
+    "mtime": 1780474109.9962387,
+    "ast_hash": "6feb10c81ddf50e5cb10b1d1d5738049",
+    "semantic_hash": "6feb10c81ddf50e5cb10b1d1d5738049"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\socket.js": {
+    "mtime": 1780474109.9972386,
+    "ast_hash": "c7b3fc7828e585febe34cc67cef6eec0",
+    "semantic_hash": "c7b3fc7828e585febe34cc67cef6eec0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\splash_screen.js": {
+    "mtime": 1776142598.9644244,
+    "ast_hash": "8c6a0a92ce2c76415689087b80c82fa8",
+    "semantic_hash": "8c6a0a92ce2c76415689087b80c82fa8"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\modules\\steps.js": {
+    "mtime": 1776219862.1689062,
+    "ast_hash": "1b1cf539f27203f72ebe54e9d862ca6a",
+    "semantic_hash": "1b1cf539f27203f72ebe54e9d862ca6a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\steps.json": {
+    "mtime": 1776365887.6021323,
+    "ast_hash": "e431c351c75499e7dfe2d71335ea7be1",
+    "semantic_hash": "e431c351c75499e7dfe2d71335ea7be1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\vendor\\socket.io.min.js": {
+    "mtime": 1779875973.8939772,
+    "ast_hash": "2b5a5f6f7e742b8f73fa48494ea78e09",
+    "semantic_hash": "2b5a5f6f7e742b8f73fa48494ea78e09"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\remote_midi_server\\src\\main.rs": {
+    "mtime": 1780417917.8348339,
+    "ast_hash": "9f46e514ce9e94965a14c4ebfb679865",
+    "semantic_hash": "9f46e514ce9e94965a14c4ebfb679865"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\remote_midi_server\\src\\tray.rs": {
+    "mtime": 1780411835.5451896,
+    "ast_hash": "ac2f3ab6d3244ed8b2a24ea60f90bf20",
+    "semantic_hash": "ac2f3ab6d3244ed8b2a24ea60f90bf20"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\reverse_dll_project\\01v96_property_map.json": {
+    "mtime": 1776122564.6098602,
+    "ast_hash": "92f998272b7a1f1714674549d4693973",
+    "semantic_hash": "92f998272b7a1f1714674549d4693973"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\reverse_dll_project\\categorized_properties.json": {
+    "mtime": 1776123011.2208037,
+    "ast_hash": "482af2c32e1185e20691251b8a58e2af",
+    "semantic_hash": "482af2c32e1185e20691251b8a58e2af"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\reverse_dll_project\\detailed_prop_map.json": {
+    "mtime": 1776123484.0167248,
+    "ast_hash": "2ed127de681dacc2dfb5a7f47046d250",
+    "semantic_hash": "2ed127de681dacc2dfb5a7f47046d250"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\reverse_dll_project\\sync_properties.json": {
+    "mtime": 1776123226.075585,
+    "ast_hash": "dc4beaa149e393ff0aa2aec7a62351e3",
+    "semantic_hash": "dc4beaa149e393ff0aa2aec7a62351e3"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\scratch\\test_fx_slots.js": {
+    "mtime": 1778822844.9029117,
+    "ast_hash": "290f4d58c25100c5c0b00ea42f5f9b4a",
+    "semantic_hash": "290f4d58c25100c5c0b00ea42f5f9b4a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\scratch\\test_sudo.js": {
+    "mtime": 1777329792.9055982,
+    "ast_hash": "a5da2dfb4c70f33761447f8c14378080",
+    "semantic_hash": "a5da2dfb4c70f33761447f8c14378080"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server.js": {
+    "mtime": 1779871506.823175,
+    "ast_hash": "db4097ffa895fa2b7e2dd910a8107dca",
+    "semantic_hash": "db4097ffa895fa2b7e2dd910a8107dca"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_old.js": {
+    "mtime": 1778753909.361131,
+    "ast_hash": "d33ebf333a198687ea4efa2b644c0dda",
+    "semantic_hash": "d33ebf333a198687ea4efa2b644c0dda"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\api\\macros.rs": {
+    "mtime": 1780413645.6736515,
+    "ast_hash": "070ad236cc221ddd7c22fab543a7342b",
+    "semantic_hash": "070ad236cc221ddd7c22fab543a7342b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\api\\mod.rs": {
+    "mtime": 1779877546.6779766,
+    "ast_hash": "149549efba1f8677b9af2cdf6d0837ec",
+    "semantic_hash": "149549efba1f8677b9af2cdf6d0837ec"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\boot.rs": {
+    "mtime": 1780415489.8022609,
+    "ast_hash": "80bd3a5e6b8093567d3482bfd7663831",
+    "semantic_hash": "80bd3a5e6b8093567d3482bfd7663831"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\config.rs": {
+    "mtime": 1780417909.2471044,
+    "ast_hash": "efa4e65e0fcec04d663c5c686775f92d",
+    "semantic_hash": "efa4e65e0fcec04d663c5c686775f92d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\dmx.rs": {
+    "mtime": 1780413645.6797974,
+    "ast_hash": "bc0f80e6253dc45fc3f1550ef3e371f3",
+    "semantic_hash": "bc0f80e6253dc45fc3f1550ef3e371f3"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\main.rs": {
+    "mtime": 1780418122.974456,
+    "ast_hash": "11f466272942fc1f3dd121098cd66f56",
+    "semantic_hash": "11f466272942fc1f3dd121098cd66f56"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\assembler.rs": {
+    "mtime": 1779964187.537638,
+    "ast_hash": "e6fecbe265d00b790b9cf6fe0b549e9f",
+    "semantic_hash": "e6fecbe265d00b790b9cf6fe0b549e9f"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\dictionary.json": {
+    "mtime": 1779874621.3758326,
+    "ast_hash": "c88eedb9b8555df43de3301d28aac778",
+    "semantic_hash": "c88eedb9b8555df43de3301d28aac778"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\engine.rs": {
+    "mtime": 1780413645.6819093,
+    "ast_hash": "cf7631228e778e5e29d918f5af625aba",
+    "semantic_hash": "cf7631228e778e5e29d918f5af625aba"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\master_meter.rs": {
+    "mtime": 1779883399.2296367,
+    "ast_hash": "09422ed8b5a59b70bbe1cd730d61b772",
+    "semantic_hash": "09422ed8b5a59b70bbe1cd730d61b772"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\meter_dummy.rs": {
+    "mtime": 1780415552.6545022,
+    "ast_hash": "ecab56d9de30baba2bc69ec7a39de11c",
+    "semantic_hash": "ecab56d9de30baba2bc69ec7a39de11c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\mod.rs": {
+    "mtime": 1780415449.5075712,
+    "ast_hash": "c016e23c462471815781bc371d785cca",
+    "semantic_hash": "c016e23c462471815781bc371d785cca"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\pair.rs": {
+    "mtime": 1780413645.6829114,
+    "ast_hash": "5ad46930a5f854c64237fd68738e9a98",
+    "semantic_hash": "5ad46930a5f854c64237fd68738e9a98"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\pan.rs": {
+    "mtime": 1780474110.001239,
+    "ast_hash": "11c6ce0353f85ce7adaac498f4a22b6d",
+    "semantic_hash": "11c6ce0353f85ce7adaac498f4a22b6d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\protocol.rs": {
+    "mtime": 1780427477.699649,
+    "ast_hash": "aacae72b9b37adb1d90088f4578a9f37",
+    "semantic_hash": "aacae72b9b37adb1d90088f4578a9f37"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\remote_client.rs": {
+    "mtime": 1780413645.6889083,
+    "ast_hash": "e494a0a469a43ac4216bd35d3edab684",
+    "semantic_hash": "e494a0a469a43ac4216bd35d3edab684"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\scheduler.rs": {
+    "mtime": 1780413645.690983,
+    "ast_hash": "123f1e73dd0e034abe00bc97de3bd054",
+    "semantic_hash": "123f1e73dd0e034abe00bc97de3bd054"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi\\sync_counter.rs": {
+    "mtime": 1779962789.9058638,
+    "ast_hash": "b42ae7de653e3250eeab8f3b0cd372c8",
+    "semantic_hash": "b42ae7de653e3250eeab8f3b0cd372c8"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\midi_receiver.rs": {
+    "mtime": 1780413645.6939888,
+    "ast_hash": "6c84a91ad1dac5fc8b8db8fc3f870809",
+    "semantic_hash": "6c84a91ad1dac5fc8b8db8fc3f870809"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\network\\connection.rs": {
+    "mtime": 1780415552.6714773,
+    "ast_hash": "9fe37c1e0ab9273fe39c146e9391e8e6",
+    "semantic_hash": "9fe37c1e0ab9273fe39c146e9391e8e6"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\network\\mod.rs": {
+    "mtime": 1779962789.9058638,
+    "ast_hash": "d20aaba1c7af5befb34480aa559406c3",
+    "semantic_hash": "d20aaba1c7af5befb34480aa559406c3"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\network\\sync_manager.rs": {
+    "mtime": 1780427544.039339,
+    "ast_hash": "98a0ccaf5d3434f92db9fa2585f20d4c",
+    "semantic_hash": "98a0ccaf5d3434f92db9fa2585f20d4c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\scene_manager.rs": {
+    "mtime": 1780413645.7061436,
+    "ast_hash": "0293b30bdfbe4a1d7ca20b4eec3a1de5",
+    "semantic_hash": "0293b30bdfbe4a1d7ca20b4eec3a1de5"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\socket_handlers.rs": {
+    "mtime": 1780427501.84667,
+    "ast_hash": "be1d46d3a920883cd415d21841a68561",
+    "semantic_hash": "be1d46d3a920883cd415d21841a68561"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\state.rs": {
+    "mtime": 1780427494.6614637,
+    "ast_hash": "c5254c08dacad16dbc7398bde7c80771",
+    "semantic_hash": "c5254c08dacad16dbc7398bde7c80771"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\src\\tray.rs": {
+    "mtime": 1780418162.4537163,
+    "ast_hash": "70967e8a373ff7d811fa6e9a70464a5b",
+    "semantic_hash": "70967e8a373ff7d811fa6e9a70464a5b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\update_main.py": {
+    "mtime": 1779878414.5792565,
+    "ast_hash": "4fb7d27b24eb8a4202ca0128487032f0",
+    "semantic_hash": "4fb7d27b24eb8a4202ca0128487032f0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\server_rust\\update_state.py": {
+    "mtime": 1779878501.1421375,
+    "ast_hash": "0ba16cee244d95f05a8c5360640b645e",
+    "semantic_hash": "0ba16cee244d95f05a8c5360640b645e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\api\\macros.js": {
+    "mtime": 1778762803.2049658,
+    "ast_hash": "2defa6ab4d024379b25481c1ba5f76f3",
+    "semantic_hash": "2defa6ab4d024379b25481c1ba5f76f3"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\core\\config.js": {
+    "mtime": 1778762878.4113734,
+    "ast_hash": "1a43496d0a861445f79d5d9133dd825a",
+    "semantic_hash": "1a43496d0a861445f79d5d9133dd825a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\dmx\\dmx.js": {
+    "mtime": 1778754642.7230222,
+    "ast_hash": "b9f207ad60da0596e300f09478169bca",
+    "semantic_hash": "b9f207ad60da0596e300f09478169bca"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\dictionary.js": {
+    "mtime": 1778806085.2700224,
+    "ast_hash": "e08851d9f9e9cd86c328c753bb81771a",
+    "semantic_hash": "e08851d9f9e9cd86c328c753bb81771a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\dictionary.json": {
+    "mtime": 1779874621.3758326,
+    "ast_hash": "c88eedb9b8555df43de3301d28aac778",
+    "semantic_hash": "c88eedb9b8555df43de3301d28aac778"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\midi-assembler.js": {
+    "mtime": 1776374630.236808,
+    "ast_hash": "b213afba2acf51900b907ab39337bbdd",
+    "semantic_hash": "b213afba2acf51900b907ab39337bbdd"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\midi-engine.js": {
+    "mtime": 1779871506.8241496,
+    "ast_hash": "6ffd9c4699197a937060a96afceb752e",
+    "semantic_hash": "6ffd9c4699197a937060a96afceb752e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\midi-handler.js": {
+    "mtime": 1778754333.6315055,
+    "ast_hash": "9367e59b245937c12910f6b6534237c9",
+    "semantic_hash": "9367e59b245937c12910f6b6534237c9"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\midi-scheduler-backup.js": {
+    "mtime": 1778762838.2761948,
+    "ast_hash": "17b37e67db6137f50303537c7fb16ad7",
+    "semantic_hash": "17b37e67db6137f50303537c7fb16ad7"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\midi-scheduler.js": {
+    "mtime": 1777460347.0783455,
+    "ast_hash": "cab90d64928d70bc0a7ba318c99822dc",
+    "semantic_hash": "cab90d64928d70bc0a7ba318c99822dc"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\pan.js": {
+    "mtime": 1778799501.5999892,
+    "ast_hash": "99eac3641df47e11207fe67f4f22f041",
+    "semantic_hash": "99eac3641df47e11207fe67f4f22f041"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\property-map.js": {
+    "mtime": 1776144327.697824,
+    "ast_hash": "101c9560bbbecb3c833759c788ad8567",
+    "semantic_hash": "101c9560bbbecb3c833759c788ad8567"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\midi\\protocol.js": {
+    "mtime": 1778806085.2725377,
+    "ast_hash": "586ffa868603395f146858a50aeb364f",
+    "semantic_hash": "586ffa868603395f146858a50aeb364f"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\network\\connection.js": {
+    "mtime": 1779871506.824653,
+    "ast_hash": "73107a304fc8bffe050dadfa6c3e03d1",
+    "semantic_hash": "73107a304fc8bffe050dadfa6c3e03d1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\network\\socket-handler.js": {
+    "mtime": 1779871506.824653,
+    "ast_hash": "1bb15e139b9c07cf642481d33b7bd9ba",
+    "semantic_hash": "1bb15e139b9c07cf642481d33b7bd9ba"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\network\\sync-counter.js": {
+    "mtime": 1776371516.2731218,
+    "ast_hash": "2f49716bd4dafa801cc34ec2c8056c2b",
+    "semantic_hash": "2f49716bd4dafa801cc34ec2c8056c2b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\network\\sync-manager.js": {
+    "mtime": 1778799929.1478448,
+    "ast_hash": "aebc3acef4cee56fc4807e2bb503bc79",
+    "semantic_hash": "aebc3acef4cee56fc4807e2bb503bc79"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\state\\master-meter.js": {
+    "mtime": 1776219571.9314008,
+    "ast_hash": "a982e476358181dde37861f7604734c5",
+    "semantic_hash": "a982e476358181dde37861f7604734c5"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\state\\meter_dummy.js": {
+    "mtime": 1777018154.534125,
+    "ast_hash": "e8fa14d057b73c8a10c235ee4746a6e2",
+    "semantic_hash": "e8fa14d057b73c8a10c235ee4746a6e2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\state\\pair.js": {
+    "mtime": 1778056913.48321,
+    "ast_hash": "b19ea65dc52f01b05c61d7a3156955d7",
+    "semantic_hash": "b19ea65dc52f01b05c61d7a3156955d7"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\state\\scene_manager.js": {
+    "mtime": 1779976540.7968981,
+    "ast_hash": "a362284c05e06bcd59cb757332ac6f29",
+    "semantic_hash": "a362284c05e06bcd59cb757332ac6f29"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\state\\state-manager.js": {
+    "mtime": 1778806085.2725377,
+    "ast_hash": "e068b21e5f1ea6e98a1044d2af9c7b4a",
+    "semantic_hash": "e068b21e5f1ea6e98a1044d2af9c7b4a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\utils\\logger.js": {
+    "mtime": 1778754217.8653977,
+    "ast_hash": "875b4a1ef650822fcc27e1743b06bcff",
+    "semantic_hash": "875b4a1ef650822fcc27e1743b06bcff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\utils\\path.js": {
+    "mtime": 1777452037.6054754,
+    "ast_hash": "334d552149b6e5e006951ae5d80662b0",
+    "semantic_hash": "334d552149b6e5e006951ae5d80662b0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\utils\\platform.js": {
+    "mtime": 1779871506.8256598,
+    "ast_hash": "3a75aba295f89b36b8bca73827d50736",
+    "semantic_hash": "3a75aba295f89b36b8bca73827d50736"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\src\\utils\\systray.js": {
+    "mtime": 1779871506.8256598,
+    "ast_hash": "be6afcd9ec5f4f65dcedd5440e2b0fc4",
+    "semantic_hash": "be6afcd9ec5f4f65dcedd5440e2b0fc4"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\test_scheduler.js": {
+    "mtime": 1777029155.5532193,
+    "ast_hash": "a9e9ad728a3be51804c7ce4234e5e1a1",
+    "semantic_hash": "a9e9ad728a3be51804c7ce4234e5e1a1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\capture-steps.js": {
+    "mtime": 1777029155.5557203,
+    "ast_hash": "751bc615c842ce96217802fd3513d810",
+    "semantic_hash": "751bc615c842ce96217802fd3513d810"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\config.json": {
+    "mtime": 1780419570.0554528,
+    "ast_hash": "fc1ede646bb017443f56a725a86053ee",
+    "semantic_hash": "fc1ede646bb017443f56a725a86053ee"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\filter.json": {
+    "mtime": 1777029155.5567203,
+    "ast_hash": "f2f878e5d5e920adc6acfd8682267755",
+    "semantic_hash": "f2f878e5d5e920adc6acfd8682267755"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\find_patch.js": {
+    "mtime": 1777029155.5567203,
+    "ast_hash": "17d42fc0fe3189b4790456986a69a1ba",
+    "semantic_hash": "17d42fc0fe3189b4790456986a69a1ba"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\list-midi.js": {
+    "mtime": 1777029155.55722,
+    "ast_hash": "668795bbcfeeb12fefb4ade4148f16df",
+    "semantic_hash": "668795bbcfeeb12fefb4ade4148f16df"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\monitor.js": {
+    "mtime": 1777029155.5577202,
+    "ast_hash": "a596d611880595e10a79c941b5997868",
+    "semantic_hash": "a596d611880595e10a79c941b5997868"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\package.json": {
+    "mtime": 1777029155.5592208,
+    "ast_hash": "7694f2605972e913ebfbcb3ef0e95300",
+    "semantic_hash": "7694f2605972e913ebfbcb3ef0e95300"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\app.js": {
+    "mtime": 1777029155.5597196,
+    "ast_hash": "78dd37bcf88ecc078e9499dd0d3d3799",
+    "semantic_hash": "78dd37bcf88ecc078e9499dd0d3d3799"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\auxs_sends.js": {
+    "mtime": 1777029155.5612216,
+    "ast_hash": "6b131a99c1064ae18d9ff553882bc2f0",
+    "semantic_hash": "6b131a99c1064ae18d9ff553882bc2f0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\channel_strip.js": {
+    "mtime": 1777029155.5617197,
+    "ast_hash": "f361ff913ef422b7e4ad20765643ee1b",
+    "semantic_hash": "f361ff913ef422b7e4ad20765643ee1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\compressor.js": {
+    "mtime": 1777029155.5622208,
+    "ast_hash": "3e9ad65d3b9c4bef8a38f20fcee21a70",
+    "semantic_hash": "3e9ad65d3b9c4bef8a38f20fcee21a70"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\dynamics.js": {
+    "mtime": 1777029155.562722,
+    "ast_hash": "48ef2232265a1b514501d82766518f04",
+    "semantic_hash": "48ef2232265a1b514501d82766518f04"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\eq.js": {
+    "mtime": 1777029155.563565,
+    "ast_hash": "a4625e7b6ffa180886ec0ee5c08ca0b7",
+    "semantic_hash": "a4625e7b6ffa180886ec0ee5c08ca0b7"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\events.js": {
+    "mtime": 1777029155.563565,
+    "ast_hash": "010bd42a686aad960f81aed97c5ea8ed",
+    "semantic_hash": "010bd42a686aad960f81aed97c5ea8ed"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\gate.js": {
+    "mtime": 1777029155.563565,
+    "ast_hash": "f655ec53006f133f11f18fbd351950b2",
+    "semantic_hash": "f655ec53006f133f11f18fbd351950b2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\globals.js": {
+    "mtime": 1777029155.5645685,
+    "ast_hash": "3356d3074094b51e87e317211a123492",
+    "semantic_hash": "3356d3074094b51e87e317211a123492"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\routing.js": {
+    "mtime": 1777029155.5650709,
+    "ast_hash": "ffbd370bea5f189251fff85ebc6645a0",
+    "semantic_hash": "ffbd370bea5f189251fff85ebc6645a0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\scroll.js": {
+    "mtime": 1777029155.5650709,
+    "ast_hash": "57aeddc7062a3970f985df673bcb3748",
+    "semantic_hash": "57aeddc7062a3970f985df673bcb3748"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\sidebar.js": {
+    "mtime": 1777029155.565571,
+    "ast_hash": "d486e314f43d916141bb677d4beecaf0",
+    "semantic_hash": "d486e314f43d916141bb677d4beecaf0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\socket.js": {
+    "mtime": 1777029155.5660715,
+    "ast_hash": "45a1797f8faec283d9efed141c71f497",
+    "semantic_hash": "45a1797f8faec283d9efed141c71f497"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\splash_screen.js": {
+    "mtime": 1777029155.566574,
+    "ast_hash": "8c6a0a92ce2c76415689087b80c82fa8",
+    "semantic_hash": "8c6a0a92ce2c76415689087b80c82fa8"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\modules\\steps.js": {
+    "mtime": 1777029155.566574,
+    "ast_hash": "63c8cf9d492bee9becc4aafcc45d0557",
+    "semantic_hash": "63c8cf9d492bee9becc4aafcc45d0557"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\steps.json": {
+    "mtime": 1777029155.5675788,
+    "ast_hash": "8ddd3a48b8fa9c26f41a416cac56a5cb",
+    "semantic_hash": "8ddd3a48b8fa9c26f41a416cac56a5cb"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\server.js": {
+    "mtime": 1777029155.569102,
+    "ast_hash": "071545d32abe156961c86583d99b8199",
+    "semantic_hash": "071545d32abe156961c86583d99b8199"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\src\\dictionary.js": {
+    "mtime": 1777029155.570101,
+    "ast_hash": "fe2303674380b735bccfc61a4c2bfd3c",
+    "semantic_hash": "fe2303674380b735bccfc61a4c2bfd3c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\src\\meter_dummy.js": {
+    "mtime": 1777029155.570604,
+    "ast_hash": "70c27fe236c9e2385194a13da689bcbd",
+    "semantic_hash": "70c27fe236c9e2385194a13da689bcbd"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\src\\midi-engine.js": {
+    "mtime": 1777029155.5713327,
+    "ast_hash": "bf5293465c70d2e84faed53285472bc4",
+    "semantic_hash": "bf5293465c70d2e84faed53285472bc4"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\src\\protocol.js": {
+    "mtime": 1777029155.571832,
+    "ast_hash": "1398c0ccc9a85538d486951e7b9e8d50",
+    "semantic_hash": "1398c0ccc9a85538d486951e7b9e8d50"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\src\\state-manager.js": {
+    "mtime": 1777029155.571832,
+    "ast_hash": "b4188bab9f178769df08cf6abdc328f2",
+    "semantic_hash": "b4188bab9f178769df08cf6abdc328f2"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\tmp\\hold_mapping.json": {
+    "mtime": 1777029155.5728343,
+    "ast_hash": "6d0d7232800c6921f67c968c06ca92e6",
+    "semantic_hash": "6d0d7232800c6921f67c968c06ca92e6"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tui.json": {
+    "mtime": 1776199992.9750175,
+    "ast_hash": "1007852a1f4a269a7b1bd3a52868e5de",
+    "semantic_hash": "1007852a1f4a269a7b1bd3a52868e5de"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\javascript-mastery\\SKILL.md": {
+    "mtime": 1777017801.2151544,
+    "ast_hash": "7fd6a49373903c56651142f81fbe2aa4",
+    "semantic_hash": "7fd6a49373903c56651142f81fbe2aa4"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\javascript-pro\\SKILL.md": {
+    "mtime": 1777017801.2156901,
+    "ast_hash": "499d211239268f6dc2bc63f62a266085",
+    "semantic_hash": "499d211239268f6dc2bc63f62a266085"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\javascript-testing-patterns\\SKILL.md": {
+    "mtime": 1777017801.2156901,
+    "ast_hash": "7d8c3f6fb09afac12e67d9906bc7f67d",
+    "semantic_hash": "7d8c3f6fb09afac12e67d9906bc7f67d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\javascript-testing-patterns\\resources\\implementation-playbook.md": {
+    "mtime": 1777017801.2166924,
+    "ast_hash": "39f68ba1d8a40003ecb1440377aa7481",
+    "semantic_hash": "39f68ba1d8a40003ecb1440377aa7481"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\nodejs-backend-patterns\\SKILL.md": {
+    "mtime": 1777017802.0079193,
+    "ast_hash": "8e515a2c4a6c1a8ffbaebb16ae14f36a",
+    "semantic_hash": "8e515a2c4a6c1a8ffbaebb16ae14f36a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\nodejs-backend-patterns\\resources\\implementation-playbook.md": {
+    "mtime": 1777017802.0089211,
+    "ast_hash": "3c41788829340d9db99a4e26f306ab76",
+    "semantic_hash": "3c41788829340d9db99a4e26f306ab76"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\nodejs-best-practices\\SKILL.md": {
+    "mtime": 1777017802.0094235,
+    "ast_hash": "b50198711140d67e282660261d61ff10",
+    "semantic_hash": "b50198711140d67e282660261d61ff10"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\ui-ux-pro-max\\SKILL.md": {
+    "mtime": 1777017802.7898388,
+    "ast_hash": "d62f9e321660a5669a2bf3312b25f982",
+    "semantic_hash": "d62f9e321660a5669a2bf3312b25f982"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agent\\skills\\ui-visual-validator\\SKILL.md": {
+    "mtime": 1777017802.8030782,
+    "ast_hash": "1a331ec2537f29b260eb3586464d199d",
+    "semantic_hash": "1a331ec2537f29b260eb3586464d199d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agents\\rules\\graphify.md": {
+    "mtime": 1780475314.781442,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": "a0e4d192b9e2e17256124dbfc8e24e6a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.agents\\workflows\\graphify.md": {
+    "mtime": 1780475314.7824428,
+    "ast_hash": "637776aa6f7496d069afe7520c845c8a",
+    "semantic_hash": "637776aa6f7496d069afe7520c845c8a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.claude\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cline\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.codex\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.cursor\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.gemini\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.github\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.junie\\memory\\errors.md": {
+    "mtime": 1777317538.880966,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.junie\\memory\\feedback.md": {
+    "mtime": 1777317538.8815114,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.junie\\memory\\tasks.md": {
+    "mtime": 1777317538.879951,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.opencode\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\coding-guidelines\\SKILL.md": {
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
+    "semantic_hash": "fb6c5ac443b02d129d21c04e2b2139ff"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\docs-writer\\SKILL.md": {
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
+    "semantic_hash": "b308c48ecaaff4d1e483dea39f212762"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\docs-writer\\references\\style-guide.md": {
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
+    "semantic_hash": "d526a4bac0e17e20936f972ab1aa4659"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\gh-address-comments\\LICENSE.txt": {
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
+    "semantic_hash": "175792518e4ac015ab6696d16c4f607e"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\gh-address-comments\\SKILL.md": {
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
+    "semantic_hash": "671c184ca81d34b9e99287ddb8e2dc1b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\javascript-mastery\\SKILL.md": {
+    "mtime": 1777017801.2151544,
+    "ast_hash": "7fd6a49373903c56651142f81fbe2aa4",
+    "semantic_hash": "7fd6a49373903c56651142f81fbe2aa4"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\javascript-pro\\SKILL.md": {
+    "mtime": 1777017801.2156901,
+    "ast_hash": "499d211239268f6dc2bc63f62a266085",
+    "semantic_hash": "499d211239268f6dc2bc63f62a266085"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\javascript-testing-patterns\\SKILL.md": {
+    "mtime": 1777017801.2156901,
+    "ast_hash": "7d8c3f6fb09afac12e67d9906bc7f67d",
+    "semantic_hash": "7d8c3f6fb09afac12e67d9906bc7f67d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\javascript-testing-patterns\\resources\\implementation-playbook.md": {
+    "mtime": 1777017801.2166924,
+    "ast_hash": "39f68ba1d8a40003ecb1440377aa7481",
+    "semantic_hash": "39f68ba1d8a40003ecb1440377aa7481"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\nodejs-backend-patterns\\SKILL.md": {
+    "mtime": 1777017802.0079193,
+    "ast_hash": "8e515a2c4a6c1a8ffbaebb16ae14f36a",
+    "semantic_hash": "8e515a2c4a6c1a8ffbaebb16ae14f36a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\nodejs-backend-patterns\\resources\\implementation-playbook.md": {
+    "mtime": 1777017802.0089211,
+    "ast_hash": "3c41788829340d9db99a4e26f306ab76",
+    "semantic_hash": "3c41788829340d9db99a4e26f306ab76"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\nodejs-best-practices\\SKILL.md": {
+    "mtime": 1777017802.0094235,
+    "ast_hash": "b50198711140d67e282660261d61ff10",
+    "semantic_hash": "b50198711140d67e282660261d61ff10"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\ui-ux-pro-max\\SKILL.md": {
+    "mtime": 1777017802.7898388,
+    "ast_hash": "d62f9e321660a5669a2bf3312b25f982",
+    "semantic_hash": "d62f9e321660a5669a2bf3312b25f982"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.roo\\skills\\ui-visual-validator\\SKILL.md": {
+    "mtime": 1777017802.8030782,
+    "ast_hash": "1a331ec2537f29b260eb3586464d199d",
+    "semantic_hash": "1a331ec2537f29b260eb3586464d199d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\.vscode\\AGENTS.md": {
+    "mtime": 1780475439.2854788,
+    "ast_hash": "752aa83aa64361ac32860f882dcff932",
+    "semantic_hash": "752aa83aa64361ac32860f882dcff932"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\MIGRATION_AUDIT.md": {
+    "mtime": 1779963364.5611348,
+    "ast_hash": "3da10bda331c833090826b080fa39b2a",
+    "semantic_hash": "3da10bda331c833090826b080fa39b2a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\README.md": {
+    "mtime": 1780474110.0407953,
+    "ast_hash": "a85f55942ca90900ca00fde93672d02d",
+    "semantic_hash": "a85f55942ca90900ca00fde93672d02d"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\chat_scraping_capture.html": {
+    "mtime": 1777367822.9113126,
+    "ast_hash": "1ff0716fe15aa9056c6fedbf60fb01b4",
+    "semantic_hash": "1ff0716fe15aa9056c6fedbf60fb01b4"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\ARCHITECTURE_REFACTOR_PLAN.md": {
+    "mtime": 1776370778.9080284,
+    "ast_hash": "78f37bc9df27fcf8996abdef12ed6679",
+    "semantic_hash": "78f37bc9df27fcf8996abdef12ed6679"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\MIGRATION_AUDIT.md": {
+    "mtime": 1779881576.918317,
+    "ast_hash": "720591a11fb140715d85eef842abd9ee",
+    "semantic_hash": "720591a11fb140715d85eef842abd9ee"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\PLANO_DE_IMPLEMENTACAO_DE_EFEITOS.md": {
+    "mtime": 1778824562.9321332,
+    "ast_hash": "b9ec1d4ddc3b53e58a34ba4d8b84c610",
+    "semantic_hash": "b9ec1d4ddc3b53e58a34ba4d8b84c610"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\PLANO_MIGRACAO_RUST.md": {
+    "mtime": 1779962789.9027183,
+    "ast_hash": "b7e9127ee52d240cfe224fb6069d9f2c",
+    "semantic_hash": "b7e9127ee52d240cfe224fb6069d9f2c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\channel_pair_implementation_plan.md": {
+    "mtime": 1778056913.4728882,
+    "ast_hash": "b4b88e74474d711928bba8cf94268fa0",
+    "semantic_hash": "b4b88e74474d711928bba8cf94268fa0"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\dmx_auto_recovery_plan.md": {
+    "mtime": 1777329792.901596,
+    "ast_hash": "c47d5d479c038dd050f1a46603598f7c",
+    "semantic_hash": "c47d5d479c038dd050f1a46603598f7c"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\github_sync_implementation_plan.md": {
+    "mtime": 1776078517.3648984,
+    "ast_hash": "f9b7c9e393e548de13b3a82d706784a1",
+    "semantic_hash": "f9b7c9e393e548de13b3a82d706784a1"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\plano_de_features.md": {
+    "mtime": 1780475061.7785482,
+    "ast_hash": "8d117f80459750479e4bff0943562b40",
+    "semantic_hash": "8d117f80459750479e4bff0943562b40"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\plano_de_otimizacao.md": {
+    "mtime": 1778654314.926256,
+    "ast_hash": "c1562418bec906af7905d0b15bb8fd6a",
+    "semantic_hash": "c1562418bec906af7905d0b15bb8fd6a"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\docs\\plano_implementacao_remote_midi.md": {
+    "mtime": 1780411835.538182,
+    "ast_hash": "10643c9474430fdadbb550ab057b1de6",
+    "semantic_hash": "10643c9474430fdadbb550ab057b1de6"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\log\\fx_test_log.txt": {
+    "mtime": 1779871506.9146936,
+    "ast_hash": "129450821c678dc15c5f3f556c87c1e8",
+    "semantic_hash": "129450821c678dc15c5f3f556c87c1e8"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\public\\index.html": {
+    "mtime": 1780474109.9879067,
+    "ast_hash": "13d448004a65db26dbbb1b9df350623b",
+    "semantic_hash": "13d448004a65db26dbbb1b9df350623b"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\reverse_dll_project\\BIBLIA_TECNICA_01V96.md": {
+    "mtime": 1776221175.005927,
+    "ast_hash": "b6bff3699c1f85334c3148bdabde3851",
+    "semantic_hash": "b6bff3699c1f85334c3148bdabde3851"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\reverse_dll_project\\DECOMPILED_README.md": {
+    "mtime": 1776208353.4513068,
+    "ast_hash": "7c98e849a69f5acbb768eef7c1783528",
+    "semantic_hash": "7c98e849a69f5acbb768eef7c1783528"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\reverse_dll_project\\junie_master_meter_report.txt": {
+    "mtime": 1776221097.1549232,
+    "ast_hash": "134d3206636fcc76aaba83f05c8cde11",
+    "semantic_hash": "134d3206636fcc76aaba83f05c8cde11"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\tmp\\working_version\\01v96-remote-web-main\\public\\index.html": {
+    "mtime": 1777029155.5607212,
+    "ast_hash": "a830bf8e2484af0873b4c72529a2dd24",
+    "semantic_hash": "a830bf8e2484af0873b4c72529a2dd24"
+  },
+  "C:\\PROJETOS\\01v96-remote-web\\log\\monitor_log(sincroniza\u00e7\u00e3o inicial).txt": {
+    "mtime": 1778791567.8233535,
+    "ast_hash": "9205e7a1dd4ccb3ef5c0ac7cf02c5ae2",
+    "semantic_hash": "9205e7a1dd4ccb3ef5c0ac7cf02c5ae2"
+  }
+}

@@ -23,6 +23,31 @@ pub struct PanData {
     pub value: f64,
 }
 
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+pub struct SetupServerData {
+    pub name: String,
+    pub password: String,
+}
+
+fn require_setup(socket: &SocketRef) -> bool {
+    if crate::env_config::is_setup_complete() {
+        return true;
+    }
+    let status = crate::env_config::detect_env_status();
+    tracing::warn!(
+        "🚫 [AUTH] Comando bloqueado: setup incompleto (status={})",
+        status.as_str()
+    );
+    let _ = socket.emit(
+        "setupRequired",
+        &serde_json::json!({
+            "error": "Configuração inicial do servidor não foi concluída",
+            "env_status": status.as_str()
+        }),
+    );
+    false
+}
+
 pub fn register_handlers(
     io: SocketIo,
     scheduler: Arc<MidiScheduler>,
@@ -72,7 +97,10 @@ pub fn register_handlers(
                             "inputs": inputs_json,
                             "outputs": outputs_json
                         },
-                        "savedConfig": config_arc
+                        "savedConfig": config_arc,
+                        "tecnicoPassword": crate::env_config::load_password(),
+                        "serverName": crate::env_config::load_server_name(),
+                        "envStatus": crate::env_config::detect_env_status().as_str()
                     }),
                 )
                 .ok();
@@ -104,6 +132,9 @@ pub fn register_handlers(
         socket.on(
             "control",
             move |socket: SocketRef, data: Data<ControlData>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 info!("Controle recebido: {:?}", *data);
 
                 // Atualiza o estado interno
@@ -156,6 +187,9 @@ pub fn register_handlers(
         socket.on(
             "setPan",
             move |socket: SocketRef, data: Data<PanData>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 info!("Pan recebido: CH={} Val={}", data.channel, data.value);
 
                 // Update state
@@ -194,6 +228,9 @@ pub fn register_handlers(
         socket.on(
             "pairChannel",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 let action = data.get("action").and_then(|v| v.as_str()).unwrap_or("");
                 let ch_a = data.get("chA").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
                 let ch_b = data.get("chB").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
@@ -313,7 +350,10 @@ pub fn register_handlers(
         let io_scene = io.clone();
         socket.on(
             "recallScene",
-            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
                     tracing::info!("SCENE Comando recebido: RECALL Cena {}", index);
                     let sysex = vec![
@@ -359,7 +399,10 @@ pub fn register_handlers(
         let io_save = io.clone();
         socket.on(
             "saveScene",
-            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
                     let index = index as u8;
                     let store_sysex = vec![
@@ -428,7 +471,10 @@ pub fn register_handlers(
         let io_delete = io.clone();
         socket.on(
             "deleteScene",
-            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
                     let delete_sysex = vec![
                         0xF0,
@@ -457,6 +503,9 @@ pub fn register_handlers(
         socket.on(
             "requestConnect",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 let in_idx = data.get("inIdx").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
                 let out_idx = data.get("outIdx").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
 
@@ -482,7 +531,10 @@ pub fn register_handlers(
         let sched_name = scheduler_socket.clone();
         socket.on(
             "updateName",
-            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 let channel = data.get("channel").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
                 let name = data
                     .get("name")
@@ -573,7 +625,10 @@ pub fn register_handlers(
         let conn_mgr_fsync = conn_mgr_handler.clone();
         socket.on(
             "forceSync",
-            move |_socket: SocketRef, _data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 conn_mgr_fsync.trigger_sync(true, "is_scene");
             },
         );
@@ -600,7 +655,10 @@ pub fn register_handlers(
         let conn_mgr_demo = conn_mgr_handler.clone();
         socket.on(
             "toggleDemo",
-            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 if let Some(enabled) = data.get("enabled").and_then(|v| v.as_bool()) {
                     if enabled {
                         conn_mgr_demo.enable_demo();
@@ -615,7 +673,10 @@ pub fn register_handlers(
         // --- UPDATE METER CONFIG ---
         socket.on(
             "updateMeterConfig",
-            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 if let Some(opacity) = data.get("opacity").and_then(|v| v.as_f64()) {
                     let mut config = crate::config::AppConfig::load();
                     config.meter_opacity = opacity;
@@ -627,7 +688,10 @@ pub fn register_handlers(
         // --- UPDATE OPEN BROWSER ---
         socket.on(
             "updateOpenBrowser",
-            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 if let Some(enabled) = data.get("enabled").and_then(|v| v.as_bool()) {
                     let mut config = crate::config::AppConfig::load();
                     config.open_browser_startup = enabled;
@@ -639,7 +703,10 @@ pub fn register_handlers(
         // --- RESTART SERVER ---
         socket.on(
             "restartServer",
-            move |_socket: SocketRef, _data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 info!("🔄 Reiniciando servidor...");
                 if let Ok(exe) = std::env::current_exe() {
                     if let Err(e) = std::process::Command::new(exe).spawn() {
@@ -653,7 +720,10 @@ pub fn register_handlers(
         // --- RESET DMX ---
         socket.on(
             "resetDmx",
-            move |_socket: SocketRef, _data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 let root = std::env::current_dir()
                     .unwrap()
                     .parent()
@@ -668,7 +738,10 @@ pub fn register_handlers(
         let scheduler_sysex = scheduler_socket.clone();
         socket.on(
             "sysex",
-            move |_socket: SocketRef, data: Data<Vec<u8>>| async move {
+            move |socket: SocketRef, data: Data<Vec<u8>>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
                 scheduler_sysex.enqueue(data.0, 1).await;
             },
         );
@@ -688,5 +761,171 @@ pub fn register_handlers(
         socket.on("disconnect", |socket: SocketRef| async move {
             info!("Cliente desconectado: {}", socket.id);
         });
+
+        // --- CHECK SETUP STATUS ---
+        socket.on(
+            "checkSetupStatus",
+            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                let status = crate::env_config::detect_env_status();
+                let _ = socket.emit(
+                    "setupStatus",
+                    &serde_json::json!({
+                        "env_status": status.as_str(),
+                        "complete": status.is_complete(),
+                        "server_name": crate::env_config::load_server_name(),
+                        "tecnico_password_present": crate::env_config::load_password().is_some()
+                    }),
+                );
+            },
+        );
+
+        // --- GET SERVER NAME ---
+        socket.on(
+            "getServerName",
+            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                let _ = socket.emit(
+                    "serverName",
+                    &serde_json::json!({
+                        "server_name": crate::env_config::load_server_name()
+                    }),
+                );
+            },
+        );
+
+        // --- RENAME SERVER ---
+        // Não chama require_setup: o renameServer é justamente a operação que
+        // completa o setup quando só falta o nome (envStatus == missing_name).
+        let io_rename = io.clone();
+        socket.on(
+            "renameServer",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let new_name = match data.get("new_name").and_then(|v| v.as_str()) {
+                    Some(n) => n.trim().to_string(),
+                    None => {
+                        let _ = socket.emit(
+                            "renameResult",
+                            &serde_json::json!({ "success": false, "error": "new_name ausente" }),
+                        );
+                        return;
+                    }
+                };
+                if let Err(e) = crate::env_config::validate_server_name(&new_name) {
+                    let _ = socket.emit(
+                        "renameResult",
+                        &serde_json::json!({ "success": false, "error": e }),
+                    );
+                    return;
+                }
+                let current_pass = match crate::env_config::load_password() {
+                    Some(p) => p,
+                    None => {
+                        let _ = socket.emit(
+                            "renameResult",
+                            &serde_json::json!({
+                                "success": false,
+                                "error": "Senha TÉCNICO não está configurada"
+                            }),
+                        );
+                        return;
+                    }
+                };
+                if let Err(e) = crate::env_config::save_env(&new_name, &current_pass) {
+                    let _ = socket.emit(
+                        "renameResult",
+                        &serde_json::json!({ "success": false, "error": e }),
+                    );
+                    return;
+                }
+                info!("✏️ [RENAME] Servidor renomeado para: {}", new_name);
+                let _ = io_rename.emit(
+                    "serverRenamed",
+                    &serde_json::json!({ "server_name": new_name }),
+                );
+                let _ = socket.emit(
+                    "renameResult",
+                    &serde_json::json!({
+                        "success": true,
+                        "server_name": new_name
+                    }),
+                );
+            },
+        );
+
+        // --- RESET CONFIG ---
+        let io_reset = io.clone();
+        socket.on(
+            "resetConfig",
+            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                match crate::env_config::delete_env() {
+                    Ok(_) => {
+                        info!("🗑️ [RESET] .env deletado — configuração resetada");
+                        let _ = io_reset.emit("configReset", &serde_json::json!({}));
+                        let _ = socket.emit(
+                            "resetResult",
+                            &serde_json::json!({ "success": true }),
+                        );
+                    }
+                    Err(e) => {
+                        let _ = socket.emit(
+                            "resetResult",
+                            &serde_json::json!({ "success": false, "error": e }),
+                        );
+                    }
+                }
+            },
+        );
+
+        // --- SETUP SERVER (cria/atualiza .env) ---
+        let io_setup = io.clone();
+        socket.on(
+            "setupServer",
+            move |socket: SocketRef, data: Data<SetupServerData>| async move {
+                let name = data.name.trim();
+                let password = data.password.trim();
+
+                if let Err(e) = crate::env_config::validate_server_name(name) {
+                    let _ = socket.emit(
+                        "setupResult",
+                        &serde_json::json!({ "success": false, "field": "name", "error": e }),
+                    );
+                    return;
+                }
+                if let Err(e) = crate::env_config::validate_password(password) {
+                    let _ = socket.emit(
+                        "setupResult",
+                        &serde_json::json!({ "success": false, "field": "password", "error": e }),
+                    );
+                    return;
+                }
+
+                match crate::env_config::save_env(name, password) {
+                    Ok(_) => {
+                        info!("✅ [SETUP] Servidor cadastrado: name={}", name);
+                        let _ = io_setup.emit(
+                            "setupCompleted",
+                            &serde_json::json!({
+                                "env_status": "complete",
+                                "server_name": name
+                            }),
+                        );
+                        let _ = socket.emit(
+                            "setupResult",
+                            &serde_json::json!({
+                                "success": true,
+                                "env_status": "complete",
+                                "server_name": name,
+                                "password": password
+                            }),
+                        );
+                    }
+                    Err(e) => {
+                        let _ = socket.emit(
+                            "setupResult",
+                            &serde_json::json!({ "success": false, "field": "global", "error": e }),
+                        );
+                    }
+                }
+            },
+        );
     });
 }

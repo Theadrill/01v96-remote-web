@@ -125,6 +125,30 @@
                 <button class="splash-btn btn-back" onclick="showSplashStep('initial')"
                     style="margin-top: 20px;">VOLTAR</button>
             </div>
+
+            <!-- Setup Inicial do Servidor -->
+            <div id="splashSetup" class="splash-step" style="display: none;">
+                <p class="splash-msg">CONFIGURAÇÃO INICIAL DO SERVIDOR</p>
+                <p id="setupHelpText" class="splash-help"
+                    style="font-size: 11px; color: #888; margin-bottom: 14px; line-height: 1.4;">
+                    Cadastre o nome e a senha de acesso (4 dígitos).
+                </p>
+                <input type="text" id="setupName" class="splash-input"
+                    placeholder="ex: mesa-do-joao" maxlength="30" autocomplete="off"
+                    style="text-transform: lowercase; text-align: center; letter-spacing: 1px; font-size: 18px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+                <input type="password" id="setupPassword" class="splash-input" placeholder="••••"
+                    maxlength="4" inputmode="numeric" autocomplete="new-password">
+                <input type="password" id="setupPasswordConfirm" class="splash-input"
+                    placeholder="Confirme a senha" maxlength="4" inputmode="numeric"
+                    autocomplete="new-password">
+                <p id="setupError" class="splash-error"
+                    style="display: none; color: #ff6b6b; font-size: 12px; margin: 8px 0 0 0; line-height: 1.3;">
+                </p>
+                <div class="splash-actions">
+                    <button class="splash-btn btn-back" onclick="cancelSetup()">VOLTAR</button>
+                    <button class="splash-btn btn-confirm" onclick="submitSetup()">CONTINUAR</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -287,6 +311,25 @@
                 <button onclick="conn()" class="btn-connect">CONECTAR</button>
                 <button onclick="document.getElementById('configModal').style.display='none'"
                     class="btn-close">FECHAR</button>
+            </div>
+
+            <!-- Seção de Configuração do Servidor -->
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #444; text-align: center;">
+                <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">SERVIDOR</p>
+                <p id="configServerNameDisplay"
+                    style="font-size: 16px; color: #5cacee; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">
+                    --
+                </p>
+                <input type="text" id="inputServerName" maxlength="30" placeholder="nome-do-servidor"
+                    autocomplete="off"
+                    style="width: 100%; box-sizing: border-box; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; font-size: 14px; text-transform: lowercase; letter-spacing: 1px; margin-bottom: 10px; outline: none;">
+                <button class="btn-connect" onclick="saveServerName()"
+                    style="width: 100%; margin-bottom: 10px; background: #007bff; font-size: 12px;">SALVAR NOME</button>
+                <button class="btn-connect" onclick="confirmResetConfig()"
+                    style="width: 100%; margin: 0; background: #6c757d; font-size: 11px;">RESETAR CONFIGURAÇÃO</button>
+                <p id="serverConfigStatus"
+                    style="font-size: 10px; color: #aaa; margin-top: 8px; min-height: 14px; line-height: 1.3;">
+                </p>
             </div>
 
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #444;">
@@ -797,6 +840,24 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmacao de Reset de Configuracao -->
+    <div id="resetConfigConfirmModal" class="modal-overlay" style="z-index:20020; display:none;">
+        <div class="modal-content"
+            style="max-width:360px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #dc3545; background:#1a1a1a; padding:30px; border-radius:15px;">
+            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+                Atencao!</p>
+            <h3 style="margin-top:0; color:#dc3545; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+                RESETAR CONFIGURAÇÃO?</h3>
+            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">O arquivo .env será apagado. Você precisará cadastrar nome e senha novamente.</p>
+            <div style="display:flex; gap:15px;">
+                <button id="resetConfigConfirmBtn" class="btn-connect"
+                    style="flex:1; margin:0; height:45px; background:#dc3545;">SIM, RESETAR</button>
+                <button onclick="document.getElementById('resetConfigConfirmModal').style.display='none'" class="btn-close"
+                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Sync Shield Overlay (Movido para o fim para garantir z-index no topo) -->
     <!-- Modal de Pair (Seleção de Direção) -->
@@ -864,11 +925,12 @@
     <script src="modules/steps.js"></script>
     <script src="modules/macro_fader.js"></script>
     <script src="modules/fader_logic.js"></script>
-    <script src="modules/socket.js"></script>
+    <script src="modules/socket.js?v=6"></script>
     <script src="modules/sidebar.js?v=5"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/scroll.js"></script>
-    <script src="modules/splash_screen.js"></script>
+    <script src="modules/setup.js?v=6"></script>
+    <script src="modules/splash_screen.js?v=6"></script>
     <script src="modules/search.js"></script>
     <script src="modules/scene_grid.js"></script>
     <script src="app.js"></script>

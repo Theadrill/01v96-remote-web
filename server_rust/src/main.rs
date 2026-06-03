@@ -2,6 +2,7 @@ mod api;
 mod boot;
 mod config;
 pub mod dmx;
+mod env_config;
 mod midi;
 mod midi_receiver;
 mod network;

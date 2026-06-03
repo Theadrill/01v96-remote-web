@@ -51,9 +51,6 @@ pub struct AppConfig {
     #[serde(default)]
     pub remote_midi_last_host: String,
 
-    #[serde(default = "default_tecnico_pass")]
-    pub tecnico_pass: String,
-
     #[serde(default = "default_port")]
     pub port: u16,
 
@@ -65,10 +62,6 @@ pub struct AppConfig {
     pub names: std::collections::HashMap<String, String>,
     #[serde(skip)]
     pub steps: serde_json::Value,
-}
-
-fn default_tecnico_pass() -> String {
-    "2107".to_string()
 }
 
 fn default_port() -> u16 {
@@ -93,6 +86,57 @@ impl AppConfig {
         // Tenta ler o arquivo config.json
         let root = get_project_root();
         let config_path = root.join("config.json");
+
+        // Migração automática: tecnico_pass legado (config.json) → SERVER_PASSWORD (.env)
+        // Só roda se o .env ainda NÃO tem SERVER_PASSWORD (preserva configuração do usuário).
+        if crate::env_config::load_password().is_none() {
+            if let Ok(contents) = fs::read_to_string(&config_path) {
+                if let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&contents) {
+                    let legacy_pass = json
+                        .get("tecnico_pass")
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string());
+                    if let Some(pass) = legacy_pass {
+                        if !pass.is_empty() {
+                            match crate::env_config::load_server_name() {
+                                Some(name) if !name.is_empty() => {
+                                    if let Err(e) = crate::env_config::save_env(&name, &pass) {
+                                        error!("[CONFIG] Falha ao migrar tecnico_pass para .env: {}", e);
+                                    } else {
+                                        info!("[CONFIG] tecnico_pass migrado para .env (nome + senha)");
+                                    }
+                                }
+                                _ => {
+                                    let env_path = crate::env_config::get_env_path();
+                                    if let Err(e) = fs::write(
+                                        &env_path,
+                                        format!("SERVER_PASSWORD={}\n", pass),
+                                    ) {
+                                        error!("[CONFIG] Falha ao migrar tecnico_pass para .env: {}", e);
+                                    } else {
+                                        info!("[CONFIG] tecnico_pass migrado para .env (apenas senha)");
+                                    }
+                                }
+                            }
+                        }
+                        if let Some(obj) = json.as_object_mut() {
+                            obj.remove("tecnico_pass");
+                        }
+                        if let Ok(pretty) = serde_json::to_string_pretty(&json) {
+                            if let Err(e) = fs::write(&config_path, pretty) {
+                                error!(
+                                    "[CONFIG] Falha ao regravar config.json sem tecnico_pass: {}",
+                                    e
+                                );
+                            } else {
+                                info!("[CONFIG] tecnico_pass removido do config.json");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         let mut config = match fs::read_to_string(&config_path) {
             Ok(contents) => match serde_json::from_str::<AppConfig>(&contents) {
                 Ok(c) => c,
@@ -173,7 +217,6 @@ impl AppConfig {
             remote_midi_networks: vec![],
             remote_midi_port: default_remote_midi_port(),
             remote_midi_last_host: "".to_string(),
-            tecnico_pass: default_tecnico_pass(),
             port: default_port(),
             meter_opacity: 1.0,
             names: std::collections::HashMap::new(),
@@ -229,7 +272,7 @@ pub fn save_names_to_disk(state: &crate::state::GlobalState, debounce_ms: u64) {
     });
 }
 
-fn get_project_root() -> std::path::PathBuf {
+pub fn get_project_root() -> std::path::PathBuf {
     if let Ok(exe_path) = std::env::current_exe() {
         if let Some(exe_dir) = exe_path.parent() {
             // Candidato 1: exe na raiz (config.json está ao lado)

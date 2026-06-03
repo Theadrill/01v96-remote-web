@@ -40,7 +40,10 @@ let musicianMode = false;
 let outsMode = false;
 let technicianMixMode = false;
 let activeMix = 1;
-let tecnicoPassword = '2107'; // Fallback inicial
+let tecnicoPassword = null; // Definido apenas pelo servidor via socket (lido do .env)
+window.tecnicoPassword = tecnicoPassword;
+window.envStatus = 'not_found';
+window.serverName = null;
 let layoutMode = localStorage.getItem('mixer_layout') || 'mobile';
 document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
 
