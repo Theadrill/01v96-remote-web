@@ -107,12 +107,49 @@ function toggleFullScreen() {
 }
 
 window.copyAppUrl = function() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-        alert("Link copiado! Abra o navegador Safari e cole este link.");
-    }).catch(err => {
-        alert("Falha ao copiar o link. Por favor, copie manualmente da barra de endereços.");
-    });
+    const textToCopy = window.location.href;
+    
+    // Tenta usar a API moderna primeiro (só funciona em HTTPS ou localhost)
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("Link copiado! Abra o navegador Safari e cole este link.");
+        }).catch(err => {
+            fallbackCopyTextToClipboard(textToCopy);
+        });
+    } else {
+        // Fallback para HTTP (redes locais) usando método tradicional
+        fallbackCopyTextToClipboard(textToCopy);
+    }
 };
+
+function fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Evita o scroll pro fim da pagina no iOS
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    
+    // Evita que o teclado virtual do celular abra
+    textArea.setAttribute('readonly', '');
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        var successful = document.execCommand('copy');
+        if (successful) {
+            alert("Link copiado! Abra o navegador Safari e cole este link.");
+        } else {
+            alert("Não foi possível copiar o link automaticamente. Por favor, copie da barra de endereços.");
+        }
+    } catch (err) {
+        alert("Falha ao copiar o link. Por favor, copie da barra de endereços.");
+    }
+    document.body.removeChild(textArea);
+}
 
 function setLayoutMode(mode) {
     layoutMode = mode;

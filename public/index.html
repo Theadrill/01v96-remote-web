@@ -16,6 +16,23 @@
     <script>
         // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
         document.addEventListener('DOMContentLoaded', function() {
+            // Esconde botões de Fullscreen se já estiver rodando como App Nativo (Standalone PWA)
+            // Afinal, já está em tela cheia e clicar neles não faria sentido.
+            if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+                var fsSplash = document.getElementById('fsBtnSplash');
+                var fsSidebar = document.getElementById('fsBtnSidebar');
+                if (fsSplash) fsSplash.style.display = 'none';
+                if (fsSidebar) fsSidebar.style.display = 'none';
+                
+                // Em modo PWA o iOS pode ter uns comportamentos estranhos de double-tap-to-zoom 
+                // ou push de viewport. Prevenir isso globalmente se não estiver focando inputs:
+                document.body.addEventListener('dblclick', function(e) {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            }
+
             var ua = navigator.userAgent;
             var isOldIOS = /OS (1[0-6])_/.test(ua) && /AppleWebKit/.test(ua);
             var isOldSafari = /^((?!chrome|android).)*safari/i.test(ua) && /Version\/1[0-6]/.test(ua);
@@ -845,7 +862,7 @@
     <script src="modules/steps.js"></script>
     <script src="modules/macro_fader.js"></script>
     <script src="modules/socket.js"></script>
-    <script src="modules/sidebar.js?v=2"></script>
+    <script src="modules/sidebar.js?v=4"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/scroll.js"></script>
     <script src="modules/splash_screen.js"></script>
