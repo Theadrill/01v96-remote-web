@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Habilita modo App/Fullscreen nativo no iOS e Android via "Adicionar à Tela de Início" -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>01V96 - LIVE SAFE</title>
     <link rel="stylesheet" href="style.css">
     <!-- UI UPDATE: 2026-04-12 -->
@@ -591,6 +596,33 @@
         </div>
     </div>
 
+    <!-- Modal de Instalação iOS (PWA) -->
+    <div id="iosInstallModal" class="modal-overlay" style="z-index:20000; display:none;">
+        <div class="modal-content"
+            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #007bff; background:#1a1a1a; padding:30px; border-radius:15px;">
+            <h2 style="margin-top:0; color:#fff; font-size:22px; letter-spacing:1px; text-transform:uppercase; margin-bottom: 25px;">
+                TELA CHEIA NO IOS</h2>
+            
+            <div id="iosSafariInstructions">
+                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia o botão de tela cheia automática pelo navegador. Para usar este app em <strong>TELA CHEIA</strong>, você deve adicionar esta página à tela inicial do seu aparelho:</p>
+                <div style="background:#222; padding:15px; border-radius:8px; margin-bottom:20px; text-align:left;">
+                    <p style="margin:0 0 10px 0; color:#ddd; font-size:13px;">1. Toque no ícone de <strong>Compartilhar</strong> <span style="font-size:16px;">( <svg style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> )</span> na barra inferior do Safari.</p>
+                    <p style="margin:0; color:#ddd; font-size:13px;">2. Escolha <strong>Adicionar à Tela de Início</strong> <span style="font-size:16px;">( <svg style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> )</span>.</p>
+                </div>
+            </div>
+
+            <div id="iosOtherBrowserInstructions" style="display:none;">
+                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia a função de tela cheia fora do Safari. Para usar este app em <strong>TELA CHEIA</strong>, você deve copiar o link abaixo, abrir pelo navegador <strong>Safari</strong>, e então adicionar à tela inicial.</p>
+                <div style="background:#222; padding:15px; border-radius:8px; margin-bottom:20px;">
+                    <button onclick="copyAppUrl()" class="btn-connect" style="width:100%; height:45px; background:#007bff; font-size:14px; margin:0; font-weight: bold;">📋 COPIAR LINK</button>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('iosInstallModal').style.display='none'" class="btn-close"
+                style="width:100%; height:45px; margin:0;">FECHAR</button>
+        </div>
+    </div>
+
     <!-- Modal de Salvar Preset Como -->
     <div id="macroSaveAsModal" class="modal-overlay" style="z-index:18500; display:none;">
         <div class="modal-content"
@@ -813,7 +845,7 @@
     <script src="modules/steps.js"></script>
     <script src="modules/macro_fader.js"></script>
     <script src="modules/socket.js"></script>
-    <script src="modules/sidebar.js"></script>
+    <script src="modules/sidebar.js?v=2"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/scroll.js"></script>
     <script src="modules/splash_screen.js"></script>

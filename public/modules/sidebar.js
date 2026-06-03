@@ -62,6 +62,40 @@ function changeTechnicianMix(delta) {
 }
 
 function toggleFullScreen() {
+    // Detecta se é iOS (iPhone, iPad, iPod)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    // Verifica se já está rodando como um app "Standalone" (instalado na Home Screen do iOS)
+    const isStandalone = window.navigator.standalone === true;
+
+    if (isIOS) {
+        if (isStandalone) {
+            alert("Você já está no Modo App Nativo em Tela Cheia!");
+            return;
+        }
+        
+        // Verifica se é Safari (Safari tem 'Safari' no UA, mas Chrome tem 'CriOS' e Firefox 'FxiOS')
+        const ua = navigator.userAgent;
+        const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+        
+        const modal = document.getElementById('iosInstallModal');
+        const safariInst = document.getElementById('iosSafariInstructions');
+        const otherInst = document.getElementById('iosOtherBrowserInstructions');
+        
+        if (modal) {
+            modal.style.display = 'flex';
+            if (isSafari) {
+                safariInst.style.display = 'block';
+                otherInst.style.display = 'none';
+            } else {
+                safariInst.style.display = 'none';
+                otherInst.style.display = 'block';
+            }
+        }
+        return; // Interrompe para não tentar executar a API padrão que falha no iOS
+    }
+
+    // Comportamento original para Android e Desktop
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         const docElm = document.documentElement;
         if (docElm.requestFullscreen) docElm.requestFullscreen();
@@ -71,6 +105,14 @@ function toggleFullScreen() {
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
+
+window.copyAppUrl = function() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        alert("Link copiado! Abra o navegador Safari e cole este link.");
+    }).catch(err => {
+        alert("Falha ao copiar o link. Por favor, copie manualmente da barra de endereços.");
+    });
+};
 
 function setLayoutMode(mode) {
     layoutMode = mode;
