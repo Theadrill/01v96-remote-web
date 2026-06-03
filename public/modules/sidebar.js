@@ -34,7 +34,14 @@ function toggleOuts() {
     const btn = document.getElementById('btnOuts');
     if (btn) {
         btn.classList.toggle('active-tab', outsMode);
-        btn.innerText = outsMode ? 'CHANNELS' : 'OUTS';
+        btn.innerText = outsMode ? 'SAIR' : 'OUTS';
+        if (outsMode) {
+            btn.style.backgroundColor = '#dc3545';
+            btn.style.color = '#fff';
+        } else {
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+        }
     }
     initUI();
 }

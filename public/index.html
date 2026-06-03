@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
     <meta name="mobile-web-app-capable" content="yes">
     <title>01V96 - LIVE SAFE</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=16">
     <!-- UI UPDATE: 2026-04-12 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
@@ -24,6 +24,8 @@
                 if (fsSplash) fsSplash.style.display = 'none';
                 if (fsSidebar) fsSidebar.style.display = 'none';
                 
+                document.body.classList.add('is-standalone');
+
                 // Em modo PWA o iOS pode ter uns comportamentos estranhos de double-tap-to-zoom 
                 // ou push de viewport. Prevenir isso globalmente se não estiver focando inputs:
                 document.body.addEventListener('dblclick', function(e) {
@@ -210,12 +212,12 @@
             <!-- Botão de Sair do Músico (Apenas no modo Músico) -->
             <button id="musicianExitBtn" class="side-btn"
                 style="display:none; width:100%; background:#dc3545; color:white;"
-                onclick="document.getElementById('logoutConfirmModal').style.display='flex'">DESCONECTAR</button>
+                onclick="document.getElementById('logoutConfirmModal').style.display='flex'">SAIR</button>
 
             <!-- Botão de Logout do Técnico (No Rodapé) -->
             <button id="tecnicoExitBtn" class="side-btn"
                 style="display:none; width:100%; background:#dc3545; color:white;"
-                onclick="document.getElementById('logoutConfirmModal').style.display='flex'">DESCONECTAR</button>
+                onclick="document.getElementById('logoutConfirmModal').style.display='flex'">SAIR</button>
 
             <!-- Botão Fullscreen da Sidebar -->
             <button id="fsBtnSidebar" class="side-btn fs-icon-btn"
@@ -852,17 +854,18 @@
     <script src="modules/globals.js?v=2"></script>
     <script src="modules/macros/core.js"></script>
     <script src="modules/macros.js"></script>
-    <script src="modules/channel_strip.js?v=10"></script>
+    <script src="modules/channel_strip.js?v=12"></script>
     <script src="modules/eq.js?v=5"></script>
     <script src="modules/gate.js"></script>
     <script src="modules/compressor.js"></script>
     <script src="modules/dynamics.js"></script>
     <script src="modules/auxs_sends.js"></script>
-    <script src="modules/events.js?v=10"></script>
+    <script src="modules/events.js?v=11"></script>
     <script src="modules/steps.js"></script>
     <script src="modules/macro_fader.js"></script>
+    <script src="modules/fader_logic.js"></script>
     <script src="modules/socket.js"></script>
-    <script src="modules/sidebar.js?v=4"></script>
+    <script src="modules/sidebar.js?v=5"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/scroll.js"></script>
     <script src="modules/splash_screen.js"></script>

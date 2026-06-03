@@ -575,7 +575,9 @@ function createOutputStrip(i, type, idPrefix = "") {
                 <button class="btn-nudge pointer-none">+</button>
             </div>
             
-            <input type="range" id="${pfx}f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${actionCh})" onclick="event.stopPropagation()">
+            <div class="fader-rotated-container">
+                <input type="range" id="${pfx}f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${actionCh})" onclick="event.stopPropagation()">
+            </div>
             
             <div class="ch-clickable-zone mt-auto" onclick="${type === 'mix' && !idPrefix ? `enterTechnicianMixMode(${i})` : ''}">
                 <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, -1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
