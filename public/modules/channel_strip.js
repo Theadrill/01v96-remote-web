@@ -270,47 +270,25 @@ function createDesktopStrip(config) {
  * @param {number}        panValue Valor entre -63 (L) e +63 (R)
  */
 function updatePanIndicator(channel, panValue) {
-    // Resolve o ID do card da mesma forma que createDesktopChannelStrip / createDesktopOutputStrip
-    let cardId;
-    if (channel === 'master') {
-        cardId = 'cardmaster';
-    } else if (typeof channel === 'number' && channel >= 60 && channel <= 67) {
-        const stIndex = Math.floor((channel - 60) / 2);
-        cardId = `cardst${stIndex}`;
-    } else {
-        cardId = `card${channel}`;
-    }
-
-    let card = document.getElementById(cardId);
-    if (!card && typeof channel === 'number') {
-        // Se não achou o card pelo ID direto, pode ser um canal linkado (o card fica no canal A)
-        const s = channelStates[channel];
-        if (s && s.paired && s.pairedWith !== null) {
-            // Se o canal atual for o "B" do par (índice ímpar), o card real é o do canal A
-            const masterIdx = Math.min(channel, s.pairedWith);
-            card = document.getElementById(`card${masterIdx}`);
-        }
-    }
-
-    if (!card) return;
-
-    // Busca a trilha específica do canal dentro do card (ou a primeira se não houver data-pan-ch)
-    const track = card.querySelector(`.desk-pan-track[data-pan-ch="${channel}"]`) || card.querySelector('.desk-pan-track');
-    if (!track) return;
-
-    const thumb = track.querySelector('.desk-pan-thumb');
-    if (!thumb) return;
-
     // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%
     const pct = ((panValue + 63) / 126) * 100;
-    thumb.style.left = `${pct}%`;
 
-    // Cor: centro = cinza, qualquer lado = roxo
-    if (panValue === 0) {
-        thumb.classList.add('pan-center');
-    } else {
-        thumb.classList.remove('pan-center');
-    }
+    // Busca todas as trilhas na UI (desktop card ou mobile routing etc)
+    const tracks = document.querySelectorAll(`.desk-pan-track[data-pan-ch="${channel}"]`);
+    
+    tracks.forEach(track => {
+        const thumb = track.querySelector('.desk-pan-thumb');
+        if (!thumb) return;
+
+        thumb.style.left = `${pct}%`;
+
+        // Cor: centro = cinza, qualquer lado = roxo
+        if (panValue === 0) {
+            thumb.classList.add('pan-center');
+        } else {
+            thumb.classList.remove('pan-center');
+        }
+    });
 }
 
 function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {

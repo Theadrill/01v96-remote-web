@@ -354,7 +354,6 @@ function handleWheelFader(e, ch, auxIdx) {
 }
 
 function handleWheelPan(e, ch1, ch2) {
-    if (layoutMode !== 'desktop') return;
 
     // Interromper scroll da tela
     e.preventDefault();
@@ -398,7 +397,6 @@ function handleWheelPan(e, ch1, ch2) {
 }
 
 function resetPan(e, ch1, ch2) {
-    if (layoutMode !== 'desktop') return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -436,7 +434,6 @@ let activePanChannel = null;
 let activePanTrack = null;
 
 function startPanLongPress(e, ch1, ch2) {
-    if (layoutMode !== 'desktop') return;
     e.stopPropagation();
     e.preventDefault(); // Impede o disparo de mousedown legado
     

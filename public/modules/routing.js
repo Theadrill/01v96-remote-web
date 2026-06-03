@@ -12,38 +12,90 @@ window.renderRouting = function(chIdx) {
         return;
     }
 
-    const patchVal = chData.patch || 0; 
-    
+    const getPanTrackHTML = (ch) => {
+        let panVal = 0;
+        const stateRef = getChannelStateById(ch);
+        if (stateRef && stateRef.pan !== undefined) {
+            panVal = stateRef.pan;
+        }
+        
+        const percent = ((panVal + 63) / 126) * 100;
+        let panClass = "pan-center";
+        if (panVal < 0) panClass = "pan-left";
+        if (panVal > 0) panClass = "pan-right";
+
+        return `
+            <div class="desk-pan-track" data-pan-ch="${ch}">
+                <div class="desk-pan-center-tick"></div>
+                <div class="desk-pan-thumb ${panClass}" style="left:${percent}%"></div>
+            </div>
+        `;
+    };
+
+    let tracksHTML = getPanTrackHTML(chIdx);
+    if (chData.paired && chData.pairedWith !== null && chData.pairedWith !== undefined) {
+        tracksHTML += getPanTrackHTML(chData.pairedWith);
+    }
+    const isMobilePan = typeof layoutMode !== 'undefined' && layoutMode !== 'desktop';
+    const panSectionHTML = isMobilePan ? `
+        <div style="flex: 1; min-width: 120px; display: flex; flex-direction: column;">
+            <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Pan</p>
+            <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+                <div style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 18px; flex: 1; display: flex; align-items: center; justify-content: center;">
+                    <div class="desk-pan-indicator" id="pani-mobile-${chIdx}" style="flex: 1; max-width: 100%; background: transparent; border: none; box-shadow: none;"
+                        onwheel="handleWheelPan(event, ${chIdx}, ${chData.paired ? chData.pairedWith : 'null'})" 
+                        ondblclick="resetPan(event, ${chIdx}, ${chData.paired ? chData.pairedWith : 'null'})"
+                        onpointerdown="startPanLongPress(event, ${chIdx}, ${chData.paired ? chData.pairedWith : 'null'})"
+                        onpointermove="handlePanPointerMove(event)"
+                        onpointerup="stopPanLongPress(event)"
+                        onpointerleave="stopPanLongPress(event)"
+                        onpointercancel="stopPanLongPress(event)">
+                    <span class="desk-pan-l">L</span>
+                    <div class="desk-pan-tracks-container">
+                        ${tracksHTML}
+                    </div>
+                    <span class="desk-pan-r">R</span>
+                </div>
+            </div>
+            </div>
+        </div>
+    ` : '';
+
     container.innerHTML = `
         <div class="routing-container" style="display: flex; flex-direction: column; gap: 25px; padding: 15px; height: 100%; overflow-y: auto;">
-            <!-- Seção de Patch -->
-            <div class="routing-section">
-                <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Entrada do Canal (Patch)</p>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <!-- Patch do Canal Principal -->
-                    <div class="patch-display-box" onclick="openPatchSelector(${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                        <div style="display: flex; flex-direction: column;">
-                            <span style="font-size: 10px; color: #888;">${chData.paired ? `PATCH CH ${chIdx+1}:` : 'FONTE ATUAL:'}</span>
-                            <span id="currentPatchName" style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(chData.patch || 0)}</span>
+            <!-- Top Row: Patch + Pan -->
+            <div style="display: flex; gap: 15px; align-items: stretch; flex-wrap: wrap;">
+                <!-- Seção de Patch -->
+                <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column;">
+                    <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Entrada do Canal (Patch)</p>
+                    <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+                        <!-- Patch do Canal Principal -->
+                        <div class="patch-display-box" onclick="openPatchSelector(${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                            <div style="display: flex; flex-direction: column; flex: 1;">
+                                <span style="font-size: 10px; color: #888;">${chData.paired ? `PATCH CH ${chIdx+1}:` : 'FONTE ATUAL:'}</span>
+                                <span id="currentPatchName" style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(chData.patch || 0)}</span>
+                            </div>
+                            <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                            </div>
                         </div>
-                        <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                        </div>
-                    </div>
 
-                    ${chData.paired ? `
-                    <!-- Patch do Canal Parceiro -->
-                    <div class="patch-display-box" onclick="openPatchSelector(${chData.pairedWith})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                        <div style="display: flex; flex-direction: column;">
-                            <span style="font-size: 10px; color: #888;">PATCH CH ${chData.pairedWith + 1}:</span>
-                            <span style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[chData.pairedWith].patch || 0)}</span>
+                        ${chData.paired ? `
+                        <!-- Patch do Canal Parceiro -->
+                        <div class="patch-display-box" onclick="openPatchSelector(${chData.pairedWith})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                            <div style="display: flex; flex-direction: column;">
+                                <span style="font-size: 10px; color: #888;">PATCH CH ${chData.pairedWith + 1}:</span>
+                                <span style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[chData.pairedWith].patch || 0)}</span>
+                            </div>
+                            <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                            </div>
                         </div>
-                        <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                        </div>
+                        ` : ''}
                     </div>
-                    ` : ''}
                 </div>
+                
+                ${panSectionHTML}
             </div>
 
             <!-- Seção de BUS / STEREO -->
