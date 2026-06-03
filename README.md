@@ -109,6 +109,8 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [ ] Implementação de Meters GPU-Accelerated (Curtain Rendering).
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
 - [x] Fazer o meter do master funcionar.
+- [ ] Sistema de cenas de nomes customizados.
+- [ ] Atribuição de nome ao servidor/mesa.
 
 
 ---
