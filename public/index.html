@@ -381,19 +381,62 @@
         </div>
     </div>
 
+    <style>
+        @media (max-height: 450px) and (orientation: landscape) {
+            #macrosModal .modal-content {
+                height: 100vh !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
+                padding: 10px 20px !important;
+            }
+            #macrosCloseBtn {
+                min-height: 50px !important;
+                max-height: 50px !important;
+            }
+        }
+    </style>
+    <!-- Script para mover os botões de ação do painel de macros -->
+    <script>
+        function updateMacrosLayout() {
+            const mql = window.matchMedia("(max-height: 450px) and (orientation: landscape)");
+            const actionBtns = document.getElementById('macrosActionButtons');
+            const mobileTarget = document.getElementById('macrosMobileActions');
+            const desktopTarget = document.getElementById('macrosHeaderContainer');
+            
+            if (mql.matches) {
+                if (actionBtns.parentNode !== mobileTarget) {
+                    mobileTarget.appendChild(actionBtns);
+                    actionBtns.style.justifyContent = 'center';
+                    actionBtns.style.flexWrap = 'wrap';
+                    actionBtns.style.marginTop = '15px';
+                    actionBtns.style.width = '100%';
+                }
+            } else {
+                if (actionBtns.parentNode !== desktopTarget) {
+                    desktopTarget.appendChild(actionBtns);
+                    actionBtns.style.justifyContent = '';
+                    actionBtns.style.flexWrap = '';
+                    actionBtns.style.marginTop = '0';
+                    actionBtns.style.width = '';
+                }
+            }
+        }
+        window.addEventListener('resize', updateMacrosLayout);
+        document.addEventListener('DOMContentLoaded', updateMacrosLayout);
+    </script>
     <!-- Modal de Macros Dinâmico -->
     <div id="macrosModal" class="modal-overlay" style="z-index:13000; display:none; background: rgba(0,0,0,0.75);">
         <div class="modal-content"
             style="max-width:550px; display:flex; flex-direction:column; overflow:hidden; background:rgba(26, 26, 26, 0.85); border:2px solid #6a1b9a; border-radius:15px; padding:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div
+            <div id="macrosHeaderContainer"
                 style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px; flex-shrink:0;">
-                <div>
+                <div id="macrosTitleBlock">
                     <h2 style="margin:0; font-size:18px; letter-spacing:1px;">PAINEL DE MACROS</h2>
                     <span id="currentPresetLabel"
                         style="font-size:10px; color:#666; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">PRESET:
                         ...</span>
                 </div>
-                <div style="display:flex; gap:8px;">
+                <div id="macrosActionButtons" style="display:flex; gap:8px;">
                     <div id="macroSharedSyncHeader"
                         style="display:flex; align-items:center; gap:8px; margin-right:6px;">
                         <label id="lblSharedSync" for="chkSharedSync"
@@ -415,19 +458,23 @@
                 </div>
             </div>
 
-            <!-- Grid de slots que será populado via JS -->
-            <!-- flex: 1 and min-height: 0 lets this area scroll instead of the modal itself expanding -->
-            <div id="macroSlotsGrid"
-                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; overflow-y:auto; scrollbar-width:none; flex:1; min-height:0; align-content:start;">
-                <style>
-                    #macroSlotsGrid::-webkit-scrollbar {
-                        display: none;
-                    }
-                </style>
+            <!-- Scrollable middle area for Grid + Mobile Actions -->
+            <div id="macrosMiddleScroll" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-height: 0; padding-right: 5px; margin-bottom: 20px;">
+                <!-- Grid de slots que será populado via JS -->
+                <div id="macroSlotsGrid"
+                    style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; scrollbar-width:none; flex-shrink:0;">
+                    <style>
+                        #macroSlotsGrid::-webkit-scrollbar {
+                            display: none;
+                        }
+                    </style>
+                </div>
+                <!-- Container para receber os botões em mobile landscape -->
+                <div id="macrosMobileActions"></div>
             </div>
 
-            <button onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close"
-                style="width: 100%; height: 50px; border-radius:10px; flex-shrink:0;">FECHAR PAINEL</button>
+            <button id="macrosCloseBtn" onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close"
+                style="width: 100%; height: 50px; min-height: 50px; max-height: 50px; border-radius:10px; flex-shrink:0; margin:0;">FECHAR PAINEL</button>
         </div>
     </div>
 
