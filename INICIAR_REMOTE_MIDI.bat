@@ -9,7 +9,13 @@ if exist "D:\RustDev\iniciar_rust.bat" (
     call "D:\RustDev\iniciar_rust.bat"
 )
 
-cd /d "%~dp0remote_midi_server"
-cargo run --release
+cd /d "%~dp0"
+if exist remote_midi_server.exe (
+    remote_midi_server.exe
+) else (
+    echo [AVISO] Executavel remote_midi_server.exe nao encontrado na raiz.
+    echo Compilando e iniciando via Cargo...
+    cargo run -p remote_midi_server --release
+)
 
 pause

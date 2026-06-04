@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "midi_common",
+    "remote_midi_server",
+    "server_rust",
+]
+resolver = "2"
+default-members = [
+    "server_rust"
+]
