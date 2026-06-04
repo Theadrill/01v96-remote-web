@@ -40,3 +40,8 @@ names.json
 
 info
 ArtNetToDMX_FTDI/info
+
+# Agent-specific local symlinks
+.cline/skills/
+.gemini/skills/
+

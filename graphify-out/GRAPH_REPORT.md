@@ -1,13 +1,18 @@
-# Graph Report - .  (2026-06-03)
+# Graph Report - 01v96-remote-web  (2026-06-04)
 
 ## Corpus Check
-- 250 files · ~473,241 words
+- 208 files · ~446,672 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 428 nodes · 553 edges · 66 communities (29 shown, 37 thin omitted)
-- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 66 edges (avg confidence: 0.85)
+- 3549 nodes · 4349 edges · 271 communities (211 shown, 60 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 114 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `36963fbb`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)|Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)]]
@@ -76,18 +81,200 @@
 - [[_COMMUNITY_Find Patch Script (legacy)|Find Patch Script (legacy)]]
 - [[_COMMUNITY_List MIDI Script (legacy)|List MIDI Script (legacy)]]
 - [[_COMMUNITY_Monitor Script (legacy)|Monitor Script (legacy)]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
+- [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
+- [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 83|Community 83]]
+- [[_COMMUNITY_Community 84|Community 84]]
+- [[_COMMUNITY_Community 85|Community 85]]
+- [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 87|Community 87]]
+- [[_COMMUNITY_Community 88|Community 88]]
+- [[_COMMUNITY_Community 89|Community 89]]
+- [[_COMMUNITY_Community 90|Community 90]]
+- [[_COMMUNITY_Community 91|Community 91]]
+- [[_COMMUNITY_Community 92|Community 92]]
+- [[_COMMUNITY_Community 93|Community 93]]
+- [[_COMMUNITY_Community 94|Community 94]]
+- [[_COMMUNITY_Community 95|Community 95]]
+- [[_COMMUNITY_Community 96|Community 96]]
+- [[_COMMUNITY_Community 97|Community 97]]
+- [[_COMMUNITY_Community 98|Community 98]]
+- [[_COMMUNITY_Community 99|Community 99]]
+- [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 101|Community 101]]
+- [[_COMMUNITY_Community 102|Community 102]]
+- [[_COMMUNITY_Community 103|Community 103]]
+- [[_COMMUNITY_Community 104|Community 104]]
+- [[_COMMUNITY_Community 105|Community 105]]
+- [[_COMMUNITY_Community 106|Community 106]]
+- [[_COMMUNITY_Community 107|Community 107]]
+- [[_COMMUNITY_Community 108|Community 108]]
+- [[_COMMUNITY_Community 109|Community 109]]
+- [[_COMMUNITY_Community 110|Community 110]]
+- [[_COMMUNITY_Community 111|Community 111]]
+- [[_COMMUNITY_Community 112|Community 112]]
+- [[_COMMUNITY_Community 113|Community 113]]
+- [[_COMMUNITY_Community 114|Community 114]]
+- [[_COMMUNITY_Community 115|Community 115]]
+- [[_COMMUNITY_Community 116|Community 116]]
+- [[_COMMUNITY_Community 117|Community 117]]
+- [[_COMMUNITY_Community 118|Community 118]]
+- [[_COMMUNITY_Community 119|Community 119]]
+- [[_COMMUNITY_Community 120|Community 120]]
+- [[_COMMUNITY_Community 121|Community 121]]
+- [[_COMMUNITY_Community 122|Community 122]]
+- [[_COMMUNITY_Community 123|Community 123]]
+- [[_COMMUNITY_Community 124|Community 124]]
+- [[_COMMUNITY_Community 125|Community 125]]
+- [[_COMMUNITY_Community 126|Community 126]]
+- [[_COMMUNITY_Community 127|Community 127]]
+- [[_COMMUNITY_Community 128|Community 128]]
+- [[_COMMUNITY_Community 129|Community 129]]
+- [[_COMMUNITY_Community 130|Community 130]]
+- [[_COMMUNITY_Community 131|Community 131]]
+- [[_COMMUNITY_Community 132|Community 132]]
+- [[_COMMUNITY_Community 133|Community 133]]
+- [[_COMMUNITY_Community 134|Community 134]]
+- [[_COMMUNITY_Community 135|Community 135]]
+- [[_COMMUNITY_Community 136|Community 136]]
+- [[_COMMUNITY_Community 137|Community 137]]
+- [[_COMMUNITY_Community 138|Community 138]]
+- [[_COMMUNITY_Community 139|Community 139]]
+- [[_COMMUNITY_Community 140|Community 140]]
+- [[_COMMUNITY_Community 141|Community 141]]
+- [[_COMMUNITY_Community 142|Community 142]]
+- [[_COMMUNITY_Community 143|Community 143]]
+- [[_COMMUNITY_Community 144|Community 144]]
+- [[_COMMUNITY_Community 145|Community 145]]
+- [[_COMMUNITY_Community 146|Community 146]]
+- [[_COMMUNITY_Community 147|Community 147]]
+- [[_COMMUNITY_Community 148|Community 148]]
+- [[_COMMUNITY_Community 149|Community 149]]
+- [[_COMMUNITY_Community 150|Community 150]]
+- [[_COMMUNITY_Community 151|Community 151]]
+- [[_COMMUNITY_Community 152|Community 152]]
+- [[_COMMUNITY_Community 153|Community 153]]
+- [[_COMMUNITY_Community 154|Community 154]]
+- [[_COMMUNITY_Community 155|Community 155]]
+- [[_COMMUNITY_Community 156|Community 156]]
+- [[_COMMUNITY_Community 157|Community 157]]
+- [[_COMMUNITY_Community 158|Community 158]]
+- [[_COMMUNITY_Community 159|Community 159]]
+- [[_COMMUNITY_Community 160|Community 160]]
+- [[_COMMUNITY_Community 161|Community 161]]
+- [[_COMMUNITY_Community 162|Community 162]]
+- [[_COMMUNITY_Community 163|Community 163]]
+- [[_COMMUNITY_Community 164|Community 164]]
+- [[_COMMUNITY_Community 165|Community 165]]
+- [[_COMMUNITY_Community 166|Community 166]]
+- [[_COMMUNITY_Community 167|Community 167]]
+- [[_COMMUNITY_Community 168|Community 168]]
+- [[_COMMUNITY_Community 169|Community 169]]
+- [[_COMMUNITY_Community 170|Community 170]]
+- [[_COMMUNITY_Community 171|Community 171]]
+- [[_COMMUNITY_Community 172|Community 172]]
+- [[_COMMUNITY_Community 173|Community 173]]
+- [[_COMMUNITY_Community 174|Community 174]]
+- [[_COMMUNITY_Community 175|Community 175]]
+- [[_COMMUNITY_Community 176|Community 176]]
+- [[_COMMUNITY_Community 177|Community 177]]
+- [[_COMMUNITY_Community 179|Community 179]]
+- [[_COMMUNITY_Community 180|Community 180]]
+- [[_COMMUNITY_Community 181|Community 181]]
+- [[_COMMUNITY_Community 182|Community 182]]
+- [[_COMMUNITY_Community 183|Community 183]]
+- [[_COMMUNITY_Community 184|Community 184]]
+- [[_COMMUNITY_Community 185|Community 185]]
+- [[_COMMUNITY_Community 186|Community 186]]
+- [[_COMMUNITY_Community 187|Community 187]]
+- [[_COMMUNITY_Community 188|Community 188]]
+- [[_COMMUNITY_Community 189|Community 189]]
+- [[_COMMUNITY_Community 190|Community 190]]
+- [[_COMMUNITY_Community 191|Community 191]]
+- [[_COMMUNITY_Community 192|Community 192]]
+- [[_COMMUNITY_Community 193|Community 193]]
+- [[_COMMUNITY_Community 194|Community 194]]
+- [[_COMMUNITY_Community 195|Community 195]]
+- [[_COMMUNITY_Community 196|Community 196]]
+- [[_COMMUNITY_Community 197|Community 197]]
+- [[_COMMUNITY_Community 198|Community 198]]
+- [[_COMMUNITY_Community 199|Community 199]]
+- [[_COMMUNITY_Community 200|Community 200]]
+- [[_COMMUNITY_Community 201|Community 201]]
+- [[_COMMUNITY_Community 202|Community 202]]
+- [[_COMMUNITY_Community 203|Community 203]]
+- [[_COMMUNITY_Community 204|Community 204]]
+- [[_COMMUNITY_Community 205|Community 205]]
+- [[_COMMUNITY_Community 206|Community 206]]
+- [[_COMMUNITY_Community 207|Community 207]]
+- [[_COMMUNITY_Community 208|Community 208]]
+- [[_COMMUNITY_Community 209|Community 209]]
+- [[_COMMUNITY_Community 210|Community 210]]
+- [[_COMMUNITY_Community 211|Community 211]]
+- [[_COMMUNITY_Community 212|Community 212]]
+- [[_COMMUNITY_Community 213|Community 213]]
+- [[_COMMUNITY_Community 214|Community 214]]
+- [[_COMMUNITY_Community 215|Community 215]]
+- [[_COMMUNITY_Community 216|Community 216]]
+- [[_COMMUNITY_Community 217|Community 217]]
+- [[_COMMUNITY_Community 218|Community 218]]
+- [[_COMMUNITY_Community 219|Community 219]]
+- [[_COMMUNITY_Community 220|Community 220]]
+- [[_COMMUNITY_Community 221|Community 221]]
+- [[_COMMUNITY_Community 222|Community 222]]
+- [[_COMMUNITY_Community 223|Community 223]]
+- [[_COMMUNITY_Community 224|Community 224]]
+- [[_COMMUNITY_Community 225|Community 225]]
+- [[_COMMUNITY_Community 226|Community 226]]
+- [[_COMMUNITY_Community 227|Community 227]]
+- [[_COMMUNITY_Community 228|Community 228]]
+- [[_COMMUNITY_Community 229|Community 229]]
+- [[_COMMUNITY_Community 230|Community 230]]
+- [[_COMMUNITY_Community 231|Community 231]]
+- [[_COMMUNITY_Community 232|Community 232]]
+- [[_COMMUNITY_Community 233|Community 233]]
+- [[_COMMUNITY_Community 235|Community 235]]
+- [[_COMMUNITY_Community 236|Community 236]]
+- [[_COMMUNITY_Community 237|Community 237]]
+- [[_COMMUNITY_Community 238|Community 238]]
+- [[_COMMUNITY_Community 239|Community 239]]
+- [[_COMMUNITY_Community 242|Community 242]]
+- [[_COMMUNITY_Community 243|Community 243]]
+- [[_COMMUNITY_Community 244|Community 244]]
+- [[_COMMUNITY_Community 245|Community 245]]
+- [[_COMMUNITY_Community 246|Community 246]]
+- [[_COMMUNITY_Community 247|Community 247]]
+- [[_COMMUNITY_Community 252|Community 252]]
+- [[_COMMUNITY_Community 253|Community 253]]
+- [[_COMMUNITY_Community 258|Community 258]]
+- [[_COMMUNITY_Community 259|Community 259]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Global Socket.IO Instance` - 18 edges
-2. `socket.js - Socket.IO event listeners and meter rendering` - 16 edges
-3. `getChannelStateById Universal State Resolver` - 15 edges
-4. `01V96 categorized property definitions` - 15 edges
-5. `async_main - application entry point: wires GlobalState, MidiScheduler, SocketIO, ConnectionManager, axum HTTP` - 15 edges
-6. `channel_strip.js - Fader channel strip UI rendering` - 15 edges
-7. `ConnectionManager - manages MIDI connection lifecycle, watchdog, meter polling, demo mode` - 13 edges
-8. `channelStates array - per-channel client state` - 13 edges
-9. `initUI Full UI Renderer` - 12 edges
-10. `NPM package definition (01v96-remote-web)` - 11 edges
+1. `getChannelStateById()` - 43 edges
+2. `ConnectionManager` - 36 edges
+3. `inputs` - 34 edges
+4. `master` - 34 edges
+5. `Plano de Migracao do Backend para Rust (01V96 Remote) — v4.0` - 24 edges
+6. `Json` - 20 edges
+7. `socket` - 19 edges
+8. `Value` - 16 edges
+9. `socket.js - Socket.IO event listeners and meter rendering` - 16 edges
+10. `GlobalState` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `MIDI ports mapeados: 8× Yamaha 01V96-1..8 IN/OUT, SMC-PAD-bt-2, monitor (IN:9/OUT:10)` --semantically_similar_to--> `MIDI ports: inIdx=0 Yamaha 01V96-1, outIdx=1`  [INFERRED] [semantically similar]
@@ -98,11 +285,26 @@
   reverse_dll_project/sync_properties.json → README.md
 - `Sends on Faders mixing mode` --conceptually_related_to--> `AUX property category`  [INFERRED]
   README.md → reverse_dll_project/categorized_properties.json
-- `MIDI bridge with SysEx fragment reassembly for Yamaha 01V96` --semantically_similar_to--> `MIDI port discovery utility`  [INFERRED] [semantically similar]
-  monitor.js → list-midi.js
+- `MIDI SysEx Protocol` --conceptually_related_to--> `01V96 reverse-engineered property map`  [INFERRED]
+  README.md → reverse_dll_project/01v96_property_map.json
 
 ## Import Cycles
-- None detected.
+- 1-file cycle: `remote_midi_server/src/tray.rs -> remote_midi_server/src/tray.rs`
+- 1-file cycle: `server_rust/src/tray.rs -> server_rust/src/tray.rs`
+- 1-file cycle: `server_rust/src/api/macros.rs -> server_rust/src/api/macros.rs`
+- 1-file cycle: `server_rust/src/boot.rs -> server_rust/src/boot.rs`
+- 1-file cycle: `server_rust/src/dmx.rs -> server_rust/src/dmx.rs`
+- 1-file cycle: `server_rust/src/env_config.rs -> server_rust/src/env_config.rs`
+- 1-file cycle: `server_rust/src/midi/engine.rs -> server_rust/src/midi/engine.rs`
+- 1-file cycle: `server_rust/src/midi/master_meter.rs -> server_rust/src/midi/master_meter.rs`
+- 1-file cycle: `server_rust/src/midi/meter_dummy.rs -> server_rust/src/midi/meter_dummy.rs`
+- 1-file cycle: `server_rust/src/network/connection.rs -> server_rust/src/network/connection.rs`
+- 1-file cycle: `server_rust/src/midi/remote_client.rs -> server_rust/src/midi/remote_client.rs`
+- 1-file cycle: `server_rust/src/midi/scheduler.rs -> server_rust/src/midi/scheduler.rs`
+- 1-file cycle: `server_rust/src/midi_receiver.rs -> server_rust/src/midi_receiver.rs`
+- 1-file cycle: `server_rust/src/network/sync_manager.rs -> server_rust/src/network/sync_manager.rs`
+- 1-file cycle: `server_rust/src/socket_handlers.rs -> server_rust/src/socket_handlers.rs`
+- 1-file cycle: `server_rust/src/state.rs -> server_rust/src/state.rs`
 
 ## Hyperedges (group relationships)
 - **Yamaha 01V96 MIDI integration via loopMIDI with SysEx reassembly** — _monitor_midi_bridge, concept_yamaha_01v96, concept_studio_manager, concept_loopmidi, concept_sysex_reassembly [INFERRED]
@@ -117,19 +319,19 @@
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 - **14-bit Master Meter via native 0x21 with steps.json calibration (dB = (raw - 4493) / 63.66)** —  [INFERRED 0.90]
 
-## Communities (66 total, 37 thin omitted)
+## Communities (271 total, 60 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
-Cohesion: 0.05
-Nodes (67): renderAuxs Aux Sends UI Renderer, updateAuxFromSocket Aux Sync Handler, clearAllSolos Master Solo Clear, createDesktopStrip / createMobileStrip Universal Fader Components, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updatePanIndicator Desktop Pan Visual, updateUI Fader/On/Solo UI Sync (+59 more)
+Cohesion: 0.13
+Nodes (25): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, renderCompressor Compressor UI Renderer, renderDynamics Dynamics Container (Gate+Comp), startDynNudge/stopDynNudge Dynamics Nudge Controls, faderInput/commitFaderChange/handleWheelFader (+17 more)
 
 ### Community 1 - "Web Frontend Utility Functions"
 Cohesion: 0.10
-Nodes (41): calibrateStep() - meter step to fill percent, dbToRaw() - dB to fader value conversion, enableDragScroll() - drag-to-scroll utility, enterMusicianMode() - activates musician view, faderInput() - commits fader change, initUI() - rebuilds all channel strips, mapDynDbToPercent() - dynamics dB to UI percent, rawToDb() - fader value to dB conversion (+33 more)
+Nodes (40): calibrateStep() - meter step to fill percent, dbToRaw() - dB to fader value conversion, enableDragScroll() - drag-to-scroll utility, enterMusicianMode() - activates musician view, faderInput() - commits fader change, initUI() - rebuilds all channel strips, mapDynDbToPercent() - dynamics dB to UI percent, rawToDb() - fader value to dB conversion (+32 more)
 
 ### Community 2 - "Migration Audit (Rust/Node.js Dead Code)"
-Cohesion: 0.06
-Nodes (34): Critical gaps: SyncCounter inativo / MasterMeter sem calibração / Lumikit IP stub / config socket não persiste, 11 warnings de código morto (AppConfig::save, SyncCounter::begin_sync, MasterMeter::parse, etc.), MIGRATION_AUDIT.md (root), Migração Rust ~95% completa em 28/Mai/2026, 16 funções Rust definidas mas nunca chamadas: macros_*_handler, MidiAssembler::reset, MidiScheduler::stop/clear/set_q1_empty_callback, Converter::Signed14/DynOn, bytes_to_dyn_on, ParsedMidi::SceneNumber/UpdateSceneChar, SceneManager::build_bulk_request, dmx::*, docs/MIGRATION_AUDIT.md (Node.js→Rust audit), Problemas adicionais: stereo_link.rs não existe, porta Rust 3001 vs Node 4000, saveScene usa 0x00 em vez de 0x40, requestDynamics não retorna state local, dead handlers no main.rs, rt.block_on unused Result, Module mapping Node.js → Rust: state-manager/protocol/midi-engine/scheduler/assembler/scene_manager/meter_dummy/master-meter/pair/sync-manager/connection/config/dictionary/systray/logger/platform/dmx (+26 more)
+Cohesion: 0.05
+Nodes (46): Critical gaps: SyncCounter inativo / MasterMeter sem calibração / Lumikit IP stub / config socket não persiste, 11 warnings de código morto (AppConfig::save, SyncCounter::begin_sync, MasterMeter::parse, etc.), MIGRATION_AUDIT.md (root), Migração Rust ~95% completa em 28/Mai/2026, ARCHITECTURE_REFACTOR_PLAN.md (01v96-Bridge refactor), server.js God Object (+1100 linhas) — extrair para src/midi-assembler, midi-scheduler, sync-manager, api/macros, Macros API router: /api/macros/hosts, /macros, /macros/slots (GET/POST/DELETE), /macros/swap, /macros/config/:modId, /macros/proxy/{http,udp} + Ninja GitSync debounce 10s, MidiAssembler: descarta 0xFE/0xFD/0xF8 Active Sensing/Clock, monta SysEx F0...F7 (+38 more)
 
 ### Community 3 - "Server Rust Core (boot, config, DMX, MIDI, state)"
 Cohesion: 0.15
@@ -137,39 +339,39 @@ Nodes (32): ArtNetToDMX.exe - FTDI USB bridge converting ArtNet to DMX512 for li
 
 ### Community 4 - "CLI Tools & MIDI Bridge Utils"
 Cohesion: 0.11
-Nodes (22): Screenshot capture script via PowerShell CopyFromScreen, Application configuration (MIDI, meters, networking, timing), MIDI message filter configuration (prefix-based), MIDI port discovery utility, MIDI bridge with SysEx fragment reassembly for Yamaha 01V96, NPM package definition (01v96-remote-web), Lumikit lighting device integration, MIDI bridge pattern (Yamaha <-> Studio Manager) (+14 more)
+Nodes (19): Application configuration (MIDI, meters, networking, timing), MIDI message filter configuration (prefix-based), MIDI bridge with SysEx fragment reassembly for Yamaha 01V96, NPM package definition (01v96-remote-web), Lumikit lighting device integration, MIDI bridge pattern (Yamaha <-> Studio Manager), Remote MIDI over TCP networking, MIDI SysEx fragment reassembly for RtMidi on Windows (+11 more)
 
 ### Community 5 - "MIDI Engine & Protocol (server_rust)"
 Cohesion: 0.18
 Nodes (17): Socket.IO v4.7.4 client, MidiAssembler, MIDI parameter dictionary, MidiEngine, MidiOutput, MasterMeter, Meter dummy simulation, MIDI module declarations (+9 more)
 
 ### Community 6 - "Graphify Knowledge Graph Tool"
-Cohesion: 0.14
-Nodes (16): graphify explain - focused concept explanation command, graphify-out/graph.json - persisted knowledge graph, graphify knowledge graph ecosystem (graph.json, query, path, explain, update, skill), graphify path - relationship tracing command, graphify query - scoped subgraph search command, GRAPH_REPORT.md - broad architecture report, graphify skill - specialized skill for knowledge graph operations, graphify update - AST-only incremental graph update (+8 more)
+Cohesion: 0.15
+Nodes (14): graphify explain - focused concept explanation command, graphify-out/graph.json - persisted knowledge graph, graphify knowledge graph ecosystem (graph.json, query, path, explain, update, skill), graphify path - relationship tracing command, graphify query - scoped subgraph search command, GRAPH_REPORT.md - broad architecture report, graphify skill - specialized skill for knowledge graph operations, graphify update - AST-only incremental graph update (+6 more)
 
 ### Community 7 - "Reverse DLL Categorized Properties"
 Cohesion: 0.15
 Nodes (13): 01V96 categorized property definitions, DAW routing properties (Phase, Insert, Routing, Pan), METER properties (VU, GR, CR, Surr, Osc), Studio Manager window control properties, AUX property category, BUS property category, COMP compressor property category, EFFECT property category (+5 more)
 
 ### Community 8 - "Architecture Refactor Plan"
-Cohesion: 0.20
-Nodes (12): ARCHITECTURE_REFACTOR_PLAN.md (01v96-Bridge refactor), server.js God Object (+1100 linhas) — extrair para src/midi-assembler, midi-scheduler, sync-manager, api/macros, Macros API router: /api/macros/hosts, /macros, /macros/slots (GET/POST/DELETE), /macros/swap, /macros/config/:modId, /macros/proxy/{http,udp} + Ninja GitSync debounce 10s, MidiAssembler: descarta 0xFE/0xFD/0xF8 Active Sensing/Clock, monta SysEx F0...F7, MidiScheduler: 3 filas q0/q1/q2, tickMs=5ms, coalescência em q0, drop silencioso em q2, SyncManager: enfileira fire() com stopMeters, kStereoFader, 32 inputs (fader/on/solo/phase/att + EQ + AUX + Gate + Comp + Patch), 8 AUX/Bus, Stereo master, Nomes, Ninja Sync Wizard: auto-check Git, Fork/Auth/Config/Vínculo flow, git remote set-url https://<TOKEN>@github.com/<USER>/repo, git push origin main --dry-run, github_sync_implementation_plan.md (Ninja Sync) (+4 more)
+Cohesion: 0.00
+Nodes (500): kAUXAttenuator/kAtt, kAUXAttenuator/kAttBitShift, kAUXBalance/kBalance, kAUXChannelOn/kChannelOn, kAUXComp/kCompAttack, kAUXComp/kCompGain, kAUXComp/kCompKnee, kAUXComp/kCompLink (+492 more)
 
 ### Community 9 - "Macros Engine & Host Profiles"
-Cohesion: 0.30
-Nodes (12): assignedMacros Slot Assignments Map, Channel Toggler Macro Mod (ON/OFF Multi-Channel), MixerAPI (mixer/network/utils) Modder Contract, Macro Engine (Multi-Preset, Slots, Plugin Registry), Host-to-Preset Mapping Configuration, Lumikit Macro Mod (Lighting Scene+Extra Control), macroDatabase Plugin Registry, registerMacro Plugin Registration Function (+4 more)
+Cohesion: 0.35
+Nodes (11): Channel Toggler Macro Mod (ON/OFF Multi-Channel), MixerAPI (mixer/network/utils) Modder Contract, Macro Engine (Multi-Preset, Slots, Plugin Registry), Host-to-Preset Mapping Configuration, Lumikit Macro Mod (Lighting Scene+Extra Control), macroDatabase, registerMacro Plugin Registration Function, Macro Profile: pcfavela (Channel Toggler + Lumikit) (+3 more)
 
 ### Community 10 - "Node.js Legacy MIDI Functions"
-Cohesion: 0.24
-Nodes (11): buildChange() - constructs MIDI change SysEx, connectPorts() - MIDI port binding, parseIncoming() - decodes incoming SysEx, triggerSync() - full state sync from mixer, updateState() - server state mutation, dictionary.js - COMMAND_BYTES mapping, meter_dummy.js - Simulated meter SysEx generator, midi-engine.js - MIDI I/O wrapper (midi npm lib) (+3 more)
+Cohesion: 0.14
+Nodes (8): buildChange() - constructs MIDI change SysEx, connectPorts() - MIDI port binding, parseIncoming() - decodes incoming SysEx, COMMAND_BYTES, { COMMAND_BYTES }, CONVERTERS, FOOTER, HEADER
 
 ### Community 11 - "Rust Migration Governance Rules"
-Cohesion: 0.22
-Nodes (10): Detailed logs for AI continuity rule, Fase 16 - Cleanup (warnings, clippy), Rust must serve ../public/ frontend rule, No auto-commit rule for migration, Preserve all Node.js features rule, Compile and test after changes rule, Update migration plan doc after each step rule, Rust migration plan v4.0 (~90% complete) (+2 more)
+Cohesion: 0.20
+Nodes (10): Detailed logs for AI continuity rule, Fase 16 - Cleanup (warnings, clippy), Rust must serve ../public/ frontend rule, No auto-commit rule for migration, Preserve all Node.js features rule, Compile and test after changes rule, Update migration plan doc after each step rule, Node.js legacy backend server (+2 more)
 
 ### Community 12 - "Project README Highlights"
-Cohesion: 0.20
-Nodes (10): Git integration for Ninja Sync auto-save, 01V96 Remote Web Interface, Lumikit lighting control integration, Ninja Sync macro system, Remote MIDI over Network Bridge, TCP port 4200 for MIDI bridge, Sends on Faders mixing mode, Windows Tray Application (+2 more)
+Cohesion: 0.22
+Nodes (9): Git integration for Ninja Sync auto-save, 01V96 Remote Web Interface, Lumikit lighting control integration, Ninja Sync macro system, Remote MIDI over Network Bridge, TCP port 4200 for MIDI bridge, Sends on Faders mixing mode, Windows Tray Application (+1 more)
 
 ### Community 13 - "Channel Pair SysEx & 01V96 Mixer"
 Cohesion: 0.22
@@ -183,29 +385,21 @@ Nodes (9): MidiAssembler, Heartbeat protocol (3s/10s + magic 0xFFFE00), write_fr
 Cohesion: 0.25
 Nodes (8): Automix sync and SMPTE/MTC properties, Bulk transfer protocol properties, Library edit properties (EQ, Gate, Comp, Eff, GEQ, Ch), SCENE property category, Recall Safe memory protection properties, Scene memory / undo system properties, kSceneSelection property, 01V96 sync/bulk transfer properties
 
-### Community 16 - "UI/UX Pro Max Design System Skills"
-Cohesion: 0.53
-Nodes (6): BM25 ranking algorithm for text search, UI design system with style/color/typography recommendations, BM25 search engine for UI/UX style guides, Design system generator with reasoning rules, UI/UX Pro Max search CLI, UI/UX Pro Max design system skill definition
-
-### Community 17 - "GitHub Address Comments Skill"
-Cohesion: 0.47
-Nodes (6): GitHub CLI (gh) command-line tool, GitHub GraphQL API, Apache License 2.0 for gh-address-comments skill, GitHub PR comment handler skill definition, GH address comments skill metadata, GitHub GraphQL PR comment fetcher script
-
 ### Community 18 - "Monitor Log & Legacy Config Snapshots"
 Cohesion: 0.33
 Nodes (6): log/monitor_log(sincronização inicial).txt, MIDI ports mapeados: 8× Yamaha 01V96-1..8 IN/OUT, SMC-PAD-bt-2, monitor (IN:9/OUT:10), Tráfego: Y→S 394 / S→Y 11 / Meters 397 / Loopback filtrado 391, dump de cena 282 bytes, dump de cena 625 bytes, MIDI ports: inIdx=0 Yamaha 01V96-1, outIdx=1, config.json (legacy working version), loopmidi-monitor=true, demo_mode=false
 
 ### Community 19 - "Reverse DLL Property Maps"
-Cohesion: 0.33
-Nodes (6): 01V96 categorized properties (SCENE/CHANNEL/GATE/COMP/EQ/AUX), 01V96 detailed property map (with m1/m2/m3 calibration), 01V96 property map (offset->kConstant mapping), 01V96 sync properties (BULK/recall/memory snapshot), 01V96 Bridge Server (Express+Socket.IO orchestrator), Legacy server (monolithic Node.js server_old.js)
+Cohesion: 0.12
+Nodes (14): AUX, BUS, CHANNEL, COMP, EFFECT, EQ, GATE, PATCH (+6 more)
 
 ### Community 20 - "DMX Art-Net Auto-Recovery"
 Cohesion: 0.50
-Nodes (5): DMX Art-Net auto-recovery integration plan, FTDI USB DMX hardware interface, dmx_heartbeat.txt health check mechanism, PowerShell USB device reset for DMX recovery, ArtNetDMX open source DMX project
+Nodes (4): FTDI USB DMX hardware interface, dmx_heartbeat.txt health check mechanism, PowerShell USB device reset for DMX recovery, ArtNetDMX open source DMX project
 
 ### Community 21 - "Backend & Testing Pattern Skills"
-Cohesion: 0.50
-Nodes (4): Node.js Backend Patterns Implementation Playbook, JavaScript Testing Patterns, Node.js Backend Patterns, JS Testing Patterns Implementation Playbook
+Cohesion: 0.12
+Nodes (14): Node.js Backend Patterns Implementation Playbook, Do not use this skill when, Instructions, JavaScript Testing Patterns, Limitations, Resources, Use this skill when, Do not use this skill when (+6 more)
 
 ### Community 22 - "Features Plan (Custom Scenes, Server Name)"
 Cohesion: 0.67
@@ -220,20 +414,664 @@ Cohesion: 0.50
 Nodes (4): Dependencies: express, midi, socket.io, uiohook-napi, systray2, screenshot-desktop, node-global-key-listener, package.json (legacy Node.js root), Repo: github.com/Theadrill/01v96-remote-web (ISC, commonjs), npm start → node server.js; main=sniffer.js
 
 ### Community 25 - "ArtNet-to-DMX Bridge (.NET 6)"
-Cohesion: 0.67
-Nodes (3): ArtNetToDMX .NET 6.0 runtime configuration, ArtNet to DMX conversion via FTDI, .NET 6.0 runtime
-
-### Community 26 - "Karpathy Coding Guidelines Skill"
-Cohesion: 0.67
-Nodes (3): Coding guidelines skill definition, Coding guidelines skill metadata, Karpathy coding guidelines
-
-### Community 27 - "Docs Writer Skill & Style Guide"
-Cohesion: 0.67
-Nodes (3): Documentation writer skill definition, Documentation writer skill metadata, Documentation style guide reference
+Cohesion: 0.25
+Nodes (7): System.Reflection.Metadata.MetadataUpdater.IsSupported, runtimeOptions, configProperties, frameworks, tfm, ArtNet to DMX conversion via FTDI, .NET 6.0 runtime
 
 ### Community 28 - "Performance Optimization Plan"
 Cohesion: 0.67
 Nodes (3): plano_de_otimizacao.md (Chrome Performance Trace), Otimizações A-K (FEITO): meter cache, EQ throttle 20fps, meter throttle 30fps, Date.now fora do loop, remover backdrop-filter, box-shadow→border, transition:none, text-shadow simples, contain: layout, will-change:transform, Chrome Performance Trace 2026-05-05: 6.761 nós DOM, INP 141,3ms, Layerize 8.496ms, Recálculo 1.729ms
+
+### Community 33 - "Design System Generator"
+Cohesion: 0.01
+Nodes (151): 0, 1, 10, 100, 101, 102, 103, 104 (+143 more)
+
+### Community 34 - "UI/UX Pro Max BM25 Search"
+Cohesion: 0.07
+Nodes (39): Result, Vec, RemoteClient, MidiInput, R, Box, Error, MidiInputConnection (+31 more)
+
+### Community 39 - "OpenCode TUI Config"
+Cohesion: 0.04
+Nodes (44): format_output(), Format results for Claude consumption (token-optimized), 1. Accessibility (CRITICAL), 2. Touch & Interaction (CRITICAL), 3. Performance (HIGH), 4. Layout & Responsive (HIGH), 5. Typography & Color (MEDIUM), 6. Animation (MEDIUM) (+36 more)
+
+### Community 44 - "JavaScript Mastery Skill"
+Cohesion: 0.07
+Nodes (31): str, BM25, detect_domain(), _load_csv(), BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query (+23 more)
+
+### Community 45 - "JavaScript Pro Skill"
+Cohesion: 0.05
+Nodes (36): app, atualizarMenuTray(), configConstants, configFile, dummy, { exec, spawn }, executarConexao(), express (+28 more)
+
+### Community 52 - "Node.js Best Practices Skill"
+Cohesion: 0.10
+Nodes (33): F, HashMap, Option, Path, PathBuf, Result, String, delete_env() (+25 more)
+
+### Community 56 - "Graphify Rules"
+Cohesion: 0.05
+Nodes (42): Configuração no config.json, FASE 1 — Configuração [CONCLUÍDO], FASE 2 — Crate compartilhado `midi_common/` [CONCLUÍDO], FASE 3 — Mini Server (`remote_midi_server/`) [CONCLUÍDO], FASE 4 — Client TCP no `server_rust` [CONCLUÍDO], FASE 5 — Integrar no boot do `main.rs` [CONCLUÍDO], FASE 6 — Script de inicialização [CONCLUÍDO], Fases de Implementação (+34 more)
+
+### Community 57 - "BM25 Script"
+Cohesion: 0.05
+Nodes (39): 10. Notas Finais, 1.1 — `public/modules/globals.js`, 1.2 — `public/index.html`, 1.3 — `public/style.css`, 1. Contexto, 2.1 Padrão da Mensagem de 14 bytes — Estado do Link (PAIR), 2.2 Padrão da Mensagem de 12 bytes — Auxiliar de Direção, 2.3 Regra de Pares Válidos (+31 more)
+
+### Community 61 - "UI Visual Validator"
+Cohesion: 0.05
+Nodes (39): 10. Anti-Patterns to Avoid, 11. Decision Checklist, 1. Framework Selection (2025), 2. Runtime Considerations (2025), 3. Architecture Principles, 4. Error Handling Principles, 5. Async Patterns Principles, 6. Validation Principles (+31 more)
+
+### Community 62 - "Graphify Workflows"
+Cohesion: 0.11
+Nodes (18): ChannelLike, SceneManager, HashMap, Option, ParsedMidi, Self, String, Vec (+10 more)
+
+### Community 66 - "Community 66"
+Cohesion: 0.13
+Nodes (18): MidiEngine, ConnectionManager, RemoteClient, AppConfig, Arc, AtomicBool, GlobalState, JoinHandle (+10 more)
+
+### Community 67 - "Community 67"
+Cohesion: 0.05
+Nodes (38): 1.1 As Duas DLLs e seus Papéis, 1.2 Diagrama de Comunicação, 1.3 Interface COM (não chamadas diretas), 1.4 Registro Windows, 1.5 Classes Internas Principais, 1. ARQUITETURA DO SISTEMA, 2.1 Anatomia de um ID de Propriedade, 2.2 Estatísticas do Mapeamento (+30 more)
+
+### Community 68 - "Community 68"
+Cohesion: 0.16
+Nodes (37): delete_preset(), delete_slots(), enqueue_git_sync(), get_hosts(), get_mod_config(), get_names(), get_slots(), GitSyncState (+29 more)
+
+### Community 69 - "Community 69"
+Cohesion: 0.06
+Nodes (36): 0, config, name, scriptId, 1, config, name, scriptId (+28 more)
+
+### Community 70 - "Community 70"
+Cohesion: 0.06
+Nodes (35): 1.1 Primitive Types, 1.2 Type Coercion, 1.3 Equality Operators, 1. Fundamentals, 2.1 Scope Types, 2.2 Closures, 2.3 var vs let vs const, 2. Scope & Closures (+27 more)
+
+### Community 71 - "Community 71"
+Cohesion: 0.09
+Nodes (28): MenuEvent, Box, Error, Icon, MenuId, Mutex, Option, Path (+20 more)
+
+### Community 72 - "Community 72"
+Cohesion: 0.06
+Nodes (34): inputs, 0, 1, 10, 11, 12, 13, 14 (+26 more)
+
+### Community 73 - "Community 73"
+Cohesion: 0.06
+Nodes (33): 0, 1, 10, 11, 12, 13, 14, 15 (+25 more)
+
+### Community 74 - "Community 74"
+Cohesion: 0.06
+Nodes (34): master, 0, 1, 10, 11, 12, 13, 14 (+26 more)
+
+### Community 75 - "Community 75"
+Cohesion: 0.06
+Nodes (32): 0, 1, 10, 11, 12, 13, 14, 15 (+24 more)
+
+### Community 76 - "Community 76"
+Cohesion: 0.13
+Nodes (26): a(), at(), c(), Ct(), d(), e(), Et(), f() (+18 more)
+
+### Community 77 - "Community 77"
+Cohesion: 0.11
+Nodes (23): flatEQ Reset All Bands to Flat, nudgeATT(), nudgeFreq(), nudgeGain(), toggleEQ(), getChannelParamPrefix(), eqBands, freqToRaw() (+15 more)
+
+### Community 78 - "Community 78"
+Cohesion: 0.10
+Nodes (22): startEQAnimation(), MidiScheduler, run(), sleep(), eqBands, freqToRaw(), gainToRaw(), initEQEngine() (+14 more)
+
+### Community 79 - "Community 79"
+Cohesion: 0.07
+Nodes (29): Best Practices, Resources, When to Use This Skill, Common Patterns, Coverage Reports, Frontend Testing with Testing Library, Integration Testing, JavaScript Testing Patterns (+21 more)
+
+### Community 80 - "Community 80"
+Cohesion: 0.07
+Nodes (29): agents, contentHash, global, installedAt, method, name, source, updatedAt (+21 more)
+
+### Community 81 - "Community 81"
+Cohesion: 0.07
+Nodes (29): author, bugs, url, dependencies, express, midi, node-global-key-listener, screenshot-desktop (+21 more)
+
+### Community 82 - "Community 82"
+Cohesion: 0.07
+Nodes (28): app, ctx, dummy, { exec, spawn }, express, http, { initConfig }, { initConnection } (+20 more)
+
+### Community 83 - "Community 83"
+Cohesion: 0.07
+Nodes (28): Best Practices, Resources, When to Use This Skill, API Response Format, Architectural Patterns, Authentication & Authorization, Authentication Middleware, Caching Strategies (+20 more)
+
+### Community 84 - "Community 84"
+Cohesion: 0.07
+Nodes (27): 🎯 A Solução Escolhida, Arquivo a Criar: `src/api/macros.js`, Arquivo a Criar: `src/midi-assembler.js`, Arquivo a Criar: `src/midi-scheduler.js`, Arquivo a Criar: `src/sync-manager.js`, As 3 Filas e suas Regras, 📋 Checklist de Implementação, Como instanciar no `server.js` (+19 more)
+
+### Community 85 - "Community 85"
+Cohesion: 0.07
+Nodes (27): 10. Problemas Adicionais, 11. Prioridades de Ação, 1. Socket.IO Event Handlers, 2. Lógica de Orquestração (connection.js + midi-handler.js), 3. State Fields (state.rs) — Definidos mas NUNCA Atualizados, 4. API HTTP (Macros), 4. Config e Persistência, 6. Código Morto no Rust (Definido mas NUNCA chamado) (+19 more)
+
+### Community 86 - "Community 86"
+Cohesion: 0.07
+Nodes (26): boot_delay_ms, demo_mode, disable_systray, dmx_boot_delay_ms, inIdx, loopmidi-monitor, lumikit_ips, meter_fps_desktop (+18 more)
+
+### Community 87 - "Community 87"
+Cohesion: 0.07
+Nodes (26): 1. Interaction to Next Paint (INP) - Crítico, 2. Layerize e Custos de Renderização (8,5 segundos), A. Cache de elementos dos meters (socket.js + channel_strip.js) ✅ FEITO, 📊 Análise Técnica de Performance (Trace Chrome), B. Throttle do canvas EQ para ~20fps (eq.js), C. Throttle dos meters para ~30fps/15fps (socket.js) ✅ FEITO, D. `Date.now()` fora do loop de canais (socket.js) ✅ FEITO, E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css) ✅ FEITO (+18 more)
+
+### Community 88 - "Community 88"
+Cohesion: 0.14
+Nodes (21): assignedMacros, availableScripts, completeMacroMove(), detectCurrentPreset(), executeMacro(), fetchProtectedPresets(), handleTouchEnd(), initMacros() (+13 more)
+
+### Community 89 - "Community 89"
+Cohesion: 0.08
+Nodes (24): author, bugs, url, dependencies, express, midi, node-global-key-listener, screenshot-desktop (+16 more)
+
+### Community 90 - "Community 90"
+Cohesion: 0.14
+Nodes (22): auxWheelInput(), updateAuxFromSocket Aux Sync Handler, updatePanIndicator Desktop Pan Visual, updateCompFromSocket Compressor Sync Handler, updateEQParam Socket-to-UI EQ Sync, handleWheelPan/resetPan/startPanLongPress Pan Controls, updateGateFromSocket Gate Sync Handler, getChannelStateById() (+14 more)
+
+### Community 91 - "Community 91"
+Cohesion: 0.10
+Nodes (12): autoScaleElement(), refreshServerNameDisplay(), triggerExitActiveMode(), updateDockScrollIndicators(), updateSidebarInfo(), changeTechnicianMix(), exitTechnicianMixMode(), savedOrientation (+4 more)
+
+### Community 92 - "Community 92"
+Cohesion: 0.09
+Nodes (20): C, customFilters, filterFile, forwardToMonitor, forwardToYamaha, fs, isHeartbeat(), isMeterData() (+12 more)
+
+### Community 93 - "Community 93"
+Cohesion: 0.10
+Nodes (18): C, customFilters, filterFile, forwardToMonitor, forwardToYamaha, fs, isHeartbeat(), isMeterData() (+10 more)
+
+### Community 94 - "Community 94"
+Cohesion: 0.09
+Nodes (22): Accessibility Visual Verification, Advanced Validation Techniques, Analysis Process, Automated Visual Testing Integration, Behavioral Traits, Capabilities, Core Principles, Cross-Platform Visual Consistency (+14 more)
+
+### Community 95 - "Community 95"
+Cohesion: 0.09
+Nodes (17): app, configFile, dummy, dynamicsQueue, express, fs, http, io (+9 more)
+
+### Community 96 - "Community 96"
+Cohesion: 0.09
+Nodes (21): Cena default: `custom_names_scene-default-{nome_da_mesa}.json`, Cena individual: `custom_names_scene-{nome}-{nome_da_mesa}.json`, Estrutura de dados, Feature 1: Cenas de Nomes Customizados, Feature 2: Atribuição de Nome ao Servidor/Mesa, Passo 1: Backend — Detecção e validação do `.env`, Passo 1: Módulo Rust de custom scenes, Passo 2: Backend — Bloqueio de acesso ao modo Técnico (+13 more)
+
+### Community 97 - "Community 97"
+Cohesion: 0.13
+Nodes (19): updatePanIndicator(), handlePanPointerMove(), handleWheelPan(), isMobileEvents, jumpPanToPosition(), resetPan(), startPanLongPress(), stopPanLongPress() (+11 more)
+
+### Community 98 - "Community 98"
+Cohesion: 0.12
+Nodes (20): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, EQ ATT Attenuator Control, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), renderEQ Full EQ UI Renderer, setBandMode (HPF/LPF/Shelf/Peaking Toggle) (+12 more)
+
+### Community 99 - "Community 99"
+Cohesion: 0.23
+Nodes (11): push_req(), queue_all_params_inner(), SyncManager, Arc, AtomicBool, GlobalState, MidiScheduler, RwLock (+3 more)
+
+### Community 100 - "Community 100"
+Cohesion: 0.20
+Nodes (11): MidiScheduler, SchedulerState, test_scheduler_priority(), Arc, MidiOutput, Mutex, Option, Self (+3 more)
+
+### Community 101 - "Community 101"
+Cohesion: 0.11
+Nodes (18): 4.1 O que ja esta feito, 4.2.10 AUX Sends Parsing, 4.2.11 Pair Status Parsing, 4.2.12 Scene Number (Section 127), 4.2.13 Scene Name Chars (Section 127), 4.2.1 Pan Parsing, 4.2.2 EQ Parsing, 4.2.3 Gate Parsing (+10 more)
+
+### Community 102 - "Community 102"
+Cohesion: 0.16
+Nodes (12): Instant, MidiEngine, MidiOutput, test_engine_initialization(), MidiInputConnection, MidiOutputConnection, Option, Result (+4 more)
+
+### Community 103 - "Community 103"
+Cohesion: 0.16
+Nodes (12): GlobalState, HashMap, PathBuf, Self, String, Value, Vec, AppConfig (+4 more)
+
+### Community 104 - "Community 104"
+Cohesion: 0.27
+Nodes (16): build_change(), build_name_change(), build_name_request(), build_request(), bytes_to_fader(), bytes_to_on(), bytes_to_signed(), cc() (+8 more)
+
+### Community 105 - "Community 105"
+Cohesion: 0.12
+Nodes (16): 🚀 Como Iniciar, 🤝 Contribuição, 💡 Créditos e Referências, 📱 Design Híbrido & Responsivo, 📄 Licença, 📊 Monitoramento em Tempo Real, 🟢 Node.js (Obsoleto), 🔥 Principais Características (+8 more)
+
+### Community 106 - "Community 106"
+Cohesion: 0.19
+Nodes (15): AppConfig, Arc, ConnectionManager, GlobalState, MidiScheduler, RwLock, SocketIo, String (+7 more)
+
+### Community 107 - "Community 107"
+Cohesion: 0.13
+Nodes (3): savedOrientation, setLayoutMode(), updateLayoutButtons()
+
+### Community 108 - "Community 108"
+Cohesion: 0.21
+Nodes (12): clearMacroSelection(), getMacroFaderHtml(), macroDeltaToDB(), nudgeMacro(), openMacroConfig(), renderMacroGrid(), resetMacroDbDisplay(), startMacroNudge() (+4 more)
+
+### Community 109 - "Community 109"
+Cohesion: 0.35
+Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
+
+### Community 110 - "Community 110"
+Cohesion: 0.35
+Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
+
+### Community 111 - "Community 111"
+Cohesion: 0.14
+Nodes (13): 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles Comuns (Presentes em todos os efeitos), 1. Documentação Técnica, 2.1. Conversão de Frequências (Padrão Yamaha), 2. Estrutura e Arquitetura Proposta, 3.1. Reverb Standard (IDs 0, 1, 2, 3), 3. Mapeamento de Algoritmos, 4. Tabela de Referência: HOLD (0x1C) (+5 more)
+
+### Community 112 - "Community 112"
+Cohesion: 0.14
+Nodes (14): 13.1 O que ja esta feito, 13.2.1 `pairChannel`, 13.2.2 `requestConnect`, 13.2.3 `updateName`, 13.2.4 Demais handlers, 13.2 Handlers a IMPLEMENTAR do zero, 13.3.1 `setPan` — correcao completa, 13.3.2 `requestDynamics` — correcao (+6 more)
+
+### Community 113 - "Community 113"
+Cohesion: 0.35
+Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
+
+### Community 114 - "Community 114"
+Cohesion: 0.35
+Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
+
+### Community 115 - "Community 115"
+Cohesion: 0.19
+Nodes (6): MasterMeter, HashMap, Option, Self, Value, Vec
+
+### Community 116 - "Community 116"
+Cohesion: 0.31
+Nodes (13): checkMasterSoloIndicator(), clearAllSolos(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip(), renderAuxs(), createChannelStrip(), createDesktopChannelStrip() (+5 more)
+
+### Community 117 - "Community 117"
+Cohesion: 0.35
+Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
+
+### Community 118 - "Community 118"
+Cohesion: 0.29
+Nodes (12): build_pan_change(), build_pan_request(), build_pan_sync_requests(), bytes_to_pan_value(), global_channel_to_pan_index(), pan_value_to_bytes(), PanTarget, parse_pan_message() (+4 more)
+
+### Community 119 - "Community 119"
+Cohesion: 0.15
+Nodes (12): AirFader (iConnectivity), AirFader Strings, 📄 Arquivos Extraídos, 📂 Engenharia Reversa - Studio Manager & AirFader, Funções Identificadas, 📊 O que falta descobrir, 🔍 Principais Descobertas (da Bible Técnica), 🛠️ Próximos Passos (+4 more)
+
+### Community 120 - "Community 120"
+Cohesion: 0.17
+Nodes (12): 1. Modificação no Projeto .NET (O Heartbeat), 2. Orquestrador no Node.js (O Vigia), 3. Reset de Hardware via PowerShell, 4. Integração com a Interface Web (01v96-remote-web), 5. Requisitos de Implementação, 6. Checklist para o Desenvolvedor (Agente), Arquivo: `FTDI.cs`, Comunicação (Socket.io): (+4 more)
+
+### Community 121 - "Community 121"
+Cohesion: 0.20
+Nodes (10): startNudge/stopNudge/nudgeFader Fader Nudge, getSteppedRaw(), busesState, channelStates, container, curve, dbToRaw(), masterState (+2 more)
+
+### Community 122 - "Community 122"
+Cohesion: 0.21
+Nodes (7): buildMeterCache(), clearAllMeters(), isMobileAgent, setupMeterObserver(), toggleMusicianMeters(), lastPeakTime, smoothedLevels
+
+### Community 123 - "Community 123"
+Cohesion: 0.26
+Nodes (7): Option, Self, String, Vec, SceneData, SceneManager, SceneManagerState
+
+### Community 124 - "Community 124"
+Cohesion: 0.26
+Nodes (9): changeConfigChannel(), commitFaderChange(), faderInput(), handleWheelFader(), nudgeFader(), openChannelConfig(), startNudge(), stopNudge() (+1 more)
+
+### Community 125 - "Community 125"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 126 - "Community 126"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 127 - "Community 127"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 128 - "Community 128"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 129 - "Community 129"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 130 - "Community 130"
+Cohesion: 0.18
+Nodes (11): 19. Prioridades de Execucao, 1. Stack e Bibliotecas Essenciais em Rust, 2.1 O que ja existe e FUNCIONA, 2.2 O que existe mas esta INCOMPLETO, 2.3 O que NAO EXISTE (precisa ser criado do zero), 2.4 Socket Handlers que NAO EXISTEM, 2. Status Atual da Migracao, Indice (+3 more)
+
+### Community 131 - "Community 131"
+Cohesion: 0.20
+Nodes (5): triggerSync() - full state sync from mixer, updateState() - server state mutation, midi, protocol, server.js - Express/Socket.IO bridge server
+
+### Community 132 - "Community 132"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 133 - "Community 133"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 134 - "Community 134"
+Cohesion: 0.31
+Nodes (10): MasterMeter, Arc, ConnectionManager, GlobalState, Receiver, RwLock, SocketIo, SyncCounter (+2 more)
+
+### Community 135 - "Community 135"
+Cohesion: 0.18
+Nodes (10): 1. O Que a IA Fez e Evolução Recente, 2. Onde a IA Parou / Gaps e Gargas Remanescentes, 3. Warnings de Código Morto (Unused Warns), 4. Próximos Passos (Plano de Ação), A. O Feedback de Loopback e stucking de toggle (SyncCounter Inativo), Auditoria de Migração Completa: Node.js → Rust, B. Falta de Calibração do Master Meter, C. IP Config do Lumikit Incompleto (DMX) (+2 more)
+
+### Community 136 - "Community 136"
+Cohesion: 0.20
+Nodes (8): showSceneGrid Scene Save/Load Grid Modal, fuzzyMatch(), normalizeStr(), resetDmx(), Connection State Handler (Online/Offline/Demo), Scene Update Handlers (scenesUpdated/currentScene), Config Modal (MIDI Ports, Scenes, DMX, Layout), Scene Grid Modal (99 Save/Load Slots with Fuzzy Search)
+
+### Community 137 - "Community 137"
+Cohesion: 0.18
+Nodes (10): Documentation style guide, I. Core principles, II. Voice and tone, III. Language and grammar, IV. Procedures and steps, IX. Accessibility quick check, V. Formatting and punctuation, VI. UI, code, and links (+2 more)
+
+### Community 138 - "Community 138"
+Cohesion: 0.29
+Nodes (5): onClear(), renderBtns(), renderExtraBtns(), renderSec(), renderUI()
+
+### Community 139 - "Community 139"
+Cohesion: 0.22
+Nodes (8): 0, config, name, scriptId, globalConfig, lumikit, ip, port
+
+### Community 140 - "Community 140"
+Cohesion: 0.22
+Nodes (8): 0, config, name, scriptId, globalConfig, lumikit, ip, port
+
+### Community 141 - "Community 141"
+Cohesion: 0.33
+Nodes (5): auxLevelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), updateAuxManual()
+
+### Community 142 - "Community 142"
+Cohesion: 0.22
+Nodes (6): busesState, channelStates, container, curve, masterState, mixesState
+
+### Community 143 - "Community 143"
+Cohesion: 0.29
+Nodes (8): atualizarMenuTray(), executarConexao(), gerarConfigMenu(), handleDisconnection(), iniciarBuscaAutomatica(), loadConfig(), saveNames(), triggerSync()
+
+### Community 144 - "Community 144"
+Cohesion: 0.25
+Nodes (3): AtomicUsize, SyncCounter, Self
+
+### Community 145 - "Community 145"
+Cohesion: 0.25
+Nodes (8): 2026-05-27 — Fase 1 concluida: Core e Configuracoes, 2026-05-27 — Hotfix: serde default para campos novos do config.json, 2026-05-27 — Sessao Inicial: Diagnostico e Regras, 2026-05-28 — Fase 10 concluida: Connection Manager, 2026-05-28 — Fase 4 concluida: SyncCounter + integracao, 2026-05-28 — Fase 9 concluida: SyncManager, 2026-05-28 — Hotfix: Panico no callback MIDI, LOG DE EXECUCAO (Atualizado a cada passo concluido)
+
+### Community 146 - "Community 146"
+Cohesion: 0.25
+Nodes (8): Regra 1 — Commits e Syncs SOB DEMANDA, Regra 2 — Preservacao de Funcionalidades, Regra 3 — Atualizacao do Plano de Migracao a Cada Passo, Regra 4 — Detalhamento para Continuidade, Regra 5 — Testar apos Codar, Regra 6 — Padrao de Codigo, Regra 7 — Sequencia de Sync Inicial (CRITICA), Regras BASE da Migracao (Leitura Obrigatoria para qualquer IA)
+
+### Community 147 - "Community 147"
+Cohesion: 0.25
+Nodes (7): Approach, Do not use this skill when, Focus Areas, Instructions, Limitations, Output, Use this skill when
+
+### Community 148 - "Community 148"
+Cohesion: 0.68
+Nodes (7): build_aux_msg(), build_pair(), build_reset(), build_state_msg(), build_unpair(), get_ch_byte(), Vec
+
+### Community 149 - "Community 149"
+Cohesion: 0.29
+Nodes (3): _pairCtx, getPatchName(), selectPatch()
+
+### Community 150 - "Community 150"
+Cohesion: 0.29
+Nodes (8): 2, color, config, name, scriptId, config, extras, scenes
+
+### Community 151 - "Community 151"
+Cohesion: 0.29
+Nodes (3): state, updateChannelNameChar(), updateState()
+
+### Community 152 - "Community 152"
+Cohesion: 0.50
+Nodes (7): createChannelStrip(), createDesktopChannelStrip(), createOutputStrip(), getFaderScaleHTML(), getMobileScaleHTML(), initUI(), updateUI()
+
+### Community 153 - "Community 153"
+Cohesion: 0.29
+Nodes (5): { execSync }, fs, path, PRINTS_DIR, { uIOhook, UiohookKey }
+
+### Community 154 - "Community 154"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 155 - "Community 155"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 156 - "Community 156"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 157 - "Community 157"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 158 - "Community 158"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 159 - "Community 159"
+Cohesion: 0.29
+Nodes (7): 5.1 O que ja esta feito, 5.2.1 Funcao auxiliar `get_channel_state_by_id()`, 5.2.2 Tipos a adicionar no `apply_midi()`:, 5.2.3 UpdateSceneChar e UpdateNameChar para Mixes/Buses/Master, 5.2 O que falta fazer — EXPANSAO DO `apply_midi()`, 5.3 Passo a passo, 5. Fase 3: Gerenciamento de Estado Concorrente
+
+### Community 160 - "Community 160"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 161 - "Community 161"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 162 - "Community 162"
+Cohesion: 0.38
+Nodes (4): execute(), onClear(), onConfigure(), renderUI()
+
+### Community 163 - "Community 163"
+Cohesion: 0.48
+Nodes (4): MidiAssembler, test_assembler(), Self, Vec
+
+### Community 164 - "Community 164"
+Cohesion: 0.48
+Nodes (4): Self, Vec, MidiAssembler, test_assembler()
+
+### Community 165 - "Community 165"
+Cohesion: 0.29
+Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
+
+### Community 166 - "Community 166"
+Cohesion: 0.52
+Nodes (6): AppConfig, Arc, ConnectionManager, SocketIo, initialize_dmx(), initialize_midi()
+
+### Community 167 - "Community 167"
+Cohesion: 0.48
+Nodes (6): Path, String, reset_dmx_system(), spawn_dmx(), start_dmx_app(), update_lumikit_config()
+
+### Community 168 - "Community 168"
+Cohesion: 0.48
+Nodes (6): Box, Error, Receiver, Result, async_main(), main()
+
+### Community 169 - "Community 169"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 170 - "Community 170"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 171 - "Community 171"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 172 - "Community 172"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 173 - "Community 173"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 174 - "Community 174"
+Cohesion: 0.33
+Nodes (5): 1. Escopo de Funcionalidades, 2. Fluxo do Usuário (Wizard), 3. Comandos Técnicos (Backend), 4. Onde Implementar (Reminders inseridos no código), 🗺️ Plano de Implementação: GitHub Sync Wizard
+
+### Community 175 - "Community 175"
+Cohesion: 0.33
+Nodes (6): 18.1 Remover codigo morto, 18.2 Corrigir warnings, 18.3 HandleMIDIData — callback central, 18.4 Testar compilacao e warnings, 18.5 Passo a passo, 18. Fase 16: Limpeza e Polimento
+
+### Community 176 - "Community 176"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 177 - "Community 177"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 179 - "Community 179"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
+
+### Community 181 - "Community 181"
+Cohesion: 0.33
+Nodes (5): fs, input, LOG_PATH, midi, path
+
+### Community 182 - "Community 182"
+Cohesion: 0.33
+Nodes (6): 10, color, config, name, scriptId, scenes
+
+### Community 183 - "Community 183"
+Cohesion: 0.33
+Nodes (6): 2, color, config, name, scriptId, extras
+
+### Community 185 - "Community 185"
+Cohesion: 0.40
+Nodes (4): demo_mode, inIdx, loopmidi-monitor, outIdx
+
+### Community 186 - "Community 186"
+Cohesion: 0.40
+Nodes (4): content, fs, lines, uniquePrefixes
+
+### Community 187 - "Community 187"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 188 - "Community 188"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 189 - "Community 189"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 190 - "Community 190"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 191 - "Community 191"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 192 - "Community 192"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 193 - "Community 193"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 194 - "Community 194"
+Cohesion: 0.40
+Nodes (4): 1) Inspect comments needing attention, 2) Ask the user for clarification, 3) If user chooses comments, PR Comment Handler
+
+### Community 195 - "Community 195"
+Cohesion: 0.40
+Nodes (5): 3, color, config, name, scriptId
+
+### Community 196 - "Community 196"
+Cohesion: 0.40
+Nodes (5): 4, color, config, name, scriptId
+
+### Community 197 - "Community 197"
+Cohesion: 0.40
+Nodes (5): 6, color, config, name, scriptId
+
+### Community 198 - "Community 198"
+Cohesion: 0.40
+Nodes (5): 7, color, config, name, scriptId
+
+### Community 199 - "Community 199"
+Cohesion: 0.40
+Nodes (5): 8, color, config, name, scriptId
+
+### Community 200 - "Community 200"
+Cohesion: 0.40
+Nodes (5): 3, color, config, name, scriptId
+
+### Community 201 - "Community 201"
+Cohesion: 0.40
+Nodes (5): 4, color, config, name, scriptId
+
+### Community 202 - "Community 202"
+Cohesion: 0.40
+Nodes (5): 5, color, config, name, scriptId
+
+### Community 203 - "Community 203"
+Cohesion: 0.40
+Nodes (5): 6, color, config, name, scriptId
+
+### Community 204 - "Community 204"
+Cohesion: 0.40
+Nodes (5): 8, color, config, name, scriptId
+
+### Community 205 - "Community 205"
+Cohesion: 0.50
+Nodes (3): input, midi, output
+
+### Community 206 - "Community 206"
+Cohesion: 0.50
+Nodes (4): 10.1 O que ja esta feito, 10.2 O que falta, 10.3 Passo a passo, 10. Fase 8: Scene Manager Completo
+
+### Community 207 - "Community 207"
+Cohesion: 0.50
+Nodes (4): 11.1 O que e, 11.2 Funcionalidades a portar, 11.3 Passo a passo, 11. Fase 9: SyncManager Completo
+
+### Community 208 - "Community 208"
+Cohesion: 0.50
+Nodes (4): 12.1 O que e, 12.2 Funcionalidades a portar, 12.3 Passo a passo, 12. Fase 10: Connection Manager (Radar/Validador/Watchdog)
+
+### Community 209 - "Community 209"
+Cohesion: 0.50
+Nodes (4): 14.1 O que ja esta feito, 14.2 O que falta, 14.3 Passo a passo, 14. Fase 12: Modo Demo
+
+### Community 210 - "Community 210"
+Cohesion: 0.50
+Nodes (4): 15.1 O que ja esta feito, 15.2 O que falta, 15.3 Passo a passo, 15. Fase 13: Sistema DMX
+
+### Community 211 - "Community 211"
+Cohesion: 0.50
+Nodes (4): 16.1 O que ja esta feito, 16.2 O que falta, 16.3 Passo a passo, 16. Fase 14: Configuracoes e Persistencia
+
+### Community 212 - "Community 212"
+Cohesion: 0.50
+Nodes (4): 17.1 O que ja esta feito, 17.2 O que falta, 17.3 Passo a passo, 17. Fase 15: Tray e Infraestrutura
+
+### Community 213 - "Community 213"
+Cohesion: 0.50
+Nodes (4): 3.1 O que ja esta feito, 3.2 O que falta fazer, 3.3 Passo a passo, 3. Fase 1: Core e Configuracoes
+
+### Community 214 - "Community 214"
+Cohesion: 0.50
+Nodes (4): 6.1 O que ja esta feito, 6.2 O que falta, 6.3 Passo a passo, 6. Fase 4: Modificadores e Schedulers
+
+### Community 215 - "Community 215"
+Cohesion: 0.50
+Nodes (4): 7.1 O que e, 7.2 Funcionalidades a portar, 7.3 Passo a passo, 7. Fase 5: Modulo Pan Completo
+
+### Community 216 - "Community 216"
+Cohesion: 0.50
+Nodes (4): 8.1 O que e, 8.2 Funcionalidades a portar, 8.3 Passo a passo, 8. Fase 6: Modulo Master Meter
+
+### Community 217 - "Community 217"
+Cohesion: 0.50
+Nodes (4): 9.1 O que e, 9.2 Funcionalidades a portar, 9.3 Passo a passo, 9. Fase 7: Modulo Pair (Stereo Link)
+
+### Community 218 - "Community 218"
+Cohesion: 0.67
+Nodes (3): start_meter_simulation(), JoinHandle, SocketIo
+
+### Community 219 - "Community 219"
+Cohesion: 0.50
+Nodes (4): 1, config, name, scriptId
+
+### Community 220 - "Community 220"
+Cohesion: 0.50
+Nodes (4): 5, color, name, scriptId
+
+### Community 221 - "Community 221"
+Cohesion: 0.50
+Nodes (4): 1, config, name, scriptId
 
 ## Ambiguous Edges - Review These
 - `FX slot deep scanner (SysEx monitor for effects)` → `PowerShell UAC elevation test`  [AMBIGUOUS]
@@ -242,9 +1080,9 @@ Nodes (3): plano_de_otimizacao.md (Chrome Performance Trace), Otimizações A-K 
   tmp/working_version/01v96-remote-web-main/capture-steps.js · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **179 isolated node(s):** `fetch_comments.py (GitHub GraphQL PR Comment Fetcher)`, `BM25 (BM25 Ranking Algorithm)`, `DesignSystemGenerator`, `generate_design_system`, `format_output (CLI search formatter)` (+174 more)
+- **2049 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+2044 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **60 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -253,13 +1091,13 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `Capture Steps — Screenshot capture tool using PowerShell CopyFromScreen, triggered by mouse wheel scroll with F6/F7 hotkeys via uiohook-napi` and `Frontend Bootstrap — Initializes UI and Socket.IO connection, sets appReady flag after stabilization delay`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
+- **Why does `getChannelStateById()` connect `Community 90` to `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)`, `Community 97`, `Community 162`, `Community 98`, `Macros Engine & Host Profiles`, `Community 77`, `Community 116`, `Community 121`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Why does `socket.js - Socket.IO event listeners and meter rendering` connect `Web Frontend Utility Functions` to `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
-- **Why does `Meter Calibration Steps Data` connect `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` to `Web Frontend Utility Functions`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
-- **Are the 2 inferred relationships involving `socket.js - Socket.IO event listeners and meter rendering` (e.g. with `initUI() - rebuilds all channel strips` and `Meter Calibration Steps Data`) actually correct?**
-  _`socket.js - Socket.IO event listeners and meter rendering` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 2 inferred relationships involving `01V96 categorized property definitions` (e.g. with `01V96 reverse-engineered property map` and `01V96 sync/bulk transfer properties`) actually correct?**
-  _`01V96 categorized property definitions` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `fetch_comments.py (GitHub GraphQL PR Comment Fetcher)`, `BM25 (BM25 Ranking Algorithm)`, `DesignSystemGenerator` to the rest of the system?**
-  _185 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Are the 28 inferred relationships involving `getChannelStateById()` (e.g. with `execute()` and `auxWheelInput()`) actually correct?**
+  _`getChannelStateById()` has 28 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `contentHash`, `downloadedAt`, `contentHash` to the rest of the system?**
+  _2086 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` be split into smaller, more focused modules?**
+  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
