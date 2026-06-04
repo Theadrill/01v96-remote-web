@@ -2442,7 +2442,7 @@ body.is-portrait .sidebar-musician {
     order: 2 !important;
     border-left: none !important;
     border-top: 2px solid #388e3c !important;
-    padding: 0 15px !important;
+    padding: 0 10px !important;
     justify-content: space-between !important;
     align-items: center !important;
     overflow: hidden !important;
@@ -2473,14 +2473,19 @@ body.is-portrait .sidebar-musician .sidebar-info #scene-info {
 
 body.is-portrait .sidebar-musician .fone-indicator {
     position: absolute !important;
-    left: 50% !important;
+    left: 120px !important;
     top: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    transform: translateY(-50%) !important;
     writing-mode: horizontal-tb !important;
     text-orientation: mixed !important;
-    letter-spacing: 1px !important;
+    letter-spacing: 1.5px !important;
     margin: 0 !important;
-    font-size: 18px !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    color: white !important;
+    opacity: 0.95;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    text-align: left !important;
 }
 
 body.is-portrait .sidebar-musician .sidebar-dock {
@@ -3454,6 +3459,7 @@ body:not(.layout-desktop):not(.is-portrait) .sidebar-macros .btn-macros {
     body:not(.layout-desktop):not(.is-portrait):not(.screen-main) .sidebar-dock {
         min-height: 102px !important;
     }
+
     body:not(.layout-desktop):not(.is-portrait):not(.screen-main) .sidebar-macros {
         height: 25vh !important;
         min-height: 25vh !important;
@@ -3664,12 +3670,10 @@ screen and (orientation: landscape) and (min-height: 600px) {
     visibility: visible;
 }
 
-/* Botão de sair exclusivo para o modo Musician (oculto por padrão) */
-.btn-exit-musician {
+/* Botões exclusivos para o modo Musician (oculto por padrão) */
+.btn-exit-musician,
+.btn-meters-musician {
     display: none !important;
-    background: #dc3545 !important;
-    color: white !important;
-    border: none !important;
     border-radius: 8px !important;
     font-weight: bold !important;
     font-size: 11px !important;
@@ -3678,6 +3682,12 @@ screen and (orientation: landscape) and (min-height: 600px) {
     text-transform: uppercase;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     cursor: pointer;
+}
+
+.btn-exit-musician {
+    background: #dc3545 !important;
+    color: white !important;
+    border: none !important;
     transition: background-color 0.2s ease;
 }
 
@@ -3686,33 +3696,73 @@ screen and (orientation: landscape) and (min-height: 600px) {
     background: #c82333 !important;
 }
 
+.btn-meters-musician {
+    background: #007bff !important;
+    color: white !important;
+    border: 1px solid #0056b3 !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-meters-musician:hover {
+    background: #0069d9 !important;
+}
+
+.btn-meters-musician.active {
+    background: #bd2130 !important;
+    border-color: #b21f2d !important;
+    color: white !important;
+}
+
+.btn-meters-musician.active:hover {
+    background: #a71d2a !important;
+}
+
 /* Ocultar COMPLETO dock e macros no modo Musician, independente da orientação */
 .sidebar-musician #sidebarDock,
 .sidebar-musician #sidebarMacros {
     display: none !important;
 }
 
-/* Exibe o botão de sair apenas quando a sidebar estiver no modo Musician */
-.sidebar-musician #musicianExitBtn {
+/* Exibe os botões apenas quando a sidebar estiver no modo Musician */
+.sidebar-musician #musicianExitBtn,
+.sidebar-musician #musicianMetersBtn {
     display: flex !important;
 }
 
 /* Modo retrato (em pé) */
-body.is-portrait .sidebar-musician #musicianExitBtn {
-    width: 80px !important;
+body.is-portrait .sidebar-musician #musicianMetersBtn {
+    width: 72px !important;
     height: 38px !important;
     margin: 0 !important;
+    margin-right: 5px !important;
     margin-left: auto !important;
-    /* Empurra para a extrema direita */
+    font-size: 9px !important;
+    line-height: 1.1 !important;
+    white-space: normal !important;
+    text-align: center;
+    padding: 2px !important;
+}
+
+body.is-portrait .sidebar-musician #musicianExitBtn {
+    width: 72px !important;
+    height: 38px !important;
+    margin: 0 !important;
 }
 
 /* Modo paisagem (deitado) */
-body:not(.is-portrait) .sidebar-musician #musicianExitBtn {
+body:not(.is-portrait) .sidebar-musician #musicianMetersBtn {
     width: calc(100% - 16px) !important;
     height: 44px !important;
     margin: 8px !important;
     margin-top: auto !important;
-    /* Empurra para a base da sidebar */
+    margin-bottom: 0 !important;
+}
+
+body:not(.is-portrait) .sidebar-musician #musicianExitBtn {
+    width: calc(100% - 16px) !important;
+    height: 44px !important;
+    margin: 8px !important;
+    margin-top: 10px !important;
 }
 
 /* Ocultar nome da cena no mobile em telas secundárias (config de canal, mix do técnico, saídas) */

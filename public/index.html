@@ -10,22 +10,22 @@
     <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
     <meta name="mobile-web-app-capable" content="yes">
     <title>01V96 - LIVE SAFE</title>
-    <link rel="stylesheet" href="style.css?v=22">
+    <link rel="stylesheet" href="style.css?v=30">
     <!-- UI UPDATE: 2026-04-12 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
         // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Marca como standalone se estiver rodando como App Nativo PWA
             if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
                 var fsSplash = document.getElementById('fsBtnSplash');
                 if (fsSplash) fsSplash.style.display = 'none';
-                
+
                 document.body.classList.add('is-standalone');
 
                 // Em modo PWA o iOS pode ter uns comportamentos estranhos de double-tap-to-zoom 
                 // ou push de viewport. Prevenir isso globalmente se não estiver focando inputs:
-                document.body.addEventListener('dblclick', function(e) {
+                document.body.addEventListener('dblclick', function (e) {
                     if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
                         e.preventDefault();
                     }
@@ -37,11 +37,11 @@
             var isOldSafari = /^((?!chrome|android).)*safari/i.test(ua) && /Version\/1[0-6]/.test(ua);
             if (isOldIOS || isOldSafari) {
                 document.documentElement.classList.add('legacy-ios');
-                
+
                 function fixLegacySliders() {
                     if (document.body.classList.contains('layout-horizontal')) return;
                     var containers = document.querySelectorAll('.fader-rotated-container');
-                    containers.forEach(function(c) {
+                    containers.forEach(function (c) {
                         var input = c.querySelector('input[type=range]');
                         if (input) {
                             var h = c.clientHeight;
@@ -52,7 +52,7 @@
                         }
                     });
                 }
-                
+
                 window.addEventListener('resize', fixLegacySliders);
                 // Roda periodicamente caso a UI mude dinamicamente (ex: abas ou faders renderizados dps)
                 setInterval(fixLegacySliders, 1000);
@@ -130,14 +130,13 @@
                     style="font-size: 11px; color: #888; margin-bottom: 14px; line-height: 1.4;">
                     Cadastre o nome e a senha de acesso (4 dígitos).
                 </p>
-                <input type="text" id="setupName" class="splash-input"
-                    placeholder="ex: mesa-do-joao" maxlength="30" autocomplete="off"
+                <input type="text" id="setupName" class="splash-input" placeholder="ex: mesa-do-joao" maxlength="30"
+                    autocomplete="off"
                     style="text-transform: lowercase; text-align: center; letter-spacing: 1px; font-size: 18px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-                <input type="password" id="setupPassword" class="splash-input" placeholder="••••"
+                <input type="password" id="setupPassword" class="splash-input" placeholder="••••" maxlength="4"
+                    inputmode="numeric" autocomplete="new-password">
+                <input type="password" id="setupPasswordConfirm" class="splash-input" placeholder="Confirme a senha"
                     maxlength="4" inputmode="numeric" autocomplete="new-password">
-                <input type="password" id="setupPasswordConfirm" class="splash-input"
-                    placeholder="Confirme a senha" maxlength="4" inputmode="numeric"
-                    autocomplete="new-password">
                 <p id="setupError" class="splash-error"
                     style="display: none; color: #ff6b6b; font-size: 12px; margin: 8px 0 0 0; line-height: 1.3;">
                 </p>
@@ -158,12 +157,10 @@
         <div id="sidebarInfo" class="sidebar-panel sidebar-info">
             <div id="scn" class="color-green font-13-bold">01V96</div>
             <div id="scene-info">SINCRONIZANDO...</div>
-            <div id="chSideTitle" class="ch-side-title" style="display:none;"
-                onclick="openNameEditor()">1 - CH 1</div>
-            <div id="techMixTitle" class="ch-side-title" style="display:none; color:#ffcc00;"
-                onclick="">MIX 1</div>
+            <div id="chSideTitle" class="ch-side-title" style="display:none;" onclick="openNameEditor()">1 - CH 1</div>
+            <div id="techMixTitle" class="ch-side-title" style="display:none; color:#ffcc00;" onclick="">MIX 1</div>
             <div id="foneIndicatorSidebar" class="fone-indicator" style="display:none;">FONE 1</div>
-            
+
             <!-- Navegação entre canais/mixes (aparece em channelConfig e techMix) -->
             <div id="sidebarNav" class="sidebar-nav" style="display:none;">
                 <button id="navPrev" class="nav-btn sidebar-nav-btn" onclick="changeConfigChannel(-1)">&lt;</button>
@@ -174,16 +171,28 @@
         <!-- PANEL 2: Dock de Botões (scrollável) -->
         <div id="sidebarDock" class="sidebar-panel sidebar-dock">
             <div class="scroll-indicator-v scroll-indicator-top">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                    <path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
             </div>
             <div class="scroll-indicator-v scroll-indicator-bottom">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
             </div>
             <div class="scroll-indicator-h scroll-indicator-left">
-                <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M5 9L1 5L5 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+                    <path d="M5 9L1 5L5 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
             </div>
             <div class="scroll-indicator-h scroll-indicator-right">
-                <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 9L5 5L1 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+                    <path d="M1 9L5 5L1 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
             </div>
             <div id="buttonDock" class="button-dock"></div>
         </div>
@@ -193,13 +202,18 @@
             <button class="side-btn btn-macros"
                 onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
             <button id="fsBtnMacros" class="side-btn btn-fs-macros" onclick="toggleFullScreen()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;">
-                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;">
+                    <path
+                        d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                    </path>
                 </svg>
             </button>
             <button id="exitBtnMacros" class="side-btn btn-exit-macros" onclick="triggerExitActiveMode()">SAIR</button>
         </div>
 
+        <button id="musicianMetersBtn" class="side-btn btn-meters-musician" onclick="toggleMusicianMeters()">MOSTRAR
+            NÍVEIS</button>
         <button id="musicianExitBtn" class="side-btn btn-exit-musician" onclick="triggerExitActiveMode()">SAIR</button>
     </div>
 
@@ -256,10 +270,12 @@
 
             <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
                 <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">PAINEL DE MACROS</p>
-                <div style="display: flex; align-items: center; justify-content: space-between; background: #222; padding: 10px 15px; border-radius: 8px;">
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; background: #222; padding: 10px 15px; border-radius: 8px;">
                     <span style="font-size: 13px; color: #fff;">Habilitar Macros</span>
                     <label class="switch">
-                        <input type="checkbox" id="toggleMacrosEnable" checked onclick="toggleMacrosPanel(this.checked)">
+                        <input type="checkbox" id="toggleMacrosEnable" checked
+                            onclick="toggleMacrosPanel(this.checked)">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -278,8 +294,7 @@
                     style="font-size: 16px; color: #5cacee; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">
                     --
                 </p>
-                <input type="text" id="inputServerName" maxlength="30" placeholder="nome-do-servidor"
-                    autocomplete="off"
+                <input type="text" id="inputServerName" maxlength="30" placeholder="nome-do-servidor" autocomplete="off"
                     style="width: 100%; box-sizing: border-box; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; font-size: 14px; text-transform: lowercase; letter-spacing: 1px; margin-bottom: 10px; outline: none;">
                 <button class="btn-connect" onclick="saveServerName()"
                     style="width: 100%; margin-bottom: 10px; background: #007bff; font-size: 12px;">SALVAR NOME</button>
@@ -414,6 +429,7 @@
                 border-radius: 0 !important;
                 padding: 10px 20px !important;
             }
+
             #macrosCloseBtn {
                 min-height: 50px !important;
                 max-height: 50px !important;
@@ -427,7 +443,7 @@
             const actionBtns = document.getElementById('macrosActionButtons');
             const mobileTarget = document.getElementById('macrosMobileActions');
             const desktopTarget = document.getElementById('macrosHeaderContainer');
-            
+
             if (mql.matches) {
                 if (actionBtns.parentNode !== mobileTarget) {
                     mobileTarget.appendChild(actionBtns);
@@ -484,7 +500,8 @@
             </div>
 
             <!-- Scrollable middle area for Grid + Mobile Actions -->
-            <div id="macrosMiddleScroll" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-height: 0; padding-right: 5px; margin-bottom: 20px;">
+            <div id="macrosMiddleScroll"
+                style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-height: 0; padding-right: 5px; margin-bottom: 20px;">
                 <!-- Grid de slots que será populado via JS -->
                 <div id="macroSlotsGrid"
                     style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; scrollbar-width:none; flex-shrink:0;">
@@ -498,8 +515,10 @@
                 <div id="macrosMobileActions"></div>
             </div>
 
-            <button id="macrosCloseBtn" onclick="document.getElementById('macrosModal').style.display='none'" class="btn-close"
-                style="width: 100%; height: 50px; min-height: 50px; max-height: 50px; border-radius:10px; flex-shrink:0; margin:0;">FECHAR PAINEL</button>
+            <button id="macrosCloseBtn" onclick="document.getElementById('macrosModal').style.display='none'"
+                class="btn-close"
+                style="width: 100%; height: 50px; min-height: 50px; max-height: 50px; border-radius:10px; flex-shrink:0; margin:0;">FECHAR
+                PAINEL</button>
         </div>
     </div>
 
@@ -620,21 +639,45 @@
     <div id="iosInstallModal" class="modal-overlay" style="z-index:20000; display:none;">
         <div class="modal-content"
             style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #007bff; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <h2 style="margin-top:0; color:#fff; font-size:22px; letter-spacing:1px; text-transform:uppercase; margin-bottom: 25px;">
+            <h2
+                style="margin-top:0; color:#fff; font-size:22px; letter-spacing:1px; text-transform:uppercase; margin-bottom: 25px;">
                 TELA CHEIA NO IOS</h2>
-            
+
             <div id="iosSafariInstructions">
-                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia o botão de tela cheia automática pelo navegador. Para usar este app em <strong>TELA CHEIA</strong>, você deve adicionar esta página à tela inicial do seu aparelho:</p>
+                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia o botão de
+                    tela cheia automática pelo navegador. Para usar este app em <strong>TELA CHEIA</strong>, você deve
+                    adicionar esta página à tela inicial do seu aparelho:</p>
                 <div style="background:#222; padding:15px; border-radius:8px; margin-bottom:20px; text-align:left;">
-                    <p style="margin:0 0 10px 0; color:#ddd; font-size:13px;">1. Toque no ícone de <strong>Compartilhar</strong> <span style="font-size:16px;">( <svg style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> )</span> na barra inferior do Safari.</p>
-                    <p style="margin:0; color:#ddd; font-size:13px;">2. Escolha <strong>Adicionar à Tela de Início</strong> <span style="font-size:16px;">( <svg style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> )</span>.</p>
+                    <p style="margin:0 0 10px 0; color:#ddd; font-size:13px;">1. Toque no ícone de
+                        <strong>Compartilhar</strong> <span style="font-size:16px;">( <svg
+                                style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16"
+                                height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                <polyline points="16 6 12 2 8 6"></polyline>
+                                <line x1="12" y1="2" x2="12" y2="15"></line>
+                            </svg> )</span> na barra inferior do Safari.
+                    </p>
+                    <p style="margin:0; color:#ddd; font-size:13px;">2. Escolha <strong>Adicionar à Tela de
+                            Início</strong> <span style="font-size:16px;">( <svg
+                                style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16"
+                                height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="12" y1="8" x2="12" y2="16"></line>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg> )</span>.</p>
                 </div>
             </div>
 
             <div id="iosOtherBrowserInstructions" style="display:none;">
-                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia a função de tela cheia fora do Safari. Para usar este app em <strong>TELA CHEIA</strong>, você deve copiar o link abaixo, abrir pelo navegador <strong>Safari</strong>, e então adicionar à tela inicial.</p>
+                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia a função de
+                    tela cheia fora do Safari. Para usar este app em <strong>TELA CHEIA</strong>, você deve copiar o
+                    link abaixo, abrir pelo navegador <strong>Safari</strong>, e então adicionar à tela inicial.</p>
                 <div style="background:#222; padding:15px; border-radius:8px; margin-bottom:20px;">
-                    <button onclick="copyAppUrl()" class="btn-connect" style="width:100%; height:45px; background:#007bff; font-size:14px; margin:0; font-weight: bold;">📋 COPIAR LINK</button>
+                    <button onclick="copyAppUrl()" class="btn-connect"
+                        style="width:100%; height:45px; background:#007bff; font-size:14px; margin:0; font-weight: bold;">📋
+                        COPIAR LINK</button>
                 </div>
             </div>
 
@@ -788,12 +831,13 @@
                 Atencao!</p>
             <h3 style="margin-top:0; color:#ffcc00; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
                 REINICIAR SERVIDOR?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">A interface vai desconectar por alguns segundos enquanto o servidor reinicia.</p>
+            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">A interface vai desconectar
+                por alguns segundos enquanto o servidor reinicia.</p>
             <div style="display:flex; gap:15px;">
                 <button id="serverRestartConfirmBtn" class="btn-connect"
                     style="flex:1; margin:0; height:45px; background:#ff9800;">SIM, REINICIAR</button>
-                <button onclick="document.getElementById('serverRestartConfirmModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
+                <button onclick="document.getElementById('serverRestartConfirmModal').style.display='none'"
+                    class="btn-close" style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -806,12 +850,13 @@
                 Atencao!</p>
             <h3 style="margin-top:0; color:#dc3545; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
                 RESETAR CONFIGURAÇÃO?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">O arquivo .env será apagado. Você precisará cadastrar nome e senha novamente.</p>
+            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">O arquivo .env será apagado.
+                Você precisará cadastrar nome e senha novamente.</p>
             <div style="display:flex; gap:15px;">
                 <button id="resetConfigConfirmBtn" class="btn-connect"
                     style="flex:1; margin:0; height:45px; background:#dc3545;">SIM, RESETAR</button>
-                <button onclick="document.getElementById('resetConfigConfirmModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
+                <button onclick="document.getElementById('resetConfigConfirmModal').style.display='none'"
+                    class="btn-close" style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -870,10 +915,10 @@
         <span>SINCRONIZANDO...</span>
     </div>
 
-    <script src="modules/globals.js?v=2"></script>
+    <script src="modules/globals.js?v=3"></script>
     <script src="modules/macros/core.js"></script>
     <script src="modules/macros.js"></script>
-    <script src="modules/channel_strip.js?v=15"></script>
+    <script src="modules/channel_strip.js?v=16"></script>
     <script src="modules/eq.js?v=5"></script>
     <script src="modules/gate.js"></script>
     <script src="modules/compressor.js"></script>
@@ -883,12 +928,12 @@
     <script src="modules/steps.js"></script>
     <script src="modules/macro_fader.js"></script>
     <script src="modules/fader_logic.js"></script>
-    <script src="modules/socket.js?v=6"></script>
+    <script src="modules/socket.js?v=7"></script>
     <script src="modules/sidebar.js?v=8"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/scroll.js"></script>
     <script src="modules/setup.js?v=6"></script>
-    <script src="modules/splash_screen.js?v=6"></script>
+    <script src="modules/splash_screen.js?v=7"></script>
     <script src="modules/search.js"></script>
     <script src="modules/scene_grid.js"></script>
     <script src="app.js"></script>

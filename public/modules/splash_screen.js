@@ -63,6 +63,13 @@ function enterMusicianMode(foneId) {
     localStorage.setItem('01v96_role', 'musician');
     localStorage.setItem('01v96_mix', foneId);
 
+    window.showMetersInMusicianMode = false;
+    const mBtn = document.getElementById('musicianMetersBtn');
+    if (mBtn) {
+        mBtn.textContent = 'MOSTRAR NÍVEIS';
+        mBtn.classList.remove('active');
+    }
+
     // Fecha a splash (se estiver visível)
     const splash = document.getElementById('splashScreen');
     if (splash.style.display !== 'none') {

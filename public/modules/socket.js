@@ -663,8 +663,56 @@ function buildMeterCache() {
     }
 }
 
+function clearAllMeters() {
+    if (!meterElementsCache) return;
+    for (let i = 0; i < meterElementsCache.length; i++) {
+        const cached = meterElementsCache[i];
+        if (!cached || !cached.card) continue;
+        
+        cached.card.classList.remove('has-meter', 'has-paired-meter', 'peak-glow');
+        cached.hasMeter = false;
+        cached.card.style.backgroundSize = '';
+        
+        if (cached.curtains) {
+            cached.curtains.forEach(curtain => {
+                if (curtain) curtain.style.transform = '';
+            });
+        }
+        if (cached.mobileBgs) {
+            cached.mobileBgs.forEach(bg => {
+                if (bg) bg.style.backgroundSize = '';
+            });
+        }
+        if (cached.peakLed) {
+            cached.peakLed.classList.remove('active');
+        }
+        cached.isPeakActive = false;
+    }
+}
+window.clearAllMeters = clearAllMeters;
+
+function toggleMusicianMeters() {
+    window.showMetersInMusicianMode = !window.showMetersInMusicianMode;
+    const btn = document.getElementById('musicianMetersBtn');
+    if (btn) {
+        if (window.showMetersInMusicianMode) {
+            btn.textContent = 'OCULTAR NÍVEIS';
+            btn.classList.add('active');
+            if (!faderCardsCache) {
+                faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
+            }
+            buildMeterCache();
+        } else {
+            btn.textContent = 'MOSTRAR NÍVEIS';
+            btn.classList.remove('active');
+            clearAllMeters();
+        }
+    }
+}
+window.toggleMusicianMeters = toggleMusicianMeters;
+
 socket.on('meterData', (levels) => {
-    if (musicianMode) return;
+    if (musicianMode && !window.showMetersInMusicianMode) return;
 
     if (currentMeterFPS > 0) {
         const now = performance.now();

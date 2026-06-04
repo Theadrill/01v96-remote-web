@@ -644,6 +644,9 @@ function initUI() {
     const musicianExitBtn = document.getElementById('musicianExitBtn');
     if (musicianExitBtn) musicianExitBtn.style.display = musicianMode ? 'flex' : 'none';
 
+    const musicianMetersBtn = document.getElementById('musicianMetersBtn');
+    if (musicianMetersBtn) musicianMetersBtn.style.display = musicianMode ? 'flex' : 'none';
+
     if (outsMode && !musicianMode && !technicianMixMode) {
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'mix');
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'bus');
