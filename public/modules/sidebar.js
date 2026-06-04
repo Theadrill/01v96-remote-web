@@ -34,7 +34,7 @@ function toggleOuts() {
     const btn = document.getElementById('dockBtnOuts');
     if (btn) {
         btn.classList.toggle('active-tab', outsMode);
-        btn.innerText = outsMode ? 'SAIR' : 'OUTS';
+        btn.innerText = outsMode ? 'SAIR' : 'MIX/BUS';
         btn.style.backgroundColor = '';
         btn.style.color = '';
     }
@@ -512,7 +512,7 @@ function renderDock(mode) {
         case 'main': {
             buttons.push({ label: 'CONFIG', action: "document.getElementById('configModal').style.display='flex'", cls: 'dock-config' });
             const isOutsOn = typeof window.outsMode !== 'undefined' && outsMode;
-            buttons.push({ label: isOutsOn ? 'SAIR' : 'OUTS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
+            buttons.push({ label: isOutsOn ? 'SAIR' : 'MIX/BUS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
             buttons.push({ label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-exit' });
             const isStandalone = window.navigator.standalone === true;
             if (!isStandalone) {

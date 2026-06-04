@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
     <meta name="mobile-web-app-capable" content="yes">
     <title>01V96 - LIVE SAFE</title>
-    <link rel="stylesheet" href="style.css?v=30">
+    <link rel="stylesheet" href="style.css?v=35">
     <!-- UI UPDATE: 2026-04-12 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
@@ -219,19 +219,22 @@
 
     <div id="configModal" class="modal-overlay">
         <div class="modal-content">
-            <select id="sin" class="modal-select"></select>
-            <select id="sout" class="modal-select"></select>
+            <p class="config-modal-title">01V96 — LIVE CONTROL</p>
+            <p class="config-section-header" style="margin-top: 6px;">Entradas · Saídas · Configuração</p>
 
-            <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #007bff;"
+            <!-- Selects ocultos usados por conn() para índices de porta MIDI -->
+            <select id="sin" class="modal-select" style="display:none;"></select>
+            <select id="sout" class="modal-select" style="display:none;"></select>
+
+            <button class="btn-connect" style="width: 100%; margin-bottom: 12px; background: #007bff;"
                 onclick="forceSync()">MANUAL SYNC</button>
 
-            <button class="btn-connect" style="width: 100%; margin-bottom: 20px; background: #ff9800;"
+            <button class="btn-connect" style="width: 100%; margin-bottom: 0; background: #ff9800;"
                 onclick="restartServer()">REINICIAR SERVIDOR</button>
 
             <!-- Seção de Cenas (Visual) -->
-            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px; text-align: center;">
-                <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">GERENCIAMENTO DE
-                    CENAS</p>
+            <div class="config-section">
+                <p class="config-section-header">Gerenciamento de Cenas</p>
                 <div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
                     <span id="configSceneDisplay"
                         style="font-size: 18px; color: #ffcc00; font-weight: bold; letter-spacing: 1px;">SINCRONIZANDO...</span>
@@ -244,11 +247,9 @@
                 </div>
             </div>
 
-
             <!-- Seção DMX (Reset) -->
-            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px; text-align: center;">
-                <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">SISTEMA DE ILUMINAÇÃO
-                </p>
+            <div class="config-section">
+                <p class="config-section-header">Sistema de Iluminação</p>
                 <button class="btn-connect" onclick="resetDmx()"
                     style="width: 100%; margin: 0; background: #6a1b9a; font-size: 12px; font-weight: bold; height: 45px;">RESETAR
                     LUZ</button>
@@ -256,10 +257,8 @@
                     ArtNetToDMX</p>
             </div>
 
-
-            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
-                <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">MODO DE VISUALIZAÇÃO
-                </p>
+            <div class="config-section">
+                <p class="config-section-header">Modo de Visualização</p>
                 <div style="display: flex; gap: 10px;">
                     <button id="btnLayoutMobile" onclick="setLayoutMode('mobile')" class="btn-connect"
                         style="background:#555;">MOBILE</button>
@@ -268,8 +267,8 @@
                 </div>
             </div>
 
-            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
-                <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">PAINEL DE MACROS</p>
+            <div class="config-section">
+                <p class="config-section-header">Painel de Macros</p>
                 <div
                     style="display: flex; align-items: center; justify-content: space-between; background: #222; padding: 10px 15px; border-radius: 8px;">
                     <span style="font-size: 13px; color: #fff;">Habilitar Macros</span>
@@ -281,15 +280,9 @@
                 </div>
             </div>
 
-            <div class="modal-actions">
-                <button onclick="conn()" class="btn-connect">CONECTAR</button>
-                <button onclick="document.getElementById('configModal').style.display='none'"
-                    class="btn-close">FECHAR</button>
-            </div>
-
             <!-- Seção de Configuração do Servidor -->
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #444; text-align: center;">
-                <p style="font-size: 11px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">SERVIDOR</p>
+            <div class="config-section">
+                <p class="config-section-header">Servidor</p>
                 <p id="configServerNameDisplay"
                     style="font-size: 16px; color: #5cacee; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">
                     --
@@ -305,11 +298,11 @@
                 </p>
             </div>
 
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #444;">
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #444;">
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
                     <div>
-                        <p style="font-size: 11px; color: #888; margin: 0; letter-spacing: 1px;">ABRIR INTERFACE
-                            AUTOMATICAMENTE</p>
+                        <p style="font-size: 12px; color: #bbb; margin: 0; letter-spacing: 1px; font-weight: 700; text-transform: uppercase;">Abrir interface
+                            automaticamente</p>
                         <p style="font-size: 9px; color: #555; margin: 4px 0 0 0;">Ao iniciar o servidor</p>
                     </div>
                     <label class="switch">
@@ -317,6 +310,12 @@
                         <span class="slider"></span>
                     </label>
                 </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button onclick="conn()" class="btn-connect">CONECTAR</button>
+                <button onclick="document.getElementById('configModal').style.display='none'"
+                    class="btn-close">FECHAR</button>
             </div>
         </div>
     </div>
@@ -929,7 +928,7 @@
     <script src="modules/macro_fader.js"></script>
     <script src="modules/fader_logic.js"></script>
     <script src="modules/socket.js?v=7"></script>
-    <script src="modules/sidebar.js?v=8"></script>
+    <script src="modules/sidebar.js?v=9"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/scroll.js"></script>
     <script src="modules/setup.js?v=6"></script>

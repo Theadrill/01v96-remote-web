@@ -887,6 +887,43 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
     color: white !important;
 }
 
+/* Config modal section headers */
+.config-modal-title {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.config-modal-subtitle {
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.config-section {
+    margin: 30px 0;
+    border-top: 1px solid #444;
+    padding-top: 24px;
+    text-align: center;
+}
+
+.config-section-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: #bbb;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
 .dock-config {
     background: #444;
     color: white;
@@ -1227,6 +1264,18 @@ body.layout-desktop .dock-btn {
     border: 1px solid #444;
     background: #222;
     color: white;
+}
+
+body.layout-desktop .dock-outs {
+    background: #28a745 !important;
+    border-color: #34ce57 !important;
+    color: white;
+}
+
+body.layout-desktop .dock-outs.active-tab {
+    background: #1b5e20 !important;
+    border-color: #2e7d32 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
 }
 
 body.layout-desktop .sidebar-macros {
