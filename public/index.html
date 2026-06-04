@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
     <meta name="mobile-web-app-capable" content="yes">
     <title>01V96 - LIVE SAFE</title>
-    <link rel="stylesheet" href="style.css?v=16">
+    <link rel="stylesheet" href="style.css?v=22">
     <!-- UI UPDATE: 2026-04-12 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
@@ -173,12 +173,23 @@
 
         <!-- PANEL 2: Dock de Botões (scrollável) -->
         <div id="sidebarDock" class="sidebar-panel sidebar-dock">
+            <div class="scroll-indicator-v scroll-indicator-top">
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="scroll-indicator-v scroll-indicator-bottom">
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="scroll-indicator-h scroll-indicator-left">
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M5 9L1 5L5 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="scroll-indicator-h scroll-indicator-right">
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 9L5 5L1 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
             <div id="buttonDock" class="button-dock"></div>
         </div>
 
         <!-- PANEL 3: Macros (fixo) -->
         <div id="sidebarMacros" class="sidebar-panel sidebar-macros">
-            <button id="exitBtnMacros" class="side-btn btn-exit-macros" onclick="triggerExitActiveMode()">SAIR</button>
             <button class="side-btn btn-macros"
                 onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
             <button id="fsBtnMacros" class="side-btn btn-fs-macros" onclick="toggleFullScreen()">
@@ -186,7 +197,10 @@
                     <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
                 </svg>
             </button>
+            <button id="exitBtnMacros" class="side-btn btn-exit-macros" onclick="triggerExitActiveMode()">SAIR</button>
         </div>
+
+        <button id="musicianExitBtn" class="side-btn btn-exit-musician" onclick="triggerExitActiveMode()">SAIR</button>
     </div>
 
     <div id="configModal" class="modal-overlay">
@@ -237,6 +251,17 @@
                         style="background:#555;">MOBILE</button>
                     <button id="btnLayoutDesktop" onclick="setLayoutMode('desktop')" class="btn-connect"
                         style="background:#555;">DESKTOP</button>
+                </div>
+            </div>
+
+            <div style="margin: 20px 0; border-top: 1px solid #444; padding-top: 20px;">
+                <p style="font-size: 11px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">PAINEL DE MACROS</p>
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #222; padding: 10px 15px; border-radius: 8px;">
+                    <span style="font-size: 13px; color: #fff;">Habilitar Macros</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleMacrosEnable" checked onclick="toggleMacrosPanel(this.checked)">
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
 
@@ -848,7 +873,7 @@
     <script src="modules/globals.js?v=2"></script>
     <script src="modules/macros/core.js"></script>
     <script src="modules/macros.js"></script>
-    <script src="modules/channel_strip.js?v=12"></script>
+    <script src="modules/channel_strip.js?v=15"></script>
     <script src="modules/eq.js?v=5"></script>
     <script src="modules/gate.js"></script>
     <script src="modules/compressor.js"></script>
@@ -859,7 +884,7 @@
     <script src="modules/macro_fader.js"></script>
     <script src="modules/fader_logic.js"></script>
     <script src="modules/socket.js?v=6"></script>
-    <script src="modules/sidebar.js?v=5"></script>
+    <script src="modules/sidebar.js?v=8"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/scroll.js"></script>
     <script src="modules/setup.js?v=6"></script>

@@ -56,7 +56,7 @@ function updateUI(ch, val, onState, soloState) {
     const isMaster = ch === 'master';
     let stateRef;
     let uiId = ch;
-    
+
     if (isMaster) {
         stateRef = masterState;
     } else if (typeof ch === 'string' && ch.startsWith('m')) {
@@ -178,8 +178,8 @@ function createDesktopStrip(config) {
             ${hasSolo ?
             `<button id="solo${id}" class="btn-cue" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">SOLO</button>` :
             isMaster ?
-            `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
-            `<div class="btn-cue-placeholder"></div>`}
+                `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
+                `<div class="btn-cue-placeholder"></div>`}
             
             <div class="desk-ch-name-zone" onclick="${configAction}">
                 <div id="${nameId}" class="desk-ch-name">${name}</div>
@@ -231,32 +231,32 @@ function createDesktopStrip(config) {
                 <span class="desk-pan-l">L</span>
                 <div class="desk-pan-tracks-container">
                     ${(() => {
-                        const getPanTrackHTML = (ch) => {
-                            let panVal = 0;
-                            const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-                            if (stateRef && stateRef.pan !== undefined) {
-                                panVal = stateRef.pan;
-                            }
-                            
-                            const percent = ((panVal + 63) / 126) * 100;
-                            let panClass = "pan-center";
-                            if (panVal < 0) panClass = "pan-left";
-                            if (panVal > 0) panClass = "pan-right";
+                const getPanTrackHTML = (ch) => {
+                    let panVal = 0;
+                    const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+                    if (stateRef && stateRef.pan !== undefined) {
+                        panVal = stateRef.pan;
+                    }
 
-                            return `
+                    const percent = ((panVal + 63) / 126) * 100;
+                    let panClass = "pan-center";
+                    if (panVal < 0) panClass = "pan-left";
+                    if (panVal > 0) panClass = "pan-right";
+
+                    return `
                                 <div class="desk-pan-track" data-pan-ch="${ch}">
                                     <div class="desk-pan-center-tick"></div>
                                     <div class="desk-pan-thumb ${panClass}" style="left:${percent}%"></div>
                                 </div>
                             `;
-                        };
+                };
 
-                        let tracksHTML = getPanTrackHTML(evtCh);
-                        if (isPaired && partnerId !== null) {
-                            tracksHTML += getPanTrackHTML(partnerId);
-                        }
-                        return tracksHTML;
-                    })()}
+                let tracksHTML = getPanTrackHTML(evtCh);
+                if (isPaired && partnerId !== null) {
+                    tracksHTML += getPanTrackHTML(partnerId);
+                }
+                return tracksHTML;
+            })()}
                 </div>
                 <span class="desk-pan-r">R</span>` : ''}
             </div>
@@ -275,7 +275,7 @@ function updatePanIndicator(channel, panValue) {
 
     // Busca todas as trilhas na UI (desktop card ou mobile routing etc)
     const tracks = document.querySelectorAll(`.desk-pan-track[data-pan-ch="${channel}"]`);
-    
+
     tracks.forEach(track => {
         const thumb = track.querySelector('.desk-pan-thumb');
         if (!thumb) return;
@@ -294,7 +294,7 @@ function updatePanIndicator(channel, panValue) {
 function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
     const s = isMaster ? masterState : channelStates[i];
     let title = isMaster ? "MASTER" : `${i + 1}`;
-    
+
     // Se estiver pareado, o título mostra os dois canais (ex: 1 + 2)
     if (!isMaster && s.paired) {
         title = `${i + 1} + ${i + 2}`;
@@ -305,7 +305,7 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
     if (!isMaster) {
         if (i < 16) customClass += " fader-group-1";
         else if (i < 32) customClass += " fader-group-2";
-        
+
         // Aplica classe de largura dupla se estiver pareado
         if (s.paired) customClass += " fader-card-paired";
     }
@@ -427,7 +427,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
 
     const s = isMaster ? masterState : channelStates[i];
     let title = isMaster ? "STEREO" : `CH ${i + 1}`;
-    
+
     // Mobile title para pareado
     if (!isMaster && s.paired) {
         title = `CH ${i + 1} + ${i + 2}`;
@@ -438,7 +438,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
     if (!isMaster) {
         if (i < 16) customClass = "fader-group-1";
         else if (i < 32) customClass = "fader-group-2";
-        
+
         // Aplica largura dupla no mobile
         if (s.paired) customClass += " fader-card-paired";
     }
@@ -479,7 +479,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
 
 function createDesktopOutputStrip(i, type, idPrefix = "") {
     let prefix, title, cmdPrefix, customClass, configId, ch;
-    
+
     if (type === 'mix') {
         prefix = 'm';
         title = `MIX ${i + 1}`;
@@ -528,7 +528,7 @@ function createOutputStrip(i, type, idPrefix = "") {
     if (layoutMode === 'desktop') return createDesktopOutputStrip(i, type, idPrefix);
 
     let prefix, title, cmdPrefix, customClass, configId, ch;
-    
+
     if (type === 'mix') {
         prefix = 'm';
         title = `MIX ${i + 1}`;
@@ -632,9 +632,17 @@ function initUI() {
     if (typeof renderDock === 'function') renderDock(dockMode);
     if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
 
-    // MACROS visibility
+    // DOCK & MACROS visibility in Musician Mode
     const macrosPanel = document.getElementById('sidebarMacros');
-    if (macrosPanel) macrosPanel.style.display = musicianMode ? 'none' : 'block';
+    if (macrosPanel) {
+        macrosPanel.style.display = musicianMode ? 'none' : 'block';
+    }
+
+    const dockPanel = document.getElementById('sidebarDock');
+    if (dockPanel) dockPanel.style.display = musicianMode ? 'none' : 'block';
+
+    const musicianExitBtn = document.getElementById('musicianExitBtn');
+    if (musicianExitBtn) musicianExitBtn.style.display = musicianMode ? 'flex' : 'none';
 
     if (outsMode && !musicianMode && !technicianMixMode) {
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'mix');
@@ -645,7 +653,7 @@ function initUI() {
             const state = channelStates[i];
             // Se estiver pareado, pulamos a renderização do canal PAR (o segundo do par)
             if (state && state.paired && i % 2 !== 0) {
-                continue; 
+                continue;
             }
             html += createChannelStrip(i, false);
         }

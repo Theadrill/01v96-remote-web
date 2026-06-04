@@ -1197,6 +1197,10 @@ body.layout-desktop .sidebar-info #scn {
     margin-bottom: 4px !important;
 }
 
+body.layout-desktop .sidebar-info {
+    margin-bottom: 24px !important;
+}
+
 body.layout-desktop .sidebar-info #scene-info {
     font-size: 11px !important;
 }
@@ -2431,6 +2435,7 @@ body.is-portrait:has(.sidebar-musician) {
 }
 
 body.is-portrait .sidebar-musician {
+    position: relative !important;
     width: 100% !important;
     height: 60px !important;
     flex-direction: row !important;
@@ -2444,12 +2449,14 @@ body.is-portrait .sidebar-musician {
 }
 
 body.is-portrait .sidebar-musician .sidebar-info {
-    flex-direction: row !important;
-    width: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
     height: 100% !important;
+    width: auto !important;
     margin: 0 !important;
-    align-items: center !important;
-    gap: 10px !important;
+    gap: 2px !important;
 }
 
 body.is-portrait .sidebar-musician .sidebar-info #scn {
@@ -2458,7 +2465,17 @@ body.is-portrait .sidebar-musician .sidebar-info #scn {
     width: auto !important;
 }
 
-body.is-portrait .sidebar-musician .sidebar-info .fone-indicator {
+body.is-portrait .sidebar-musician .sidebar-info #scene-info {
+    margin: 0 !important;
+    font-size: 9px !important;
+    color: #ffffff !important;
+}
+
+body.is-portrait .sidebar-musician .fone-indicator {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
     writing-mode: horizontal-tb !important;
     text-orientation: mixed !important;
     letter-spacing: 1px !important;
@@ -3404,8 +3421,9 @@ body:not(.layout-desktop):not(.is-portrait) .button-dock::-webkit-scrollbar {
 }
 
 body:not(.layout-desktop):not(.is-portrait) .dock-btn {
-    min-height: 70px !important;
-    font-size: 12px !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    font-size: 11px !important;
 }
 
 /* Oculta o botão de fullscreen da dock em modo landscape no mobile/Steam Deck */
@@ -3431,14 +3449,28 @@ body:not(.layout-desktop):not(.is-portrait) .sidebar-macros .btn-macros {
     margin: 0 !important;
 }
 
+/* Ajustes específicos para telas com altura reduzida (ex: iPhone deitado) quando não estiver na tela principal */
+@media screen and (orientation: landscape) and (max-height: 480px) {
+    body:not(.layout-desktop):not(.is-portrait):not(.screen-main) .sidebar-dock {
+        min-height: 102px !important;
+    }
+    body:not(.layout-desktop):not(.is-portrait):not(.screen-main) .sidebar-macros {
+        height: 25vh !important;
+        min-height: 25vh !important;
+    }
+}
+
 /* Exibe o botão de fullscreen dentro da área de macros no modo deitado */
 body:not(.layout-desktop):not(.is-portrait) .btn-fs-macros {
     display: flex !important;
-    height: 50px !important;
-    min-height: 50px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 44px !important;
+    min-height: 44px !important;
     background: #444 !important;
     color: white !important;
     margin: 0 !important;
+    padding: 0 !important;
     border-radius: 8px !important;
 }
 
@@ -3468,13 +3500,16 @@ body:not(.layout-desktop):not(.is-portrait) .btn-fs-macros {
         justify-content: center;
         font-size: 11px;
     }
+
     body:not(.layout-desktop) .sidebar-macros {
         flex-direction: column !important;
         gap: 6px !important;
     }
+
     body:not(.layout-desktop) .sidebar-macros .btn-macros {
         height: calc(50% - 3px) !important;
     }
+
     body:not(.layout-desktop) .dock-close,
     body:not(.layout-desktop) .dock-exit {
         display: none !important;
@@ -3482,8 +3517,8 @@ body:not(.layout-desktop):not(.is-portrait) .btn-fs-macros {
 }
 
 /* Landscape: tablets e telas maiores (width >= 1024px ou height >= 600px) */
-@media screen and (orientation: landscape) and (min-width: 1024px), 
-       screen and (orientation: landscape) and (min-height: 600px) {
+@media screen and (orientation: landscape) and (min-width: 1024px),
+screen and (orientation: landscape) and (min-height: 600px) {
     body:not(.layout-desktop) .btn-exit-macros {
         display: flex !important;
         height: 44px !important;
@@ -3494,8 +3529,267 @@ body:not(.layout-desktop):not(.is-portrait) .btn-fs-macros {
         margin: 0 !important;
         border-radius: 8px !important;
     }
+
     body:not(.layout-desktop) .dock-close,
     body:not(.layout-desktop) .dock-exit {
         display: none !important;
     }
+}
+
+/* Estilos para os Indicadores de Rolagem da Dock */
+.sidebar-dock {
+    position: relative !important;
+}
+
+.scroll-indicator-v,
+.scroll-indicator-h {
+    position: absolute;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 15;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+@keyframes scrollPulseY {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateY(1.5px) scale(1.1);
+        opacity: 0.95;
+    }
+}
+
+@keyframes scrollPulseX {
+
+    0%,
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateX(1.5px) scale(1.1);
+        opacity: 0.95;
+    }
+}
+
+.scroll-indicator-top svg,
+.scroll-indicator-bottom svg {
+    animation: scrollPulseY 1.8s infinite ease-in-out;
+}
+
+.scroll-indicator-left svg,
+.scroll-indicator-right svg {
+    animation: scrollPulseX 1.8s infinite ease-in-out;
+}
+
+/* Indicadores Verticais (modo paisagem) */
+.scroll-indicator-top {
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    height: 20px;
+    background: linear-gradient(to bottom, rgba(20, 20, 20, 0.95) 0%, transparent 100%);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    align-items: flex-start;
+    padding-top: 4px;
+}
+
+.scroll-indicator-bottom {
+    bottom: 4px;
+    left: 4px;
+    right: 4px;
+    height: 20px;
+    background: linear-gradient(to top, rgba(20, 20, 20, 0.95) 0%, transparent 100%);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    align-items: flex-end;
+    padding-bottom: 4px;
+}
+
+/* Indicadores Horizontais (modo retrato / bottom bar) */
+.scroll-indicator-left {
+    left: 4px;
+    top: 4px;
+    bottom: 4px;
+    width: 20px;
+    background: linear-gradient(to right, rgba(20, 20, 20, 0.95) 0%, transparent 100%);
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    justify-content: flex-start;
+    padding-left: 4px;
+}
+
+.scroll-indicator-right {
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    width: 20px;
+    background: linear-gradient(to left, rgba(20, 20, 20, 0.95) 0%, transparent 100%);
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    justify-content: flex-end;
+    padding-right: 4px;
+}
+
+/* Estados ativos controlados via JS classes no sidebarDock */
+.sidebar-dock.has-scroll-top .scroll-indicator-top {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sidebar-dock.has-scroll-bottom .scroll-indicator-bottom {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sidebar-dock.has-scroll-left .scroll-indicator-left {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sidebar-dock.has-scroll-right .scroll-indicator-right {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Botão de sair exclusivo para o modo Musician (oculto por padrão) */
+.btn-exit-musician {
+    display: none !important;
+    background: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-exit-musician:hover,
+.btn-exit-musician:active {
+    background: #c82333 !important;
+}
+
+/* Ocultar COMPLETO dock e macros no modo Musician, independente da orientação */
+.sidebar-musician #sidebarDock,
+.sidebar-musician #sidebarMacros {
+    display: none !important;
+}
+
+/* Exibe o botão de sair apenas quando a sidebar estiver no modo Musician */
+.sidebar-musician #musicianExitBtn {
+    display: flex !important;
+}
+
+/* Modo retrato (em pé) */
+body.is-portrait .sidebar-musician #musicianExitBtn {
+    width: 80px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    margin-left: auto !important;
+    /* Empurra para a extrema direita */
+}
+
+/* Modo paisagem (deitado) */
+body:not(.is-portrait) .sidebar-musician #musicianExitBtn {
+    width: calc(100% - 16px) !important;
+    height: 44px !important;
+    margin: 8px !important;
+    margin-top: auto !important;
+    /* Empurra para a base da sidebar */
+}
+
+/* Ocultar nome da cena no mobile em telas secundárias (config de canal, mix do técnico, saídas) */
+body:not(.layout-desktop).screen-config #scene-info,
+body:not(.layout-desktop).screen-techmix #scene-info,
+body:not(.layout-desktop).screen-outs #scene-info {
+    display: none !important;
+}
+
+/* Ocultar botão de fullscreen no mobile em telas secundárias (config de canal, mix do técnico, saídas) */
+body:not(.layout-desktop).screen-config .btn-fs-macros,
+body:not(.layout-desktop).screen-techmix .btn-fs-macros,
+body:not(.layout-desktop).screen-outs .btn-fs-macros {
+    display: none !important;
+}
+
+/* Ocultar apenas o botão de macros quando desabilitado nas configurações */
+body.hide-macros .btn-macros {
+    display: none !important;
+}
+
+/* Posiciona o botão de fullscreen abaixo do botão macro no modo desktop */
+body.layout-desktop .btn-fs-macros {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 50px !important;
+    min-height: 44px !important;
+    border-radius: 8px !important;
+    border: 1px solid #444 !important;
+    background: #222 !important;
+    color: white !important;
+    margin: 0 0 10px 0 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+body.layout-desktop .btn-fs-macros:hover {
+    background: #333 !important;
+}
+
+body.layout-desktop .btn-fs-macros:active {
+    opacity: 0.8;
+    transform: scale(0.96);
+}
+
+body.layout-desktop .btn-exit-macros {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 50px !important;
+    min-height: 44px !important;
+    border-radius: 8px !important;
+    border: 1px solid #721c24 !important;
+    background: #dc3545 !important;
+    color: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    font-weight: bold !important;
+    font-size: 13px !important;
+    letter-spacing: 0.5px !important;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+body.layout-desktop .btn-exit-macros:hover {
+    background: #c82333 !important;
+}
+
+body.layout-desktop .btn-exit-macros:active {
+    opacity: 0.8 !important;
+    transform: scale(0.96) !important;
+}
+
+body.layout-desktop .dock-fs,
+body.layout-desktop .dock-exit,
+body.layout-desktop .dock-close {
+    display: none !important;
 }

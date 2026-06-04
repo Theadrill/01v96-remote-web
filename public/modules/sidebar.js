@@ -228,6 +228,12 @@ function updateViewportInfo() {
 
     // Compatibilidade extra para iOS (força reflow se necessário)
     // console.log(`Viewport: ${w}x${h} (${isPortrait ? 'Retrato' : 'Paisagem'})`);
+    
+    if (typeof updateDockScrollIndicators === 'function') {
+        updateDockScrollIndicators();
+        setTimeout(updateDockScrollIndicators, 100);
+        setTimeout(updateDockScrollIndicators, 300);
+    }
 }
 
 // Listeners para mudança de viewport (incluindo iOS)
@@ -453,13 +459,43 @@ window.onConfigReset = function () {
     document.querySelectorAll('.modal-overlay').forEach(m => { m.style.display = 'none'; });
 };
 
+window.toggleMacrosPanel = function(enabled) {
+    console.log("🛠️ toggleMacrosPanel chamando com:", enabled);
+    localStorage.setItem('01v96_show_macros', enabled ? 'true' : 'false');
+    if (enabled) {
+        document.body.classList.remove('hide-macros');
+    } else {
+        document.body.classList.add('hide-macros');
+    }
+};
+
+function updateMacrosState() {
+    const showMacros = localStorage.getItem('01v96_show_macros') !== 'false';
+    console.log("🛠️ updateMacrosState lido showMacros de localStorage:", showMacros);
+    const toggleCheckbox = document.getElementById('toggleMacrosEnable');
+    if (toggleCheckbox) {
+        toggleCheckbox.checked = showMacros;
+        console.log("🛠️ Configurado checkbox toggleMacrosEnable para checked =", showMacros);
+    } else {
+        console.warn("⚠️ Checkbox toggleMacrosEnable não encontrado na DOM!");
+    }
+    if (showMacros) {
+        document.body.classList.remove('hide-macros');
+    } else {
+        document.body.classList.add('hide-macros');
+    }
+    console.log("🛠️ Class hide-macros ativa no body:", document.body.classList.contains('hide-macros'));
+}
+
 // Atualiza o display do nome do servidor sempre que o configModal abrir
 document.addEventListener('DOMContentLoaded', () => {
+    updateMacrosState();
     const configModal = document.getElementById('configModal');
     if (!configModal) return;
     const observer = new MutationObserver(() => {
         if (configModal.style.display === 'flex') {
             refreshServerNameDisplay();
+            updateMacrosState();
         }
     });
     observer.observe(configModal, { attributes: true, attributeFilter: ['style'] });
@@ -537,6 +573,20 @@ window.triggerExitActiveMode = triggerExitActiveMode;
 
 
 function updateSidebarInfo() {
+    // Sync active screen classes on body to allow CSS targeting
+    document.body.classList.remove('screen-main', 'screen-config', 'screen-techmix', 'screen-outs', 'screen-musician');
+    if (musicianMode) {
+        document.body.classList.add('screen-musician');
+    } else if (activeConfigChannel !== null) {
+        document.body.classList.add('screen-config');
+    } else if (technicianMixMode) {
+        document.body.classList.add('screen-techmix');
+    } else if (outsMode) {
+        document.body.classList.add('screen-outs');
+    } else {
+        document.body.classList.add('screen-main');
+    }
+
     const chTitle = document.getElementById('chSideTitle');
     const tmTitle = document.getElementById('techMixTitle');
     const fiSidebar = document.getElementById('foneIndicatorSidebar');
@@ -593,3 +643,77 @@ function updateSidebarInfo() {
         if (sidebarNav) sidebarNav.style.display = 'none';
     }
 }
+
+// Função para atualizar os indicadores de rolagem da dock
+function updateDockScrollIndicators() {
+    const parent = document.getElementById('sidebarDock');
+    const el = document.getElementById('buttonDock');
+    if (!parent || !el) return;
+
+    const isPortrait = document.body.classList.contains('is-portrait');
+    const isDesktop = document.body.classList.contains('layout-desktop');
+
+    if (isDesktop || parent.style.display === 'none' || parent.offsetParent === null) {
+        parent.classList.remove('has-scroll-top', 'has-scroll-bottom', 'has-scroll-left', 'has-scroll-right');
+        return;
+    }
+
+    if (isPortrait) {
+        const scrollLeft = el.scrollLeft;
+        const scrollWidth = el.scrollWidth;
+        const clientWidth = el.clientWidth;
+        
+        if (scrollLeft > 2) {
+            parent.classList.add('has-scroll-left');
+        } else {
+            parent.classList.remove('has-scroll-left');
+        }
+
+        if (scrollLeft + clientWidth < scrollWidth - 2) {
+            parent.classList.add('has-scroll-right');
+        } else {
+            parent.classList.remove('has-scroll-right');
+        }
+
+        parent.classList.remove('has-scroll-top', 'has-scroll-bottom');
+    } else {
+        const scrollTop = el.scrollTop;
+        const scrollHeight = el.scrollHeight;
+        const clientHeight = el.clientHeight;
+
+        if (scrollTop > 2) {
+            parent.classList.add('has-scroll-top');
+        } else {
+            parent.classList.remove('has-scroll-top');
+        }
+
+        if (scrollTop + clientHeight < scrollHeight - 2) {
+            parent.classList.add('has-scroll-bottom');
+        } else {
+            parent.classList.remove('has-scroll-bottom');
+        }
+
+        parent.classList.remove('has-scroll-left', 'has-scroll-right');
+    }
+}
+
+// Inicializa eventos para os indicadores
+document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('buttonDock');
+    if (el) {
+        el.addEventListener('scroll', updateDockScrollIndicators);
+        el.addEventListener('touchmove', updateDockScrollIndicators, { passive: true });
+    }
+    window.addEventListener('resize', updateDockScrollIndicators);
+    
+    // Configura um MutationObserver para monitorar mudanças nos botões da dock
+    const observer = new MutationObserver(updateDockScrollIndicators);
+    if (el) {
+        observer.observe(el, { childList: true });
+    }
+    
+    setTimeout(updateDockScrollIndicators, 100);
+});
+
+// Exporta para ser chamada manualmente se necessário
+window.updateDockScrollIndicators = updateDockScrollIndicators;
