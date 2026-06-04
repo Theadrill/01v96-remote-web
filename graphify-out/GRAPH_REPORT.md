@@ -1,22 +1,22 @@
 # Graph Report - 01v96-remote-web  (2026-06-04)
 
 ## Corpus Check
-- 476 files · ~401,133 words
+- 110 files · ~353,068 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 6751 nodes · 7320 edges · 534 communities (491 shown, 43 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 155 edges (avg confidence: 0.81)
+- 2935 nodes · 3792 edges · 206 communities (176 shown, 30 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 154 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9d682fdf`
+- Built from commit: `626ecdc0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)|Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)]]
-- [[_COMMUNITY_Web Frontend Utility Functions|Web Frontend Utility Functions]]
+- [[_COMMUNITY_Community 1|Community 1]]
 - [[_COMMUNITY_Migration Audit (RustNode.js Dead Code)|Migration Audit (Rust/Node.js Dead Code)]]
 - [[_COMMUNITY_Server Rust Core (boot, config, DMX, MIDI, state)|Server Rust Core (boot, config, DMX, MIDI, state)]]
 - [[_COMMUNITY_CLI Tools & MIDI Bridge Utils|CLI Tools & MIDI Bridge Utils]]
@@ -47,13 +47,17 @@
 - [[_COMMUNITY_Docs Writer & Style Guide|Docs Writer & Style Guide]]
 - [[_COMMUNITY_GitHub Comment Fetcher|GitHub Comment Fetcher]]
 - [[_COMMUNITY_FX Slot Scanner & Elevation Test|FX Slot Scanner & Elevation Test]]
+- [[_COMMUNITY_Community 33|Community 33]]
 - [[_COMMUNITY_UIUX Pro Max BM25 Search|UI/UX Pro Max BM25 Search]]
+- [[_COMMUNITY_Community 35|Community 35]]
 - [[_COMMUNITY_VSCode Editor Settings|VSCode Editor Settings]]
+- [[_COMMUNITY_Community 37|Community 37]]
 - [[_COMMUNITY_ESLint Config|ESLint Config]]
 - [[_COMMUNITY_OpenCode TUI Config|OpenCode TUI Config]]
 - [[_COMMUNITY_Agent Skill Lock|Agent Skill Lock]]
 - [[_COMMUNITY_Chat Scraping Capture HTML|Chat Scraping Capture HTML]]
 - [[_COMMUNITY_Coding Guidelines (Karpathy)|Coding Guidelines (Karpathy)]]
+- [[_COMMUNITY_Community 43|Community 43]]
 - [[_COMMUNITY_JavaScript Mastery Skill|JavaScript Mastery Skill]]
 - [[_COMMUNITY_Slider Restriction Handler|Slider Restriction Handler]]
 - [[_COMMUNITY_Mixer State Structure|Mixer State Structure]]
@@ -78,18 +82,14 @@
 - [[_COMMUNITY_Community 74|Community 74]]
 - [[_COMMUNITY_Community 76|Community 76]]
 - [[_COMMUNITY_Community 77|Community 77]]
-- [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 79|Community 79]]
 - [[_COMMUNITY_Community 80|Community 80]]
-- [[_COMMUNITY_Community 81|Community 81]]
-- [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_Community 83|Community 83]]
 - [[_COMMUNITY_Community 84|Community 84]]
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY_Community 87|Community 87]]
 - [[_COMMUNITY_Community 88|Community 88]]
-- [[_COMMUNITY_Community 90|Community 90]]
 - [[_COMMUNITY_Community 91|Community 91]]
 - [[_COMMUNITY_Community 92|Community 92]]
 - [[_COMMUNITY_Community 94|Community 94]]
@@ -106,14 +106,10 @@
 - [[_COMMUNITY_Community 106|Community 106]]
 - [[_COMMUNITY_Community 108|Community 108]]
 - [[_COMMUNITY_Community 109|Community 109]]
-- [[_COMMUNITY_Community 110|Community 110]]
 - [[_COMMUNITY_Community 111|Community 111]]
 - [[_COMMUNITY_Community 112|Community 112]]
-- [[_COMMUNITY_Community 113|Community 113]]
-- [[_COMMUNITY_Community 114|Community 114]]
 - [[_COMMUNITY_Community 115|Community 115]]
 - [[_COMMUNITY_Community 116|Community 116]]
-- [[_COMMUNITY_Community 117|Community 117]]
 - [[_COMMUNITY_Community 118|Community 118]]
 - [[_COMMUNITY_Community 119|Community 119]]
 - [[_COMMUNITY_Community 120|Community 120]]
@@ -130,19 +126,16 @@
 - [[_COMMUNITY_Community 133|Community 133]]
 - [[_COMMUNITY_Community 134|Community 134]]
 - [[_COMMUNITY_Community 135|Community 135]]
-- [[_COMMUNITY_Community 136|Community 136]]
 - [[_COMMUNITY_Community 137|Community 137]]
 - [[_COMMUNITY_Community 138|Community 138]]
 - [[_COMMUNITY_Community 139|Community 139]]
 - [[_COMMUNITY_Community 140|Community 140]]
-- [[_COMMUNITY_Community 143|Community 143]]
 - [[_COMMUNITY_Community 144|Community 144]]
 - [[_COMMUNITY_Community 145|Community 145]]
 - [[_COMMUNITY_Community 146|Community 146]]
 - [[_COMMUNITY_Community 147|Community 147]]
 - [[_COMMUNITY_Community 148|Community 148]]
 - [[_COMMUNITY_Community 149|Community 149]]
-- [[_COMMUNITY_Community 150|Community 150]]
 - [[_COMMUNITY_Community 154|Community 154]]
 - [[_COMMUNITY_Community 155|Community 155]]
 - [[_COMMUNITY_Community 156|Community 156]]
@@ -204,332 +197,13 @@
 - [[_COMMUNITY_Community 217|Community 217]]
 - [[_COMMUNITY_Community 218|Community 218]]
 - [[_COMMUNITY_Community 220|Community 220]]
-- [[_COMMUNITY_Community 221|Community 221]]
 - [[_COMMUNITY_Community 222|Community 222]]
 - [[_COMMUNITY_Community 223|Community 223]]
 - [[_COMMUNITY_Community 224|Community 224]]
-- [[_COMMUNITY_Community 225|Community 225]]
-- [[_COMMUNITY_Community 226|Community 226]]
-- [[_COMMUNITY_Community 227|Community 227]]
-- [[_COMMUNITY_Community 228|Community 228]]
-- [[_COMMUNITY_Community 229|Community 229]]
-- [[_COMMUNITY_Community 230|Community 230]]
-- [[_COMMUNITY_Community 231|Community 231]]
-- [[_COMMUNITY_Community 232|Community 232]]
-- [[_COMMUNITY_Community 233|Community 233]]
-- [[_COMMUNITY_Community 235|Community 235]]
-- [[_COMMUNITY_Community 236|Community 236]]
-- [[_COMMUNITY_Community 237|Community 237]]
-- [[_COMMUNITY_Community 238|Community 238]]
-- [[_COMMUNITY_Community 239|Community 239]]
 - [[_COMMUNITY_Community 244|Community 244]]
-- [[_COMMUNITY_Community 245|Community 245]]
-- [[_COMMUNITY_Community 247|Community 247]]
 - [[_COMMUNITY_Community 252|Community 252]]
 - [[_COMMUNITY_Community 253|Community 253]]
-- [[_COMMUNITY_Community 258|Community 258]]
 - [[_COMMUNITY_Community 259|Community 259]]
-- [[_COMMUNITY_Community 271|Community 271]]
-- [[_COMMUNITY_Community 272|Community 272]]
-- [[_COMMUNITY_Community 273|Community 273]]
-- [[_COMMUNITY_Community 274|Community 274]]
-- [[_COMMUNITY_Community 275|Community 275]]
-- [[_COMMUNITY_Community 276|Community 276]]
-- [[_COMMUNITY_Community 277|Community 277]]
-- [[_COMMUNITY_Community 278|Community 278]]
-- [[_COMMUNITY_Community 279|Community 279]]
-- [[_COMMUNITY_Community 280|Community 280]]
-- [[_COMMUNITY_Community 281|Community 281]]
-- [[_COMMUNITY_Community 282|Community 282]]
-- [[_COMMUNITY_Community 283|Community 283]]
-- [[_COMMUNITY_Community 284|Community 284]]
-- [[_COMMUNITY_Community 285|Community 285]]
-- [[_COMMUNITY_Community 286|Community 286]]
-- [[_COMMUNITY_Community 287|Community 287]]
-- [[_COMMUNITY_Community 288|Community 288]]
-- [[_COMMUNITY_Community 289|Community 289]]
-- [[_COMMUNITY_Community 290|Community 290]]
-- [[_COMMUNITY_Community 291|Community 291]]
-- [[_COMMUNITY_Community 292|Community 292]]
-- [[_COMMUNITY_Community 293|Community 293]]
-- [[_COMMUNITY_Community 294|Community 294]]
-- [[_COMMUNITY_Community 295|Community 295]]
-- [[_COMMUNITY_Community 296|Community 296]]
-- [[_COMMUNITY_Community 297|Community 297]]
-- [[_COMMUNITY_Community 298|Community 298]]
-- [[_COMMUNITY_Community 299|Community 299]]
-- [[_COMMUNITY_Community 300|Community 300]]
-- [[_COMMUNITY_Community 301|Community 301]]
-- [[_COMMUNITY_Community 302|Community 302]]
-- [[_COMMUNITY_Community 303|Community 303]]
-- [[_COMMUNITY_Community 304|Community 304]]
-- [[_COMMUNITY_Community 305|Community 305]]
-- [[_COMMUNITY_Community 306|Community 306]]
-- [[_COMMUNITY_Community 307|Community 307]]
-- [[_COMMUNITY_Community 308|Community 308]]
-- [[_COMMUNITY_Community 309|Community 309]]
-- [[_COMMUNITY_Community 310|Community 310]]
-- [[_COMMUNITY_Community 311|Community 311]]
-- [[_COMMUNITY_Community 312|Community 312]]
-- [[_COMMUNITY_Community 313|Community 313]]
-- [[_COMMUNITY_Community 314|Community 314]]
-- [[_COMMUNITY_Community 315|Community 315]]
-- [[_COMMUNITY_Community 316|Community 316]]
-- [[_COMMUNITY_Community 317|Community 317]]
-- [[_COMMUNITY_Community 318|Community 318]]
-- [[_COMMUNITY_Community 319|Community 319]]
-- [[_COMMUNITY_Community 320|Community 320]]
-- [[_COMMUNITY_Community 321|Community 321]]
-- [[_COMMUNITY_Community 322|Community 322]]
-- [[_COMMUNITY_Community 323|Community 323]]
-- [[_COMMUNITY_Community 324|Community 324]]
-- [[_COMMUNITY_Community 325|Community 325]]
-- [[_COMMUNITY_Community 326|Community 326]]
-- [[_COMMUNITY_Community 327|Community 327]]
-- [[_COMMUNITY_Community 328|Community 328]]
-- [[_COMMUNITY_Community 329|Community 329]]
-- [[_COMMUNITY_Community 330|Community 330]]
-- [[_COMMUNITY_Community 331|Community 331]]
-- [[_COMMUNITY_Community 332|Community 332]]
-- [[_COMMUNITY_Community 333|Community 333]]
-- [[_COMMUNITY_Community 334|Community 334]]
-- [[_COMMUNITY_Community 335|Community 335]]
-- [[_COMMUNITY_Community 336|Community 336]]
-- [[_COMMUNITY_Community 337|Community 337]]
-- [[_COMMUNITY_Community 338|Community 338]]
-- [[_COMMUNITY_Community 339|Community 339]]
-- [[_COMMUNITY_Community 340|Community 340]]
-- [[_COMMUNITY_Community 341|Community 341]]
-- [[_COMMUNITY_Community 342|Community 342]]
-- [[_COMMUNITY_Community 343|Community 343]]
-- [[_COMMUNITY_Community 344|Community 344]]
-- [[_COMMUNITY_Community 345|Community 345]]
-- [[_COMMUNITY_Community 346|Community 346]]
-- [[_COMMUNITY_Community 347|Community 347]]
-- [[_COMMUNITY_Community 348|Community 348]]
-- [[_COMMUNITY_Community 349|Community 349]]
-- [[_COMMUNITY_Community 350|Community 350]]
-- [[_COMMUNITY_Community 351|Community 351]]
-- [[_COMMUNITY_Community 352|Community 352]]
-- [[_COMMUNITY_Community 353|Community 353]]
-- [[_COMMUNITY_Community 354|Community 354]]
-- [[_COMMUNITY_Community 355|Community 355]]
-- [[_COMMUNITY_Community 356|Community 356]]
-- [[_COMMUNITY_Community 357|Community 357]]
-- [[_COMMUNITY_Community 358|Community 358]]
-- [[_COMMUNITY_Community 359|Community 359]]
-- [[_COMMUNITY_Community 360|Community 360]]
-- [[_COMMUNITY_Community 361|Community 361]]
-- [[_COMMUNITY_Community 362|Community 362]]
-- [[_COMMUNITY_Community 363|Community 363]]
-- [[_COMMUNITY_Community 364|Community 364]]
-- [[_COMMUNITY_Community 365|Community 365]]
-- [[_COMMUNITY_Community 366|Community 366]]
-- [[_COMMUNITY_Community 367|Community 367]]
-- [[_COMMUNITY_Community 368|Community 368]]
-- [[_COMMUNITY_Community 369|Community 369]]
-- [[_COMMUNITY_Community 370|Community 370]]
-- [[_COMMUNITY_Community 371|Community 371]]
-- [[_COMMUNITY_Community 372|Community 372]]
-- [[_COMMUNITY_Community 373|Community 373]]
-- [[_COMMUNITY_Community 374|Community 374]]
-- [[_COMMUNITY_Community 375|Community 375]]
-- [[_COMMUNITY_Community 376|Community 376]]
-- [[_COMMUNITY_Community 377|Community 377]]
-- [[_COMMUNITY_Community 378|Community 378]]
-- [[_COMMUNITY_Community 379|Community 379]]
-- [[_COMMUNITY_Community 380|Community 380]]
-- [[_COMMUNITY_Community 381|Community 381]]
-- [[_COMMUNITY_Community 382|Community 382]]
-- [[_COMMUNITY_Community 383|Community 383]]
-- [[_COMMUNITY_Community 384|Community 384]]
-- [[_COMMUNITY_Community 385|Community 385]]
-- [[_COMMUNITY_Community 386|Community 386]]
-- [[_COMMUNITY_Community 387|Community 387]]
-- [[_COMMUNITY_Community 388|Community 388]]
-- [[_COMMUNITY_Community 389|Community 389]]
-- [[_COMMUNITY_Community 390|Community 390]]
-- [[_COMMUNITY_Community 391|Community 391]]
-- [[_COMMUNITY_Community 392|Community 392]]
-- [[_COMMUNITY_Community 393|Community 393]]
-- [[_COMMUNITY_Community 394|Community 394]]
-- [[_COMMUNITY_Community 395|Community 395]]
-- [[_COMMUNITY_Community 396|Community 396]]
-- [[_COMMUNITY_Community 397|Community 397]]
-- [[_COMMUNITY_Community 398|Community 398]]
-- [[_COMMUNITY_Community 399|Community 399]]
-- [[_COMMUNITY_Community 400|Community 400]]
-- [[_COMMUNITY_Community 401|Community 401]]
-- [[_COMMUNITY_Community 402|Community 402]]
-- [[_COMMUNITY_Community 403|Community 403]]
-- [[_COMMUNITY_Community 404|Community 404]]
-- [[_COMMUNITY_Community 405|Community 405]]
-- [[_COMMUNITY_Community 406|Community 406]]
-- [[_COMMUNITY_Community 407|Community 407]]
-- [[_COMMUNITY_Community 408|Community 408]]
-- [[_COMMUNITY_Community 409|Community 409]]
-- [[_COMMUNITY_Community 410|Community 410]]
-- [[_COMMUNITY_Community 411|Community 411]]
-- [[_COMMUNITY_Community 412|Community 412]]
-- [[_COMMUNITY_Community 413|Community 413]]
-- [[_COMMUNITY_Community 414|Community 414]]
-- [[_COMMUNITY_Community 415|Community 415]]
-- [[_COMMUNITY_Community 416|Community 416]]
-- [[_COMMUNITY_Community 417|Community 417]]
-- [[_COMMUNITY_Community 418|Community 418]]
-- [[_COMMUNITY_Community 419|Community 419]]
-- [[_COMMUNITY_Community 420|Community 420]]
-- [[_COMMUNITY_Community 421|Community 421]]
-- [[_COMMUNITY_Community 422|Community 422]]
-- [[_COMMUNITY_Community 423|Community 423]]
-- [[_COMMUNITY_Community 424|Community 424]]
-- [[_COMMUNITY_Community 425|Community 425]]
-- [[_COMMUNITY_Community 426|Community 426]]
-- [[_COMMUNITY_Community 427|Community 427]]
-- [[_COMMUNITY_Community 428|Community 428]]
-- [[_COMMUNITY_Community 429|Community 429]]
-- [[_COMMUNITY_Community 430|Community 430]]
-- [[_COMMUNITY_Community 431|Community 431]]
-- [[_COMMUNITY_Community 432|Community 432]]
-- [[_COMMUNITY_Community 433|Community 433]]
-- [[_COMMUNITY_Community 434|Community 434]]
-- [[_COMMUNITY_Community 435|Community 435]]
-- [[_COMMUNITY_Community 436|Community 436]]
-- [[_COMMUNITY_Community 437|Community 437]]
-- [[_COMMUNITY_Community 438|Community 438]]
-- [[_COMMUNITY_Community 439|Community 439]]
-- [[_COMMUNITY_Community 440|Community 440]]
-- [[_COMMUNITY_Community 441|Community 441]]
-- [[_COMMUNITY_Community 442|Community 442]]
-- [[_COMMUNITY_Community 443|Community 443]]
-- [[_COMMUNITY_Community 444|Community 444]]
-- [[_COMMUNITY_Community 445|Community 445]]
-- [[_COMMUNITY_Community 446|Community 446]]
-- [[_COMMUNITY_Community 447|Community 447]]
-- [[_COMMUNITY_Community 448|Community 448]]
-- [[_COMMUNITY_Community 449|Community 449]]
-- [[_COMMUNITY_Community 450|Community 450]]
-- [[_COMMUNITY_Community 451|Community 451]]
-- [[_COMMUNITY_Community 452|Community 452]]
-- [[_COMMUNITY_Community 453|Community 453]]
-- [[_COMMUNITY_Community 454|Community 454]]
-- [[_COMMUNITY_Community 455|Community 455]]
-- [[_COMMUNITY_Community 456|Community 456]]
-- [[_COMMUNITY_Community 457|Community 457]]
-- [[_COMMUNITY_Community 458|Community 458]]
-- [[_COMMUNITY_Community 459|Community 459]]
-- [[_COMMUNITY_Community 460|Community 460]]
-- [[_COMMUNITY_Community 461|Community 461]]
-- [[_COMMUNITY_Community 462|Community 462]]
-- [[_COMMUNITY_Community 463|Community 463]]
-- [[_COMMUNITY_Community 464|Community 464]]
-- [[_COMMUNITY_Community 465|Community 465]]
-- [[_COMMUNITY_Community 466|Community 466]]
-- [[_COMMUNITY_Community 467|Community 467]]
-- [[_COMMUNITY_Community 468|Community 468]]
-- [[_COMMUNITY_Community 469|Community 469]]
-- [[_COMMUNITY_Community 470|Community 470]]
-- [[_COMMUNITY_Community 471|Community 471]]
-- [[_COMMUNITY_Community 472|Community 472]]
-- [[_COMMUNITY_Community 473|Community 473]]
-- [[_COMMUNITY_Community 474|Community 474]]
-- [[_COMMUNITY_Community 475|Community 475]]
-- [[_COMMUNITY_Community 476|Community 476]]
-- [[_COMMUNITY_Community 477|Community 477]]
-- [[_COMMUNITY_Community 478|Community 478]]
-- [[_COMMUNITY_Community 479|Community 479]]
-- [[_COMMUNITY_Community 480|Community 480]]
-- [[_COMMUNITY_Community 481|Community 481]]
-- [[_COMMUNITY_Community 482|Community 482]]
-- [[_COMMUNITY_Community 483|Community 483]]
-- [[_COMMUNITY_Community 484|Community 484]]
-- [[_COMMUNITY_Community 485|Community 485]]
-- [[_COMMUNITY_Community 486|Community 486]]
-- [[_COMMUNITY_Community 487|Community 487]]
-- [[_COMMUNITY_Community 488|Community 488]]
-- [[_COMMUNITY_Community 489|Community 489]]
-- [[_COMMUNITY_Community 490|Community 490]]
-- [[_COMMUNITY_Community 491|Community 491]]
-- [[_COMMUNITY_Community 492|Community 492]]
-- [[_COMMUNITY_Community 493|Community 493]]
-- [[_COMMUNITY_Community 494|Community 494]]
-- [[_COMMUNITY_Community 495|Community 495]]
-- [[_COMMUNITY_Community 496|Community 496]]
-- [[_COMMUNITY_Community 497|Community 497]]
-- [[_COMMUNITY_Community 498|Community 498]]
-- [[_COMMUNITY_Community 499|Community 499]]
-- [[_COMMUNITY_Community 500|Community 500]]
-- [[_COMMUNITY_Community 501|Community 501]]
-- [[_COMMUNITY_Community 502|Community 502]]
-- [[_COMMUNITY_Community 503|Community 503]]
-- [[_COMMUNITY_Community 504|Community 504]]
-- [[_COMMUNITY_Community 505|Community 505]]
-- [[_COMMUNITY_Community 506|Community 506]]
-- [[_COMMUNITY_Community 507|Community 507]]
-- [[_COMMUNITY_Community 508|Community 508]]
-- [[_COMMUNITY_Community 509|Community 509]]
-- [[_COMMUNITY_Community 510|Community 510]]
-- [[_COMMUNITY_Community 511|Community 511]]
-- [[_COMMUNITY_Community 512|Community 512]]
-- [[_COMMUNITY_Community 513|Community 513]]
-- [[_COMMUNITY_Community 514|Community 514]]
-- [[_COMMUNITY_Community 515|Community 515]]
-- [[_COMMUNITY_Community 516|Community 516]]
-- [[_COMMUNITY_Community 517|Community 517]]
-- [[_COMMUNITY_Community 518|Community 518]]
-- [[_COMMUNITY_Community 519|Community 519]]
-- [[_COMMUNITY_Community 520|Community 520]]
-- [[_COMMUNITY_Community 521|Community 521]]
-- [[_COMMUNITY_Community 522|Community 522]]
-- [[_COMMUNITY_Community 523|Community 523]]
-- [[_COMMUNITY_Community 524|Community 524]]
-- [[_COMMUNITY_Community 525|Community 525]]
-- [[_COMMUNITY_Community 526|Community 526]]
-- [[_COMMUNITY_Community 527|Community 527]]
-- [[_COMMUNITY_Community 528|Community 528]]
-- [[_COMMUNITY_Community 529|Community 529]]
-- [[_COMMUNITY_Community 530|Community 530]]
-- [[_COMMUNITY_Community 531|Community 531]]
-- [[_COMMUNITY_Community 532|Community 532]]
-- [[_COMMUNITY_Community 533|Community 533]]
-- [[_COMMUNITY_Community 534|Community 534]]
-- [[_COMMUNITY_Community 535|Community 535]]
-- [[_COMMUNITY_Community 536|Community 536]]
-- [[_COMMUNITY_Community 537|Community 537]]
-- [[_COMMUNITY_Community 538|Community 538]]
-- [[_COMMUNITY_Community 539|Community 539]]
-- [[_COMMUNITY_Community 540|Community 540]]
-- [[_COMMUNITY_Community 541|Community 541]]
-- [[_COMMUNITY_Community 542|Community 542]]
-- [[_COMMUNITY_Community 543|Community 543]]
-- [[_COMMUNITY_Community 544|Community 544]]
-- [[_COMMUNITY_Community 545|Community 545]]
-- [[_COMMUNITY_Community 546|Community 546]]
-- [[_COMMUNITY_Community 547|Community 547]]
-- [[_COMMUNITY_Community 548|Community 548]]
-- [[_COMMUNITY_Community 549|Community 549]]
-- [[_COMMUNITY_Community 550|Community 550]]
-- [[_COMMUNITY_Community 551|Community 551]]
-- [[_COMMUNITY_Community 552|Community 552]]
-- [[_COMMUNITY_Community 553|Community 553]]
-- [[_COMMUNITY_Community 554|Community 554]]
-- [[_COMMUNITY_Community 555|Community 555]]
-- [[_COMMUNITY_Community 556|Community 556]]
-- [[_COMMUNITY_Community 557|Community 557]]
-- [[_COMMUNITY_Community 558|Community 558]]
-- [[_COMMUNITY_Community 559|Community 559]]
-- [[_COMMUNITY_Community 560|Community 560]]
-- [[_COMMUNITY_Community 561|Community 561]]
-- [[_COMMUNITY_Community 562|Community 562]]
-- [[_COMMUNITY_Community 563|Community 563]]
-- [[_COMMUNITY_Community 564|Community 564]]
-- [[_COMMUNITY_Community 565|Community 565]]
-- [[_COMMUNITY_Community 566|Community 566]]
-- [[_COMMUNITY_Community 567|Community 567]]
-- [[_COMMUNITY_Community 568|Community 568]]
-- [[_COMMUNITY_Community 569|Community 569]]
-- [[_COMMUNITY_Community 570|Community 570]]
-- [[_COMMUNITY_Community 571|Community 571]]
 - [[_COMMUNITY_Community 574|Community 574]]
 
 ## God Nodes (most connected - your core abstractions)
@@ -540,9 +214,9 @@
 5. `Plano de Migracao do Backend para Rust (01V96 Remote) — v4.0` - 24 edges
 6. `socket` - 20 edges
 7. `initUI()` - 19 edges
-8. `Json` - 19 edges
-9. `Value` - 16 edges
-10. `GlobalState` - 15 edges
+8. `Json` - 17 edges
+9. `Node.js Backend Patterns` - 17 edges
+10. `Value` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `METER properties (VU, GR, CR, Surr, Osc)` --conceptually_related_to--> `MIDI SysEx Protocol`  [INFERRED]
@@ -587,15 +261,15 @@
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 - **14-bit Master Meter via native 0x21 with steps.json calibration (dB = (raw - 4493) / 63.66)** —  [INFERRED 0.90]
 
-## Communities (534 total, 43 thin omitted)
+## Communities (206 total, 30 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
 Cohesion: 0.11
 Nodes (26): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, renderCompressor(), renderDynamics(), startDynNudge/stopDynNudge Dynamics Nudge Controls, toggleState() (+18 more)
 
-### Community 1 - "Web Frontend Utility Functions"
-Cohesion: 0.35
-Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
+### Community 1 - "Community 1"
+Cohesion: 0.50
+Nodes (4): 1, config, name, scriptId
 
 ### Community 2 - "Migration Audit (Rust/Node.js Dead Code)"
 Cohesion: 0.05
@@ -606,16 +280,16 @@ Cohesion: 0.15
 Nodes (32): ArtNetToDMX.exe - FTDI USB bridge converting ArtNet to DMX512 for lighting control, axum Router - HTTP server serving static files and API routes, LumikitSHOW.exe - professional lighting control software, api module - exports macros submodule, initialize_dmx - boot sequence: delayed launch of ArtNetToDMX for lighting system, initialize_midi - boot sequence: connects MIDI ports, launches radar/search, starts demo simulation, AppConfig - centralized configuration loaded from config.json, names.json, steps.json, save_names_to_disk - debounced names.json persistence from GlobalState snapshot (+24 more)
 
 ### Community 4 - "CLI Tools & MIDI Bridge Utils"
-Cohesion: 0.11
-Nodes (19): Application configuration (MIDI, meters, networking, timing), MIDI message filter configuration (prefix-based), MIDI bridge with SysEx fragment reassembly for Yamaha 01V96, NPM package definition (01v96-remote-web), Lumikit lighting device integration, MIDI bridge pattern (Yamaha <-> Studio Manager), Remote MIDI over TCP networking, MIDI SysEx fragment reassembly for RtMidi on Windows (+11 more)
+Cohesion: 0.40
+Nodes (6): Application configuration (MIDI, meters, networking, timing), MIDI bridge with SysEx fragment reassembly for Yamaha 01V96, Lumikit lighting device integration, MIDI bridge pattern (Yamaha <-> Studio Manager), Remote MIDI over TCP networking, MIDI SysEx fragment reassembly for RtMidi on Windows
 
 ### Community 5 - "MIDI Engine & Protocol (server_rust)"
 Cohesion: 0.18
 Nodes (17): Socket.IO v4.7.4 client, MidiAssembler, MIDI parameter dictionary, MidiEngine, MidiOutput, MasterMeter, Meter dummy simulation, MIDI module declarations (+9 more)
 
 ### Community 6 - "Graphify Knowledge Graph Tool"
-Cohesion: 0.15
-Nodes (14): graphify explain - focused concept explanation command, graphify-out/graph.json - persisted knowledge graph, graphify knowledge graph ecosystem (graph.json, query, path, explain, update, skill), graphify path - relationship tracing command, graphify query - scoped subgraph search command, GRAPH_REPORT.md - broad architecture report, graphify skill - specialized skill for knowledge graph operations, graphify update - AST-only incremental graph update (+6 more)
+Cohesion: 0.20
+Nodes (10): graphify explain - focused concept explanation command, graphify-out/graph.json - persisted knowledge graph, graphify knowledge graph ecosystem (graph.json, query, path, explain, update, skill), graphify path - relationship tracing command, graphify query - scoped subgraph search command, GRAPH_REPORT.md - broad architecture report, graphify skill - specialized skill for knowledge graph operations, graphify update - AST-only incremental graph update (+2 more)
 
 ### Community 7 - "Reverse DLL Categorized Properties"
 Cohesion: 0.15
@@ -658,8 +332,8 @@ Cohesion: 0.67
 Nodes (3): log/monitor_log(sincronização inicial).txt, MIDI ports mapeados: 8× Yamaha 01V96-1..8 IN/OUT, SMC-PAD-bt-2, monitor (IN:9/OUT:10), Tráfego: Y→S 394 / S→Y 11 / Meters 397 / Loopback filtrado 391, dump de cena 282 bytes, dump de cena 625 bytes
 
 ### Community 19 - "Reverse DLL Property Maps"
-Cohesion: 0.12
-Nodes (13): AUX, BUS, CHANNEL, COMP, EFFECT, EQ, GATE, PATCH (+5 more)
+Cohesion: 0.13
+Nodes (12): AUX, BUS, CHANNEL, COMP, EFFECT, EQ, GATE, PATCH (+4 more)
 
 ### Community 20 - "DMX Art-Net Auto-Recovery"
 Cohesion: 0.50
@@ -677,10 +351,6 @@ Nodes (3): Feature 1 — Custom Scene Names: JSON registry custom_names_scenes-{
 Cohesion: 0.50
 Nodes (3): Arquitetura Remote MIDI: midi_common (assembler + framing) + remote_midi_server (TCP:4200) + RemoteClient + MidiOutput enum (Local/Remote), Ambiente Rust portátil D:\RustDev\ (RUSTUP_HOME/CARGO_HOME); INICIAR_REMOTE_MIDI.bat, Remote MIDI protocol: 4-byte LE len + payload; HEARTBEAT_MAGIC=[0xFF,0xFE,0x00]; HEARTBEAT_INTERVAL=3s, HEARTBEAT_TIMEOUT=10s; remote_midi_port=4200
 
-### Community 24 - "Legacy Project Package Snapshot"
-Cohesion: 0.50
-Nodes (4): globalConfig, lumikit, ip, port
-
 ### Community 25 - "ArtNet-to-DMX Bridge (.NET 6)"
 Cohesion: 0.25
 Nodes (7): System.Reflection.Metadata.MetadataUpdater.IsSupported, runtimeOptions, configProperties, frameworks, tfm, ArtNet to DMX conversion via FTDI, .NET 6.0 runtime
@@ -689,6 +359,14 @@ Nodes (7): System.Reflection.Metadata.MetadataUpdater.IsSupported, runtimeOption
 Cohesion: 0.67
 Nodes (3): plano_de_otimizacao.md (Chrome Performance Trace), Otimizações A-K (FEITO): meter cache, EQ throttle 20fps, meter throttle 30fps, Date.now fora do loop, remover backdrop-filter, box-shadow→border, transition:none, text-shadow simples, contain: layout, will-change:transform, Chrome Performance Trace 2026-05-05: 6.761 nós DOM, INP 141,3ms, Layerize 8.496ms, Recálculo 1.729ms
 
+### Community 29 - "Docs Writer & Style Guide"
+Cohesion: 0.11
+Nodes (16): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1), Documentation style guide, I. Core principles (+8 more)
+
+### Community 33 - "Community 33"
+Cohesion: 0.11
+Nodes (29): auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxFromSocket(), updateAuxManual() (+21 more)
+
 ### Community 34 - "UI/UX Pro Max BM25 Search"
 Cohesion: 0.07
 Nodes (39): Result, Vec, RemoteClient, MidiInput, R, Box, Error, MidiInputConnection (+31 more)
@@ -696,6 +374,10 @@ Nodes (39): Result, Vec, RemoteClient, MidiInput, R, Box, Error, MidiInputConnec
 ### Community 39 - "OpenCode TUI Config"
 Cohesion: 0.04
 Nodes (44): format_output(), Format results for Claude consumption (token-optimized), 1. Accessibility (CRITICAL), 2. Touch & Interaction (CRITICAL), 3. Performance (HIGH), 4. Layout & Responsive (HIGH), 5. Typography & Color (MEDIUM), 6. Animation (MEDIUM) (+36 more)
+
+### Community 42 - "Coding Guidelines (Karpathy)"
+Cohesion: 0.33
+Nodes (5): 1. Think Before Coding, 2. Simplicity First, 3. Surgical Changes, 4. Goal-Driven Execution, Coding Guidelines
 
 ### Community 44 - "JavaScript Mastery Skill"
 Cohesion: 0.07
@@ -761,10 +443,6 @@ Nodes (26): a(), at(), c(), Ct(), d(), e(), Et(), f() (+18 more)
 Cohesion: 0.06
 Nodes (45): EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), flatEQ Reset All Bands to Flat, freqToRaw(), gainToRaw() (+37 more)
 
-### Community 78 - "Community 78"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
 ### Community 79 - "Community 79"
 Cohesion: 0.07
 Nodes (29): Best Practices, Resources, When to Use This Skill, Common Patterns, Coverage Reports, Frontend Testing with Testing Library, Integration Testing, JavaScript Testing Patterns (+21 more)
@@ -773,17 +451,9 @@ Nodes (29): Best Practices, Resources, When to Use This Skill, Common Patterns, 
 Cohesion: 0.07
 Nodes (29): agents, contentHash, global, installedAt, method, name, source, updatedAt (+21 more)
 
-### Community 81 - "Community 81"
-Cohesion: 0.07
-Nodes (29): author, bugs, url, dependencies, express, midi, node-global-key-listener, screenshot-desktop (+21 more)
-
-### Community 82 - "Community 82"
-Cohesion: 0.07
-Nodes (28): app, ctx, dummy, { exec, spawn }, express, http, { initConfig }, { initConnection } (+20 more)
-
 ### Community 83 - "Community 83"
-Cohesion: 0.07
-Nodes (28): Best Practices, Resources, When to Use This Skill, API Response Format, Architectural Patterns, Authentication & Authorization, Authentication Middleware, Caching Strategies (+20 more)
+Cohesion: 0.06
+Nodes (31): Best Practices, Resources, When to Use This Skill, Best Practices, Resources, When to Use This Skill, API Response Format, Architectural Patterns (+23 more)
 
 ### Community 84 - "Community 84"
 Cohesion: 0.07
@@ -802,16 +472,12 @@ Cohesion: 0.07
 Nodes (26): 1. Interaction to Next Paint (INP) - Crítico, 2. Layerize e Custos de Renderização (8,5 segundos), A. Cache de elementos dos meters (socket.js + channel_strip.js) ✅ FEITO, 📊 Análise Técnica de Performance (Trace Chrome), B. Throttle do canvas EQ para ~20fps (eq.js), C. Throttle dos meters para ~30fps/15fps (socket.js) ✅ FEITO, D. `Date.now()` fora do loop de canais (socket.js) ✅ FEITO, E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css) ✅ FEITO (+18 more)
 
 ### Community 88 - "Community 88"
-Cohesion: 0.15
-Nodes (20): availableScripts, completeMacroMove(), detectCurrentPreset(), executeMacro(), fetchProtectedPresets(), handleTouchEnd(), initMacros(), loadExternalScripts() (+12 more)
-
-### Community 90 - "Community 90"
-Cohesion: 0.11
-Nodes (29): auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxFromSocket(), updateAuxManual() (+21 more)
+Cohesion: 0.10
+Nodes (32): assignedMacros, availableScripts, Channel Toggler Macro Mod (ON/OFF Multi-Channel), completeMacroMove(), MixerAPI (mixer/network/utils) Modder Contract, detectCurrentPreset(), Macro Engine (Multi-Preset, Slots, Plugin Registry), executeMacro() (+24 more)
 
 ### Community 91 - "Community 91"
-Cohesion: 0.07
-Nodes (27): autoScaleElement(), changeTechnicianMix(), enterTechnicianMixMode(), exitTechnicianMixMode(), fallbackCopyTextToClipboard(), refreshServerNameDisplay(), resetDmx(), restartServer() (+19 more)
+Cohesion: 0.08
+Nodes (23): autoScaleElement(), exitTechnicianMixMode(), fallbackCopyTextToClipboard(), refreshServerNameDisplay(), resetDmx(), restartServer(), savedOrientation, setLayoutMode() (+15 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.09
@@ -826,12 +492,12 @@ Cohesion: 0.09
 Nodes (21): Cena default: `custom_names_scene-default-{nome_da_mesa}.json`, Cena individual: `custom_names_scene-{nome}-{nome_da_mesa}.json`, Estrutura de dados, Feature 1: Cenas de Nomes Customizados, Feature 2: Atribuição de Nome ao Servidor/Mesa, Passo 1: Backend — Detecção e validação do `.env`, Passo 1: Módulo Rust de custom scenes, Passo 2: Backend — Bloqueio de acesso ao modo Técnico (+13 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.13
-Nodes (24): commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition(), nudgeFader() (+16 more)
+Cohesion: 0.12
+Nodes (26): updatePanIndicator(), commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition() (+18 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.14
-Nodes (15): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, stopEQAnimation(), changeConfigChannel(), closeChannelConfig(), Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop) (+7 more)
+Cohesion: 0.13
+Nodes (18): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, stopEQAnimation(), changeConfigChannel(), closeChannelConfig(), Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), updateConfigUIForChannel() (+10 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.23
@@ -858,24 +524,20 @@ Cohesion: 0.27
 Nodes (16): build_change(), build_name_change(), build_name_request(), build_request(), bytes_to_fader(), bytes_to_on(), bytes_to_signed(), cc() (+8 more)
 
 ### Community 105 - "Community 105"
-Cohesion: 0.12
-Nodes (16): 🚀 Como Iniciar, 🤝 Contribuição, 💡 Créditos e Referências, 📱 Design Híbrido & Responsivo, 📄 Licença, 📊 Monitoramento em Tempo Real, 🟢 Node.js (Obsoleto), 🔥 Principais Características (+8 more)
+Cohesion: 0.10
+Nodes (19): 🚀 Como Iniciar, 🛠️ Compilação e Geração de Releases, 🤝 Contribuição, 💡 Créditos e Referências, 📱 Design Híbrido & Responsivo, ⚡ Inicialização Rápida (Recomendado), 💻 Inicialização via Terminal (Modo Desenvolvimento), 📄 Licença (+11 more)
 
 ### Community 106 - "Community 106"
 Cohesion: 0.19
 Nodes (15): AppConfig, Arc, ConnectionManager, GlobalState, MidiScheduler, RwLock, SocketIo, String (+7 more)
 
 ### Community 108 - "Community 108"
-Cohesion: 0.26
-Nodes (11): clearMacroSelection(), macroDeltaToDB(), nudgeMacro(), openMacroConfig(), renderMacroGrid(), resetMacroDbDisplay(), startMacroNudge(), stopMacroNudge() (+3 more)
+Cohesion: 0.23
+Nodes (12): clearMacroSelection(), macroDeltaToDB(), nudgeMacro(), openMacroConfig(), renderMacroFader(), renderMacroGrid(), resetMacroDbDisplay(), startMacroNudge() (+4 more)
 
 ### Community 109 - "Community 109"
-Cohesion: 0.35
-Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
-
-### Community 110 - "Community 110"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
+Cohesion: 0.14
+Nodes (29): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+21 more)
 
 ### Community 111 - "Community 111"
 Cohesion: 0.14
@@ -885,25 +547,13 @@ Nodes (13): 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles
 Cohesion: 0.14
 Nodes (14): 13.1 O que ja esta feito, 13.2.1 `pairChannel`, 13.2.2 `requestConnect`, 13.2.3 `updateName`, 13.2.4 Demais handlers, 13.2 Handlers a IMPLEMENTAR do zero, 13.3.1 `setPan` — correcao completa, 13.3.2 `requestDynamics` — correcao (+6 more)
 
-### Community 113 - "Community 113"
-Cohesion: 0.35
-Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
-
-### Community 114 - "Community 114"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
 ### Community 115 - "Community 115"
 Cohesion: 0.19
 Nodes (6): MasterMeter, HashMap, Option, Self, Value, Vec
 
 ### Community 116 - "Community 116"
-Cohesion: 0.17
-Nodes (27): renderAuxs(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+19 more)
-
-### Community 117 - "Community 117"
-Cohesion: 0.35
-Nodes (13): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+5 more)
+Cohesion: 0.18
+Nodes (25): renderAuxs(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+17 more)
 
 ### Community 118 - "Community 118"
 Cohesion: 0.29
@@ -979,15 +629,11 @@ Nodes (5): onClear(), renderBtns(), renderExtraBtns(), renderSec(), renderUI()
 
 ### Community 139 - "Community 139"
 Cohesion: 0.22
-Nodes (8): 0, config, name, scriptId, 1, config, name, scriptId
+Nodes (8): 0, config, name, scriptId, globalConfig, lumikit, ip, port
 
 ### Community 140 - "Community 140"
 Cohesion: 0.22
 Nodes (8): 0, config, name, scriptId, globalConfig, lumikit, ip, port
-
-### Community 143 - "Community 143"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
 
 ### Community 144 - "Community 144"
 Cohesion: 0.25
@@ -1012,10 +658,6 @@ Nodes (7): build_aux_msg(), build_pair(), build_reset(), build_state_msg(), buil
 ### Community 149 - "Community 149"
 Cohesion: 0.29
 Nodes (9): executePair(), executeResetBoth(), executeUnpair(), getPatchName(), _pairCtx, renderPairSection(), selectPatch(), getPatchName() (+1 more)
-
-### Community 150 - "Community 150"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
 
 ### Community 154 - "Community 154"
 Cohesion: 0.29
@@ -1257,1226 +899,6 @@ Nodes (3): start_meter_simulation(), JoinHandle, SocketIo
 Cohesion: 0.50
 Nodes (4): 5, color, name, scriptId
 
-### Community 221 - "Community 221"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 231 - "Community 231"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 232 - "Community 232"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 233 - "Community 233"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 271 - "Community 271"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 272 - "Community 272"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 273 - "Community 273"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 274 - "Community 274"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 275 - "Community 275"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 276 - "Community 276"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 277 - "Community 277"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 278 - "Community 278"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 279 - "Community 279"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 280 - "Community 280"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 281 - "Community 281"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 282 - "Community 282"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 283 - "Community 283"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 284 - "Community 284"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 285 - "Community 285"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 286 - "Community 286"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 287 - "Community 287"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 288 - "Community 288"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 289 - "Community 289"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 290 - "Community 290"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 291 - "Community 291"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 292 - "Community 292"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 293 - "Community 293"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 294 - "Community 294"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 295 - "Community 295"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 296 - "Community 296"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 297 - "Community 297"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 298 - "Community 298"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 299 - "Community 299"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 300 - "Community 300"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 301 - "Community 301"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 302 - "Community 302"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 303 - "Community 303"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 304 - "Community 304"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 305 - "Community 305"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 306 - "Community 306"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 307 - "Community 307"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 308 - "Community 308"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 309 - "Community 309"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 310 - "Community 310"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 311 - "Community 311"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 312 - "Community 312"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 313 - "Community 313"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 314 - "Community 314"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 315 - "Community 315"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 316 - "Community 316"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 317 - "Community 317"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 318 - "Community 318"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 319 - "Community 319"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 320 - "Community 320"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 321 - "Community 321"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 322 - "Community 322"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 323 - "Community 323"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 324 - "Community 324"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 325 - "Community 325"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 326 - "Community 326"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 327 - "Community 327"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 328 - "Community 328"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 329 - "Community 329"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 330 - "Community 330"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 331 - "Community 331"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 332 - "Community 332"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 333 - "Community 333"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 334 - "Community 334"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 335 - "Community 335"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 336 - "Community 336"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 337 - "Community 337"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 338 - "Community 338"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 339 - "Community 339"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 340 - "Community 340"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 341 - "Community 341"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 342 - "Community 342"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 343 - "Community 343"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 344 - "Community 344"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 345 - "Community 345"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 346 - "Community 346"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 347 - "Community 347"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 348 - "Community 348"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 349 - "Community 349"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 350 - "Community 350"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 351 - "Community 351"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 352 - "Community 352"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 353 - "Community 353"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 354 - "Community 354"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 355 - "Community 355"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 356 - "Community 356"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 357 - "Community 357"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 358 - "Community 358"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 359 - "Community 359"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 360 - "Community 360"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 361 - "Community 361"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 362 - "Community 362"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 363 - "Community 363"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 364 - "Community 364"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 365 - "Community 365"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 366 - "Community 366"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 367 - "Community 367"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 368 - "Community 368"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 369 - "Community 369"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 370 - "Community 370"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 371 - "Community 371"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 372 - "Community 372"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 373 - "Community 373"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 374 - "Community 374"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 375 - "Community 375"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 376 - "Community 376"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 377 - "Community 377"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 378 - "Community 378"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 379 - "Community 379"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 380 - "Community 380"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 381 - "Community 381"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 382 - "Community 382"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 383 - "Community 383"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 384 - "Community 384"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 385 - "Community 385"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 386 - "Community 386"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 387 - "Community 387"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 388 - "Community 388"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 389 - "Community 389"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 390 - "Community 390"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 391 - "Community 391"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 392 - "Community 392"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 393 - "Community 393"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 394 - "Community 394"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 395 - "Community 395"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 396 - "Community 396"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 397 - "Community 397"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 398 - "Community 398"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 399 - "Community 399"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 400 - "Community 400"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 401 - "Community 401"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 402 - "Community 402"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 403 - "Community 403"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 404 - "Community 404"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 405 - "Community 405"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 406 - "Community 406"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 407 - "Community 407"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 408 - "Community 408"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 409 - "Community 409"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 410 - "Community 410"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 411 - "Community 411"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 412 - "Community 412"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 413 - "Community 413"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 414 - "Community 414"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 415 - "Community 415"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 416 - "Community 416"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 417 - "Community 417"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 418 - "Community 418"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 419 - "Community 419"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 420 - "Community 420"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 421 - "Community 421"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 422 - "Community 422"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 423 - "Community 423"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 424 - "Community 424"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 425 - "Community 425"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 426 - "Community 426"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 427 - "Community 427"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 428 - "Community 428"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 429 - "Community 429"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 430 - "Community 430"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 431 - "Community 431"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 432 - "Community 432"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 433 - "Community 433"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 434 - "Community 434"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 435 - "Community 435"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 436 - "Community 436"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 437 - "Community 437"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 438 - "Community 438"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 439 - "Community 439"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 440 - "Community 440"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 441 - "Community 441"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 442 - "Community 442"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 443 - "Community 443"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 444 - "Community 444"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 445 - "Community 445"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 446 - "Community 446"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 447 - "Community 447"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 448 - "Community 448"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 449 - "Community 449"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 450 - "Community 450"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 451 - "Community 451"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 452 - "Community 452"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 453 - "Community 453"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 454 - "Community 454"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 455 - "Community 455"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 456 - "Community 456"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 457 - "Community 457"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 458 - "Community 458"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 459 - "Community 459"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 460 - "Community 460"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 461 - "Community 461"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 462 - "Community 462"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 463 - "Community 463"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 464 - "Community 464"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 465 - "Community 465"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 466 - "Community 466"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 467 - "Community 467"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 468 - "Community 468"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 469 - "Community 469"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 470 - "Community 470"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 471 - "Community 471"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 472 - "Community 472"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 473 - "Community 473"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 474 - "Community 474"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 475 - "Community 475"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 476 - "Community 476"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 477 - "Community 477"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 478 - "Community 478"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 479 - "Community 479"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 480 - "Community 480"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 481 - "Community 481"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 482 - "Community 482"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 483 - "Community 483"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 484 - "Community 484"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 485 - "Community 485"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 486 - "Community 486"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 487 - "Community 487"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 488 - "Community 488"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 489 - "Community 489"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 490 - "Community 490"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 491 - "Community 491"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 492 - "Community 492"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 493 - "Community 493"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 494 - "Community 494"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 495 - "Community 495"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 496 - "Community 496"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 497 - "Community 497"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 498 - "Community 498"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 499 - "Community 499"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 500 - "Community 500"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 501 - "Community 501"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 502 - "Community 502"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 503 - "Community 503"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 504 - "Community 504"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 505 - "Community 505"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 506 - "Community 506"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 507 - "Community 507"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 508 - "Community 508"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 509 - "Community 509"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 510 - "Community 510"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 511 - "Community 511"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 512 - "Community 512"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 513 - "Community 513"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 514 - "Community 514"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 515 - "Community 515"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 516 - "Community 516"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 517 - "Community 517"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 518 - "Community 518"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 519 - "Community 519"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 520 - "Community 520"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 521 - "Community 521"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 522 - "Community 522"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 523 - "Community 523"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 524 - "Community 524"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 525 - "Community 525"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 526 - "Community 526"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 527 - "Community 527"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 528 - "Community 528"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 529 - "Community 529"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 530 - "Community 530"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 531 - "Community 531"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 532 - "Community 532"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 533 - "Community 533"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 534 - "Community 534"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 535 - "Community 535"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 536 - "Community 536"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 537 - "Community 537"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 538 - "Community 538"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 539 - "Community 539"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 540 - "Community 540"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 541 - "Community 541"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 542 - "Community 542"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 543 - "Community 543"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 544 - "Community 544"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 545 - "Community 545"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 546 - "Community 546"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 547 - "Community 547"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 548 - "Community 548"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 549 - "Community 549"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 550 - "Community 550"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 551 - "Community 551"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 552 - "Community 552"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 553 - "Community 553"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 554 - "Community 554"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 555 - "Community 555"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 556 - "Community 556"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 557 - "Community 557"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 558 - "Community 558"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 559 - "Community 559"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 560 - "Community 560"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 561 - "Community 561"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 562 - "Community 562"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 563 - "Community 563"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 564 - "Community 564"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 565 - "Community 565"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 566 - "Community 566"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 567 - "Community 567"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 568 - "Community 568"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 569 - "Community 569"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 570 - "Community 570"
-Cohesion: 0.17
-Nodes (11): compile_kind, config, declared_features, deps, features, local, path, profile (+3 more)
-
-### Community 571 - "Community 571"
-Cohesion: 0.30
-Nodes (12): assignedMacros, Channel Toggler Macro Mod (ON/OFF Multi-Channel), MixerAPI (mixer/network/utils) Modder Contract, Macro Engine (Multi-Preset, Slots, Plugin Registry), Host-to-Preset Mapping Configuration, Lumikit Macro Mod (Lighting Scene+Extra Control), macroDatabase, registerMacro Plugin Registration Function (+4 more)
-
 ### Community 574 - "Community 574"
 Cohesion: 0.50
 Nodes (4): 1, config, name, scriptId
@@ -2486,24 +908,24 @@ Nodes (4): 1, config, name, scriptId
   scratch/test_sudo.js · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **5091 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+5086 more)
+- **1627 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+1622 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **43 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **30 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `FX slot deep scanner (SysEx monitor for effects)` and `PowerShell UAC elevation test`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `initUI()` connect `Community 116` to `Community 98`, `Community 91`, `Community 149`, `Community 122`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `getChannelStateById()` connect `Community 90` to `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)`, `Community 97`, `Community 162`, `Community 98`, `Community 77`, `Community 116`, `Community 121`, `Community 571`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `enterMusicianMode()` connect `Community 122` to `Community 116`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
+- **Why does `getChannelStateById()` connect `Community 33` to `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)`, `Community 97`, `Community 162`, `Community 98`, `Community 77`, `Community 116`, `Community 88`, `Community 121`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `initUI()` connect `Community 116` to `Community 97`, `Community 98`, `Community 108`, `Community 149`, `Community 122`, `Community 91`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `MixerAPI (mixer/network/utils) Modder Contract` connect `Community 88` to `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)`, `Community 33`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **Are the 40 inferred relationships involving `getChannelStateById()` (e.g. with `execute()` and `auxWheelInput()`) actually correct?**
   _`getChannelStateById()` has 40 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `contentHash`, `downloadedAt`, `contentHash` to the rest of the system?**
-  _5126 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1658 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` be split into smaller, more focused modules?**
   _Cohesion score 0.10574712643678161 - nodes in this community are weakly interconnected._

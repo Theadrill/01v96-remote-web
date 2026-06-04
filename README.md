@@ -57,30 +57,49 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 
 ### 🦀 Rust (Recomendado)
 
-O servidor em Rust oferece performance superior, baixíssima latência e é o foco principal do desenvolvimento atual.
+O servidor em Rust oferece performance superior, baixíssima latência e é o foco principal do desenvolvimento atual. O projeto é estruturado em um **Cargo Workspace** unificado na raiz.
 
 **Pré-requisitos:**
-* **Ambiente Rust** instalado.
+* **Ambiente Rust** instalado (necessário para compilar/rodar via Cargo).
 * **Driver MIDI da Yamaha** instalado e a mesa conectada via USB.
 * **Git** configurado (para as funções de Auto-Sync/Ninja Sync).
 
-**Passos para Execução:**
+#### ⚡ Inicialização Rápida (Recomendado)
+Você pode iniciar os servidores diretamente através dos atalhos na raiz do projeto (não requer terminal aberto):
+* **Servidor Principal (Local)**: Dê um duplo clique no atalho `server_rust.lnk`.
+* **Servidor MIDI Remoto**: Dê um duplo clique no atalho `remote_midi_server.lnk`.
+
+---
+
+#### 💻 Inicialização via Terminal (Modo Desenvolvimento)
+Como o projeto utiliza um Workspace, você pode executar os comandos diretamente na raiz do projeto:
+
 1. **Inicie o servidor principal**:
-   Acesse a pasta `server_rust` e execute:
    ```bash
-   cd server_rust
-   cargo run --release
+   cargo run
    ```
+   *(Ou especifique o pacote: `cargo run -p server_rust`)*
+
 2. **Inicie o servidor de rede MIDI física (opcional)**:
-   Se a mesa estiver conectada fisicamente em outro PC na mesma rede, execute no computador da mesa:
+   Se a mesa estiver conectada fisicamente em outro PC na mesma rede, execute no root:
    ```bash
-   cd server_rust
-   cargo run --bin remote_midi_server --release
+   cargo run -p remote_midi_server
    ```
+
+---
+
+#### 🛠️ Compilação e Geração de Releases
+Para compilar a versão final otimizada dos servidores:
+1. **Via Script (Fácil)**: Execute o arquivo `cargo build release.bat` na raiz.
+2. **Via Terminal**: Execute o comando abaixo no root do projeto:
+   ```bash
+   cargo build --release
+   ```
+Os executáveis finais (`server_rust.exe` e `remote_midi_server.exe`) serão gerados em `target/release/` e estarão prontos para serem iniciados pelos atalhos do root.
 
 ### 🟢 Node.js (Obsoleto)
 
-O servidor legado em Node.js continua funcional para testes básicos, mas possui menos recursos e não recebe novas atualizações.
+O servidor legado em Node.js continua funcional para testes básicos, mas possui menos recursos e não recebe novas atualizações. Seus arquivos de código e configuração foram compactados para manter a raiz limpa.
 
 **Pré-requisitos:**
 * **Node.js** instalado.
@@ -88,11 +107,13 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 * **Git** configurado (para as funções de Auto-Sync/Ninja Sync).
 
 **Passos para Execução:**
-1. **Instale as dependências na raiz do projeto**:
+1. **Extraia os arquivos do servidor legado**:
+   Extraia todo o conteúdo do arquivo `_legacy_node_server.zip` diretamente na raiz do projeto (isso restaurará o arquivo `server.js`, a pasta `src/`, o `package.json` e o `package-lock.json`).
+2. **Instale as dependências na raiz do projeto**:
    ```bash
    npm install
    ```
-2. **Inicie o servidor legado**:
+3. **Inicie o servidor legado**:
    ```bash
    npm start
    ```
@@ -110,14 +131,16 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
 - [x] Fazer o meter do master funcionar.
 - [ ] Sistema de cenas de nomes customizados.
-- [ ] Atribuição de nome ao servidor/mesa.
+- [x] Atribuição de nome ao servidor/mesa.
+- [ ] Patch de INSERTS nos canais.
+- [ ] Tela de EFEITOS.
 
 
 ---
 
 ## 🤝 Contribuição
 
-Contribuições são o que fazem a comunidade open source um lugar incrível para aprender, inspirar e criar. Qualquer contribuição que você fizer será **muito apreciada**.
+Qualquer contribuição que você fizer será **muito apreciada**.
 
 ---
 
@@ -131,4 +154,4 @@ O módulo de integração DMX deste projeto utiliza o motor de tradução ArtNet
 
 ---
 **Desenvolvido por Rodrigo (Theadrill) usando Antigravity**  
-*Transformando o controle de áudio ao vivo em uma experiência moderna e conectada.*
+*Fazendo sua velha 01v96 soar como 'nova' 😉*
