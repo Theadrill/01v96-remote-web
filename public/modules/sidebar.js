@@ -30,18 +30,13 @@ function forceSync() {
 
 function toggleOuts() {
     outsMode = !outsMode;
-    technicianMixMode = false; // Garante que sai do modo de edição se alternar canais
-    const btn = document.getElementById('btnOuts');
+    technicianMixMode = false;
+    const btn = document.getElementById('dockBtnOuts');
     if (btn) {
         btn.classList.toggle('active-tab', outsMode);
         btn.innerText = outsMode ? 'SAIR' : 'OUTS';
-        if (outsMode) {
-            btn.style.backgroundColor = '#dc3545';
-            btn.style.color = '#fff';
-        } else {
-            btn.style.backgroundColor = '';
-            btn.style.color = '';
-        }
+        btn.style.backgroundColor = '';
+        btn.style.color = '';
     }
     initUI();
 }
@@ -193,23 +188,19 @@ const savedOrientation = localStorage.getItem('mixer_orientation');
 if (savedOrientation) setOrientation(savedOrientation);
 
 function switchTab(tabId) {
-    activeConfigTab = tabId; // Salva a aba atual para persistir na navegação
-    // Para animações pesadas se existirem
+    activeConfigTab = tabId;
     if (window.stopEQAnimation) stopEQAnimation();
 
-    // Muda visual dos botões na sidebar
-    document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active-tab'));
-    
-    // Se a função foi chamada por um evento, destaca o botão clicado. 
-    // Caso contrário (chamada automática ao abrir), destaca o primeiro por padrão.
-    if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('side-btn')) {
+    document.querySelectorAll('.dock-tab').forEach(btn => btn.classList.remove('active-tab'));
+
+    if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('dock-tab')) {
         window.event.currentTarget.classList.add('active-tab');
     } else {
-        const btn = document.querySelector(`#chNav .side-btn:nth-child(${tabId === 'eq' ? 1 : (tabId === 'dyn' ? 2 : (tabId === 'aux' ? 3 : 4))})`);
-        if (btn) btn.classList.add('active-tab');
+        const tabIndex = tabId === 'eq' ? 0 : (tabId === 'dyn' ? 1 : (tabId === 'aux' ? 2 : 3));
+        const btns = document.querySelectorAll('.dock-tab');
+        if (btns[tabIndex]) btns[tabIndex].classList.add('active-tab');
     }
-    
-    // Altera o conteúdo do corpo do modal delegando para os novos módulos
+
     const modeEl = document.getElementById('chSideMode');
     if (tabId === 'eq') { 
         if(modeEl) modeEl.innerText = 'EQUALIZADOR'; 
@@ -250,6 +241,7 @@ window.addEventListener('load', updateViewportInfo);
 window.addEventListener('DOMContentLoaded', () => {
     updateViewportInfo();
     updateLayoutButtons();
+    autoScaleElement(document.getElementById('scn'));
 });
 
 // Controle de Nomes dos Canais
@@ -278,18 +270,31 @@ window.openNameEditor = function() {
     input.select();
 };
 
-window.autoScaleTitle = function() {
-    const el = document.getElementById('chSideTitle');
+function autoScaleElement(el) {
     if (!el) return;
-    const txt = el.innerText;
-    // Se o texto for muito longo (número + nome), diminui a fonte para não quebrar feio
-    if (txt.length > 9) {
-        el.style.fontSize = '12px';
-    } else if (txt.length > 13) {
-        el.style.fontSize = '10px';
-    } else {
-        el.style.fontSize = '15px';
+    const parent = el.parentElement;
+    if (!parent) return;
+    const cs = window.getComputedStyle(el);
+    const maxSize = parseInt(cs.fontSize, 10) || 15;
+    el.style.width = '100%';
+    el.style.maxWidth = '100%';
+    el.style.boxSizing = 'border-box';
+    el.style.whiteSpace = 'nowrap';
+    el.style.overflow = 'visible';
+    void el.offsetHeight;
+    const availableWidth = parent.clientWidth;
+    let size = maxSize;
+    el.style.setProperty('font-size', size + 'px', 'important');
+    void el.offsetWidth;
+    while (el.scrollWidth > availableWidth && size > 6) {
+        size--;
+        el.style.setProperty('font-size', size + 'px', 'important');
+        void el.offsetWidth;
     }
+}
+
+window.autoScaleTitle = function() {
+    autoScaleElement(document.getElementById('chSideTitle'));
 };
 
 window.saveChannelName = function() {
@@ -358,6 +363,7 @@ function refreshServerNameDisplay() {
     if (input && (!input.value || input.value === window.serverName)) {
         input.value = name;
     }
+    autoScaleElement(document.getElementById('scn'));
 }
 
 window.saveServerName = function () {
@@ -458,3 +464,114 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     observer.observe(configModal, { attributes: true, attributeFilter: ['style'] });
 });
+
+function renderDock(mode) {
+    const dock = document.getElementById('buttonDock');
+    if (!dock) return;
+
+    let buttons = [];
+
+    switch (mode) {
+        case 'main': {
+            buttons.push({ label: 'CONFIG', action: "document.getElementById('configModal').style.display='flex'", cls: 'dock-config' });
+            const isOutsOn = typeof window.outsMode !== 'undefined' && outsMode;
+            buttons.push({ label: isOutsOn ? 'SAIR' : 'OUTS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
+            buttons.push({ label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-exit' });
+            const isStandalone = window.navigator.standalone === true;
+            if (!isStandalone) {
+                buttons.push({ label: 'FULL', action: 'toggleFullScreen()', cls: 'dock-fs' });
+            }
+            break;
+        }
+        case 'channelConfig': {
+            const tabs = ['eq', 'dyn', 'aux', 'etc'];
+            buttons = tabs.map(tab => ({
+                label: tab.toUpperCase(),
+                action: `switchTab('${tab}')`,
+                cls: 'dock-tab' + (tab === activeConfigTab ? ' active-tab' : '')
+            }));
+            buttons.push({ label: 'SAIR', action: 'closeChannelConfig()', cls: 'dock-close' });
+            break;
+        }
+        case 'outs': {
+            buttons = [
+                { label: 'SAIR', action: 'toggleOuts()', cls: 'dock-close' }
+            ];
+            break;
+        }
+        case 'techMix': {
+            buttons = [
+                { label: 'SAIR', action: 'exitTechnicianMixMode()', cls: 'dock-close' }
+            ];
+            break;
+        }
+        case 'musician': {
+            buttons = [
+                { label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-close' }
+            ];
+            break;
+        }
+    }
+
+    dock.innerHTML = buttons.map(b =>
+        `<button class="dock-btn ${b.cls || ''}" onclick="${b.action}"${b.id ? ` id="${b.id}"` : ''}>${b.label}</button>`
+    ).join('');
+}
+
+function updateSidebarInfo() {
+    const chTitle = document.getElementById('chSideTitle');
+    const tmTitle = document.getElementById('techMixTitle');
+    const fiSidebar = document.getElementById('foneIndicatorSidebar');
+    const sidebarNav = document.getElementById('sidebarNav');
+    const navPrev = document.getElementById('navPrev');
+    const navNext = document.getElementById('navNext');
+
+    if (activeConfigChannel !== null) {
+        const ch = activeConfigChannel;
+        const stateRef = channelStates[ch];
+        const name = stateRef ? stateRef.name : '';
+        if (chTitle) {
+            chTitle.style.display = 'block';
+            chTitle.innerText = `${ch + 1} - ${name || `CH ${ch + 1}`}`;
+        }
+        if (tmTitle) tmTitle.style.display = 'none';
+        if (fiSidebar) fiSidebar.style.display = 'none';
+        if (sidebarNav) {
+            sidebarNav.style.display = 'flex';
+            if (navPrev) navPrev.onclick = function() { changeConfigChannel(-1); };
+            if (navNext) navNext.onclick = function() { changeConfigChannel(1); };
+        }
+        if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle();
+    } else if (technicianMixMode) {
+        if (chTitle) chTitle.style.display = 'none';
+        if (tmTitle) {
+            tmTitle.style.display = 'block';
+            const mixData = typeof mixesState !== 'undefined' && mixesState[activeMix - 1];
+            tmTitle.innerText = `${activeMix} - ${mixData ? mixData.name : `MIX ${activeMix}`}`;
+        }
+        if (fiSidebar) {
+            fiSidebar.style.display = 'block';
+            fiSidebar.innerText = `MIX ${activeMix}`;
+            fiSidebar.style.color = '#ffcc00';
+        }
+        if (sidebarNav) {
+            sidebarNav.style.display = 'flex';
+            if (navPrev) navPrev.onclick = function() { changeTechnicianMix(-1); };
+            if (navNext) navNext.onclick = function() { changeTechnicianMix(1); };
+        }
+    } else if (musicianMode) {
+        if (chTitle) chTitle.style.display = 'none';
+        if (tmTitle) tmTitle.style.display = 'none';
+        if (fiSidebar) {
+            fiSidebar.style.display = 'block';
+            fiSidebar.innerText = `FONE ${activeMix}`;
+            fiSidebar.style.color = 'white';
+        }
+        if (sidebarNav) sidebarNav.style.display = 'none';
+    } else {
+        if (chTitle) chTitle.style.display = 'none';
+        if (tmTitle) tmTitle.style.display = 'none';
+        if (fiSidebar) fiSidebar.style.display = 'none';
+        if (sidebarNav) sidebarNav.style.display = 'none';
+    }
+}

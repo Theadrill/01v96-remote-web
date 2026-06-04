@@ -606,93 +606,35 @@ function initUI() {
     if (typeof resetFaderCache === 'function') resetFaderCache();
     let html = '';
 
-    // 🔒 SEGURANÇA: Apenas o Técnico vê botões de Macros
-    const macroButtons = document.querySelectorAll('.btn-macros');
-    macroButtons.forEach(btn => {
-        btn.style.display = musicianMode ? 'none' : 'flex';
-    });
-
     const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
     if (musicianMode) {
-        // Remove banner de topo legado se ainda existir
-        const oldH = document.getElementById('musician-header');
-        if (oldH) oldH.remove();
-
         sidebar.classList.add('sidebar-musician');
-        document.getElementById('mainNav').style.display = 'none';
-        document.getElementById('chNav').style.display = 'none';
-        document.getElementById('chContext').style.display = 'none';
-        document.getElementById('sideFooter').style.display = 'flex';
-
-        // Exibe o botão de saída estático do músico
-        const mExit = document.getElementById('musicianExitBtn');
-        if (mExit) mExit.style.display = 'block';
-
-        const tExit = document.getElementById('tecnicoExitBtn');
-        if (tExit) tExit.style.display = 'none';
-
-        // Garante o indicador no fone
-        let indicator = document.getElementById('foneIndicator');
-        if (!indicator) {
-            indicator = document.createElement('div');
-            indicator.id = 'foneIndicator';
-            indicator.className = 'fone-indicator';
-            sidebar.insertBefore(indicator, document.getElementById('sideFooter'));
-        }
-        indicator.innerText = `FONE ${activeMix}`;
-        container.style.marginTop = "0";
     } else {
         sidebar.classList.remove('sidebar-musician');
-        
-        // CORREÇÃO: Respeita o modo de configuração de canal ao atualizar a sidebar
-        const isConfig = activeConfigChannel !== null;
-        
-        // Mantém o menu principal visível para técnicos, mas esconde em technicianMixMode ou Config do Canal
-        document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode || isConfig) ? 'none' : 'flex';
-        // Mostra navegação de canal APENAS se estiver configurando
-        document.getElementById('chNav').style.display = isConfig ? 'flex' : 'none';
-        // Mostra contexto do canal APENAS se estiver configurando
-        document.getElementById('chContext').style.display = isConfig ? 'flex' : 'none';
-
-        // MOSTRA o painel de contexto do OUTS ou Technico Mix (apenas se não estiver configurando canal)
-        document.getElementById('outsContext').style.display = (outsMode && !musicianMode && !isConfig) ? 'flex' : 'none';
-
-        // Novo container de contexto para Técnico Mix
-        const tmContext = document.getElementById('techMixContext');
-        if (tmContext) tmContext.style.display = (technicianMixMode && !isConfig) ? 'flex' : 'none';
-
-        document.getElementById('sideFooter').style.display = 'flex';
-
-        const mExit = document.getElementById('musicianExitBtn');
-        if (mExit) mExit.style.display = 'none'; // Sempre escondido no modo técnico aqui
-
-        // Esconde apenas o desconectar técnico quando estiver na visão de saídas, editando mix ou configurando canal
-        const tExit = document.getElementById('tecnicoExitBtn');
-        if (tExit) tExit.style.display = (outsMode || musicianMode || technicianMixMode || isConfig) ? 'none' : 'block';
-
-        const mInd = document.getElementById('foneIndicator');
-        if (mInd && !technicianMixMode) mInd.remove();
-
-        if (technicianMixMode) {
-            let indicator = document.getElementById('foneIndicator');
-            if (!indicator) {
-                indicator = document.createElement('div');
-                indicator.id = 'foneIndicator';
-                indicator.className = 'fone-indicator';
-                // Adiciona cor amarelo/alaranjado para diferenciar do modo músico (opcional, mas bom pra UX)
-                indicator.style.color = '#ffcc00';
-                sidebar.insertBefore(indicator, document.getElementById('sideFooter'));
-            }
-            indicator.innerText = `MIX ${activeMix}`;
-        }
-
-        // Atualiza o título na sidebar do modo técnico mix
-        const tmTitle = document.getElementById('techMixTitle');
-        if (tmTitle) {
-            const mixData = mixesState[activeMix - 1];
-            tmTitle.innerText = `${activeMix} - ${mixData ? mixData.name : `MIX ${activeMix}`}`;
-        }
     }
+
+    const isConfig = activeConfigChannel !== null;
+
+    let dockMode;
+    if (musicianMode) {
+        dockMode = 'musician';
+    } else if (isConfig) {
+        dockMode = 'channelConfig';
+    } else if (technicianMixMode) {
+        dockMode = 'techMix';
+    } else if (outsMode) {
+        dockMode = 'outs';
+    } else {
+        dockMode = 'main';
+    }
+
+    if (typeof renderDock === 'function') renderDock(dockMode);
+    if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
+
+    // MACROS visibility
+    const macrosPanel = document.getElementById('sidebarMacros');
+    if (macrosPanel) macrosPanel.style.display = musicianMode ? 'none' : 'block';
 
     if (outsMode && !musicianMode && !technicianMixMode) {
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'mix');

@@ -400,36 +400,82 @@ body.layout-horizontal .sidebar {
     flex-direction: row;
     border: none;
     border-top: 2px solid #333;
-    padding: 0 15px;
+    padding: 6px 10px;
     order: 3;
-    justify-content: space-around;
     flex-shrink: 0;
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.7);
     z-index: 950;
     position: relative;
     background: #1a1a1a;
+    align-items: stretch;
+}
+
+body.layout-horizontal .sidebar-info {
+    flex-shrink: 0;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+body.layout-horizontal .sidebar-nav {
+    margin-top: 2px;
+    gap: 4px;
+}
+
+body.layout-horizontal .sidebar-nav-btn {
+    font-size: 14px;
+}
+
+body.layout-horizontal .sidebar-dock {
+    flex: 1;
     overflow-x: auto;
     overflow-y: hidden;
+    min-width: 0;
+    display: flex;
+    align-items: stretch;
     -webkit-overflow-scrolling: touch;
 }
 
-body.layout-horizontal #mainNav,
-body.layout-horizontal #chNav,
-body.layout-horizontal #chContext {
-    flex-direction: row !important;
+body.layout-horizontal .button-dock {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    min-width: min-content;
     height: 100%;
-    width: auto !important;
-    margin: 0;
-    gap: 5px;
-    border: none !important;
-    padding: 0 !important;
+    align-items: stretch;
 }
 
-body.layout-horizontal .side-btn {
-    min-width: 70px;
-    height: 45px;
+body.layout-horizontal .sidebar-macros {
+    flex-shrink: 0;
+    width: 70px;
+    display: flex;
+    align-items: stretch;
+    margin-left: 6px;
+    margin-top: 0;
+}
+
+.sidebar-macros .btn-macros {
+    background: #6a1b9a;
+    color: white;
+    min-height: 50px;
+}
+
+body.layout-horizontal .sidebar-macros .btn-macros {
+    height: 100%;
+    min-height: 0;
     margin: 0;
-    font-size: 11px;
+}
+
+body.layout-horizontal .dock-btn {
+    min-width: 60px;
+    height: 100%;
+    margin: 0;
+    font-size: 10px;
 }
 
 .card-title,
@@ -724,23 +770,130 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
     width: 100px;
     background: #222;
     border-left: 1px solid #444;
-    padding: 15px 10px;
     box-sizing: border-box;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     order: 2;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
     position: relative;
     z-index: 950;
+    padding: 10px 8px;
 }
 
-.sidebar::-webkit-scrollbar {
+.sidebar-panel {
+    box-sizing: border-box;
+}
+
+.sidebar-info {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.sidebar-nav {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+}
+
+.sidebar-nav-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 18px;
+    border: 1px solid #555;
+    background: #333;
+    color: #ccc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.sidebar-nav-btn:active {
+    background: #555;
+    transform: scale(0.9);
+}
+
+.sidebar-dock {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.sidebar-dock::-webkit-scrollbar {
     display: none;
+}
+
+.button-dock {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.sidebar-macros {
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.dock-btn {
+    min-height: 36px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dock-close, .dock-exit {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+.dock-config {
+    background: #444;
+    color: white;
+}
+
+.dock-outs {
+    background: #28a745;
+    color: white;
+    border: 1px solid #34ce57;
+    transition: 0.3s;
+}
+
+.dock-outs.active-tab {
+    background: #1b5e20 !important;
+    border-color: #2e7d32 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+}
+
+.dock-fs {
+    background: #444;
+    color: white;
 }
 
 .side-btn {
@@ -811,17 +964,6 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
     box-shadow: 0 0 15px rgba(0, 255, 204, 0.15) inset;
 }
 
-/* Ajuste dinÃƒÂ¢mico para os botÃƒÂµes de saÃƒÂ­da para nÃƒÂ£o quebrar linha */
-#musicianExitBtn,
-#tecnicoExitBtn {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    font-size: 10px !important;
-    /* Ajuste para caber 11 caracteres em 80-100px */
-    letter-spacing: -0.5px;
-    padding: 10px 2px !important;
-    text-overflow: clip;
-}
 
 /* Classes Modulares de Estilo Limpo */
 .card-title {
@@ -1015,10 +1157,61 @@ body.layout-desktop .sidebar {
     background: #1a1a1a;
     border-left: 1px solid #444;
     order: 10;
-    padding: 10px;
-    gap: 15px;
+    padding: 12px 10px;
     position: relative;
     z-index: 950;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+}
+
+body.layout-desktop .sidebar-info .ch-side-title {
+    font-size: 15px;
+}
+
+body.layout-desktop .sidebar-nav {
+    margin-top: 8px;
+}
+
+body.layout-desktop .sidebar-nav-btn {
+    font-size: 24px;
+}
+
+body.layout-desktop .sidebar-info #scn {
+    font-size: 16px !important;
+    margin-bottom: 4px !important;
+}
+
+body.layout-desktop .sidebar-info #scene-info {
+    font-size: 11px !important;
+}
+
+body.layout-desktop .sidebar-dock {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+body.layout-desktop .button-dock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+body.layout-desktop .dock-btn {
+    height: 50px;
+    font-size: 13px;
+    min-height: 44px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #222;
+}
+
+body.layout-desktop .sidebar-macros {
+    margin-top: 12px;
 }
 
 .fader-card-desktop {
@@ -1446,19 +1639,12 @@ body.layout-desktop .sidebar {
     box-shadow: 0 0 7px rgba(168, 85, 247, 0.8);
 }
 
-body.layout-desktop .sidebar .side-btn {
+body.layout-desktop .sidebar .btn-macros {
     height: 60px;
     font-size: 14px;
     border: 1px solid #444;
-    background: #222;
-}
-
-body.layout-desktop .sidebar .btn-config {
-    background: #333;
-}
-
-body.layout-desktop .sidebar .btn-outs {
-    background: #1b5e20;
+    background: #6a1b9a;
+    color: white;
 }
 
 .fader-group-st {
@@ -1467,10 +1653,6 @@ body.layout-desktop .sidebar .btn-outs {
 
 .fader-group-st .card-title {
     color: #e1bee7 !important;
-}
-
-body.layout-desktop .sidebar .btn-sync {
-    background: #004d99;
 }
 
 /* Fixed Master on Desktop */
@@ -1638,7 +1820,7 @@ body.layout-desktop .ch-modal-overlay {
         font-size: 10px !important;
     }
 
-    .side-btn {
+    .side-btn, .dock-btn {
         padding: 8px 2px;
         margin-bottom: 5px;
         font-size: 10px;
@@ -1737,6 +1919,11 @@ body.layout-desktop .ch-modal-overlay {
     color: #0f0;
     font-weight: bold;
     white-space: nowrap;
+}
+
+#scn {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 @media screen and (max-height: 600px) and (orientation: landscape) {
@@ -2131,8 +2318,25 @@ body.is-portrait .side-btn {
     border-left-color: #388e3c !important;
 }
 
-.sidebar-musician #scn {
+.sidebar-musician .sidebar-info #scn {
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar-musician .sidebar-dock {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.sidebar-musician .button-dock {
+    flex: 1;
+    min-height: 0;
+}
+
+.sidebar-musician .dock-close {
+    flex: 1;
+    min-height: 0;
 }
 
 .fone-indicator {
@@ -2147,7 +2351,6 @@ body.is-portrait .side-btn {
     opacity: 0.9;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     white-space: nowrap !important;
-    /* Impede quebra para 2 linhas */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2160,24 +2363,20 @@ body.is-portrait .side-btn {
         padding: 5px 10px !important;
     }
 
-    .sidebar-musician #scn {
+    .sidebar-musician .sidebar-info #scn {
         font-size: 10px !important;
         margin-bottom: 5px !important;
     }
 
-    .sidebar-musician .side-btn {
+    .sidebar-musician .dock-btn {
         min-height: 34px !important;
         padding: 8px 2px !important;
         font-size: 9px !important;
         margin-bottom: 5px !important;
     }
-
-    .sidebar-musician #fsBtnSidebar {
-        height: 34px !important;
-    }
 }
 
-/* Layout de Retrato para MÃƒÂºsico */
+/* Layout de Retrato para Músico */
 body.is-portrait:has(.sidebar-musician) {
     flex-direction: column !important;
 }
@@ -2187,7 +2386,6 @@ body.is-portrait .sidebar-musician {
     height: 60px !important;
     flex-direction: row !important;
     order: 2 !important;
-    /* Move para o rodapÃƒÂ© */
     border-left: none !important;
     border-top: 2px solid #388e3c !important;
     padding: 0 15px !important;
@@ -2196,39 +2394,52 @@ body.is-portrait .sidebar-musician {
     overflow: hidden !important;
 }
 
-body.is-portrait .sidebar-musician #scn {
+body.is-portrait .sidebar-musician .sidebar-info {
+    flex-direction: row !important;
+    width: auto !important;
+    height: 100% !important;
+    margin: 0 !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+body.is-portrait .sidebar-musician .sidebar-info #scn {
     margin: 0 !important;
     font-size: 14px !important;
     width: auto !important;
 }
 
-body.is-portrait .sidebar-musician .fone-indicator {
+body.is-portrait .sidebar-musician .sidebar-info .fone-indicator {
     writing-mode: horizontal-tb !important;
     text-orientation: mixed !important;
     letter-spacing: 1px !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
     font-size: 18px !important;
 }
 
-body.is-portrait .sidebar-musician #sideFooter {
+body.is-portrait .sidebar-musician .sidebar-dock {
+    width: auto !important;
+    flex: 0 1 auto !important;
+}
+
+body.is-portrait .sidebar-musician .button-dock {
     flex-direction: row !important;
     width: auto !important;
-    margin: 0 !important;
     gap: 8px !important;
 }
 
-body.is-portrait .sidebar-musician #musicianExitBtn {
-    width: 110px !important;
-    height: 40px !important;
-    margin: 0 !important;
-    font-size: 11px !important;
-    letter-spacing: 0 !important;
+body.is-portrait .sidebar-musician .dock-close {
+    height: 55px;
+    margin-left: auto;
 }
 
-body.is-portrait .sidebar-musician #fsBtnSidebar {
-    width: 44px !important;
-    height: 40px !important;
-    margin: 0 !important;
+body.layout-horizontal .sidebar-musician .dock-close {
+    width: 70px;
+    margin-left: auto;
+}
+
+body.is-portrait .sidebar-musician .sidebar-macros {
+    display: none !important;
 }
 
 
@@ -2949,7 +3160,7 @@ input:checked+.slider:before {
     transform: translateY(0);
 }
 
-/* Sidebar at the bottom for portrait mode (2-row Grid) */
+/* Sidebar at the bottom for portrait mode (3-panel flex row) */
 body:not(.layout-desktop).is-portrait {
     flex-direction: column;
 }
@@ -2976,11 +3187,10 @@ body:not(.layout-desktop).is-portrait .sidebar {
     z-index: 2500 !important;
     position: relative;
     background: #1a1a1a;
-    display: grid !important;
-    grid-template-columns: minmax(55px, 0.8fr) 70px 70px 1.5fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 6px;
+    display: flex !important;
+    flex-direction: row;
     align-items: stretch;
+    gap: 6px;
 }
 
 body:not(.layout-desktop).is-portrait .ch-modal-overlay {
@@ -2992,175 +3202,96 @@ body:not(.layout-desktop).is-portrait .ch-modal-overlay {
     border-bottom: 1px solid #333 !important;
 }
 
-/* Force CSS display over inline JS display for main blocks */
-body:not(.layout-desktop).is-portrait #mainNav:not([style*="none"]),
-body:not(.layout-desktop).is-portrait #sideFooter:not([style*="none"]) {
-    display: contents !important;
+/* Panel 1: Info (left) */
+body:not(.layout-desktop).is-portrait .sidebar-info {
+    flex-shrink: 0;
+    width: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 0;
 }
 
-body:not(.layout-desktop).is-portrait .side-btn {
-    min-width: 0 !important;
-    height: 100% !important;
-    margin: 0 !important;
-    font-size: 11px;
-    padding: 2px;
-}
-
-/* Main Nav Grid Placement */
-body:not(.layout-desktop).is-portrait #scn {
-    grid-column: 1;
-    grid-row: 1;
+body:not(.layout-desktop).is-portrait .sidebar-info #scn {
     align-self: center;
-    margin: 0 !important;
-    font-size: 14px !important;
+    margin: 0 0 2px 0 !important;
+    font-size: 13px;
+    line-height: 1.1;
 }
-body:not(.layout-desktop).is-portrait #scene-info {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: start;
+
+body:not(.layout-desktop).is-portrait .sidebar-info #scene-info {
     margin: 0 !important;
     white-space: normal;
     word-wrap: break-word;
     line-height: 1.1;
     text-align: center;
-    font-size: 9px;
+    font-size: 8px;
 }
-body:not(.layout-desktop).is-portrait .btn-config {
-    grid-column: 2;
-    grid-row: 1;
-}
-body:not(.layout-desktop).is-portrait #tecnicoExitBtn,
-body:not(.layout-desktop).is-portrait #musicianExitBtn {
-    grid-column: 2;
-    grid-row: 2;
+
+body:not(.layout-desktop).is-portrait .sidebar-info .ch-side-title {
     font-size: 10px !important;
+    margin: 0 !important;
+    line-height: 1.1;
+    min-height: 0;
 }
 
-body:not(.layout-desktop).is-portrait #btnOuts {
-    grid-column: 3;
-    grid-row: 1;
-}
-body:not(.layout-desktop).is-portrait #fsBtnSidebar {
-    grid-column: 3;
-    grid-row: 2;
+body:not(.layout-desktop).is-portrait .sidebar-nav {
+    margin-top: 1px;
+    gap: 3px;
 }
 
-/* Em modo PWA (standalone) o botão de Fullscreen some, então o botão OUTS pode ocupar todo o espaço verticalmente */
-body.is-standalone:not(.layout-desktop).is-portrait #btnOuts {
-    grid-row: 1 / 3;
-    font-size: 14px !important;
-}
-
-body:not(.layout-desktop).is-portrait #mainNav .btn-macros {
-    grid-column: 4;
-    grid-row: 1 / 3;
+body:not(.layout-desktop).is-portrait .sidebar-nav-btn {
     font-size: 12px;
-    font-weight: bold;
+    border-radius: 4px;
 }
 
-/* --- CHANNEL NAV & CONTEXT (2 Rows) --- */
-body:not(.layout-desktop).is-portrait #chNav:not([style*="none"]),
-body:not(.layout-desktop).is-portrait #chContext:not([style*="none"]) {
-    display: contents !important;
+/* Panel 2: Dock (center, scrollable) */
+body:not(.layout-desktop).is-portrait .sidebar-dock {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 0;
+    display: flex;
+    align-items: stretch;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Col 1: Title & Nav (Row 1), SAIR (Row 2) */
-body:not(.layout-desktop).is-portrait #chContext > div:first-child {
-    grid-column: 1;
-    grid-row: 1;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center;
-    align-items: center;
-    gap: 2px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
+body:not(.layout-desktop).is-portrait .button-dock {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    min-width: min-content;
+    height: 100%;
+    align-items: stretch;
 }
-body:not(.layout-desktop).is-portrait #chSideTitle {
-    font-size: 11px !important;
-    margin: 0 !important;
-}
-body:not(.layout-desktop).is-portrait #chContext > div:first-child > div {
-    gap: 2px !important;
-}
-body:not(.layout-desktop).is-portrait #chContext .nav-btn {
-    height: 20px !important;
-    font-size: 14px !important;
-    min-width: 25px !important;
-}
-body:not(.layout-desktop).is-portrait #chContext .btn-close-side {
-    grid-column: 1;
-    grid-row: 2;
+
+body:not(.layout-desktop).is-portrait .dock-btn {
+    min-width: 55px;
     height: 100% !important;
-    width: 100% !important;
-    min-width: 0 !important;
     margin: 0 !important;
+    min-height: 0 !important;
+    border-radius: 6px;
     font-size: 10px;
-    background: #dc3545 !important;
+    padding: 2px 4px;
+    white-space: nowrap;
 }
 
-/* Tabs */
-body:not(.layout-desktop).is-portrait #chNav .btn-tab:nth-of-type(1) { grid-column: 2; grid-row: 1; }
-body:not(.layout-desktop).is-portrait #chNav .btn-tab:nth-of-type(2) { grid-column: 2; grid-row: 2; }
-body:not(.layout-desktop).is-portrait #chNav .btn-tab:nth-of-type(3) { grid-column: 3; grid-row: 1; }
-body:not(.layout-desktop).is-portrait #chNav .btn-tab:nth-of-type(4) { grid-column: 3; grid-row: 2; }
-/* MACROS */
-body:not(.layout-desktop).is-portrait #chNav .btn-macros {
-    grid-column: 4;
-    grid-row: 1 / 3;
-    font-size: 12px;
-    font-weight: bold;
-    height: 100% !important;
-    margin: 0 !important;
+/* Panel 3: Macros (right) */
+body:not(.layout-desktop).is-portrait .sidebar-macros {
+    flex-shrink: 0;
+    width: 65px;
+    display: flex;
+    align-items: stretch;
+    margin: 0;
 }
 
-/* --- TECHNICIAN MIX CONTEXT (2 Rows) --- */
-body:not(.layout-desktop).is-portrait #techMixContext[style*="display: flex"],
-body:not(.layout-desktop).is-portrait #techMixContext[style*="display:flex"] {
-    display: contents !important;
-}
-
-body:not(.layout-desktop).is-portrait #techMixContext > div:nth-child(1) {
-    display: none !important; /* Esconde "EDITANDO MIX" pra salvar espaço */
-}
-body:not(.layout-desktop).is-portrait #techMixContext > div:nth-child(2) {
-    display: contents !important;
-}
-body:not(.layout-desktop).is-portrait #techMixContext > div:nth-child(2) > div:nth-child(2) {
-    display: contents !important;
-}
-body:not(.layout-desktop).is-portrait #techMixTitle {
-    grid-column: 1 / 3;
-    grid-row: 1 / 3;
-    align-self: center;
-    justify-self: center;
-    font-size: 16px !important;
-    margin: 0 !important;
-}
-body:not(.layout-desktop).is-portrait #techMixContext .nav-btn:nth-child(1) {
-    grid-column: 3;
-    grid-row: 1;
-    margin: 0 !important;
-    height: 100% !important;
-}
-body:not(.layout-desktop).is-portrait #techMixContext .nav-btn:nth-child(2) {
-    grid-column: 3;
-    grid-row: 2;
-    margin: 0 !important;
-    height: 100% !important;
-}
-body:not(.layout-desktop).is-portrait #techMixContext .btn-close-side {
-    grid-column: 4;
-    grid-row: 1 / 3;
-    margin: 0 !important;
-    height: 100% !important;
-    min-width: 0 !important;
-    background: #dc3545 !important;
-    font-size: 14px !important;
-}
-
-/* Hide outs context because it is handled by Main Nav in portrait */
-body:not(.layout-desktop).is-portrait #outsContext {
-    display: none !important;
+body:not(.layout-desktop).is-portrait .sidebar-macros .btn-macros {
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    font-size: 11px;
+    padding: 2px;
 }

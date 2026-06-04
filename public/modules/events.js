@@ -36,24 +36,15 @@ function updateConfigUIForChannel(ch) {
     document.getElementById('chSideTitle').innerText = `${displayTitle} - ${chName || `...`}`;
 
     document.getElementById('chConfigModal').style.display = 'flex';
-    document.getElementById('mainNav').style.display = 'none';
-    document.getElementById('chNav').style.display = 'flex';
-    document.getElementById('chContext').style.display = 'flex';
 
-    // Esconde rodapés de modo para não bugar a UI com múltiplos botões SAIR
-    const outsCtx = document.getElementById('outsContext');
-    if (outsCtx) outsCtx.style.display = 'none';
-    const techCtx = document.getElementById('techMixContext');
-    if (techCtx) techCtx.style.display = 'none';
+    // Sidebar: channel config mode
+    if (typeof renderDock === 'function') renderDock('channelConfig');
+    if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
 
     // Ocultar aba DYN para canais ST IN (não possuem Dynamics na 01v96)
-    const dynTabBtn = document.querySelectorAll('#chNav .side-btn.btn-tab')[1];
+    const dynTabBtn = document.querySelectorAll('.dock-tab')[1];
     if (dynTabBtn) {
-        if (ch >= 60 && ch <= 67) {
-            dynTabBtn.style.display = 'none';
-        } else {
-            dynTabBtn.style.display = 'block';
-        }
+        dynTabBtn.style.display = (ch >= 60 && ch <= 67) ? 'none' : '';
     }
 
     const miniFader = document.getElementById('miniFaderContext');
@@ -71,12 +62,6 @@ function updateConfigUIForChannel(ch) {
         }
         else miniFader.innerHTML = createChannelStrip(ch, false, "mini-");
     }
-
-    // Esconde botões de logout ao entrar na config do canal
-    const mExit = document.getElementById('musicianExitBtn');
-    if (mExit) mExit.style.display = 'none';
-    const tExit = document.getElementById('tecnicoExitBtn');
-    if (tExit) tExit.style.display = 'none';
 
     if (window.autoScaleTitle) autoScaleTitle();
 
@@ -139,38 +124,13 @@ function closeChannelConfig() {
     if (window.stopEQAnimation) stopEQAnimation();
     document.getElementById('chConfigModal').style.display = 'none';
 
-    // Restaura o painel principal, a menos que estejamos em fones/mix
-    document.getElementById('mainNav').style.display = (musicianMode || technicianMixMode) ? 'none' : 'flex';
-    document.getElementById('chNav').style.display = 'none';
-    document.getElementById('chContext').style.display = 'none';
-
-    // Restaura rodapés de modo se necessário
-    if (outsMode) {
-        const outsCtx = document.getElementById('outsContext');
-        if (outsCtx) outsCtx.style.display = 'flex';
-    }
-    if (technicianMixMode) {
-        const techCtx = document.getElementById('techMixContext');
-        if (techCtx) techCtx.style.display = 'flex';
-    }
-
+    activeConfigChannel = null;
     const miniFader = document.getElementById('miniFaderContext');
     if (miniFader) miniFader.innerHTML = '';
 
-    // Mostra botões de logout de volta ao sair (respeitando modos)
-    if (musicianMode) {
-        const mExit = document.getElementById('musicianExitBtn');
-        if (mExit) mExit.style.display = 'block';
-    } else {
-        const tExit = document.getElementById('tecnicoExitBtn');
-        if (tExit) tExit.style.display = (outsMode || technicianMixMode) ? 'none' : 'block';
-    }
-
-    // Reseta cores dos cards
-    document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
-
-    activeConfigChannel = null;
     initUI();
+
+    document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
 }
 
 function toggleState(type, ch) {
