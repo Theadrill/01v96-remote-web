@@ -80,9 +80,6 @@ impl RemoteClient {
 
         // 2. Tenta a lista de redes configuradas
         for host in &self.config.remote_midi_networks {
-            if host == &last_host {
-                continue; // já testado
-            }
             let addr = format!("{}:{}", host, port);
             info!("🌐 Tentando host da lista: {}", addr);
             if let Ok(Ok(stream)) = timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await

@@ -142,12 +142,12 @@ impl ConnectionManager {
     }
 
     pub fn iniciar_busca_automatica(self: &Arc<Self>) {
-        if self.is_connected() {
+        if self.config.remote_midi {
+            self.iniciar_monitor_conexao_remota();
             return;
         }
 
-        if self.config.remote_midi {
-            self.iniciar_monitor_conexao_remota();
+        if self.is_connected() {
             return;
         }
 
@@ -410,7 +410,10 @@ impl ConnectionManager {
         self.sync_counter.reset();
         self.emit_connection_state();
 
-        if retry && !self.config.remote_midi {
+        if self.config.remote_midi {
+            info!("🌐 [Conexão Remota] Reiniciando monitor de conexão...");
+            self.iniciar_monitor_conexao_remota();
+        } else if retry {
             info!("❌ Conexao perdida. Tentando reconectar...");
             self.iniciar_busca_automatica();
         }
