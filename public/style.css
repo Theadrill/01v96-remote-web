@@ -3413,12 +3413,12 @@ body:not(.layout-desktop):not(.is-portrait) .dock-fs {
     display: none !important;
 }
 
-/* No modo técnico/mobile deitado, o container de macros ocupa pelo menos 25% do viewport height */
+/* No modo técnico/mobile deitado, o container de macros ocupa pelo menos 35% do viewport height */
 body:not(.layout-desktop):not(.is-portrait) .sidebar-macros {
-    height: 25vh !important;
-    min-height: 25vh !important;
+    height: 35vh !important;
+    min-height: 35vh !important;
     background: transparent !important;
-    margin-top: 0 !important;
+    margin-top: 8px !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
@@ -3440,4 +3440,62 @@ body:not(.layout-desktop):not(.is-portrait) .btn-fs-macros {
     color: white !important;
     margin: 0 !important;
     border-radius: 8px !important;
+}
+
+/* Botão de sair fixo na área de macros para telas maiores */
+.btn-exit-macros {
+    display: none !important;
+    background: #dc3545 !important;
+    color: white !important;
+    border-radius: 6px;
+    font-weight: bold;
+    border: 1px solid #721c24;
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+.btn-exit-macros:active {
+    opacity: 0.8 !important;
+    transform: scale(0.96) !important;
+}
+
+/* Portrait: tablets e telas maiores (width >= 768px) */
+@media screen and (orientation: portrait) and (min-width: 768px) {
+    body:not(.layout-desktop) .btn-exit-macros {
+        display: flex !important;
+        height: calc(50% - 3px) !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+    }
+    body:not(.layout-desktop) .sidebar-macros {
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+    body:not(.layout-desktop) .sidebar-macros .btn-macros {
+        height: calc(50% - 3px) !important;
+    }
+    body:not(.layout-desktop) .dock-close,
+    body:not(.layout-desktop) .dock-exit {
+        display: none !important;
+    }
+}
+
+/* Landscape: tablets e telas maiores (width >= 1024px ou height >= 600px) */
+@media screen and (orientation: landscape) and (min-width: 1024px), 
+       screen and (orientation: landscape) and (min-height: 600px) {
+    body:not(.layout-desktop) .btn-exit-macros {
+        display: flex !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        margin: 0 !important;
+        border-radius: 8px !important;
+    }
+    body:not(.layout-desktop) .dock-close,
+    body:not(.layout-desktop) .dock-exit {
+        display: none !important;
+    }
 }

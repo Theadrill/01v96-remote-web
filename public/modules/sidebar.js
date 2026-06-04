@@ -466,6 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderDock(mode) {
+    window.currentDockMode = mode;
     const dock = document.getElementById('buttonDock');
     if (!dock) return;
 
@@ -518,6 +519,22 @@ function renderDock(mode) {
         `<button class="dock-btn ${b.cls || ''}" onclick="${b.action}"${b.id ? ` id="${b.id}"` : ''}>${b.label}</button>`
     ).join('');
 }
+
+function triggerExitActiveMode() {
+    const mode = window.currentDockMode;
+    if (mode === 'main' || mode === 'musician') {
+        const modal = document.getElementById('logoutConfirmModal');
+        if (modal) modal.style.display = 'flex';
+    } else if (mode === 'channelConfig') {
+        if (typeof closeChannelConfig === 'function') closeChannelConfig();
+    } else if (mode === 'outs') {
+        if (typeof toggleOuts === 'function') toggleOuts();
+    } else if (mode === 'techMix') {
+        if (typeof exitTechnicianMixMode === 'function') exitTechnicianMixMode();
+    }
+}
+window.triggerExitActiveMode = triggerExitActiveMode;
+
 
 function updateSidebarInfo() {
     const chTitle = document.getElementById('chSideTitle');
