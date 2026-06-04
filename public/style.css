@@ -860,7 +860,9 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
     padding: 4px 6px;
     border-radius: 6px;
     font-weight: bold;
-    border: none;
+    border: 1px solid #555;
+    background: #333;
+    color: #ccc;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -870,7 +872,14 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
     line-height: 1.1;
     width: 100%;
     box-sizing: border-box;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
 }
+
+.dock-btn:active {
+    opacity: 0.8;
+    transform: scale(0.96);
+}
+
 
 .dock-close,
 .dock-exit {
@@ -1213,6 +1222,7 @@ body.layout-desktop .dock-btn {
     border-radius: 8px;
     border: 1px solid #444;
     background: #222;
+    color: white;
 }
 
 body.layout-desktop .sidebar-macros {
