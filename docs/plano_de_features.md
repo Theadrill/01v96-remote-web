@@ -89,139 +89,396 @@ sem custom scene própria herda os nomes da default.
 Módulo responsável por todas as operações de leitura, escrita e
 sincronização dos arquivos JSON de custom scenes. Deve conter:
 
-1. **`struct CustomSceneRegistry`** — representa `custom_names_scenes-{nome}.json`
+1. **`enum ChannelId`** — chave tipada para identificar canais no JSON.
+   ```rust
+   #[derive(Debug, Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
+   #[serde(rename_all = "snake_case")]
+   pub enum ChannelId {
+       Input(u8),  // 1..=32
+       StIn(u8),   // 33..=40
+       Master,
+   }
+   ```
+   - Implementar `TryFrom<&str>` / `FromStr` para converter de string JSON
+     (`"1"` → `Input(1)`, `"master"` → `Master`).
+   - Implementar `Display` para serializar de volta (`Input(1)` → `"1"`,
+     `Master` → `"master"`).
+   - **Validar ranges**: `Input(1..=32)`, `StIn(33..=40)`.
+   - Rejeitar `0`, `41+`, strings vazias, `"mastr"` (typo).
+
+2. **`struct CustomSceneRegistry`** — representa `custom_names_scenes-{nome}.json`
    - Campos: `mesa_nome: String`, `scenes: Vec<SceneEntry>`
    - `SceneEntry`: `physical_scene: String`, `physical_id: u8`,
      `file: String`
 
-2. **`struct CustomScene`** — representa `custom_names_scene-{nome}-{mesa}.json`
+3. **`struct CustomScene`** — representa `custom_names_scene-{nome}-{mesa}.json`
    - Campos: `scene_name: String`, `scene_id: u8`,
-     `channels: HashMap<String, ChannelNameEntry>`
+     `channels: HashMap<ChannelId, ChannelNameEntry>` (usar `ChannelId`, não `String`)
    - `ChannelNameEntry`: `name: String`, `short: String`
 
-3. **`fn load_registry(mesa_nome: &str) -> CustomSceneRegistry`**
+4. **`struct CachedScene`** — wrapper para detecção de stale cache.
+   ```rust
+   struct CachedScene {
+       scene: CustomScene,
+       mtime: std::time::SystemTime,  // para detectar mudanças externas (Git pull)
+   }
+   ```
+
+5. **`struct CustomSceneManager`** — gerencia cache + fila de operações + persistência.
+   ```rust
+   pub struct CustomSceneManager {
+       registry: CustomSceneRegistry,
+       cache: HashMap<String, CachedScene>,  // filename -> cached scene
+       data_dir: PathBuf,
+       mesa_nome: String,
+       dirty_files: HashSet<String>,  // arquivos que precisam persistir
+       operation_queue: CustomSceneOpQueue,
+   }
+   ```
+
+6. **`struct CustomSceneOpQueue`** — fila serializada com CancellationToken.
+   ```rust
+   struct CustomSceneOpQueue {
+       current_token: tokio_util::sync::CancellationToken,
+       is_running: bool,
+   }
+   ```
+
+7. **`fn CustomSceneManager::load_all(data_dir: &Path, mesa_nome: &str) -> Self`**
+   - **Antes de tudo**: varre `data_dir` por arquivos `.tmp` e os remove
+     (órfãos de crashes anteriores).
    - Carrega `custom_names_scenes-{mesa_nome}.json` do disco.
-   - Se não existir, retorna registro vazio.
+   - Para cada entrada no registro, carrega o JSON da cena e guarda em cache
+     com `mtime` do arquivo.
+   - Se não existir registro, retorna manager vazio.
 
-4. **`fn save_registry(mesa_nome: &str, registry: &CustomSceneRegistry)`**
-   - Salva o registro no disco.
+8. **`fn get_scene(&mut self, filename: &str) -> Option<&CustomScene>`**
+   - Verifica se o `mtime` atual do arquivo difere do `mtime` em cache.
+   - Se mudou (Git pull externo), recarrega do disco e atualiza cache.
+   - Retorna referência à cena em cache.
 
-5. **`fn load_scene(filename: &str) -> Option<CustomScene>`**
-   - Carrega uma cena individual do disco.
-   - Se o arquivo não existir ou estiver mal formatado, loga erro e retorna
-     `None`.
-
-6. **`fn save_scene(filename: &str, scene: &CustomScene)`**
-   - Salva a cena individual no disco.
-   - Usa `serde_json::to_string_pretty` para facilitar edição manual.
-
-7. **`fn find_scene_for_physical(registry: &CustomSceneRegistry, physical_id: u8, physical_scene: &str, mesa_nome: &str) -> Option<CustomScene>`**
+9. **`fn find_scene_for_physical(&mut self, physical_id: u8, physical_scene: &str) -> Option<&CustomScene>`**
    - Ordem de busca (primeiro match vence):
-     1. `physical_id` no registro.
-     2. `physical_scene` no registro.
+     1. `physical_id` no registro → carrega via `get_scene(file)`.
+     2. `physical_scene` no registro → carrega via `get_scene(file)`.
      3. Tenta `custom_names_scene-default-{mesa_nome}.json`.
      4. Nenhum encontrado: retorna `None`.
 
-8. **`fn ensure_registry_entry(registry: &mut CustomSceneRegistry, physical_scene: &str, physical_id: u8, file: &str)`**
-   - Se já existe entrada com mesmo `physical_id`, atualiza `file`.
-   - Senão, adiciona nova entrada.
+10. **`fn ensure_registry_entry(&mut self, physical_scene: &str, physical_id: u8, file: &str)`**
+    - Se já existe entrada com mesmo `physical_id`, atualiza `file`.
+    - Senão, adiciona nova entrada.
+    - Marca registro como dirty.
 
-9. **`fn remove_channel(scene: &mut CustomScene, channel_id: &str)`**
-   - Remove `channels[channel_id]` da cena.
-   - Se `channels` ficar vazio, retorna `true` (indica que o arquivo deve ser
-     deletado).
+11. **`fn upsert_channel(&mut self, filename: &str, channel_id: ChannelId, name: &str)`**
+    - Carrega ou cria `CustomScene` para `filename`.
+    - Calcula `short = to_short_name(name)` — **derivado, nunca recebido do frontend**.
+    - Atualiza `channels[channel_id] = ChannelNameEntry { name, short }`.
+    - Marca arquivo como dirty.
 
-10. **`fn normalize_name(input: &str) -> String`**
-    - Converte para maiúsculo.
-    - Remove acentos (substitui por equivalente sem acento).
-    - Remove símbolos especiais.
-    - Trunca em 10 caracteres.
+12. **`fn remove_channel(&mut self, filename: &str, channel_id: &ChannelId) -> bool`**
+    - Remove `channels[channel_id]` da cena.
+    - Se `channels` ficar vazio:
+      a. Deleta o arquivo JSON do disco.
+      b. **Remove a `SceneEntry` correspondente do registro**.
+      c. Marca registro como dirty.
+      d. Remove do cache.
+      e. Retorna `true`.
+    - Senão: marca arquivo como dirty, retorna `false`.
 
-11. **`fn to_short_name(name: &str) -> String`**
-    - Pega os 4 primeiros caracteres, maiúsculo.
-    - Se menor que 4, preenche com espaços à direita.
+13. **`fn list_scenes(&self) -> Vec<SceneEntry>`**
+    - Retorna cópia das entradas do registro para o frontend.
 
-**Verificação:** Teste unitário para cada função pública.
+14. **`fn persist(&mut self)` (chamado com debounce)**
+    - Para cada arquivo dirty:
+      a. Serializa para JSON via `serde_json::to_string_pretty`.
+      b. Escreve em `{filename}.tmp`.
+      c. Renomeia `.tmp` → `.json` (operação atômica no OS).
+    - Se registro dirty: salva `custom_names_scenes-{mesa_nome}.json` com mesmo
+      padrão atômico.
+
+15. **`fn enqueue_op<F, Fut>(&self, op: F) where F: FnOnce(CancellationToken) -> Fut`**
+    - Cancela o token da operação anterior.
+    - Cria novo `CancellationToken`.
+    - Spawna task com a nova operação e o novo token.
+
+16. **`fn normalize_name(input: &str) -> String`**
+    ```rust
+    pub fn normalize_name(input: &str) -> String {
+        input
+            .to_uppercase()                    // 1. Maiúsculo primeiro
+            .chars()
+            .map(|c| remove_accent(c))         // 2. Remove acentos
+            .filter(|c| c.is_ascii_alphanumeric() || *c == ' ')
+            .take(10)                          // 3. Trunca em 10 chars
+            .collect::<String>()
+            .trim()
+            .to_string()
+    }
+    ```
+    - Usar crate `unicode-normalization` para NFD + strip combining marks.
+
+17. **`fn to_short_name(name: &str) -> String`**
+    ```rust
+    pub fn to_short_name(name: &str) -> String {
+        let normalized: String = name
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric())
+            .take(4)
+            .collect();
+        format!("{: <4}", normalized.to_uppercase())  // padding à direita
+    }
+    ```
+    - Garante **exatamente 4 bytes** (`name.len()` deve ser 4).
+    - Ex: `"AX"` → `"AX  "`, `"MAURICIO"` → `"MAUR"`.
+
+18. **`fn save_json_atomic(path: &Path, data: &impl Serialize)`**
+    - Escreve em `path.with_extension("json.tmp")`.
+    - Renomeia `.json.tmp` → `.json`.
+    - Se `rename` falhar, o `.json` original permanece intacto.
+
+**Verificação:** Teste unitário para cada função pública, incluindo:
+- `normalize_name` com acentos, emojis, strings vazias
+- `to_short_name` com nomes curtos ("AX" → "AX  ") e longos
+- `ChannelId` com valores válidos e inválidos
+- `remove_channel` com e sem deleção de arquivo
+- `save_json_atomic` simulando crash no meio da escrita
+- `get_scene` com mtime alterado (simular Git pull)
 
 ---
 
 ### Passo 2: Integração com troca de cena da mesa
 
-**Onde:** `server_rust/src/state.rs` e `server_rust/src/midi/protocol.rs`
+**Onde:**
+- `server_rust/src/socket_handlers.rs` (handler `recallScene` existente)
+- `server_rust/src/midi_receiver.rs` (detecção de `PhysicalSceneRecall`)
+- `server_rust/src/custom_scenes.rs` (operação na fila)
 
-Quando o servidor detecta que uma cena física foi carregada (evento
-`PhysicalSceneRecall` ou mudança de `SceneNumber` no `apply_midi`):
+**IMPORTANTE:** O `CustomSceneManager` vive em `Arc<RwLock<CustomSceneManager>>`
+**separado** do `GlobalState`. Isso evita bloquear faders/mutes durante a
+aplicação de nomes.
 
-1. Adicione um callback/hook no `GlobalState` que é chamado quando
-   `scene_number` muda para um valor > 0. O callback:
-   a. Aguarda 2 segundos (tempo para o dump MIDI da cena terminar).
-   b. Lê `SERVER_NAME` do `.env`.
-   c. Chama `load_registry(mesa_nome)`.
-   d. Chama `find_scene_for_physical(...)` para localizar a custom scene.
-   e. Se encontrada, itera sobre `scene.channels` e para cada canal:
-      - Lê o nome atual da mesa via `self.channels.get(&local_ch).name_chars`.
-      - Compara com `entry.short` (4 primeiros caracteres da custom scene,
-        maiúsculo, com espaços).
-      - Se diferente, emite `build_name_change(local_ch, char_index, code)`.
-      - Delay de 30ms entre comandos para não sobrecarregar a mesa.
-   f. Emite evento Socket.io `"customSceneLoaded"` para o frontend com
-      `{ active: true, scene_name: "...", mesa_nome: "..." }`.
+Quando o servidor detecta que uma cena física foi carregada:
+
+1. Em vez de executar diretamente, **enfileira uma operação** via
+   `CustomSceneManager::enqueue_op()`:
+
+   ```rust
+   // Conceitual — no handler recallScene ou midi_receiver:
+   custom_scene_manager.enqueue_op(|cancel_token| async move {
+       // 1. Aguarda 2s (tempo do dump MIDI)
+       tokio::select! {
+           _ = tokio::time::sleep(Duration::from_secs(2)) => {}
+           _ = cancel_token.cancelled() => {
+               tracing::info!("⏹️ Aplicação de nomes cancelada (nova cena)");
+               return;
+           }
+       }
+
+       // 2. Snapshot: locks curtos, copia só o necessário
+       let mesa_nome = {
+           let csm = custom_scene_manager.read().await;
+           csm.mesa_nome.clone()
+       };
+
+       let (scene_option, current_names) = {
+           let state = global_state.read().await;
+           let scene_number = state.scene_number;
+           let scene_name = state.scene_name.clone();
+           // Coletar nomes atuais da mesa (ChannelId -> String)
+           let names = collect_current_names(&state);
+           drop(state);  // ← lock do GlobalState liberado aqui
+
+           let mut csm = custom_scene_manager.write().await;
+           let scene = csm.find_scene_for_physical(
+               scene_number as u8,
+               &scene_name,
+           ).cloned();
+           (scene, names)
+       };  // ← lock do CustomSceneManager liberado aqui
+
+       // 3. A partir daqui, NENHUM lock está retido
+       let scene = match scene_option {
+           Some(s) => s,
+           None => {
+               // Emitir evento: nenhuma custom scene ativa
+               let _ = io.emit("customSceneLoaded", &serde_json::json!({
+                   "active": false
+               })).await;
+               return;
+           }
+       };
+
+       // 4. Comparar nomes e enviar MIDI apenas dos divergentes
+       for (channel_id, entry) in &scene.channels {
+           if cancel_token.is_cancelled() { return; }
+
+           // Converter ChannelId para channel global da mesa
+           let global_ch = channel_id.to_global_channel();
+
+           // Comparar com nome atual na mesa
+           let current_short = current_names.get(channel_id)
+               .map(|n| to_short_name(n))
+               .unwrap_or_default();
+
+           if current_short == entry.short {
+               continue;  // já está igual, pula
+           }
+
+           // Enviar os 4 bytes do short para a mesa
+           let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
+           for (ci, &byte) in short_bytes.iter().enumerate() {
+               if cancel_token.is_cancelled() { return; }
+
+               if let Some(req) = midi::protocol::build_name_change(
+                   global_ch, ci as u8, byte
+               ) {
+                   scheduler.enqueue(req, 1).await;
+               }
+
+               if ci < short_bytes.len() - 1 {
+                   tokio::select! {
+                       _ = tokio::time::sleep(Duration::from_millis(30)) => {}
+                       _ = cancel_token.cancelled() => { return; }
+                   }
+               }
+           }
+       }
+
+       // 5. Emitir evento de sucesso
+       let _ = io.emit("customSceneLoaded", &serde_json::json!({
+           "active": true,
+           "scene_name": scene.scene_name,
+           "scene_id": scene.scene_id,
+       })).await;
+   });
+   ```
 
 2. Casos de borda:
-   - Canal do JSON não encontrado no `self.channels`: pula (não altera).
-   - JSON mal formatado: loga erro, encerra sem alterar nomes.
-   - Nome `short` menor que 4 chars: preenche com espaços (ex: `"AX"` →
-     `"AX  "`).
+   - Canal do JSON não encontrado no `current_names`: pula (não altera).
+   - JSON mal formatado: `get_scene` retorna `None`, loga erro.
+   - `short` SEMPRE tem exatamente 4 bytes (garantido por `to_short_name`).
    - `physical_id` é a chave principal de matching; `physical_scene` é
      fallback.
+   - Se token for cancelado durante o loop de 30ms, interrompe
+     imediatamente sem enviar comandos parciais.
 
-**Verificação:** Trocar cena na mesa, verificar que os nomes customizados
-são aplicados apenas nos canais divergentes. Logs mostram quais canais foram
-alterados e quais foram pulados.
+3. **Onde detectar a troca de cena:**
+   - No handler `recallScene` (`socket_handlers.rs`): após o delay de 2s
+     existente e antes do `fire_params_only`, enfileirar a operação.
+   - No `midi_receiver.rs`: ao receber `PhysicalSceneRecall`, enfileirar
+     a operação.
+   - **Proteger com dedup**: se ambas as fontes detectarem a mesma cena,
+     a segunda operação apenas cancela a primeira (que já está fazendo
+     a coisa certa) — é um cancelamento inócuo.
+
+**Verificação:**
+- Trocar cena na mesa → nomes customizados aplicados (só os que mudaram).
+- Trocar cena 2x rápido → a primeira aplicação é cancelada (log mostra
+  `"⏹️ Aplicação de nomes cancelada"`), só a segunda roda.
+- Logs mostram quais canais foram alterados e quais foram pulados.
 
 ---
 
 ### Passo 3: Salvamento de nome customizado
 
-**Onde:** `server_rust/src/socket_handlers.rs` — novo handler ou extensão do
-handler `updateName`
+**Onde:** `server_rust/src/socket_handlers.rs` — novo handler
+`"saveCustomName"`
 
-Modifique ou crie um handler para o evento `"saveCustomName"` que o frontend
-emitirá ao salvar um nome com a checkbox "Criar nome customizado" marcada.
+**IMPORTANTE:** O `short` é **sempre derivado** de `name` pelo backend via
+`to_short_name()`. O frontend **não envia** `short`.
 
 **Dados recebidos do frontend:**
 ```json
 {
   "channel": 2,
-  "name": "MAURICIO",
-  "short": "MAUR"
+  "name": "MAURICIO"
+  // NOTA: short NÃO é enviado — é derivado no backend
 }
 ```
 
-**Handler:**
+**Handler (`saveCustomName`):**
 
-1. Lê `sceneName` e `sceneNumber` do `GlobalState`.
+1. Lê `sceneName` e `sceneNumber` do `GlobalState` (lock curto de leitura).
 2. Extrai o nome base da cena:
    - Se `sceneName` contém `" - "`, usa o texto após o primeiro `" - "`.
    - Senão, usa o nome completo.
-3. Determina o nome do arquivo:
+3. Determina `filename`:
    `custom_names_scene-{nome_base}-{SERVER_NAME}.json`.
-4. Verifica se o `.env` tem `SERVER_NAME`. Se não, retorna erro exigindo
-   cadastro (Feature 2).
-5. Carrega ou cria `CustomScene`:
-   - Se o arquivo já existe, carrega.
-   - Se não, varre `GlobalState.channels` (índices 0-39) e `master`,
-     coleta os nomes atuais de 4 caracteres de cada canal, e preenche o
-     `channels` com `name` = nome atual e `short` = nome atual.
-6. Atualiza `channels["{channel}"]` com os novos `name` e `short`.
-7. Salva a cena no disco.
-8. Carrega o registro, chama `ensure_registry_entry(...)` com
-   `physical_scene`, `physical_id` e `file`, salva o registro.
-9. Se `short != nome atual na mesa`, emite `build_name_change` para a mesa.
-10. Emite `"updateName"` para todos os clientes com o `name` completo.
+4. Se `.env` não tem `SERVER_NAME`, retorna erro (Feature 2 necessária).
+5. Converte `channel` recebido (base-0 da mesa) para `ChannelId`
+   (base-1 do JSON):
+   - `0..=31` → `Input(ch + 1)`
+   - `32..=39` (ST IN local) → `StIn(60 + (ch - 32) + 1)` (global + 1)
+   - `52` → `Master`
+6. Calcula `short = to_short_name(&data.name)` — **sempre derivado, nunca
+   vindo do frontend**.
+7. **Enfileira operação** via `enqueue_op`:
 
-**Verificação:** Editar nome de um canal com checkbox marcada, verificar que
-o arquivo JSON é criado/atualizado corretamente e o registro é mantido.
+   ```rust
+   custom_scene_manager.enqueue_op(|cancel_token| async move {
+       // Snapshot: lock curto em cada cofre
+       let (scene_number, scene_name) = {
+           let state = global_state.read().await;
+           (state.scene_number, state.scene_name.clone())
+       };
+
+       // Atualizar ou criar CustomScene
+       {
+           let mut csm = custom_scene_manager.write().await;
+           // Se arquivo não existe, criar com snapshot dos nomes atuais
+           if csm.get_scene(&filename).is_none() {
+               let state = global_state.read().await;
+               let channels = collect_current_channels_as_entries(&state);
+               csm.create_scene(&filename, &scene_name, scene_number as u8, channels);
+           }
+
+           // upsert com short derivado
+           csm.upsert_channel(&filename, channel_id, &data.name);
+           csm.ensure_registry_entry(&scene_name, scene_number as u8, &filename);
+       }  // lock do CSM liberado aqui
+
+       // Se short != nome atual na mesa, enviar MIDI
+       let current_name = {
+           let state = global_state.read().await;
+           get_channel_short_name(&state, data.channel)
+       };
+       drop(global_state);  // lock liberado
+
+       if current_name.as_deref() != Some(&short) {
+           let short_bytes: Vec<u8> = short.bytes().take(4).collect();
+           for (ci, &byte) in short_bytes.iter().enumerate() {
+               if cancel_token.is_cancelled() { return; }
+               if let Some(req) = midi::protocol::build_name_change(
+                   data.channel as u8, ci as u8, byte
+               ) {
+                   scheduler.enqueue(req, 1).await;
+               }
+               if ci < short_bytes.len() - 1 {
+                   tokio::time::sleep(Duration::from_millis(30)).await;
+               }
+           }
+       }
+
+       // Persistência com debounce
+       let mut csm = custom_scene_manager.write().await;
+       csm.mark_dirty(&filename);
+       // O debounce de persist é feito externamente (timer separado)
+   });
+   ```
+
+8. Emite `"updateName"` para todos os clientes com o `name` completo.
+
+**Handler (`removeCustomName`):**
+- Recebe `{ channel: 2 }`.
+- Remove o canal da custom scene atual.
+- Se `channels` ficar vazio: deleta o JSON + remove entrada do registro.
+- Emite `"updateName"` com o nome original de 4 chars (volta ao padrão).
+
+**Verificação:**
+- Editar nome com checkbox marcada → JSON criado/atualizado na pasta
+  `data/custom_scenes/`.
+- `short` é sempre derivado de `name` — testar com `"MAURICIO"` → `short = "MAUR"`.
+- Remover último canal → JSON deletado + registro limpo.
 
 ---
 
@@ -270,8 +527,17 @@ do canal, o sistema já está preparado para edição. Adicione:
 
 4. **Fluxo de salvamento:**
    - Se checkbox desmarcada: fluxo legado (`updateName`).
-   - Se checkbox marcada: emite `"saveCustomName"` com `channel`, `name`
-     (normalizado, até 10 chars), e `short` (4 chars).
+   - Se checkbox marcada: emite `"saveCustomName"` com `channel` e `name`
+     (normalizado, até 10 chars).
+   - **NOTA:** `short` NÃO é enviado. O backend deriva `short` de `name`
+     automaticamente via `to_short_name()`.
+
+5. **Handler `"removeCustomName"`:**
+   - Botão "Remover nome customizado" visível apenas se o canal atual
+     tem entrada na custom scene ativa.
+   - Emite `{ channel: id }`.
+   - Backend remove a chave do JSON. Se ficar vazio, deleta arquivo + limpa
+     registro.
 
 **Verificação:**
 - Digitar "MÚSICA!" → App mostra "MUSICA", Mesa mostra "MUSI".
@@ -279,7 +545,8 @@ do canal, o sistema já está preparado para edição. Adicione:
 - Salvar com checkbox desmarcada → nome de 4 chars vai para a mesa (fluxo
   legado).
 - Salvar com checkbox marcada → arquivo JSON criado/atualizado, nome de 4
-  chars enviado para a mesa.
+  chars enviado para a mesa (short derivado do name).
+- Remover nome customizado → voltes para o nome de 4 chars padrão da mesa.
 
 ---
 
@@ -324,49 +591,145 @@ com tabela de comparação, confirmar que a atribuição persiste após reload.
 
 ### Passo 6: Backend — Renomeação de servidor
 
-**Onde:** `server_rust/src/socket_handlers.rs` — handler `"renameServer"`
+**Onde:**
+- `server_rust/src/socket_handlers.rs` — handler `"renameServer"`
+- `server_rust/src/custom_scenes.rs` — método `CustomSceneManager::rename_mesa()`
 
 Handler que propaga a renomeação do servidor para todos os arquivos de
 custom scenes:
 
 1. Recebe `{ old_name: "casa-antiga", new_name: "casa-nova" }`.
 2. Valida `new_name` (mesmas regras de 2.3.3).
-3. Carrega `custom_names_scenes-{old_name}.json`.
-4. Para cada `scene` no registro:
-   a. Lê o arquivo `{scene.file}`.
-   b. Atualiza `scene_name` e `scene_id` se necessário.
-   c. Salva com o novo nome:
-      `custom_names_scene-{scene.physical_scene}-{new_name}.json`.
-   d. Atualiza `scene.file` no registro para o novo nome.
-   e. Remove o arquivo antigo.
-5. Salva o registro como `custom_names_scenes-{new_name}.json`.
-6. Remove o registro antigo.
-7. Atualiza o `.env` com `SERVER_NAME={new_name}`.
-8. Se existir `custom_names_scene-default-{old_name}.json`, renomeia para
-   `custom_names_scene-default-{new_name}.json`.
+3. Chama `CustomSceneManager::rename_mesa(old_name, new_name)` que faz:
+
+   ```rust
+   pub async fn rename_mesa(&mut self, old_name: &str, new_name: &str) -> Result<(), String> {
+       // 1. Carrega registro antigo
+       let old_registry_path = self.data_dir.join(format!("custom_names_scenes-{}.json", old_name));
+       let registry: CustomSceneRegistry = load_json(&old_registry_path)?;
+
+       // 2. Para cada scene, renomeia o arquivo
+       let mut new_registry = CustomSceneRegistry {
+           mesa_nome: new_name.to_string(),
+           scenes: Vec::with_capacity(registry.scenes.len()),
+       };
+
+       for entry in &registry.scenes {
+           // Novo nome do arquivo: substitui {old_name} por {new_name}
+           let new_file = entry.file.replace(old_name, new_name);
+           let old_path = self.data_dir.join(&entry.file);
+           let new_path = self.data_dir.join(&new_file);
+
+           // Renomeia (move) o arquivo
+           fs::rename(&old_path, &new_path).map_err(|e| format!("Erro ao renomear {}: {}", entry.file, e))?;
+
+           new_registry.scenes.push(SceneEntry {
+               physical_scene: entry.physical_scene.clone(),
+               physical_id: entry.physical_id,
+               file: new_file,
+           });
+       }
+
+       // 3. Default scene
+       let old_default = self.data_dir.join(format!("custom_names_scene-default-{}.json", old_name));
+       let new_default = self.data_dir.join(format!("custom_names_scene-default-{}.json", new_name));
+       if old_default.exists() {
+           fs::rename(&old_default, &new_default)?;
+       }
+
+       // 4. Salva novo registro
+       let new_registry_path = self.data_dir.join(format!("custom_names_scenes-{}.json", new_name));
+       save_json_atomic(&new_registry_path, &new_registry)?;
+
+       // 5. Remove registro antigo
+       fs::remove_file(&old_registry_path)?;
+
+       // 6. Atualiza cache em RAM
+       self.registry = new_registry;
+       self.mesa_nome = new_name.to_string();
+       // Invalidar cache (nomes de arquivo mudaram)
+       self.cache.clear();
+
+       // 7. Persiste
+       self.persist();
+       
+       Ok(())
+   }
+   ```
+
+4. Atualiza o `.env` com `SERVER_NAME={new_name}` (já existente).
 
 **Verificação:** Renomear servidor, verificar que todos os arquivos foram
 renomeados e o registro atualizado.
 
 ---
 
-### Passo 7: Integração Ninja Sync
+### Passo 7: Integração Ninja Sync + Cache Invalidation
 
-**Onde:** `server_rust/src/network/sync_manager.rs` ou módulo existente de
-Git sync
+**Onde:**
+- `server_rust/src/network/sync_manager.rs` ou módulo existente de Git sync
+- `server_rust/src/api/macros.rs` — função `enqueue_git_sync`
+- `server_rust/src/custom_scenes.rs` — `get_scene` (mtime check)
 
-Adicione os arquivos de custom scenes ao fluxo de auto push/pull:
+**IMPORTANTE:** O Git sync do projeto é **fire-and-forget** (dispara
+commit/push e termina). Não há callback de "pull concluído". Por isso, o
+cache não pode depender de notificação — ele usa **verificação lazy via
+mtime**.
 
-1. **Pull:** na inicialização do servidor, após o pull Git, recarrega o
-   registro e todas as custom scenes em memória (cache para acesso rápido).
-2. **Push:** após qualquer `save_scene`, `save_registry`, ou
-   `remove_channel` (com deleção de arquivo), agenda um commit e push.
+1. **Git push:** após qualquer `upsert_channel`, `remove_channel`, ou
+   `persist`, agenda um commit e push:
    - Use debounce de 5 segundos (acumula múltiplas alterações em um único
      commit).
    - Mensagem de commit: `"custom_scenes: update {filename}"`.
+   - Reutilizar `enqueue_git_sync` existente em `api/macros.rs`.
 
-**Verificação:** Criar uma custom scene, verificar que após 5s o Git push é
-executado. Em outro dispositivo, fazer pull e verificar que a cena aparece.
+2. **Git pull: detecção de mudanças externas (stale cache):**
+   - O `CustomSceneManager::get_scene(filename)` **sempre** compara o
+     `mtime` atual do arquivo com o `mtime` armazenado em cache.
+   - Se o `mtime` mudou (outro computador fez push, este servidor fez pull
+     manual): recarrega o JSON do disco e atualiza o cache.
+   - Isso funciona **sem listener de pull** — a detecção é sob demanda,
+     na primeira consulta após a mudança.
+
+   ```rust
+   pub fn get_scene(&mut self, filename: &str) -> Option<&CustomScene> {
+       let cached = self.cache.get(filename)?;
+       let path = self.data_dir.join(filename);
+
+       // Verificar mtime atual vs cache
+       let current_mtime = fs::metadata(&path).ok()?.modified().ok()?;
+       if current_mtime != cached.mtime {
+           // Stale! Recarregar do disco
+           tracing::info!("🔄 Cache stale para {}, recarregando do disco...", filename);
+           match load_scene_inner(&path) {
+               Ok(scene) => {
+                   self.cache.insert(filename.to_string(), CachedScene {
+                       scene,
+                       mtime: current_mtime,
+                   });
+               }
+               Err(e) => {
+                   tracing::error!("Erro ao recarregar {}: {}", filename, e);
+                   return None;
+               }
+           }
+       }
+
+       self.cache.get(filename).map(|c| &c.scene)
+   }
+   ```
+
+3. **No boot do servidor:**
+   - Após o pull Git inicial (já existente), o `CustomSceneManager::load_all`
+     já carrega tudo com mtimes corretos.
+   - **Não precisa** recarregar após o pull — a verificação lazy cuida disso
+     na primeira consulta.
+
+**Verificação:**
+- Criar uma custom scene → após 5s, Git push é executado (ver log).
+- Em outro dispositivo, fazer pull manual → no servidor, acessar a cena
+  → log mostra "Cache stale, recarregando".
+- Arquivos `.tmp` não são commitados (adicionar ao `.gitignore`).
 
 ---
 
