@@ -42,11 +42,7 @@ async fn trigger_git_sync() {
         .unwrap_or_else(|| "auto-sync: profiles updated".to_string());
 
     tokio::spawn(async move {
-        let root_dir = std::env::current_dir()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .to_path_buf();
+        let root_dir = crate::config::get_project_root();
         let hostname = gethostname::gethostname().to_string_lossy().to_string();
         let commit_msg = format!("{} from {}", msg, hostname);
         let escaped_msg = commit_msg.replace("\"", "\\\"");
@@ -133,8 +129,8 @@ pub fn router(state: Arc<RwLock<crate::state::GlobalState>>) -> axum::Router {
 }
 
 fn root_dir() -> PathBuf {
-    // Para simplificar, assumimos que o server_rust e public estao lado a lado (em 01v96-remote-web)
-    PathBuf::from("..")
+    // Para simplificar, usamos get_project_root() para funcionar de qualquer cwd
+    crate::config::get_project_root()
 }
 
 async fn list_macros() -> Json<Value> {
