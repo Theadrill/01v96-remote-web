@@ -82,12 +82,24 @@ sem custom scene própria herda os nomes da default.
 
 ---
 
-### Passo 1: Módulo Rust de custom scenes
+### ✅ Passo 1: Módulo Rust de custom scenes (COMPLETO)
 
 **Onde:** `server_rust/src/custom_scenes.rs` (novo arquivo)
 
 Módulo responsável por todas as operações de leitura, escrita e
 sincronização dos arquivos JSON de custom scenes. Deve conter:
+
+**O que foi feito:**
+- Criado `server_rust/src/custom_scenes.rs` com 490 linhas contendo todos os tipos e funções
+- `ChannelId` com `Input(u8)`, `StIn(u8)`, `Master` — serializa como string via `Display`/`FromStr`
+- `CustomSceneRegistry`, `CustomScene`, `ChannelNameEntry`, `CachedScene`, `CustomSceneManager`, `CustomSceneOpQueue`
+- `load_all`, `get_scene` (com mtime cache invalidation), `find_scene_for_physical`, `ensure_registry_entry`, `upsert_channel`, `remove_channel`, `list_scenes`, `persist` (atômico .tmp→.json), `enqueue_op` (CancellationToken)
+- `normalize_name` (NFD + remove accents + alphanumeric only + trim 10)
+- `to_short_name` (4 chars + right-pad with spaces)
+- `save_json_atomic` (escreve .tmp, rename atômico)
+- Adicionadas dependências `tokio-util` e `unicode-normalization` ao `Cargo.toml`
+- Adicionado `mod custom_scenes` em `main.rs`, inicializado `CustomSceneManager` em `Arc<RwLock<>>`, criado diretório `data/custom_scenes/` no startup
+- 8 testes unitários passando (ChannelId, normalize, to_short_name, remove_channel, registry, global_channel)
 
 1. **`enum ChannelId`** — chave tipada para identificar canais no JSON.
    ```rust
@@ -246,12 +258,24 @@ sincronização dos arquivos JSON de custom scenes. Deve conter:
 
 ---
 
-### Passo 2: Integração com troca de cena da mesa
+### ✅ Passo 2: Integração com troca de cena da mesa (COMPLETO)
 
 **Onde:**
 - `server_rust/src/socket_handlers.rs` (handler `recallScene` existente)
 - `server_rust/src/midi_receiver.rs` (detecção de `PhysicalSceneRecall`)
 - `server_rust/src/custom_scenes.rs` (operação na fila)
+
+**O que foi feito:**
+- No handler `recallScene` em `socket_handlers.rs`, após o delay de 2s existente e antes do `fire_params_only`, foi inserida uma task `tokio::spawn` que:
+  1. Aguarda 2s com `CancellationToken` (select)
+  2. Dá lock curto no `GlobalState` para ler `scene_number` e `scene_name`
+  3. Dá lock curto no `CustomSceneManager` para buscar `find_scene_for_physical` + coletar `current_names`
+  4. Libera todos os locks
+  5. Itera sobre `scene.channels`, compara `current_short` com `entry.short`, envia MIDI só dos divergentes (30ms entre bytes)
+  6. Emite `customSceneLoaded` com `{ active, scene_name, scene_id, channels }`
+- Caso não encontre custom scene: emite `{ active: false }` sem alterar nada
+- `midi_receiver.rs` não foi modificado (a detecção via socket é suficiente por enquanto)
+- `CustomSceneManager` vive em `Arc<RwLock<>>` separado do `GlobalState` — sem interferência com faders/mutes/sync
 
 **IMPORTANTE:** O `CustomSceneManager` vive em `Arc<RwLock<CustomSceneManager>>`
 **separado** do `GlobalState`. Isso evita bloquear faders/mutes durante a
@@ -379,10 +403,21 @@ Quando o servidor detecta que uma cena física foi carregada:
 
 ---
 
-### Passo 3: Salvamento de nome customizado
+### ✅ Passo 3: Salvamento de nome customizado (COMPLETO)
 
-**Onde:** `server_rust/src/socket_handlers.rs` — novo handler
-`"saveCustomName"`
+**Onde:** `server_rust/src/socket_handlers.rs` — handlers
+`"saveCustomName"` e `"removeCustomName"`
+
+**O que foi feito:**
+- Handler `saveCustomName`: recebe `{ channel, name }`, valida, normaliza, deriva `short` server-side, upsert no JSON via `upsert_channel`, envia MIDI se short difere do atual, emite `updateName` (broadcast) e `saveNameResult` (ack)
+- Handler `removeCustomName`: recebe `{ channel }`, remove do JSON, se channels ficar vazio deleta arquivo + entrada do registro, emite `updateName` com nome original de 4 chars
+- Handler `listCustomScenes`: retorna lista de cenas do registro
+- Handler `assignCustomScene`: associa custom scene a cena física via `ensure_registry_entry`
+- Funções auxiliares: `collect_current_names`, `collect_current_channels_as_entries`, `get_channel_short_name`
+- `saveSceneResult` agora inclui `scene_name` para o frontend saber qual cena foi salva
+- `updateName` emitido para todos os clientes com o `name` completo (não só 4 chars)
+- Criação automática de custom scene com snapshot dos nomes atuais se arquivo não existe
+- Persistência atômica (`persist()` chamada após upsert)
 
 **IMPORTANTE:** O `short` é **sempre derivado** de `name` pelo backend via
 `to_short_name()`. O frontend **não envia** `short`.
@@ -482,9 +517,27 @@ Quando o servidor detecta que uma cena física foi carregada:
 
 ---
 
-### Passo 4: Frontend — Modal de edição de nome
+### ✅ Passo 4: Frontend — Modal de edição de nome (COMPLETO)
 
-**Onde:** `public/modules/events.js` e `public/modules/channel_strip.js`
+**Onde:** `public/index.html`, `public/modules/sidebar.js`, `public/modules/socket.js`
+
+**O que foi feito:**
+- **`index.html`**: adicionado ao `#nameEditorModal`:
+  - Checkbox "Criar nome customizado" com `onchange="toggleCustomNameEditor()"`
+  - Preview `#namePreview` com duas linhas: "App: XX" (azul) / "Mesa: XX" (laranja)
+  - Botão "Remover nome customizado" (`#btnRemoveCustomName`)
+- **`sidebar.js`**: adicionadas funções:
+  - `normalizeNameEditor(str)` — NFD + remove combining marks + `[^A-Za-z0-9 ]` + toUpperCase
+  - `updateNamePreview()` — atualiza preview em tempo real
+  - `toggleCustomNameEditor()` — alterna maxlength 4↔10, trunca se desmarcar, mostra/esconde preview
+  - `removeCustomName()` — emite `removeCustomName`, limpa `activeCustomSceneChannels` local
+  - `openNameEditor()` modificado: verifica `window.activeCustomSceneChannels[ch]`, seta checkbox/removeBtn/preview
+  - `saveChannelName()` modificado: checkbox OFF→`updateName` (4 chars legado), ON→`saveCustomName` (10 chars)
+  - Input listener: validação em tempo real (remove acentos/símbolos na digitação), atualiza preview
+- **`socket.js`**: adicionados listeners:
+  - `customSceneLoaded`: armazena `window.activeCustomSceneChannels` (mapa ch→{name, short})
+  - `saveNameResult`: overlay de sucesso/erro
+- **`socket_handlers.rs`**: `customSceneLoaded` agora inclui `channels` array com `{ch, name, short}`
 
 Extenda o fluxo existente de edição de nome. Atualmente, ao clicar no nome
 do canal, o sistema já está preparado para edição. Adicione:

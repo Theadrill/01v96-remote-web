@@ -251,11 +251,53 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // Controle de Nomes dos Canais
+function normalizeNameEditor(str) {
+    return str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Za-z0-9 ]/g, '')
+        .toUpperCase();
+}
+
+function updateNamePreview() {
+    const input = document.getElementById('inputChName');
+    const preview = document.getElementById('namePreview');
+    if (!input || !preview) return;
+    const upper = normalizeNameEditor(input.value).substring(0, 10);
+    preview.querySelector('.preview-app').textContent = 'App: ' + (upper || '(vazio)');
+    preview.querySelector('.preview-mesa').textContent = 'Mesa: ' + (upper.substring(0, 4).padEnd(4) || '    ');
+}
+
+window.toggleCustomNameEditor = function() {
+    const input = document.getElementById('inputChName');
+    const preview = document.getElementById('namePreview');
+    const isChecked = document.getElementById('chkCustomName').checked;
+    if (isChecked) {
+        input.setAttribute('maxlength', '10');
+        updateNamePreview();
+        preview.style.display = 'block';
+    } else {
+        const val = input.value;
+        if (val.length > 4) input.value = val.substring(0, 4);
+        input.setAttribute('maxlength', '4');
+        preview.style.display = 'none';
+    }
+};
+
+window.removeCustomName = function() {
+    const ch = activeConfigChannel;
+    if (ch === null) return;
+    socket.emit('removeCustomName', { channel: ch });
+    if (window.activeCustomSceneChannels) {
+        delete window.activeCustomSceneChannels[ch];
+    }
+    document.getElementById('nameEditorModal').style.display = 'none';
+};
+
 window.openNameEditor = function() {
     const ch = activeConfigChannel;
     if (ch === null) return;
 
-    // Resolve o ID correto dependendo do tipo de canal (CH, MIX, BUS, MASTER)
     let targetId = `name${ch}`;
     if (ch >= 0 && ch <= 31) {
         targetId = `name${ch}`;
@@ -271,6 +313,27 @@ window.openNameEditor = function() {
     const currentName = nameEl ? nameEl.innerText.trim() : '';
     const input = document.getElementById('inputChName');
     input.value = currentName === '...' ? '' : currentName;
+
+    const checkbox = document.getElementById('chkCustomName');
+    const preview = document.getElementById('namePreview');
+    const removeBtn = document.getElementById('btnRemoveCustomName');
+
+    const customCh = window.activeCustomSceneChannels && window.activeCustomSceneChannels[ch];
+    const hasCustomName = !!(customCh && customCh.name);
+
+    checkbox.checked = hasCustomName;
+    removeBtn.style.display = hasCustomName ? 'block' : 'none';
+
+    if (hasCustomName) {
+        input.setAttribute('maxlength', '10');
+        input.value = customCh.name;
+        updateNamePreview();
+        preview.style.display = 'block';
+    } else {
+        input.setAttribute('maxlength', '4');
+        preview.style.display = 'none';
+    }
+
     document.getElementById('nameEditorModal').style.display = 'flex';
     input.focus();
     input.select();
@@ -307,18 +370,28 @@ window.saveChannelName = function() {
     const ch = activeConfigChannel;
     if (ch === null) return;
 
-    // 🚨 [CRITICAL SYNC LOGIC] - LIMITAÇÃO DE 4 CARACTERES (FRONT-END)
-    // A 01V96 só exibe 4 letras. Truncamos aqui para evitar "BUMBE" (5 letras) no names.json.
-    const newName = document.getElementById('inputChName').value.trim().toUpperCase().substring(0, 4);
-    
-    // Emitir para o servidor
-    socket.emit('updateName', { channel: ch, name: newName });
-    
-    // Feedback visual imediato usando a função unificada
-    if (typeof window.updateNameUI === 'function') {
-        window.updateNameUI(ch, newName);
+    const input = document.getElementById('inputChName');
+    const isCustom = document.getElementById('chkCustomName').checked;
+    let newName = input.value.trim();
+
+    if (isCustom) {
+        newName = normalizeNameEditor(newName).substring(0, 10);
+        if (!newName) return;
+        socket.emit('saveCustomName', { channel: ch, name: newName });
+        if (typeof window.updateNameUI === 'function') {
+            window.updateNameUI(ch, newName.substring(0, 4));
+        }
+        if (!window.activeCustomSceneChannels) window.activeCustomSceneChannels = {};
+        window.activeCustomSceneChannels[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4) };
+    } else {
+        newName = newName.toUpperCase().substring(0, 4);
+        if (!newName) return;
+        socket.emit('updateName', { channel: ch, name: newName });
+        if (typeof window.updateNameUI === 'function') {
+            window.updateNameUI(ch, newName);
+        }
     }
-    
+
     document.getElementById('nameEditorModal').style.display = 'none';
 };
 
@@ -717,3 +790,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Exporta para ser chamada manualmente se necessário
 window.updateDockScrollIndicators = updateDockScrollIndicators;
+
+var inputChName = document.getElementById('inputChName');
+if (inputChName) {
+    inputChName.addEventListener('input', function() {
+        var cb = document.getElementById('chkCustomName');
+        if (cb && cb.checked) {
+            var raw = this.value;
+            var normalized = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9 ]/g, '');
+            if (raw !== normalized) {
+                this.value = normalized;
+            }
+            updateNamePreview();
+        }
+    });
+}

@@ -518,6 +518,25 @@ socket.on('saveSceneResult', (data) => {
     }
 });
 
+socket.on('customSceneLoaded', (data) => {
+    if (data && data.active && data.channels) {
+        window.activeCustomSceneChannels = {};
+        for (const entry of data.channels) {
+            window.activeCustomSceneChannels[entry.ch] = { name: entry.name, short: entry.short };
+        }
+    } else {
+        window.activeCustomSceneChannels = null;
+    }
+});
+
+socket.on('saveNameResult', (data) => {
+    if (data && data.success) {
+        OverlayInfo.show('success', 'NOME CUSTOMIZADO SALVO');
+    } else if (data && !data.success) {
+        OverlayInfo.show('error', 'ERRO: ' + (data.error || 'falha ao salvar nome'));
+    }
+});
+
 socket.on('connectionState', (state) => {
     window.isDemoMode = !!state.demo_mode;
     document.body.classList.toggle('is-offline', !state.connected);

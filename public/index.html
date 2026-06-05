@@ -360,7 +360,18 @@
             <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
                 Editar Nome do Canal</p>
             <input type="text" id="inputChName" maxlength="4"
-                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:22px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
+                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:22px; font-weight:bold; border-radius:8px; margin-bottom:15px; outline:none; text-transform:uppercase;">
+            <label id="lblCustomName" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:15px; cursor:pointer; font-size:13px; color:#aaa;">
+                <input type="checkbox" id="chkCustomName" onchange="toggleCustomNameEditor()">
+                Criar nome customizado
+            </label>
+            <div id="namePreview" style="display:none; background:#111; border-radius:6px; padding:10px; margin-bottom:15px; font-size:11px; text-align:left;">
+                <div style="color:#8cf;"><span class="preview-app"></span></div>
+                <div style="color:#fa8;"><span class="preview-mesa"></span></div>
+            </div>
+            <button id="btnRemoveCustomName" onclick="removeCustomName()" style="display:none; width:100%; background:#3a1a1a; border:1px solid #622; color:#e88; border-radius:6px; padding:8px; margin-bottom:12px; font-size:11px; cursor:pointer;">
+                Remover nome customizado
+            </button>
             <div style="display:flex; gap:10px;">
                 <button onclick="saveChannelName()" class="btn-connect"
                     style="flex:1; margin:0; height:45px;">SALVAR</button>

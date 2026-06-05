@@ -470,6 +470,18 @@ pub fn register_handlers(
                                 }
                             }
 
+                            let channels_arr: Vec<serde_json::Value> = scene
+                                .channels
+                                .iter()
+                                .map(|(ch_id, entry)| {
+                                    serde_json::json!({
+                                        "ch": ch_id.to_global_channel(),
+                                        "name": entry.name,
+                                        "short": entry.short
+                                    })
+                                })
+                                .collect();
+
                             let _ = io_clone
                                 .emit(
                                     "customSceneLoaded",
@@ -477,6 +489,7 @@ pub fn register_handlers(
                                         "active": true,
                                         "scene_name": scene.scene_name,
                                         "scene_id": scene.scene_id,
+                                        "channels": channels_arr,
                                     }),
                                 )
                                 .await;
