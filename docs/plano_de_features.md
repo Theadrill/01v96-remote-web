@@ -977,3 +977,17 @@ screen reaparece.
 2. O `SERVER_NAME` pode ser versionado (não contém senha).
 
 **Verificação:** `git status` não mostra `.env` como arquivo modificado.
+
+---
+
+## Status Atual da Implementação
+
+### O que foi feito recentemente
+- Tentativa de correção de reatividade no frontend para que a interface reflita imediatamente as mudanças de nome de cenas físicas.
+- O handler `saveScene` no backend (`socket_handlers.rs`) agora atualiza o `CustomSceneManager` usando `update_physical_scene_name` e emite os eventos `scenesUpdated` e `customScenesList`.
+
+### Onde paramos e Problema Atual
+**Problema:** Quando o operador edita o nome de uma cena física e a salva, e logo em seguida abre o modal de "Atribuir Cena" na tela de Custom Scenes, a lista de cenas físicas ainda mostra o **nome antigo** da cena modificada. A interface só atualiza para o nome correto se a página for recarregada (F5) ou se o navegador perder e ganhar foco (o que aciona um `requestSync` forçado pelo evento `visibilitychange`).
+
+**Diagnóstico pendente:**
+Sabemos que o servidor emite o evento `scenesUpdated` após o salvamento, e o arquivo `socket.js` escuta esse evento e atualiza `window.scenesLibrary`. Como o modal de atribuição utiliza `window.scenesLibrary` ao ser aberto, o dado já deveria estar correto. Existe uma suspeita de condição de corrida (Race Condition): o processo de salvamento na mesa via MIDI (`saveScene`) pode estar causando a recepção de dados desatualizados do hardware (a mesa pode ecoar o nome antigo durante o save_sysex antes do rename_sysex finalizar), sobrescrevendo a memória no backend momentaneamente e emitindo um `scenesUpdated` com o nome antigo. Outra possibilidade é o comportamento das modais sobrescrevendo/ignorando variáveis globais no frontend.
