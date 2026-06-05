@@ -122,8 +122,8 @@ impl MidiEngine {
     }
 
     pub fn send(&mut self, message: &[u8]) {
-        if let Some(out) = &mut self.output_conn {
-            if let Err(e) = out.send(message) {
+        if let Some(out) = &mut self.output_conn
+            && let Err(e) = out.send(message) {
                 let now = Instant::now();
                 let should_log = self
                     .last_send_error
@@ -134,7 +134,6 @@ impl MidiEngine {
                     self.last_send_error = Some(now);
                 }
             }
-        }
     }
 }
 

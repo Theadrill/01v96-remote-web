@@ -166,9 +166,7 @@ pub fn save_env_partial(name: Option<&str>, password: Option<&str>) -> Result<()
 
 pub fn load_server_name() -> Option<String> {
     let map = load_env_map();
-    map.get("SERVER_NAME")
-        .filter(|v| !v.is_empty())
-        .cloned()
+    map.get("SERVER_NAME").filter(|v| !v.is_empty()).cloned()
 }
 
 pub fn load_password() -> Option<String> {
@@ -182,7 +180,10 @@ pub fn load_password() -> Option<String> {
 pub fn delete_env() -> Result<(), String> {
     let path = get_env_path();
     if !path.exists() {
-        warn!("[ENV] delete_env chamado mas arquivo não existe: {:?}", path);
+        warn!(
+            "[ENV] delete_env chamado mas arquivo não existe: {:?}",
+            path
+        );
         return Ok(());
     }
     fs::remove_file(&path).map_err(|e| format!("Erro ao deletar .env: {}", e))
@@ -283,12 +284,9 @@ mod tests {
 
     #[test]
     fn test_detect_status_complete() {
-        with_temp_env(
-            Some("SERVER_NAME=mesa-x\nSERVER_PASSWORD=1234\n"),
-            |_| {
-                assert_eq!(detect_env_status(), EnvStatus::Complete);
-            },
-        );
+        with_temp_env(Some("SERVER_NAME=mesa-x\nSERVER_PASSWORD=1234\n"), |_| {
+            assert_eq!(detect_env_status(), EnvStatus::Complete);
+        });
     }
 
     #[test]
@@ -345,42 +343,33 @@ mod tests {
 
     #[test]
     fn test_save_env_partial_updates_only_provided() {
-        with_temp_env(
-            Some("SERVER_NAME=antigo\nSERVER_PASSWORD=1111\n"),
-            |_| {
-                save_env_partial(Some("novo"), None).unwrap();
-                assert_eq!(load_server_name(), Some("novo".to_string()));
-                assert_eq!(load_password(), Some("1111".to_string()));
+        with_temp_env(Some("SERVER_NAME=antigo\nSERVER_PASSWORD=1111\n"), |_| {
+            save_env_partial(Some("novo"), None).unwrap();
+            assert_eq!(load_server_name(), Some("novo".to_string()));
+            assert_eq!(load_password(), Some("1111".to_string()));
 
-                save_env_partial(None, Some("2222")).unwrap();
-                assert_eq!(load_server_name(), Some("novo".to_string()));
-                assert_eq!(load_password(), Some("2222".to_string()));
-            },
-        );
+            save_env_partial(None, Some("2222")).unwrap();
+            assert_eq!(load_server_name(), Some("novo".to_string()));
+            assert_eq!(load_password(), Some("2222".to_string()));
+        });
     }
 
     #[test]
     fn test_delete_env() {
-        with_temp_env(
-            Some("SERVER_NAME=x\nSERVER_PASSWORD=1234\n"),
-            |path| {
-                assert!(path.exists());
-                assert!(delete_env().is_ok());
-                assert!(!path.exists());
-                assert!(delete_env().is_ok());
-            },
-        );
+        with_temp_env(Some("SERVER_NAME=x\nSERVER_PASSWORD=1234\n"), |path| {
+            assert!(path.exists());
+            assert!(delete_env().is_ok());
+            assert!(!path.exists());
+            assert!(delete_env().is_ok());
+        });
     }
 
     #[test]
     fn test_load_empty_values_treated_as_missing() {
-        with_temp_env(
-            Some("SERVER_NAME=\nSERVER_PASSWORD=1234\n"),
-            |_| {
-                assert_eq!(detect_env_status(), EnvStatus::MissingName);
-                assert_eq!(load_server_name(), None);
-            },
-        );
+        with_temp_env(Some("SERVER_NAME=\nSERVER_PASSWORD=1234\n"), |_| {
+            assert_eq!(detect_env_status(), EnvStatus::MissingName);
+            assert_eq!(load_server_name(), None);
+        });
     }
 
     #[test]

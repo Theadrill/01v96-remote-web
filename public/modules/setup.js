@@ -119,7 +119,7 @@
                 nameInput.focus();
                 return;
             }
-            socket.emit('renameServer', { new_name: name });
+            socket.emit('renameServer', { new_name: name, syncShared: window.customScenesSyncEnabled });
             return;
         }
 

@@ -48,7 +48,9 @@ impl TryFrom<&str> for ChannelId {
         if s == "master" {
             return Ok(ChannelId::Master);
         }
-        let n: u8 = s.parse().map_err(|_| format!("invalid channel id '{}'", s))?;
+        let n: u8 = s
+            .parse()
+            .map_err(|_| format!("invalid channel id '{}'", s))?;
         match n {
             1..=32 => Ok(ChannelId::Input(n)),
             33..=40 => Ok(ChannelId::StIn(n)),
@@ -156,11 +158,24 @@ impl CustomSceneManager {
             }
         }
 
-        let registry_path = data_dir.join(format!("custom_names_scenes-{}.json", mesa_nome));
-        tracing::info!("[CUSTOM] load_all: mesa_nome={}, registry_path={:?}", mesa_nome, registry_path);
+        let local_dir = data_dir.join("local");
+        let shared_dir = data_dir.join("shared");
+
+        let _ = fs::create_dir_all(&local_dir);
+        let _ = fs::create_dir_all(&shared_dir);
+
+        let registry_path = local_dir.join(format!("custom_names_scenes-{}.json", mesa_nome));
+        tracing::info!(
+            "[CUSTOM] load_all: mesa_nome={}, registry_path={:?}",
+            mesa_nome,
+            registry_path
+        );
         let registry: CustomSceneRegistry = match fs::read_to_string(&registry_path) {
             Ok(content) => {
-                tracing::info!("[CUSTOM] registry file found ({} bytes), parsing...", content.len());
+                tracing::info!(
+                    "[CUSTOM] registry file found ({} bytes), parsing...",
+                    content.len()
+                );
                 serde_json::from_str(&content).unwrap_or_else(|e| {
                     tracing::error!("[CUSTOM] failed to parse registry: {}", e);
                     CustomSceneRegistry {
@@ -175,17 +190,27 @@ impl CustomSceneManager {
                     mesa_nome: mesa_nome.to_string(),
                     scenes: Vec::new(),
                 }
-            },
+            }
         };
 
-        tracing::info!("[CUSTOM] registry loaded with {} scene(s)", registry.scenes.len());
+        tracing::info!(
+            "[CUSTOM] registry loaded with {} scene(s)",
+            registry.scenes.len()
+        );
 
         let mut cache = HashMap::new();
         for entry in &registry.scenes {
-            let path = data_dir.join(&entry.file);
+            let mut path = local_dir.join(&entry.file);
+            if !path.exists() {
+                path = shared_dir.join(&entry.file);
+            }
             tracing::info!("[CUSTOM] loading scene file: {:?}", path);
             if let Ok((scene, mtime)) = load_scene_inner(&path) {
-                tracing::info!("[CUSTOM] scene '{}' loaded successfully ({} channels)", entry.file, scene.channels.len());
+                tracing::info!(
+                    "[CUSTOM] scene '{}' loaded successfully ({} channels)",
+                    entry.file,
+                    scene.channels.len()
+                );
                 cache.insert(entry.file.clone(), CachedScene { scene, mtime });
             } else {
                 tracing::warn!("[CUSTOM] failed to load scene file: {:?}", path);
@@ -205,7 +230,10 @@ impl CustomSceneManager {
 
     pub fn get_scene(&mut self, filename: &str) -> Option<&CustomScene> {
         let cached = self.cache.get(filename)?;
-        let path = self.data_dir.join(filename);
+        let mut path = self.data_dir.join("local").join(filename);
+        if !path.exists() {
+            path = self.data_dir.join("shared").join(filename);
+        }
 
         let current_mtime = fs::metadata(&path).ok()?.modified().ok()?;
         if current_mtime != cached.mtime {
@@ -248,7 +276,12 @@ impl CustomSceneManager {
         self.get_scene(&default_file).cloned()
     }
 
-    pub fn update_physical_scene_name(&mut self, physical_id: u8, new_name: &str) -> bool {
+    pub fn update_physical_scene_name(
+        &mut self,
+        physical_id: u8,
+        new_name: &str,
+        sync_shared: bool,
+    ) -> bool {
         let mut updated = false;
         for entry in &mut self.registry.scenes {
             if entry.physical_id == physical_id && entry.physical_scene != new_name {
@@ -258,17 +291,12 @@ impl CustomSceneManager {
         }
         if updated {
             self.registry_dirty = true;
-            self.persist();
+            self.persist(sync_shared);
         }
         updated
     }
 
-    pub fn ensure_registry_entry(
-        &mut self,
-        physical_scene: &str,
-        physical_id: u8,
-        filename: &str,
-    ) {
+    pub fn ensure_registry_entry(&mut self, physical_scene: &str, physical_id: u8, filename: &str) {
         if !self.registry.scenes.iter().any(|e| e.file == filename) {
             // Attempt to extract a default custom name from the filename if we don't have one
             let mut extracted_name = filename.to_string();
@@ -279,7 +307,7 @@ impl CustomSceneManager {
             if let Some(stripped) = extracted_name.strip_suffix(&suffix) {
                 extracted_name = stripped.to_string();
             }
-            
+
             self.registry.scenes.push(SceneEntry {
                 custom_name: Some(extracted_name),
                 physical_scene: physical_scene.to_string(),
@@ -295,13 +323,13 @@ impl CustomSceneManager {
         let short = to_short_name(&normalized);
 
         if let Some(cached) = self.cache.get_mut(filename) {
-            cached
-                .scene
-                .channels
-                .insert(channel_id, ChannelNameEntry {
+            cached.scene.channels.insert(
+                channel_id,
+                ChannelNameEntry {
                     name: normalized,
                     short,
-                });
+                },
+            );
         }
         self.dirty_files.insert(filename.to_string());
     }
@@ -315,8 +343,10 @@ impl CustomSceneManager {
         };
 
         if empty {
-            let path = self.data_dir.join(filename);
-            let _ = fs::remove_file(&path);
+            let local_path = self.data_dir.join("local").join(filename);
+            let shared_path = self.data_dir.join("shared").join(filename);
+            let _ = fs::remove_file(&local_path);
+            let _ = fs::remove_file(&shared_path);
             self.registry.scenes.retain(|e| e.file != filename);
             self.cache.remove(filename);
             self.registry_dirty = true;
@@ -331,7 +361,12 @@ impl CustomSceneManager {
         self.registry.scenes.clone()
     }
 
-    pub fn rename_custom_scene(&mut self, old_file: &str, new_scene_name: &str) -> Result<(), String> {
+    pub fn rename_custom_scene(
+        &mut self,
+        old_file: &str,
+        new_scene_name: &str,
+        sync_shared: bool,
+    ) -> Result<(), String> {
         let entry = self
             .registry
             .scenes
@@ -346,14 +381,23 @@ impl CustomSceneManager {
             return Ok(());
         }
 
-        let old_path = self.data_dir.join(old_file);
-        let new_path = self.data_dir.join(&new_file);
+        let old_local = self.data_dir.join("local").join(old_file);
+        let new_local = self.data_dir.join("local").join(&new_file);
+        let old_shared = self.data_dir.join("shared").join(old_file);
+        let new_shared = self.data_dir.join("shared").join(&new_file);
 
-        if new_path.exists() {
+        if new_local.exists() || new_shared.exists() {
             return Err("A scene with this name already exists".to_string());
         }
 
-        std::fs::rename(&old_path, &new_path).map_err(|e| format!("Failed to rename file: {}", e))?;
+        if old_local.exists() {
+            std::fs::rename(&old_local, &new_local)
+                .map_err(|e| format!("Failed to rename local file: {}", e))?;
+        }
+        if old_shared.exists() {
+            std::fs::rename(&old_shared, &new_shared)
+                .map_err(|e| format!("Failed to rename shared file: {}", e))?;
+        }
 
         if let Some(mut cached) = self.cache.remove(old_file) {
             cached.scene.scene_name = new_scene_name.to_string();
@@ -364,33 +408,42 @@ impl CustomSceneManager {
         entry.file = new_file;
         entry.custom_name = Some(new_scene_name.to_string());
         self.registry_dirty = true;
-        self.persist();
+        self.persist(sync_shared);
 
         Ok(())
     }
 
-    pub fn persist(&mut self) {
+    pub fn persist(&mut self, sync_shared: bool) {
         let mut synced_files = Vec::new();
+
+        let local_dir = self.data_dir.join("local");
+        let shared_dir = self.data_dir.join("shared");
 
         for file in self.dirty_files.drain() {
             if let Some(cached) = self.cache.get(&file) {
-                let path = self.data_dir.join(&file);
-                save_json_atomic(&path, &cached.scene);
-                synced_files.push(format!("data/custom_scenes/{}", file));
+                let local_path = local_dir.join(&file);
+                save_json_atomic(&local_path, &cached.scene);
+                if sync_shared {
+                    let shared_path = shared_dir.join(&file);
+                    save_json_atomic(&shared_path, &cached.scene);
+                    synced_files.push(format!("data/custom_scenes/shared/{}", file));
+                }
             }
         }
 
         if self.registry_dirty {
             let file = format!("custom_names_scenes-{}.json", self.mesa_nome);
-            let path = self
-                .data_dir
-                .join(&file);
-            save_json_atomic(&path, &self.registry);
+            let local_path = local_dir.join(&file);
+            save_json_atomic(&local_path, &self.registry);
             self.registry_dirty = false;
-            synced_files.push(format!("data/custom_scenes/{}", file));
+            if sync_shared {
+                let shared_path = shared_dir.join(&file);
+                save_json_atomic(&shared_path, &self.registry);
+                synced_files.push(format!("data/custom_scenes/shared/{}", file));
+            }
         }
 
-        if !synced_files.is_empty() {
+        if sync_shared && !synced_files.is_empty() {
             let msg = if synced_files.len() == 1 {
                 format!("auto-sync: custom scene {} updated", synced_files[0])
             } else {
@@ -433,16 +486,20 @@ impl CustomSceneManager {
         self.operation_queue.new_token()
     }
 
-    pub fn rename_mesa(&mut self, old_name: &str, new_name: &str) -> Result<(), String> {
-        let old_registry_path =
-            self.data_dir
-                .join(format!("custom_names_scenes-{}.json", old_name));
-        let registry_content =
-            fs::read_to_string(&old_registry_path)
-                .map_err(|e| format!("failed to read old registry: {}", e))?;
-        let registry: CustomSceneRegistry =
-            serde_json::from_str(&registry_content)
-                .map_err(|e| format!("failed to parse old registry: {}", e))?;
+    pub fn rename_mesa(
+        &mut self,
+        old_name: &str,
+        new_name: &str,
+        sync_shared: bool,
+    ) -> Result<(), String> {
+        let old_registry_path = self
+            .data_dir
+            .join("local")
+            .join(format!("custom_names_scenes-{}.json", old_name));
+        let registry_content = fs::read_to_string(&old_registry_path)
+            .map_err(|e| format!("failed to read old registry: {}", e))?;
+        let registry: CustomSceneRegistry = serde_json::from_str(&registry_content)
+            .map_err(|e| format!("failed to parse old registry: {}", e))?;
 
         let mut new_registry = CustomSceneRegistry {
             mesa_nome: new_name.to_string(),
@@ -451,12 +508,16 @@ impl CustomSceneManager {
 
         for entry in &registry.scenes {
             let new_file = entry.file.replace(old_name, new_name);
-            let old_path = self.data_dir.join(&entry.file);
-            let new_path = self.data_dir.join(&new_file);
+            let old_local = self.data_dir.join("local").join(&entry.file);
+            let new_local = self.data_dir.join("local").join(&new_file);
+            let old_shared = self.data_dir.join("shared").join(&entry.file);
+            let new_shared = self.data_dir.join("shared").join(&new_file);
 
-            if old_path.exists() {
-                fs::rename(&old_path, &new_path)
-                    .map_err(|e| format!("failed to rename {}: {}", entry.file, e))?;
+            if old_local.exists() {
+                fs::rename(&old_local, &new_local).ok();
+            }
+            if old_shared.exists() {
+                fs::rename(&old_shared, &new_shared).ok();
             }
 
             new_registry.scenes.push(SceneEntry {
@@ -467,41 +528,67 @@ impl CustomSceneManager {
             });
         }
 
-        let old_default = self
+        let old_default_local = self
             .data_dir
+            .join("local")
             .join(format!("custom_names_scene-default-{}.json", old_name));
-        let new_default = self
+        let new_default_local = self
             .data_dir
+            .join("local")
             .join(format!("custom_names_scene-default-{}.json", new_name));
-        if old_default.exists() {
-            fs::rename(&old_default, &new_default)
-                .map_err(|e| format!("failed to rename default scene: {}", e))?;
+        if old_default_local.exists() {
+            fs::rename(&old_default_local, &new_default_local).ok();
         }
 
-        let new_registry_path = self
+        let old_default_shared = self
             .data_dir
+            .join("shared")
+            .join(format!("custom_names_scene-default-{}.json", old_name));
+        let new_default_shared = self
+            .data_dir
+            .join("shared")
+            .join(format!("custom_names_scene-default-{}.json", new_name));
+        if old_default_shared.exists() {
+            fs::rename(&old_default_shared, &new_default_shared).ok();
+        }
+
+        let new_registry_path_local = self
+            .data_dir
+            .join("local")
             .join(format!("custom_names_scenes-{}.json", new_name));
-        save_json_atomic(&new_registry_path, &new_registry);
+        save_json_atomic(&new_registry_path_local, &new_registry);
+        if sync_shared {
+            let new_registry_path_shared = self
+                .data_dir
+                .join("shared")
+                .join(format!("custom_names_scenes-{}.json", new_name));
+            save_json_atomic(&new_registry_path_shared, &new_registry);
+        }
 
         let _ = fs::remove_file(&old_registry_path);
+        let old_registry_path_shared = self
+            .data_dir
+            .join("shared")
+            .join(format!("custom_names_scenes-{}.json", old_name));
+        let _ = fs::remove_file(&old_registry_path_shared);
 
         self.registry = new_registry;
         self.mesa_nome = new_name.to_string();
         self.cache.clear();
 
-        self.persist();
+        self.persist(sync_shared);
 
         let new_name_clone = new_name.to_string();
-        tokio::spawn(async move {
-            crate::api::macros::enqueue_git_sync(
-                vec![
-                    "data/custom_scenes/custom_names_scene*.json".to_string(),
-                ],
-                format!("auto-sync: mesa renamed to '{}'", new_name_clone),
-                5000,
-            )
-            .await;
-        });
+        if sync_shared {
+            tokio::spawn(async move {
+                crate::api::macros::enqueue_git_sync(
+                    vec!["data/custom_scenes/shared/custom_names_scene*.json".to_string()],
+                    format!("auto-sync: mesa renamed to '{}'", new_name_clone),
+                    5000,
+                )
+                .await;
+            });
+        }
 
         Ok(())
     }
@@ -564,10 +651,10 @@ pub fn save_json_atomic(path: &Path, data: &impl Serialize) {
 }
 
 fn load_scene_inner(path: &Path) -> Result<(CustomScene, SystemTime), String> {
-    let content =
-        fs::read_to_string(path).map_err(|e| format!("failed to read {}: {}", path.display(), e))?;
-    let scene: CustomScene =
-        serde_json::from_str(&content).map_err(|e| format!("failed to parse {}: {}", path.display(), e))?;
+    let content = fs::read_to_string(path)
+        .map_err(|e| format!("failed to read {}: {}", path.display(), e))?;
+    let scene: CustomScene = serde_json::from_str(&content)
+        .map_err(|e| format!("failed to parse {}: {}", path.display(), e))?;
     let mtime = fs::metadata(path)
         .and_then(|m| m.modified())
         .map_err(|e| format!("failed to get mtime: {}", e))?;
@@ -630,10 +717,7 @@ mod tests {
 
     #[test]
     fn test_from_global_channel() {
-        assert_eq!(
-            ChannelId::from_global_channel(0),
-            Some(ChannelId::Input(1))
-        );
+        assert_eq!(ChannelId::from_global_channel(0), Some(ChannelId::Input(1)));
         assert_eq!(
             ChannelId::from_global_channel(31),
             Some(ChannelId::Input(32))
@@ -646,10 +730,7 @@ mod tests {
             ChannelId::from_global_channel(67),
             Some(ChannelId::StIn(40))
         );
-        assert_eq!(
-            ChannelId::from_global_channel(52),
-            Some(ChannelId::Master)
-        );
+        assert_eq!(ChannelId::from_global_channel(52), Some(ChannelId::Master));
         assert_eq!(ChannelId::from_global_channel(99), None);
     }
 

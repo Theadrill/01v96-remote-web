@@ -87,17 +87,20 @@ pub fn build_change(
     packet.push(coords[3]);
 
     let mut final_channel = channel;
-    if command_name.contains("EQ/") || command_name.contains("Comp/") || command_name == "kInputAttenuator/kAtt" {
-        if command_name.starts_with("kAUX") && channel >= 36 && channel <= 43 {
+    if command_name.contains("EQ/")
+        || command_name.contains("Comp/")
+        || command_name == "kInputAttenuator/kAtt"
+    {
+        if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
             final_channel = channel - 36;
-        } else if command_name.starts_with("kBus") && channel >= 44 && channel <= 51 {
+        } else if command_name.starts_with("kBus") && (44..=51).contains(&channel) {
             final_channel = channel - 44;
         } else if command_name.starts_with("kStereo") && channel == 52 {
             final_channel = 0;
-        } else if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
+        } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
             final_channel = 32 + (channel - 60);
         }
-    } else if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
+    } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
         final_channel = 32 + (channel - 60);
     }
     packet.push(final_channel);
@@ -122,16 +125,19 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     packet.push(coords[3]);
 
     let mut final_channel = channel;
-    
+
     // Map ST IN channels for any Input command
-    if command_name.starts_with("kInput") && channel >= 60 && channel <= 67 {
+    if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
         final_channel = 32 + (channel - 60);
     }
-    
-    if command_name.contains("EQ/") || command_name.contains("Comp/") || command_name == "kInputAttenuator/kAtt" {
-        if command_name.starts_with("kAUX") && channel >= 36 && channel <= 43 {
+
+    if command_name.contains("EQ/")
+        || command_name.contains("Comp/")
+        || command_name == "kInputAttenuator/kAtt"
+    {
+        if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
             final_channel = channel - 36;
-        } else if command_name.starts_with("kBus") && channel >= 44 && channel <= 51 {
+        } else if command_name.starts_with("kBus") && (44..=51).contains(&channel) {
             final_channel = channel - 44;
         } else if command_name.starts_with("kStereo") && channel == 52 {
             final_channel = 0;
@@ -261,7 +267,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
     if section == 13 || section == 127 || section == 26 || section == 1 {
         // --- NAMES ---
-        if [4, 15, 16, 18, 23].contains(&element) && parameter >= 4 && parameter <= 19 {
+        if [4, 15, 16, 18, 23].contains(&element) && (4..=19).contains(&parameter) {
             let char_index = (parameter - 4) as usize;
             let char_code = *data_bytes.last().unwrap_or(&32);
             let char_str = String::from_utf8_lossy(&[char_code]).to_string();
@@ -332,12 +338,12 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 "kBus" => 44 + channel,
                 "kStereo" => 52,
                 _ => {
-                    if channel >= 32 && channel <= 39 {
+                    if (32..=39).contains(&channel) {
                         60 + (channel - 32)
                     } else {
                         channel
                     }
-                },
+                }
             };
 
             return Some(ParsedMidi::ControlChange {
@@ -439,7 +445,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                     value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
                 });
             }
-            if parameter >= 3 && parameter <= 10 {
+            if (3..=10).contains(&parameter) {
                 return Some(ParsedMidi::ControlChange {
                     msg_type: format!("kInputBus/kBus{}", parameter - 2),
                     channel,
@@ -472,7 +478,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         // --- ST IN channel remap for faders/on ---
         let mut final_ch = channel;
-        if channel >= 32 && channel <= 39 {
+        if (32..=39).contains(&channel) {
             final_ch = 60 + (channel - 32);
         }
 
@@ -621,11 +627,11 @@ pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Option<V
 }
 
 fn name_channel_mapping(channel: u8) -> (u8, u8) {
-    if channel >= 60 && channel <= 67 {
+    if (60..=67).contains(&channel) {
         (23, (channel - 60) / 2)
-    } else if channel >= 36 && channel <= 43 {
+    } else if (36..=43).contains(&channel) {
         (16, channel - 36)
-    } else if channel >= 44 && channel <= 51 {
+    } else if (44..=51).contains(&channel) {
         (15, channel - 44)
     } else if channel == 52 {
         (18, 0)

@@ -51,7 +51,7 @@ impl SceneManager {
                 for i in 0..16 {
                     if 20 + i < message.len() {
                         let c = message[20 + i];
-                        if c >= 32 && c <= 126 {
+                        if (32..=126).contains(&c) {
                             name.push(c as char);
                         } else if c != 0 {
                             name.push(' ');
@@ -87,11 +87,10 @@ impl SceneManager {
         self.active_scene_index = index;
         if let Some(ref mut cs) = self.current_scene {
             cs.index = index;
-            if (index as usize) < self.scenes.len() {
-                if let Some(ref s) = self.scenes[index as usize] {
+            if (index as usize) < self.scenes.len()
+                && let Some(ref s) = self.scenes[index as usize] {
                     cs.name = s.name.clone();
                 }
-            }
         }
     }
 }

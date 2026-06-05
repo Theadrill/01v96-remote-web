@@ -51,8 +51,8 @@ impl MidiScheduler {
         match priority {
             0 => {
                 for bytes in items {
-                    if let Some(addr) = Self::extract_address(&bytes) {
-                        if let Some(idx) = state
+                    if let Some(addr) = Self::extract_address(&bytes)
+                        && let Some(idx) = state
                             .q0
                             .iter()
                             .position(|i| Self::extract_address(i) == Some(addr.clone()))
@@ -60,18 +60,16 @@ impl MidiScheduler {
                             state.q0[idx] = bytes;
                             continue;
                         }
-                    }
                     state.q0.push(bytes);
                 }
             }
             1 => {
                 state.q1.extend(items);
             }
-            2 => {
-                if state.q0.is_empty() && state.q1.is_empty() {
+            2
+                if state.q0.is_empty() && state.q1.is_empty() => {
                     state.q2.extend(items);
                 }
-            }
             _ => {}
         }
     }
@@ -83,8 +81,8 @@ impl MidiScheduler {
         let mut state = self.state.lock().await;
         match priority {
             0 => {
-                if let Some(addr) = Self::extract_address(&bytes) {
-                    if let Some(idx) = state
+                if let Some(addr) = Self::extract_address(&bytes)
+                    && let Some(idx) = state
                         .q0
                         .iter()
                         .position(|i| Self::extract_address(i) == Some(addr.clone()))
@@ -92,7 +90,6 @@ impl MidiScheduler {
                         state.q0[idx] = bytes;
                         return true;
                     }
-                }
                 state.q0.push(bytes);
                 true
             }
@@ -158,21 +155,18 @@ impl MidiScheduler {
                     None
                 };
 
-                match packet {
-                    Some(p) => {
-                        drop(state);
-                        if p.len() >= 3 && p[0] == 0xF0 && p[1] == 0x43 && p[2] == 0x10 {
-                            sync_counter.begin_sync();
-                        }
-                        output.send(&p).await;
-                        let mut st = state_clone.lock().await;
-                        st.total_processed += 1;
-                        if st.total_processed % 100 == 0 {
-                            // tracing::info!("📤 [Scheduler] {} processados (Q0:{}, Q1:{}, Q2:{})",
-                            //    st.total_processed, st.q0.len(), st.q1.len(), st.q2.len());
-                        }
+                if let Some(p) = packet {
+                    drop(state);
+                    if p.len() >= 3 && p[0] == 0xF0 && p[1] == 0x43 && p[2] == 0x10 {
+                        sync_counter.begin_sync();
                     }
-                    None => {}
+                    output.send(&p).await;
+                    let mut st = state_clone.lock().await;
+                    st.total_processed += 1;
+                    if st.total_processed % 100 == 0 {
+                        // tracing::info!("📤 [Scheduler] {} processados (Q0:{}, Q1:{}, Q2:{})",
+                        //    st.total_processed, st.q0.len(), st.q1.len(), st.q2.len());
+                    }
                 }
             }
         });

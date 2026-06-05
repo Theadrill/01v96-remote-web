@@ -287,7 +287,7 @@ window.toggleCustomNameEditor = function() {
 window.removeCustomName = function() {
     const ch = activeConfigChannel;
     if (ch === null) return;
-    socket.emit('removeCustomName', { channel: ch });
+    socket.emit('removeCustomName', { channel: ch, syncShared: window.customScenesSyncEnabled });
     if (window.customNamesEnabled && window.activeCustomSceneChannels) {
         delete window.activeCustomSceneChannels[ch];
     }
@@ -376,7 +376,7 @@ window.saveChannelName = function() {
 
     if (isCustom) {
         newName = normalizeNameEditor(newName).substring(0, 10);
-        socket.emit('saveCustomName', { channel: ch, name: newName });
+        socket.emit('saveCustomName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
         if (typeof window.updateNameUI === 'function') {
             window.updateNameUI(ch, newName.substring(0, 4));
         }
@@ -466,7 +466,7 @@ window.saveServerName = function () {
         setServerConfigStatus('Sem conexão com o servidor.', '#ff6b6b');
         return;
     }
-    socket.emit('renameServer', { new_name: newName });
+    socket.emit('renameServer', { new_name: newName, syncShared: window.customScenesSyncEnabled });
     setServerConfigStatus('Salvando...', '#aaa');
 };
 

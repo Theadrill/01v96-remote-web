@@ -252,11 +252,10 @@ impl ConnectionManager {
     }
 
     pub fn parar_busca(&self) {
-        if let Ok(mut guard) = self.busca_handle.lock() {
-            if let Some(h) = guard.take() {
+        if let Ok(mut guard) = self.busca_handle.lock()
+            && let Some(h) = guard.take() {
                 h.abort();
             }
-        }
     }
 
     pub fn iniciar_meter_loop(self: &Arc<Self>) {
@@ -401,11 +400,10 @@ impl ConnectionManager {
         self.scheduler.clear(None).await;
 
         self.parar_busca();
-        if let Ok(mut guard) = self.meter_handle.lock() {
-            if let Some(h) = guard.take() {
+        if let Ok(mut guard) = self.meter_handle.lock()
+            && let Some(h) = guard.take() {
                 h.abort();
             }
-        }
 
         self.sync_counter.reset();
         self.emit_connection_state();
@@ -459,11 +457,10 @@ impl ConnectionManager {
 
     pub fn disable_demo(self: &Arc<Self>) {
         self.is_connected.store(false, Ordering::SeqCst);
-        if let Ok(mut guard) = self.demo_handle.lock() {
-            if let Some(h) = guard.take() {
+        if let Ok(mut guard) = self.demo_handle.lock()
+            && let Some(h) = guard.take() {
                 h.abort();
             }
-        }
         self.emit_connection_state();
     }
 

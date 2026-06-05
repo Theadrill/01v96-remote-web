@@ -123,14 +123,13 @@ impl SyncManager {
                     if let Some(ref mut cs) = sm.current_scene {
                         cs.index = adjusted_id;
                     }
-                } else if let Some(ref current) = sm.current_scene.clone() {
-                    if let Some(m) = sm.scenes.iter().flatten().find(|s| s.name == current.name) {
+                } else if let Some(ref current) = sm.current_scene.clone()
+                    && let Some(m) = sm.scenes.iter().flatten().find(|s| s.name == current.name) {
                         sm.active_scene_index = m.index;
                         if let Some(ref mut cs) = sm.current_scene {
                             cs.index = m.index;
                         }
                     }
-                }
                 let _ = io.emit("scenesUpdated", &sm.get_state()).await;
                 if let Some(ref cs) = sm.current_scene {
                     let _ = io.emit("currentScene", &serde_json::json!(cs)).await;

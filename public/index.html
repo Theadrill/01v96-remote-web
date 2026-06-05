@@ -396,6 +396,14 @@
                     <span class="slider"></span>
                 </label>
             </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #2a3a2a; border: 1px solid #4a4; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px;">
+                <span style="font-size: 13px; color: #4caf50; font-weight: bold; text-transform: uppercase;">Sincronizar com a Nuvem</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggleCustomScenesSync" checked
+                        onclick="toggleCustomScenesSyncSetting(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
             <div id="customScenesList" style="max-height:400px; overflow-y:auto; margin-bottom:15px;">
                 <p style="color:#666; font-size:12px;">Carregando...</p>
             </div>

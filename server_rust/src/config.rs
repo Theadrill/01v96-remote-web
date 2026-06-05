@@ -89,9 +89,9 @@ impl AppConfig {
 
         // Migração automática: tecnico_pass legado (config.json) → SERVER_PASSWORD (.env)
         // Só roda se o .env ainda NÃO tem SERVER_PASSWORD (preserva configuração do usuário).
-        if crate::env_config::load_password().is_none() {
-            if let Ok(contents) = fs::read_to_string(&config_path) {
-                if let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&contents) {
+        if crate::env_config::load_password().is_none()
+            && let Ok(contents) = fs::read_to_string(&config_path)
+                && let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&contents) {
                     let legacy_pass = json
                         .get("tecnico_pass")
                         .and_then(|v| v.as_str())
@@ -101,20 +101,29 @@ impl AppConfig {
                             match crate::env_config::load_server_name() {
                                 Some(name) if !name.is_empty() => {
                                     if let Err(e) = crate::env_config::save_env(&name, &pass) {
-                                        error!("[CONFIG] Falha ao migrar tecnico_pass para .env: {}", e);
+                                        error!(
+                                            "[CONFIG] Falha ao migrar tecnico_pass para .env: {}",
+                                            e
+                                        );
                                     } else {
-                                        info!("[CONFIG] tecnico_pass migrado para .env (nome + senha)");
+                                        info!(
+                                            "[CONFIG] tecnico_pass migrado para .env (nome + senha)"
+                                        );
                                     }
                                 }
                                 _ => {
                                     let env_path = crate::env_config::get_env_path();
-                                    if let Err(e) = fs::write(
-                                        &env_path,
-                                        format!("SERVER_PASSWORD={}\n", pass),
-                                    ) {
-                                        error!("[CONFIG] Falha ao migrar tecnico_pass para .env: {}", e);
+                                    if let Err(e) =
+                                        fs::write(&env_path, format!("SERVER_PASSWORD={}\n", pass))
+                                    {
+                                        error!(
+                                            "[CONFIG] Falha ao migrar tecnico_pass para .env: {}",
+                                            e
+                                        );
                                     } else {
-                                        info!("[CONFIG] tecnico_pass migrado para .env (apenas senha)");
+                                        info!(
+                                            "[CONFIG] tecnico_pass migrado para .env (apenas senha)"
+                                        );
                                     }
                                 }
                             }
@@ -134,8 +143,6 @@ impl AppConfig {
                         }
                     }
                 }
-            }
-        }
 
         let mut config = match fs::read_to_string(&config_path) {
             Ok(contents) => match serde_json::from_str::<AppConfig>(&contents) {
@@ -156,21 +163,19 @@ impl AppConfig {
 
         // Ler names.json
         let names_path = root.join("names.json");
-        if let Ok(contents) = fs::read_to_string(&names_path) {
-            if let Ok(names) = serde_json::from_str(&contents) {
+        if let Ok(contents) = fs::read_to_string(&names_path)
+            && let Ok(names) = serde_json::from_str(&contents) {
                 config.names = names;
                 info!("✅ names.json carregado.");
             }
-        }
 
         // Ler steps.json
         let steps_path = root.join("public/steps.json");
-        if let Ok(contents) = fs::read_to_string(&steps_path) {
-            if let Ok(steps) = serde_json::from_str(&contents) {
+        if let Ok(contents) = fs::read_to_string(&steps_path)
+            && let Ok(steps) = serde_json::from_str(&contents) {
                 config.steps = steps;
                 info!("✅ steps.json carregado.");
             }
-        }
 
         config
     }
@@ -273,8 +278,8 @@ pub fn save_names_to_disk(state: &crate::state::GlobalState, debounce_ms: u64) {
 }
 
 pub fn get_project_root() -> std::path::PathBuf {
-    if let Ok(exe_path) = std::env::current_exe() {
-        if let Some(exe_dir) = exe_path.parent() {
+    if let Ok(exe_path) = std::env::current_exe()
+        && let Some(exe_dir) = exe_path.parent() {
             // Candidato 1: exe na raiz (config.json está ao lado)
             if exe_dir.join("config.json").exists() {
                 return exe_dir.to_path_buf();
@@ -292,6 +297,5 @@ pub fn get_project_root() -> std::path::PathBuf {
                 }
             }
         }
-    }
     std::path::PathBuf::from("..")
 }

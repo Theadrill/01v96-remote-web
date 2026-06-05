@@ -116,12 +116,15 @@ async fn async_main(
         let _ = std::fs::create_dir_all(&dir);
         dir
     };
-    let mesa_nome = crate::env_config::load_server_name()
-        .unwrap_or_else(|| "default".to_string());
-    tracing::info!("[CUSTOM] mesa_nome={:?}, data_dir={:?}", mesa_nome, data_dir);
-    let custom_scene_manager = Arc::new(RwLock::new(
-        custom_scenes::CustomSceneManager::load_all(&data_dir, &mesa_nome)
-    ));
+    let mesa_nome = crate::env_config::load_server_name().unwrap_or_else(|| "default".to_string());
+    tracing::info!(
+        "[CUSTOM] mesa_nome={:?}, data_dir={:?}",
+        mesa_nome,
+        data_dir
+    );
+    let custom_scene_manager = Arc::new(RwLock::new(custom_scenes::CustomSceneManager::load_all(
+        &data_dir, &mesa_nome,
+    )));
 
     socket_handlers::register_handlers(
         io.clone(),
@@ -135,8 +138,8 @@ async fn async_main(
 
     // --- LOCALIZAR PASTA PUBLIC ---
     let mut public_dir = std::path::PathBuf::from("../public");
-    if let Ok(exe_path) = std::env::current_exe() {
-        if let Some(exe_dir) = exe_path.parent() {
+    if let Ok(exe_path) = std::env::current_exe()
+        && let Some(exe_dir) = exe_path.parent() {
             // Candidato 1: exe na raiz do projeto ou pasta de deploy com 'public' ao lado
             let path1 = exe_dir.join("public");
             if path1.is_dir() {
@@ -158,8 +161,10 @@ async fn async_main(
                 }
             }
         }
-    }
-    info!("📂 Servindo arquivos estáticos de: {:?}", public_dir.canonicalize().unwrap_or(public_dir.clone()));
+    info!(
+        "📂 Servindo arquivos estáticos de: {:?}",
+        public_dir.canonicalize().unwrap_or(public_dir.clone())
+    );
 
     // --- SERVIDOR HTTP SOBE PRIMEIRO (antes de conectar MIDI) ---
     let app = Router::new()
@@ -180,7 +185,7 @@ async fn async_main(
         tokio::spawn(async move {
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             let _ = std::process::Command::new("cmd")
-                .args(&["/C", "start", &url])
+                .args(["/C", "start", &url])
                 .spawn();
         });
     }

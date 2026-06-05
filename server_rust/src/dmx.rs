@@ -26,7 +26,7 @@ pub fn start_dmx_app(force: bool, root_dir: &str) {
     if is_running && force {
         println!("T? [DMX] Forando reinicializao do aplicativo...");
         let _ = Command::new("taskkill")
-            .args(&["/F", "/IM", "ArtNetToDMX.exe"])
+            .args(["/F", "/IM", "ArtNetToDMX.exe"])
             .output();
         spawn_dmx(exe_path);
     } else {
@@ -59,10 +59,10 @@ pub fn reset_dmx_system(root_dir: String) {
 
     tokio::spawn(async move {
         let _ = Command::new("taskkill")
-            .args(&["/F", "/IM", "LumikitSHOW.exe"])
+            .args(["/F", "/IM", "LumikitSHOW.exe"])
             .output();
         let _ = Command::new("taskkill")
-            .args(&["/F", "/IM", "ArtNetToDMX.exe"])
+            .args(["/F", "/IM", "ArtNetToDMX.exe"])
             .output();
 
         tokio::time::sleep(time::Duration::from_millis(1000)).await;
@@ -71,7 +71,7 @@ pub fn reset_dmx_system(root_dir: String) {
         let ps_cmd = "Start-Process powershell -ArgumentList '-NoProfile -Command  = Get-PnpDevice | Where-Object { .InstanceId -like ''*VID_0403&PID_6001*'' -or .FriendlyName -like ''*USB Serial Converter*'' } | Select-Object -First 1; if () { pnputil /restart-device .InstanceId }' -Verb RunAs -WindowStyle Hidden -Wait";
 
         match Command::new("powershell")
-            .args(&["-Command", ps_cmd])
+            .args(["-Command", ps_cmd])
             .output()
         {
             Ok(_) => println!("o. [DMX] Comando de reset enviado para o Windows e concludo."),
@@ -113,14 +113,13 @@ pub fn update_lumikit_config(root_dir: &str) {
         if let Ok(output) = Command::new("ipconfig").output() {
             let stdout = String::from_utf8_lossy(&output.stdout);
             for line in stdout.lines() {
-                if line.contains("IPv4") {
-                    if let Some(ip_part) = line.split(':').last() {
+                if line.contains("IPv4")
+                    && let Some(ip_part) = line.split(':').next_back() {
                         let ip = ip_part.trim();
                         if !ip.is_empty() {
                             local_ips.push(ip.to_string());
                         }
                     }
-                }
             }
         }
     }

@@ -132,7 +132,7 @@ pub fn parse_pan_message(message: &[u8]) -> Option<ParsedMidi> {
     if sec == PAN_SECTION && grp == PAN_GROUP && elem == PAN_ELEMENT {
         let global_ch = if ch_idx <= 0x1F {
             ch_idx as i64
-        } else if ch_idx >= 0x20 && ch_idx <= 0x27 {
+        } else if (0x20..=0x27).contains(&ch_idx) {
             60 + (ch_idx - 0x20) as i64
         } else {
             return None;

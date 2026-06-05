@@ -137,7 +137,7 @@ pub fn start_rx_loop(
                                     std::sync::atomic::AtomicUsize::new(0);
                                 let uc =
                                     UPDATE_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                                if uc < 20 || uc % 200 == 0 {
+                                if uc < 20 || uc.is_multiple_of(200) {
                                     tracing::info!(
                                         "📡 [UPDATE] #{uc}: type={}, ch={}, val={}",
                                         msg_type,
@@ -189,7 +189,7 @@ pub fn start_rx_loop(
                     static METER_COUNT: std::sync::atomic::AtomicUsize =
                         std::sync::atomic::AtomicUsize::new(0);
                     let c = METER_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                    if c < 5 || c % 100 == 0 {
+                    if c < 5 || c.is_multiple_of(100) {
                         // tracing::info!("📡 emit meterData #{} ({} bytes)", c, buf.len());
                     }
                     let _ = io_clone.emit("meterData", &buf).await;

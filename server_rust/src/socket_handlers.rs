@@ -77,11 +77,10 @@ pub fn register_handlers(
         tokio::spawn(async move {
             let current_state = state_arc_connect.read().await;
             let is_syncing = conn_mgr_connect.is_syncing();
-            if !is_syncing {
-                if let Ok(state_json) = serde_json::to_value(&*current_state) {
+            if !is_syncing
+                && let Ok(state_json) = serde_json::to_value(&*current_state) {
                     socket_initial.emit("sync", &state_json).ok();
                 }
-            }
 
             let (inputs, outputs) = crate::midi::MidiEngine::get_available_ports();
             let inputs_json: Vec<serde_json::Value> = inputs
@@ -145,7 +144,7 @@ pub fn register_handlers(
                     let mut state = state_arc_control.write().await;
                     let parsed = crate::midi::protocol::ParsedMidi::ControlChange {
                         msg_type: data.msg_type.clone(),
-                        channel: data.channel as usize,
+                        channel: data.channel,
                         value: data.value,
                     };
                     state.apply_midi(&parsed);
@@ -200,7 +199,7 @@ pub fn register_handlers(
                     let mut state = state_pan.write().await;
                     let parsed = crate::midi::protocol::ParsedMidi::ControlChange {
                         msg_type: "kPan".to_string(),
-                        channel: data.channel as usize,
+                        channel: data.channel,
                         value: data.value,
                     };
                     state.apply_midi(&parsed);
@@ -337,13 +336,12 @@ pub fn register_handlers(
         socket.on(
             "requestEqAtt",
             move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
-                if let Some(ch) = data.get("channel").and_then(|v| v.as_u64()) {
-                    if let Some(sysex) =
+                if let Some(ch) = data.get("channel").and_then(|v| v.as_u64())
+                    && let Some(sysex) =
                         crate::midi::protocol::build_request("kInputAttenuator/kAtt", ch as u8)
                     {
                         scheduler_eq.enqueue(sysex, 2).await;
                     }
-                }
             },
         );
 
@@ -611,7 +609,8 @@ pub fn register_handlers(
                             mgr.upsert_channel(&fname, ch_id, &norm_name);
                             mgr.ensure_registry_entry(&scene_name, scene_number, &fname);
                             mgr.mark_dirty(&fname);
-                            mgr.persist();
+                            let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+                            mgr.persist(sync_shared);
                         }
 
                         let current_name = {
@@ -700,9 +699,12 @@ pub fn register_handlers(
                     _ => return,
                 };
 
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
                 let deleted = {
                     let mut csm = csm_remove.write().await;
-                    csm.remove_channel(&filename, &channel_id)
+                    let result = csm.remove_channel(&filename, &channel_id);
+                    csm.persist(sync_shared);
+                    result
                 };
 
                 if deleted {
@@ -722,7 +724,7 @@ pub fn register_handlers(
                         .await;
                 } else {
                     let mut csm = csm_remove.write().await;
-                    csm.persist();
+                    csm.persist(sync_shared);
                 }
             },
         );
@@ -750,9 +752,11 @@ pub fn register_handlers(
                     return;
                 }
 
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+
                 {
                     let mut csm = csm_rename_file.write().await;
-                    match csm.rename_custom_scene(&old_file, &new_name) {
+                    match csm.rename_custom_scene(&old_file, &new_name, sync_shared) {
                         Ok(_) => {
                             tracing::info!("[CUSTOM] Successfully renamed scene file {} to {}", old_file, new_name);
                             // emit updated list
@@ -821,10 +825,12 @@ pub fn register_handlers(
                     return;
                 }
 
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+
                 {
                     let mut csm = csm_assign.write().await;
                     csm.ensure_registry_entry(&physical_scene, physical_id, &file);
-                    csm.persist();
+                    csm.persist(sync_shared);
                 }
 
                 let _ = socket.emit(
@@ -963,7 +969,7 @@ pub fn register_handlers(
                     }
                     None => Vec::new(),
                 };
-                
+
                 // Sort by channel index so they are in sequential order
                 let mut channels = channels;
                 channels.sort_by_key(|v| v.get("ch").and_then(|c| c.as_u64()).unwrap_or(0));
@@ -1047,11 +1053,12 @@ pub fn register_handlers(
                             io_save.emit("currentScene", &state.scene_manager.current_scene);
                         let _ = io_save.emit("scenesUpdated", &state.scene_manager.get_state());
                     }
-                    
+
                     // Update Custom Scenes Registry to reflect the new physical scene name
+                    let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
                     {
                         let mut csm = csm_save.write().await;
-                        if csm.update_physical_scene_name(index, &target_name) {
+                        if csm.update_physical_scene_name(index, &target_name, sync_shared) {
                             let list = csm.list_scenes();
                             let m_nome = csm.mesa_nome().to_string();
                             let _ = io_save.emit("customScenesList", &serde_json::json!({ "scenes": list, "mesa_nome": m_nome }));
@@ -1304,11 +1311,10 @@ pub fn register_handlers(
                     return;
                 }
                 info!("🔄 Reiniciando servidor...");
-                if let Ok(exe) = std::env::current_exe() {
-                    if let Err(e) = std::process::Command::new(exe).spawn() {
+                if let Ok(exe) = std::env::current_exe()
+                    && let Err(e) = std::process::Command::new(exe).spawn() {
                         tracing::error!("Falha ao reiniciar: {}", e);
                     }
-                }
                 std::process::exit(0);
             },
         );
@@ -1438,9 +1444,10 @@ pub fn register_handlers(
                     );
                     return;
                 }
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
                 if old_name != new_name {
                     let mut csm = csm_rename.write().await;
-                    if let Err(e) = csm.rename_mesa(&old_name, &new_name) {
+                    if let Err(e) = csm.rename_mesa(&old_name, &new_name, sync_shared) {
                         tracing::error!("[RENAME] Erro ao renomear custom scenes: {}", e);
                     }
                 }
@@ -1548,11 +1555,10 @@ fn collect_current_names(
     let mut names = std::collections::HashMap::new();
 
     for (global_ch, ch_state) in &state.channels {
-        if *global_ch <= 31 {
-            if let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
+        if *global_ch <= 31
+            && let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
                 names.insert(cid, ch_state.name.clone());
             }
-        }
     }
 
     for (global_ch, ch_state) in &state.channels {
@@ -1574,8 +1580,8 @@ fn collect_current_channels_as_entries(
     let mut entries = std::collections::HashMap::new();
 
     for (global_ch, ch_state) in &state.channels {
-        if *global_ch <= 31 {
-            if let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
+        if *global_ch <= 31
+            && let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
                 let short = crate::custom_scenes::to_short_name(&ch_state.name);
                 entries.insert(
                     cid,
@@ -1585,7 +1591,6 @@ fn collect_current_channels_as_entries(
                     },
                 );
             }
-        }
     }
 
     for (global_ch, ch_state) in &state.channels {
@@ -1618,7 +1623,10 @@ fn collect_current_channels_as_entries(
 
 fn get_channel_short_name(state: &crate::state::GlobalState, channel: u8) -> Option<String> {
     let name = match channel {
-        0..=31 => state.channels.get(&(channel as usize)).map(|c| c.name.clone()),
+        0..=31 => state
+            .channels
+            .get(&(channel as usize))
+            .map(|c| c.name.clone()),
         60..=67 => state
             .channels
             .get(&(32 + (channel - 60) as usize))

@@ -1,6 +1,13 @@
 console.log('[CUSTOM] custom_scenes.js loaded, socket is', typeof socket, socket ? 'defined' : 'UNDEFINED');
 window.customScenesData = [];
 window.pendingAssignFile = null;
+window.customScenesSyncEnabled = localStorage.getItem('custom_scenes_sync') === 'true';
+
+window.toggleCustomScenesSyncSetting = function(enabled) {
+    window.customScenesSyncEnabled = enabled;
+    localStorage.setItem('custom_scenes_sync', enabled ? 'true' : 'false');
+    console.log('[CUSTOM] customScenesSyncEnabled changed to:', enabled);
+};
 
 window.showCustomScenes = function() {
     console.log('[CUSTOM] showCustomScenes CALLED');
@@ -11,6 +18,8 @@ window.showCustomScenes = function() {
             modal.style.display = 'flex';
             var toggle = document.getElementById('toggleCustomNames');
             if (toggle) toggle.checked = window.customNamesEnabled !== false;
+            var toggleSync = document.getElementById('toggleCustomScenesSync');
+            if (toggleSync) toggleSync.checked = window.customScenesSyncEnabled === true;
         } else {
             console.error('[CUSTOM] customScenesModal not found in DOM');
         }
@@ -175,7 +184,7 @@ window.renameScene = function(file, explicitCustomName) {
 window.confirmRenameScene = function() {
     const newName = document.getElementById('renameSceneInput').value;
     if (newName && newName.trim() !== '') {
-        socket.emit('renameCustomSceneFile', { old_file: window.pendingRenameFile, new_name: newName.trim() });
+        socket.emit('renameCustomSceneFile', { old_file: window.pendingRenameFile, new_name: newName.trim(), syncShared: window.customScenesSyncEnabled });
         document.getElementById('renameSceneModal').style.display = 'none';
     } else {
         if (typeof OverlayInfo !== 'undefined' && OverlayInfo.show) {
@@ -251,6 +260,7 @@ window.confirmAssignScene = function() {
         file: window.pendingAssignFile,
         physical_id: libScene.index,
         physical_scene: libScene.name || '',
+        syncShared: window.customScenesSyncEnabled
     });
     document.getElementById('assignSceneModal').style.display = 'none';
 };

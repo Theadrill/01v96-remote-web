@@ -30,8 +30,8 @@ pub fn load_icon(path: &Path) -> Result<Icon, Box<dyn std::error::Error>> {
 impl TrayApp {
     pub fn new(port: u16, remote_midi: bool) -> Result<Self, Box<dyn std::error::Error>> {
         let mut icon_path = Path::new("..").join("public").join("favicon.ico");
-        if let Ok(exe_path) = std::env::current_exe() {
-            if let Some(exe_dir) = exe_path.parent() {
+        if let Ok(exe_path) = std::env::current_exe()
+            && let Some(exe_dir) = exe_path.parent() {
                 let path1 = exe_dir.join("public").join("favicon.ico");
                 if path1.is_file() {
                     icon_path = path1;
@@ -51,7 +51,6 @@ impl TrayApp {
                     }
                 }
             }
-        }
 
         let icon = load_icon(&icon_path)
             .unwrap_or_else(|_| Icon::from_rgba(vec![0; 4 * 16 * 16], 16, 16).unwrap());
@@ -59,14 +58,14 @@ impl TrayApp {
         let tray_menu = Menu::new();
 
         let connect_i = MenuItem::new("🔌 Conectar à Mesa", true, None);
-        
+
         let remote_label = if remote_midi {
             "🌐 Modo Remoto: ON"
         } else {
             "🌐 Modo Remoto: OFF"
         };
         let remote_i = MenuItem::new(remote_label, true, None);
-        
+
         let browser_i = MenuItem::new("🌐 Abrir no Navegador", true, None);
         let restart_i = MenuItem::new("Reiniciar Servidor", true, None);
         let quit_i = MenuItem::new("❌ Sair e Encerrar", true, None);
@@ -112,7 +111,7 @@ impl TrayApp {
             println!("Abrindo navegador: {}", url);
             #[cfg(target_os = "windows")]
             let _ = std::process::Command::new("cmd")
-                .args(&["/C", "start", &url])
+                .args(["/C", "start", &url])
                 .spawn();
             #[cfg(target_os = "macos")]
             let _ = std::process::Command::new("open").arg(&url).spawn();
@@ -130,25 +129,23 @@ impl TrayApp {
                 let mut config = crate::config::AppConfig::load();
                 config.remote_midi = !config.remote_midi;
                 config.save();
-                
+
                 println!("Reiniciando servidor após alterar Modo Remoto...");
-                if let Ok(mut tx_guard) = self.shutdown_tx.lock() {
-                    if let Some(tx) = tx_guard.take() {
+                if let Ok(mut tx_guard) = self.shutdown_tx.lock()
+                    && let Some(tx) = tx_guard.take() {
                         let _ = tx.send(());
                         return;
                     }
-                }
                 let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
                 std::process::exit(0);
             }
         } else if event.id == self.restart_id {
             println!("Reiniciando servidor...");
-            if let Ok(mut tx_guard) = self.shutdown_tx.lock() {
-                if let Some(tx) = tx_guard.take() {
+            if let Ok(mut tx_guard) = self.shutdown_tx.lock()
+                && let Some(tx) = tx_guard.take() {
                     let _ = tx.send(());
                     return;
                 }
-            }
             let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
             std::process::exit(0);
         }
@@ -202,7 +199,8 @@ fn show_confirm_dialog(title: &str, text: &str) -> bool {
                 std::ptr::null_mut(),
                 text_u16.as_ptr(),
                 title_u16.as_ptr(),
-                windows_sys::Win32::UI::WindowsAndMessaging::MB_YESNO | windows_sys::Win32::UI::WindowsAndMessaging::MB_ICONQUESTION,
+                windows_sys::Win32::UI::WindowsAndMessaging::MB_YESNO
+                    | windows_sys::Win32::UI::WindowsAndMessaging::MB_ICONQUESTION,
             );
             result == windows_sys::Win32::UI::WindowsAndMessaging::IDYES
         }

@@ -18,6 +18,10 @@ target/release/*
 public/modules/macros/profiles/local/*
 !public/modules/macros/profiles/local/.gitkeep
 
+# Custom Scenes Local
+data/custom_scenes/local/*
+!data/custom_scenes/local/.gitkeep
+
 # Logs
 logs/
 server_log.txt
