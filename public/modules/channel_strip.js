@@ -300,7 +300,7 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         title = `${i + 1} + ${i + 2}`;
     }
 
-    let nameDiv = isMaster ? (s.name || "MASTER") : (s.name || "...");
+    let nameDiv = isMaster ? (s.name !== undefined ? s.name : "MASTER") : (s.name !== undefined ? s.name : "...");
     if (!isMaster && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
         nameDiv = window.activeCustomSceneChannels[i].name;
     }
@@ -436,7 +436,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         title = `CH ${i + 1} + ${i + 2}`;
     }
 
-    let nameDiv = isMaster ? "MASTER" : (s.name || "...");
+    let nameDiv = isMaster ? "MASTER" : (s.name !== undefined ? s.name : "...");
     if (!isMaster && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
         nameDiv = window.activeCustomSceneChannels[i].name;
     }
@@ -509,7 +509,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         ch = 32 + (i * 2);
     }
 
-    let nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
+    let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
     if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
         nameDiv = window.activeCustomSceneChannels[configId].name;
     }
@@ -560,7 +560,7 @@ function createOutputStrip(i, type, idPrefix = "") {
         ch = 32 + (i * 2);
     }
 
-    let nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
+    let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
     if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
         nameDiv = window.activeCustomSceneChannels[configId].name;
     }
@@ -718,7 +718,7 @@ function initUI() {
             }
             const nameEl = document.getElementById(`name${i}`);
             if (nameEl) {
-                let dName = state.name || `CH ${i + 1}`;
+                let dName = state.name !== undefined ? state.name : `CH ${i + 1}`;
                 if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
                     dName = window.activeCustomSceneChannels[i].name;
                 }

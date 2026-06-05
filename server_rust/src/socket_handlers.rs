@@ -532,9 +532,6 @@ pub fn register_handlers(
                     .to_string();
                 let normalized = crate::custom_scenes::normalize_name(&name);
                 tracing::info!("[CUSTOM] saveCustomName: ch={}, raw='{}', normalized='{}'", channel, name, normalized);
-                if normalized.is_empty() {
-                    return;
-                }
 
                 let (scene_number, scene_name, mesa_nome, _data_dir) = {
                     let state = state_save_name.read().await;

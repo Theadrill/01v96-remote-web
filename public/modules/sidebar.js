@@ -376,7 +376,6 @@ window.saveChannelName = function() {
 
     if (isCustom) {
         newName = normalizeNameEditor(newName).substring(0, 10);
-        if (!newName) return;
         socket.emit('saveCustomName', { channel: ch, name: newName });
         if (typeof window.updateNameUI === 'function') {
             window.updateNameUI(ch, newName.substring(0, 4));
@@ -385,7 +384,6 @@ window.saveChannelName = function() {
         window.activeCustomSceneChannels[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4) };
     } else {
         newName = newName.toUpperCase().substring(0, 4);
-        if (!newName) return;
         socket.emit('updateName', { channel: ch, name: newName });
         if (typeof window.updateNameUI === 'function') {
             window.updateNameUI(ch, newName);

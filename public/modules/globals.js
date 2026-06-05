@@ -162,7 +162,7 @@ function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
  * Fader Principal, Mini Fader (Config) e Sidebar Title.
  */
 window.updateNameUI = function(channel, name) {
-    const limitedName = (name || '').substring(0, 16).trim(); // Armazenamos até 16, mas exibimos 4 no visor
+    const limitedName = (name !== undefined && name !== null ? name : '').substring(0, 16).trim(); // Armazenamos até 16, mas exibimos 4 no visor
     let defaultShortName = '';
     if (channel >= 0 && channel <= 31) defaultShortName = `CH ${channel + 1}`;
     else if (channel >= 60 && channel <= 67) defaultShortName = `ST ${Math.floor((channel - 60) / 2) + 1}`;
@@ -170,10 +170,11 @@ window.updateNameUI = function(channel, name) {
     else if (channel >= 44 && channel <= 51) defaultShortName = `BUS${channel - 43}`;
     else if (channel === 52) defaultShortName = `MSTR`;
 
-    let displayName = limitedName.substring(0, 4) || defaultShortName;
+    let displayName = name !== undefined ? limitedName.substring(0, 4) : defaultShortName;
     if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[channel]) {
         // Usa o nome customizado inteiro (ou short se preferir, mas vamos permitir nomes um pouco maiores)
-        displayName = window.activeCustomSceneChannels[channel].name || displayName;
+        const customName = window.activeCustomSceneChannels[channel].name;
+        displayName = customName !== undefined ? customName : displayName;
     }
     
     // 1. Atualiza o estado local para consistência
@@ -210,11 +211,25 @@ window.updateNameUI = function(channel, name) {
 
     // 3. Atualiza fader na tela principal
     const el = document.getElementById(baseId);
-    if (el) el.innerText = displayName;
+    if (el) {
+        el.innerText = displayName;
+        // if (displayName.length > 7) {
+        //     el.classList.add('long-name');
+        // } else {
+        //     el.classList.remove('long-name');
+        // }
+    }
 
     // 4. Atualiza mini-fader se estiver aberto na config
     const elMini = document.getElementById(`mini-${baseId}`);
-    if (elMini) elMini.innerText = displayName;
+    if (elMini) {
+        elMini.innerText = displayName;
+        // if (displayName.length > 7) {
+        //     elMini.classList.add('long-name');
+        // } else {
+        //     elMini.classList.remove('long-name');
+        // }
+    }
 
     // 5. Atualiza título da sidebar se este canal for o ativo na config
     if (activeConfigChannel === channel) {
