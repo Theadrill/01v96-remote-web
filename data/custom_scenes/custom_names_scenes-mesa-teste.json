@@ -2,9 +2,10 @@
   "mesa_nome": "mesa-teste",
   "scenes": [
     {
+      "custom_name": "CENA TESTE 222",
       "physical_scene": "CENA TESTE 22",
       "physical_id": 2,
-      "file": "custom_names_scene-CENA TESTE 22-mesa-teste.json"
+      "file": "custom_names_scene-CENA_TESTE_222-mesa-teste.json"
     }
   ]
 }

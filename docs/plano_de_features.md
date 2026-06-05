@@ -603,9 +603,28 @@ do canal, o sistema já está preparado para edição. Adicione:
 
 ---
 
-### Passo 5: Frontend — Tela de gerenciamento
+### ✅ Passo 5: Frontend — Tela de gerenciamento (COMPLETO)
 
-**Onde:** `public/modules/custom_scenes.js` (novo) + HTML/CSS
+**Onde:** `public/modules/custom_scenes.js` (novo), `public/index.html`, `public/modules/sidebar.js`
+
+**O que foi feito:**
+- **`custom_scenes.js`** (novo, 160 linhas): lógica completa de gerenciamento:
+  - `showCustomScenes()`: abre modal, emite `listCustomScenes`
+  - `renderCustomScenesList()`: renderiza cartões com nome, arquivo, status de atribuição
+  - `openAssignScene()`: abre modal de atribuição com radio buttons das cenas físicas (de `scenesLibrary`)
+  - `confirmAssignScene()`: emite `assignCustomScene` com `{ file, physical_id, physical_scene }`
+  - `openSceneDetails()`: abre tabela de comparação, emite `previewCustomScene`
+  - `getChannelLabel()`: converte channel global (0-31, 60-67, 52) para label "CH 1", "ST IN 1L", "MASTER"
+  - Escuta `customScenesList`, `previewResult`, `assignResult`
+- **`index.html`**: 3 novos modais:
+  - `customScenesModal`: lista de cenas customizadas com botões ATRIBUIR/DETALHES
+  - `assignSceneModal`: seletor de cena física via radio buttons
+  - `sceneDetailsModal`: tabela de comparação Canal | Nome Customizado | Nome na Mesa (linhas divergentes em amarelo)
+  - Botão "NOMES CUSTOMIZADOS" na seção de cenas do config modal (ao lado de SALVAR/CARREGAR CENA)
+- **`sidebar.js`**: removido botão "CENAS" do dock (agora fica no config modal)
+- **`socket_handlers.rs`**: novo handler `previewCustomScene` — carrega cena do disco + `GlobalState` (locks sequenciais), retorna `{ channels: [{ ch, name, short, mesa_name }] }`, incluindo canais da cena + canais da mesa sem entrada
+- **`socket_handlers.rs`**: novo handler `getActiveCustomChannels` — retorna canais customizados da cena física ativa (para popular `activeCustomSceneChannels` após reconnect/save)
+- **`socket.js`**: novo listener `activeCustomChannels` — popula `window.activeCustomSceneChannels`; `requestActiveCustomChannels()` chamado após `currentScene` e `saveSceneResult`
 
 Nova tela acessível pelo menu principal. Exibe a lista de custom scenes e
 permite atribuí-las a cenas físicas.
@@ -642,7 +661,7 @@ com tabela de comparação, confirmar que a atribuição persiste após reload.
 
 ---
 
-### Passo 6: Backend — Renomeação de servidor
+### ✅ Passo 6: Backend — Renomeação de servidor (COMPLETO)
 
 **Onde:**
 - `server_rust/src/socket_handlers.rs` — handler `"renameServer"`
@@ -717,7 +736,7 @@ renomeados e o registro atualizado.
 
 ---
 
-### Passo 7: Integração Ninja Sync + Cache Invalidation
+### ✅ Passo 7: Integração Ninja Sync + Cache Invalidation (COMPLETO)
 
 **Onde:**
 - `server_rust/src/network/sync_manager.rs` ou módulo existente de Git sync

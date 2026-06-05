@@ -1,0 +1,170 @@
+{
+  "scene_name": "CENA TESTE 222",
+  "scene_id": 2,
+  "channels": {
+    "7": {
+      "name": "CH7",
+      "short": "CH7 "
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "14": {
+      "name": "CH14",
+      "short": "CH14"
+    },
+    "16": {
+      "name": "CH16",
+      "short": "CH16"
+    },
+    "17": {
+      "name": "CH17",
+      "short": "CH17"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "24": {
+      "name": "CH24",
+      "short": "CH24"
+    },
+    "31": {
+      "name": "CH31",
+      "short": "CH31"
+    },
+    "11": {
+      "name": "CH11",
+      "short": "CH11"
+    },
+    "20": {
+      "name": "CH20",
+      "short": "CH20"
+    },
+    "13": {
+      "name": "CH13",
+      "short": "CH13"
+    },
+    "28": {
+      "name": "CH28",
+      "short": "CH28"
+    },
+    "22": {
+      "name": "CH22",
+      "short": "CH22"
+    },
+    "9": {
+      "name": "CH9",
+      "short": "CH9 "
+    },
+    "32": {
+      "name": "CH32",
+      "short": "CH32"
+    },
+    "23": {
+      "name": "CH23",
+      "short": "CH23"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "25": {
+      "name": "CH25",
+      "short": "CH25"
+    },
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
+    },
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "18": {
+      "name": "CH18",
+      "short": "CH18"
+    },
+    "6": {
+      "name": "CH6",
+      "short": "CH6 "
+    },
+    "8": {
+      "name": "CH8",
+      "short": "CH8 "
+    },
+    "26": {
+      "name": "CH26",
+      "short": "CH26"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "29": {
+      "name": "CH29",
+      "short": "CH29"
+    },
+    "3": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "15": {
+      "name": "CH15",
+      "short": "CH15"
+    },
+    "12": {
+      "name": "CH12",
+      "short": "CH12"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "21": {
+      "name": "CH21",
+      "short": "CH21"
+    },
+    "19": {
+      "name": "CH19",
+      "short": "CH19"
+    },
+    "27": {
+      "name": "CH27",
+      "short": "CH27"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "30": {
+      "name": "CH30",
+      "short": "CH30"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "10": {
+      "name": "CH10",
+      "short": "CH10"
+    }
+  }
+}

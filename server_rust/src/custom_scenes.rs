@@ -84,6 +84,8 @@ pub struct ChannelNameEntry {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SceneEntry {
+    #[serde(default)]
+    pub custom_name: Option<String>,
     pub physical_scene: String,
     pub physical_id: u8,
     pub file: String,
@@ -155,25 +157,38 @@ impl CustomSceneManager {
         }
 
         let registry_path = data_dir.join(format!("custom_names_scenes-{}.json", mesa_nome));
+        tracing::info!("[CUSTOM] load_all: mesa_nome={}, registry_path={:?}", mesa_nome, registry_path);
         let registry: CustomSceneRegistry = match fs::read_to_string(&registry_path) {
-            Ok(content) => serde_json::from_str(&content).unwrap_or_else(|e| {
-                tracing::error!("failed to parse registry: {}", e);
+            Ok(content) => {
+                tracing::info!("[CUSTOM] registry file found ({} bytes), parsing...", content.len());
+                serde_json::from_str(&content).unwrap_or_else(|e| {
+                    tracing::error!("[CUSTOM] failed to parse registry: {}", e);
+                    CustomSceneRegistry {
+                        mesa_nome: mesa_nome.to_string(),
+                        scenes: Vec::new(),
+                    }
+                })
+            }
+            Err(e) => {
+                tracing::warn!("[CUSTOM] registry file not found or unreadable: {}", e);
                 CustomSceneRegistry {
                     mesa_nome: mesa_nome.to_string(),
                     scenes: Vec::new(),
                 }
-            }),
-            Err(_) => CustomSceneRegistry {
-                mesa_nome: mesa_nome.to_string(),
-                scenes: Vec::new(),
             },
         };
+
+        tracing::info!("[CUSTOM] registry loaded with {} scene(s)", registry.scenes.len());
 
         let mut cache = HashMap::new();
         for entry in &registry.scenes {
             let path = data_dir.join(&entry.file);
+            tracing::info!("[CUSTOM] loading scene file: {:?}", path);
             if let Ok((scene, mtime)) = load_scene_inner(&path) {
+                tracing::info!("[CUSTOM] scene '{}' loaded successfully ({} channels)", entry.file, scene.channels.len());
                 cache.insert(entry.file.clone(), CachedScene { scene, mtime });
+            } else {
+                tracing::warn!("[CUSTOM] failed to load scene file: {:?}", path);
             }
         }
 
@@ -233,28 +248,46 @@ impl CustomSceneManager {
         self.get_scene(&default_file).cloned()
     }
 
+    pub fn update_physical_scene_name(&mut self, physical_id: u8, new_name: &str) -> bool {
+        let mut updated = false;
+        for entry in &mut self.registry.scenes {
+            if entry.physical_id == physical_id && entry.physical_scene != new_name {
+                entry.physical_scene = new_name.to_string();
+                updated = true;
+            }
+        }
+        if updated {
+            self.registry_dirty = true;
+            self.persist();
+        }
+        updated
+    }
+
     pub fn ensure_registry_entry(
         &mut self,
         physical_scene: &str,
         physical_id: u8,
-        file: &str,
+        filename: &str,
     ) {
-        if let Some(entry) = self
-            .registry
-            .scenes
-            .iter_mut()
-            .find(|e| e.physical_id == physical_id)
-        {
-            entry.file = file.to_string();
-            entry.physical_scene = physical_scene.to_string();
-        } else {
+        if !self.registry.scenes.iter().any(|e| e.file == filename) {
+            // Attempt to extract a default custom name from the filename if we don't have one
+            let mut extracted_name = filename.to_string();
+            if let Some(stripped) = extracted_name.strip_prefix("custom_names_scene-") {
+                extracted_name = stripped.to_string();
+            }
+            let suffix = format!("-{}.json", self.mesa_nome);
+            if let Some(stripped) = extracted_name.strip_suffix(&suffix) {
+                extracted_name = stripped.to_string();
+            }
+            
             self.registry.scenes.push(SceneEntry {
+                custom_name: Some(extracted_name),
                 physical_scene: physical_scene.to_string(),
                 physical_id,
-                file: file.to_string(),
+                file: filename.to_string(),
             });
+            self.registry_dirty = true;
         }
-        self.registry_dirty = true;
     }
 
     pub fn upsert_channel(&mut self, filename: &str, channel_id: ChannelId, name: &str) {
@@ -298,20 +331,74 @@ impl CustomSceneManager {
         self.registry.scenes.clone()
     }
 
+    pub fn rename_custom_scene(&mut self, old_file: &str, new_scene_name: &str) -> Result<(), String> {
+        let entry = self
+            .registry
+            .scenes
+            .iter_mut()
+            .find(|e| e.file == old_file)
+            .ok_or("Scene not found in registry")?;
+
+        let safe_name = new_scene_name.replace(|c: char| !c.is_alphanumeric() && c != '-', "_");
+        let new_file = format!("custom_names_scene-{}-{}.json", safe_name, self.mesa_nome);
+
+        if old_file == new_file {
+            return Ok(());
+        }
+
+        let old_path = self.data_dir.join(old_file);
+        let new_path = self.data_dir.join(&new_file);
+
+        if new_path.exists() {
+            return Err("A scene with this name already exists".to_string());
+        }
+
+        std::fs::rename(&old_path, &new_path).map_err(|e| format!("Failed to rename file: {}", e))?;
+
+        if let Some(mut cached) = self.cache.remove(old_file) {
+            cached.scene.scene_name = new_scene_name.to_string();
+            self.cache.insert(new_file.clone(), cached);
+            self.dirty_files.insert(new_file.clone());
+        }
+
+        entry.file = new_file;
+        entry.custom_name = Some(new_scene_name.to_string());
+        self.registry_dirty = true;
+        self.persist();
+
+        Ok(())
+    }
+
     pub fn persist(&mut self) {
+        let mut synced_files = Vec::new();
+
         for file in self.dirty_files.drain() {
             if let Some(cached) = self.cache.get(&file) {
                 let path = self.data_dir.join(&file);
                 save_json_atomic(&path, &cached.scene);
+                synced_files.push(format!("data/custom_scenes/{}", file));
             }
         }
 
         if self.registry_dirty {
+            let file = format!("custom_names_scenes-{}.json", self.mesa_nome);
             let path = self
                 .data_dir
-                .join(format!("custom_names_scenes-{}.json", self.mesa_nome));
+                .join(&file);
             save_json_atomic(&path, &self.registry);
             self.registry_dirty = false;
+            synced_files.push(format!("data/custom_scenes/{}", file));
+        }
+
+        if !synced_files.is_empty() {
+            let msg = if synced_files.len() == 1 {
+                format!("auto-sync: custom scene {} updated", synced_files[0])
+            } else {
+                "auto-sync: multiple custom scenes updated".to_string()
+            };
+            tokio::spawn(async move {
+                crate::api::macros::enqueue_git_sync(synced_files, msg, 5000).await;
+            });
         }
     }
 
@@ -373,6 +460,7 @@ impl CustomSceneManager {
             }
 
             new_registry.scenes.push(SceneEntry {
+                custom_name: entry.custom_name.clone(),
                 physical_scene: entry.physical_scene.clone(),
                 physical_id: entry.physical_id,
                 file: new_file,
@@ -402,6 +490,18 @@ impl CustomSceneManager {
         self.cache.clear();
 
         self.persist();
+
+        let new_name_clone = new_name.to_string();
+        tokio::spawn(async move {
+            crate::api::macros::enqueue_git_sync(
+                vec![
+                    "data/custom_scenes/custom_names_scene*.json".to_string(),
+                ],
+                format!("auto-sync: mesa renamed to '{}'", new_name_clone),
+                5000,
+            )
+            .await;
+        });
 
         Ok(())
     }

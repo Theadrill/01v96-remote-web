@@ -118,6 +118,7 @@ async fn async_main(
     };
     let mesa_nome = crate::env_config::load_server_name()
         .unwrap_or_else(|| "default".to_string());
+    tracing::info!("[CUSTOM] mesa_nome={:?}, data_dir={:?}", mesa_nome, data_dir);
     let custom_scene_manager = Arc::new(RwLock::new(
         custom_scenes::CustomSceneManager::load_all(&data_dir, &mesa_nome)
     ));

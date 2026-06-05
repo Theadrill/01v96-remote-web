@@ -288,7 +288,7 @@ window.removeCustomName = function() {
     const ch = activeConfigChannel;
     if (ch === null) return;
     socket.emit('removeCustomName', { channel: ch });
-    if (window.activeCustomSceneChannels) {
+    if (window.customNamesEnabled && window.activeCustomSceneChannels) {
         delete window.activeCustomSceneChannels[ch];
     }
     document.getElementById('nameEditorModal').style.display = 'none';
@@ -318,7 +318,7 @@ window.openNameEditor = function() {
     const preview = document.getElementById('namePreview');
     const removeBtn = document.getElementById('btnRemoveCustomName');
 
-    const customCh = window.activeCustomSceneChannels && window.activeCustomSceneChannels[ch];
+    const customCh = window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[ch];
     const hasCustomName = !!(customCh && customCh.name);
 
     checkbox.checked = hasCustomName;

@@ -90,7 +90,7 @@ async fn trigger_git_sync() {
     });
 }
 
-async fn enqueue_git_sync(files: Vec<String>, message: String, delay_ms: u64) {
+pub async fn enqueue_git_sync(files: Vec<String>, message: String, delay_ms: u64) {
     let mut state = GIT_SYNC_STATE.lock().await;
     for f in files {
         state.queue.insert(f);

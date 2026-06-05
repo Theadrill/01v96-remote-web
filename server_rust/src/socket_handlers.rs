@@ -422,8 +422,12 @@ pub fn register_handlers(
                             };
 
                             let scene = match scene_opt {
-                                Some(s) => s,
+                                Some(s) => {
+                                    tracing::info!("[CUSTOM] recallScene: custom scene '{}' (id={}) encontrada com {} canais", s.scene_name, s.scene_id, s.channels.len());
+                                    s
+                                }
                                 None => {
+                                    tracing::info!("[CUSTOM] recallScene: nenhuma custom scene para esta cena física");
                                     let _ = io_clone
                                         .emit(
                                             "customSceneLoaded",
@@ -434,6 +438,8 @@ pub fn register_handlers(
                                 }
                             };
 
+                            let mut applied = 0u32;
+                            let mut skipped = 0u32;
                             for (channel_id, entry) in &scene.channels {
                                 if token.is_cancelled() {
                                     return;
@@ -446,9 +452,11 @@ pub fn register_handlers(
                                     .unwrap_or_default();
 
                                 if current_short == entry.short {
+                                    skipped += 1;
                                     continue;
                                 }
 
+                                tracing::info!("[CUSTOM] recallScene: ch{} '{}' -> '{}' (cur='{}')", global_ch, current_short, entry.short, current_short);
                                 let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
                                 for (ci, &byte) in short_bytes.iter().enumerate() {
                                     if token.is_cancelled() {
@@ -468,7 +476,9 @@ pub fn register_handlers(
                                         }
                                     }
                                 }
+                                applied += 1;
                             }
+                            tracing::info!("[CUSTOM] recallScene: aplicados={}, ignorados={}", applied, skipped);
 
                             let channels_arr: Vec<serde_json::Value> = scene
                                 .channels
@@ -521,6 +531,7 @@ pub fn register_handlers(
                     .unwrap_or("")
                     .to_string();
                 let normalized = crate::custom_scenes::normalize_name(&name);
+                tracing::info!("[CUSTOM] saveCustomName: ch={}, raw='{}', normalized='{}'", channel, name, normalized);
                 if normalized.is_empty() {
                     return;
                 }
@@ -719,18 +730,72 @@ pub fn register_handlers(
             },
         );
 
+        // --- RENAME CUSTOM SCENE FILE ---
+        let csm_rename_file = csm_socket.clone();
+        socket.on(
+            "renameCustomSceneFile",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                let old_file = data
+                    .get("old_file")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                let new_name = data
+                    .get("new_name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+
+                if old_file.is_empty() || new_name.is_empty() {
+                    return;
+                }
+
+                {
+                    let mut csm = csm_rename_file.write().await;
+                    match csm.rename_custom_scene(&old_file, &new_name) {
+                        Ok(_) => {
+                            tracing::info!("[CUSTOM] Successfully renamed scene file {} to {}", old_file, new_name);
+                            // emit updated list
+                            let list = csm.list_scenes();
+                            let _ = socket.emit(
+                                "customScenesList",
+                                &serde_json::json!({ "scenes": list }),
+                            );
+                        }
+                        Err(e) => {
+                            tracing::error!("[CUSTOM] Failed to rename scene file: {}", e);
+                            let _ = socket.emit(
+                                "customSceneRenameError",
+                                &serde_json::json!({ "error": e }),
+                            );
+                        }
+                    }
+                }
+            },
+        );
+
         // --- LIST CUSTOM SCENES ---
         let csm_list = csm_socket.clone();
         socket.on(
             "listCustomScenes",
-            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
-                let scenes = {
+            move |socket: SocketRef| async move {
+                tracing::info!("[CUSTOM] listCustomScenes HANDLER EXECUTING");
+                let (scenes, mesa_nome) = {
                     let csm = csm_list.read().await;
-                    csm.list_scenes()
+                    let list = csm.list_scenes();
+                    let m_nome = csm.mesa_nome().to_string();
+                    tracing::info!("[CUSTOM] listCustomScenes: {} scene(s) in registry", list.len());
+                    for s in &list {
+                        tracing::info!("[CUSTOM]   scene: physical_scene={:?}, physical_id={}, file={:?}", s.physical_scene, s.physical_id, s.file);
+                    }
+                    (list, m_nome)
                 };
                 let _ = socket.emit(
                     "customScenesList",
-                    &serde_json::json!({ "scenes": scenes }),
+                    &serde_json::json!({ "scenes": scenes, "mesa_nome": mesa_nome }),
                 );
             },
         );
@@ -772,10 +837,152 @@ pub fn register_handlers(
             },
         );
 
+        // --- GET ACTIVE CUSTOM CHANNELS ---
+        let csm_active = csm_socket.clone();
+        let state_active = global_state_socket.clone();
+        socket.on(
+            "getActiveCustomChannels",
+            move |socket: SocketRef| async move {
+                tracing::info!("[CUSTOM] getActiveCustomChannels HANDLER EXECUTING");
+                let (scene_number, scene_name) = {
+                    let state = state_active.read().await;
+                    let sn = state.scene_manager.active_scene_index;
+                    let sname = state
+                        .scene_manager
+                        .current_scene
+                        .as_ref()
+                        .map(|s| s.name.clone())
+                        .unwrap_or_default();
+                    (sn, sname)
+                };
+                let base_name = if let Some(pos) = scene_name.find(" - ") {
+                    scene_name[pos + 3..].to_string()
+                } else {
+                    scene_name.clone()
+                };
+                tracing::info!(
+                    "[CUSTOM] getActiveCustomChannels: scene={}, name='{}', base='{}'",
+                    scene_number, scene_name, base_name
+                );
+                if base_name.is_empty() {
+                    tracing::info!("[CUSTOM] getActiveCustomChannels: base_name vazio, active=false");
+                    let _ = socket.emit("activeCustomChannels", &serde_json::json!({ "active": false }));
+                    return;
+                }
+                let mesa_nome = {
+                    let csm = csm_active.read().await;
+                    csm.mesa_nome().to_string()
+                };
+                let filename = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
+                tracing::info!("[CUSTOM] getActiveCustomChannels: filename='{}'", filename);
+                let channels = {
+                    let mut csm = csm_active.write().await;
+                    match csm.get_scene(&filename) {
+                        Some(scene) => {
+                            let count = scene.channels.len();
+                            let arr: Vec<serde_json::Value> = scene.channels.iter().map(|(ch_id, entry)| {
+                                serde_json::json!({
+                                    "ch": ch_id.to_global_channel(),
+                                    "name": entry.name,
+                                    "short": entry.short
+                                })
+                            }).collect();
+                            tracing::info!("[CUSTOM] getActiveCustomChannels: cena encontrada com {} canais", count);
+                            arr
+                        }
+                        None => {
+                            tracing::info!("[CUSTOM] getActiveCustomChannels: arquivo '{}' nao encontrado", filename);
+                            Vec::new()
+                        }
+                    }
+                };
+                if channels.is_empty() {
+                    let _ = socket.emit("activeCustomChannels", &serde_json::json!({ "active": false }));
+                } else {
+                    let _ = socket.emit("activeCustomChannels", &serde_json::json!({
+                        "active": true,
+                        "channels": channels,
+                    }));
+                }
+            },
+        );
+
+        // --- PREVIEW CUSTOM SCENE ---
+        let csm_preview = csm_socket.clone();
+        let state_preview = global_state_socket.clone();
+        socket.on(
+            "previewCustomScene",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let file = data
+                    .get("file")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                if file.is_empty() {
+                    return;
+                }
+                tracing::info!("[CUSTOM] previewCustomScene: file='{}'", file);
+                let scene_opt = {
+                    let mut csm = csm_preview.write().await;
+                    csm.get_scene(&file).cloned()
+                };
+                if scene_opt.is_none() {
+                    tracing::info!("[CUSTOM] previewCustomScene: cena '{}' nao encontrada", file);
+                }
+                let mesa_entries = {
+                    let state = state_preview.read().await;
+                    collect_current_channels_as_entries(&state)
+                };
+                let channels = match scene_opt {
+                    Some(scene) => {
+                        let mut result = Vec::new();
+                        let scene_ch_ids: std::collections::HashSet<_> =
+                            scene.channels.keys().cloned().collect();
+                        for (ch_id, entry) in &scene.channels {
+                            let global_ch = ch_id.to_global_channel();
+                            let mesa_name = mesa_entries
+                                .get(ch_id)
+                                .map(|m| m.name.clone())
+                                .unwrap_or_default();
+                            result.push(serde_json::json!({
+                                "ch": global_ch,
+                                "name": entry.name,
+                                "short": entry.short,
+                                "mesa_name": mesa_name,
+                            }));
+                        }
+                        for (ch_id, mesa_entry) in &mesa_entries {
+                            if !scene_ch_ids.contains(ch_id) {
+                                let global_ch = ch_id.to_global_channel();
+                                result.push(serde_json::json!({
+                                    "ch": global_ch,
+                                    "name": "",
+                                    "short": "",
+                                    "mesa_name": mesa_entry.name,
+                                }));
+                            }
+                        }
+                        result
+                    }
+                    None => Vec::new(),
+                };
+                
+                // Sort by channel index so they are in sequential order
+                let mut channels = channels;
+                channels.sort_by_key(|v| v.get("ch").and_then(|c| c.as_u64()).unwrap_or(0));
+
+                let _ = socket.emit(
+                    "previewResult",
+                    &serde_json::json!({ "channels": channels }),
+                );
+            },
+        );
+
         // --- SAVE SCENE ---
         let scheduler_save = scheduler_socket.clone();
         let state_save = global_state_socket.clone();
         let io_save = io.clone();
+        let csm_save = csm_socket.clone();
         socket.on(
             "saveScene",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -842,6 +1049,16 @@ pub fn register_handlers(
                         let _ =
                             io_save.emit("currentScene", &state.scene_manager.current_scene);
                         let _ = io_save.emit("scenesUpdated", &state.scene_manager.get_state());
+                    }
+                    
+                    // Update Custom Scenes Registry to reflect the new physical scene name
+                    {
+                        let mut csm = csm_save.write().await;
+                        if csm.update_physical_scene_name(index, &target_name) {
+                            let list = csm.list_scenes();
+                            let m_nome = csm.mesa_nome().to_string();
+                            let _ = io_save.emit("customScenesList", &serde_json::json!({ "scenes": list, "mesa_nome": m_nome }));
+                        }
                     }
                     let _ = socket.emit(
                         "saveSceneResult",
@@ -1179,6 +1396,7 @@ pub fn register_handlers(
         // Não chama require_setup: o renameServer é justamente a operação que
         // completa o setup quando só falta o nome (envStatus == missing_name).
         let io_rename = io.clone();
+        let csm_rename = csm_socket.clone();
         socket.on(
             "renameServer",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -1212,12 +1430,22 @@ pub fn register_handlers(
                         return;
                     }
                 };
+                let old_name = {
+                    let csm = csm_rename.read().await;
+                    csm.mesa_nome().to_string()
+                };
                 if let Err(e) = crate::env_config::save_env(&new_name, &current_pass) {
                     let _ = socket.emit(
                         "renameResult",
                         &serde_json::json!({ "success": false, "error": e }),
                     );
                     return;
+                }
+                if old_name != new_name {
+                    let mut csm = csm_rename.write().await;
+                    if let Err(e) = csm.rename_mesa(&old_name, &new_name) {
+                        tracing::error!("[RENAME] Erro ao renomear custom scenes: {}", e);
+                    }
                 }
                 info!("✏️ [RENAME] Servidor renomeado para: {}", new_name);
                 let _ = io_rename.emit(

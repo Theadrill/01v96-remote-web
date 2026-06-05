@@ -341,7 +341,12 @@ socket.on('updateName', (data) => {
         const stateObj = getChannelStateById(data.channel);
         if (stateObj) {
             stateObj.nameChars = (data.name || '').padEnd(16, ' ').substring(0, 16).split('');
+            // Se não houver nome customizado na cena ativa ou custom names desativado, atualizamos o stateObj.name normal
+            if (!window.customNamesEnabled || !window.activeCustomSceneChannels || !window.activeCustomSceneChannels[data.channel]) {
+                stateObj.name = data.name;
+            }
         }
+        
         window.updateNameUI(data.channel, data.name);
     }
 });
@@ -420,7 +425,10 @@ socket.on('sync', (s) => {
                 const globalId = (i >= 32) ? (60 + (i - 32)) : i;
 
                 updateUI(globalId, v, onBool, soloBool);
-                const newName = ch.name || (i < 32 ? `CH ${i + 1}` : `ST IN ${i - 32 + 1}`);
+                let newName = ch.name || (i < 32 ? `CH ${i + 1}` : `ST IN ${i - 32 + 1}`);
+                if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[globalId]) {
+                    newName = window.activeCustomSceneChannels[globalId].name;
+                }
                 if (typeof window.updateNameUI === 'function') {
                     window.updateNameUI(globalId, newName);
                 }
@@ -493,8 +501,15 @@ socket.on('scenesUpdated', (data) => {
         window.currentSceneName = data.currentScene.name;
         console.log(`🎬 Cena Atual Atualizada (scenesUpdated): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
+        requestActiveCustomChannels();
     }
 });
+
+function requestActiveCustomChannels() {
+    if (typeof socket !== 'undefined' && socket.connected) {
+        socket.emit('getActiveCustomChannels');
+    }
+}
 
 socket.on('currentScene', (data) => {
     if (data) {
@@ -502,6 +517,7 @@ socket.on('currentScene', (data) => {
         window.currentSceneName = data.name;
         console.log(`🎬 Cena Atual Atualizada (currentScene): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
+        requestActiveCustomChannels();
     }
 });
 
@@ -513,8 +529,25 @@ socket.on('saveSceneResult', (data) => {
         window.currentSceneName = data.scene_name || '';
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         OverlayInfo.show('success', 'CENA ' + num + name + ' SALVA');
+        requestActiveCustomChannels();
     } else if (data && !data.success) {
         OverlayInfo.show('error', 'ERRO AO SALVAR CENA');
+    }
+});
+
+socket.on('activeCustomChannels', (data) => {
+    if (data && data.active && data.channels) {
+        window.activeCustomSceneChannels = {};
+        for (const entry of data.channels) {
+            window.activeCustomSceneChannels[entry.ch] = { name: entry.name, short: entry.short };
+            if (typeof window.updateNameUI === 'function') {
+                window.updateNameUI(entry.ch, entry.name);
+            }
+        }
+        console.log('[CUSTOM] activeCustomChannels carregado:', data.channels.length, 'canais');
+    } else {
+        window.activeCustomSceneChannels = null;
+        console.log('[CUSTOM] activeCustomChannels: nenhuma cena ativa');
     }
 });
 
@@ -523,9 +556,14 @@ socket.on('customSceneLoaded', (data) => {
         window.activeCustomSceneChannels = {};
         for (const entry of data.channels) {
             window.activeCustomSceneChannels[entry.ch] = { name: entry.name, short: entry.short };
+            if (typeof window.updateNameUI === 'function') {
+                window.updateNameUI(entry.ch, entry.name);
+            }
         }
+        console.log('[CUSTOM] customSceneLoaded:', data.scene_name, '-', data.channels.length, 'canais');
     } else {
         window.activeCustomSceneChannels = null;
+        console.log('[CUSTOM] customSceneLoaded: nenhuma cena ativa');
     }
 });
 

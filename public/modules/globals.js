@@ -47,6 +47,7 @@ window.envStatus = 'not_found';
 window.serverName = null;
 let layoutMode = localStorage.getItem('mixer_layout') || 'mobile';
 document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
+window.customNamesEnabled = localStorage.getItem('custom_names_enabled') !== 'false';
 
 const container = document.getElementById('faders-container');
 
@@ -169,7 +170,11 @@ window.updateNameUI = function(channel, name) {
     else if (channel >= 44 && channel <= 51) defaultShortName = `BUS${channel - 43}`;
     else if (channel === 52) defaultShortName = `MSTR`;
 
-    const displayName = limitedName.substring(0, 4) || defaultShortName;
+    let displayName = limitedName.substring(0, 4) || defaultShortName;
+    if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[channel]) {
+        // Usa o nome customizado inteiro (ou short se preferir, mas vamos permitir nomes um pouco maiores)
+        displayName = window.activeCustomSceneChannels[channel].name || displayName;
+    }
     
     // 1. Atualiza o estado local para consistência
     const stateObj = getChannelStateById(channel);

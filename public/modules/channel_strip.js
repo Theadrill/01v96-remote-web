@@ -300,7 +300,10 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         title = `${i + 1} + ${i + 2}`;
     }
 
-    const nameDiv = isMaster ? (s.name || "MASTER") : (s.name || "...");
+    let nameDiv = isMaster ? (s.name || "MASTER") : (s.name || "...");
+    if (!isMaster && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
+        nameDiv = window.activeCustomSceneChannels[i].name;
+    }
     let customClass = isMaster ? "master-card-desktop" : "";
     if (!isMaster) {
         if (i < 16) customClass += " fader-group-1";
@@ -433,7 +436,10 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         title = `CH ${i + 1} + ${i + 2}`;
     }
 
-    const nameDiv = isMaster ? "MASTER" : (s.name || "...");
+    let nameDiv = isMaster ? "MASTER" : (s.name || "...");
+    if (!isMaster && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
+        nameDiv = window.activeCustomSceneChannels[i].name;
+    }
     let customClass = isMaster ? "master-card" : "";
     if (!isMaster) {
         if (i < 16) customClass = "fader-group-1";
@@ -503,8 +509,10 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         ch = 32 + (i * 2);
     }
 
-    const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
-    const nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
+    let nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
+    if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
+        nameDiv = window.activeCustomSceneChannels[configId].name;
+    }
     const actionCh = type === 'stIn' ? configId : ch;
 
     return createDesktopStrip({
@@ -552,8 +560,10 @@ function createOutputStrip(i, type, idPrefix = "") {
         ch = 32 + (i * 2);
     }
 
-    const stateRef = getChannelStateById(type === 'stIn' ? configId : prefix + i);
-    const nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
+    let nameDiv = (stateRef && stateRef.name) ? stateRef.name : title;
+    if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
+        nameDiv = window.activeCustomSceneChannels[configId].name;
+    }
     const actionCh = type === 'stIn' ? configId : ch;
 
     const pfx = idPrefix || "";
@@ -707,7 +717,13 @@ function initUI() {
                 updateUI(i, state.value, state.on, state.solo);
             }
             const nameEl = document.getElementById(`name${i}`);
-            if (nameEl) nameEl.innerText = state.name || `CH ${i + 1}`;
+            if (nameEl) {
+                let dName = state.name || `CH ${i + 1}`;
+                if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
+                    dName = window.activeCustomSceneChannels[i].name;
+                }
+                nameEl.innerText = dName;
+            }
         }
     }
 
