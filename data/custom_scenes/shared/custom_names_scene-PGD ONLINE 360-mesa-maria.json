@@ -2,29 +2,29 @@
   "scene_name": "PGD ONLINE 360",
   "scene_id": 11,
   "channels": {
-    "13": {
-      "name": "voz3",
-      "short": "VOZ3"
-    },
-    "40": {
-      "name": "CH 40",
-      "short": "CH40"
-    },
-    "9": {
-      "name": "CAVACO",
-      "short": "CAVA"
+    "39": {
+      "name": "STER",
+      "short": "STER"
     },
     "24": {
       "name": "TOMS",
       "short": "TOMS"
     },
-    "30": {
-      "name": "PAND AGUDO",
-      "short": "PAND"
+    "11": {
+      "name": "HAMILTON",
+      "short": "HAMI"
     },
-    "26": {
+    "28": {
       "name": "",
       "short": "    "
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
     },
     "17": {
       "name": "CONVIDADO",
@@ -34,69 +34,77 @@
       "name": "CH 34",
       "short": "CH34"
     },
-    "3": {
-      "name": "SURDAO",
-      "short": "SURD"
-    },
-    "27": {
-      "name": "",
-      "short": "    "
-    },
-    "32": {
-      "name": "KICK AGUDO",
-      "short": "KICK"
-    },
-    "31": {
-      "name": "TANT AGUDO",
+    "5": {
+      "name": "TANTAN",
       "short": "TANT"
     },
-    "4": {
-      "name": "PANDEIRO",
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "30": {
+      "name": "PAND AGUDO",
       "short": "PAND"
     },
-    "21": {
-      "name": "DJ",
-      "short": "DJ  "
-    },
-    "39": {
-      "name": "STER",
-      "short": "STER"
-    },
-    "15": {
-      "name": "REGENCIA",
-      "short": "REGE"
-    },
-    "18": {
-      "name": "MIC DJ",
-      "short": "MICD"
+    "19": {
+      "name": "DAVI",
+      "short": "DAVI"
     },
     "1": {
       "name": "BUMBO",
       "short": "BUMB"
     },
-    "16": {
-      "name": "CEL",
-      "short": "CEL "
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "3": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
     },
     "35": {
       "name": "STER",
       "short": "STER"
     },
-    "33": {
-      "name": "STER",
-      "short": "STER"
-    },
-    "5": {
-      "name": "TANTAN",
-      "short": "TANT"
-    },
-    "2": {
-      "name": "CHIMBAL",
-      "short": "CHIM"
-    },
-    "11": {
-      "name": "HAMILTON",
-      "short": "HAMI"
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
     },
     "12": {
       "name": "MATHEUS",
@@ -106,65 +114,57 @@
       "name": "",
       "short": "    "
     },
-    "36": {
-      "name": "CH 36",
-      "short": "CH36"
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
     },
-    "10": {
-      "name": "VIOLAO",
-      "short": "VIOL"
+    "33": {
+      "name": "STER",
+      "short": "STER"
     },
-    "38": {
-      "name": "CH 38",
-      "short": "CH38"
-    },
-    "20": {
-      "name": "VOCALISTA",
-      "short": "VOCA"
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
     },
     "master": {
       "name": "STEREO",
       "short": "STER"
     },
-    "22": {
-      "name": "DJ2",
-      "short": "DJ2 "
-    },
     "29": {
       "name": "",
       "short": "    "
     },
-    "25": {
+    "7": {
       "name": "",
       "short": "    "
     },
-    "23": {
-      "name": "SURDO BAT",
-      "short": "SURD"
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
     },
-    "28": {
-      "name": "",
-      "short": "    "
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
     },
     "14": {
       "name": "voz4",
       "short": "VOZ4"
     },
-    "19": {
-      "name": "DAVI",
-      "short": "DAVI"
-    },
     "6": {
       "name": "OUTRO",
       "short": "OUTR"
     },
-    "37": {
-      "name": "STER",
-      "short": "STER"
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
     },
-    "7": {
-      "name": "A",
-      "short": "A   "
+    "20": {
+      "name": "VOCALISTA",
+      "short": "VOCA"
+    },
+    "13": {
+      "name": "voz3",
+      "short": "VOZ3"
     }
   }
 }
