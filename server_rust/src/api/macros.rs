@@ -45,44 +45,28 @@ async fn trigger_git_sync() {
         let root_dir = crate::config::get_project_root();
         let hostname = gethostname::gethostname().to_string_lossy().to_string();
         let commit_msg = format!("{} from {}", msg, hostname);
-        let escaped_msg = commit_msg.replace("\"", "\\\"");
 
-        let files_str = files
-            .iter()
-            .map(|f| format!("\"{}\"", f.replace("\\", "/")))
-            .collect::<Vec<_>>()
-            .join(" ");
+        println!("🚀 [NINJA SYNC] Iniciando sync: {}", commit_msg);
 
-        let cmd = format!(
-            "git add {} && (git commit -m \"{}\" || echo \"Nothing to commit\") && git pull --rebase --autostash && git push",
-            files_str, escaped_msg
-        );
+        let mut add = tokio::process::Command::new("git");
+        add.arg("add").args(&files).current_dir(&root_dir);
+        if add.status().await.map_or(false, |s| s.success()) {
+            let mut commit = tokio::process::Command::new("git");
+            commit.args(&["commit", "-m", &commit_msg]).current_dir(&root_dir);
+            let _ = commit.status().await;
 
-        println!("ðŸš€ [NINJA SYNC] Iniciando sync: {}", commit_msg);
-
-        #[cfg(target_os = "windows")]
-        let mut child = tokio::process::Command::new("cmd")
-            .arg("/C")
-            .arg(&cmd)
-            .current_dir(&root_dir)
-            .spawn()
-            .expect("Falha ao rodar git");
-
-        #[cfg(not(target_os = "windows"))]
-        let mut child = tokio::process::Command::new("sh")
-            .arg("-c")
-            .arg(&cmd)
-            .current_dir(&root_dir)
-            .spawn()
-            .expect("Falha ao rodar git");
-
-        if let Ok(status) = child.wait().await {
-            if status.success() {
-                println!("ðŸŒ [NINJA SYNC] GitHub Atualizado com Sucesso!");
-            } else {
-                eprintln!("âŒ [NINJA SYNC] Falha no comando Git! Status: {}", status);
+            let mut pull = tokio::process::Command::new("git");
+            pull.args(&["pull", "--rebase", "--autostash"]).current_dir(&root_dir);
+            if pull.status().await.map_or(false, |s| s.success()) {
+                let mut push = tokio::process::Command::new("git");
+                push.arg("push").current_dir(&root_dir);
+                if push.status().await.map_or(false, |s| s.success()) {
+                    println!("🌍 [NINJA SYNC] GitHub Atualizado com Sucesso!");
+                    return;
+                }
             }
         }
+        eprintln!("❌ [NINJA SYNC] Falha no comando Git!");
     });
 }
 
