@@ -163,8 +163,7 @@ function _openConfirmModal(scene, action, gridModal) {
             socket.emit('recallScene', { index: scene.index });
             confirmModal.style.display = 'none';
             gridModal.style.display   = 'none';
-            const shield = document.getElementById('syncShield');
-            if (shield) shield.style.display = 'flex';
+            OverlayInfo.show('sync', 'CARREGANDO CENA...');
         };
     } else {
         confirmTitle.innerText    = 'SALVAR CENA?';

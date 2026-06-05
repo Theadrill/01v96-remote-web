@@ -55,24 +55,21 @@ if (typeof socket !== 'undefined' && socket.connected) {
 // Se quebrar essa estrutura de listeners, a sincronia bidirecional da dynamics/faders irá parar de funcionar.
 
 socket.on('syncStatus', (data) => {
-    const shield = document.getElementById('syncShield');
     const blocker = document.getElementById('blockingOverlay');
 
-    // Suporte para formato antigo (boolean) ou novo (object)
     const isActive = (typeof data === 'object') ? data.active : data;
     const isScene = (typeof data === 'object') ? (data.type === 'is_scene') : false;
 
-    if (shield) {
-        shield.style.display = isActive ? 'flex' : 'none';
+    if (isActive) {
+        OverlayInfo.show('sync', 'SINCRONIZANDO...');
+    } else {
+        OverlayInfo.hide();
     }
 
     if (blocker) {
-        // Bloqueia a interface totalmente apenas se for um carregamento de cena
-        // Perdurando enquanto o shield de sincronismo estiver ativo
         blocker.style.display = (isActive && isScene) ? 'block' : 'none';
     }
 
-    // 🔍 [DEBUG] Quando o sync termina, logar estado dos pares para diagnostico
     if (!isActive) {
         console.log('✅ [SYNC COMPLETO] syncStatus=false → estado atual dos pares:');
         for (let i = 0; i < 4; i++) {
@@ -505,6 +502,19 @@ socket.on('currentScene', (data) => {
         window.currentSceneName = data.name;
         console.log(`🎬 Cena Atual Atualizada (currentScene): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
+    }
+});
+
+socket.on('saveSceneResult', (data) => {
+    if (data && data.success) {
+        const num = String(data.index).padStart(2, '0');
+        const name = data.scene_name ? ' - ' + data.scene_name : '';
+        window.currentSceneNumber = data.index;
+        window.currentSceneName = data.scene_name || '';
+        if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
+        OverlayInfo.show('success', 'CENA ' + num + name + ' SALVA');
+    } else if (data && !data.success) {
+        OverlayInfo.show('error', 'ERRO AO SALVAR CENA');
     }
 });
 

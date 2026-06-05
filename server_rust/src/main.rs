@@ -1,6 +1,7 @@
 mod api;
 mod boot;
 mod config;
+pub mod custom_scenes;
 pub mod dmx;
 mod env_config;
 mod midi;
@@ -107,6 +108,20 @@ async fn async_main(
     );
 
     let global_state_api = global_state.clone();
+
+    // --- CUSTOM SCENES ---
+    let data_dir = {
+        let root = config::get_project_root();
+        let dir = root.join("data").join("custom_scenes");
+        let _ = std::fs::create_dir_all(&dir);
+        dir
+    };
+    let mesa_nome = crate::env_config::load_server_name()
+        .unwrap_or_else(|| "default".to_string());
+    let custom_scene_manager = Arc::new(RwLock::new(
+        custom_scenes::CustomSceneManager::load_all(&data_dir, &mesa_nome)
+    ));
+
     socket_handlers::register_handlers(
         io.clone(),
         scheduler.clone(),
@@ -114,6 +129,7 @@ async fn async_main(
         app_config.clone(),
         conn_mgr.clone(),
         sync_manager_socket,
+        custom_scene_manager.clone(),
     );
 
     // --- LOCALIZAR PASTA PUBLIC ---

@@ -5,6 +5,7 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 use crate::config::AppConfig;
+use crate::custom_scenes::{ChannelId, CustomSceneManager};
 use crate::midi::MidiScheduler;
 use crate::network::{ConnectionManager, SyncManager};
 use crate::state::GlobalState;
@@ -55,12 +56,14 @@ pub fn register_handlers(
     app_config: AppConfig,
     conn_mgr: Arc<ConnectionManager>,
     sync_manager: Arc<SyncManager>,
+    custom_scene_manager: Arc<RwLock<CustomSceneManager>>,
 ) {
     let sync_manager_socket = sync_manager.clone();
     let scheduler_socket = scheduler.clone();
     let global_state_socket = global_state.clone();
     let app_config_clone = app_config.clone();
     let conn_mgr_handler = conn_mgr.clone();
+    let csm_socket = custom_scene_manager.clone();
     let io_for_ns = io.clone();
 
     io.ns("/", move |socket: SocketRef| async move {
@@ -348,6 +351,7 @@ pub fn register_handlers(
         let state_scene = global_state_socket.clone();
         let conn_mgr_scene = conn_mgr_handler.clone();
         let io_scene = io.clone();
+        let csm_scene = csm_socket.clone();
         socket.on(
             "recallScene",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -357,17 +361,7 @@ pub fn register_handlers(
                 if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
                     tracing::info!("SCENE Comando recebido: RECALL Cena {}", index);
                     let sysex = vec![
-                        0xF0,
-                        0x43,
-                        0x10,
-                        0x3E,
-                        0x7F,
-                        0x10,
-                        0x00,
-                        0x00,
-                        index as u8,
-                        0x02,
-                        0x00,
+                        0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x00, 0x00, index as u8, 0x02, 0x00,
                         0xF7,
                     ];
                     scheduler_scene.enqueue(sysex, 1).await;
@@ -387,6 +381,108 @@ pub fn register_handlers(
                         }
                     }
 
+                    // --- Custom Scene: enqueue name application ---
+                    {
+                        let mut csm = csm_scene.write().await;
+                        let token = csm.prepare_op();
+                        let csm_clone = csm_scene.clone();
+                        let io_clone = io_scene.clone();
+                        let state_clone = state_scene.clone();
+                        let sched_clone = scheduler_scene.clone();
+                        let _mesa_nome = csm.mesa_nome().to_string();
+                        let _data_dir = csm.data_dir().to_path_buf();
+                        drop(csm);
+
+                        tokio::spawn(async move {
+                            tokio::select! {
+                                _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {}
+                                _ = token.cancelled() => {
+                                    tracing::info!("aplicação de nomes cancelada (nova cena)");
+                                    return;
+                                }
+                            }
+
+                            let (scene_opt, current_names) = {
+                                let state = state_clone.read().await;
+                                let scene_number = state.scene_manager.active_scene_index;
+                                let scene_name = state
+                                    .scene_manager
+                                    .current_scene
+                                    .as_ref()
+                                    .map(|s| s.name.clone())
+                                    .unwrap_or_default();
+                                let names = collect_current_names(&state);
+                                drop(state);
+
+                                let mut csm = csm_clone.write().await;
+                                (
+                                    csm.find_scene_for_physical(scene_number, &scene_name),
+                                    names,
+                                )
+                            };
+
+                            let scene = match scene_opt {
+                                Some(s) => s,
+                                None => {
+                                    let _ = io_clone
+                                        .emit(
+                                            "customSceneLoaded",
+                                            &serde_json::json!({ "active": false }),
+                                        )
+                                        .await;
+                                    return;
+                                }
+                            };
+
+                            for (channel_id, entry) in &scene.channels {
+                                if token.is_cancelled() {
+                                    return;
+                                }
+
+                                let global_ch = channel_id.to_global_channel();
+                                let current_short = current_names
+                                    .get(channel_id)
+                                    .map(|n| crate::custom_scenes::to_short_name(n))
+                                    .unwrap_or_default();
+
+                                if current_short == entry.short {
+                                    continue;
+                                }
+
+                                let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
+                                for (ci, &byte) in short_bytes.iter().enumerate() {
+                                    if token.is_cancelled() {
+                                        return;
+                                    }
+                                    if let Some(req) =
+                                        crate::midi::protocol::build_name_change(
+                                            global_ch, ci as u8, byte,
+                                        )
+                                    {
+                                        sched_clone.enqueue(req, 1).await;
+                                    }
+                                    if ci < short_bytes.len() - 1 {
+                                        tokio::select! {
+                                            _ = tokio::time::sleep(std::time::Duration::from_millis(30)) => {}
+                                            _ = token.cancelled() => { return; }
+                                        }
+                                    }
+                                }
+                            }
+
+                            let _ = io_clone
+                                .emit(
+                                    "customSceneLoaded",
+                                    &serde_json::json!({
+                                        "active": true,
+                                        "scene_name": scene.scene_name,
+                                        "scene_id": scene.scene_id,
+                                    }),
+                                )
+                                .await;
+                        });
+                    }
+
                     tokio::time::sleep(std::time::Duration::from_millis(1200)).await;
 
                     conn_mgr_scene.fire_params_only(false, "is_scene");
@@ -394,6 +490,276 @@ pub fn register_handlers(
             },
         );
 
+        // --- SAVE CUSTOM NAME ---
+        let csm_save = csm_socket.clone();
+        let state_save_name = global_state_socket.clone();
+        let io_save_name = io.clone();
+        let sched_save_name = scheduler_socket.clone();
+        socket.on(
+            "saveCustomName",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                let channel = data.get("channel").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+                let name = data
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                let normalized = crate::custom_scenes::normalize_name(&name);
+                if normalized.is_empty() {
+                    return;
+                }
+
+                let (scene_number, scene_name, mesa_nome, _data_dir) = {
+                    let state = state_save_name.read().await;
+                    let sn = state.scene_manager.active_scene_index;
+                    let sname = state
+                        .scene_manager
+                        .current_scene
+                        .as_ref()
+                        .map(|s| s.name.clone())
+                        .unwrap_or_default();
+                    drop(state);
+                    let csm = csm_save.read().await;
+                    (
+                        sn,
+                        sname.clone(),
+                        csm.mesa_nome().to_string(),
+                        csm.data_dir().to_path_buf(),
+                    )
+                };
+
+                let base_name = if let Some(pos) = scene_name.find(" - ") {
+                    scene_name[pos + 3..].to_string()
+                } else {
+                    scene_name.clone()
+                };
+
+                if base_name.is_empty() {
+                    let _ = socket.emit(
+                        "saveNameResult",
+                        &serde_json::json!({ "success": false, "error": "cena física não identificada" }),
+                    );
+                    return;
+                }
+
+                let filename = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
+
+                let channel_id = match channel {
+                    0..=31 => ChannelId::Input(channel + 1),
+                    60..=67 => ChannelId::StIn(channel - 27),
+                    52 => ChannelId::Master,
+                    _ => {
+                        let _ = socket.emit(
+                            "saveNameResult",
+                            &serde_json::json!({ "success": false, "error": "canal inválido" }),
+                        );
+                        return;
+                    }
+                };
+
+                let csm_clone_save = csm_save.clone();
+                let io_save_event = io_save_name.clone();
+                let sched_save = sched_save_name.clone();
+                let state_clone_save = state_save_name.clone();
+                let short = crate::custom_scenes::to_short_name(&normalized);
+
+                {
+                    let mut csm = csm_clone_save.write().await;
+                    let token = csm.prepare_op();
+                    let csm_op = csm_clone_save.clone();
+                    let _io_op = io_save_event.clone();
+                    let sched_op = sched_save.clone();
+                    let state_op = state_clone_save.clone();
+                    let fname = filename.clone();
+                    let ch_id = channel_id.clone();
+                    let norm_name = normalized.clone();
+                    drop(csm);
+
+                    tokio::spawn(async move {
+                        {
+                            let mut mgr = csm_op.write().await;
+                            if mgr.get_scene(&fname).is_none() {
+                                let state_guard = state_op.read().await;
+                                let channels = collect_current_channels_as_entries(&state_guard);
+                                drop(state_guard);
+                                mgr.create_scene(&fname, &base_name, scene_number, channels);
+                            }
+                            mgr.upsert_channel(&fname, ch_id, &norm_name);
+                            mgr.ensure_registry_entry(&scene_name, scene_number, &fname);
+                            mgr.mark_dirty(&fname);
+                            mgr.persist();
+                        }
+
+                        let current_name = {
+                            let state_guard = state_op.read().await;
+                            get_channel_short_name(&state_guard, channel)
+                        };
+                        drop(state_op);
+
+                        if current_name.as_deref() != Some(&short) {
+                            let short_bytes: Vec<u8> = short.bytes().take(4).collect();
+                            for (ci, &byte) in short_bytes.iter().enumerate() {
+                                if token.is_cancelled() {
+                                    return;
+                                }
+                                if let Some(req) = crate::midi::protocol::build_name_change(
+                                    channel, ci as u8, byte,
+                                ) {
+                                    sched_op.enqueue(req, 1).await;
+                                }
+                                if ci < short_bytes.len() - 1 {
+                                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                }
+                            }
+                        }
+                    });
+                }
+
+                let _ = io_save_name
+                    .emit(
+                        "updateName",
+                        &serde_json::json!({
+                            "channel": channel,
+                            "name": normalized
+                        }),
+                    )
+                    .await;
+
+                let _ = socket.emit(
+                    "saveNameResult",
+                    &serde_json::json!({ "success": true }),
+                );
+            },
+        );
+
+        // --- REMOVE CUSTOM NAME ---
+        let csm_remove = csm_socket.clone();
+        let state_remove_name = global_state_socket.clone();
+        let io_remove_name = io.clone();
+        socket.on(
+            "removeCustomName",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                let channel = data.get("channel").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+
+                let (mesa_nome, scene_name) = {
+                    let csm = csm_remove.read().await;
+                    let mesa = csm.mesa_nome().to_string();
+                    drop(csm);
+                    let state = state_remove_name.read().await;
+                    let sname = state
+                        .scene_manager
+                        .current_scene
+                        .as_ref()
+                        .map(|s| s.name.clone())
+                        .unwrap_or_default();
+                    (mesa, sname)
+                };
+
+                let base_name = if let Some(pos) = scene_name.find(" - ") {
+                    scene_name[pos + 3..].to_string()
+                } else {
+                    scene_name
+                };
+
+                if base_name.is_empty() {
+                    return;
+                }
+
+                let filename = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
+                let channel_id = match channel {
+                    0..=31 => ChannelId::Input(channel + 1),
+                    60..=67 => ChannelId::StIn(channel - 27),
+                    52 => ChannelId::Master,
+                    _ => return,
+                };
+
+                let deleted = {
+                    let mut csm = csm_remove.write().await;
+                    csm.remove_channel(&filename, &channel_id)
+                };
+
+                if deleted {
+                    let state = state_remove_name.read().await;
+                    let original_4 = get_channel_short_name(&state, channel)
+                        .unwrap_or_else(|| "    ".to_string());
+                    drop(state);
+
+                    let _ = io_remove_name
+                        .emit(
+                            "updateName",
+                            &serde_json::json!({
+                                "channel": channel,
+                                "name": original_4.trim()
+                            }),
+                        )
+                        .await;
+                } else {
+                    let mut csm = csm_remove.write().await;
+                    csm.persist();
+                }
+            },
+        );
+
+        // --- LIST CUSTOM SCENES ---
+        let csm_list = csm_socket.clone();
+        socket.on(
+            "listCustomScenes",
+            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                let scenes = {
+                    let csm = csm_list.read().await;
+                    csm.list_scenes()
+                };
+                let _ = socket.emit(
+                    "customScenesList",
+                    &serde_json::json!({ "scenes": scenes }),
+                );
+            },
+        );
+
+        // --- ASSIGN CUSTOM SCENE ---
+        let csm_assign = csm_socket.clone();
+        socket.on(
+            "assignCustomScene",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                let file = data
+                    .get("file")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                let physical_id = data.get("physical_id").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+                let physical_scene = data
+                    .get("physical_scene")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+
+                if file.is_empty() {
+                    return;
+                }
+
+                {
+                    let mut csm = csm_assign.write().await;
+                    csm.ensure_registry_entry(&physical_scene, physical_id, &file);
+                    csm.persist();
+                }
+
+                let _ = socket.emit(
+                    "assignResult",
+                    &serde_json::json!({ "success": true }),
+                );
+            },
+        );
+
+        // --- SAVE SCENE ---
         let scheduler_save = scheduler_socket.clone();
         let state_save = global_state_socket.clone();
         let io_save = io.clone();
@@ -405,10 +771,14 @@ pub fn register_handlers(
                 }
                 if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
                     let index = index as u8;
+                    tracing::info!("SCENE Comando recebido: SALVAR Cena {}", index);
+                    let t_start = std::time::Instant::now();
+
                     let store_sysex = vec![
                         0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x20, 0x00, index, 0x02, 0x00, 0xF7,
                     ];
                     scheduler_save.enqueue(store_sysex, 1).await;
+                    tracing::info!("[TIMING] store enqueue: {:?}", t_start.elapsed());
 
                     let original_name = {
                         let state = state_save.read().await;
@@ -432,35 +802,43 @@ pub fn register_handlers(
                         != original_name.trim().to_uppercase()
                     {
                         tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                        tracing::info!("[TIMING] after 500ms sleep: {:?}", t_start.elapsed());
 
                         let mut rename_sysex =
                             vec![0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x40, 0x00, index];
                         rename_sysex.extend_from_slice(target_name_padded.as_bytes());
                         rename_sysex.push(0xF7);
                         scheduler_save.enqueue(rename_sysex, 1).await;
-
-                        {
-                            let mut state = state_save.write().await;
-                            state.scene_manager.scenes[index as usize] =
-                                Some(crate::scene_manager::SceneData {
-                                    index,
-                                    name: target_name,
-                                });
-                            state.scene_manager.set_active_scene(index);
-                            let _ =
-                                io_save.emit("currentScene", &state.scene_manager.current_scene);
-                            let _ = io_save.emit("scenesUpdated", &state.scene_manager.get_state());
-                        }
+                        tracing::info!("[TIMING] rename enqueue: {:?}", t_start.elapsed());
 
                         tokio::time::sleep(std::time::Duration::from_millis(700)).await;
+                        tracing::info!("[TIMING] after 700ms sleep: {:?}", t_start.elapsed());
+                    } else {
+                        tracing::info!("[TIMING] nome nao mudou, sem delays: {:?}", t_start.elapsed());
                     }
 
-                    // Re-emit scenes state for consistency
+                    // Update state and emit events only after MIDI commands completed
                     {
-                        let state = state_save.read().await;
-                        let _ = io_save.emit("currentScene", &state.scene_manager.current_scene);
+                        let mut state = state_save.write().await;
+                        state.scene_manager.scenes[index as usize] =
+                            Some(crate::scene_manager::SceneData {
+                                index,
+                                name: target_name.clone(),
+                            });
+                        state.scene_manager.set_active_scene(index);
+                        let _ =
+                            io_save.emit("currentScene", &state.scene_manager.current_scene);
                         let _ = io_save.emit("scenesUpdated", &state.scene_manager.get_state());
                     }
+                    let _ = socket.emit(
+                        "saveSceneResult",
+                        &serde_json::json!({
+                            "success": true,
+                            "index": index,
+                            "scene_name": target_name
+                        }),
+                    );
+                    tracing::info!("SCENE Cena {} salva com sucesso (total: {:?})", index, t_start.elapsed());
                 }
             },
         );
@@ -477,16 +855,7 @@ pub fn register_handlers(
                 }
                 if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
                     let delete_sysex = vec![
-                        0xF0,
-                        0x43,
-                        0x10,
-                        0x3E,
-                        0x7F,
-                        0x10,
-                        0x60,
-                        0x00,
-                        index as u8,
-                        0xF7,
+                        0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x60, 0x00, index as u8, 0xF7,
                     ];
                     scheduler_delete.enqueue(delete_sysex, 1).await;
 
@@ -758,6 +1127,7 @@ pub fn register_handlers(
             },
         );
 
+        // --- DISCONNECT ---
         socket.on("disconnect", |socket: SocketRef| async move {
             info!("Cliente desconectado: {}", socket.id);
         });
@@ -928,4 +1298,102 @@ pub fn register_handlers(
             },
         );
     });
+}
+
+// ===========================================================================
+// Helper functions for custom scenes (module level)
+// ===========================================================================
+
+fn collect_current_names(
+    state: &crate::state::GlobalState,
+) -> std::collections::HashMap<ChannelId, String> {
+    let mut names = std::collections::HashMap::new();
+
+    for (global_ch, ch_state) in &state.channels {
+        if *global_ch <= 31 {
+            if let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
+                names.insert(cid, ch_state.name.clone());
+            }
+        }
+    }
+
+    for (global_ch, ch_state) in &state.channels {
+        if (32..=39).contains(global_ch) {
+            let json_id = *global_ch - 32 + 33;
+            if let Ok(cid) = ChannelId::try_from(format!("{}", json_id).as_str()) {
+                names.insert(cid, ch_state.name.clone());
+            }
+        }
+    }
+
+    names.insert(ChannelId::Master, state.master.name.clone());
+    names
+}
+
+fn collect_current_channels_as_entries(
+    state: &crate::state::GlobalState,
+) -> std::collections::HashMap<ChannelId, crate::custom_scenes::ChannelNameEntry> {
+    let mut entries = std::collections::HashMap::new();
+
+    for (global_ch, ch_state) in &state.channels {
+        if *global_ch <= 31 {
+            if let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
+                let short = crate::custom_scenes::to_short_name(&ch_state.name);
+                entries.insert(
+                    cid,
+                    crate::custom_scenes::ChannelNameEntry {
+                        name: ch_state.name.clone(),
+                        short,
+                    },
+                );
+            }
+        }
+    }
+
+    for (global_ch, ch_state) in &state.channels {
+        if (32..=39).contains(global_ch) {
+            let json_id = *global_ch - 32 + 33;
+            if let Ok(cid) = ChannelId::try_from(format!("{}", json_id).as_str()) {
+                let short = crate::custom_scenes::to_short_name(&ch_state.name);
+                entries.insert(
+                    cid,
+                    crate::custom_scenes::ChannelNameEntry {
+                        name: ch_state.name.clone(),
+                        short,
+                    },
+                );
+            }
+        }
+    }
+
+    let master_short = crate::custom_scenes::to_short_name(&state.master.name);
+    entries.insert(
+        ChannelId::Master,
+        crate::custom_scenes::ChannelNameEntry {
+            name: state.master.name.clone(),
+            short: master_short,
+        },
+    );
+
+    entries
+}
+
+fn get_channel_short_name(state: &crate::state::GlobalState, channel: u8) -> Option<String> {
+    let name = match channel {
+        0..=31 => state.channels.get(&(channel as usize)).map(|c| c.name.clone()),
+        60..=67 => state
+            .channels
+            .get(&(32 + (channel - 60) as usize))
+            .map(|c| c.name.clone()),
+        52 => Some(state.master.name.clone()),
+        _ => None,
+    };
+    name.map(|n| {
+        let s: String = n
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric())
+            .take(4)
+            .collect();
+        format!("{: <4}", s.to_uppercase())
+    })
 }

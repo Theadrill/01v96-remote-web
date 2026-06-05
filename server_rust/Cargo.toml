@@ -21,4 +21,6 @@ tracing-subscriber = "0.3.23"
 tray-icon = "0.24.0"
 windows-sys = { version = "0.61.2", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
 midi_common = { path = "../midi_common" }
+tokio-util = "0.7"
+unicode-normalization = "0.1"
 
