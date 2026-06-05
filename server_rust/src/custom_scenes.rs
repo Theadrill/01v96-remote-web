@@ -414,12 +414,14 @@ impl CustomSceneManager {
     }
 
     pub fn persist(&mut self, sync_shared: bool) {
+        tracing::info!("[CUSTOM] persist called with sync_shared={}", sync_shared);
         let mut synced_files = Vec::new();
 
         let local_dir = self.data_dir.join("local");
         let shared_dir = self.data_dir.join("shared");
 
         for file in self.dirty_files.drain() {
+            tracing::info!("[CUSTOM] dirty file found: {}", file);
             if let Some(cached) = self.cache.get(&file) {
                 let local_path = local_dir.join(&file);
                 save_json_atomic(&local_path, &cached.scene);
@@ -427,11 +429,13 @@ impl CustomSceneManager {
                     let shared_path = shared_dir.join(&file);
                     save_json_atomic(&shared_path, &cached.scene);
                     synced_files.push(format!("data/custom_scenes/shared/{}", file));
+                    tracing::info!("[CUSTOM] added to synced_files: {}", file);
                 }
             }
         }
 
         if self.registry_dirty {
+            tracing::info!("[CUSTOM] registry is dirty");
             let file = format!("custom_names_scenes-{}.json", self.mesa_nome);
             let local_path = local_dir.join(&file);
             save_json_atomic(&local_path, &self.registry);
@@ -440,15 +444,18 @@ impl CustomSceneManager {
                 let shared_path = shared_dir.join(&file);
                 save_json_atomic(&shared_path, &self.registry);
                 synced_files.push(format!("data/custom_scenes/shared/{}", file));
+                tracing::info!("[CUSTOM] registry added to synced_files");
             }
         }
 
+        tracing::info!("[CUSTOM] finished persist, sync_shared={}, synced_files_len={}", sync_shared, synced_files.len());
         if sync_shared && !synced_files.is_empty() {
             let msg = if synced_files.len() == 1 {
                 format!("auto-sync: custom scene {} updated", synced_files[0])
             } else {
                 "auto-sync: multiple custom scenes updated".to_string()
             };
+            tracing::info!("[CUSTOM] Spawning git sync: {}", msg);
             tokio::spawn(async move {
                 crate::api::macros::enqueue_git_sync(synced_files, msg, 5000).await;
             });
