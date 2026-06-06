@@ -457,7 +457,7 @@ impl CustomSceneManager {
             };
             tracing::info!("[CUSTOM] Spawning git sync: {}", msg);
             tokio::spawn(async move {
-                crate::api::macros::enqueue_git_sync(synced_files, msg, 5000).await;
+                crate::api::macros::enqueue_git_sync(synced_files, msg, 30000).await;
             });
         }
     }

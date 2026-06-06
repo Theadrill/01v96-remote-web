@@ -512,6 +512,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         stateRef = channelStates[ch];
     }
 
+    const stateRef = window.appState && window.appState.channels ? window.appState.channels[configId] : {};
     let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
     if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
         nameDiv = window.activeCustomSceneChannels[configId].name;
@@ -566,6 +567,7 @@ function createOutputStrip(i, type, idPrefix = "") {
         stateRef = channelStates[ch];
     }
 
+    const stateRef = window.appState && window.appState.channels ? window.appState.channels[configId] : {};
     let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
     if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
         nameDiv = window.activeCustomSceneChannels[configId].name;
