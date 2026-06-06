@@ -88,9 +88,10 @@ impl SceneManager {
         if let Some(ref mut cs) = self.current_scene {
             cs.index = index;
             if (index as usize) < self.scenes.len()
-                && let Some(ref s) = self.scenes[index as usize] {
-                    cs.name = s.name.clone();
-                }
+                && let Some(ref s) = self.scenes[index as usize]
+            {
+                cs.name = s.name.clone();
+            }
         }
     }
 }

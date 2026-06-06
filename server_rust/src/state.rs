@@ -518,9 +518,10 @@ impl GlobalState {
                 } else if mt.starts_with("kInputBus/kBus") {
                     if let Ok(bus_num) = mt.replace("kInputBus/kBus", "").parse::<usize>()
                         && (1..=8).contains(&bus_num)
-                            && let Some(ch) = self.channels.get_mut(channel) {
-                                ch.buses[bus_num - 1] = cv;
-                            }
+                        && let Some(ch) = self.channels.get_mut(channel)
+                    {
+                        ch.buses[bus_num - 1] = cv;
+                    }
                 // --- AUX Sends ---
                 } else if mt.starts_with("kInputAUX/") {
                     let target_ch_idx = if *channel <= 31 {
@@ -531,67 +532,72 @@ impl GlobalState {
                         None
                     };
                     if let Some(ch_idx) = target_ch_idx
-                        && let Some(ch) = self.channels.get_mut(&ch_idx) {
-                            if mt.ends_with("Level") {
-                                if let Some(aux_num_str) = mt
-                                    .strip_prefix("kInputAUX/kAUX")
-                                    .and_then(|s| s.strip_suffix("Level"))
-                                    && let Ok(aux_num) = aux_num_str.parse::<usize>() {
-                                        match aux_num {
-                                            1 => ch.aux1 = v,
-                                            2 => ch.aux2 = v,
-                                            3 => ch.aux3 = v,
-                                            4 => ch.aux4 = v,
-                                            5 => ch.aux5 = v,
-                                            6 => ch.aux6 = v,
-                                            7 => ch.aux7 = v,
-                                            8 => ch.aux8 = v,
-                                            _ => {}
-                                        }
-                                    }
-                            } else if mt.ends_with("On")
-                                && let Some(aux_num_str) = mt
-                                    .strip_prefix("kInputAUX/kAUX")
-                                    .and_then(|s| s.strip_suffix("On"))
-                                    && let Ok(aux_num) = aux_num_str.parse::<usize>() {
-                                        match aux_num {
-                                            1 => ch.aux1_on = cv,
-                                            2 => ch.aux2_on = cv,
-                                            3 => ch.aux3_on = cv,
-                                            4 => ch.aux4_on = cv,
-                                            5 => ch.aux5_on = cv,
-                                            6 => ch.aux6_on = cv,
-                                            7 => ch.aux7_on = cv,
-                                            8 => ch.aux8_on = cv,
-                                            _ => {}
-                                        }
-                                    }
+                        && let Some(ch) = self.channels.get_mut(&ch_idx)
+                    {
+                        if mt.ends_with("Level") {
+                            if let Some(aux_num_str) = mt
+                                .strip_prefix("kInputAUX/kAUX")
+                                .and_then(|s| s.strip_suffix("Level"))
+                                && let Ok(aux_num) = aux_num_str.parse::<usize>()
+                            {
+                                match aux_num {
+                                    1 => ch.aux1 = v,
+                                    2 => ch.aux2 = v,
+                                    3 => ch.aux3 = v,
+                                    4 => ch.aux4 = v,
+                                    5 => ch.aux5 = v,
+                                    6 => ch.aux6 = v,
+                                    7 => ch.aux7 = v,
+                                    8 => ch.aux8 = v,
+                                    _ => {}
+                                }
+                            }
+                        } else if mt.ends_with("On")
+                            && let Some(aux_num_str) = mt
+                                .strip_prefix("kInputAUX/kAUX")
+                                .and_then(|s| s.strip_suffix("On"))
+                            && let Ok(aux_num) = aux_num_str.parse::<usize>()
+                        {
+                            match aux_num {
+                                1 => ch.aux1_on = cv,
+                                2 => ch.aux2_on = cv,
+                                3 => ch.aux3_on = cv,
+                                4 => ch.aux4_on = cv,
+                                5 => ch.aux5_on = cv,
+                                6 => ch.aux6_on = cv,
+                                7 => ch.aux7_on = cv,
+                                8 => ch.aux8_on = cv,
+                                _ => {}
+                            }
                         }
+                    }
                 // --- EQ ---
                 } else if mt.contains("EQ/") {
                     self.apply_eq(mt, *channel, v);
                 // --- Gate ---
                 } else if mt.contains("Gate/") {
                     if let Some(s) = self.get_target_for_mt(mt, *channel)
-                        && let Some(gate) = s.gate_mut() {
-                            let parts: Vec<&str> = mt.splitn(2, "Gate/").collect();
-                            if parts.len() == 2 {
-                                match parts[1] {
-                                    "kGateOn" => gate.on = cv,
-                                    "kGateThreshold" => gate.thresh = v,
-                                    "kGateAttack" => gate.attack = v,
-                                    "kGateRange" => gate.range = v,
-                                    "kGateHold" => gate.hold = v,
-                                    "kGateDecay" => gate.decay = v,
-                                    _ => {}
-                                }
+                        && let Some(gate) = s.gate_mut()
+                    {
+                        let parts: Vec<&str> = mt.splitn(2, "Gate/").collect();
+                        if parts.len() == 2 {
+                            match parts[1] {
+                                "kGateOn" => gate.on = cv,
+                                "kGateThreshold" => gate.thresh = v,
+                                "kGateAttack" => gate.attack = v,
+                                "kGateRange" => gate.range = v,
+                                "kGateHold" => gate.hold = v,
+                                "kGateDecay" => gate.decay = v,
+                                _ => {}
                             }
                         }
+                    }
                 // --- Comp ---
                 } else if mt.contains("Comp/")
-                    && let Some(s) = self.get_target_for_mt(mt, *channel) {
-                        s.apply_comp(mt, v);
-                    }
+                    && let Some(s) = self.get_target_for_mt(mt, *channel)
+                {
+                    s.apply_comp(mt, v);
+                }
             }
             crate::midi::protocol::ParsedMidi::MeterData { .. } => {}
             crate::midi::protocol::ParsedMidi::SceneNumber(scene) => {
@@ -658,10 +664,11 @@ impl GlobalState {
     fn apply_name_char(&mut self, channel: usize, char_index: usize, char: &str) {
         if channel <= 31 {
             if let Some(ch) = self.channels.get_mut(&channel)
-                && char_index < ch.name_chars.len() {
-                    ch.name_chars[char_index] = char.to_string();
-                    ch.name = ch.name_chars.join("").trim().to_string();
-                }
+                && char_index < ch.name_chars.len()
+            {
+                ch.name_chars[char_index] = char.to_string();
+                ch.name = ch.name_chars.join("").trim().to_string();
+            }
         } else if (60..=67).contains(&channel) {
             let local = 32 + (channel - 60);
             if let Some(ch) = self.channels.get_mut(&local) {
@@ -676,22 +683,23 @@ impl GlobalState {
         } else if (36..=43).contains(&channel) {
             let local = channel - 36;
             if let Some(m) = self.mixes.get_mut(&local)
-                && char_index < m.name_chars.len() {
-                    m.name_chars[char_index] = char.to_string();
-                    m.name = m.name_chars.join("").trim().to_string();
-                }
+                && char_index < m.name_chars.len()
+            {
+                m.name_chars[char_index] = char.to_string();
+                m.name = m.name_chars.join("").trim().to_string();
+            }
         } else if (44..=51).contains(&channel) {
             let local = channel - 44;
             if let Some(b) = self.buses.get_mut(&local)
-                && char_index < b.name_chars.len() {
-                    b.name_chars[char_index] = char.to_string();
-                    b.name = b.name_chars.join("").trim().to_string();
-                }
-        } else if channel == 52
-            && char_index < self.master.name_chars.len() {
-                self.master.name_chars[char_index] = char.to_string();
-                self.master.name = self.master.name_chars.join("").trim().to_string();
+                && char_index < b.name_chars.len()
+            {
+                b.name_chars[char_index] = char.to_string();
+                b.name = b.name_chars.join("").trim().to_string();
             }
+        } else if channel == 52 && char_index < self.master.name_chars.len() {
+            self.master.name_chars[char_index] = char.to_string();
+            self.master.name = self.master.name_chars.join("").trim().to_string();
+        }
     }
 
     fn apply_eq(&mut self, mt: &str, channel: usize, value: f64) {
@@ -721,27 +729,28 @@ impl GlobalState {
         let found = eq_keys.iter().position(|&k| k == key);
 
         if let Some(s) = self.get_target_for_mt(mt, channel)
-            && let Some(idx) = found {
-                match idx {
-                    0 => s.eq_mut().mode = value,
-                    1 => s.eq_mut().low.q = value,
-                    2 => s.eq_mut().low.f = value,
-                    3 => s.eq_mut().low.g = value,
-                    4 => s.eq_mut().low.hpf_on = Some(value),
-                    5 => s.eq_mut().lowmid.q = value,
-                    6 => s.eq_mut().lowmid.f = value,
-                    7 => s.eq_mut().lowmid.g = value,
-                    8 => s.eq_mut().himid.q = value,
-                    9 => s.eq_mut().himid.f = value,
-                    10 => s.eq_mut().himid.g = value,
-                    11 => s.eq_mut().high.q = value,
-                    12 => s.eq_mut().high.f = value,
-                    13 => s.eq_mut().high.g = value,
-                    14 => s.eq_mut().high.lpf_on = Some(value),
-                    15 => s.eq_mut().on = value > 0.0,
-                    _ => {}
-                }
+            && let Some(idx) = found
+        {
+            match idx {
+                0 => s.eq_mut().mode = value,
+                1 => s.eq_mut().low.q = value,
+                2 => s.eq_mut().low.f = value,
+                3 => s.eq_mut().low.g = value,
+                4 => s.eq_mut().low.hpf_on = Some(value),
+                5 => s.eq_mut().lowmid.q = value,
+                6 => s.eq_mut().lowmid.f = value,
+                7 => s.eq_mut().lowmid.g = value,
+                8 => s.eq_mut().himid.q = value,
+                9 => s.eq_mut().himid.f = value,
+                10 => s.eq_mut().himid.g = value,
+                11 => s.eq_mut().high.q = value,
+                12 => s.eq_mut().high.f = value,
+                13 => s.eq_mut().high.g = value,
+                14 => s.eq_mut().high.lpf_on = Some(value),
+                15 => s.eq_mut().on = value > 0.0,
+                _ => {}
             }
+        }
     }
 }
 

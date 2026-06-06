@@ -56,20 +56,19 @@ impl MidiScheduler {
                             .q0
                             .iter()
                             .position(|i| Self::extract_address(i) == Some(addr.clone()))
-                        {
-                            state.q0[idx] = bytes;
-                            continue;
-                        }
+                    {
+                        state.q0[idx] = bytes;
+                        continue;
+                    }
                     state.q0.push(bytes);
                 }
             }
             1 => {
                 state.q1.extend(items);
             }
-            2
-                if state.q0.is_empty() && state.q1.is_empty() => {
-                    state.q2.extend(items);
-                }
+            2 if state.q0.is_empty() && state.q1.is_empty() => {
+                state.q2.extend(items);
+            }
             _ => {}
         }
     }
@@ -86,10 +85,10 @@ impl MidiScheduler {
                         .q0
                         .iter()
                         .position(|i| Self::extract_address(i) == Some(addr.clone()))
-                    {
-                        state.q0[idx] = bytes;
-                        return true;
-                    }
+                {
+                    state.q0[idx] = bytes;
+                    return true;
+                }
                 state.q0.push(bytes);
                 true
             }

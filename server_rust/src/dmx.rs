@@ -114,12 +114,13 @@ pub fn update_lumikit_config(root_dir: &str) {
             let stdout = String::from_utf8_lossy(&output.stdout);
             for line in stdout.lines() {
                 if line.contains("IPv4")
-                    && let Some(ip_part) = line.split(':').next_back() {
-                        let ip = ip_part.trim();
-                        if !ip.is_empty() {
-                            local_ips.push(ip.to_string());
-                        }
+                    && let Some(ip_part) = line.split(':').next_back()
+                {
+                    let ip = ip_part.trim();
+                    if !ip.is_empty() {
+                        local_ips.push(ip.to_string());
                     }
+                }
             }
         }
     }

@@ -31,26 +31,27 @@ impl TrayApp {
     pub fn new(port: u16, remote_midi: bool) -> Result<Self, Box<dyn std::error::Error>> {
         let mut icon_path = Path::new("..").join("public").join("favicon.ico");
         if let Ok(exe_path) = std::env::current_exe()
-            && let Some(exe_dir) = exe_path.parent() {
-                let path1 = exe_dir.join("public").join("favicon.ico");
-                if path1.is_file() {
-                    icon_path = path1;
-                } else {
-                    let mut current = exe_dir.to_path_buf();
-                    for _ in 0..4 {
-                        if let Some(parent) = current.parent() {
-                            current = parent.to_path_buf();
-                            let candidate = current.join("public").join("favicon.ico");
-                            if candidate.is_file() {
-                                icon_path = candidate;
-                                break;
-                            }
-                        } else {
+            && let Some(exe_dir) = exe_path.parent()
+        {
+            let path1 = exe_dir.join("public").join("favicon.ico");
+            if path1.is_file() {
+                icon_path = path1;
+            } else {
+                let mut current = exe_dir.to_path_buf();
+                for _ in 0..4 {
+                    if let Some(parent) = current.parent() {
+                        current = parent.to_path_buf();
+                        let candidate = current.join("public").join("favicon.ico");
+                        if candidate.is_file() {
+                            icon_path = candidate;
                             break;
                         }
+                    } else {
+                        break;
                     }
                 }
             }
+        }
 
         let icon = load_icon(&icon_path)
             .unwrap_or_else(|_| Icon::from_rgba(vec![0; 4 * 16 * 16], 16, 16).unwrap());
@@ -132,20 +133,22 @@ impl TrayApp {
 
                 println!("Reiniciando servidor após alterar Modo Remoto...");
                 if let Ok(mut tx_guard) = self.shutdown_tx.lock()
-                    && let Some(tx) = tx_guard.take() {
-                        let _ = tx.send(());
-                        return;
-                    }
+                    && let Some(tx) = tx_guard.take()
+                {
+                    let _ = tx.send(());
+                    return;
+                }
                 let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
                 std::process::exit(0);
             }
         } else if event.id == self.restart_id {
             println!("Reiniciando servidor...");
             if let Ok(mut tx_guard) = self.shutdown_tx.lock()
-                && let Some(tx) = tx_guard.take() {
-                    let _ = tx.send(());
-                    return;
-                }
+                && let Some(tx) = tx_guard.take()
+            {
+                let _ = tx.send(());
+                return;
+            }
             let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
             std::process::exit(0);
         }

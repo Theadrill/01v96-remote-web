@@ -139,28 +139,29 @@ async fn async_main(
     // --- LOCALIZAR PASTA PUBLIC ---
     let mut public_dir = std::path::PathBuf::from("../public");
     if let Ok(exe_path) = std::env::current_exe()
-        && let Some(exe_dir) = exe_path.parent() {
-            // Candidato 1: exe na raiz do projeto ou pasta de deploy com 'public' ao lado
-            let path1 = exe_dir.join("public");
-            if path1.is_dir() {
-                public_dir = path1;
-            } else {
-                // Candidato 2: exe dentro de target/release/ ou server_rust/target/release/
-                let mut current = exe_dir.to_path_buf();
-                for _ in 0..4 {
-                    if let Some(parent) = current.parent() {
-                        current = parent.to_path_buf();
-                        let candidate = current.join("public");
-                        if candidate.is_dir() {
-                            public_dir = candidate;
-                            break;
-                        }
-                    } else {
+        && let Some(exe_dir) = exe_path.parent()
+    {
+        // Candidato 1: exe na raiz do projeto ou pasta de deploy com 'public' ao lado
+        let path1 = exe_dir.join("public");
+        if path1.is_dir() {
+            public_dir = path1;
+        } else {
+            // Candidato 2: exe dentro de target/release/ ou server_rust/target/release/
+            let mut current = exe_dir.to_path_buf();
+            for _ in 0..4 {
+                if let Some(parent) = current.parent() {
+                    current = parent.to_path_buf();
+                    let candidate = current.join("public");
+                    if candidate.is_dir() {
+                        public_dir = candidate;
                         break;
                     }
+                } else {
+                    break;
                 }
             }
         }
+    }
     info!(
         "📂 Servindo arquivos estáticos de: {:?}",
         public_dir.canonicalize().unwrap_or(public_dir.clone())

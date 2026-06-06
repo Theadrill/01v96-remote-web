@@ -6,6 +6,7 @@ export default [
             "dist/**",
             "build/**",
             "public/lib/**",
+            "public/vendor/**",
             "**/working_version/**"
         ]
     },
@@ -35,6 +36,9 @@ export default [
                 requestAnimationFrame: "readonly",
                 alert: "readonly",
                 Event: "readonly",
+                MutationObserver: "readonly",
+                IntersectionObserver: "readonly",
+                performance: "readonly",
                 // App Specific (Shared across files)
                 io: "readonly",
                 socket: "readonly",
@@ -82,7 +86,12 @@ export default [
                 getSteppedRaw: "readonly",
                 updateAuxManual: "readonly",
                 switchTab: "readonly",
-                container: "readonly"
+                container: "readonly",
+                OverlayInfo: "readonly",
+                createFuzzySearch: "readonly",
+                fuzzyMatch: "readonly",
+                changeConfigChannel: "readonly",
+                enterMusicianMode: "readonly"
             }
         },
         rules: {

@@ -52,11 +52,14 @@ async fn trigger_git_sync() {
         add.arg("add").args(&files).current_dir(&root_dir);
         if add.status().await.map_or(false, |s| s.success()) {
             let mut commit = tokio::process::Command::new("git");
-            commit.args(&["commit", "-m", &commit_msg]).current_dir(&root_dir);
+            commit
+                .args(&["commit", "-m", &commit_msg])
+                .current_dir(&root_dir);
             let _ = commit.status().await;
 
             let mut pull = tokio::process::Command::new("git");
-            pull.args(&["pull", "--rebase", "--autostash"]).current_dir(&root_dir);
+            pull.args(&["pull", "--rebase", "--autostash"])
+                .current_dir(&root_dir);
             if pull.status().await.map_or(false, |s| s.success()) {
                 let mut push = tokio::process::Command::new("git");
                 push.arg("push").current_dir(&root_dir);
@@ -123,16 +126,17 @@ async fn list_macros() -> Json<Value> {
     if let Ok(entries) = std::fs::read_dir(dir) {
         for entry in entries.flatten() {
             if let Ok(file_type) = entry.file_type()
-                && file_type.is_file() {
-                    let file_name = entry.file_name().to_string_lossy().to_string();
-                    if file_name.ends_with(".js")
-                        && !file_name.ends_with(".server.js")
-                        && file_name != "core.js"
-                        && file_name != "macros.js"
-                    {
-                        macros.push(file_name.replace(".js", ""));
-                    }
+                && file_type.is_file()
+            {
+                let file_name = entry.file_name().to_string_lossy().to_string();
+                if file_name.ends_with(".js")
+                    && !file_name.ends_with(".server.js")
+                    && file_name != "core.js"
+                    && file_name != "macros.js"
+                {
+                    macros.push(file_name.replace(".js", ""));
                 }
+            }
         }
     }
     Json(json!(macros))
@@ -168,9 +172,10 @@ async fn get_hosts() -> Json<Value> {
     let hosts_path = root_dir().join("public/modules/macros/hosts.json");
     if hosts_path.exists()
         && let Ok(content) = std::fs::read_to_string(hosts_path)
-            && let Ok(json) = serde_json::from_str(&content) {
-                return Json(json);
-            }
+        && let Ok(json) = serde_json::from_str(&content)
+    {
+        return Json(json);
+    }
     Json(json!([
         { "match": "192.168.15.99", "preset": "pcmaria" },
         { "match": "pcfavela", "preset": "pcfavela" }
@@ -195,28 +200,33 @@ async fn get_slots(Query(q): Query<PresetQuery>) -> Json<Value> {
 
         if local_path.exists()
             && let Ok(c) = std::fs::read_to_string(&local_path)
-                && let Ok(v) = serde_json::from_str(&c) {
-                    return Json(v);
-                }
+            && let Ok(v) = serde_json::from_str(&c)
+        {
+            return Json(v);
+        }
         if shared_path.exists()
             && let Ok(c) = std::fs::read_to_string(&shared_path)
-                && let Ok(v) = serde_json::from_str(&c) {
-                    return Json(v);
-                }
+            && let Ok(v) = serde_json::from_str(&c)
+        {
+            return Json(v);
+        }
         Json(json!({}))
     } else {
         let mut profiles = HashMap::new();
         let mut scan = |dir: &StdPath| {
             if dir.exists()
-                && let Ok(entries) = std::fs::read_dir(dir) {
-                    for entry in entries.flatten() {
-                        if let Ok(name) = entry.file_name().into_string()
-                            && name.starts_with("profile_") && name.ends_with(".json") {
-                                let p = name.replace("profile_", "").replace(".json", "");
-                                profiles.insert(p, true);
-                            }
+                && let Ok(entries) = std::fs::read_dir(dir)
+            {
+                for entry in entries.flatten() {
+                    if let Ok(name) = entry.file_name().into_string()
+                        && name.starts_with("profile_")
+                        && name.ends_with(".json")
+                    {
+                        let p = name.replace("profile_", "").replace(".json", "");
+                        profiles.insert(p, true);
                     }
                 }
+            }
         };
         scan(&shared_dir);
         scan(&local_dir);
@@ -317,25 +327,26 @@ async fn swap_slots(Query(q): Query<SwapQuery>, Json(body): Json<SwapBody>) -> J
     let handle_swap = |dir: PathBuf| {
         let p_path = dir.join(format!("profile_{}.json", preset));
         if p_path.exists()
-            && let Ok(content) = std::fs::read_to_string(&p_path) {
-                if let Ok(Value::Array(_config)) = serde_json::from_str(&content) {
-                    // ... array unhandled
-                } else if let Ok(Value::Object(mut config)) = serde_json::from_str(&content) {
-                    let from_key = from_index.to_string();
-                    let to_key = to_index.to_string();
-                    let t_from = config.remove(&from_key);
-                    let t_to = config.remove(&to_key);
+            && let Ok(content) = std::fs::read_to_string(&p_path)
+        {
+            if let Ok(Value::Array(_config)) = serde_json::from_str(&content) {
+                // ... array unhandled
+            } else if let Ok(Value::Object(mut config)) = serde_json::from_str(&content) {
+                let from_key = from_index.to_string();
+                let to_key = to_index.to_string();
+                let t_from = config.remove(&from_key);
+                let t_to = config.remove(&to_key);
 
-                    if let Some(t_to_val) = t_to {
-                        config.insert(from_key, t_to_val);
-                    }
-                    if let Some(t_from_val) = t_from {
-                        config.insert(to_key, t_from_val);
-                    }
-
-                    let _ = std::fs::write(&p_path, serde_json::to_string_pretty(&config).unwrap());
+                if let Some(t_to_val) = t_to {
+                    config.insert(from_key, t_to_val);
                 }
+                if let Some(t_from_val) = t_from {
+                    config.insert(to_key, t_from_val);
+                }
+
+                let _ = std::fs::write(&p_path, serde_json::to_string_pretty(&config).unwrap());
             }
+        }
     };
 
     handle_swap(macros_dir.join("local"));
@@ -345,15 +356,16 @@ async fn swap_slots(Query(q): Query<SwapQuery>, Json(body): Json<SwapBody>) -> J
         .join("shared")
         .join(format!("profile_{}.json", preset));
     if shared_path.exists()
-        && let Ok(rel) = shared_path.strip_prefix(root_dir()) {
-            let rel_str = rel.to_string_lossy().to_string();
-            enqueue_git_sync(
-                vec![rel_str],
-                format!("auto-sync: slots swapped in '{}'", preset),
-                10000,
-            )
-            .await;
-        }
+        && let Ok(rel) = shared_path.strip_prefix(root_dir())
+    {
+        let rel_str = rel.to_string_lossy().to_string();
+        enqueue_git_sync(
+            vec![rel_str],
+            format!("auto-sync: slots swapped in '{}'", preset),
+            10000,
+        )
+        .await;
+    }
 
     Json(json!({ "success": true }))
 }
@@ -375,9 +387,9 @@ async fn sync_preset(Query(q): Query<PresetQuery>) -> Json<Value> {
             if let Ok(name) = entry.file_name().into_string()
                 && (name.contains(&format!("_{}.json", preset))
                     || name == format!("profile_{}.json", preset))
-                {
-                    files.push(name);
-                }
+            {
+                files.push(name);
+            }
         }
     }
 
@@ -420,9 +432,9 @@ async fn delete_preset(Query(q): Query<PresetQuery>) -> Json<Value> {
             if let Ok(name) = entry.file_name().into_string()
                 && (name.contains(&format!("_{}.json", preset))
                     || name == format!("profile_{}.json", preset))
-                {
-                    files.push(name);
-                }
+            {
+                files.push(name);
+            }
         }
     }
 
@@ -468,14 +480,16 @@ async fn get_mod_config(Path(mod_id): Path<String>, Query(q): Query<PresetQuery>
 
     if local_path.exists()
         && let Ok(c) = std::fs::read_to_string(local_path)
-            && let Ok(v) = serde_json::from_str(&c) {
-                return Json(v);
-            }
+        && let Ok(v) = serde_json::from_str(&c)
+    {
+        return Json(v);
+    }
     if shared_path.exists()
         && let Ok(c) = std::fs::read_to_string(shared_path)
-            && let Ok(v) = serde_json::from_str(&c) {
-                return Json(v);
-            }
+        && let Ok(v) = serde_json::from_str(&c)
+    {
+        return Json(v);
+    }
     Json(json!({}))
 }
 
@@ -554,9 +568,10 @@ async fn proxy_http(Json(req): Json<ProxyHttpReq>) -> Json<Value> {
 
     if let Some(opt) = req.options {
         if let Some(m) = opt.get("method").and_then(|m| m.as_str())
-            && let Ok(meth) = reqwest::Method::from_bytes(m.as_bytes()) {
-                request = client.request(meth, &req.url);
-            }
+            && let Ok(meth) = reqwest::Method::from_bytes(m.as_bytes())
+        {
+            request = client.request(meth, &req.url);
+        }
         if let Some(headers) = opt.get("headers").and_then(|h| h.as_object()) {
             for (k, v) in headers {
                 if let Some(v_str) = v.as_str() {

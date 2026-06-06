@@ -123,17 +123,18 @@ impl MidiEngine {
 
     pub fn send(&mut self, message: &[u8]) {
         if let Some(out) = &mut self.output_conn
-            && let Err(e) = out.send(message) {
-                let now = Instant::now();
-                let should_log = self
-                    .last_send_error
-                    .map(|t| now.duration_since(t).as_secs() >= 3)
-                    .unwrap_or(true);
-                if should_log {
-                    warn!("Erro ao enviar MIDI (throttled): {}", e);
-                    self.last_send_error = Some(now);
-                }
+            && let Err(e) = out.send(message)
+        {
+            let now = Instant::now();
+            let should_log = self
+                .last_send_error
+                .map(|t| now.duration_since(t).as_secs() >= 3)
+                .unwrap_or(true);
+            if should_log {
+                warn!("Erro ao enviar MIDI (throttled): {}", e);
+                self.last_send_error = Some(now);
             }
+        }
     }
 }
 
