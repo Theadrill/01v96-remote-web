@@ -296,6 +296,50 @@ impl CustomSceneManager {
         updated
     }
 
+    pub fn duplicate_scene_by_id(
+        &mut self,
+        source_id: u8,
+        target_id: u8,
+        target_name: &str,
+        sync_shared: bool,
+    ) -> bool {
+        let source_entry = self
+            .registry
+            .scenes
+            .iter()
+            .find(|e| e.physical_id == source_id)
+            .cloned();
+
+        if let Some(src) = source_entry {
+            // Obtém os dados da cena de origem
+            if let Some(cached_src) = self.get_scene(&src.file).cloned() {
+                // Prepara o nome do novo arquivo
+                let safe_name =
+                    target_name.replace(|c: char| !c.is_alphanumeric() && c != '-', "_");
+                let new_file = format!("custom_names_scene-{}-{}.json", safe_name, self.mesa_nome);
+
+                // Cria a nova cena em memória
+                self.create_scene(&new_file, target_name, target_id, cached_src.channels);
+
+                // Remove qualquer entrada anterior para o target_id
+                self.registry.scenes.retain(|e| e.physical_id != target_id);
+
+                // Adiciona a nova entrada no registry
+                self.registry.scenes.push(SceneEntry {
+                    custom_name: Some(target_name.to_string()),
+                    physical_scene: target_name.to_string(),
+                    physical_id: target_id,
+                    file: new_file,
+                });
+
+                self.registry_dirty = true;
+                self.persist(sync_shared);
+                return true;
+            }
+        }
+        false
+    }
+
     pub fn ensure_registry_entry(&mut self, physical_scene: &str, physical_id: u8, filename: &str) {
         if !self.registry.scenes.iter().any(|e| e.file == filename) {
             // Attempt to extract a default custom name from the filename if we don't have one
@@ -448,7 +492,11 @@ impl CustomSceneManager {
             }
         }
 
-        tracing::info!("[CUSTOM] finished persist, sync_shared={}, synced_files_len={}", sync_shared, synced_files.len());
+        tracing::info!(
+            "[CUSTOM] finished persist, sync_shared={}, synced_files_len={}",
+            sync_shared,
+            synced_files.len()
+        );
         if sync_shared && !synced_files.is_empty() {
             let msg = if synced_files.len() == 1 {
                 format!("auto-sync: custom scene {} updated", synced_files[0])

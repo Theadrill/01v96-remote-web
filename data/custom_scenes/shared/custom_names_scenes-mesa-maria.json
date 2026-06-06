@@ -6,6 +6,12 @@
       "physical_scene": "PGD ONLINE 360",
       "physical_id": 11,
       "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "CAI NA GANDAIA",
+      "physical_scene": "CAI NA GANDAIA",
+      "physical_id": 37,
+      "file": "custom_names_scene-CAI_NA_GANDAIA-mesa-maria.json"
     }
   ]
 }

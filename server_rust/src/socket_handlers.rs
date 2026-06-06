@@ -1003,6 +1003,11 @@ pub fn register_handlers(
                     scheduler_save.enqueue(store_sysex, 1).await;
                     tracing::info!("[TIMING] store enqueue: {:?}", t_start.elapsed());
 
+                    let original_scene_index = {
+                        let state = state_save.read().await;
+                        state.scene_manager.active_scene_index
+                    };
+
                     let original_name = {
                         let state = state_save.read().await;
                         state.scene_manager.scenes[index as usize]
@@ -1058,11 +1063,17 @@ pub fn register_handlers(
                     let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
                     {
                         let mut csm = csm_save.write().await;
-                        if csm.update_physical_scene_name(index, &target_name, sync_shared) {
-                            let list = csm.list_scenes();
-                            let m_nome = csm.mesa_nome().to_string();
-                            let _ = io_save.emit("customScenesList", &serde_json::json!({ "scenes": list, "mesa_nome": m_nome }));
+
+                        // Se estamos salvando em um slot diferente do atual, duplicamos a cena
+                        if index != original_scene_index {
+                            csm.duplicate_scene_by_id(original_scene_index, index, &target_name, sync_shared);
+                        } else {
+                            csm.update_physical_scene_name(index, &target_name, sync_shared);
                         }
+
+                        let list = csm.list_scenes();
+                        let m_nome = csm.mesa_nome().to_string();
+                        let _ = io_save.emit("customScenesList", &serde_json::json!({ "scenes": list, "mesa_nome": m_nome }));
                     }
                     let _ = socket.emit(
                         "saveSceneResult",
@@ -1556,9 +1567,10 @@ fn collect_current_names(
 
     for (global_ch, ch_state) in &state.channels {
         if *global_ch <= 31
-            && let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
-                names.insert(cid, ch_state.name.clone());
-            }
+            && let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str())
+        {
+            names.insert(cid, ch_state.name.clone());
+        }
     }
 
     for (global_ch, ch_state) in &state.channels {
@@ -1581,16 +1593,17 @@ fn collect_current_channels_as_entries(
 
     for (global_ch, ch_state) in &state.channels {
         if *global_ch <= 31
-            && let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str()) {
-                let short = crate::custom_scenes::to_short_name(&ch_state.name);
-                entries.insert(
-                    cid,
-                    crate::custom_scenes::ChannelNameEntry {
-                        name: ch_state.name.clone(),
-                        short,
-                    },
-                );
-            }
+            && let Ok(cid) = ChannelId::try_from(format!("{}", global_ch + 1).as_str())
+        {
+            let short = crate::custom_scenes::to_short_name(&ch_state.name);
+            entries.insert(
+                cid,
+                crate::custom_scenes::ChannelNameEntry {
+                    name: ch_state.name.clone(),
+                    short,
+                },
+            );
+        }
     }
 
     for (global_ch, ch_state) in &state.channels {
