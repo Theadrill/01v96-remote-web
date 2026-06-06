@@ -2,7 +2,115 @@
   "scene_name": "CAI NA GANDAIA",
   "scene_id": 37,
   "channels": {
+    "30": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "4": {
+      "name": "pand",
+      "short": "PAND"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "1": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "6": {
+      "name": "",
+      "short": "    "
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "11": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "VOCA",
+      "short": "VOCA"
+    },
+    "15": {
+      "name": "REGE",
+      "short": "REGE"
+    },
+    "31": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "12": {
+      "name": "",
+      "short": "    "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "19": {
+      "name": "DAVI",
+      "short": "DAVI"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "tant",
+      "short": "TANT"
+    },
     "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "10": {
+      "name": "viol",
+      "short": "VIOL"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "18": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "32": {
+      "name": "KICK",
+      "short": "KICK"
+    },
+    "2": {
+      "name": "chim",
+      "short": "CHIM"
+    },
+    "23": {
       "name": "SURD",
       "short": "SURD"
     },
@@ -14,39 +122,27 @@
       "name": "CONV",
       "short": "CONV"
     },
-    "27": {
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "7": {
+      "name": "PERCUSSAO",
+      "short": "PERC"
+    },
+    "28": {
       "name": "",
       "short": "    "
-    },
-    "21": {
-      "name": "DJ",
-      "short": "DJ  "
-    },
-    "10": {
-      "name": "viol",
-      "short": "VIOL"
-    },
-    "1": {
-      "name": "BUMB",
-      "short": "BUMB"
     },
     "9": {
       "name": "CAVA",
       "short": "CAVA"
     },
-    "31": {
-      "name": "TANT",
-      "short": "TANT"
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
     },
-    "26": {
-      "name": "",
-      "short": "    "
-    },
-    "34": {
-      "name": "CH 34",
-      "short": "CH34"
-    },
-    "29": {
+    "14": {
       "name": "",
       "short": "    "
     },
@@ -54,117 +150,21 @@
       "name": "STER",
       "short": "STER"
     },
-    "master": {
-      "name": "STEREO",
-      "short": "STER"
-    },
-    "40": {
-      "name": "CH 40",
-      "short": "CH40"
-    },
-    "2": {
-      "name": "chim",
-      "short": "CHIM"
-    },
-    "19": {
-      "name": "DAVI",
-      "short": "DAVI"
-    },
-    "8": {
+    "27": {
       "name": "",
       "short": "    "
-    },
-    "22": {
-      "name": "DJ2",
-      "short": "DJ2 "
-    },
-    "6": {
-      "name": "",
-      "short": "    "
-    },
-    "32": {
-      "name": "KICK",
-      "short": "KICK"
-    },
-    "39": {
-      "name": "STER",
-      "short": "STER"
-    },
-    "30": {
-      "name": "PAND",
-      "short": "PAND"
-    },
-    "18": {
-      "name": "MICD",
-      "short": "MICD"
-    },
-    "25": {
-      "name": "",
-      "short": "    "
-    },
-    "4": {
-      "name": "pand",
-      "short": "PAND"
     },
     "36": {
       "name": "CH 36",
       "short": "CH36"
     },
-    "23": {
-      "name": "SURD",
-      "short": "SURD"
-    },
-    "37": {
-      "name": "STER",
+    "master": {
+      "name": "STEREO",
       "short": "STER"
     },
-    "20": {
-      "name": "VOCA",
-      "short": "VOCA"
-    },
-    "13": {
-      "name": "voz3",
-      "short": "VOZ3"
-    },
-    "11": {
-      "name": "HAMI",
-      "short": "HAMI"
-    },
-    "5": {
-      "name": "tant",
-      "short": "TANT"
-    },
-    "14": {
-      "name": "voz4",
-      "short": "VOZ4"
-    },
-    "7": {
+    "29": {
       "name": "",
       "short": "    "
-    },
-    "15": {
-      "name": "REGE",
-      "short": "REGE"
-    },
-    "24": {
-      "name": "TOMS",
-      "short": "TOMS"
-    },
-    "38": {
-      "name": "CH 38",
-      "short": "CH38"
-    },
-    "28": {
-      "name": "",
-      "short": "    "
-    },
-    "16": {
-      "name": "CEL",
-      "short": "CEL "
-    },
-    "12": {
-      "name": "MATH",
-      "short": "MATH"
     }
   }
 }
