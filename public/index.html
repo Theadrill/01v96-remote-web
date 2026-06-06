@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
     <meta name="mobile-web-app-capable" content="yes">
     <title>01V96 - LIVE SAFE</title>
-    <link rel="stylesheet" href="style.css?v=38">
+    <link rel="stylesheet" href="style.css?v=41">
     <!-- UI UPDATE: 2026-04-12 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
@@ -217,7 +217,7 @@
         <button id="musicianExitBtn" class="side-btn btn-exit-musician" onclick="triggerExitActiveMode()">SAIR</button>
     </div>
 
-    <div id="configModal" class="modal-overlay">
+    <div id="configModal" class="modal-overlay" style="z-index: 25000;">
         <div class="modal-content">
             <p class="config-modal-title">01V96 — LIVE CONTROL</p>
             <p class="config-section-header" style="margin-top: 6px;">Entradas · Saídas · Configuração</p>
@@ -239,13 +239,13 @@
                     <span id="configSceneDisplay"
                         style="font-size: 18px; color: #ffcc00; font-weight: bold; letter-spacing: 1px;">SINCRONIZANDO...</span>
                 </div>
-                <div style="display: flex; gap: 6px;">
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                     <button class="btn-connect" onclick="showSceneGrid('save')"
-                        style="width:110px; margin:0; background:#dc3545; font-size:11px; white-space:nowrap;">SALVAR CENA</button>
+                        style="flex: 1 1 110px; margin:0; background:#dc3545; font-size:11px; white-space:nowrap;">SALVAR CENA</button>
                     <button class="btn-connect" onclick="showSceneGrid('load')"
-                        style="width:110px; margin:0; background:#28a745; font-size:11px; white-space:nowrap;">CARREGAR CENA</button>
+                        style="flex: 1 1 110px; margin:0; background:#28a745; font-size:11px; white-space:nowrap;">CARREGAR CENA</button>
                     <button class="btn-connect" onclick="showCustomScenes()"
-                        style="width:150px; margin:0; background:#5a4a8a; font-size:11px; white-space:nowrap;">NOMES CUSTOMIZADOS</button>
+                        style="flex: 1 1 150px; margin:0; background:#5a4a8a; font-size:11px; white-space:nowrap;">NOMES CUSTOMIZADOS</button>
                 </div>
             </div>
 

@@ -3591,11 +3591,16 @@ body:not(.layout-desktop):not(.is-portrait) .btn-fs-macros {
 screen and (orientation: landscape) and (min-height: 600px) {
     body:not(.layout-desktop) .btn-exit-macros {
         display: flex !important;
-        height: 44px !important;
-        min-height: 44px !important;
+    }
+
+    body:not(.layout-desktop) .btn-exit-macros,
+    body:not(.layout-desktop) .btn-exit-musician {
+        height: 88px !important;
+        min-height: 88px !important;
         align-items: center;
         justify-content: center;
-        font-size: 11px;
+        font-size: 14px;
+        letter-spacing: 1px;
         margin: 0 !important;
         border-radius: 8px !important;
     }
@@ -3988,4 +3993,12 @@ body.layout-desktop .dock-close {
     #virtualKeyboard, #virtualKeyboardSearch {
         display: none !important;
     }
+}
+
+/* Dobrar tamanho do botão de macros na sidebar no modo Desktop */
+body.layout-desktop .btn-macros {
+    padding: 30px 10px !important;
+    font-size: 14px !important;
+    min-height: 88px !important;
+    letter-spacing: 1px;
 }
