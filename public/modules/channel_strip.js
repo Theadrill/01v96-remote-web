@@ -484,7 +484,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
 }
 
 function createDesktopOutputStrip(i, type, idPrefix = "") {
-    let prefix, title, cmdPrefix, customClass, configId, ch;
+    let prefix, title, cmdPrefix, customClass, configId, ch, stateRef;
 
     if (type === 'mix') {
         prefix = 'm';
@@ -493,6 +493,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         customClass = "fader-group-mix";
         configId = 36 + i;
         ch = `'m${i}'`;
+        stateRef = mixesState[i];
     } else if (type === 'bus') {
         prefix = 'b';
         title = `BUS ${i + 1}`;
@@ -500,6 +501,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         customClass = "fader-group-bus";
         configId = 44 + i;
         ch = `'b${i}'`;
+        stateRef = busesState[i];
     } else if (type === 'stIn') {
         prefix = 'st';
         title = `ST IN ${i + 1}`;
@@ -507,6 +509,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         customClass = "fader-group-st";
         configId = 60 + (i * 2);
         ch = 32 + (i * 2);
+        stateRef = channelStates[ch];
     }
 
     let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
@@ -535,7 +538,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
 function createOutputStrip(i, type, idPrefix = "") {
     if (layoutMode === 'desktop') return createDesktopOutputStrip(i, type, idPrefix);
 
-    let prefix, title, cmdPrefix, customClass, configId, ch;
+    let prefix, title, cmdPrefix, customClass, configId, ch, stateRef;
 
     if (type === 'mix') {
         prefix = 'm';
@@ -544,6 +547,7 @@ function createOutputStrip(i, type, idPrefix = "") {
         customClass = "fader-group-mix";
         configId = 36 + i;
         ch = `'m${i}'`;
+        stateRef = mixesState[i];
     } else if (type === 'bus') {
         prefix = 'b';
         title = `BUS ${i + 1}`;
@@ -551,6 +555,7 @@ function createOutputStrip(i, type, idPrefix = "") {
         customClass = "fader-group-bus";
         configId = 44 + i;
         ch = `'b${i}'`;
+        stateRef = busesState[i];
     } else if (type === 'stIn') {
         prefix = 'st';
         title = `ST IN ${i + 1}`;
@@ -558,6 +563,7 @@ function createOutputStrip(i, type, idPrefix = "") {
         customClass = "fader-group-st";
         configId = 60 + (i * 2);
         ch = 32 + (i * 2);
+        stateRef = channelStates[ch];
     }
 
     let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
