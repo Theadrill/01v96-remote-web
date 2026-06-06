@@ -1299,7 +1299,10 @@ body.layout-desktop .sidebar-macros {
 }
 
 .fader-card-desktop {
-    flex: 0 0 clamp(54px, 4vw, 65px);
+    flex: 0 0 86px;
+    width: 86px;
+    min-width: 86px;
+    max-width: 86px;
     display: flex;
     flex-direction: column;
     background: #222;
@@ -3924,23 +3927,26 @@ body.layout-desktop .dock-close {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     transition: background 0.1s;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
 }
+
 .vk-btn:active {
     background: #555;
     transform: translateY(2px);
     box-shadow: none;
 }
+
 .vk-backspace {
     background: #c62828;
     border-color: #e53935;
     flex: 1.5;
 }
+
 .vk-space {
     flex: 5;
     font-size: 14px;
@@ -3948,7 +3954,9 @@ body.layout-desktop .dock-close {
 }
 
 /* Modal Fullscreen no Mobile (sceneConfirmModal e sceneGridModal) */
-@media screen and (max-width: 600px), screen and (max-height: 600px) {
+@media screen and (max-width: 600px),
+screen and (max-height: 600px) {
+
     #sceneConfirmModal .modal-content,
     #sceneGridModal .modal-content {
         max-width: 100% !important;
@@ -3969,18 +3977,25 @@ body.layout-desktop .dock-close {
         height: 28px !important;
         font-size: 11px !important;
     }
+
     .vk-space {
         font-size: 9px !important;
     }
-    #virtualKeyboard, #virtualKeyboardSearch {
+
+    #virtualKeyboard,
+    #virtualKeyboardSearch {
         gap: 3px !important;
         margin-top: 5px !important;
         margin-bottom: 5px !important;
     }
-    #virtualKeyboard > div, #virtualKeyboardSearch > div {
+
+    #virtualKeyboard>div,
+    #virtualKeyboardSearch>div {
         gap: 3px !important;
     }
-    #sceneGridModal .btn-close, #sceneConfirmModal .btn-close {
+
+    #sceneGridModal .btn-close,
+    #sceneConfirmModal .btn-close {
         height: 35px !important;
         flex: 0 0 35px !important;
         font-size: 11px !important;
@@ -3989,8 +4004,11 @@ body.layout-desktop .dock-close {
 }
 
 /* Esconder o teclado virtual customizado em celulares (onde usamos o teclado nativo) */
-@media screen and (max-width: 767px), screen and (max-height: 500px) {
-    #virtualKeyboard, #virtualKeyboardSearch {
+@media screen and (max-width: 767px),
+screen and (max-height: 500px) {
+
+    #virtualKeyboard,
+    #virtualKeyboardSearch {
         display: none !important;
     }
 }
