@@ -313,9 +313,7 @@ impl CustomSceneManager {
         if let Some(src) = source_entry {
             // Obtém os dados da cena de origem
             if let Some(cached_src) = self.get_scene(&src.file).cloned() {
-                // Prepara o nome do novo arquivo
-                let safe_name =
-                    target_name.replace(|c: char| !c.is_alphanumeric() && c != '-', "_");
+                let safe_name = target_name.replace(|c: char| !c.is_alphanumeric() && c != '-' && c != ' ' && c != '_', "_");
                 let new_file = format!("custom_names_scene-{}-{}.json", safe_name, self.mesa_nome);
 
                 // Cria a nova cena em memória
@@ -418,7 +416,7 @@ impl CustomSceneManager {
             .find(|e| e.file == old_file)
             .ok_or("Scene not found in registry")?;
 
-        let safe_name = new_scene_name.replace(|c: char| !c.is_alphanumeric() && c != '-', "_");
+        let safe_name = new_scene_name.replace(|c: char| !c.is_alphanumeric() && c != '-' && c != ' ' && c != '_', "_");
         let new_file = format!("custom_names_scene-{}-{}.json", safe_name, self.mesa_nome);
 
         if old_file == new_file {
