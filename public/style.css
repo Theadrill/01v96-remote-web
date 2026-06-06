@@ -3907,3 +3907,85 @@ body.layout-desktop .dock-exit,
 body.layout-desktop .dock-close {
     display: none !important;
 }
+
+/* --- TECLADO VIRTUAL --- */
+.vk-btn {
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    border-radius: 6px;
+    height: 40px;
+    flex: 1;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: background 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.vk-btn:active {
+    background: #555;
+    transform: translateY(2px);
+    box-shadow: none;
+}
+.vk-backspace {
+    background: #c62828;
+    border-color: #e53935;
+    flex: 1.5;
+}
+.vk-space {
+    flex: 5;
+    font-size: 14px;
+    letter-spacing: 2px;
+}
+
+/* Modal Fullscreen no Mobile (sceneConfirmModal e sceneGridModal) */
+@media screen and (max-width: 600px), screen and (max-height: 600px) {
+    #sceneConfirmModal .modal-content,
+    #sceneGridModal .modal-content {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
+
+/* Teclado Compacto no Celular Deitado (Landscape) */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .vk-btn {
+        height: 28px !important;
+        font-size: 11px !important;
+    }
+    .vk-space {
+        font-size: 9px !important;
+    }
+    #virtualKeyboard, #virtualKeyboardSearch {
+        gap: 3px !important;
+        margin-top: 5px !important;
+        margin-bottom: 5px !important;
+    }
+    #virtualKeyboard > div, #virtualKeyboardSearch > div {
+        gap: 3px !important;
+    }
+    #sceneGridModal .btn-close, #sceneConfirmModal .btn-close {
+        height: 35px !important;
+        flex: 0 0 35px !important;
+        font-size: 11px !important;
+        padding: 0 !important;
+    }
+}
+
+/* Esconder o teclado virtual customizado em celulares (onde usamos o teclado nativo) */
+@media screen and (max-width: 767px), screen and (max-height: 500px) {
+    #virtualKeyboard, #virtualKeyboardSearch {
+        display: none !important;
+    }
+}

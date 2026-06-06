@@ -24,6 +24,14 @@ function normalizeStr(str) {
 }
 
 /**
+ * Função global do módulo para detectar se é tela de celular
+ * @returns {boolean}
+ */
+function isPhoneSize() {
+    return window.innerWidth <= 767 || window.innerHeight <= 500;
+}
+
+/**
  * Verifica se qWord é subsequência de nWord (caracteres em ordem).
  * Ex: "pgd" é subsequência de "pagode" → true
  * @param {string} qWord
@@ -76,6 +84,10 @@ function createFuzzySearch({ container, targetEl, placeholder = '🔍  Buscar...
         if (inputId) input.id = inputId;
         input.type = 'text';
         input.autocomplete = 'off';
+
+        if (!isPhoneSize()) {
+            input.inputMode = 'none'; // Suppress native keyboard in tablet/desktop
+        }
         input.style.cssText = [
             'width:100%',
             'box-sizing:border-box',
@@ -97,6 +109,14 @@ function createFuzzySearch({ container, targetEl, placeholder = '🔍  Buscar...
         if (container && targetEl) {
             container.insertBefore(input, targetEl);
         }
+
+        // Prevenir teclado nativo no Android (apenas se não for celular)
+        input.addEventListener('touchstart', function(e) {
+            if (!isPhoneSize()) {
+                e.preventDefault();
+                this.focus();
+            }
+        }, { passive: false });
     }
 
     input.placeholder = placeholder;
@@ -108,8 +128,10 @@ function createFuzzySearch({ container, targetEl, placeholder = '🔍  Buscar...
     input._fuzzyHandler = handler;
     input.addEventListener('input', handler);
 
-    // Foca com leve delay para aguardar a animação do modal
-    setTimeout(() => input.focus(), 80);
+    // Foca com leve delay para aguardar a animação do modal (mas evita no celular para não abrir teclado nativo na cara)
+    if (!isPhoneSize() && !('ontouchstart' in window && navigator.maxTouchPoints > 0)) {
+        setTimeout(() => input.focus(), 80);
+    }
 
     function destroy() {
         input.removeEventListener('input', input._fuzzyHandler);
