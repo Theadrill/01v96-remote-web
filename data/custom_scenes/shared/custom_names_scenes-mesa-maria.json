@@ -8,16 +8,10 @@
       "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     },
     {
-      "custom_name": "CAI NA GANDAIA",
-      "physical_scene": "CAI NA GANDAIA",
+      "custom_name": "LIVRE P SONHAR",
+      "physical_scene": "LIVRE P SONHAR",
       "physical_id": 37,
-      "file": "custom_names_scene-CAI_NA_GANDAIA-mesa-maria.json"
-    },
-    {
-      "custom_name": "CAI NA GANDAIA",
-      "physical_scene": "CAI NA GANDAIA",
-      "physical_id": 37,
-      "file": "custom_names_scene-CAI NA GANDAIA-mesa-maria.json"
+      "file": "custom_names_scene-LIVRE P SONHAR-mesa-maria.json"
     }
   ]
 }

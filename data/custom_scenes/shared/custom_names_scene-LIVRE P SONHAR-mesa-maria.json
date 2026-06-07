@@ -1,0 +1,170 @@
+{
+  "scene_name": "LIVRE P SONHAR",
+  "scene_id": 37,
+  "channels": {
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "12": {
+      "name": "VOZ RECO",
+      "short": "VOZR"
+    },
+    "20": {
+      "name": "CONVIDAD 2",
+      "short": "CONV"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "11": {
+      "name": "VOZ PANDEI",
+      "short": "VOZP"
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "3": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "19": {
+      "name": "CONVIDAD 1",
+      "short": "CONV"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "17": {
+      "name": "VOCALISTA",
+      "short": "VOCA"
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "8": {
+      "name": "CONGA",
+      "short": "CONG"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "7": {
+      "name": "CONGA",
+      "short": "CONG"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    }
+  }
+}
