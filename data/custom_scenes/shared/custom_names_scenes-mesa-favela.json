@@ -1,0 +1,17 @@
+{
+  "mesa_nome": "mesa-favela",
+  "scenes": [
+    {
+      "custom_name": "SEXTETO",
+      "physical_scene": "SEXTETO",
+      "physical_id": 34,
+      "file": "custom_names_scene-SEXTETO-mesa-favela.json"
+    },
+    {
+      "custom_name": "SARU",
+      "physical_scene": "SARU",
+      "physical_id": 2,
+      "file": "custom_names_scene-SARU-mesa-favela.json"
+    }
+  ]
+}

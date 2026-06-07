@@ -1,0 +1,170 @@
+{
+  "scene_name": "SARU",
+  "scene_id": 2,
+  "channels": {
+    "15": {
+      "name": "pand",
+      "short": "PAND"
+    },
+    "19": {
+      "name": "",
+      "short": "    "
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "24": {
+      "name": "",
+      "short": "    "
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "16": {
+      "name": "OUTR",
+      "short": "OUTR"
+    },
+    "27": {
+      "name": "MICP",
+      "short": "MICP"
+    },
+    "2": {
+      "name": "",
+      "short": "    "
+    },
+    "12": {
+      "name": "toms",
+      "short": "TOMS"
+    },
+    "37": {
+      "name": "STI3",
+      "short": "STI3"
+    },
+    "26": {
+      "name": "MICT",
+      "short": "MICT"
+    },
+    "11": {
+      "name": "CHIM",
+      "short": "CHIM"
+    },
+    "22": {
+      "name": "R-CL",
+      "short": "RCL "
+    },
+    "30": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "CELU",
+      "short": "CELU"
+    },
+    "9": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "1": {
+      "name": "",
+      "short": "    "
+    },
+    "6": {
+      "name": "CAVA",
+      "short": "CAVA"
+    },
+    "31": {
+      "name": "VOCA",
+      "short": "VOCA"
+    },
+    "13": {
+      "name": "surd",
+      "short": "SURD"
+    },
+    "17": {
+      "name": "",
+      "short": "    "
+    },
+    "23": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "35": {
+      "name": "STI2",
+      "short": "STI2"
+    },
+    "18": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "4": {
+      "name": "",
+      "short": "    "
+    },
+    "21": {
+      "name": "TECL",
+      "short": "TECL"
+    },
+    "28": {
+      "name": "MICV",
+      "short": "MICV"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "25": {
+      "name": "REGE",
+      "short": "REGE"
+    },
+    "master": {
+      "name": "ST",
+      "short": "ST  "
+    },
+    "10": {
+      "name": "bumb",
+      "short": "BUMB"
+    },
+    "3": {
+      "name": "",
+      "short": "    "
+    },
+    "14": {
+      "name": "tant",
+      "short": "TANT"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "5": {
+      "name": "BAIX",
+      "short": "BAIX"
+    },
+    "39": {
+      "name": "STI4",
+      "short": "STI4"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "33": {
+      "name": "STI1",
+      "short": "STI1"
+    },
+    "7": {
+      "name": "viol",
+      "short": "VIOL"
+    },
+    "32": {
+      "name": "TANT",
+      "short": "TANT"
+    }
+  }
+}
