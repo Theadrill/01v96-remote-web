@@ -564,6 +564,9 @@ socket.on('customSceneLoaded', (data) => {
     } else {
         window.activeCustomSceneChannels = null;
         console.log('[CUSTOM] customSceneLoaded: nenhuma cena ativa');
+        if (window.customNamesEnabled) {
+            socket.emit('ensureCurrentCustomScene', { syncShared: window.customScenesSyncEnabled });
+        }
     }
 });
 

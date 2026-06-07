@@ -99,11 +99,10 @@ function initEQEngine(ch) {
     
     let highMode = 'peaking';
     const highQRaw = sysexToVal(highData.q);
-    const highLPFOn = sysexToVal(highData.lpfOn);
     
     if (highQRaw === 41 || highQRaw === 42) {
         highMode = 'highshelf';
-    } else if (highQRaw >= 43 || highLPFOn === 1) {
+    } else if (highQRaw >= 43) {
         highMode = 'lowpass';
     }
     const highWasLPFMode = (highMode === 'lowpass');
@@ -445,7 +444,7 @@ function onEQMove(e, ch) {
     const rawF = Math.round(freqToRaw(newF));
     const rawG = Math.round(gainToRaw(newG));
     
-    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'High' };
     const label = labelMap[b.key] || 'Low';
     
     // ATUALIZAÇÃO DO ESTADO LOCAL (MEMÓRIA)
@@ -465,7 +464,7 @@ function onEQMove(e, ch) {
 }
 
 function onEQUp() { 
-    activeBandIdx = -1; // Para de arrastar imediatamente ao soltar
+    activeBandIdx = -1; // Para de arrastrar imediatamente ao soltar
     if (longPressTimeout) clearTimeout(longPressTimeout);
 }
 
@@ -535,11 +534,10 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
 
     let hMode = 'peaking';
     const hqRaw = sysexToVal(eq.high?.q ?? eq.hi?.q);
-    const hlpfOn = sysexToVal(eq.high?.lpfOn ?? eq.hi?.lpfOn);
     
     if (hqRaw === 41 || hqRaw === 42) {
         hMode = 'highshelf';
-    } else if (hqRaw >= 43 || hlpfOn === 1) {
+    } else if (hqRaw >= 43) {
         hMode = 'lowpass';
     }
 
@@ -1025,7 +1023,7 @@ window.showCustomConfirm = function(msg, onOk) {
 window.pasteEQ = function(ch) {
     if (!eqClipboard) return;
     showCustomConfirm(`Deseja colar as definições de EQ para o Canal ${ch + 1}?`, () => {
-        console.log(`\n📥 [COLAR] Aplicando no Canal ${ch + 1}...`);
+        console.log(`n📥 [COLAR] Aplicando no Canal ${ch + 1}...`);
     
     const prefix = getChannelParamPrefix(ch);
 

@@ -983,17 +983,11 @@
     32,
     13
   ],
-  "kInputEQ/kEQLPFOn": [
-    127,
-    1,
-    32,
-    14
-  ],
   "kInputEQ/kEQOn": [
     127,
     1,
     32,
-    15
+    14
   ],
   "kInputDelay/kInDelayOn": [
     127,
@@ -1781,17 +1775,11 @@
     46,
     13
   ],
-  "kBusEQ/kEQLPFOn": [
-    127,
-    1,
-    46,
-    14
-  ],
   "kBusEQ/kEQOn": [
     127,
     1,
     46,
-    15
+    14
   ],
   "kBusDelay/kOutDelayOn": [
     127,
@@ -2273,17 +2261,11 @@
     60,
     13
   ],
-  "kAUXEQ/kEQLPFOn": [
-    127,
-    1,
-    60,
-    14
-  ],
   "kAUXEQ/kEQOn": [
     127,
     1,
     60,
-    15
+    14
   ],
   "kAUXDelay/kOutDelayOn": [
     127,
@@ -2735,17 +2717,11 @@
     72,
     13
   ],
-  "kMatrixEQ/kEQLPFOn": [
-    127,
-    1,
-    72,
-    14
-  ],
   "kMatrixEQ/kEQOn": [
     127,
     1,
     72,
-    15
+    14
   ],
   "kMatrixDelay/kOutDelayOn": [
     127,
@@ -3077,17 +3053,11 @@
     82,
     13
   ],
-  "kStereoEQ/kEQLPFOn": [
-    127,
-    1,
-    82,
-    14
-  ],
   "kStereoEQ/kEQOn": [
     127,
     1,
     82,
-    15
+    14
   ],
   "kStereoDelay/kOutDelayOn": [
     127,

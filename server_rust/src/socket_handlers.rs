@@ -1256,6 +1256,272 @@ pub fn register_handlers(
             },
         );
 
+        // --- ENSURE CURRENT CUSTOM SCENE ---
+        let csm_ensure = csm_socket.clone();
+        let state_ensure = global_state_socket.clone();
+        let io_ensure = io.clone();
+        let sched_ensure = scheduler_socket.clone();
+        socket.on(
+            "ensureCurrentCustomScene",
+            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+                let (scene_number, scene_name, mesa_nome, current_names) = {
+                    let state = state_ensure.read().await;
+                    let sn = state.scene_manager.active_scene_index;
+                    let sname = state
+                        .scene_manager
+                        .current_scene
+                        .as_ref()
+                        .map(|s| s.name.clone())
+                        .unwrap_or_default();
+                    let names = collect_current_names(&state);
+                    drop(state);
+                    let csm = csm_ensure.read().await;
+                    (sn, sname, csm.mesa_nome().to_string(), names)
+                };
+
+                let base_name = if let Some(pos) = scene_name.find(" - ") {
+                    scene_name[pos + 3..].to_string()
+                } else {
+                    scene_name.clone()
+                };
+
+                if base_name.is_empty() {
+                    return;
+                }
+
+                let fname = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
+
+                let mut scene_created = false;
+                {
+                    let mut mgr = csm_ensure.write().await;
+                    if mgr.get_scene(&fname).is_none() {
+                        let state_guard = state_ensure.read().await;
+                        let channels = collect_current_channels_as_entries(&state_guard);
+                        drop(state_guard);
+                        mgr.create_scene(&fname, &base_name, scene_number, channels);
+                        mgr.ensure_registry_entry(&scene_name, scene_number, &fname);
+                        mgr.persist(sync_shared);
+                        scene_created = true;
+                    }
+                }
+
+                let scene_opt = {
+                    let mut csm = csm_ensure.write().await;
+                    csm.get_scene(&fname).cloned()
+                };
+
+                if let Some(scene) = scene_opt {
+                    let mut csm = csm_ensure.write().await;
+                    let token = csm.prepare_op();
+                    let sched_clone = sched_ensure.clone();
+                    let io_clone = io_ensure.clone();
+                    drop(csm);
+
+                    tokio::spawn(async move {
+                        let mut applied = 0u32;
+                        let mut skipped = 0u32;
+                        for (channel_id, entry) in &scene.channels {
+                            if token.is_cancelled() {
+                                return;
+                            }
+                            let global_ch = channel_id.to_global_channel();
+                            let current_short = current_names
+                                .get(channel_id)
+                                .map(|n| crate::custom_scenes::to_short_name(n))
+                                .unwrap_or_default();
+
+                            if current_short == entry.short {
+                                skipped += 1;
+                                continue;
+                            }
+
+                            let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
+                            for (ci, &byte) in short_bytes.iter().enumerate() {
+                                if token.is_cancelled() {
+                                    return;
+                                }
+                                if let Some(req) =
+                                    crate::midi::protocol::build_name_change(
+                                        global_ch, ci as u8, byte,
+                                    )
+                                {
+                                    sched_clone.enqueue(req, 1).await;
+                                }
+                                if ci < short_bytes.len() - 1 {
+                                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                }
+                            }
+                            applied += 1;
+                        }
+                        tracing::info!("[CUSTOM] ensureCurrentCustomScene: aplicados={}, ignorados={}", applied, skipped);
+
+                        let channels_arr: Vec<serde_json::Value> = scene
+                            .channels
+                            .iter()
+                            .map(|(ch_id, entry)| {
+                                serde_json::json!({
+                                    "ch": ch_id.to_global_channel(),
+                                    "name": entry.name,
+                                    "short": entry.short
+                                })
+                            })
+                            .collect();
+
+                        let _ = io_clone
+                            .emit(
+                                "customSceneLoaded",
+                                &serde_json::json!({
+                                    "active": true,
+                                    "scene_name": scene.scene_name,
+                                    "scene_id": scene.scene_id,
+                                    "channels": channels_arr,
+                                }),
+                            )
+                            .await;
+                    });
+
+                    if scene_created {
+                        let csm = csm_ensure.read().await;
+                        let list = csm.list_scenes();
+                        let m_nome = csm.mesa_nome().to_string();
+                        let _ = io_ensure.emit("customScenesList", &serde_json::json!({ "scenes": list, "mesa_nome": m_nome }));
+                    }
+                }
+            }
+        );
+
+        // --- COPY CUSTOM SCENE TO CURRENT ---
+        let csm_copy = csm_socket.clone();
+        let state_copy = global_state_socket.clone();
+        let io_copy = io.clone();
+        let sched_copy = scheduler_socket.clone();
+        socket.on(
+            "copyCustomSceneToCurrent",
+            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+                let source_file = data.get("source_file").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                if source_file.is_empty() {
+                    return;
+                }
+
+                let (scene_number, scene_name, mesa_nome, current_names) = {
+                    let state = state_copy.read().await;
+                    let sn = state.scene_manager.active_scene_index;
+                    let sname = state
+                        .scene_manager
+                        .current_scene
+                        .as_ref()
+                        .map(|s| s.name.clone())
+                        .unwrap_or_default();
+                    let names = collect_current_names(&state);
+                    drop(state);
+                    let csm = csm_copy.read().await;
+                    (sn, sname, csm.mesa_nome().to_string(), names)
+                };
+
+                let base_name = if let Some(pos) = scene_name.find(" - ") {
+                    scene_name[pos + 3..].to_string()
+                } else {
+                    scene_name.clone()
+                };
+
+                if base_name.is_empty() {
+                    return;
+                }
+
+                let target_fname = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
+
+                let target_scene_opt = {
+                    let mut csm = csm_copy.write().await;
+                    
+                    let source_channels = if let Some(src) = csm.get_scene(&source_file) {
+                        Some(src.channels.clone())
+                    } else {
+                        None
+                    };
+
+                    if let Some(chans) = source_channels {
+                        csm.create_scene(&target_fname, &base_name, scene_number, chans);
+                        csm.ensure_registry_entry(&scene_name, scene_number, &target_fname);
+                        csm.persist(sync_shared);
+                    }
+                    csm.get_scene(&target_fname).cloned()
+                };
+
+                if let Some(scene) = target_scene_opt {
+                    let mut csm = csm_copy.write().await;
+                    let token = csm.prepare_op();
+                    let sched_clone = sched_copy.clone();
+                    let io_clone = io_copy.clone();
+                    drop(csm);
+
+                    tokio::spawn(async move {
+                        let mut applied = 0u32;
+                        let mut skipped = 0u32;
+                        for (channel_id, entry) in &scene.channels {
+                            if token.is_cancelled() {
+                                return;
+                            }
+                            let global_ch = channel_id.to_global_channel();
+                            let current_short = current_names
+                                .get(channel_id)
+                                .map(|n| crate::custom_scenes::to_short_name(n))
+                                .unwrap_or_default();
+
+                            if current_short == entry.short {
+                                skipped += 1;
+                                continue;
+                            }
+
+                            let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
+                            for (ci, &byte) in short_bytes.iter().enumerate() {
+                                if token.is_cancelled() {
+                                    return;
+                                }
+                                if let Some(req) =
+                                    crate::midi::protocol::build_name_change(
+                                        global_ch, ci as u8, byte,
+                                    )
+                                {
+                                    sched_clone.enqueue(req, 1).await;
+                                }
+                                if ci < short_bytes.len() - 1 {
+                                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                }
+                            }
+                            applied += 1;
+                        }
+                        tracing::info!("[CUSTOM] copyCustomSceneToCurrent: aplicados={}, ignorados={}", applied, skipped);
+
+                        let channels_arr: Vec<serde_json::Value> = scene
+                            .channels
+                            .iter()
+                            .map(|(ch_id, entry)| {
+                                serde_json::json!({
+                                    "ch": ch_id.to_global_channel(),
+                                    "name": entry.name,
+                                    "short": entry.short
+                                })
+                            })
+                            .collect();
+
+                        let _ = io_clone
+                            .emit(
+                                "customSceneLoaded",
+                                &serde_json::json!({
+                                    "active": true,
+                                    "scene_name": scene.scene_name,
+                                    "scene_id": scene.scene_id,
+                                    "channels": channels_arr,
+                                }),
+                            )
+                            .await;
+                    });
+                }
+            }
+        );
+
         // --- SYNC NAMES ONLY ---
         let sync_mgr_names = sync_manager_socket.clone();
         socket.on(

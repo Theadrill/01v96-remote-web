@@ -60,7 +60,11 @@ window.toggleCustomNamesSetting = function(enabled) {
     
     // Refresh the names from the backend just to be absolutely sure
     if (typeof socket !== 'undefined' && socket) {
-        socket.emit('refreshNames');
+        if (enabled) {
+            socket.emit('ensureCurrentCustomScene', { syncShared: window.customScenesSyncEnabled });
+        } else {
+            socket.emit('refreshNames');
+        }
     }
 };
 
@@ -139,10 +143,15 @@ function renderCustomScenesList(scenes) {
                 html += '<div style="color:#f44336; font-size:10px; margin-top:2px;">Não atribuída</div>';
             }
             html += '</div>';
-            html += '<div style="display:flex; gap:5px; flex-shrink:0;">';
-            html += '<button onclick="openAssignScene(' + i + ')" style="background:#2a4a2a; border:1px solid #4a4; color:#4caf50; border-radius:6px; padding:6px 10px; font-size:10px; cursor:pointer;">ATRIBUIR</button>';
-            html += '<button onclick="renameScene(\'' + escHtml(s.file) + '\', \'' + escHtml(s.custom_name || '') + '\')" style="background:#4a3a2a; border:1px solid #a84; color:#fa4; border-radius:6px; padding:6px 10px; font-size:10px; cursor:pointer;">RENOMEAR</button>';
-            html += '<button onclick="openSceneDetails(' + i + ')" style="background:#2a2a4a; border:1px solid #44a; color:#58f; border-radius:6px; padding:6px 10px; font-size:10px; cursor:pointer;">DETALHES</button>';
+            html += '<div style="display:flex; flex-direction:column; gap:5px; flex-shrink:0;">';
+            html += '<div style="display:flex; gap:5px;">';
+            html += '<button onclick="openAssignScene(' + i + ')" style="flex:1; background:#2a4a2a; border:1px solid #4a4; color:#4caf50; border-radius:6px; padding:6px 10px; font-size:10px; cursor:pointer;">ATRIBUIR</button>';
+            html += '<button onclick="renameScene(\'' + escHtml(s.file) + '\', \'' + escHtml(s.custom_name || '') + '\')" style="flex:1; background:#4a3a2a; border:1px solid #a84; color:#fa4; border-radius:6px; padding:6px 10px; font-size:10px; cursor:pointer;">RENOMEAR</button>';
+            html += '</div>';
+            html += '<div style="display:flex; gap:5px;">';
+            html += '<button onclick="openSceneDetails(' + i + ')" style="flex:1; background:#2a2a4a; border:1px solid #44a; color:#58f; border-radius:6px; padding:6px 10px; font-size:10px; cursor:pointer;">DETALHES</button>';
+            html += '<button onclick="copySceneNames(' + i + ')" style="flex:1; background:#4a2a4a; border:1px solid #a4a; color:#f8f; border-radius:6px; padding:6px 10px; font-size:10px; cursor:pointer;">COPIAR</button>';
+            html += '</div>';
             html += '</div>';
             html += '</div>';
             html += '</div>';
@@ -325,3 +334,22 @@ function getChannelLabel(globalCh) {
     if (globalCh === 52) return 'MASTER';
     return 'CH ' + globalCh;
 }
+
+window.pendingCopyFile = null;
+
+window.copySceneNames = function(index) {
+    const scene = window.customScenesData[index];
+    if (!scene) return;
+    window.pendingCopyFile = scene.file;
+    document.getElementById('copySceneNameDisplay').textContent = 'Cena Fonte: ' + (scene.custom_name || scene.file);
+    document.getElementById('copySceneModal').style.display = 'flex';
+};
+
+window.confirmCopyScene = function() {
+    if (!window.pendingCopyFile) return;
+    socket.emit('copyCustomSceneToCurrent', {
+        source_file: window.pendingCopyFile,
+        syncShared: window.customScenesSyncEnabled
+    });
+    document.getElementById('copySceneModal').style.display = 'none';
+};
