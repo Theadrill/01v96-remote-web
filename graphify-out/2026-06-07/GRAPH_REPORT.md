@@ -1,16 +1,16 @@
-# Graph Report - 01v96-remote-web  (2026-06-05)
+# Graph Report - 01v96-remote-web  (2026-06-07)
 
 ## Corpus Check
-- 485 files · ~537,846 words
+- 493 files · ~541,469 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7146 nodes · 7745 edges · 620 communities (586 shown, 34 thin omitted)
+- 7753 nodes · 8336 edges · 830 communities (788 shown, 42 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 154 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `45acf94b`
+- Built from commit: `db82b597`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -615,18 +615,228 @@
 - [[_COMMUNITY_Community 613|Community 613]]
 - [[_COMMUNITY_Community 614|Community 614]]
 - [[_COMMUNITY_Community 615|Community 615]]
+- [[_COMMUNITY_Community 620|Community 620]]
+- [[_COMMUNITY_Community 621|Community 621]]
+- [[_COMMUNITY_Community 622|Community 622]]
+- [[_COMMUNITY_Community 623|Community 623]]
+- [[_COMMUNITY_Community 624|Community 624]]
+- [[_COMMUNITY_Community 625|Community 625]]
+- [[_COMMUNITY_Community 626|Community 626]]
+- [[_COMMUNITY_Community 627|Community 627]]
+- [[_COMMUNITY_Community 628|Community 628]]
+- [[_COMMUNITY_Community 629|Community 629]]
+- [[_COMMUNITY_Community 630|Community 630]]
+- [[_COMMUNITY_Community 631|Community 631]]
+- [[_COMMUNITY_Community 632|Community 632]]
+- [[_COMMUNITY_Community 633|Community 633]]
+- [[_COMMUNITY_Community 634|Community 634]]
+- [[_COMMUNITY_Community 635|Community 635]]
+- [[_COMMUNITY_Community 636|Community 636]]
+- [[_COMMUNITY_Community 637|Community 637]]
+- [[_COMMUNITY_Community 638|Community 638]]
+- [[_COMMUNITY_Community 639|Community 639]]
+- [[_COMMUNITY_Community 640|Community 640]]
+- [[_COMMUNITY_Community 641|Community 641]]
+- [[_COMMUNITY_Community 642|Community 642]]
+- [[_COMMUNITY_Community 643|Community 643]]
+- [[_COMMUNITY_Community 644|Community 644]]
+- [[_COMMUNITY_Community 645|Community 645]]
+- [[_COMMUNITY_Community 646|Community 646]]
+- [[_COMMUNITY_Community 647|Community 647]]
+- [[_COMMUNITY_Community 648|Community 648]]
+- [[_COMMUNITY_Community 649|Community 649]]
+- [[_COMMUNITY_Community 650|Community 650]]
+- [[_COMMUNITY_Community 651|Community 651]]
+- [[_COMMUNITY_Community 652|Community 652]]
+- [[_COMMUNITY_Community 653|Community 653]]
+- [[_COMMUNITY_Community 654|Community 654]]
+- [[_COMMUNITY_Community 655|Community 655]]
+- [[_COMMUNITY_Community 656|Community 656]]
+- [[_COMMUNITY_Community 657|Community 657]]
+- [[_COMMUNITY_Community 658|Community 658]]
+- [[_COMMUNITY_Community 659|Community 659]]
+- [[_COMMUNITY_Community 660|Community 660]]
+- [[_COMMUNITY_Community 661|Community 661]]
+- [[_COMMUNITY_Community 662|Community 662]]
+- [[_COMMUNITY_Community 663|Community 663]]
+- [[_COMMUNITY_Community 664|Community 664]]
+- [[_COMMUNITY_Community 665|Community 665]]
+- [[_COMMUNITY_Community 666|Community 666]]
+- [[_COMMUNITY_Community 667|Community 667]]
+- [[_COMMUNITY_Community 668|Community 668]]
+- [[_COMMUNITY_Community 669|Community 669]]
+- [[_COMMUNITY_Community 670|Community 670]]
+- [[_COMMUNITY_Community 671|Community 671]]
+- [[_COMMUNITY_Community 672|Community 672]]
+- [[_COMMUNITY_Community 673|Community 673]]
+- [[_COMMUNITY_Community 674|Community 674]]
+- [[_COMMUNITY_Community 675|Community 675]]
+- [[_COMMUNITY_Community 676|Community 676]]
+- [[_COMMUNITY_Community 677|Community 677]]
+- [[_COMMUNITY_Community 678|Community 678]]
+- [[_COMMUNITY_Community 679|Community 679]]
+- [[_COMMUNITY_Community 680|Community 680]]
+- [[_COMMUNITY_Community 681|Community 681]]
+- [[_COMMUNITY_Community 682|Community 682]]
+- [[_COMMUNITY_Community 683|Community 683]]
+- [[_COMMUNITY_Community 684|Community 684]]
+- [[_COMMUNITY_Community 685|Community 685]]
+- [[_COMMUNITY_Community 686|Community 686]]
+- [[_COMMUNITY_Community 687|Community 687]]
+- [[_COMMUNITY_Community 688|Community 688]]
+- [[_COMMUNITY_Community 689|Community 689]]
+- [[_COMMUNITY_Community 690|Community 690]]
+- [[_COMMUNITY_Community 691|Community 691]]
+- [[_COMMUNITY_Community 692|Community 692]]
+- [[_COMMUNITY_Community 693|Community 693]]
+- [[_COMMUNITY_Community 694|Community 694]]
+- [[_COMMUNITY_Community 695|Community 695]]
+- [[_COMMUNITY_Community 696|Community 696]]
+- [[_COMMUNITY_Community 697|Community 697]]
+- [[_COMMUNITY_Community 698|Community 698]]
+- [[_COMMUNITY_Community 699|Community 699]]
+- [[_COMMUNITY_Community 700|Community 700]]
+- [[_COMMUNITY_Community 701|Community 701]]
+- [[_COMMUNITY_Community 702|Community 702]]
+- [[_COMMUNITY_Community 703|Community 703]]
+- [[_COMMUNITY_Community 704|Community 704]]
+- [[_COMMUNITY_Community 705|Community 705]]
+- [[_COMMUNITY_Community 706|Community 706]]
+- [[_COMMUNITY_Community 707|Community 707]]
+- [[_COMMUNITY_Community 708|Community 708]]
+- [[_COMMUNITY_Community 709|Community 709]]
+- [[_COMMUNITY_Community 710|Community 710]]
+- [[_COMMUNITY_Community 711|Community 711]]
+- [[_COMMUNITY_Community 712|Community 712]]
+- [[_COMMUNITY_Community 713|Community 713]]
+- [[_COMMUNITY_Community 714|Community 714]]
+- [[_COMMUNITY_Community 715|Community 715]]
+- [[_COMMUNITY_Community 716|Community 716]]
+- [[_COMMUNITY_Community 717|Community 717]]
+- [[_COMMUNITY_Community 718|Community 718]]
+- [[_COMMUNITY_Community 719|Community 719]]
+- [[_COMMUNITY_Community 720|Community 720]]
+- [[_COMMUNITY_Community 721|Community 721]]
+- [[_COMMUNITY_Community 722|Community 722]]
+- [[_COMMUNITY_Community 723|Community 723]]
+- [[_COMMUNITY_Community 724|Community 724]]
+- [[_COMMUNITY_Community 725|Community 725]]
+- [[_COMMUNITY_Community 726|Community 726]]
+- [[_COMMUNITY_Community 727|Community 727]]
+- [[_COMMUNITY_Community 728|Community 728]]
+- [[_COMMUNITY_Community 729|Community 729]]
+- [[_COMMUNITY_Community 730|Community 730]]
+- [[_COMMUNITY_Community 731|Community 731]]
+- [[_COMMUNITY_Community 732|Community 732]]
+- [[_COMMUNITY_Community 733|Community 733]]
+- [[_COMMUNITY_Community 734|Community 734]]
+- [[_COMMUNITY_Community 735|Community 735]]
+- [[_COMMUNITY_Community 736|Community 736]]
+- [[_COMMUNITY_Community 737|Community 737]]
+- [[_COMMUNITY_Community 738|Community 738]]
+- [[_COMMUNITY_Community 739|Community 739]]
+- [[_COMMUNITY_Community 740|Community 740]]
+- [[_COMMUNITY_Community 741|Community 741]]
+- [[_COMMUNITY_Community 742|Community 742]]
+- [[_COMMUNITY_Community 743|Community 743]]
+- [[_COMMUNITY_Community 744|Community 744]]
+- [[_COMMUNITY_Community 745|Community 745]]
+- [[_COMMUNITY_Community 746|Community 746]]
+- [[_COMMUNITY_Community 747|Community 747]]
+- [[_COMMUNITY_Community 748|Community 748]]
+- [[_COMMUNITY_Community 749|Community 749]]
+- [[_COMMUNITY_Community 750|Community 750]]
+- [[_COMMUNITY_Community 751|Community 751]]
+- [[_COMMUNITY_Community 752|Community 752]]
+- [[_COMMUNITY_Community 753|Community 753]]
+- [[_COMMUNITY_Community 754|Community 754]]
+- [[_COMMUNITY_Community 755|Community 755]]
+- [[_COMMUNITY_Community 756|Community 756]]
+- [[_COMMUNITY_Community 757|Community 757]]
+- [[_COMMUNITY_Community 758|Community 758]]
+- [[_COMMUNITY_Community 759|Community 759]]
+- [[_COMMUNITY_Community 760|Community 760]]
+- [[_COMMUNITY_Community 761|Community 761]]
+- [[_COMMUNITY_Community 762|Community 762]]
+- [[_COMMUNITY_Community 763|Community 763]]
+- [[_COMMUNITY_Community 764|Community 764]]
+- [[_COMMUNITY_Community 765|Community 765]]
+- [[_COMMUNITY_Community 766|Community 766]]
+- [[_COMMUNITY_Community 767|Community 767]]
+- [[_COMMUNITY_Community 768|Community 768]]
+- [[_COMMUNITY_Community 769|Community 769]]
+- [[_COMMUNITY_Community 770|Community 770]]
+- [[_COMMUNITY_Community 771|Community 771]]
+- [[_COMMUNITY_Community 772|Community 772]]
+- [[_COMMUNITY_Community 773|Community 773]]
+- [[_COMMUNITY_Community 774|Community 774]]
+- [[_COMMUNITY_Community 775|Community 775]]
+- [[_COMMUNITY_Community 776|Community 776]]
+- [[_COMMUNITY_Community 777|Community 777]]
+- [[_COMMUNITY_Community 778|Community 778]]
+- [[_COMMUNITY_Community 779|Community 779]]
+- [[_COMMUNITY_Community 780|Community 780]]
+- [[_COMMUNITY_Community 781|Community 781]]
+- [[_COMMUNITY_Community 782|Community 782]]
+- [[_COMMUNITY_Community 783|Community 783]]
+- [[_COMMUNITY_Community 784|Community 784]]
+- [[_COMMUNITY_Community 785|Community 785]]
+- [[_COMMUNITY_Community 786|Community 786]]
+- [[_COMMUNITY_Community 787|Community 787]]
+- [[_COMMUNITY_Community 788|Community 788]]
+- [[_COMMUNITY_Community 789|Community 789]]
+- [[_COMMUNITY_Community 790|Community 790]]
+- [[_COMMUNITY_Community 791|Community 791]]
+- [[_COMMUNITY_Community 792|Community 792]]
+- [[_COMMUNITY_Community 793|Community 793]]
+- [[_COMMUNITY_Community 794|Community 794]]
+- [[_COMMUNITY_Community 795|Community 795]]
+- [[_COMMUNITY_Community 796|Community 796]]
+- [[_COMMUNITY_Community 797|Community 797]]
+- [[_COMMUNITY_Community 798|Community 798]]
+- [[_COMMUNITY_Community 799|Community 799]]
+- [[_COMMUNITY_Community 800|Community 800]]
+- [[_COMMUNITY_Community 801|Community 801]]
+- [[_COMMUNITY_Community 802|Community 802]]
+- [[_COMMUNITY_Community 803|Community 803]]
+- [[_COMMUNITY_Community 804|Community 804]]
+- [[_COMMUNITY_Community 805|Community 805]]
+- [[_COMMUNITY_Community 806|Community 806]]
+- [[_COMMUNITY_Community 807|Community 807]]
+- [[_COMMUNITY_Community 808|Community 808]]
+- [[_COMMUNITY_Community 809|Community 809]]
+- [[_COMMUNITY_Community 810|Community 810]]
+- [[_COMMUNITY_Community 811|Community 811]]
+- [[_COMMUNITY_Community 812|Community 812]]
+- [[_COMMUNITY_Community 813|Community 813]]
+- [[_COMMUNITY_Community 814|Community 814]]
+- [[_COMMUNITY_Community 815|Community 815]]
+- [[_COMMUNITY_Community 816|Community 816]]
+- [[_COMMUNITY_Community 817|Community 817]]
+- [[_COMMUNITY_Community 818|Community 818]]
+- [[_COMMUNITY_Community 819|Community 819]]
+- [[_COMMUNITY_Community 820|Community 820]]
+- [[_COMMUNITY_Community 821|Community 821]]
+- [[_COMMUNITY_Community 822|Community 822]]
+- [[_COMMUNITY_Community 823|Community 823]]
+- [[_COMMUNITY_Community 824|Community 824]]
+- [[_COMMUNITY_Community 825|Community 825]]
+- [[_COMMUNITY_Community 826|Community 826]]
+- [[_COMMUNITY_Community 827|Community 827]]
+- [[_COMMUNITY_Community 828|Community 828]]
+- [[_COMMUNITY_Community 829|Community 829]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `getChannelStateById()` - 56 edges
 2. `channels` - 42 edges
-3. `ConnectionManager` - 36 edges
-4. `inputs` - 35 edges
-5. `master` - 35 edges
-6. `CustomSceneManager` - 25 edges
-7. `Plano de Migracao do Backend para Rust (01V96 Remote) — v4.0` - 24 edges
-8. `socket` - 20 edges
-9. `initUI()` - 19 edges
-10. `Json` - 17 edges
+3. `channels` - 42 edges
+4. `channels` - 42 edges
+5. `channels` - 42 edges
+6. `channels` - 42 edges
+7. `channels` - 42 edges
+8. `ConnectionManager` - 36 edges
+9. `inputs` - 35 edges
+10. `master` - 35 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `METER properties (VU, GR, CR, Surr, Osc)` --conceptually_related_to--> `MIDI SysEx Protocol`  [INFERRED]
@@ -672,14 +882,14 @@
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 - **14-bit Master Meter via native 0x21 with steps.json calibration (dB = (raw - 4493) / 63.66)** —  [INFERRED 0.90]
 
-## Communities (620 total, 34 thin omitted)
+## Communities (830 total, 42 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
-Cohesion: 0.09
-Nodes (28): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, renderCompressor(), renderDynamics(), startDynNudge/stopDynNudge Dynamics Nudge Controls, toggleState() (+20 more)
+Cohesion: 0.13
+Nodes (23): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, startDynNudge/stopDynNudge Dynamics Nudge Controls, toggleState(), appReady Global Guard Flag, channelStates (+15 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.07
+Cohesion: 0.06
 Nodes (37): CancellationToken, D, Deserialize, Display, Err, Formatter, FromStr, Ok (+29 more)
 
 ### Community 2 - "Migration Audit (Rust/Node.js Dead Code)"
@@ -708,7 +918,7 @@ Nodes (13): 01V96 categorized property definitions, DAW routing properties (Phas
 
 ### Community 8 - "Architecture Refactor Plan"
 Cohesion: 0.00
-Nodes (500): kAUXAttenuator/kAtt, kAUXAttenuator/kAttBitShift, kAUXBalance/kBalance, kAUXChannelOn/kChannelOn, kAUXComp/kCompAttack, kAUXComp/kCompGain, kAUXComp/kCompKnee, kAUXComp/kCompLink (+492 more)
+Nodes (504): kAUXAttenuator/kAtt, kAUXAttenuator/kAttBitShift, kAUXBalance/kBalance, kAUXChannelOn/kChannelOn, kAUXComp/kCompAttack, kAUXComp/kCompGain, kAUXComp/kCompKnee, kAUXComp/kCompLink (+496 more)
 
 ### Community 9 - "Macros Engine & Host Profiles"
 Cohesion: 0.39
@@ -775,8 +985,8 @@ Cohesion: 0.11
 Nodes (16): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1), Documentation style guide, I. Core principles (+8 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.12
-Nodes (28): auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxManual(), updateAuxFromSocket Aux Sync Handler (+20 more)
+Cohesion: 0.09
+Nodes (32): auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxFromSocket(), updateAuxManual() (+24 more)
 
 ### Community 34 - "UI/UX Pro Max BM25 Search"
 Cohesion: 0.07
@@ -799,8 +1009,8 @@ Cohesion: 0.07
 Nodes (31): str, BM25, detect_domain(), _load_csv(), BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query (+23 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.05
-Nodes (47): 10, name, scriptId, 11, name, scriptId, 2, color (+39 more)
+Cohesion: 0.12
+Nodes (18): nudgeATT(), eqBands, freqToRaw(), gainToRaw(), initEQEngine(), nudgeQ(), onEQMove(), rawToGain() (+10 more)
 
 ### Community 46 - "Community 46"
 Cohesion: 0.07
@@ -859,8 +1069,8 @@ Cohesion: 0.05
 Nodes (38): 1.1 As Duas DLLs e seus Papéis, 1.2 Diagrama de Comunicação, 1.3 Interface COM (não chamadas diretas), 1.4 Registro Windows, 1.5 Classes Internas Principais, 1. ARQUITETURA DO SISTEMA, 2.1 Anatomia de um ID de Propriedade, 2.2 Estatísticas do Mapeamento (+30 more)
 
 ### Community 68 - "Community 68"
-Cohesion: 0.16
-Nodes (38): delete_preset(), delete_slots(), enqueue_git_sync(), get_hosts(), get_mod_config(), get_names(), get_slots(), GitSyncState (+30 more)
+Cohesion: 0.07
+Nodes (67): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+59 more)
 
 ### Community 69 - "Community 69"
 Cohesion: 0.06
@@ -895,8 +1105,8 @@ Cohesion: 0.13
 Nodes (26): a(), at(), c(), Ct(), d(), e(), Et(), f() (+18 more)
 
 ### Community 77 - "Community 77"
-Cohesion: 0.06
-Nodes (45): EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), flatEQ Reset All Bands to Flat, freqToRaw(), gainToRaw() (+37 more)
+Cohesion: 0.09
+Nodes (32): EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), flatEQ Reset All Bands to Flat, freqToRaw(), gainToRaw() (+24 more)
 
 ### Community 78 - "Community 78"
 Cohesion: 0.14
@@ -939,8 +1149,8 @@ Cohesion: 0.07
 Nodes (26): 1. Interaction to Next Paint (INP) - Crítico, 2. Layerize e Custos de Renderização (8,5 segundos), A. Cache de elementos dos meters (socket.js + channel_strip.js) ✅ FEITO, 📊 Análise Técnica de Performance (Trace Chrome), B. Throttle do canvas EQ para ~20fps (eq.js), C. Throttle dos meters para ~30fps/15fps (socket.js) ✅ FEITO, D. `Date.now()` fora do loop de canais (socket.js) ✅ FEITO, E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css) ✅ FEITO (+18 more)
 
 ### Community 88 - "Community 88"
-Cohesion: 0.10
-Nodes (32): assignedMacros, availableScripts, Channel Toggler Macro Mod (ON/OFF Multi-Channel), completeMacroMove(), MixerAPI (mixer/network/utils) Modder Contract, detectCurrentPreset(), Macro Engine (Multi-Preset, Slots, Plugin Registry), executeMacro() (+24 more)
+Cohesion: 0.14
+Nodes (21): assignedMacros, availableScripts, completeMacroMove(), detectCurrentPreset(), executeMacro(), fetchProtectedPresets(), handleTouchEnd(), initMacros() (+13 more)
 
 ### Community 89 - "Community 89"
 Cohesion: 0.14
@@ -952,7 +1162,7 @@ Nodes (13): Benchmarking Profile, Custom Profiles, Default Profile, Dev Dependen
 
 ### Community 91 - "Community 91"
 Cohesion: 0.07
-Nodes (25): autoScaleElement(), exitTechnicianMixMode(), fallbackCopyTextToClipboard(), normalizeNameEditor(), refreshServerNameDisplay(), resetDmx(), restartServer(), savedOrientation (+17 more)
+Nodes (26): autoScaleElement(), enterTechnicianMixMode(), exitTechnicianMixMode(), fallbackCopyTextToClipboard(), normalizeNameEditor(), refreshServerNameDisplay(), resetDmx(), restartServer() (+18 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.09
@@ -975,12 +1185,12 @@ Cohesion: 0.06
 Nodes (31): Cena default: `custom_names_scene-default-{nome_da_mesa}.json`, Cena individual: `custom_names_scene-{nome}-{nome_da_mesa}.json`, Estrutura de dados, Feature 1: Cenas de Nomes Customizados, Feature 2: Atribuição de Nome ao Servidor/Mesa, O que foi feito recentemente, Onde paramos e Problema Atual, Passo 1: Backend — Detecção e validação do `.env` (+23 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.12
-Nodes (25): commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition(), nudgeFader() (+17 more)
+Cohesion: 0.13
+Nodes (24): commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition(), nudgeFader() (+16 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.15
-Nodes (14): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, stopEQAnimation(), closeChannelConfig(), Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop), enableDragScroll() (+6 more)
+Cohesion: 0.22
+Nodes (9): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop), enableDragScroll(), Splash Screen (Technician/Musician Login), Channel Config Modal (EQ/DYN/AUX/ETC + Mini Fader) (+1 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.23
@@ -1023,8 +1233,8 @@ Cohesion: 0.23
 Nodes (12): clearMacroSelection(), macroDeltaToDB(), nudgeMacro(), openMacroConfig(), renderMacroFader(), renderMacroGrid(), resetMacroDbDisplay(), startMacroNudge() (+4 more)
 
 ### Community 109 - "Community 109"
-Cohesion: 0.14
-Nodes (29): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+21 more)
+Cohesion: 0.35
+Nodes (11): Channel Toggler Macro Mod (ON/OFF Multi-Channel), MixerAPI (mixer/network/utils) Modder Contract, Macro Engine (Multi-Preset, Slots, Plugin Registry), Host-to-Preset Mapping Configuration, Lumikit Macro Mod (Lighting Scene+Extra Control), macroDatabase, registerMacro Plugin Registration Function, Macro Profile: pcfavela (Channel Toggler + Lumikit) (+3 more)
 
 ### Community 110 - "Community 110"
 Cohesion: 0.15
@@ -1051,8 +1261,8 @@ Cohesion: 0.19
 Nodes (6): MasterMeter, HashMap, Option, Self, Value, Vec
 
 ### Community 116 - "Community 116"
-Cohesion: 0.15
-Nodes (31): renderAuxs(), updateAuxFromSocket(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip() (+23 more)
+Cohesion: 0.16
+Nodes (30): renderAuxs(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+22 more)
 
 ### Community 117 - "Community 117"
 Cohesion: 0.15
@@ -2772,169 +2982,977 @@ Nodes (7): computedHash, skillPath, source, sourceType, skills, rust-skills, ver
 
 ### Community 569 - "Community 569"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 24, 36
+Nodes (7): name, short, name, short, channels, 36, 5
 
 ### Community 571 - "Community 571"
 Cohesion: 0.50
 Nodes (4): globalConfig, lumikit, ip, port
 
+### Community 572 - "Community 572"
+Cohesion: 0.29
+Nodes (7): name, short, name, short, channels, 18, 36
+
 ### Community 573 - "Community 573"
-Cohesion: 0.67
-Nodes (3): name, short, 10
+Cohesion: 0.29
+Nodes (7): name, short, name, short, channels, 3, 36
 
 ### Community 574 - "Community 574"
 Cohesion: 0.50
 Nodes (4): 1, config, name, scriptId
 
 ### Community 575 - "Community 575"
-Cohesion: 0.67
-Nodes (3): name, short, 11
+Cohesion: 0.29
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 576 - "Community 576"
-Cohesion: 0.67
-Nodes (3): name, short, 12
+Cohesion: 0.29
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 577 - "Community 577"
-Cohesion: 0.67
-Nodes (3): name, short, 13
+Cohesion: 0.29
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 578 - "Community 578"
-Cohesion: 0.67
-Nodes (3): name, short, 14
+Cohesion: 0.47
+Nodes (4): createFuzzySearch(), fuzzyMatch(), isPhoneSize(), normalizeStr()
 
 ### Community 579 - "Community 579"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 580 - "Community 580"
-Cohesion: 0.67
-Nodes (3): name, short, 16
+Cohesion: 0.40
+Nodes (4): globalConfig, lumikit, ip, port
 
 ### Community 581 - "Community 581"
 Cohesion: 0.67
-Nodes (3): name, short, 17
+Nodes (3): name, short, 10
 
 ### Community 582 - "Community 582"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 11
 
 ### Community 583 - "Community 583"
 Cohesion: 0.67
-Nodes (3): name, short, 19
+Nodes (3): name, short, 12
 
 ### Community 584 - "Community 584"
 Cohesion: 0.67
-Nodes (3): name, short, 1
+Nodes (3): name, short, 13
 
 ### Community 585 - "Community 585"
 Cohesion: 0.67
-Nodes (3): name, short, 20
+Nodes (3): name, short, 14
 
 ### Community 586 - "Community 586"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 15
 
 ### Community 587 - "Community 587"
 Cohesion: 0.67
-Nodes (3): name, short, 22
+Nodes (3): name, short, 16
 
 ### Community 588 - "Community 588"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 17
 
 ### Community 589 - "Community 589"
 Cohesion: 0.67
-Nodes (3): name, short, 25
+Nodes (3): name, short, 18
 
 ### Community 590 - "Community 590"
 Cohesion: 0.67
-Nodes (3): name, short, 26
+Nodes (3): name, short, 19
 
 ### Community 591 - "Community 591"
 Cohesion: 0.67
-Nodes (3): name, short, 27
+Nodes (3): name, short, 1
 
 ### Community 592 - "Community 592"
 Cohesion: 0.67
-Nodes (3): name, short, 28
+Nodes (3): name, short, 20
 
 ### Community 593 - "Community 593"
 Cohesion: 0.67
-Nodes (3): name, short, 29
+Nodes (3): name, short, 21
 
 ### Community 594 - "Community 594"
 Cohesion: 0.67
-Nodes (3): name, short, 2
+Nodes (3): name, short, 22
 
 ### Community 595 - "Community 595"
 Cohesion: 0.67
-Nodes (3): name, short, 30
+Nodes (3): name, short, 23
 
 ### Community 596 - "Community 596"
 Cohesion: 0.67
-Nodes (3): name, short, 31
+Nodes (3): name, short, 24
 
 ### Community 597 - "Community 597"
 Cohesion: 0.67
-Nodes (3): name, short, 32
+Nodes (3): name, short, 25
 
 ### Community 598 - "Community 598"
 Cohesion: 0.67
-Nodes (3): name, short, 33
+Nodes (3): name, short, 26
 
 ### Community 599 - "Community 599"
 Cohesion: 0.67
-Nodes (3): name, short, 34
+Nodes (3): name, short, 27
 
 ### Community 600 - "Community 600"
 Cohesion: 0.67
-Nodes (3): name, short, 35
+Nodes (3): name, short, 28
 
 ### Community 601 - "Community 601"
 Cohesion: 0.67
-Nodes (3): name, short, 37
+Nodes (3): name, short, 29
 
 ### Community 602 - "Community 602"
 Cohesion: 0.67
-Nodes (3): name, short, 38
+Nodes (3): name, short, 2
 
 ### Community 603 - "Community 603"
 Cohesion: 0.67
-Nodes (3): name, short, 39
+Nodes (3): name, short, 30
 
 ### Community 604 - "Community 604"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 31
 
 ### Community 605 - "Community 605"
 Cohesion: 0.67
-Nodes (3): name, short, 40
+Nodes (3): name, short, 32
 
 ### Community 606 - "Community 606"
 Cohesion: 0.67
-Nodes (3): name, short, 4
+Nodes (3): name, short, 33
 
 ### Community 607 - "Community 607"
 Cohesion: 0.67
-Nodes (3): name, short, 5
+Nodes (3): name, short, 34
 
 ### Community 608 - "Community 608"
 Cohesion: 0.67
-Nodes (3): name, short, 6
+Nodes (3): name, short, 35
 
 ### Community 609 - "Community 609"
 Cohesion: 0.67
-Nodes (3): name, short, 7
+Nodes (3): name, short, 37
 
 ### Community 610 - "Community 610"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 38
 
 ### Community 611 - "Community 611"
 Cohesion: 0.67
-Nodes (3): name, short, 9
+Nodes (3): name, short, 39
 
 ### Community 612 - "Community 612"
+Cohesion: 0.67
+Nodes (3): name, short, 3
+
+### Community 613 - "Community 613"
+Cohesion: 0.67
+Nodes (3): name, short, 40
+
+### Community 620 - "Community 620"
+Cohesion: 0.67
+Nodes (3): name, short, 4
+
+### Community 621 - "Community 621"
+Cohesion: 0.67
+Nodes (3): name, short, 6
+
+### Community 622 - "Community 622"
+Cohesion: 0.67
+Nodes (3): name, short, 7
+
+### Community 623 - "Community 623"
+Cohesion: 0.67
+Nodes (3): name, short, 8
+
+### Community 624 - "Community 624"
+Cohesion: 0.67
+Nodes (3): name, short, 9
+
+### Community 625 - "Community 625"
+Cohesion: 0.67
+Nodes (3): master, name, short
+
+### Community 627 - "Community 627"
+Cohesion: 0.67
+Nodes (3): name, short, 10
+
+### Community 628 - "Community 628"
+Cohesion: 0.67
+Nodes (3): name, short, 11
+
+### Community 629 - "Community 629"
+Cohesion: 0.67
+Nodes (3): name, short, 12
+
+### Community 630 - "Community 630"
+Cohesion: 0.67
+Nodes (3): name, short, 13
+
+### Community 631 - "Community 631"
+Cohesion: 0.67
+Nodes (3): name, short, 14
+
+### Community 632 - "Community 632"
+Cohesion: 0.67
+Nodes (3): name, short, 15
+
+### Community 633 - "Community 633"
+Cohesion: 0.67
+Nodes (3): name, short, 16
+
+### Community 634 - "Community 634"
+Cohesion: 0.67
+Nodes (3): name, short, 17
+
+### Community 635 - "Community 635"
+Cohesion: 0.67
+Nodes (3): name, short, 19
+
+### Community 636 - "Community 636"
+Cohesion: 0.67
+Nodes (3): name, short, 1
+
+### Community 637 - "Community 637"
+Cohesion: 0.67
+Nodes (3): name, short, 20
+
+### Community 638 - "Community 638"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
+### Community 639 - "Community 639"
+Cohesion: 0.67
+Nodes (3): name, short, 22
+
+### Community 640 - "Community 640"
+Cohesion: 0.67
+Nodes (3): name, short, 23
+
+### Community 641 - "Community 641"
+Cohesion: 0.67
+Nodes (3): name, short, 24
+
+### Community 642 - "Community 642"
+Cohesion: 0.67
+Nodes (3): name, short, 25
+
+### Community 643 - "Community 643"
+Cohesion: 0.67
+Nodes (3): name, short, 26
+
+### Community 644 - "Community 644"
+Cohesion: 0.67
+Nodes (3): name, short, 27
+
+### Community 645 - "Community 645"
+Cohesion: 0.67
+Nodes (3): name, short, 28
+
+### Community 646 - "Community 646"
+Cohesion: 0.67
+Nodes (3): name, short, 29
+
+### Community 647 - "Community 647"
+Cohesion: 0.67
+Nodes (3): name, short, 2
+
+### Community 648 - "Community 648"
+Cohesion: 0.67
+Nodes (3): name, short, 30
+
+### Community 649 - "Community 649"
+Cohesion: 0.67
+Nodes (3): name, short, 31
+
+### Community 650 - "Community 650"
+Cohesion: 0.67
+Nodes (3): name, short, 32
+
+### Community 651 - "Community 651"
+Cohesion: 0.67
+Nodes (3): name, short, 33
+
+### Community 652 - "Community 652"
+Cohesion: 0.67
+Nodes (3): name, short, 34
+
+### Community 653 - "Community 653"
+Cohesion: 0.67
+Nodes (3): name, short, 35
+
+### Community 654 - "Community 654"
+Cohesion: 0.67
+Nodes (3): name, short, 37
+
+### Community 655 - "Community 655"
+Cohesion: 0.67
+Nodes (3): name, short, 38
+
+### Community 656 - "Community 656"
+Cohesion: 0.67
+Nodes (3): name, short, 39
+
+### Community 657 - "Community 657"
+Cohesion: 0.67
+Nodes (3): name, short, 3
+
+### Community 658 - "Community 658"
+Cohesion: 0.67
+Nodes (3): name, short, 40
+
+### Community 659 - "Community 659"
+Cohesion: 0.67
+Nodes (3): name, short, 4
+
+### Community 660 - "Community 660"
+Cohesion: 0.67
+Nodes (3): name, short, 5
+
+### Community 661 - "Community 661"
+Cohesion: 0.67
+Nodes (3): name, short, 6
+
+### Community 662 - "Community 662"
+Cohesion: 0.67
+Nodes (3): name, short, 7
+
+### Community 663 - "Community 663"
+Cohesion: 0.67
+Nodes (3): name, short, 8
+
+### Community 664 - "Community 664"
+Cohesion: 0.67
+Nodes (3): name, short, 9
+
+### Community 665 - "Community 665"
+Cohesion: 0.67
+Nodes (3): master, name, short
+
+### Community 668 - "Community 668"
+Cohesion: 0.67
+Nodes (3): name, short, 10
+
+### Community 669 - "Community 669"
+Cohesion: 0.67
+Nodes (3): name, short, 11
+
+### Community 670 - "Community 670"
+Cohesion: 0.67
+Nodes (3): name, short, 12
+
+### Community 671 - "Community 671"
+Cohesion: 0.67
+Nodes (3): name, short, 13
+
+### Community 672 - "Community 672"
+Cohesion: 0.67
+Nodes (3): name, short, 14
+
+### Community 673 - "Community 673"
+Cohesion: 0.67
+Nodes (3): name, short, 15
+
+### Community 674 - "Community 674"
+Cohesion: 0.67
+Nodes (3): name, short, 16
+
+### Community 675 - "Community 675"
+Cohesion: 0.67
+Nodes (3): name, short, 17
+
+### Community 676 - "Community 676"
+Cohesion: 0.67
+Nodes (3): name, short, 18
+
+### Community 677 - "Community 677"
+Cohesion: 0.67
+Nodes (3): name, short, 19
+
+### Community 678 - "Community 678"
+Cohesion: 0.67
+Nodes (3): name, short, 1
+
+### Community 679 - "Community 679"
+Cohesion: 0.67
+Nodes (3): name, short, 20
+
+### Community 680 - "Community 680"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
+### Community 681 - "Community 681"
+Cohesion: 0.67
+Nodes (3): name, short, 22
+
+### Community 682 - "Community 682"
+Cohesion: 0.67
+Nodes (3): name, short, 23
+
+### Community 683 - "Community 683"
+Cohesion: 0.67
+Nodes (3): name, short, 24
+
+### Community 684 - "Community 684"
+Cohesion: 0.67
+Nodes (3): name, short, 25
+
+### Community 685 - "Community 685"
+Cohesion: 0.67
+Nodes (3): name, short, 26
+
+### Community 686 - "Community 686"
+Cohesion: 0.67
+Nodes (3): name, short, 27
+
+### Community 687 - "Community 687"
+Cohesion: 0.67
+Nodes (3): name, short, 28
+
+### Community 688 - "Community 688"
+Cohesion: 0.67
+Nodes (3): name, short, 29
+
+### Community 689 - "Community 689"
+Cohesion: 0.67
+Nodes (3): name, short, 2
+
+### Community 690 - "Community 690"
+Cohesion: 0.67
+Nodes (3): name, short, 30
+
+### Community 691 - "Community 691"
+Cohesion: 0.67
+Nodes (3): name, short, 31
+
+### Community 692 - "Community 692"
+Cohesion: 0.67
+Nodes (3): name, short, 32
+
+### Community 693 - "Community 693"
+Cohesion: 0.67
+Nodes (3): name, short, 33
+
+### Community 694 - "Community 694"
+Cohesion: 0.67
+Nodes (3): name, short, 34
+
+### Community 695 - "Community 695"
+Cohesion: 0.67
+Nodes (3): name, short, 35
+
+### Community 696 - "Community 696"
+Cohesion: 0.67
+Nodes (3): name, short, 37
+
+### Community 697 - "Community 697"
+Cohesion: 0.67
+Nodes (3): name, short, 38
+
+### Community 698 - "Community 698"
+Cohesion: 0.67
+Nodes (3): name, short, 39
+
+### Community 699 - "Community 699"
+Cohesion: 0.67
+Nodes (3): name, short, 40
+
+### Community 700 - "Community 700"
+Cohesion: 0.67
+Nodes (3): name, short, 4
+
+### Community 701 - "Community 701"
+Cohesion: 0.67
+Nodes (3): name, short, 5
+
+### Community 702 - "Community 702"
+Cohesion: 0.67
+Nodes (3): name, short, 6
+
+### Community 703 - "Community 703"
+Cohesion: 0.67
+Nodes (3): name, short, 7
+
+### Community 704 - "Community 704"
+Cohesion: 0.67
+Nodes (3): name, short, 8
+
+### Community 705 - "Community 705"
+Cohesion: 0.67
+Nodes (3): name, short, 9
+
+### Community 706 - "Community 706"
+Cohesion: 0.67
+Nodes (3): master, name, short
+
+### Community 708 - "Community 708"
+Cohesion: 0.67
+Nodes (3): name, short, 10
+
+### Community 709 - "Community 709"
+Cohesion: 0.67
+Nodes (3): name, short, 11
+
+### Community 710 - "Community 710"
+Cohesion: 0.67
+Nodes (3): name, short, 12
+
+### Community 711 - "Community 711"
+Cohesion: 0.67
+Nodes (3): name, short, 13
+
+### Community 712 - "Community 712"
+Cohesion: 0.67
+Nodes (3): name, short, 14
+
+### Community 713 - "Community 713"
+Cohesion: 0.67
+Nodes (3): name, short, 15
+
+### Community 714 - "Community 714"
+Cohesion: 0.67
+Nodes (3): name, short, 16
+
+### Community 715 - "Community 715"
+Cohesion: 0.67
+Nodes (3): name, short, 17
+
+### Community 716 - "Community 716"
+Cohesion: 0.67
+Nodes (3): name, short, 18
+
+### Community 717 - "Community 717"
+Cohesion: 0.67
+Nodes (3): name, short, 19
+
+### Community 718 - "Community 718"
+Cohesion: 0.67
+Nodes (3): name, short, 1
+
+### Community 719 - "Community 719"
+Cohesion: 0.67
+Nodes (3): name, short, 20
+
+### Community 720 - "Community 720"
+Cohesion: 0.67
+Nodes (3): name, short, 22
+
+### Community 721 - "Community 721"
+Cohesion: 0.67
+Nodes (3): name, short, 23
+
+### Community 722 - "Community 722"
+Cohesion: 0.67
+Nodes (3): name, short, 24
+
+### Community 723 - "Community 723"
+Cohesion: 0.67
+Nodes (3): name, short, 25
+
+### Community 724 - "Community 724"
+Cohesion: 0.67
+Nodes (3): name, short, 26
+
+### Community 725 - "Community 725"
+Cohesion: 0.67
+Nodes (3): name, short, 27
+
+### Community 726 - "Community 726"
+Cohesion: 0.67
+Nodes (3): name, short, 28
+
+### Community 727 - "Community 727"
+Cohesion: 0.67
+Nodes (3): name, short, 29
+
+### Community 728 - "Community 728"
+Cohesion: 0.67
+Nodes (3): name, short, 2
+
+### Community 729 - "Community 729"
+Cohesion: 0.67
+Nodes (3): name, short, 30
+
+### Community 730 - "Community 730"
+Cohesion: 0.67
+Nodes (3): name, short, 31
+
+### Community 731 - "Community 731"
+Cohesion: 0.67
+Nodes (3): name, short, 32
+
+### Community 732 - "Community 732"
+Cohesion: 0.67
+Nodes (3): name, short, 33
+
+### Community 733 - "Community 733"
+Cohesion: 0.67
+Nodes (3): name, short, 34
+
+### Community 734 - "Community 734"
+Cohesion: 0.67
+Nodes (3): name, short, 35
+
+### Community 735 - "Community 735"
+Cohesion: 0.67
+Nodes (3): name, short, 37
+
+### Community 736 - "Community 736"
+Cohesion: 0.67
+Nodes (3): name, short, 38
+
+### Community 737 - "Community 737"
+Cohesion: 0.67
+Nodes (3): name, short, 39
+
+### Community 738 - "Community 738"
+Cohesion: 0.67
+Nodes (3): name, short, 3
+
+### Community 739 - "Community 739"
+Cohesion: 0.67
+Nodes (3): name, short, 40
+
+### Community 740 - "Community 740"
+Cohesion: 0.67
+Nodes (3): name, short, 4
+
+### Community 741 - "Community 741"
+Cohesion: 0.67
+Nodes (3): name, short, 5
+
+### Community 742 - "Community 742"
+Cohesion: 0.67
+Nodes (3): name, short, 6
+
+### Community 743 - "Community 743"
+Cohesion: 0.67
+Nodes (3): name, short, 7
+
+### Community 744 - "Community 744"
+Cohesion: 0.67
+Nodes (3): name, short, 8
+
+### Community 745 - "Community 745"
+Cohesion: 0.67
+Nodes (3): name, short, 9
+
+### Community 746 - "Community 746"
+Cohesion: 0.67
+Nodes (3): master, name, short
+
+### Community 748 - "Community 748"
+Cohesion: 0.67
+Nodes (3): name, short, 10
+
+### Community 749 - "Community 749"
+Cohesion: 0.67
+Nodes (3): name, short, 11
+
+### Community 750 - "Community 750"
+Cohesion: 0.67
+Nodes (3): name, short, 12
+
+### Community 751 - "Community 751"
+Cohesion: 0.67
+Nodes (3): name, short, 13
+
+### Community 752 - "Community 752"
+Cohesion: 0.67
+Nodes (3): name, short, 14
+
+### Community 753 - "Community 753"
+Cohesion: 0.67
+Nodes (3): name, short, 15
+
+### Community 754 - "Community 754"
+Cohesion: 0.67
+Nodes (3): name, short, 16
+
+### Community 755 - "Community 755"
+Cohesion: 0.67
+Nodes (3): name, short, 17
+
+### Community 756 - "Community 756"
+Cohesion: 0.67
+Nodes (3): name, short, 19
+
+### Community 757 - "Community 757"
+Cohesion: 0.67
+Nodes (3): name, short, 1
+
+### Community 758 - "Community 758"
+Cohesion: 0.67
+Nodes (3): name, short, 20
+
+### Community 759 - "Community 759"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
+### Community 760 - "Community 760"
+Cohesion: 0.67
+Nodes (3): name, short, 22
+
+### Community 761 - "Community 761"
+Cohesion: 0.67
+Nodes (3): name, short, 23
+
+### Community 762 - "Community 762"
+Cohesion: 0.67
+Nodes (3): name, short, 24
+
+### Community 763 - "Community 763"
+Cohesion: 0.67
+Nodes (3): name, short, 25
+
+### Community 764 - "Community 764"
+Cohesion: 0.67
+Nodes (3): name, short, 26
+
+### Community 765 - "Community 765"
+Cohesion: 0.67
+Nodes (3): name, short, 27
+
+### Community 766 - "Community 766"
+Cohesion: 0.67
+Nodes (3): name, short, 28
+
+### Community 767 - "Community 767"
+Cohesion: 0.67
+Nodes (3): name, short, 29
+
+### Community 768 - "Community 768"
+Cohesion: 0.67
+Nodes (3): name, short, 2
+
+### Community 769 - "Community 769"
+Cohesion: 0.67
+Nodes (3): name, short, 30
+
+### Community 770 - "Community 770"
+Cohesion: 0.67
+Nodes (3): name, short, 31
+
+### Community 771 - "Community 771"
+Cohesion: 0.67
+Nodes (3): name, short, 32
+
+### Community 772 - "Community 772"
+Cohesion: 0.67
+Nodes (3): name, short, 33
+
+### Community 773 - "Community 773"
+Cohesion: 0.67
+Nodes (3): name, short, 34
+
+### Community 774 - "Community 774"
+Cohesion: 0.67
+Nodes (3): name, short, 35
+
+### Community 775 - "Community 775"
+Cohesion: 0.67
+Nodes (3): name, short, 37
+
+### Community 776 - "Community 776"
+Cohesion: 0.67
+Nodes (3): name, short, 38
+
+### Community 777 - "Community 777"
+Cohesion: 0.67
+Nodes (3): name, short, 39
+
+### Community 778 - "Community 778"
+Cohesion: 0.67
+Nodes (3): name, short, 3
+
+### Community 779 - "Community 779"
+Cohesion: 0.67
+Nodes (3): name, short, 40
+
+### Community 780 - "Community 780"
+Cohesion: 0.67
+Nodes (3): name, short, 4
+
+### Community 781 - "Community 781"
+Cohesion: 0.67
+Nodes (3): name, short, 5
+
+### Community 782 - "Community 782"
+Cohesion: 0.67
+Nodes (3): name, short, 6
+
+### Community 783 - "Community 783"
+Cohesion: 0.67
+Nodes (3): name, short, 7
+
+### Community 784 - "Community 784"
+Cohesion: 0.67
+Nodes (3): name, short, 8
+
+### Community 785 - "Community 785"
+Cohesion: 0.67
+Nodes (3): name, short, 9
+
+### Community 786 - "Community 786"
+Cohesion: 0.67
+Nodes (3): master, name, short
+
+### Community 788 - "Community 788"
+Cohesion: 0.67
+Nodes (3): name, short, 10
+
+### Community 789 - "Community 789"
+Cohesion: 0.67
+Nodes (3): name, short, 11
+
+### Community 790 - "Community 790"
+Cohesion: 0.67
+Nodes (3): name, short, 12
+
+### Community 791 - "Community 791"
+Cohesion: 0.67
+Nodes (3): name, short, 13
+
+### Community 792 - "Community 792"
+Cohesion: 0.67
+Nodes (3): name, short, 14
+
+### Community 793 - "Community 793"
+Cohesion: 0.67
+Nodes (3): name, short, 15
+
+### Community 794 - "Community 794"
+Cohesion: 0.67
+Nodes (3): name, short, 16
+
+### Community 795 - "Community 795"
+Cohesion: 0.67
+Nodes (3): name, short, 17
+
+### Community 796 - "Community 796"
+Cohesion: 0.67
+Nodes (3): name, short, 19
+
+### Community 797 - "Community 797"
+Cohesion: 0.67
+Nodes (3): name, short, 1
+
+### Community 798 - "Community 798"
+Cohesion: 0.67
+Nodes (3): name, short, 20
+
+### Community 799 - "Community 799"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
+### Community 800 - "Community 800"
+Cohesion: 0.67
+Nodes (3): name, short, 22
+
+### Community 801 - "Community 801"
+Cohesion: 0.67
+Nodes (3): name, short, 23
+
+### Community 802 - "Community 802"
+Cohesion: 0.67
+Nodes (3): name, short, 24
+
+### Community 803 - "Community 803"
+Cohesion: 0.67
+Nodes (3): name, short, 25
+
+### Community 804 - "Community 804"
+Cohesion: 0.67
+Nodes (3): name, short, 26
+
+### Community 805 - "Community 805"
+Cohesion: 0.67
+Nodes (3): name, short, 27
+
+### Community 806 - "Community 806"
+Cohesion: 0.67
+Nodes (3): name, short, 28
+
+### Community 807 - "Community 807"
+Cohesion: 0.67
+Nodes (3): name, short, 29
+
+### Community 808 - "Community 808"
+Cohesion: 0.67
+Nodes (3): name, short, 2
+
+### Community 809 - "Community 809"
+Cohesion: 0.67
+Nodes (3): name, short, 30
+
+### Community 810 - "Community 810"
+Cohesion: 0.67
+Nodes (3): name, short, 31
+
+### Community 811 - "Community 811"
+Cohesion: 0.67
+Nodes (3): name, short, 32
+
+### Community 812 - "Community 812"
+Cohesion: 0.67
+Nodes (3): name, short, 33
+
+### Community 813 - "Community 813"
+Cohesion: 0.67
+Nodes (3): name, short, 34
+
+### Community 814 - "Community 814"
+Cohesion: 0.67
+Nodes (3): name, short, 35
+
+### Community 815 - "Community 815"
+Cohesion: 0.67
+Nodes (3): name, short, 37
+
+### Community 816 - "Community 816"
+Cohesion: 0.67
+Nodes (3): name, short, 38
+
+### Community 817 - "Community 817"
+Cohesion: 0.67
+Nodes (3): name, short, 39
+
+### Community 818 - "Community 818"
+Cohesion: 0.67
+Nodes (3): name, short, 3
+
+### Community 819 - "Community 819"
+Cohesion: 0.67
+Nodes (3): name, short, 40
+
+### Community 820 - "Community 820"
+Cohesion: 0.67
+Nodes (3): name, short, 4
+
+### Community 821 - "Community 821"
+Cohesion: 0.67
+Nodes (3): name, short, 5
+
+### Community 822 - "Community 822"
+Cohesion: 0.67
+Nodes (3): name, short, 6
+
+### Community 823 - "Community 823"
+Cohesion: 0.67
+Nodes (3): name, short, 7
+
+### Community 824 - "Community 824"
+Cohesion: 0.67
+Nodes (3): name, short, 8
+
+### Community 825 - "Community 825"
+Cohesion: 0.67
+Nodes (3): name, short, 9
+
+### Community 826 - "Community 826"
 Cohesion: 0.67
 Nodes (3): master, name, short
 
@@ -2943,24 +3961,24 @@ Nodes (3): master, name, short
   scratch/test_sudo.js · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **4914 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+4909 more)
+- **5319 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+5314 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **42 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `FX slot deep scanner (SysEx monitor for effects)` and `PowerShell UAC elevation test`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `getChannelStateById()` connect `Community 33` to `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)`, `Community 97`, `Community 162`, `Community 98`, `Community 77`, `Community 116`, `Community 88`, `Community 121`?**
+- **Why does `Json` connect `Community 68` to `JavaScript Mastery Skill`, `OpenCode TUI Config`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `initUI()` connect `Community 116` to `Community 97`, `Community 98`, `Community 108`, `Community 149`, `Community 122`, `Community 91`?**
+- **Why does `channels` connect `Community 576` to `Community 768`, `Community 769`, `Community 770`, `Community 771`, `Community 772`, `Community 773`, `Community 774`, `Community 775`, `Community 776`, `Community 777`, `Community 778`, `Community 779`, `Community 780`, `Community 781`, `Community 782`, `Community 783`, `Community 784`, `Community 785`, `Community 786`, `Community 747`, `Community 748`, `Community 749`, `Community 750`, `Community 751`, `Community 752`, `Community 753`, `Community 754`, `Community 755`, `Community 756`, `Community 757`, `Community 758`, `Community 759`, `Community 760`, `Community 761`, `Community 762`, `Community 763`, `Community 764`, `Community 765`, `Community 766`, `Community 767`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `01V96 Remote Web Interface` connect `Project README Highlights` to `Rust Migration Governance Rules`, `DMX Art-Net Auto-Recovery`, `Channel Pair SysEx & 01V96 Mixer`?**
+- **Why does `channels` connect `Community 569` to `Community 580`, `Community 581`, `Community 582`, `Community 583`, `Community 584`, `Community 585`, `Community 586`, `Community 587`, `Community 588`, `Community 589`, `Community 590`, `Community 591`, `Community 592`, `Community 593`, `Community 594`, `Community 595`, `Community 596`, `Community 597`, `Community 598`, `Community 599`, `Community 600`, `Community 601`, `Community 602`, `Community 603`, `Community 604`, `Community 605`, `Community 606`, `Community 607`, `Community 608`, `Community 609`, `Community 610`, `Community 611`, `Community 612`, `Community 613`, `Community 620`, `Community 621`, `Community 622`, `Community 623`, `Community 624`, `Community 625`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **Are the 40 inferred relationships involving `getChannelStateById()` (e.g. with `execute()` and `auxWheelInput()`) actually correct?**
   _`getChannelStateById()` has 40 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `contentHash`, `downloadedAt`, `contentHash` to the rest of the system?**
-  _4945 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _5350 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` be split into smaller, more focused modules?**
-  _Cohesion score 0.08739495798319327 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13405797101449277 - nodes in this community are weakly interconnected._

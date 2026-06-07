@@ -535,8 +535,8 @@
     "semantic_hash": "129450821c678dc15c5f3f556c87c1e8"
   },
   "public/index.html": {
-    "mtime": 1780801873.408924,
-    "ast_hash": "9cee89ccb4d5a6047f3de1583bdd62e5",
+    "mtime": 1780804316.350551,
+    "ast_hash": "c05e6749401c692c90bd8c467ca043ab",
     "semantic_hash": ""
   },
   "reverse_dll_project/BIBLIA_TECNICA_01V96.md": {
@@ -2485,8 +2485,8 @@
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/local/profile_pcfavela.json": {
-    "mtime": 1780799475.6521156,
-    "ast_hash": "4068afd4fa14ab68e6b3f87d70abe2a2",
+    "mtime": 1780803890.5705736,
+    "ast_hash": "12a1518164191e2d9f7baf635d3151c7",
     "semantic_hash": ""
   }
 }

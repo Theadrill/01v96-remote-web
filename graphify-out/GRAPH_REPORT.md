@@ -1,16 +1,16 @@
 # Graph Report - 01v96-remote-web  (2026-06-07)
 
 ## Corpus Check
-- 493 files · ~541,469 words
+- 493 files · ~541,489 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7753 nodes · 8336 edges · 830 communities (788 shown, 42 thin omitted)
+- 7762 nodes · 8345 edges · 829 communities (787 shown, 42 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 154 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `db82b597`
+- Built from commit: `5b9760dc`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -818,7 +818,6 @@
 - [[_COMMUNITY_Community 820|Community 820]]
 - [[_COMMUNITY_Community 821|Community 821]]
 - [[_COMMUNITY_Community 822|Community 822]]
-- [[_COMMUNITY_Community 823|Community 823]]
 - [[_COMMUNITY_Community 824|Community 824]]
 - [[_COMMUNITY_Community 825|Community 825]]
 - [[_COMMUNITY_Community 826|Community 826]]
@@ -882,11 +881,11 @@
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 - **14-bit Master Meter via native 0x21 with steps.json calibration (dB = (raw - 4493) / 63.66)** —  [INFERRED 0.90]
 
-## Communities (830 total, 42 thin omitted)
+## Communities (829 total, 42 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
-Cohesion: 0.13
-Nodes (23): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, startDynNudge/stopDynNudge Dynamics Nudge Controls, toggleState(), appReady Global Guard Flag, channelStates (+15 more)
+Cohesion: 0.11
+Nodes (25): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, renderCompressor(), renderDynamics(), startDynNudge/stopDynNudge Dynamics Nudge Controls, toggleState() (+17 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
@@ -985,8 +984,8 @@ Cohesion: 0.11
 Nodes (16): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1), Documentation style guide, I. Core principles (+8 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.09
-Nodes (32): auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxFromSocket(), updateAuxManual() (+24 more)
+Cohesion: 0.11
+Nodes (29): auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxFromSocket(), updateAuxManual() (+21 more)
 
 ### Community 34 - "UI/UX Pro Max BM25 Search"
 Cohesion: 0.07
@@ -1105,8 +1104,8 @@ Cohesion: 0.13
 Nodes (26): a(), at(), c(), Ct(), d(), e(), Et(), f() (+18 more)
 
 ### Community 77 - "Community 77"
-Cohesion: 0.09
-Nodes (32): EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), flatEQ Reset All Bands to Flat, freqToRaw(), gainToRaw() (+24 more)
+Cohesion: 0.10
+Nodes (27): EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), flatEQ Reset All Bands to Flat, freqToRaw(), gainToRaw() (+19 more)
 
 ### Community 78 - "Community 78"
 Cohesion: 0.14
@@ -1149,8 +1148,8 @@ Cohesion: 0.07
 Nodes (26): 1. Interaction to Next Paint (INP) - Crítico, 2. Layerize e Custos de Renderização (8,5 segundos), A. Cache de elementos dos meters (socket.js + channel_strip.js) ✅ FEITO, 📊 Análise Técnica de Performance (Trace Chrome), B. Throttle do canvas EQ para ~20fps (eq.js), C. Throttle dos meters para ~30fps/15fps (socket.js) ✅ FEITO, D. `Date.now()` fora do loop de canais (socket.js) ✅ FEITO, E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css) ✅ FEITO (+18 more)
 
 ### Community 88 - "Community 88"
-Cohesion: 0.14
-Nodes (21): assignedMacros, availableScripts, completeMacroMove(), detectCurrentPreset(), executeMacro(), fetchProtectedPresets(), handleTouchEnd(), initMacros() (+13 more)
+Cohesion: 0.10
+Nodes (32): assignedMacros, availableScripts, Channel Toggler Macro Mod (ON/OFF Multi-Channel), completeMacroMove(), MixerAPI (mixer/network/utils) Modder Contract, detectCurrentPreset(), Macro Engine (Multi-Preset, Slots, Plugin Registry), executeMacro() (+24 more)
 
 ### Community 89 - "Community 89"
 Cohesion: 0.14
@@ -1161,8 +1160,8 @@ Cohesion: 0.14
 Nodes (13): Benchmarking Profile, Custom Profiles, Default Profile, Dev Dependencies Optimization, LTO Options, Optimization Levels, Optimized Profile, perf-release-profile (+5 more)
 
 ### Community 91 - "Community 91"
-Cohesion: 0.07
-Nodes (26): autoScaleElement(), enterTechnicianMixMode(), exitTechnicianMixMode(), fallbackCopyTextToClipboard(), normalizeNameEditor(), refreshServerNameDisplay(), resetDmx(), restartServer() (+18 more)
+Cohesion: 0.06
+Nodes (30): showSceneGrid Scene Save/Load Grid Modal, autoScaleElement(), changeTechnicianMix(), enterTechnicianMixMode(), exitTechnicianMixMode(), fallbackCopyTextToClipboard(), normalizeNameEditor(), refreshServerNameDisplay() (+22 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.09
@@ -1189,8 +1188,8 @@ Cohesion: 0.13
 Nodes (24): commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition(), nudgeFader() (+16 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.22
-Nodes (9): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop), enableDragScroll(), Splash Screen (Technician/Musician Login), Channel Config Modal (EQ/DYN/AUX/ETC + Mini Fader) (+1 more)
+Cohesion: 0.14
+Nodes (15): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, stopEQAnimation(), changeConfigChannel(), closeChannelConfig(), Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop) (+7 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.23
@@ -1233,8 +1232,8 @@ Cohesion: 0.23
 Nodes (12): clearMacroSelection(), macroDeltaToDB(), nudgeMacro(), openMacroConfig(), renderMacroFader(), renderMacroGrid(), resetMacroDbDisplay(), startMacroNudge() (+4 more)
 
 ### Community 109 - "Community 109"
-Cohesion: 0.35
-Nodes (11): Channel Toggler Macro Mod (ON/OFF Multi-Channel), MixerAPI (mixer/network/utils) Modder Contract, Macro Engine (Multi-Preset, Slots, Plugin Registry), Host-to-Preset Mapping Configuration, Lumikit Macro Mod (Lighting Scene+Extra Control), macroDatabase, registerMacro Plugin Registration Function, Macro Profile: pcfavela (Channel Toggler + Lumikit) (+3 more)
+Cohesion: 0.50
+Nodes (4): 1, config, name, scriptId
 
 ### Community 110 - "Community 110"
 Cohesion: 0.15
@@ -1261,8 +1260,8 @@ Cohesion: 0.19
 Nodes (6): MasterMeter, HashMap, Option, Self, Value, Vec
 
 ### Community 116 - "Community 116"
-Cohesion: 0.16
-Nodes (30): renderAuxs(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+22 more)
+Cohesion: 0.19
+Nodes (26): renderAuxs(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+18 more)
 
 ### Community 117 - "Community 117"
 Cohesion: 0.15
@@ -1354,11 +1353,11 @@ Nodes (5): onClear(), renderBtns(), renderExtraBtns(), renderSec(), renderUI()
 
 ### Community 139 - "Community 139"
 Cohesion: 0.22
-Nodes (8): 0, config, name, scriptId, 1, config, name, scriptId
+Nodes (8): 0, config, name, scriptId, globalConfig, lumikit, ip, port
 
 ### Community 140 - "Community 140"
 Cohesion: 0.22
-Nodes (8): 0, config, name, scriptId, globalConfig, lumikit, ip, port
+Nodes (8): 1, config, name, scriptId, globalConfig, lumikit, ip, port
 
 ### Community 141 - "Community 141"
 Cohesion: 0.15
@@ -2982,27 +2981,27 @@ Nodes (7): computedHash, skillPath, source, sourceType, skills, rust-skills, ver
 
 ### Community 569 - "Community 569"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 36, 5
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 571 - "Community 571"
 Cohesion: 0.50
-Nodes (4): globalConfig, lumikit, ip, port
+Nodes (4): 0, config, name, scriptId
 
 ### Community 572 - "Community 572"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 24, 36
 
 ### Community 573 - "Community 573"
 Cohesion: 0.29
 Nodes (7): name, short, name, short, channels, 3, 36
 
 ### Community 574 - "Community 574"
-Cohesion: 0.50
-Nodes (4): 1, config, name, scriptId
+Cohesion: 0.67
+Nodes (3): name, short, 5
 
 ### Community 575 - "Community 575"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 576 - "Community 576"
 Cohesion: 0.29
@@ -3010,15 +3009,15 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 577 - "Community 577"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 36, 7
 
 ### Community 578 - "Community 578"
 Cohesion: 0.47
 Nodes (4): createFuzzySearch(), fuzzyMatch(), isPhoneSize(), normalizeStr()
 
 ### Community 579 - "Community 579"
-Cohesion: 0.40
-Nodes (4): globalConfig, lumikit, ip, port
+Cohesion: 0.14
+Nodes (13): 0, config, name, scriptId, 1, name, scriptId, extras (+5 more)
 
 ### Community 581 - "Community 581"
 Cohesion: 0.67
@@ -3234,7 +3233,7 @@ Nodes (3): name, short, 23
 
 ### Community 641 - "Community 641"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 21
 
 ### Community 642 - "Community 642"
 Cohesion: 0.67
@@ -3940,10 +3939,6 @@ Nodes (3): name, short, 5
 Cohesion: 0.67
 Nodes (3): name, short, 6
 
-### Community 823 - "Community 823"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
 ### Community 824 - "Community 824"
 Cohesion: 0.67
 Nodes (3): name, short, 8
@@ -3961,7 +3956,7 @@ Nodes (3): master, name, short
   scratch/test_sudo.js · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **5319 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+5314 more)
+- **5325 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+5320 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **42 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -3970,15 +3965,15 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `FX slot deep scanner (SysEx monitor for effects)` and `PowerShell UAC elevation test`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `Json` connect `Community 68` to `JavaScript Mastery Skill`, `OpenCode TUI Config`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **Why does `channels` connect `Community 576` to `Community 768`, `Community 769`, `Community 770`, `Community 771`, `Community 772`, `Community 773`, `Community 774`, `Community 775`, `Community 776`, `Community 777`, `Community 778`, `Community 779`, `Community 780`, `Community 781`, `Community 782`, `Community 783`, `Community 784`, `Community 785`, `Community 786`, `Community 747`, `Community 748`, `Community 749`, `Community 750`, `Community 751`, `Community 752`, `Community 753`, `Community 754`, `Community 755`, `Community 756`, `Community 757`, `Community 758`, `Community 759`, `Community 760`, `Community 761`, `Community 762`, `Community 763`, `Community 764`, `Community 765`, `Community 766`, `Community 767`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `channels` connect `Community 569` to `Community 580`, `Community 581`, `Community 582`, `Community 583`, `Community 584`, `Community 585`, `Community 586`, `Community 587`, `Community 588`, `Community 589`, `Community 590`, `Community 591`, `Community 592`, `Community 593`, `Community 594`, `Community 595`, `Community 596`, `Community 597`, `Community 598`, `Community 599`, `Community 600`, `Community 601`, `Community 602`, `Community 603`, `Community 604`, `Community 605`, `Community 606`, `Community 607`, `Community 608`, `Community 609`, `Community 610`, `Community 611`, `Community 612`, `Community 613`, `Community 620`, `Community 621`, `Community 622`, `Community 623`, `Community 624`, `Community 625`?**
+- **Why does `channels` connect `Community 569` to `Community 574`, `Community 580`, `Community 581`, `Community 582`, `Community 583`, `Community 584`, `Community 585`, `Community 586`, `Community 587`, `Community 588`, `Community 590`, `Community 591`, `Community 592`, `Community 593`, `Community 594`, `Community 595`, `Community 596`, `Community 597`, `Community 598`, `Community 599`, `Community 600`, `Community 601`, `Community 602`, `Community 603`, `Community 604`, `Community 605`, `Community 606`, `Community 607`, `Community 608`, `Community 609`, `Community 610`, `Community 611`, `Community 612`, `Community 613`, `Community 620`, `Community 621`, `Community 622`, `Community 623`, `Community 624`, `Community 625`?**
+  _High betweenness centrality (0.001) - this node is a cross-community bridge._
+- **Why does `channels` connect `Community 577` to `Community 787`, `Community 788`, `Community 789`, `Community 790`, `Community 791`, `Community 792`, `Community 793`, `Community 794`, `Community 795`, `Community 796`, `Community 797`, `Community 798`, `Community 799`, `Community 800`, `Community 801`, `Community 802`, `Community 803`, `Community 804`, `Community 805`, `Community 806`, `Community 807`, `Community 808`, `Community 809`, `Community 810`, `Community 811`, `Community 812`, `Community 813`, `Community 814`, `Community 815`, `Community 816`, `Community 817`, `Community 818`, `Community 819`, `Community 820`, `Community 821`, `Community 822`, `Community 824`, `Community 825`, `Community 826`, `Community 716`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **Are the 40 inferred relationships involving `getChannelStateById()` (e.g. with `execute()` and `auxWheelInput()`) actually correct?**
   _`getChannelStateById()` has 40 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `contentHash`, `downloadedAt`, `contentHash` to the rest of the system?**
-  _5350 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _5356 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` be split into smaller, more focused modules?**
-  _Cohesion score 0.13405797101449277 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10837438423645321 - nodes in this community are weakly interconnected._
