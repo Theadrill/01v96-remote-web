@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
     <meta name="mobile-web-app-capable" content="yes">
     <title>01V96 - LIVE SAFE</title>
-    <link rel="stylesheet" href="style.css?v=44">
-    <!-- UI UPDATE: 2026-04-12 -->
+    <link rel="stylesheet" href="style.css?v=48">
+    <!-- UI UPDATE: 2026-06-07 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
         // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
@@ -803,8 +803,8 @@
             <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:20px; letter-spacing:1px;">
                 Selecione os canais desejados abaixo:</p>
 
-            <div id="macroSettingsGrid"
-                style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; max-height:400px; overflow-y:auto; margin-bottom:25px; scrollbar-width:none;">
+            <div id="macroSettingsGrid" class="macro-settings-grid"
+                style="max-height:400px; overflow-y:auto; margin-bottom:25px; scrollbar-width:none;">
                 <style>
                     ::-webkit-scrollbar {
                         display: none !important;
@@ -817,7 +817,7 @@
                 <!-- Grid de 32 botões gerado via JS -->
             </div>
 
-            <div style="display:flex; gap:15px;">
+            <div class="macro-settings-actions">
                 <button id="btnMacroSave" class="btn-connect" style="flex:1; height:50px; background:#28a745;"
                     onclick="window.saveCurrentMacroSettings()">SALVAR</button>
                 <button id="btnMacroClear" class="btn-connect" style="flex:1; height:50px; background:#dc3545;"

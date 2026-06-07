@@ -4024,3 +4024,32 @@ body.layout-desktop .btn-macros {
     min-height: 88px !important;
     letter-spacing: 1px;
 }
+.macro-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+@media (max-width: 400px) {
+    .macro-settings-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+    .macro-settings-grid .btn-connect {
+        padding: 4px !important;
+        min-height: 45px !important;
+        font-size: 9px !important;
+    }
+}
+.macro-settings-actions {
+    display: flex;
+    gap: 15px;
+}
+@media (max-width: 400px) {
+    .macro-settings-actions {
+        gap: 5px;
+    }
+    .macro-settings-actions button {
+        font-size: 10px !important;
+        padding: 0 4px !important;
+    }
+}
