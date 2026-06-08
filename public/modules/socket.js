@@ -61,7 +61,16 @@ socket.on('syncStatus', (data) => {
     const isScene = (typeof data === 'object') ? (data.type === 'is_scene') : false;
 
     if (isActive) {
-        OverlayInfo.show('sync', 'SINCRONIZANDO...');
+        let text = 'SINCRONIZANDO...';
+        if (typeof data === 'object' && data.progress !== undefined && data.total !== undefined) {
+            let percent = Math.floor((data.progress / data.total) * 100);
+            if (data.type === 'channels') {
+                text = `SINCRONIZANDO - CANAIS ${percent}%`;
+            } else if (data.type === 'scenes') {
+                text = `SINCRONIZANDO - CENAS ${percent}%`;
+            }
+        }
+        OverlayInfo.show('sync', text);
     } else {
         OverlayInfo.hide();
     }

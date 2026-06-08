@@ -96,8 +96,14 @@ impl SyncManager {
                     0x00, i, 0xF7,
                 ];
                 sched.enqueue(req, 1).await;
-                if i % 20 == 0 {
+                if i % 10 == 0 {
                     tracing::info!("⏳ [Scene Manager] Progresso: {}/100...", i);
+                    let _ = io.emit("syncStatus", &serde_json::json!({
+                        "active": true,
+                        "type": "scenes",
+                        "progress": i,
+                        "total": 100
+                    })).await;
                 }
                 tokio::time::sleep(std::time::Duration::from_millis(50)).await;
             }
@@ -511,6 +517,7 @@ async fn queue_all_params_inner(
     }
 
     // Batch enqueue — all at once (single lock), matching Node.js synchronous behavior
+    let total_reqs = requests.len();
     sched.enqueue_batch(requests, 1).await;
 
     // Wait for Q0+Q1 to drain
@@ -525,6 +532,14 @@ async fn queue_all_params_inner(
         if last_log != remaining as u32 {
             tracing::info!("⏳ [Sync] Aguardando {} requests na fila...", remaining);
             last_log = remaining as u32;
+            
+            let current = if remaining < total_reqs { total_reqs - remaining } else { 0 };
+            let _ = io.emit("syncStatus", &serde_json::json!({
+                "active": true,
+                "type": "channels",
+                "progress": current,
+                "total": total_reqs
+            })).await;
         }
     }
 

@@ -179,7 +179,7 @@ pub fn register_handlers(
                     data.value,
                     converter,
                 ) {
-                    scheduler_control.enqueue(sysex, 1).await;
+                    scheduler_control.enqueue(sysex, 0).await;
                 }
             },
         );
@@ -218,7 +218,7 @@ pub fn register_handlers(
                 if let Some(sysex) =
                     crate::midi::pan::build_pan_change(data.channel as i64, data.value)
                 {
-                    scheduler_pan.enqueue(sysex, 1).await;
+                    scheduler_pan.enqueue(sysex, 0).await;
                 }
             },
         );
@@ -241,8 +241,8 @@ pub fn register_handlers(
                 let (paired_value, should_broadcast) = match action {
                     "pair" => {
                         let (aux, state) = crate::midi::pair::build_pair(ch_a, ch_b, source_ch);
-                        scheduler_pair.enqueue(aux, 1).await;
-                        scheduler_pair.enqueue(state, 1).await;
+                        scheduler_pair.enqueue(aux, 0).await;
+                        scheduler_pair.enqueue(state, 0).await;
                         let mut s = state_pair.write().await;
                         let p = crate::midi::protocol::ParsedMidi::ControlChange {
                             msg_type: "kInputPair/kPair".to_string(),
@@ -254,7 +254,7 @@ pub fn register_handlers(
                     }
                     "unpair" => {
                         let state = crate::midi::pair::build_unpair(ch_a, ch_b);
-                        scheduler_pair.enqueue(state, 1).await;
+                        scheduler_pair.enqueue(state, 0).await;
                         let mut s = state_pair.write().await;
                         let p = crate::midi::protocol::ParsedMidi::ControlChange {
                             msg_type: "kInputPair/kPair".to_string(),
@@ -266,8 +266,8 @@ pub fn register_handlers(
                     }
                     "reset" => {
                         let (aux, state) = crate::midi::pair::build_reset(ch_a, ch_b);
-                        scheduler_pair.enqueue(aux, 1).await;
-                        scheduler_pair.enqueue(state, 1).await;
+                        scheduler_pair.enqueue(aux, 0).await;
+                        scheduler_pair.enqueue(state, 0).await;
                         let mut s = state_pair.write().await;
                         let p = crate::midi::protocol::ParsedMidi::ControlChange {
                             msg_type: "kInputPair/kPair".to_string(),
@@ -340,7 +340,7 @@ pub fn register_handlers(
                     && let Some(sysex) =
                         crate::midi::protocol::build_request("kInputAttenuator/kAtt", ch as u8)
                     {
-                        scheduler_eq.enqueue(sysex, 2).await;
+                        scheduler_eq.enqueue(sysex, 0).await;
                     }
             },
         );
@@ -362,7 +362,7 @@ pub fn register_handlers(
                         0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x00, 0x00, index as u8, 0x02, 0x00,
                         0xF7,
                     ];
-                    scheduler_scene.enqueue(sysex, 1).await;
+                    scheduler_scene.enqueue(sysex, 0).await;
 
                     {
                         let mut state = state_scene.write().await;
@@ -465,7 +465,7 @@ pub fn register_handlers(
                                             global_ch, ci as u8, byte,
                                         )
                                     {
-                                        sched_clone.enqueue(req, 1).await;
+                                        sched_clone.enqueue(req, 0).await;
                                     }
                                     if ci < short_bytes.len() - 1 {
                                         tokio::select! {
@@ -645,7 +645,7 @@ pub fn register_handlers(
                                 if let Some(req) = crate::midi::protocol::build_name_change(
                                     channel, ci as u8, byte,
                                 ) {
-                                    sched_op.enqueue(req, 1).await;
+                                    sched_op.enqueue(req, 0).await;
                                 }
                                 if ci < short_bytes.len() - 1 {
                                     tokio::time::sleep(std::time::Duration::from_millis(30)).await;
@@ -1038,7 +1038,7 @@ pub fn register_handlers(
                     let store_sysex = vec![
                         0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x20, 0x00, index, 0x02, 0x00, 0xF7,
                     ];
-                    scheduler_save.enqueue(store_sysex, 1).await;
+                    scheduler_save.enqueue(store_sysex, 0).await;
                     tracing::info!("[TIMING] store enqueue: {:?}", t_start.elapsed());
 
                     let original_scene_index = {
@@ -1074,7 +1074,7 @@ pub fn register_handlers(
                             vec![0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x40, 0x00, index];
                         rename_sysex.extend_from_slice(target_name_padded.as_bytes());
                         rename_sysex.push(0xF7);
-                        scheduler_save.enqueue(rename_sysex, 1).await;
+                        scheduler_save.enqueue(rename_sysex, 0).await;
                         tracing::info!("[TIMING] rename enqueue: {:?}", t_start.elapsed());
 
                         tokio::time::sleep(std::time::Duration::from_millis(700)).await;
@@ -1140,7 +1140,7 @@ pub fn register_handlers(
                     let delete_sysex = vec![
                         0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x60, 0x00, index as u8, 0xF7,
                     ];
-                    scheduler_delete.enqueue(delete_sysex, 1).await;
+                    scheduler_delete.enqueue(delete_sysex, 0).await;
 
                     let mut state = state_delete.write().await;
                     state.scene_manager.scenes[index as usize] = None;
@@ -1251,7 +1251,7 @@ pub fn register_handlers(
                     if let Some(req) =
                         crate::midi::protocol::build_name_change(channel as u8, ci as u8, code)
                     {
-                        sched_name.enqueue(req, 1).await;
+                        sched_name.enqueue(req, 0).await;
                     }
                     if ci < padded_bytes.len() - 1 {
                         tokio::time::sleep(std::time::Duration::from_millis(30)).await;
@@ -1261,7 +1261,7 @@ pub fn register_handlers(
                 for ci in 0..4u8 {
                     if let Some(req) = crate::midi::protocol::build_name_request(channel as u8, ci)
                     {
-                        sched_name.enqueue(req, 1).await;
+                        sched_name.enqueue(req, 0).await;
                     }
                 }
 
@@ -1384,7 +1384,7 @@ pub fn register_handlers(
                                         global_ch, ci as u8, byte,
                                     )
                                 {
-                                    sched_clone.enqueue(req, 1).await;
+                                    sched_clone.enqueue(req, 0).await;
                                 }
                                 if ci < short_bytes.len() - 1 {
                                     tokio::time::sleep(std::time::Duration::from_millis(30)).await;
@@ -1522,7 +1522,7 @@ pub fn register_handlers(
                                         global_ch, ci as u8, byte,
                                     )
                                 {
-                                    sched_clone.enqueue(req, 1).await;
+                                    sched_clone.enqueue(req, 0).await;
                                 }
                                 if ci < short_bytes.len() - 1 {
                                     tokio::time::sleep(std::time::Duration::from_millis(30)).await;
@@ -1659,7 +1659,7 @@ pub fn register_handlers(
                 if !require_setup(&socket) {
                     return;
                 }
-                scheduler_sysex.enqueue(data.0, 1).await;
+                scheduler_sysex.enqueue(data.0, 0).await;
             },
         );
 
@@ -1670,7 +1670,7 @@ pub fn register_handlers(
             move |_socket: SocketRef, _data: Data<serde_json::Value>| async move {
                 let requests = crate::midi::pan::build_pan_sync_requests();
                 for req in requests {
-                    scheduler_syncpan.enqueue(req, 1).await;
+                    scheduler_syncpan.enqueue(req, 0).await;
                 }
             },
         );
