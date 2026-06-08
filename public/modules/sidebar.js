@@ -626,6 +626,10 @@ function renderDock(mode) {
         }
     }
 
+    if (layoutMode === 'desktop' && mode !== 'main' && mode !== 'musician') {
+        buttons.unshift({ label: 'CONFIG', action: "document.getElementById('configModal').style.display='flex'", cls: 'dock-config' });
+    }
+
     dock.innerHTML = buttons.map(b =>
         `<button class="dock-btn ${b.cls || ''}" onclick="${b.action}"${b.id ? ` id="${b.id}"` : ''}>${b.label}</button>`
     ).join('');
@@ -671,11 +675,12 @@ function updateSidebarInfo() {
 
     if (activeConfigChannel !== null) {
         const ch = activeConfigChannel;
-        const stateRef = channelStates[ch];
+        const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
         const name = stateRef ? stateRef.name : '';
+        const label = typeof getChannelLabel === 'function' ? getChannelLabel(ch) : `CH ${ch + 1}`;
         if (chTitle) {
             chTitle.style.display = 'block';
-            chTitle.innerText = `${ch + 1} - ${name || `CH ${ch + 1}`}`;
+            chTitle.innerText = `${label} - ${name || label}`;
         }
         if (tmTitle) tmTitle.style.display = 'none';
         if (fiSidebar) fiSidebar.style.display = 'none';

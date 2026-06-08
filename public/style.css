@@ -941,8 +941,9 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
 }
 
 .dock-config {
-    background: #444;
-    color: white;
+    background: #ffcc00 !important;
+    color: #111 !important;
+    font-weight: 900 !important;
 }
 
 .dock-outs {
