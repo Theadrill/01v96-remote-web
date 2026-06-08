@@ -298,21 +298,6 @@ impl ConnectionManager {
                     continue;
                 }
 
-                let (needs_ins, needs_outs) = {
-                    let views = this.active_views.lock().unwrap();
-                    let mut i = false;
-                    let mut o = false;
-                    if views.is_empty() {
-                        i = true; // Default to INS if no clients connected
-                    } else {
-                        for v in views.values() {
-                            if v == "ins" { i = true; }
-                            if v == "outs" || v == "techMix" { o = true; }
-                        }
-                    }
-                    (i, o)
-                };
-
                 this.scheduler
                     .enqueue(midi::master_meter::MasterMeter::build_request(), 2)
                     .await;
@@ -320,50 +305,25 @@ impl ConnectionManager {
                     .enqueue(vec![240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 32, 247], 2)
                     .await;
                 this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 32, 247], 2)
+                    .enqueue(vec![240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 32, 247], 2)
                     .await;
+                // Removed 127, 32
                 this.scheduler
                     .enqueue(vec![240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 32, 247], 2)
                     .await;
-
-                if needs_ins && !needs_outs {
-                    // Only INS clients
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2)
-                        .await;
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
-                        .await;
-                } else if needs_outs && !needs_ins {
-                    // Only OUTS clients
-                    // We still request INS (13, 33, 0) if we want? Actually, ST IN is in 13, 32. Let's just request the necessary blocks.
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2) // Some functionality might expect basic channels
-                        .await;
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2) // ST IN and FX
-                        .await;
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2) // Bus
-                        .await;
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2) // Aux
-                        .await;
-                } else if needs_ins && needs_outs {
-                    // Both INS and OUTS clients
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2)
-                        .await;
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
-                        .await;
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2)
-                        .await;
-                    this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2)
-                        .await;
-                }
+                // Request all meters unconditionally to avoid Yamaha console "wake up" delays
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2) // Inputs 1-32
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 4, 0, 0, 32, 247], 2) // ST IN 1-4 L/R
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2) // Bus 1-8
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2) // Aux 1-8
+                    .await;
             }
         });
 

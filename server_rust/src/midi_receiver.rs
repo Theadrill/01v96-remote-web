@@ -30,7 +30,7 @@ pub fn start_rx_loop(
 
     // Meter buffer + FPS throttle (like Node.js)
     let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> =
-        Arc::new(std::sync::Mutex::new(vec![0.0; 64]));
+        Arc::new(std::sync::Mutex::new(vec![0.0; 72]));
     let last_meter_emit: Arc<std::sync::Mutex<std::time::Instant>> =
         Arc::new(std::sync::Mutex::new(std::time::Instant::now()));
     let meter_buffer_emit = meter_buffer.clone();
@@ -105,7 +105,7 @@ pub fn start_rx_loop(
                                     } else {
                                         let mut buf = meter_buffer_emit.lock().unwrap();
                                         for (ch, val) in levels.iter() {
-                                            if *ch < 64 {
+                                            if *ch < 72 {
                                                 buf[*ch] = (*val as f64).min(32.0);
                                             }
                                         }

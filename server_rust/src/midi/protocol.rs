@@ -256,10 +256,22 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 if (34..=41).contains(&target_ch) {
                     levels.insert(target_ch, val);
                 }
+            } else if group == 33 && element == 0 && parameter == 4 {
+                // ST IN 1-4 L/R
+                let target_ch = 60 + i;
+                if (60..=67).contains(&target_ch) {
+                    levels.insert(target_ch, val);
+                }
+            } else if group == 33 && element == 0 && parameter == 5 {
+                // FX Returns 1-4 L/R
+                let target_ch = 68 + i;
+                if (68..=75).contains(&target_ch) {
+                    levels.insert(target_ch, val);
+                }
             } else {
                 let base_ch = match group {
                     33 => channel,      // Input CH 1-32
-                    32 => 32 + channel, // Input CH 33-64? Actually ST IN and effects
+                    32 => 32 + channel, // Should not be used
                     82 => 32 + channel, // Stereo Master
                     _ => channel,
                 };
