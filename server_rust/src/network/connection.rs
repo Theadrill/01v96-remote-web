@@ -24,6 +24,7 @@ pub struct ConnectionManager {
     busca_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
     meter_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
     demo_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
+    pub active_views: Arc<std::sync::Mutex<std::collections::HashMap<String, String>>>,
 }
 
 impl ConnectionManager {
@@ -54,6 +55,7 @@ impl ConnectionManager {
             busca_handle: Arc::new(std::sync::Mutex::new(None)),
             meter_handle: Arc::new(std::sync::Mutex::new(None)),
             demo_handle: Arc::new(std::sync::Mutex::new(None)),
+            active_views: Arc::new(std::sync::Mutex::new(std::collections::HashMap::new())),
         })
     }
 
@@ -296,6 +298,21 @@ impl ConnectionManager {
                     continue;
                 }
 
+                let (needs_ins, needs_outs) = {
+                    let views = this.active_views.lock().unwrap();
+                    let mut i = false;
+                    let mut o = false;
+                    if views.is_empty() {
+                        i = true; // Default to INS if no clients connected
+                    } else {
+                        for v in views.values() {
+                            if v == "ins" { i = true; }
+                            if v == "outs" || v == "techMix" { o = true; }
+                        }
+                    }
+                    (i, o)
+                };
+
                 this.scheduler
                     .enqueue(midi::master_meter::MasterMeter::build_request(), 2)
                     .await;
@@ -308,18 +325,41 @@ impl ConnectionManager {
                 this.scheduler
                     .enqueue(vec![240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 32, 247], 2)
                     .await;
-                this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2)
-                    .await;
-                this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
-                    .await;
-                this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2)
-                    .await;
-                this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2)
-                    .await;
+
+                if needs_ins && !needs_outs {
+                    // Only INS clients
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2)
+                        .await;
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
+                        .await;
+                } else if needs_outs && !needs_ins {
+                    // Only OUTS clients
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 40, 247], 2)
+                        .await;
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2)
+                        .await;
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2)
+                        .await;
+                } else if needs_ins && needs_outs {
+                    // Both INS and OUTS clients
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 40, 247], 2)
+                        .await;
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
+                        .await;
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2)
+                        .await;
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2)
+                        .await;
+                }
             }
         });
 

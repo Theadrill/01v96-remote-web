@@ -3,13 +3,45 @@ window.renderRouting = function(chIdx) {
     const chData = getChannelStateById(chIdx) || {};
     
     // Master (52), Buses (44-51), Mixes (36-43) não têm essa tela de routing na 01V96
-    if ((chIdx >= 36 && chIdx <= 52) && !(chIdx >= 60 && chIdx <= 63)) {
+    if ((chIdx >= 36 && chIdx <= 52) && !(chIdx >= 60 && chIdx <= 67)) {
         container.innerHTML = `
             <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#666; padding:20px; text-align:center;">
                 <div style="font-size:48px; margin-bottom:15px; opacity:0.3;"><i class="fas fa-route"></i></div>
                 <div style="font-size:14px; font-weight:bold; text-transform:uppercase;">Routing Não Disponível</div>
             </div>`;
         return;
+    }
+
+    let primaryLogicCh = chIdx;
+    let partnerLogicCh = null;
+    let isPaired = false;
+    let isStereoIn = false;
+    let primaryName = 'FONTE ATUAL:';
+    let partnerName = '';
+
+    if (chIdx >= 60 && chIdx <= 67) {
+        isStereoIn = true;
+        isPaired = true;
+        primaryLogicCh = 32 + (chIdx - 60);
+        
+        if (primaryLogicCh % 2 === 0) {
+            partnerLogicCh = primaryLogicCh + 1;
+            const stIndex = Math.floor((primaryLogicCh - 32) / 2) + 1;
+            primaryName = `PATCH ST IN ${stIndex} L:`;
+            partnerName = `PATCH ST IN ${stIndex} R:`;
+        } else {
+            partnerLogicCh = primaryLogicCh - 1;
+            const stIndex = Math.floor((partnerLogicCh - 32) / 2) + 1;
+            primaryName = `PATCH ST IN ${stIndex} R:`;
+            partnerName = `PATCH ST IN ${stIndex} L:`;
+        }
+    } else {
+        if (chData.paired && chData.pairedWith !== null && chData.pairedWith !== undefined) {
+            isPaired = true;
+            partnerLogicCh = chData.pairedWith;
+            primaryName = `PATCH CH ${primaryLogicCh + 1}:`;
+            partnerName = `PATCH CH ${partnerLogicCh + 1}:`;
+        }
     }
 
     const getPanTrackHTML = (ch) => {
@@ -32,9 +64,9 @@ window.renderRouting = function(chIdx) {
         `;
     };
 
-    let tracksHTML = getPanTrackHTML(chIdx);
-    if (chData.paired && chData.pairedWith !== null && chData.pairedWith !== undefined) {
-        tracksHTML += getPanTrackHTML(chData.pairedWith);
+    let tracksHTML = getPanTrackHTML(primaryLogicCh);
+    if (isPaired && partnerLogicCh !== null) {
+        tracksHTML += getPanTrackHTML(partnerLogicCh);
     }
     const isMobilePan = typeof layoutMode !== 'undefined' && layoutMode !== 'desktop';
     const panSectionHTML = isMobilePan ? `
@@ -43,9 +75,9 @@ window.renderRouting = function(chIdx) {
             <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
                 <div style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 18px; flex: 1; display: flex; align-items: center; justify-content: center;">
                     <div class="desk-pan-indicator" id="pani-mobile-${chIdx}" style="flex: 1; max-width: 100%; background: transparent; border: none; box-shadow: none;"
-                        onwheel="handleWheelPan(event, ${chIdx}, ${chData.paired ? chData.pairedWith : 'null'})" 
-                        ondblclick="resetPan(event, ${chIdx}, ${chData.paired ? chData.pairedWith : 'null'})"
-                        onpointerdown="startPanLongPress(event, ${chIdx}, ${chData.paired ? chData.pairedWith : 'null'})"
+                        onwheel="handleWheelPan(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})" 
+                        ondblclick="resetPan(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})"
+                        onpointerdown="startPanLongPress(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})"
                         onpointermove="handlePanPointerMove(event)"
                         onpointerup="stopPanLongPress(event)"
                         onpointerleave="stopPanLongPress(event)"
@@ -70,22 +102,22 @@ window.renderRouting = function(chIdx) {
                     <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Entrada do Canal (Patch)</p>
                     <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
                         <!-- Patch do Canal Principal -->
-                        <div class="patch-display-box" onclick="openPatchSelector(${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                        <div class="patch-display-box" onclick="openPatchSelector(${primaryLogicCh}, ${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
                             <div style="display: flex; flex-direction: column; flex: 1;">
-                                <span style="font-size: 10px; color: #888;">${chData.paired ? `PATCH CH ${chIdx+1}:` : 'FONTE ATUAL:'}</span>
-                                <span id="currentPatchName" style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(chData.patch || 0)}</span>
+                                <span style="font-size: 10px; color: #888;">${primaryName}</span>
+                                <span id="currentPatchName" style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[primaryLogicCh].patch || 0)}</span>
                             </div>
                             <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa; flex-shrink: 0;">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                             </div>
                         </div>
 
-                        ${chData.paired ? `
+                        ${isPaired ? `
                         <!-- Patch do Canal Parceiro -->
-                        <div class="patch-display-box" onclick="openPatchSelector(${chData.pairedWith})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                        <div class="patch-display-box" onclick="openPatchSelector(${partnerLogicCh}, ${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
                             <div style="display: flex; flex-direction: column;">
-                                <span style="font-size: 10px; color: #888;">PATCH CH ${chData.pairedWith + 1}:</span>
-                                <span style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[chData.pairedWith].patch || 0)}</span>
+                                <span style="font-size: 10px; color: #888;">${partnerName}</span>
+                                <span style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[partnerLogicCh].patch || 0)}</span>
                             </div>
                             <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa;">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -137,6 +169,7 @@ window.renderRouting = function(chIdx) {
         }
     }
 };
+
 
 
 window.toggleStereoAssignment = function(chIdx) {
@@ -198,7 +231,7 @@ function getPatchName(val) {
     return `ID ${val}`;
 }
 
-window.openPatchSelector = function(chIdx) {
+window.openPatchSelector = function(logicChIdx, uiChIdx) {
     const grid = document.getElementById('patchGrid');
     grid.innerHTML = '';
     grid.style.cssText = `
@@ -262,10 +295,10 @@ window.openPatchSelector = function(chIdx) {
 
         cat.options.forEach(opt => {
             const btn = document.createElement('button');
-            const isActive = (channelStates[chIdx].patch === opt.id);
+            const isActive = (channelStates[logicChIdx].patch === opt.id);
             btn.className = `patch-opt-btn ${isActive ? 'active' : ''}`;
             btn.innerText = opt.name;
-            btn.onclick = () => selectPatch(chIdx, opt.id);
+            btn.onclick = () => selectPatch(logicChIdx, opt.id, uiChIdx);
             btnGrid.appendChild(btn);
         });
         
@@ -276,23 +309,27 @@ window.openPatchSelector = function(chIdx) {
     document.getElementById('patchSelectorModal').style.display = 'flex';
 };
 
-function selectPatch(chIdx, patchId) {
+function selectPatch(logicChIdx, patchId, uiChIdx) {
     if (!appReady) return;
     
-    console.log(`[PATCH] Canal ${chIdx+1} -> ID ${patchId} (${getPatchName(patchId)})`);
+    console.log(`[PATCH] Canal ${logicChIdx+1} -> ID ${patchId} (${getPatchName(patchId)})`);
     
     socket.emit('control', {
         type: 'kChannelInput/kChannelIn',
-        channel: chIdx,
+        channel: logicChIdx,
         value: patchId
     });
     
-    channelStates[chIdx].patch = patchId;
+    channelStates[logicChIdx].patch = patchId;
     document.getElementById('patchSelectorModal').style.display = 'none';
     
     // IMPORTANTE: Se o canal for parte de um par, precisamos re-renderizar a aba
     // para mostrar os dois patches atualizados.
-    renderRouting(channelStates[chIdx].paired ? (chIdx % 2 === 0 ? chIdx : chIdx - 1) : chIdx);
+    if (uiChIdx !== undefined) {
+        renderRouting(uiChIdx);
+    } else {
+        renderRouting(channelStates[logicChIdx].paired ? (logicChIdx % 2 === 0 ? logicChIdx : logicChIdx - 1) : logicChIdx);
+    }
 }
 
 

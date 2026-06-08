@@ -184,6 +184,24 @@ pub fn register_handlers(
             },
         );
 
+        let conn_mgr_view = conn_mgr_handler.clone();
+        socket.on(
+            "set_active_view",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if let Some(view) = data.get("view").and_then(|v| v.as_str()) {
+                    let mut current_views = conn_mgr_view.active_views.lock().unwrap();
+                    current_views.insert(socket.id.to_string(), view.to_string());
+                }
+            },
+        );
+
+        let conn_mgr_disconnect = conn_mgr_handler.clone();
+        socket.on_disconnect(move |socket: SocketRef| async move {
+            info!("Cliente desconectado: {}", socket.id);
+            let mut current_views = conn_mgr_disconnect.active_views.lock().unwrap();
+            current_views.remove(&socket.id.to_string());
+        });
+
         let scheduler_pan = scheduler_socket.clone();
         let state_pan = global_state_socket.clone();
         socket.on(

@@ -62,6 +62,7 @@ function enterMusicianMode(foneId) {
     activeMix = foneId;
     localStorage.setItem('01v96_role', 'musician');
     localStorage.setItem('01v96_mix', foneId);
+    socket.emit('set_active_view', { view: 'techMix' });
 
     // Força layout mobile em memória temporariamente para o modo músico
     layoutMode = 'mobile';

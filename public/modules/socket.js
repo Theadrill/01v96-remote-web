@@ -42,6 +42,8 @@ function applySetupStatus(data) {
 function requestSetupStatus() {
     if (typeof socket !== 'undefined' && socket.connected) {
         socket.emit('checkSetupStatus');
+        const view = (typeof outsMode !== 'undefined' && outsMode) ? 'outs' : 'ins';
+        socket.emit('set_active_view', { view: view });
     }
 }
 socket.on('connect', requestSetupStatus);

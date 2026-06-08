@@ -38,6 +38,7 @@ function toggleOuts() {
         btn.style.backgroundColor = '';
         btn.style.color = '';
     }
+    socket.emit('set_active_view', { view: outsMode ? 'outs' : 'ins' });
     initUI();
 }
 
@@ -45,12 +46,14 @@ function enterTechnicianMixMode(mixIdx) {
     activeMix = mixIdx + 1;
     technicianMixMode = true;
     outsMode = false;
+    socket.emit('set_active_view', { view: 'techMix' });
     initUI();
 }
 
 function exitTechnicianMixMode() {
     technicianMixMode = false;
     outsMode = true;
+    socket.emit('set_active_view', { view: 'outs' });
     initUI();
 }
 
