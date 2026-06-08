@@ -37,7 +37,7 @@ let activeConfigChannel = null;
 let activeConfigTab = "aux"; // Auxiliares por padrão
 let appOrientation = 'vertical';
 let musicianMode = false;
-window.showMetersInMusicianMode = false;
+window.showMetersInMusicianMode = localStorage.getItem('01v96_musician_meters') === 'true';
 let outsMode = false;
 let technicianMixMode = false;
 let activeMix = 1;
@@ -45,7 +45,8 @@ let tecnicoPassword = null; // Definido apenas pelo servidor via socket (lido do
 window.tecnicoPassword = tecnicoPassword;
 window.envStatus = 'not_found';
 window.serverName = null;
-let layoutMode = localStorage.getItem('mixer_layout') || 'mobile';
+const savedRole = localStorage.getItem('01v96_role');
+let layoutMode = savedRole === 'musician' ? 'mobile' : (localStorage.getItem('mixer_layout') || 'mobile');
 document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
 window.customNamesEnabled = localStorage.getItem('custom_names_enabled') !== 'false';
 

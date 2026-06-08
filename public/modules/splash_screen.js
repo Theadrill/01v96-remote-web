@@ -63,11 +63,21 @@ function enterMusicianMode(foneId) {
     localStorage.setItem('01v96_role', 'musician');
     localStorage.setItem('01v96_mix', foneId);
 
-    window.showMetersInMusicianMode = false;
+    // Força layout mobile em memória temporariamente para o modo músico
+    layoutMode = 'mobile';
+    document.body.classList.remove('layout-desktop');
+
+    const savedMeters = localStorage.getItem('01v96_musician_meters') === 'true';
+    window.showMetersInMusicianMode = savedMeters;
     const mBtn = document.getElementById('musicianMetersBtn');
     if (mBtn) {
-        mBtn.textContent = 'MOSTRAR NÍVEIS';
-        mBtn.classList.remove('active');
+        if (savedMeters) {
+            mBtn.textContent = 'OCULTAR NÍVEIS';
+            mBtn.classList.add('active');
+        } else {
+            mBtn.textContent = 'MOSTRAR NÍVEIS';
+            mBtn.classList.remove('active');
+        }
     }
 
     // Fecha a splash (se estiver visível)
@@ -79,11 +89,11 @@ function enterMusicianMode(foneId) {
         splash.style.pointerEvents = 'none';
         setTimeout(() => splash.style.display = 'none', 300);
     }
-    
+
     // Garante que a sidebar esteja visível (agora adaptada pelo initUI)
     const side = document.querySelector('.sidebar');
     if (side) side.style.display = 'flex';
-    
+
     // Re-inicializa os faders focados no AUX (MIX)
     initUI();
 }

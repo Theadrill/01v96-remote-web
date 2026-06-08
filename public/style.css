@@ -3748,7 +3748,8 @@ screen and (orientation: landscape) and (min-height: 600px) {
 
 /* Botões exclusivos para o modo Musician (oculto por padrão) */
 .btn-exit-musician,
-.btn-meters-musician {
+.btn-meters-musician,
+.btn-fs-musician {
     display: none !important;
     border-radius: 8px !important;
     font-weight: bold !important;
@@ -3793,6 +3794,18 @@ screen and (orientation: landscape) and (min-height: 600px) {
     background: #a71d2a !important;
 }
 
+.btn-fs-musician {
+    background: #222 !important;
+    color: white !important;
+    border: 1px solid #444 !important;
+    padding: 0 !important;
+    transition: background-color 0.2s ease;
+}
+
+.btn-fs-musician:hover {
+    background: #333 !important;
+}
+
 /* Ocultar COMPLETO dock e macros no modo Musician, independente da orientação */
 .sidebar-musician #sidebarDock,
 .sidebar-musician #sidebarMacros {
@@ -3801,7 +3814,8 @@ screen and (orientation: landscape) and (min-height: 600px) {
 
 /* Exibe os botões apenas quando a sidebar estiver no modo Musician */
 .sidebar-musician #musicianExitBtn,
-.sidebar-musician #musicianMetersBtn {
+.sidebar-musician #musicianMetersBtn,
+.sidebar-musician #musicianFsBtn {
     display: flex !important;
 }
 
@@ -3819,6 +3833,13 @@ body.is-portrait .sidebar-musician #musicianMetersBtn {
     padding: 2px !important;
 }
 
+body.is-portrait .sidebar-musician #musicianFsBtn {
+    width: 50px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    margin-right: 5px !important;
+}
+
 body.is-portrait .sidebar-musician #musicianExitBtn {
     width: 72px !important;
     height: 38px !important;
@@ -3831,6 +3852,14 @@ body:not(.is-portrait) .sidebar-musician #musicianMetersBtn {
     height: 44px !important;
     margin: 8px !important;
     margin-top: auto !important;
+    margin-bottom: 0 !important;
+}
+
+body:not(.is-portrait) .sidebar-musician #musicianFsBtn {
+    width: calc(100% - 16px) !important;
+    height: 44px !important;
+    margin: 8px !important;
+    margin-top: 10px !important;
     margin-bottom: 0 !important;
 }
 
@@ -4051,5 +4080,57 @@ body.layout-desktop .btn-macros {
     .macro-settings-actions button {
         font-size: 10px !important;
         padding: 0 4px !important;
+    }
+}
+
+
+/* Ajuste de informações no rodapé do músico para telas estreitas (Celular em pé) */
+@media screen and (max-width: 480px) {
+    body.is-portrait .sidebar-musician .sidebar-info {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        gap: 2px !important;
+        min-width: 120px !important;
+        width: 120px !important;
+        padding-left: 5px !important;
+    }
+
+    body.is-portrait .sidebar-musician .fone-indicator {
+        position: static !important;
+        transform: none !important;
+        order: 1 !important;
+        font-size: 15px !important;
+        font-weight: 900 !important;
+        line-height: 1.1 !important;
+        letter-spacing: 0.5px !important;
+        writing-mode: horizontal-tb !important;
+        text-orientation: mixed !important;
+        margin: 0 !important;
+        opacity: 1 !important;
+        text-shadow: none !important;
+        text-align: left !important;
+        display: block !important;
+    }
+
+    body.is-portrait .sidebar-musician .sidebar-info #scene-info {
+        order: 2 !important;
+        font-size: 10px !important;
+        color: #bbb !important;
+        margin: 0 !important;
+        display: block !important;
+        align-self: flex-start !important;
+        text-align: left !important;
+    }
+
+    body.is-portrait .sidebar-musician .sidebar-info #scn {
+        order: 3 !important;
+        font-size: 9px !important;
+        color: #00ff00 !important;
+        margin: 0 !important;
+        display: block !important;
+        align-self: flex-start !important;
+        text-align: left !important;
     }
 }

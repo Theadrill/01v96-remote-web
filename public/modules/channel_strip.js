@@ -663,6 +663,16 @@ function initUI() {
     const musicianMetersBtn = document.getElementById('musicianMetersBtn');
     if (musicianMetersBtn) musicianMetersBtn.style.display = musicianMode ? 'flex' : 'none';
 
+    const musicianFsBtn = document.getElementById('musicianFsBtn');
+    if (musicianFsBtn) {
+        const isStandalone = window.navigator.standalone === true;
+        if (musicianMode && !isStandalone) {
+            musicianFsBtn.style.removeProperty('display');
+        } else {
+            musicianFsBtn.style.setProperty('display', 'none', 'important');
+        }
+    }
+
     if (outsMode && !musicianMode && !technicianMixMode) {
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'mix');
         for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'bus');

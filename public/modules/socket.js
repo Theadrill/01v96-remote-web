@@ -763,6 +763,7 @@ window.clearAllMeters = clearAllMeters;
 
 function toggleMusicianMeters() {
     window.showMetersInMusicianMode = !window.showMetersInMusicianMode;
+    localStorage.setItem('01v96_musician_meters', window.showMetersInMusicianMode);
     const btn = document.getElementById('musicianMetersBtn');
     if (btn) {
         if (window.showMetersInMusicianMode) {

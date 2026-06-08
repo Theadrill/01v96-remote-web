@@ -1,20 +1,20 @@
-function conn() { 
-    socket.emit('requestConnect', { 
-        inIdx: parseInt(document.getElementById('sin').value, 10), 
-        outIdx: parseInt(document.getElementById('sout').value, 10) 
-    }); 
-    document.getElementById('configModal').style.display='none'; 
+function conn() {
+    socket.emit('requestConnect', {
+        inIdx: parseInt(document.getElementById('sin').value, 10),
+        outIdx: parseInt(document.getElementById('sout').value, 10)
+    });
+    document.getElementById('configModal').style.display = 'none';
 }
 
 function toggleDemoMode() {
     const btn = document.getElementById('demoBtn');
     const currentlyOn = btn.innerText.includes('OFF'); // Se diz OFF, é porque está ligado e quer desligar
-    
+
     const nextStateOn = !currentlyOn;
-    
+
     btn.innerText = nextStateOn ? 'DEMO OFF' : 'DEMO ON';
     btn.style.background = nextStateOn ? '#dc3545' : '#28a745';
-    
+
     socket.emit('toggleDemo', { enabled: nextStateOn });
 }
 
@@ -24,8 +24,8 @@ function updateMeterOpacity(v) {
     socket.emit('updateMeterConfig', { opacity: v });
 }
 
-function forceSync() { 
-    socket.emit('forceSync'); 
+function forceSync() {
+    socket.emit('forceSync');
 }
 
 function toggleOuts() {
@@ -58,7 +58,7 @@ function changeTechnicianMix(delta) {
     let nextMix = activeMix + delta;
     if (nextMix < 1) nextMix = 8;
     if (nextMix > 8) nextMix = 1;
-    
+
     activeMix = nextMix;
     initUI();
 }
@@ -66,7 +66,7 @@ function changeTechnicianMix(delta) {
 function toggleFullScreen() {
     // Detecta se é iOS (iPhone, iPad, iPod)
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    
+
     // Verifica se já está rodando como um app "Standalone" (instalado na Home Screen do iOS)
     const isStandalone = window.navigator.standalone === true;
 
@@ -75,15 +75,15 @@ function toggleFullScreen() {
             alert("Você já está no Modo App Nativo em Tela Cheia!");
             return;
         }
-        
+
         // Verifica se é Safari (Safari tem 'Safari' no UA, mas Chrome tem 'CriOS' e Firefox 'FxiOS')
         const ua = navigator.userAgent;
         const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
-        
+
         const modal = document.getElementById('iosInstallModal');
         const safariInst = document.getElementById('iosSafariInstructions');
         const otherInst = document.getElementById('iosOtherBrowserInstructions');
-        
+
         if (modal) {
             modal.style.display = 'flex';
             if (isSafari) {
@@ -108,9 +108,9 @@ function toggleFullScreen() {
     }
 }
 
-window.copyAppUrl = function() {
+window.copyAppUrl = function () {
     const textToCopy = window.location.href;
-    
+
     // Tenta usar a API moderna primeiro (só funciona em HTTPS ou localhost)
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(textToCopy).then(() => {
@@ -127,12 +127,12 @@ window.copyAppUrl = function() {
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");
     textArea.value = text;
-    
+
     // Evita o scroll pro fim da pagina no iOS
     textArea.style.top = "0";
     textArea.style.left = "0";
     textArea.style.position = "fixed";
-    
+
     // Evita que o teclado virtual do celular abra
     textArea.setAttribute('readonly', '');
 
@@ -202,14 +202,14 @@ function switchTab(tabId) {
     }
 
     const modeEl = document.getElementById('chSideMode');
-    if (tabId === 'eq') { 
-        if(modeEl) modeEl.innerText = 'EQUALIZADOR'; 
-        renderEQ(activeConfigChannel); 
+    if (tabId === 'eq') {
+        if (modeEl) modeEl.innerText = 'EQUALIZADOR';
+        renderEQ(activeConfigChannel);
     }
-    
-    if (tabId === 'dyn') { if(modeEl) modeEl.innerText = 'DYNAMICS'; renderDynamics(activeConfigChannel); }
-    if (tabId === 'aux') { if(modeEl) modeEl.innerText = 'AUX SENDS'; renderAuxs(activeConfigChannel); }
-    if (tabId === 'etc') { if(modeEl) modeEl.innerText = 'ROUTING / ETC'; renderRouting(activeConfigChannel); }
+
+    if (tabId === 'dyn') { if (modeEl) modeEl.innerText = 'DYNAMICS'; renderDynamics(activeConfigChannel); }
+    if (tabId === 'aux') { if (modeEl) modeEl.innerText = 'AUX SENDS'; renderAuxs(activeConfigChannel); }
+    if (tabId === 'etc') { if (modeEl) modeEl.innerText = 'ROUTING / ETC'; renderRouting(activeConfigChannel); }
 }
 
 
@@ -228,7 +228,7 @@ function updateViewportInfo() {
 
     // Compatibilidade extra para iOS (força reflow se necessário)
     // console.log(`Viewport: ${w}x${h} (${isPortrait ? 'Retrato' : 'Paisagem'})`);
-    
+
     if (typeof updateDockScrollIndicators === 'function') {
         updateDockScrollIndicators();
         setTimeout(updateDockScrollIndicators, 100);
@@ -268,7 +268,7 @@ function updateNamePreview() {
     preview.querySelector('.preview-mesa').textContent = 'Mesa: ' + (upper.substring(0, 4).padEnd(4) || '    ');
 }
 
-window.toggleCustomNameEditor = function() {
+window.toggleCustomNameEditor = function () {
     const input = document.getElementById('inputChName');
     const preview = document.getElementById('namePreview');
     const isChecked = document.getElementById('chkCustomName').checked;
@@ -284,7 +284,7 @@ window.toggleCustomNameEditor = function() {
     }
 };
 
-window.removeCustomName = function() {
+window.removeCustomName = function () {
     const ch = activeConfigChannel;
     if (ch === null) return;
     socket.emit('removeCustomName', { channel: ch, syncShared: window.customScenesSyncEnabled });
@@ -294,7 +294,7 @@ window.removeCustomName = function() {
     document.getElementById('nameEditorModal').style.display = 'none';
 };
 
-window.openNameEditor = function() {
+window.openNameEditor = function () {
     const ch = activeConfigChannel;
     if (ch === null) return;
 
@@ -362,11 +362,11 @@ function autoScaleElement(el) {
     }
 }
 
-window.autoScaleTitle = function() {
+window.autoScaleTitle = function () {
     autoScaleElement(document.getElementById('chSideTitle'));
 };
 
-window.saveChannelName = function() {
+window.saveChannelName = function () {
     const ch = activeConfigChannel;
     if (ch === null) return;
 
@@ -530,7 +530,7 @@ window.onConfigReset = function () {
     document.querySelectorAll('.modal-overlay').forEach(m => { m.style.display = 'none'; });
 };
 
-window.toggleMacrosPanel = function(enabled) {
+window.toggleMacrosPanel = function (enabled) {
     console.log("🛠️ toggleMacrosPanel chamando com:", enabled);
     localStorage.setItem('01v96_show_macros', enabled ? 'true' : 'false');
     if (enabled) {
@@ -615,9 +615,13 @@ function renderDock(mode) {
             break;
         }
         case 'musician': {
-            buttons = [
-                { label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-close' }
-            ];
+            buttons = [];
+            const isStandalone = window.navigator.standalone === true;
+            if (!isStandalone) {
+                const fsSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`;
+                buttons.push({ label: fsSvg, action: 'toggleFullScreen()', cls: 'dock-fs' });
+            }
+            buttons.push({ label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-close' });
             break;
         }
     }
@@ -677,8 +681,8 @@ function updateSidebarInfo() {
         if (fiSidebar) fiSidebar.style.display = 'none';
         if (sidebarNav) {
             sidebarNav.style.display = 'flex';
-            if (navPrev) navPrev.onclick = function() { changeConfigChannel(-1); };
-            if (navNext) navNext.onclick = function() { changeConfigChannel(1); };
+            if (navPrev) navPrev.onclick = function () { changeConfigChannel(-1); };
+            if (navNext) navNext.onclick = function () { changeConfigChannel(1); };
         }
         if (typeof window.autoScaleTitle === 'function') window.autoScaleTitle();
     } else if (technicianMixMode) {
@@ -695,8 +699,8 @@ function updateSidebarInfo() {
         }
         if (sidebarNav) {
             sidebarNav.style.display = 'flex';
-            if (navPrev) navPrev.onclick = function() { changeTechnicianMix(-1); };
-            if (navNext) navNext.onclick = function() { changeTechnicianMix(1); };
+            if (navPrev) navPrev.onclick = function () { changeTechnicianMix(-1); };
+            if (navNext) navNext.onclick = function () { changeTechnicianMix(1); };
         }
     } else if (musicianMode) {
         if (chTitle) chTitle.style.display = 'none';
@@ -733,7 +737,7 @@ function updateDockScrollIndicators() {
         const scrollLeft = el.scrollLeft;
         const scrollWidth = el.scrollWidth;
         const clientWidth = el.clientWidth;
-        
+
         if (scrollLeft > 2) {
             parent.classList.add('has-scroll-left');
         } else {
@@ -776,13 +780,13 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('touchmove', updateDockScrollIndicators, { passive: true });
     }
     window.addEventListener('resize', updateDockScrollIndicators);
-    
+
     // Configura um MutationObserver para monitorar mudanças nos botões da dock
     const observer = new MutationObserver(updateDockScrollIndicators);
     if (el) {
         observer.observe(el, { childList: true });
     }
-    
+
     setTimeout(updateDockScrollIndicators, 100);
 });
 
@@ -791,7 +795,7 @@ window.updateDockScrollIndicators = updateDockScrollIndicators;
 
 var inputChName = document.getElementById('inputChName');
 if (inputChName) {
-    inputChName.addEventListener('input', function() {
+    inputChName.addEventListener('input', function () {
         var cb = document.getElementById('chkCustomName');
         if (cb && cb.checked) {
             var raw = this.value;
