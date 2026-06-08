@@ -611,6 +611,25 @@ pub fn register_handlers(
                             mgr.mark_dirty(&fname);
                             let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
                             mgr.persist(sync_shared);
+                            
+                            let arr = match mgr.get_scene(&fname) {
+                                Some(scene) => {
+                                    scene.channels.iter().map(|(ch_id, entry)| {
+                                        serde_json::json!({
+                                            "ch": ch_id.to_global_channel(),
+                                            "name": entry.name,
+                                            "short": entry.short
+                                        })
+                                    }).collect::<Vec<_>>()
+                                }
+                                None => Vec::new(),
+                            };
+                            if !arr.is_empty() {
+                                let _ = _io_op.emit("activeCustomChannels", &serde_json::json!({
+                                    "active": true,
+                                    "channels": arr,
+                                })).await;
+                            }
                         }
 
                         let current_name = {
@@ -704,6 +723,29 @@ pub fn register_handlers(
                     let mut csm = csm_remove.write().await;
                     let result = csm.remove_channel(&filename, &channel_id);
                     csm.persist(sync_shared);
+                    
+                    let arr = match csm.get_scene(&filename) {
+                        Some(scene) => {
+                            scene.channels.iter().map(|(ch_id, entry)| {
+                                serde_json::json!({
+                                    "ch": ch_id.to_global_channel(),
+                                    "name": entry.name,
+                                    "short": entry.short
+                                })
+                            }).collect::<Vec<_>>()
+                        }
+                        None => Vec::new(),
+                    };
+                    
+                    if arr.is_empty() {
+                        let _ = io_remove_name.emit("activeCustomChannels", &serde_json::json!({ "active": false })).await;
+                    } else {
+                        let _ = io_remove_name.emit("activeCustomChannels", &serde_json::json!({
+                            "active": true,
+                            "channels": arr,
+                        })).await;
+                    }
+                    
                     result
                 };
 
@@ -1205,7 +1247,7 @@ pub fn register_handlers(
                         "channel": channel,
                         "name": limited.clone()
                     }),
-                );
+                ).await;
 
                 // MIDI write-back: send each char to the mesa with 30ms spacing
                 let padded_bytes: Vec<u8> = padded.bytes().take(4).collect();
