@@ -198,7 +198,7 @@ function createDesktopStrip(config) {
             <div class="desk-fader-container" onwheel="${wheelCall}">
                 ${getFaderScaleHTML(isMaster)}
                 <input type="range" id="${fId}" min="0" max="1023" value="${val}" orient="vertical" oninput="${inputCall}">
-                ${type === 'main' ? `
+                ${(type === 'main' || type === 'output') ? `
                 <div class="desk-meter-container" style="display: flex; flex-direction: column; align-items: center; margin-left: 2px; height: 100%;">
                     <div id="${pId}" class="desk-peak-led"></div>
                     <div style="display: flex; gap: 2px; flex: 1; width: 100%; justify-content: center;">
