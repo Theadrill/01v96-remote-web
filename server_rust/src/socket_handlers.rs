@@ -566,11 +566,9 @@ pub fn register_handlers(
 
                 let filename = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
 
-                let channel_id = match channel {
-                    0..=31 => ChannelId::Input(channel + 1),
-                    60..=67 => ChannelId::StIn(channel - 27),
-                    52 => ChannelId::Master,
-                    _ => {
+                let channel_id = match ChannelId::from_global_channel(channel) {
+                    Some(id) => id,
+                    None => {
                         let _ = socket.emit(
                             "saveNameResult",
                             &serde_json::json!({ "success": false, "error": "canal inválido" }),
@@ -711,11 +709,9 @@ pub fn register_handlers(
                 }
 
                 let filename = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
-                let channel_id = match channel {
-                    0..=31 => ChannelId::Input(channel + 1),
-                    60..=67 => ChannelId::StIn(channel - 27),
-                    52 => ChannelId::Master,
-                    _ => return,
+                let channel_id = match ChannelId::from_global_channel(channel) {
+                    Some(id) => id,
+                    None => return,
                 };
 
                 let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);

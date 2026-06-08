@@ -318,7 +318,7 @@ socket.on('previewResult', (data) => {
         const mesaName = ch.mesa_name || '';
         const isDifferent = customName && mesaName && customName.substring(0, 4).toUpperCase() !== mesaName.substring(0, 4).toUpperCase();
         const rowBg = isDifferent ? '#3a3a1a' : 'transparent';
-        const chLabel = getChannelLabel(ch.ch);
+        const chLabel = window.getChannelLabel ? window.getChannelLabel(ch.ch) : ch.ch;
         html += '<tr style="border-bottom:1px solid #2a2a2a; background:' + rowBg + ';">';
         html += '<td style="padding:6px 8px; color:#aaa;">' + escHtml(chLabel) + '</td>';
         html += '<td style="padding:6px 8px; color:' + (customName ? '#8cf' : '#555') + ';">' + escHtml(customName || '—') + '</td>';
@@ -327,13 +327,6 @@ socket.on('previewResult', (data) => {
     }
     tbody.innerHTML = html;
 });
-
-function getChannelLabel(globalCh) {
-    if (globalCh >= 0 && globalCh <= 31) return 'CH ' + (globalCh + 1);
-    if (globalCh >= 60 && globalCh <= 67) return 'ST IN ' + (Math.floor((globalCh - 60) / 2) + 1) + (globalCh % 2 === 0 ? 'L' : 'R');
-    if (globalCh === 52) return 'MASTER';
-    return 'CH ' + globalCh;
-}
 
 window.pendingCopyFile = null;
 

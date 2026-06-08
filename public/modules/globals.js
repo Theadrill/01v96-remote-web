@@ -107,6 +107,15 @@ function getChannelStateById(id) {
     return null;
 }
 
+window.getChannelLabel = function(globalCh) {
+    if (globalCh >= 0 && globalCh <= 31) return 'CH ' + (globalCh + 1);
+    if (globalCh >= 36 && globalCh <= 43) return 'AUX ' + (globalCh - 35);
+    if (globalCh >= 44 && globalCh <= 51) return 'BUS ' + (globalCh - 43);
+    if (globalCh >= 60 && globalCh <= 67) return 'ST IN ' + (Math.floor((globalCh - 60) / 2) + 1) + (globalCh % 2 === 0 ? 'L' : 'R');
+    if (globalCh === 52) return 'MASTER';
+    return 'CH ' + globalCh;
+};
+
 /**
  * Retorna o prefixo do parâmetro baseado no ID global do canal
  */

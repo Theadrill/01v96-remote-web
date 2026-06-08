@@ -10,6 +10,8 @@ use tokio_util::sync::CancellationToken;
 pub enum ChannelId {
     Input(u8),
     StIn(u8),
+    Mix(u8),
+    Bus(u8),
     Master,
 }
 
@@ -30,6 +32,8 @@ impl std::fmt::Display for ChannelId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ChannelId::Input(n) | ChannelId::StIn(n) => write!(f, "{}", n),
+            ChannelId::Mix(n) => write!(f, "mix{}", n),
+            ChannelId::Bus(n) => write!(f, "bus{}", n),
             ChannelId::Master => write!(f, "master"),
         }
     }
@@ -48,6 +52,14 @@ impl TryFrom<&str> for ChannelId {
         if s == "master" {
             return Ok(ChannelId::Master);
         }
+        if let Some(stripped) = s.strip_prefix("mix") {
+            let n: u8 = stripped.parse().map_err(|_| format!("invalid mix id '{}'", s))?;
+            return Ok(ChannelId::Mix(n));
+        }
+        if let Some(stripped) = s.strip_prefix("bus") {
+            let n: u8 = stripped.parse().map_err(|_| format!("invalid bus id '{}'", s))?;
+            return Ok(ChannelId::Bus(n));
+        }
         let n: u8 = s
             .parse()
             .map_err(|_| format!("invalid channel id '{}'", s))?;
@@ -64,6 +76,8 @@ impl ChannelId {
         match self {
             ChannelId::Input(n) => n - 1,
             ChannelId::StIn(n) => n + 27,
+            ChannelId::Mix(n) => n + 35,
+            ChannelId::Bus(n) => n + 43,
             ChannelId::Master => 52,
         }
     }
@@ -72,6 +86,8 @@ impl ChannelId {
         match ch {
             0..=31 => Some(ChannelId::Input(ch + 1)),
             60..=67 => Some(ChannelId::StIn(ch - 27)),
+            36..=43 => Some(ChannelId::Mix(ch - 35)),
+            44..=51 => Some(ChannelId::Bus(ch - 43)),
             52 => Some(ChannelId::Master),
             _ => None,
         }
