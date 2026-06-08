@@ -189,8 +189,11 @@ pub fn register_handlers(
             "set_active_view",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
                 if let Some(view) = data.get("view").and_then(|v| v.as_str()) {
+                    tracing::info!("🔄 View change: client {} is now in {}", socket.id, view);
                     let mut current_views = conn_mgr_view.active_views.lock().unwrap();
                     current_views.insert(socket.id.to_string(), view.to_string());
+                } else {
+                    tracing::warn!("⚠️ Invalid view data received from client {}", socket.id);
                 }
             },
         );

@@ -336,19 +336,23 @@ impl ConnectionManager {
                         .await;
                 } else if needs_outs && !needs_ins {
                     // Only OUTS clients
+                    // We still request INS (13, 33, 0) if we want? Actually, ST IN is in 13, 32. Let's just request the necessary blocks.
                     this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 40, 247], 2)
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2) // Some functionality might expect basic channels
                         .await;
                     this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2)
+                        .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2) // ST IN and FX
                         .await;
                     this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2)
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2) // Bus
+                        .await;
+                    this.scheduler
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2) // Aux
                         .await;
                 } else if needs_ins && needs_outs {
                     // Both INS and OUTS clients
                     this.scheduler
-                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 40, 247], 2)
+                        .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2)
                         .await;
                     this.scheduler
                         .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
