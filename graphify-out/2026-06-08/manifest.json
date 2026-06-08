@@ -150,9 +150,9 @@
     "semantic_hash": "c50619d46b80c8f2a18f8408c7b71ebf"
   },
   "public/modules/macros/profiles/shared/profile_pcfavela.json": {
-    "mtime": 1780895726.5353422,
-    "ast_hash": "a6563b10e5c1b8cd97c160bec8509d59",
-    "semantic_hash": ""
+    "mtime": 1780576123.5667524,
+    "ast_hash": "3c844d0335d07282029363cb72a34638",
+    "semantic_hash": "3c844d0335d07282029363cb72a34638"
   },
   "public/modules/macros/profiles/shared/profile_pcmaria.json": {
     "mtime": 1780576123.5684624,
@@ -350,8 +350,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/network/connection.rs": {
-    "mtime": 1780896098.875238,
-    "ast_hash": "b8e5c93aa37b00a032f3e01fa4c24874",
+    "mtime": 1780800157.0156028,
+    "ast_hash": "1853584dc9659b76b95b32e728159b02",
     "semantic_hash": ""
   },
   "server_rust/src/network/mod.rs": {
@@ -2485,8 +2485,8 @@
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/local/profile_pcfavela.json": {
-    "mtime": 1780895726.534821,
-    "ast_hash": "a6563b10e5c1b8cd97c160bec8509d59",
+    "mtime": 1780803890.5705736,
+    "ast_hash": "12a1518164191e2d9f7baf635d3151c7",
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-REGIS-mesa-favela.json": {
@@ -2502,146 +2502,6 @@
   "data/custom_scenes/shared/custom_names_scene-REGIS-mesa-favela.json": {
     "mtime": 1780887139.2275276,
     "ast_hash": "fd53139fa7737d240cd5758d5eced644",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/package.json": {
-    "mtime": 1780589306.0,
-    "ast_hash": "c32a0ac66c7157f633a0f6d79bc8ad71",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/server.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "db4097ffa895fa2b7e2dd910a8107dca",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/api/macros.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "b07570aabb825083ef57173275f85aa0",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/core/config.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "3853ef7884771444b07f41e1a144dea1",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/dmx/dmx.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "654840dd0292deb67fe3dff8e7786eaa",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/dictionary.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "e08851d9f9e9cd86c328c753bb81771a",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/dictionary.json": {
-    "mtime": 1780576122.0,
-    "ast_hash": "9d0886ce2ac9d9e1ee3487652beed5a6",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/midi-assembler.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "b213afba2acf51900b907ab39337bbdd",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/midi-engine.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "6ffd9c4699197a937060a96afceb752e",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/midi-handler.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "f273abb1dc2d1a40424ab2ab595780b2",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/midi-scheduler-backup.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "b44c4dfdf6bd284ed3a8ceb6bb7d7909",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/midi-scheduler.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "cab90d64928d70bc0a7ba318c99822dc",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/pan.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "ceb0ef13022493405fa660d0dc10d2f8",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/property-map.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "1aae446b86390360e1ad2d2a51a63eb9",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/midi/protocol.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "9cfe349bc0eb46eff646c6d3f3d97de7",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/network/connection.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "73107a304fc8bffe050dadfa6c3e03d1",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/network/socket-handler.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "1bb15e139b9c07cf642481d33b7bd9ba",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/network/sync-counter.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "2f49716bd4dafa801cc34ec2c8056c2b",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/network/sync-manager.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "aebc3acef4cee56fc4807e2bb503bc79",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/state/master-meter.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "64e83b4f83a7838bcc984824138cb237",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/state/meter_dummy.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "db206bd3d05c802c95ff2e740fae65c0",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/state/pair.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "b19ea65dc52f01b05c61d7a3156955d7",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/state/scene_manager.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "a362284c05e06bcd59cb757332ac6f29",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/state/state-manager.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "e068b21e5f1ea6e98a1044d2af9c7b4a",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/utils/logger.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "a6206ea28bd60f95ad165d8096b0a172",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/utils/path.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "d25b572ce0df4a3da490d31ac1797cc3",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/utils/platform.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "3a75aba295f89b36b8bca73827d50736",
-    "semantic_hash": ""
-  },
-  "scratch/legacy_unpacked/src/utils/systray.js": {
-    "mtime": 1780576122.0,
-    "ast_hash": "be6afcd9ec5f4f65dcedd5440e2b0fc4",
     "semantic_hash": ""
   }
 }

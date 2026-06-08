@@ -300,19 +300,19 @@ impl ConnectionManager {
                     .enqueue(midi::master_meter::MasterMeter::build_request(), 2)
                     .await;
                 this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 31, 247], 2)
+                    .enqueue(vec![240, 67, 48, 62, 127, 33, 0, 0, 0, 0, 32, 247], 2)
                     .await;
                 this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 31, 247], 2)
+                    .enqueue(vec![240, 67, 48, 62, 127, 32, 0, 0, 0, 0, 32, 247], 2)
                     .await;
                 this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 31, 247], 2)
+                    .enqueue(vec![240, 67, 48, 62, 26, 33, 0, 0, 0, 0, 32, 247], 2)
                     .await;
                 this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 31, 247], 2)
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2)
                     .await;
                 this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 31, 247], 2)
+                    .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
                     .await;
             }
         });
