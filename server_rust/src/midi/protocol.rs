@@ -240,17 +240,31 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         let data_bytes_available = (message.len() - 1).saturating_sub(data_start);
         let num_channels = data_bytes_available / 2;
 
-        // Determine base channel from group number (like Node.js)
-        let base_ch: usize = match group {
-            33 => channel,      // Input CH 1-32
-            32 => 32 + channel, // Input CH 33-64? Actually ST IN and effects
-            82 => 32 + channel, // Stereo Master
-            _ => channel,
-        };
-
         for i in 0..num_channels {
             let idx = data_start + (i * 2);
-            levels.insert(base_ch + i, message[idx]);
+            let val = message[idx];
+
+            if group == 33 && element == 1 {
+                // Element 1 is Bus. Bus 1 is at i=0.
+                let target_ch = 42 + channel + i;
+                if (42..=49).contains(&target_ch) {
+                    levels.insert(target_ch, val);
+                }
+            } else if group == 33 && element == 2 {
+                // Element 2 is Aux. Aux 1 is at i=0.
+                let target_ch = 34 + channel + i;
+                if (34..=41).contains(&target_ch) {
+                    levels.insert(target_ch, val);
+                }
+            } else {
+                let base_ch = match group {
+                    33 => channel,      // Input CH 1-32
+                    32 => 32 + channel, // Input CH 33-64? Actually ST IN and effects
+                    82 => 32 + channel, // Stereo Master
+                    _ => channel,
+                };
+                levels.insert(base_ch + i, val);
+            }
         }
         return Some(ParsedMidi::MeterData {
             is_master,

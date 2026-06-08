@@ -314,6 +314,12 @@ impl ConnectionManager {
                 this.scheduler
                     .enqueue(vec![240, 67, 48, 62, 13, 32, 0, 0, 0, 0, 32, 247], 2)
                     .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2)
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 2, 0, 0, 0, 16, 247], 2)
+                    .await;
             }
         });
 
