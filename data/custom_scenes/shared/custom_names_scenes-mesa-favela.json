@@ -12,6 +12,12 @@
       "physical_scene": "SARU",
       "physical_id": 2,
       "file": "custom_names_scene-SARU-mesa-favela.json"
+    },
+    {
+      "custom_name": "REGIS",
+      "physical_scene": "REGIS",
+      "physical_id": 12,
+      "file": "custom_names_scene-REGIS-mesa-favela.json"
     }
   ]
 }
