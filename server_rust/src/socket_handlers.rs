@@ -80,7 +80,8 @@ pub fn register_handlers(
             if !is_syncing
                 && let Ok(state_json) = serde_json::to_value(&*current_state) {
                     socket_initial.emit("sync", &state_json).ok();
-                }
+                    let _ = socket_initial.emit("scenesUpdated", &current_state.scene_manager.get_state());
+            }
 
             let (inputs, outputs) = crate::midi::MidiEngine::get_available_ports();
             let inputs_json: Vec<serde_json::Value> = inputs

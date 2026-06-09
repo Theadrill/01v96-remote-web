@@ -488,6 +488,12 @@ socket.on('sync', (s) => {
         }
     }
 
+    if (s.sceneNumber !== undefined && s.sceneNumber !== null) {
+        window.currentSceneNumber = s.sceneNumber;
+        window.currentSceneName = s.sceneName || '';
+        if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
+    }
+
     if (typeof initUI === 'function') {
         console.log("♻️ [SOCKET] Re-inicializando UI após Sync Completo");
         const ch0 = getCh(s.channels || {}, 0);
