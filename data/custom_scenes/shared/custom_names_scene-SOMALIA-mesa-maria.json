@@ -1,0 +1,170 @@
+{
+  "scene_name": "SOMALIA",
+  "scene_id": 34,
+  "channels": {
+    "17": {
+      "name": "CONV",
+      "short": "CONV"
+    },
+    "23": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "5": {
+      "name": "tant",
+      "short": "TANT"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "1": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "7": {
+      "name": "REPD",
+      "short": "REPD"
+    },
+    "31": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "REGE",
+      "short": "REGE"
+    },
+    "12": {
+      "name": "VOZP",
+      "short": "VOZP"
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "13": {
+      "name": "VOZR",
+      "short": "VOZR"
+    },
+    "11": {
+      "name": "VOZT",
+      "short": "VOZT"
+    },
+    "14": {
+      "name": "VOZ4",
+      "short": "VOZ4"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "2": {
+      "name": "chim",
+      "short": "CHIM"
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "32": {
+      "name": "KICK",
+      "short": "KICK"
+    },
+    "18": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "10": {
+      "name": "viol",
+      "short": "VIOL"
+    },
+    "8": {
+      "name": "CONG",
+      "short": "CONG"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "9": {
+      "name": "CAVA",
+      "short": "CAVA"
+    },
+    "30": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "4": {
+      "name": "pand",
+      "short": "PAND"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "19": {
+      "name": "CONV",
+      "short": "CONV"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "20": {
+      "name": "CONV",
+      "short": "CONV"
+    }
+  }
+}
