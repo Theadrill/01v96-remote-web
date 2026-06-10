@@ -2,89 +2,69 @@
   "scene_name": "SOMALIA",
   "scene_id": 34,
   "channels": {
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
     "19": {
       "name": "MIC PANDEI",
       "short": "MICP"
     },
-    "21": {
-      "name": "DJ",
-      "short": "DJ  "
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
     },
-    "30": {
-      "name": "PAND AGUDO",
+    "16": {
+      "name": "NOTEBOOK",
+      "short": "NOTE"
+    },
+    "4": {
+      "name": "PANDEIRO",
       "short": "PAND"
     },
     "39": {
       "name": "STER",
       "short": "STER"
     },
-    "40": {
-      "name": "CH 40",
-      "short": "CH40"
-    },
-    "15": {
-      "name": "REGENCIA",
-      "short": "REGE"
-    },
     "3": {
       "name": "SURDAO",
       "short": "SURD"
-    },
-    "23": {
-      "name": "SURD",
-      "short": "SURD"
-    },
-    "10": {
-      "name": "VIOLAO",
-      "short": "VIOL"
-    },
-    "7": {
-      "name": "CONGA HIGH",
-      "short": "CONG"
-    },
-    "5": {
-      "name": "TANTAN",
-      "short": "TANT"
-    },
-    "6": {
-      "name": "CONGA LOW",
-      "short": "CONG"
-    },
-    "32": {
-      "name": "KICK AGUDO",
-      "short": "KICK"
-    },
-    "4": {
-      "name": "PANDEIRO",
-      "short": "PAND"
     },
     "25": {
       "name": "",
       "short": "    "
     },
-    "9": {
-      "name": "CAVACO",
-      "short": "CAVA"
+    "17": {
+      "name": "CONVIDADO",
+      "short": "CONV"
     },
-    "38": {
-      "name": "CH 38",
-      "short": "CH38"
-    },
-    "27": {
+    "28": {
       "name": "",
       "short": "    "
-    },
-    "22": {
-      "name": "DJ2",
-      "short": "DJ2 "
-    },
-    "12": {
-      "name": "VOZ VIOLAO",
-      "short": "VOZV"
     },
     "31": {
       "name": "TANT AGUDO",
       "short": "TANT"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
     },
     "36": {
       "name": "CH 36",
@@ -94,27 +74,71 @@
       "name": "",
       "short": "    "
     },
-    "34": {
-      "name": "CH 34",
-      "short": "CH34"
+    "23": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "12": {
+      "name": "VOZ VIOLAO",
+      "short": "VOZV"
     },
     "35": {
       "name": "STER",
       "short": "STER"
     },
-    "8": {
-      "name": "",
-      "short": "    "
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
     },
     "11": {
       "name": "VOZ TANTAN",
       "short": "VOZT"
     },
-    "37": {
-      "name": "STER",
-      "short": "STER"
+    "2": {
+      "name": "REPIQUE",
+      "short": "REPI"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "6": {
+      "name": "CONGA LOW",
+      "short": "CONG"
+    },
+    "13": {
+      "name": "VOZ CAVACO",
+      "short": "VOZC"
     },
     "29": {
+      "name": "",
+      "short": "    "
+    },
+    "7": {
+      "name": "CONGA HIGH",
+      "short": "CONG"
+    },
+    "26": {
       "name": "",
       "short": "    "
     },
@@ -122,49 +146,25 @@
       "name": "MIC SOMALI",
       "short": "MICS"
     },
-    "18": {
-      "name": "MIC DJ",
-      "short": "MICD"
+    "37": {
+      "name": "STER",
+      "short": "STER"
     },
     "24": {
       "name": "TOMS",
       "short": "TOMS"
     },
-    "17": {
-      "name": "CONVIDADO",
-      "short": "CONV"
-    },
-    "master": {
-      "name": "STEREO",
-      "short": "STER"
-    },
-    "2": {
-      "name": "REPIQUE",
-      "short": "REPI"
-    },
-    "28": {
-      "name": "",
-      "short": "    "
-    },
-    "26": {
-      "name": "",
-      "short": "    "
-    },
-    "33": {
-      "name": "STER",
-      "short": "STER"
-    },
     "1": {
       "name": "",
       "short": "    "
     },
-    "13": {
-      "name": "VOZ CAVACO",
-      "short": "VOZC"
+    "8": {
+      "name": "",
+      "short": "    "
     },
-    "16": {
-      "name": "CEL",
-      "short": "CEL "
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
     }
   }
 }
