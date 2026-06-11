@@ -1,0 +1,9 @@
+{
+  "mesa_nome": "mesa-teste",
+  "channels": {
+    "8": {
+      "name": "DJ",
+      "short": "DJ  "
+    }
+  }
+}
