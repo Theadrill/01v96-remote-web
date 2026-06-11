@@ -2,17 +2,169 @@
   "scene_name": "PISEIRO2",
   "scene_id": 38,
   "channels": {
-    "20": {
-      "name": "CELULAR",
-      "short": "CELU"
+    "3": {
+      "name": "",
+      "short": "    "
     },
-    "23": {
-      "name": "MIC DJ",
-      "short": "MICD"
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "master": {
+      "name": "ST",
+      "short": "ST  "
+    },
+    "16": {
+      "name": "",
+      "short": "    "
+    },
+    "17": {
+      "name": "",
+      "short": "    "
+    },
+    "32": {
+      "name": "",
+      "short": "    "
+    },
+    "10": {
+      "name": "",
+      "short": "    "
+    },
+    "24": {
+      "name": "",
+      "short": "    "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "19": {
+      "name": "",
+      "short": "    "
+    },
+    "33": {
+      "name": "STI1",
+      "short": "STI1"
+    },
+    "1": {
+      "name": "",
+      "short": "    "
+    },
+    "22": {
+      "name": "R-CL",
+      "short": "RCL "
+    },
+    "4": {
+      "name": "",
+      "short": "    "
+    },
+    "7": {
+      "name": "",
+      "short": "    "
     },
     "18": {
-      "name": "DJ",
-      "short": "DJ  "
+      "name": "DJJ",
+      "short": "DJJ "
+    },
+    "2": {
+      "name": "",
+      "short": "    "
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "11": {
+      "name": "",
+      "short": "    "
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "CELU",
+      "short": "CELU"
+    },
+    "39": {
+      "name": "STI4",
+      "short": "STI4"
+    },
+    "15": {
+      "name": "",
+      "short": "    "
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "31": {
+      "name": "MIC S FIO",
+      "short": "MICS"
+    },
+    "35": {
+      "name": "STI2",
+      "short": "STI2"
+    },
+    "30": {
+      "name": "MIC S FIO2",
+      "short": "MICS"
+    },
+    "6": {
+      "name": "",
+      "short": "    "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "",
+      "short": "    "
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "23": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "12": {
+      "name": "",
+      "short": "    "
+    },
+    "37": {
+      "name": "STI3",
+      "short": "STI3"
+    },
+    "21": {
+      "name": "LR",
+      "short": "LR  "
+    },
+    "9": {
+      "name": "",
+      "short": "    "
     }
   }
 }
