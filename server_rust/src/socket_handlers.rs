@@ -477,46 +477,6 @@ pub fn register_handlers(
                                 }
                             };
 
-                            let mut applied = 0u32;
-                            let mut skipped = 0u32;
-                            for (channel_id, entry) in &scene.channels {
-                                if token.is_cancelled() {
-                                    return;
-                                }
-
-                                let global_ch = channel_id.to_global_channel();
-                                let current_short = current_names
-                                    .get(channel_id)
-                                    .map(|n| crate::custom_scenes::to_short_name(n))
-                                    .unwrap_or_default();
-
-                                if current_short == entry.short {
-                                    skipped += 1;
-                                    continue;
-                                }
-
-                                tracing::info!("[CUSTOM] recallScene: ch{} '{}' -> '{}' (cur='{}')", global_ch, current_short, entry.short, current_short);
-                                let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
-                                for (ci, &byte) in short_bytes.iter().enumerate() {
-                                    if token.is_cancelled() {
-                                        return;
-                                    }
-                                    for req in crate::midi::protocol::build_name_change(
-                                        global_ch, ci as u8, byte,
-                                    ) {
-                                        sched_clone.enqueue(req, 0).await;
-                                    }
-                                    if ci < short_bytes.len() - 1 {
-                                        tokio::select! {
-                                            _ = tokio::time::sleep(std::time::Duration::from_millis(30)) => {}
-                                            _ = token.cancelled() => { return; }
-                                        }
-                                    }
-                                }
-                                applied += 1;
-                            }
-                            tracing::info!("[CUSTOM] recallScene: aplicados={}, ignorados={}", applied, skipped);
-
                             let channels_arr: Vec<serde_json::Value> = scene
                                 .channels
                                 .iter()
@@ -536,10 +496,13 @@ pub fn register_handlers(
                                         "active": true,
                                         "scene_name": scene.scene_name,
                                         "scene_id": scene.scene_id,
-                                        "channels": channels_arr,
-                                    }),
+                                        "channels": channels_arr
+                                    })
                                 )
                                 .await;
+                            
+                            // Os nomes serão enviados para a mesa pelo sync_manager automaticamente
+                            // após o sync da cena física terminar, evitando colisão de mensagens e travamentos.            .await;
                         });
                     }
 

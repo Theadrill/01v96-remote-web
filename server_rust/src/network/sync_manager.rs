@@ -350,83 +350,46 @@ async fn queue_all_params_inner(
     csm: Arc<RwLock<CustomSceneManager>>,
 ) {
     let mut pending_corrections: Vec<Vec<u8>> = Vec::new();
-    if force_names {
-        let mut name_requests: Vec<Vec<u8>> = Vec::new();
-        
-        // 1. Inputs (0..32)
-        for i in 0u8..32 {
-            for c in 0..4u8 {
-                if let Some(req) = midi::protocol::build_name_request(i, c) { name_requests.push(req); }
-            }
-        }
-        // 2. Stereo In (60, 62, 64, 66)
-        for st in 0..4u8 {
-            let gid = 60 + (st * 2);
-            for c in 0..4u8 {
-                if let Some(req) = midi::protocol::build_name_request(gid, c) { name_requests.push(req); }
-            }
-        }
-        // 3. Mixes, Buses, Master
-        let mut outs: Vec<u8> = (36..=43).collect();
-        outs.extend(44..=51);
-        outs.push(52);
-        for idx in outs {
-            for c in 0..8u8 {
-                if let Some(req) = midi::protocol::build_name_request(idx, c) { name_requests.push(req); }
-            }
-        }
 
-        let total_names = name_requests.len();
-        tracing::info!("📦 [SyncNames] Enfileirando {} requests de nomes...", total_names);
-        sched.enqueue_batch(name_requests, 1).await;
-        
-        let mut last_log = 0u32;
-        loop {
-            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-            let st = sched.state.lock().await;
-            let remaining = st.q0.len() + st.q1.len();
-            if remaining == 0 { break; }
-            if last_log != remaining as u32 {
-                tracing::info!("⏳ [SyncNames] Aguardando {} requests de nomes...", remaining);
-                last_log = remaining as u32;
-                let current = if remaining < total_names { total_names - remaining } else { 0 };
-                let _ = io.emit("syncStatus", &serde_json::json!({
-                    "active": true,
-                    "type": "names",
-                    "progress": current,
-                    "total": total_names
-                })).await;
-            }
-        }
-        
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-
-        let resolved = crate::name_resolver::resolve_all(&state, &csm).await;
-        {
-            let state_guard = state.read().await;
-            for r in &resolved {
-                if r.source != crate::name_resolver::NameSource::Physical {
-                    let physical_short = get_physical_short(&state_guard, r.ch);
-                    if physical_short != r.short {
-                        tracing::info!("🔄 [SyncNames] Corrigindo nome na mesa para CH {}: de '{}' para '{}' (será enviado após o sync principal)", r.ch, physical_short, r.short);
-                        let bytes: Vec<u8> = r.short.bytes().take(4).collect();
-                        for (ci, &code) in bytes.iter().enumerate() {
-                            for req in crate::midi::protocol::build_name_change(r.ch as u8, ci as u8, code) {
-                                pending_corrections.push(req);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        crate::name_resolver::broadcast(&io, &state, &csm).await;
-    }
     let mut requests: Vec<Vec<u8>> = Vec::with_capacity(700);
 
     requests.push(midi::master_meter::MasterMeter::build_stop_request());
     requests.extend(midi::pan::build_pan_sync_requests());
     push_req(&mut requests, "kStereoFader/kFader", 0);
+
+    for st in 0..4u8 {
+        push_req(&mut requests, "kSTInFader/kFader", st);
+        push_req(&mut requests, "kSTInChannelOn/kChannelOn", st);
+        push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", st + 32);
+        push_req(&mut requests, "kSTInAttenuator/kAtt", st);
+        push_req(&mut requests, "kSTInEQ/kEQOn", st);
+        push_req(&mut requests, "kChannelInput/kChannelIn", st + 32);
+
+        for band in &["Low", "LowMid", "HiMid", "Hi"] {
+            push_req(&mut requests, &format!("kSTInEQ/kEQ{}F", band), st);
+            push_req(&mut requests, &format!("kSTInEQ/kEQ{}G", band), st);
+            push_req(&mut requests, &format!("kSTInEQ/kEQ{}Q", band), st);
+        }
+        for a in 1..=8 {
+            push_req(&mut requests, &format!("kSTInAUX/kAUX{}Level", a), st);
+            push_req(&mut requests, &format!("kSTInAUX/kAUX{}On", a), st);
+        }
+        push_req(&mut requests, "kSTInBus/kStereo", st);
+        for b in 1..=8 {
+            push_req(&mut requests, &format!("kSTInBus/kBus{}", b), st);
+        }
+        if st % 2 == 0 {
+            push_req(&mut requests, "kSTInPair/kPair", st);
+        }
+        if force_names {
+            let gid = 60 + (st * 2);
+            for c in 0..4u8 {
+                if let Some(req) = midi::protocol::build_name_request(gid, c) {
+                    requests.push(req);
+                }
+            }
+        }
+    }
 
     for i in 0u8..32 {
         push_req(&mut requests, "kInputFader/kFader", i);
@@ -475,6 +438,13 @@ async fn queue_all_params_inner(
         }
         if i % 2 == 0 {
             push_req(&mut requests, "kInputPair/kPair", i);
+        }
+        if force_names {
+            for c in 0..4u8 {
+                if let Some(req) = midi::protocol::build_name_request(i, c) {
+                    requests.push(req);
+                }
+            }
         }
     }
 
@@ -557,6 +527,19 @@ async fn queue_all_params_inner(
         push_req(&mut requests, &format!("kStereoComp/{}", p), 0);
     }
 
+    if force_names {
+        let mut outs: Vec<u8> = (36..=43).collect();
+        outs.extend(44..=51);
+        outs.push(52);
+        for idx in outs {
+            for c in 0..8u8 {
+                if let Some(req) = midi::protocol::build_name_request(idx, c) {
+                    requests.push(req);
+                }
+            }
+        }
+    }
+
     info!(
         "📦 [Sync] {} requests preparados. Enfileirando em lote...",
         requests.len()
@@ -619,16 +602,41 @@ async fn queue_all_params_inner(
     tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
     // Send pending name corrections now that the massive sync is over
-    if !pending_corrections.is_empty() {
-        tracing::info!("📦 [SyncNames] Enviando {} correções pendentes de nomes para a mesa...", pending_corrections.len());
-        sched.enqueue_batch(pending_corrections, 1).await;
-        loop {
-            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-            let st = sched.state.lock().await;
-            if st.q0.len() + st.q1.len() == 0 { break; }
+    if force_names {
+        let resolved = crate::name_resolver::resolve_all(&state, &csm).await;
+        let state_guard = state.read().await;
+        for r in &resolved {
+            if r.source != crate::name_resolver::NameSource::Physical {
+                let physical_short = get_physical_short(&state_guard, r.ch);
+                if physical_short != r.short {
+                    tracing::info!("🔄 [SyncNames] Corrigindo nome na mesa para CH {}: de '{}' para '{}' (será enviado após o sync principal)", r.ch, physical_short, r.short);
+                    let bytes: Vec<u8> = r.short.bytes().take(4).collect();
+                    for (ci, &code) in bytes.iter().enumerate() {
+                        for req in crate::midi::protocol::build_name_change(r.ch as u8, ci as u8, code) {
+                            pending_corrections.push(req);
+                        }
+                    }
+                }
+            }
         }
-        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
     }
+
+        if !pending_corrections.is_empty() {
+            tracing::info!("🔄 [SyncNames] Enviando {} pacotes de correção de nomes para a mesa em background...", pending_corrections.len());
+            let sched_clone = sched.clone();
+            tokio::spawn(async move {
+                for (ci, req) in pending_corrections.into_iter().enumerate() {
+                    sched_clone.enqueue(req, 1).await;
+                    // A mesa (01V96) requer um pequeno delay entre comandos de nome para não engasgar.
+                    // Cada caractere gera 2 pacotes (um pro short e um pro long se houver, ou 2 pro short/long).
+                    // Vamos dar um sleep a cada 2 pacotes para garantir o pacing de ~30ms por char.
+                    if ci % 2 == 1 {
+                        tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                    }
+                }
+                tracing::info!("✅ [SyncNames] Envio de correções de nomes concluído.");
+            });
+        }
 
     // Garante que scene_number e scene_name reflitam o scene_manager (fonte canônica)
     // antes de emitir o sync. O fire_params_only não re-lê dados de cena, então
@@ -672,6 +680,12 @@ async fn queue_all_params_inner(
             json_str.len(),
             state_guard.channels.len()
         );
+
+        // DROP state_guard BEFORE any await!
+        // Tokio RwLock doesn't allow a new read lock if a writer is waiting,
+        // which causes deadlock when broadcast calls resolve_all()
+        drop(state_guard);
+
         let _ = io
             .emit("syncStatus", &serde_json::json!({ "active": false }))
             .await;
@@ -681,8 +695,9 @@ async fn queue_all_params_inner(
         crate::name_resolver::broadcast(&io, &state, &csm).await;
 
         let _ = io.emit("sync", &state_json).await;
+    } else {
+        drop(state_guard);
     }
-    drop(state_guard);
 
 
     is_syncing.store(false, Ordering::SeqCst);
