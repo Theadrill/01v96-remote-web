@@ -30,6 +30,12 @@
       "physical_scene": "FORRO ENGATILH",
       "physical_id": 36,
       "file": "custom_names_scene-FORRO ENGATILH-mesa-favela.json"
+    },
+    {
+      "custom_name": "PISEIRO",
+      "physical_scene": "PISEIRO",
+      "physical_id": 25,
+      "file": "custom_names_scene-PISEIRO-mesa-favela.json"
     }
   ]
 }
