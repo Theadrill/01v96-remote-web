@@ -24,6 +24,12 @@
       "physical_scene": "FORRO ENGATILHAD",
       "physical_id": 36,
       "file": "custom_names_scene-FORRO ENGATILHAD-mesa-favela.json"
+    },
+    {
+      "custom_name": "FORRO ENGATILH",
+      "physical_scene": "FORRO ENGATILH",
+      "physical_id": 36,
+      "file": "custom_names_scene-FORRO ENGATILH-mesa-favela.json"
     }
   ]
 }

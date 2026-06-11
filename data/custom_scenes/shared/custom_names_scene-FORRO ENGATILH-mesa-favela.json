@@ -1,0 +1,186 @@
+{
+  "scene_name": "FORRO ENGATILH",
+  "scene_id": 36,
+  "channels": {
+    "19": {
+      "name": "",
+      "short": "    "
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "bus4": {
+      "name": "VOZES LOW",
+      "short": "VOZE"
+    },
+    "22": {
+      "name": "R-CL",
+      "short": "RCL "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "3": {
+      "name": "",
+      "short": "    "
+    },
+    "37": {
+      "name": "STI3",
+      "short": "STI3"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "33": {
+      "name": "STI1",
+      "short": "STI1"
+    },
+    "16": {
+      "name": "",
+      "short": "    "
+    },
+    "9": {
+      "name": "",
+      "short": "    "
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "12": {
+      "name": "",
+      "short": "    "
+    },
+    "7": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "",
+      "short": "    "
+    },
+    "bus3": {
+      "name": "VOZES LOW",
+      "short": "VOZE"
+    },
+    "bus2": {
+      "name": "VOZES HIGH",
+      "short": "VOZE"
+    },
+    "master": {
+      "name": "ST",
+      "short": "ST  "
+    },
+    "1": {
+      "name": "",
+      "short": "    "
+    },
+    "23": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "6": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "CELU",
+      "short": "CELU"
+    },
+    "24": {
+      "name": "",
+      "short": "    "
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "31": {
+      "name": "MICS",
+      "short": "MICS"
+    },
+    "30": {
+      "name": "",
+      "short": "    "
+    },
+    "35": {
+      "name": "STI2",
+      "short": "STI2"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "4": {
+      "name": "",
+      "short": "    "
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "21": {
+      "name": "LR",
+      "short": "LR  "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "11": {
+      "name": "",
+      "short": "    "
+    },
+    "10": {
+      "name": "",
+      "short": "    "
+    },
+    "2": {
+      "name": "",
+      "short": "    "
+    },
+    "bus1": {
+      "name": "VOZES HIGH",
+      "short": "VOZE"
+    },
+    "18": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "39": {
+      "name": "STI4",
+      "short": "STI4"
+    },
+    "32": {
+      "name": "",
+      "short": "    "
+    },
+    "17": {
+      "name": "",
+      "short": "    "
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    }
+  }
+}
