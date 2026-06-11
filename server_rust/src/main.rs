@@ -106,24 +106,7 @@ async fn async_main(
 
     let (layer, io) = SocketIo::new_layer();
 
-    let sync_manager = Arc::new(network::SyncManager::new(scheduler.clone(), io.clone()));
-    let sync_manager_socket = sync_manager.clone();
-
-    let conn_mgr = network::ConnectionManager::new(
-        app_config.clone(),
-        io.clone(),
-        scheduler.clone(),
-        global_state.clone(),
-        sync_counter.clone(),
-        sync_manager,
-        engine,
-        remote_client,
-        midi_in_tx.clone(),
-    );
-
-    let global_state_api = global_state.clone();
-
-    // --- CUSTOM SCENES ---
+    // --- CUSTOM SCENES (precisa ser antes do SyncManager) ---
     let data_dir = {
         let root = config::get_project_root();
         let dir = root.join("data").join("custom_scenes");
@@ -139,6 +122,23 @@ async fn async_main(
     let custom_scene_manager = Arc::new(RwLock::new(custom_scenes::CustomSceneManager::load_all(
         &data_dir, &mesa_nome,
     )));
+
+    let sync_manager = Arc::new(network::SyncManager::new(scheduler.clone(), io.clone(), custom_scene_manager.clone()));
+    let sync_manager_socket = sync_manager.clone();
+
+    let conn_mgr = network::ConnectionManager::new(
+        app_config.clone(),
+        io.clone(),
+        scheduler.clone(),
+        global_state.clone(),
+        sync_counter.clone(),
+        sync_manager,
+        engine,
+        remote_client,
+        midi_in_tx.clone(),
+    );
+
+    let global_state_api = global_state.clone();
 
     socket_handlers::register_handlers(
         io.clone(),

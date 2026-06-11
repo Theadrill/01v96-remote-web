@@ -1,3 +1,4 @@
+use crate::custom_scenes::CustomSceneManager;
 use crate::midi::{self, MidiScheduler};
 use crate::state::GlobalState;
 use socketioxide::SocketIo;
@@ -12,16 +13,18 @@ pub struct SyncManager {
     is_syncing: Arc<AtomicBool>,
     is_fully_synced: Arc<AtomicBool>,
     has_synced_names: AtomicBool,
+    csm: Arc<RwLock<CustomSceneManager>>,
 }
 
 impl SyncManager {
-    pub fn new(scheduler: Arc<MidiScheduler>, io: SocketIo) -> Self {
+    pub fn new(scheduler: Arc<MidiScheduler>, io: SocketIo, csm: Arc<RwLock<CustomSceneManager>>) -> Self {
         Self {
             scheduler,
             io,
             is_syncing: Arc::new(AtomicBool::new(false)),
             is_fully_synced: Arc::new(AtomicBool::new(false)),
             has_synced_names: AtomicBool::new(false),
+            csm,
         }
     }
 
@@ -50,6 +53,7 @@ impl SyncManager {
         let is_fully_synced = self.is_fully_synced.clone();
         let has_synced_names = self.has_synced_names.load(Ordering::SeqCst);
         let _sync_type = sync_type.to_string();
+        let csm = self.csm.clone();
 
         tokio::spawn(async move {
             tracing::info!("🔄 [SyncManager] Task de sync iniciada");
@@ -152,6 +156,7 @@ impl SyncManager {
                 is_fully_synced,
                 force_names,
                 has_synced_names,
+                csm,
             )
             .await;
         });
@@ -214,6 +219,7 @@ impl SyncManager {
         let is_syncing = self.is_syncing.clone();
         let is_fully_synced = self.is_fully_synced.clone();
         let has_synced_names = self.has_synced_names.load(Ordering::SeqCst);
+        let csm = self.csm.clone();
 
         tokio::spawn(async move {
             queue_all_params_inner(
@@ -224,6 +230,7 @@ impl SyncManager {
                 is_fully_synced,
                 force_names,
                 has_synced_names,
+                csm,
             )
             .await;
         });
@@ -319,6 +326,7 @@ async fn queue_all_params_inner(
     is_fully_synced: Arc<AtomicBool>,
     force_names: bool,
     _has_synced_names: bool,
+    csm: Arc<RwLock<CustomSceneManager>>,
 ) {
     let mut requests: Vec<Vec<u8>> = Vec::with_capacity(700);
 
@@ -592,6 +600,44 @@ async fn queue_all_params_inner(
         let _ = io
             .emit("syncStatus", &serde_json::json!({ "active": false }))
             .await;
+
+        // Emit global names BEFORE sync para eliminar flicker no frontend
+        {
+            let csm_guard = csm.read().await;
+            let gnames = csm_guard.get_global_names();
+            if !gnames.is_empty() {
+                let channels: Vec<serde_json::Value> = gnames
+                    .iter()
+                    .map(|(ch_id, entry)| {
+                        serde_json::json!({
+                            "ch": ch_id.to_global_channel(),
+                            "name": entry.name,
+                            "short": entry.short
+                        })
+                    })
+                    .collect();
+                let _ = io
+                    .emit(
+                        "globalNamesLoaded",
+                        &serde_json::json!({
+                            "active": true,
+                            "channels": channels,
+                        }),
+                    )
+                    .await;
+            } else {
+                let _ = io
+                    .emit(
+                        "globalNamesLoaded",
+                        &serde_json::json!({
+                            "active": false,
+                            "channels": [],
+                        }),
+                    )
+                    .await;
+            }
+        }
+
         let _ = io.emit("sync", &state_json).await;
     }
     drop(state_guard);
