@@ -301,7 +301,12 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
     }
 
     let nameDiv = isMaster ? (s.name !== undefined ? s.name : "MASTER") : (s.name !== undefined ? s.name : "...");
-    if (!isMaster && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
+    // Prioridade 1: Nome Global
+    if (!isMaster && window.globalNames && window.globalNames[i]) {
+        nameDiv = window.globalNames[i].name;
+    }
+    // Prioridade 2: Nome Custom Scene
+    else if (!isMaster && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
         nameDiv = window.activeCustomSceneChannels[i].name;
     }
     let customClass = isMaster ? "master-card-desktop" : "";

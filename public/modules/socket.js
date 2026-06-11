@@ -46,9 +46,13 @@ function requestSetupStatus() {
         socket.emit('set_active_view', { view: view });
     }
 }
-socket.on('connect', requestSetupStatus);
+socket.on('connect', function () {
+    requestSetupStatus();
+    requestGlobalNames();
+});
 if (typeof socket !== 'undefined' && socket.connected) {
     requestSetupStatus();
+    requestGlobalNames();
 }
 
 // 🚨 [CRITICAL SYNC LOGIC] - LISTENER DE UPDATES E DINÂMICAS
@@ -505,6 +509,7 @@ socket.on('sync', (s) => {
             console.log("🔍 [DEBUG SYNC] CH2 state:", channelStates[1].paired, "pairedWith:", channelStates[1].pairedWith);
         }
         initUI();
+        requestGlobalNames();
     }
 });
 
@@ -519,12 +524,19 @@ socket.on('scenesUpdated', (data) => {
         console.log(`🎬 Cena Atual Atualizada (scenesUpdated): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         requestActiveCustomChannels();
+        requestGlobalNames();
     }
 });
 
 function requestActiveCustomChannels() {
     if (typeof socket !== 'undefined' && socket.connected) {
         socket.emit('getActiveCustomChannels');
+    }
+}
+
+function requestGlobalNames() {
+    if (typeof socket !== 'undefined' && socket.connected) {
+        socket.emit('getGlobalNames');
     }
 }
 
@@ -535,6 +547,7 @@ socket.on('currentScene', (data) => {
         console.log(`🎬 Cena Atual Atualizada (currentScene): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         requestActiveCustomChannels();
+        requestGlobalNames();
     }
 });
 
@@ -558,6 +571,7 @@ socket.on('saveSceneResult', (data) => {
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         OverlayInfo.show('success', 'CENA ' + num + name + ' SALVA');
         requestActiveCustomChannels();
+        requestGlobalNames();
     } else if (data && !data.success) {
         OverlayInfo.show('error', 'ERRO AO SALVAR CENA');
     }
@@ -574,9 +588,27 @@ socket.on('activeCustomChannels', (data) => {
             }
         }
         console.log('[CUSTOM] activeCustomChannels carregado:', data.channels.length, 'canais');
+        requestGlobalNames();
     } else {
         window.activeCustomSceneChannels = null;
         console.log('[CUSTOM] activeCustomChannels: nenhuma cena ativa');
+        requestGlobalNames();
+    }
+});
+
+socket.on('globalNamesLoaded', (data) => {
+    if (data && data.channels) {
+        window.globalNames = {};
+        for (const entry of data.channels) {
+            window.globalNames[entry.ch] = { name: entry.name, short: entry.short };
+            if (typeof window.updateNameUI === 'function') {
+                window.updateNameUI(entry.ch, entry.name);
+            }
+        }
+        console.log('[GLOBAL] globalNamesLoaded:', Object.keys(window.globalNames).length, 'canais');
+    } else {
+        window.globalNames = null;
+        console.log('[GLOBAL] globalNamesLoaded: nenhum nome global');
     }
 });
 
@@ -590,12 +622,14 @@ socket.on('customSceneLoaded', (data) => {
             }
         }
         console.log('[CUSTOM] customSceneLoaded:', data.scene_name, '-', data.channels.length, 'canais');
+        requestGlobalNames();
     } else {
         window.activeCustomSceneChannels = null;
         console.log('[CUSTOM] customSceneLoaded: nenhuma cena ativa');
         if (window.customNamesEnabled) {
             socket.emit('ensureCurrentCustomScene', { syncShared: window.customScenesSyncEnabled });
         }
+        requestGlobalNames();
     }
 });
 

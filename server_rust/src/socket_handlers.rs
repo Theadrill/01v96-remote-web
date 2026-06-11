@@ -521,6 +521,63 @@ pub fn register_handlers(
                                     }),
                                 )
                                 .await;
+
+                            // Re-apply global names on top of custom scene names
+                            let global_channels = {
+                                let csm = csm_clone.write().await;
+                                let gnames = csm.get_global_names().clone();
+                                let mut applied_global = 0u32;
+                                for (ch_id, entry) in &gnames {
+                                    if token.is_cancelled() {
+                                        return;
+                                    }
+                                    let global_ch = ch_id.to_global_channel();
+                                    let current_short = current_names
+                                        .get(ch_id)
+                                        .map(|n| crate::custom_scenes::to_short_name(n))
+                                        .unwrap_or_default();
+
+                                    if current_short == entry.short {
+                                        continue;
+                                    }
+
+                                    let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
+                                    for (ci, &byte) in short_bytes.iter().enumerate() {
+                                        if token.is_cancelled() {
+                                            return;
+                                        }
+                                        for req in crate::midi::protocol::build_name_change(
+                                            global_ch, ci as u8, byte,
+                                        ) {
+                                            sched_clone.enqueue(req, 0).await;
+                                        }
+                                        if ci < short_bytes.len() - 1 {
+                                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                        }
+                                    }
+                                    applied_global += 1;
+                                }
+                                if applied_global > 0 {
+                                    tracing::info!("[GLOBAL] recallScene: applied {} global name(s) over custom scene", applied_global);
+                                }
+                                gnames.iter().map(|(ch_id, entry)| {
+                                    serde_json::json!({
+                                        "ch": ch_id.to_global_channel(),
+                                        "name": entry.name,
+                                        "short": entry.short
+                                    })
+                                }).collect::<Vec<_>>()
+                            };
+
+                            let _ = io_clone
+                                .emit(
+                                    "globalNamesLoaded",
+                                    &serde_json::json!({
+                                        "active": !global_channels.is_empty(),
+                                        "channels": global_channels,
+                                    }),
+                                )
+                                .await;
                         });
                     }
 
@@ -784,6 +841,211 @@ pub fn register_handlers(
                     let mut csm = csm_remove.write().await;
                     csm.persist(sync_shared);
                 }
+            },
+        );
+
+        // --- GET GLOBAL NAMES ---
+        let csm_global_get = csm_socket.clone();
+        socket.on(
+            "getGlobalNames",
+            move |socket: SocketRef| async move {
+                let (channels, mesa_nome) = {
+                    let csm = csm_global_get.read().await;
+                    let names = csm.get_global_names();
+                    let arr: Vec<serde_json::Value> = names.iter().map(|(ch_id, entry)| {
+                        serde_json::json!({
+                            "ch": ch_id.to_global_channel(),
+                            "name": entry.name,
+                            "short": entry.short
+                        })
+                    }).collect();
+                    (arr, csm.mesa_nome().to_string())
+                };
+                let _ = socket.emit("globalNamesLoaded", &serde_json::json!({
+                    "active": !channels.is_empty(),
+                    "channels": channels,
+                    "mesa_nome": mesa_nome,
+                }));
+            },
+        );
+
+        // --- SAVE GLOBAL NAME ---
+        let csm_global_save = csm_socket.clone();
+        let state_global_save = global_state_socket.clone();
+        let io_global_save = io.clone();
+        let sched_global_save = scheduler_socket.clone();
+        socket.on(
+            "saveGlobalName",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                let channel = data.get("channel").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+                let name = data
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                let normalized = crate::custom_scenes::normalize_name(&name);
+                tracing::info!("[GLOBAL] saveGlobalName: ch={}, raw='{}', normalized='{}'", channel, name, normalized);
+
+                let channel_id = match ChannelId::from_global_channel(channel) {
+                    Some(id) => id,
+                    None => {
+                        let _ = socket.emit(
+                            "saveNameResult",
+                            &serde_json::json!({ "success": false, "error": "canal inválido" }),
+                        );
+                        return;
+                    }
+                };
+
+                let short = crate::custom_scenes::to_short_name(&normalized);
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+
+                {
+                    let mut csm = csm_global_save.write().await;
+                    csm.upsert_global_name(channel_id, &normalized);
+                    csm.persist(sync_shared);
+                }
+
+                // Enviar MIDI se short difere do nome atual na mesa
+                let current_name = {
+                    let state = state_global_save.read().await;
+                    get_channel_short_name(&state, channel)
+                };
+
+                if current_name.as_deref() != Some(&short) {
+                    let sched_clone = sched_global_save.clone();
+                    let short_bytes: Vec<u8> = short.bytes().take(4).collect();
+                    for (ci, &byte) in short_bytes.iter().enumerate() {
+                        for req in crate::midi::protocol::build_name_change(
+                            channel, ci as u8, byte,
+                        ) {
+                            sched_clone.enqueue(req, 0).await;
+                        }
+                        if ci < short_bytes.len() - 1 {
+                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                        }
+                    }
+                }
+
+                // Emitir broadcast de update + globalNamesLoaded
+                let _ = io_global_save
+                    .emit(
+                        "updateName",
+                        &serde_json::json!({
+                            "channel": channel,
+                            "name": normalized
+                        }),
+                    )
+                    .await;
+
+                let channels = {
+                    let csm = csm_global_save.read().await;
+                    let names = csm.get_global_names();
+                    names.iter().map(|(ch_id, entry)| {
+                        serde_json::json!({
+                            "ch": ch_id.to_global_channel(),
+                            "name": entry.name,
+                            "short": entry.short
+                        })
+                    }).collect::<Vec<_>>()
+                };
+                let _ = io_global_save
+                    .emit(
+                        "globalNamesLoaded",
+                        &serde_json::json!({
+                            "active": !channels.is_empty(),
+                            "channels": channels,
+                        }),
+                    )
+                    .await;
+
+                let _ = socket.emit(
+                    "saveNameResult",
+                    &serde_json::json!({ "success": true }),
+                );
+            },
+        );
+
+        // --- REMOVE GLOBAL NAME ---
+        let csm_global_remove = csm_socket.clone();
+        let state_global_remove = global_state_socket.clone();
+        let io_global_remove = io.clone();
+        let sched_global_remove = scheduler_socket.clone();
+        socket.on(
+            "removeGlobalName",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                let channel = data.get("channel").and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+                let channel_id = match ChannelId::from_global_channel(channel) {
+                    Some(id) => id,
+                    None => return,
+                };
+                let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+
+                {
+                    let mut csm = csm_global_remove.write().await;
+                    csm.remove_global_name(&channel_id);
+                    csm.persist(sync_shared);
+                }
+
+                // After removing global name, re-apply the fallback name (custom scene or physical)
+                let fallback_name = {
+                    let state = state_global_remove.read().await;
+                    get_channel_short_name(&state, channel)
+                };
+
+                if let Some(fb_name) = &fallback_name {
+                    let sched_clone = sched_global_remove.clone();
+                    let short_bytes: Vec<u8> = fb_name.bytes().take(4).collect();
+                    for (ci, &byte) in short_bytes.iter().enumerate() {
+                        for req in crate::midi::protocol::build_name_change(
+                            channel, ci as u8, byte,
+                        ) {
+                            sched_clone.enqueue(req, 0).await;
+                        }
+                        if ci < short_bytes.len() - 1 {
+                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                        }
+                    }
+                }
+
+                // Emitir broadcast de updateName com o nome de fallback (ou vazio)
+                let display_name = fallback_name.unwrap_or_default().trim().to_string();
+                let _ = io_global_remove
+                    .emit(
+                        "updateName",
+                        &serde_json::json!({
+                            "channel": channel,
+                            "name": display_name
+                        }),
+                    )
+                    .await;
+
+                let channels = {
+                    let csm = csm_global_remove.read().await;
+                    let names = csm.get_global_names();
+                    names.iter().map(|(ch_id, entry)| {
+                        serde_json::json!({
+                            "ch": ch_id.to_global_channel(),
+                            "name": entry.name,
+                            "short": entry.short
+                        })
+                    }).collect::<Vec<_>>()
+                };
+                let _ = io_global_remove
+                    .emit(
+                        "globalNamesLoaded",
+                        &serde_json::json!({
+                            "active": !channels.is_empty(),
+                            "channels": channels,
+                        }),
+                    )
+                    .await;
             },
         );
 
@@ -1119,12 +1381,40 @@ pub fn register_handlers(
 
                     // Update Custom Scenes Registry to reflect the new physical scene name
                     let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
+                    let original_scene_name = {
+                        let state = state_save.read().await;
+                        state.scene_manager.scenes[original_scene_index as usize]
+                            .as_ref()
+                            .map(|s| s.name.clone())
+                            .unwrap_or_default()
+                    };
                     {
                         let mut csm = csm_save.write().await;
 
-                        // Se estamos salvando em um slot diferente do atual, duplicamos a cena
                         if index != original_scene_index {
-                            csm.duplicate_scene_by_id(original_scene_index, index, &target_name, sync_shared);
+                            // Tenta duplicar via registry (cena fonte tem entrada própria)
+                            let duplicated = csm.duplicate_scene_by_id(original_scene_index, index, &target_name, sync_shared);
+                            if !duplicated {
+                                // Fallback: cena fonte não tem entrada no registry (ex: veio do default scene).
+                                // Vamos criar a cena alvo com os canais da cena fonte + global names
+                                let source_scene = csm.find_scene_for_physical(original_scene_index, &original_scene_name);
+                                let mut channels: std::collections::HashMap<ChannelId, crate::custom_scenes::ChannelNameEntry> =
+                                    match source_scene {
+                                        Some(s) => s.channels,
+                                        None => std::collections::HashMap::new(),
+                                    };
+                                // Global names sobrescrevem os canais da cena fonte
+                                for (ch_id, entry) in csm.get_global_names() {
+                                    channels.insert(ch_id.clone(), entry.clone());
+                                }
+                                let safe_name = target_name.replace(
+                                    |c: char| !c.is_alphanumeric() && c != '-' && c != ' ' && c != '_', "_"
+                                );
+                                let new_file = format!("custom_names_scene-{}-{}.json", safe_name, csm.mesa_nome());
+                                csm.create_scene(&new_file, &target_name, index, channels);
+                                csm.ensure_registry_entry(&target_name, index, &new_file);
+                                csm.persist(sync_shared);
+                            }
                         } else {
                             csm.update_physical_scene_name(index, &target_name, sync_shared);
                         }
@@ -1372,6 +1662,7 @@ pub fn register_handlers(
                     let token = csm.prepare_op();
                     let sched_clone = sched_ensure.clone();
                     let io_clone = io_ensure.clone();
+                    let csm_clone = csm_ensure.clone();
                     drop(csm);
 
                     tokio::spawn(async move {
@@ -1430,6 +1721,63 @@ pub fn register_handlers(
                                     "scene_name": scene.scene_name,
                                     "scene_id": scene.scene_id,
                                     "channels": channels_arr,
+                                }),
+                            )
+                            .await;
+
+                        // Re-apply global names on top of custom scene names
+                        let global_channels = {
+                            let csm = csm_clone.write().await;
+                            let gnames = csm.get_global_names().clone();
+                            let mut applied_global = 0u32;
+                            for (ch_id, entry) in &gnames {
+                                if token.is_cancelled() {
+                                    return;
+                                }
+                                let global_ch = ch_id.to_global_channel();
+                                let current_short = current_names
+                                    .get(ch_id)
+                                    .map(|n| crate::custom_scenes::to_short_name(n))
+                                    .unwrap_or_default();
+
+                                if current_short == entry.short {
+                                    continue;
+                                }
+
+                                let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
+                                for (ci, &byte) in short_bytes.iter().enumerate() {
+                                    if token.is_cancelled() {
+                                        return;
+                                    }
+                                    for req in crate::midi::protocol::build_name_change(
+                                        global_ch, ci as u8, byte,
+                                    ) {
+                                        sched_clone.enqueue(req, 0).await;
+                                    }
+                                    if ci < short_bytes.len() - 1 {
+                                        tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                    }
+                                }
+                                applied_global += 1;
+                            }
+                            if applied_global > 0 {
+                                tracing::info!("[GLOBAL] ensureCurrentCustomScene: applied {} global name(s) over custom scene", applied_global);
+                            }
+                            gnames.iter().map(|(ch_id, entry)| {
+                                serde_json::json!({
+                                    "ch": ch_id.to_global_channel(),
+                                    "name": entry.name,
+                                    "short": entry.short
+                                })
+                            }).collect::<Vec<_>>()
+                        };
+
+                        let _ = io_clone
+                            .emit(
+                                "globalNamesLoaded",
+                                &serde_json::json!({
+                                    "active": !global_channels.is_empty(),
+                                    "channels": global_channels,
                                 }),
                             )
                             .await;
@@ -1508,6 +1856,7 @@ pub fn register_handlers(
                     let token = csm.prepare_op();
                     let sched_clone = sched_copy.clone();
                     let io_clone = io_copy.clone();
+                    let csm_clone = csm_copy.clone();
                     drop(csm);
 
                     tokio::spawn(async move {
@@ -1566,6 +1915,63 @@ pub fn register_handlers(
                                     "scene_name": scene.scene_name,
                                     "scene_id": scene.scene_id,
                                     "channels": channels_arr,
+                                }),
+                            )
+                            .await;
+
+                        // Re-apply global names on top
+                        let global_channels = {
+                            let csm = csm_clone.write().await;
+                            let gnames = csm.get_global_names().clone();
+                            let mut applied_global = 0u32;
+                            for (ch_id, entry) in &gnames {
+                                if token.is_cancelled() {
+                                    return;
+                                }
+                                let global_ch = ch_id.to_global_channel();
+                                let current_short = current_names
+                                    .get(ch_id)
+                                    .map(|n| crate::custom_scenes::to_short_name(n))
+                                    .unwrap_or_default();
+
+                                if current_short == entry.short {
+                                    continue;
+                                }
+
+                                let short_bytes: Vec<u8> = entry.short.bytes().take(4).collect();
+                                for (ci, &byte) in short_bytes.iter().enumerate() {
+                                    if token.is_cancelled() {
+                                        return;
+                                    }
+                                    for req in crate::midi::protocol::build_name_change(
+                                        global_ch, ci as u8, byte,
+                                    ) {
+                                        sched_clone.enqueue(req, 0).await;
+                                    }
+                                    if ci < short_bytes.len() - 1 {
+                                        tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                    }
+                                }
+                                applied_global += 1;
+                            }
+                            if applied_global > 0 {
+                                tracing::info!("[GLOBAL] copyCustomSceneToCurrent: applied {} global name(s) over custom scene", applied_global);
+                            }
+                            gnames.iter().map(|(ch_id, entry)| {
+                                serde_json::json!({
+                                    "ch": ch_id.to_global_channel(),
+                                    "name": entry.name,
+                                    "short": entry.short
+                                })
+                            }).collect::<Vec<_>>()
+                        };
+
+                        let _ = io_clone
+                            .emit(
+                                "globalNamesLoaded",
+                                &serde_json::json!({
+                                    "active": !global_channels.is_empty(),
+                                    "channels": global_channels,
                                 }),
                             )
                             .await;

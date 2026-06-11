@@ -275,24 +275,56 @@ window.toggleCustomNameEditor = function () {
     const input = document.getElementById('inputChName');
     const preview = document.getElementById('namePreview');
     const isChecked = document.getElementById('chkCustomName').checked;
+    const cbGlobal = document.getElementById('chkGlobalName');
     if (isChecked) {
+        cbGlobal.checked = false;
         input.setAttribute('maxlength', '10');
         updateNamePreview();
         preview.style.display = 'block';
     } else {
-        const val = input.value;
-        if (val.length > 4) input.value = val.substring(0, 4);
-        input.setAttribute('maxlength', '4');
-        preview.style.display = 'none';
+        if (!cbGlobal.checked) {
+            const val = input.value;
+            if (val.length > 4) input.value = val.substring(0, 4);
+            input.setAttribute('maxlength', '4');
+            preview.style.display = 'none';
+        }
+    }
+};
+
+window.toggleGlobalNameEditor = function () {
+    const input = document.getElementById('inputChName');
+    const preview = document.getElementById('namePreview');
+    const isChecked = document.getElementById('chkGlobalName').checked;
+    const cbCustom = document.getElementById('chkCustomName');
+    if (isChecked) {
+        cbCustom.checked = false;
+        input.setAttribute('maxlength', '10');
+        updateNamePreview();
+        preview.style.display = 'block';
+    } else {
+        if (!cbCustom.checked) {
+            const val = input.value;
+            if (val.length > 4) input.value = val.substring(0, 4);
+            input.setAttribute('maxlength', '4');
+            preview.style.display = 'none';
+        }
     }
 };
 
 window.removeCustomName = function () {
     const ch = activeConfigChannel;
     if (ch === null) return;
-    socket.emit('removeCustomName', { channel: ch, syncShared: window.customScenesSyncEnabled });
-    if (window.customNamesEnabled && window.activeCustomSceneChannels) {
-        delete window.activeCustomSceneChannels[ch];
+    const isGlobal = document.getElementById('chkGlobalName').checked;
+    if (isGlobal) {
+        socket.emit('removeGlobalName', { channel: ch, syncShared: window.customScenesSyncEnabled });
+        if (window.globalNames) {
+            delete window.globalNames[ch];
+        }
+    } else {
+        socket.emit('removeCustomName', { channel: ch, syncShared: window.customScenesSyncEnabled });
+        if (window.customNamesEnabled && window.activeCustomSceneChannels) {
+            delete window.activeCustomSceneChannels[ch];
+        }
     }
     document.getElementById('nameEditorModal').style.display = 'none';
 };
@@ -317,17 +349,28 @@ window.openNameEditor = function () {
     const input = document.getElementById('inputChName');
     input.value = currentName === '...' ? '' : currentName;
 
-    const checkbox = document.getElementById('chkCustomName');
+    const checkboxCustom = document.getElementById('chkCustomName');
+    const checkboxGlobal = document.getElementById('chkGlobalName');
     const preview = document.getElementById('namePreview');
     const removeBtn = document.getElementById('btnRemoveCustomName');
 
     const customCh = window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[ch];
     const hasCustomName = !!(customCh && typeof customCh.name === 'string');
 
-    checkbox.checked = hasCustomName;
-    removeBtn.style.display = hasCustomName ? 'block' : 'none';
+    const globalCh = window.globalNames && window.globalNames[ch];
+    const hasGlobalName = !!(globalCh && typeof globalCh.name === 'string');
 
-    if (hasCustomName) {
+    checkboxCustom.checked = hasCustomName && !hasGlobalName;
+    checkboxGlobal.checked = hasGlobalName;
+    removeBtn.style.display = (hasCustomName || hasGlobalName) ? 'block' : 'none';
+    removeBtn.innerText = hasGlobalName ? 'Remover nome global' : (hasCustomName ? 'Remover nome customizado' : '');
+
+    if (hasGlobalName) {
+        input.setAttribute('maxlength', '10');
+        input.value = globalCh.name;
+        updateNamePreview();
+        preview.style.display = 'block';
+    } else if (hasCustomName) {
         input.setAttribute('maxlength', '10');
         input.value = customCh.name;
         updateNamePreview();
@@ -375,9 +418,18 @@ window.saveChannelName = function () {
 
     const input = document.getElementById('inputChName');
     const isCustom = document.getElementById('chkCustomName').checked;
+    const isGlobal = document.getElementById('chkGlobalName').checked;
     let newName = input.value.trim();
 
-    if (isCustom) {
+    if (isGlobal) {
+        newName = normalizeNameEditor(newName).substring(0, 10);
+        socket.emit('saveGlobalName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
+        if (typeof window.updateNameUI === 'function') {
+            window.updateNameUI(ch, newName);
+        }
+        if (!window.globalNames) window.globalNames = {};
+        window.globalNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4) };
+    } else if (isCustom) {
         newName = normalizeNameEditor(newName).substring(0, 10);
         socket.emit('saveCustomName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
         if (typeof window.updateNameUI === 'function') {

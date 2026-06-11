@@ -161,6 +161,8 @@ pub struct CustomSceneManager {
     dirty_files: HashSet<String>,
     registry_dirty: bool,
     operation_queue: CustomSceneOpQueue,
+    global_names: HashMap<ChannelId, ChannelNameEntry>,
+    global_names_dirty: bool,
 }
 
 impl CustomSceneManager {
@@ -233,7 +235,7 @@ impl CustomSceneManager {
             }
         }
 
-        Self {
+        let mut mgr = Self {
             mesa_nome: mesa_nome.to_string(),
             data_dir: data_dir.to_path_buf(),
             registry,
@@ -241,7 +243,11 @@ impl CustomSceneManager {
             dirty_files: HashSet::new(),
             registry_dirty: false,
             operation_queue: CustomSceneOpQueue::new(),
-        }
+            global_names: HashMap::new(),
+            global_names_dirty: false,
+        };
+        mgr.load_global_names();
+        mgr
     }
 
     pub fn get_scene(&mut self, filename: &str) -> Option<&CustomScene> {
@@ -506,6 +512,30 @@ impl CustomSceneManager {
             }
         }
 
+        // Persist global names
+        if self.global_names_dirty {
+            #[derive(Serialize)]
+            struct GlobalNamesFile<'a> {
+                mesa_nome: &'a str,
+                channels: &'a HashMap<ChannelId, ChannelNameEntry>,
+            }
+            let data = GlobalNamesFile {
+                mesa_nome: &self.mesa_nome,
+                channels: &self.global_names,
+            };
+            let local_path = self.global_names_path();
+            save_json_atomic(&local_path, &data);
+            tracing::info!("[CUSTOM] saved {} global name(s)", self.global_names.len());
+            if sync_shared {
+                let shared_path = self.global_names_path_shared();
+                save_json_atomic(&shared_path, &data);
+                let gfile = format!("data/custom_scenes/shared/global-names-{}.json", self.mesa_nome);
+                synced_files.push(gfile);
+                tracing::info!("[CUSTOM] global names added to synced_files");
+            }
+            self.global_names_dirty = false;
+        }
+
         tracing::info!(
             "[CUSTOM] finished persist, sync_shared={}, synced_files_len={}",
             sync_shared,
@@ -621,6 +651,18 @@ impl CustomSceneManager {
             fs::rename(&old_default_shared, &new_default_shared).ok();
         }
 
+        // Rename global names file
+        let old_global_local = self.data_dir.join("local").join(format!("global-names-{}.json", old_name));
+        let new_global_local = self.data_dir.join("local").join(format!("global-names-{}.json", new_name));
+        let old_global_shared = self.data_dir.join("shared").join(format!("global-names-{}.json", old_name));
+        let new_global_shared = self.data_dir.join("shared").join(format!("global-names-{}.json", new_name));
+        if old_global_local.exists() {
+            fs::rename(&old_global_local, &new_global_local).ok();
+        }
+        if old_global_shared.exists() {
+            fs::rename(&old_global_shared, &new_global_shared).ok();
+        }
+
         let new_registry_path_local = self
             .data_dir
             .join("local")
@@ -672,6 +714,130 @@ impl CustomSceneManager {
 
     pub fn registry(&self) -> &CustomSceneRegistry {
         &self.registry
+    }
+
+    // --- Global Names ---
+
+    fn global_names_path(&self) -> PathBuf {
+        self.data_dir.join("local").join(format!("global-names-{}.json", self.mesa_nome))
+    }
+
+    fn global_names_path_shared(&self) -> PathBuf {
+        self.data_dir.join("shared").join(format!("global-names-{}.json", self.mesa_nome))
+    }
+
+    fn load_global_names(&mut self) {
+        let path = self.global_names_path();
+        let shared_path = self.global_names_path_shared();
+        let load_from = if path.exists() { path } else { shared_path };
+
+        if !load_from.exists() {
+            tracing::info!("[CUSTOM] global names file not found, starting empty");
+            return;
+        }
+
+        match fs::read_to_string(&load_from) {
+            Ok(content) => {
+                #[derive(Deserialize)]
+                #[allow(dead_code)]
+                struct GlobalNamesFile {
+                    mesa_nome: String,
+                    channels: HashMap<ChannelId, ChannelNameEntry>,
+                }
+                match serde_json::from_str::<GlobalNamesFile>(&content) {
+                    Ok(data) => {
+                        self.global_names = data.channels;
+                        tracing::info!("[CUSTOM] loaded {} global name(s)", self.global_names.len());
+                    }
+                    Err(e) => {
+                        tracing::error!("[CUSTOM] failed to parse global names: {}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                tracing::error!("[CUSTOM] failed to read global names: {}", e);
+            }
+        }
+    }
+
+    pub fn save_global_names(&mut self, sync_shared: bool) {
+        if !self.global_names_dirty {
+            return;
+        }
+
+        #[derive(Serialize)]
+        struct GlobalNamesFile<'a> {
+            mesa_nome: &'a str,
+            channels: &'a HashMap<ChannelId, ChannelNameEntry>,
+        }
+
+        let data = GlobalNamesFile {
+            mesa_nome: &self.mesa_nome,
+            channels: &self.global_names,
+        };
+
+        let local_path = self.global_names_path();
+        save_json_atomic(&local_path, &data);
+        tracing::info!("[CUSTOM] saved {} global name(s)", self.global_names.len());
+
+        if sync_shared {
+            let shared_path = self.global_names_path_shared();
+            save_json_atomic(&shared_path, &data);
+            let file = format!("data/custom_scenes/shared/global-names-{}.json", self.mesa_nome);
+            tokio::spawn(async move {
+                crate::api::macros::enqueue_git_sync(
+                    vec![file],
+                    format!("auto-sync: global names updated"),
+                    30000,
+                )
+                .await;
+            });
+        }
+
+        self.global_names_dirty = false;
+    }
+
+    pub fn upsert_global_name(&mut self, channel_id: ChannelId, name: &str) {
+        let normalized = normalize_name(name);
+        let short = to_short_name(&normalized);
+        self.global_names.insert(
+            channel_id,
+            ChannelNameEntry {
+                name: normalized,
+                short,
+            },
+        );
+        self.global_names_dirty = true;
+    }
+
+    pub fn remove_global_name(&mut self, channel_id: &ChannelId) -> bool {
+        if self.global_names.remove(channel_id).is_some() {
+            self.global_names_dirty = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_global_names(&self) -> &HashMap<ChannelId, ChannelNameEntry> {
+        &self.global_names
+    }
+
+    pub fn rename_global_names_mesa(&mut self, old_name: &str, new_name: &str) {
+        let old_local = self.data_dir.join("local").join(format!("global-names-{}.json", old_name));
+        let new_local = self.data_dir.join("local").join(format!("global-names-{}.json", new_name));
+        let old_shared = self.data_dir.join("shared").join(format!("global-names-{}.json", old_name));
+        let new_shared = self.data_dir.join("shared").join(format!("global-names-{}.json", new_name));
+
+        if old_local.exists() {
+            let _ = fs::rename(&old_local, &new_local);
+        }
+        if old_shared.exists() {
+            let _ = fs::rename(&old_shared, &new_shared);
+        }
+
+        self.mesa_nome = new_name.to_string();
+        self.global_names_dirty = true;
     }
 }
 

@@ -49,6 +49,7 @@ const savedRole = localStorage.getItem('01v96_role');
 let layoutMode = savedRole === 'musician' ? 'mobile' : (localStorage.getItem('mixer_layout') || 'mobile');
 document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
 window.customNamesEnabled = localStorage.getItem('custom_names_enabled') !== 'false';
+window.globalNames = null;
 
 const container = document.getElementById('faders-container');
 
@@ -181,8 +182,12 @@ window.updateNameUI = function(channel, name) {
     else if (channel === 52) defaultShortName = `MSTR`;
 
     let displayName = name !== undefined ? limitedName.substring(0, 4) : defaultShortName;
-    if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[channel]) {
-        // Usa o nome customizado inteiro (ou short se preferir, mas vamos permitir nomes um pouco maiores)
+    // Prioridade 1: Nome Global (máxima prioridade)
+    if (window.globalNames && window.globalNames[channel]) {
+        displayName = window.globalNames[channel].name;
+    }
+    // Prioridade 2: Nome Custom Scene (se habilitado e ativo)
+    else if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[channel]) {
         const customName = window.activeCustomSceneChannels[channel].name;
         displayName = customName !== undefined ? customName : displayName;
     }
