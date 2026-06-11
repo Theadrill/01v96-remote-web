@@ -2,71 +2,11 @@
   "scene_name": "FORRO ENGATILH",
   "scene_id": 36,
   "channels": {
-    "9": {
-      "name": "",
-      "short": "    "
-    },
-    "23": {
-      "name": "MICD",
-      "short": "MICD"
-    },
     "31": {
-      "name": "MICS",
+      "name": "MIC S FIO",
       "short": "MICS"
     },
-    "39": {
-      "name": "STI4",
-      "short": "STI4"
-    },
-    "2": {
-      "name": "",
-      "short": "    "
-    },
-    "11": {
-      "name": "",
-      "short": "    "
-    },
-    "10": {
-      "name": "",
-      "short": "    "
-    },
-    "40": {
-      "name": "CH 40",
-      "short": "CH40"
-    },
-    "19": {
-      "name": "",
-      "short": "    "
-    },
-    "1": {
-      "name": "",
-      "short": "    "
-    },
-    "21": {
-      "name": "LR",
-      "short": "LR  "
-    },
-    "bus4": {
-      "name": "VOZES LOW",
-      "short": "VOZE"
-    },
-    "26": {
-      "name": "",
-      "short": "    "
-    },
-    "36": {
-      "name": "CH 36",
-      "short": "CH36"
-    },
-    "master": {
-      "name": "ST",
-      "short": "ST  "
-    },
-    "32": {
-      "name": "",
-      "short": "    "
-    },
-    "12": {
+    "29": {
       "name": "",
       "short": "    "
     },
@@ -74,13 +14,53 @@
       "name": "",
       "short": "    "
     },
-    "20": {
-      "name": "CELU",
-      "short": "CELU"
-    },
-    "29": {
+    "8": {
       "name": "",
       "short": "    "
+    },
+    "7": {
+      "name": "",
+      "short": "    "
+    },
+    "11": {
+      "name": "",
+      "short": "    "
+    },
+    "19": {
+      "name": "",
+      "short": "    "
+    },
+    "33": {
+      "name": "STI1",
+      "short": "STI1"
+    },
+    "23": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "4": {
+      "name": "",
+      "short": "    "
+    },
+    "bus4": {
+      "name": "VOZES LOW",
+      "short": "VOZE"
+    },
+    "5": {
+      "name": "",
+      "short": "    "
+    },
+    "bus1": {
+      "name": "VOZES HIGH",
+      "short": "VOZE"
+    },
+    "master": {
+      "name": "ST",
+      "short": "ST  "
+    },
+    "18": {
+      "name": "DJ",
+      "short": "DJ  "
     },
     "15": {
       "name": "",
@@ -90,9 +70,65 @@
       "name": "VOZES LOW",
       "short": "VOZE"
     },
-    "25": {
+    "9": {
       "name": "",
       "short": "    "
+    },
+    "39": {
+      "name": "STI4",
+      "short": "STI4"
+    },
+    "1": {
+      "name": "",
+      "short": "    "
+    },
+    "35": {
+      "name": "STI2",
+      "short": "STI2"
+    },
+    "24": {
+      "name": "",
+      "short": "    "
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "16": {
+      "name": "",
+      "short": "    "
+    },
+    "37": {
+      "name": "STI3",
+      "short": "STI3"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "3": {
+      "name": "",
+      "short": "    "
+    },
+    "22": {
+      "name": "R-CL",
+      "short": "RCL "
+    },
+    "6": {
+      "name": "",
+      "short": "    "
+    },
+    "21": {
+      "name": "LR",
+      "short": "LR  "
     },
     "30": {
       "name": "",
@@ -102,63 +138,19 @@
       "name": "VOZES HIGH",
       "short": "VOZE"
     },
-    "4": {
-      "name": "",
-      "short": "    "
-    },
-    "18": {
-      "name": "DJ",
-      "short": "DJ  "
-    },
-    "7": {
-      "name": "",
-      "short": "    "
-    },
-    "37": {
-      "name": "STI3",
-      "short": "STI3"
-    },
-    "24": {
-      "name": "",
-      "short": "    "
-    },
-    "35": {
-      "name": "STI2",
-      "short": "STI2"
-    },
-    "13": {
-      "name": "",
-      "short": "    "
-    },
-    "33": {
-      "name": "STI1",
-      "short": "STI1"
-    },
-    "14": {
-      "name": "",
-      "short": "    "
-    },
-    "5": {
-      "name": "",
-      "short": "    "
-    },
-    "6": {
-      "name": "",
-      "short": "    "
-    },
-    "22": {
-      "name": "R-CL",
-      "short": "RCL "
-    },
-    "3": {
-      "name": "",
-      "short": "    "
-    },
-    "16": {
-      "name": "",
-      "short": "    "
-    },
     "17": {
+      "name": "",
+      "short": "    "
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "2": {
       "name": "",
       "short": "    "
     },
@@ -166,21 +158,29 @@
       "name": "",
       "short": "    "
     },
-    "bus1": {
-      "name": "VOZES HIGH",
-      "short": "VOZE"
-    },
-    "8": {
+    "26": {
       "name": "",
       "short": "    "
     },
-    "38": {
-      "name": "CH 38",
-      "short": "CH38"
+    "12": {
+      "name": "",
+      "short": "    "
     },
-    "34": {
-      "name": "CH 34",
-      "short": "CH34"
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "32": {
+      "name": "",
+      "short": "    "
+    },
+    "10": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "CELULAR",
+      "short": "CELU"
     }
   }
 }
