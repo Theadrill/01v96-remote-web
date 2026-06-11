@@ -1,0 +1,170 @@
+{
+  "scene_name": "FORRO ENGATILHAD",
+  "scene_id": 36,
+  "channels": {
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "23": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "19": {
+      "name": "",
+      "short": "    "
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "4": {
+      "name": "",
+      "short": "    "
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "master": {
+      "name": "ST",
+      "short": "ST  "
+    },
+    "7": {
+      "name": "",
+      "short": "    "
+    },
+    "30": {
+      "name": "",
+      "short": "    "
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "9": {
+      "name": "",
+      "short": "    "
+    },
+    "39": {
+      "name": "STI4",
+      "short": "STI4"
+    },
+    "24": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "",
+      "short": "    "
+    },
+    "35": {
+      "name": "STI2",
+      "short": "STI2"
+    },
+    "22": {
+      "name": "R-CL",
+      "short": "RCL "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "18": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "1": {
+      "name": "",
+      "short": "    "
+    },
+    "17": {
+      "name": "",
+      "short": "    "
+    },
+    "37": {
+      "name": "STI3",
+      "short": "STI3"
+    },
+    "31": {
+      "name": "MIC S FIO",
+      "short": "MICS"
+    },
+    "11": {
+      "name": "",
+      "short": "    "
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "CELULAR",
+      "short": "CELU"
+    },
+    "3": {
+      "name": "",
+      "short": "    "
+    },
+    "10": {
+      "name": "",
+      "short": "    "
+    },
+    "33": {
+      "name": "STI1",
+      "short": "STI1"
+    },
+    "12": {
+      "name": "",
+      "short": "    "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "2": {
+      "name": "",
+      "short": "    "
+    },
+    "6": {
+      "name": "",
+      "short": "    "
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "21": {
+      "name": "LR",
+      "short": "LR  "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "32": {
+      "name": "",
+      "short": "    "
+    },
+    "16": {
+      "name": "",
+      "short": "    "
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    }
+  }
+}

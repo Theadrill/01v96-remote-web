@@ -18,6 +18,12 @@
       "physical_scene": "REGIS",
       "physical_id": 12,
       "file": "custom_names_scene-REGIS-mesa-favela.json"
+    },
+    {
+      "custom_name": "FORRO ENGATILHAD",
+      "physical_scene": "FORRO ENGATILHAD",
+      "physical_id": 36,
+      "file": "custom_names_scene-FORRO ENGATILHAD-mesa-favela.json"
     }
   ]
 }
