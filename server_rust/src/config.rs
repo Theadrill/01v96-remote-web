@@ -1,11 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::sync::Arc;
-use tokio::sync::Mutex;
 use tracing::{error, info};
 
-static SAVE_NAMES_TIMER: std::sync::LazyLock<Arc<Mutex<Option<tokio::task::JoinHandle<()>>>>> =
-    std::sync::LazyLock::new(|| Arc::new(Mutex::new(None)));
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AppConfig {
@@ -58,8 +54,6 @@ pub struct AppConfig {
     pub meter_opacity: f64,
 
     // Dados carregados dos outros JSONs
-    #[serde(skip)]
-    pub names: std::collections::HashMap<String, String>,
     #[serde(skip)]
     pub steps: serde_json::Value,
 }
@@ -152,15 +146,6 @@ impl AppConfig {
             }
         };
 
-        // Ler names.json
-        let names_path = root.join("names.json");
-        if let Ok(contents) = fs::read_to_string(&names_path)
-            && let Ok(names) = serde_json::from_str(&contents)
-        {
-            config.names = names;
-            info!("✅ names.json carregado.");
-        }
-
         // Ler steps.json
         let steps_path = root.join("public/steps.json");
         if let Ok(contents) = fs::read_to_string(&steps_path)
@@ -217,58 +202,11 @@ impl AppConfig {
             remote_midi_last_host: "".to_string(),
             port: default_port(),
             meter_opacity: 1.0,
-            names: std::collections::HashMap::new(),
             steps: serde_json::Value::Null,
         }
     }
 }
 
-pub fn save_names_to_disk(state: &crate::state::GlobalState, debounce_ms: u64) {
-    let state_snapshot = state.clone();
-    let timer_lock = SAVE_NAMES_TIMER.clone();
-
-    tokio::spawn(async move {
-        let mut guard = timer_lock.lock().await;
-        if let Some(handle) = guard.take() {
-            handle.abort();
-        }
-        *guard = Some(tokio::spawn(async move {
-            tokio::time::sleep(std::time::Duration::from_millis(debounce_ms)).await;
-
-            let mut names: std::collections::HashMap<String, String> =
-                std::collections::HashMap::new();
-            for i in 0..32 {
-                if let Some(ch) = state_snapshot.channels.get(&i) {
-                    names.insert(i.to_string(), ch.name.clone());
-                }
-            }
-            for st_idx in 0..4 {
-                let global_id = 60 + st_idx * 2;
-                let local_idx = 32 + st_idx;
-                if let Some(ch) = state_snapshot.channels.get(&local_idx) {
-                    names.insert(global_id.to_string(), ch.name.clone());
-                }
-            }
-            for (i, m) in &state_snapshot.mixes {
-                names.insert((36 + i).to_string(), m.name.clone());
-            }
-            for (i, b) in &state_snapshot.buses {
-                names.insert((44 + i).to_string(), b.name.clone());
-            }
-            names.insert("52".to_string(), state_snapshot.master.name.clone());
-
-            let names_path = get_project_root().join("names.json");
-            match serde_json::to_string_pretty(&names) {
-                Ok(json_str) => {
-                    if let Err(e) = fs::write(&names_path, json_str) {
-                        error!("❌ [NAMES] Erro ao salvar names.json: {}", e);
-                    }
-                }
-                Err(e) => error!("❌ [NAMES] Erro ao serializar nomes: {}", e),
-            }
-        }));
-    });
-}
 
 pub fn get_project_root() -> std::path::PathBuf {
     if let Ok(exe_path) = std::env::current_exe()

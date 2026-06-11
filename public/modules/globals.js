@@ -173,6 +173,11 @@ function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
  * Fader Principal, Mini Fader (Config) e Sidebar Title.
  */
 window.updateNameUI = function(channel, name) {
+    // 0. Fonte da verdade ABSOLUTA: se o backend já resolveu este nome (Global/Custom), forçamos ele.
+    if (window.resolvedNames && window.resolvedNames[channel]) {
+        name = window.resolvedNames[channel].name;
+    }
+
     const limitedName = (name !== undefined && name !== null ? name : '').substring(0, 16).trim(); // Armazenamos até 16, mas exibimos 4 no visor
     let defaultShortName = '';
     if (channel >= 0 && channel <= 31) defaultShortName = `CH ${channel + 1}`;
@@ -181,18 +186,9 @@ window.updateNameUI = function(channel, name) {
     else if (channel >= 44 && channel <= 51) defaultShortName = `BUS${channel - 43}`;
     else if (channel === 52) defaultShortName = `MSTR`;
 
-    let displayName = name !== undefined ? limitedName.substring(0, 4) : defaultShortName;
-    // Prioridade 1: Nome Global (máxima prioridade)
-    if (window.globalNames && window.globalNames[channel]) {
-        displayName = window.globalNames[channel].name;
-    }
-    // Prioridade 2: Nome Custom Scene (se habilitado e ativo)
-    else if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[channel]) {
-        const customName = window.activeCustomSceneChannels[channel].name;
-        displayName = customName !== undefined ? customName : displayName;
-    }
-    
-    // 1. Atualiza o estado local para consistência
+    let displayName = name !== undefined ? limitedName : defaultShortName;
+
+    // 1. Atualiza o estado local para consistência (guardando o nome resolvido ou o físico limitados)
     const stateObj = getChannelStateById(channel);
     if (stateObj) stateObj.name = limitedName;
 

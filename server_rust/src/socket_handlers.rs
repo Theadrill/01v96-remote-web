@@ -74,9 +74,28 @@ pub fn register_handlers(
         let config_arc = app_config_clone.clone();
         let socket_initial = socket.clone();
         let conn_mgr_connect = conn_mgr_handler.clone();
+        let csm_connect = csm_socket.clone();
         tokio::spawn(async move {
             let current_state = state_arc_connect.read().await;
             let is_syncing = conn_mgr_connect.is_syncing();
+            
+            // Send the resolved names BEFORE the sync event so the frontend is prepared
+            {
+                let resolved = crate::name_resolver::resolve_all(&state_arc_connect, &csm_connect).await;
+                let payload: Vec<serde_json::Value> = resolved
+                    .iter()
+                    .map(|r| {
+                        serde_json::json!({
+                            "ch":     r.ch,
+                            "name":   r.name,
+                            "short":  r.short,
+                            "source": r.source,
+                        })
+                    })
+                    .collect();
+                socket_initial.emit("resolvedNamesUpdated", &serde_json::json!({ "channels": payload })).ok();
+            }
+
             if !is_syncing
                 && let Ok(state_json) = serde_json::to_value(&*current_state) {
                     socket_initial.emit("sync", &state_json).ok();
@@ -629,26 +648,8 @@ pub fn register_handlers(
                             mgr.mark_dirty(&fname);
                             let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
                             mgr.persist(sync_shared);
-                            
-                            let arr = match mgr.get_scene(&fname) {
-                                Some(scene) => {
-                                    scene.channels.iter().map(|(ch_id, entry)| {
-                                        serde_json::json!({
-                                            "ch": ch_id.to_global_channel(),
-                                            "name": entry.name,
-                                            "short": entry.short
-                                        })
-                                    }).collect::<Vec<_>>()
-                                }
-                                None => Vec::new(),
-                            };
-                            if !arr.is_empty() {
-                                let _ = _io_op.emit("activeCustomChannels", &serde_json::json!({
-                                    "active": true,
-                                    "channels": arr,
-                                })).await;
-                            }
                         }
+
 
                         let current_name = {
                             let state_guard = state_op.read().await;
@@ -675,15 +676,13 @@ pub fn register_handlers(
                     });
                 }
 
-                let _ = io_save_name
-                    .emit(
-                        "updateName",
-                        &serde_json::json!({
-                            "channel": channel,
-                            "name": normalized
-                        }),
-                    )
-                    .await;
+                // Broadcast de nomes resolvidos (fonte de verdade única)
+                let io_broadcast = io_save_name.clone();
+                let state_bcast = state_clone_save.clone();
+                let csm_bcast = csm_clone_save.clone();
+                tokio::spawn(async move {
+                    crate::name_resolver::broadcast(&io_broadcast, &state_bcast, &csm_bcast).await;
+                });
 
                 let _ = socket.emit(
                     "saveNameResult",
@@ -696,6 +695,7 @@ pub fn register_handlers(
         let csm_remove = csm_socket.clone();
         let state_remove_name = global_state_socket.clone();
         let io_remove_name = io.clone();
+        let scheduler_remove_name = scheduler_socket.clone();
         socket.on(
             "removeCustomName",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -735,80 +735,50 @@ pub fn register_handlers(
                 };
 
                 let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
-                let deleted = {
+                {
                     let mut csm = csm_remove.write().await;
-                    let result = csm.remove_channel(&filename, &channel_id);
-                    csm.persist(sync_shared);
-                    
-                    let arr = match csm.get_scene(&filename) {
-                        Some(scene) => {
-                            scene.channels.iter().map(|(ch_id, entry)| {
-                                serde_json::json!({
-                                    "ch": ch_id.to_global_channel(),
-                                    "name": entry.name,
-                                    "short": entry.short
-                                })
-                            }).collect::<Vec<_>>()
-                        }
-                        None => Vec::new(),
-                    };
-                    
-                    if arr.is_empty() {
-                        let _ = io_remove_name.emit("activeCustomChannels", &serde_json::json!({ "active": false })).await;
-                    } else {
-                        let _ = io_remove_name.emit("activeCustomChannels", &serde_json::json!({
-                            "active": true,
-                            "channels": arr,
-                        })).await;
-                    }
-                    
-                    result
-                };
-
-                if deleted {
-                    let state = state_remove_name.read().await;
-                    let original_4 = get_channel_short_name(&state, channel)
-                        .unwrap_or_else(|| "    ".to_string());
-                    drop(state);
-
-                    let _ = io_remove_name
-                        .emit(
-                            "updateName",
-                            &serde_json::json!({
-                                "channel": channel,
-                                "name": original_4.trim()
-                            }),
-                        )
-                        .await;
-                } else {
-                    let mut csm = csm_remove.write().await;
+                    csm.remove_channel(&filename, &channel_id);
                     csm.persist(sync_shared);
                 }
+
+                // Enviar para a mesa se o nome resolvido agora for diferente
+                let resolved = crate::name_resolver::resolve_all(&state_remove_name, &csm_remove).await;
+                if let Some(r) = resolved.iter().find(|res| res.ch == channel) {
+                    let current_name = {
+                        let state = state_remove_name.read().await;
+                        get_channel_short_name(&state, channel)
+                    };
+                    if current_name.as_deref() != Some(&r.short) {
+                        let sched_clone = scheduler_remove_name.clone();
+                        let short_bytes: Vec<u8> = r.short.bytes().take(4).collect();
+                        tokio::spawn(async move {
+                            for (ci, &byte) in short_bytes.iter().enumerate() {
+                                for req in crate::midi::protocol::build_name_change(channel, ci as u8, byte) {
+                                    sched_clone.enqueue(req, 0).await;
+                                }
+                                if ci < short_bytes.len() - 1 {
+                                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // Broadcast de nomes resolvidos (fonte de verdade única)
+                crate::name_resolver::broadcast(&io_remove_name, &state_remove_name, &csm_remove).await;
             },
         );
 
+
         // --- GET GLOBAL NAMES ---
         let csm_global_get = csm_socket.clone();
+        let state_global_get = global_state_socket.clone();
+        let io_global_get = io.clone();
         socket.on(
             "getGlobalNames",
-            move |socket: SocketRef| async move {
-                let (channels, mesa_nome) = {
-                    let csm = csm_global_get.read().await;
-                    let names = csm.get_global_names();
-                    let arr: Vec<serde_json::Value> = names.iter().map(|(ch_id, entry)| {
-                        serde_json::json!({
-                            "ch": ch_id.to_global_channel(),
-                            "name": entry.name,
-                            "short": entry.short
-                        })
-                    }).collect();
-                    (arr, csm.mesa_nome().to_string())
-                };
-                let _ = socket.emit("globalNamesLoaded", &serde_json::json!({
-                    "active": !channels.is_empty(),
-                    "channels": channels,
-                    "mesa_nome": mesa_nome,
-                }));
+            move |_socket: SocketRef| async move {
+                // Reenvia o mapa completo de nomes resolvidos
+                crate::name_resolver::broadcast(&io_global_get, &state_global_get, &csm_global_get).await;
             },
         );
 
@@ -843,7 +813,6 @@ pub fn register_handlers(
                     }
                 };
 
-                let short = crate::custom_scenes::to_short_name(&normalized);
                 let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
 
                 {
@@ -852,58 +821,35 @@ pub fn register_handlers(
                     csm.persist(sync_shared);
                 }
 
-                // Enviar MIDI se short difere do nome atual na mesa
-                let current_name = {
-                    let state = state_global_save.read().await;
-                    get_channel_short_name(&state, channel)
-                };
+                // Resolve todos os nomes para obter a fonte de verdade atual (respeitando hierarquia)
+                let resolved = crate::name_resolver::resolve_all(&state_global_save, &csm_global_save).await;
+                
+                // Encontrar o nome resolvido para este canal
+                if let Some(r) = resolved.iter().find(|res| res.ch == channel) {
+                    let current_name = {
+                        let state = state_global_save.read().await;
+                        get_channel_short_name(&state, channel)
+                    };
 
-                if current_name.as_deref() != Some(&short) {
-                    let sched_clone = sched_global_save.clone();
-                    let short_bytes: Vec<u8> = short.bytes().take(4).collect();
-                    for (ci, &byte) in short_bytes.iter().enumerate() {
-                        for req in crate::midi::protocol::build_name_change(
-                            channel, ci as u8, byte,
-                        ) {
-                            sched_clone.enqueue(req, 0).await;
-                        }
-                        if ci < short_bytes.len() - 1 {
-                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                    // Só manda para a mesa se o NOME RESOLVIDO for diferente do NOME FÍSICO atual
+                    if current_name.as_deref() != Some(&r.short) {
+                        let sched_clone = sched_global_save.clone();
+                        let short_bytes: Vec<u8> = r.short.bytes().take(4).collect();
+                        for (ci, &byte) in short_bytes.iter().enumerate() {
+                            for req in crate::midi::protocol::build_name_change(
+                                channel, ci as u8, byte,
+                            ) {
+                                sched_clone.enqueue(req, 0).await;
+                            }
+                            if ci < short_bytes.len() - 1 {
+                                tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                            }
                         }
                     }
                 }
 
-                // Emitir broadcast de update + globalNamesLoaded
-                let _ = io_global_save
-                    .emit(
-                        "updateName",
-                        &serde_json::json!({
-                            "channel": channel,
-                            "name": normalized
-                        }),
-                    )
-                    .await;
-
-                let channels = {
-                    let csm = csm_global_save.read().await;
-                    let names = csm.get_global_names();
-                    names.iter().map(|(ch_id, entry)| {
-                        serde_json::json!({
-                            "ch": ch_id.to_global_channel(),
-                            "name": entry.name,
-                            "short": entry.short
-                        })
-                    }).collect::<Vec<_>>()
-                };
-                let _ = io_global_save
-                    .emit(
-                        "globalNamesLoaded",
-                        &serde_json::json!({
-                            "active": !channels.is_empty(),
-                            "channels": channels,
-                        }),
-                    )
-                    .await;
+                // Broadcast de nomes resolvidos (fonte de verdade única)
+                crate::name_resolver::broadcast(&io_global_save, &state_global_save, &csm_global_save).await;
 
                 let _ = socket.emit(
                     "saveNameResult",
@@ -916,7 +862,7 @@ pub fn register_handlers(
         let csm_global_remove = csm_socket.clone();
         let state_global_remove = global_state_socket.clone();
         let io_global_remove = io.clone();
-        let sched_global_remove = scheduler_socket.clone();
+        let scheduler_global_remove = scheduler_socket.clone();
         socket.on(
             "removeGlobalName",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -936,59 +882,31 @@ pub fn register_handlers(
                     csm.persist(sync_shared);
                 }
 
-                // After removing global name, re-apply the fallback name (custom scene or physical)
-                let fallback_name = {
-                    let state = state_global_remove.read().await;
-                    get_channel_short_name(&state, channel)
-                };
-
-                if let Some(fb_name) = &fallback_name {
-                    let sched_clone = sched_global_remove.clone();
-                    let short_bytes: Vec<u8> = fb_name.bytes().take(4).collect();
-                    for (ci, &byte) in short_bytes.iter().enumerate() {
-                        for req in crate::midi::protocol::build_name_change(
-                            channel, ci as u8, byte,
-                        ) {
-                            sched_clone.enqueue(req, 0).await;
-                        }
-                        if ci < short_bytes.len() - 1 {
-                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
-                        }
+                // Enviar para a mesa se o nome resolvido agora for diferente
+                let resolved = crate::name_resolver::resolve_all(&state_global_remove, &csm_global_remove).await;
+                if let Some(r) = resolved.iter().find(|res| res.ch == channel) {
+                    let current_name = {
+                        let state = state_global_remove.read().await;
+                        get_channel_short_name(&state, channel)
+                    };
+                    if current_name.as_deref() != Some(&r.short) {
+                        let sched_clone = scheduler_global_remove.clone();
+                        let short_bytes: Vec<u8> = r.short.bytes().take(4).collect();
+                        tokio::spawn(async move {
+                            for (ci, &byte) in short_bytes.iter().enumerate() {
+                                for req in crate::midi::protocol::build_name_change(channel, ci as u8, byte) {
+                                    sched_clone.enqueue(req, 0).await;
+                                }
+                                if ci < short_bytes.len() - 1 {
+                                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                }
+                            }
+                        });
                     }
                 }
 
-                // Emitir broadcast de updateName com o nome de fallback (ou vazio)
-                let display_name = fallback_name.unwrap_or_default().trim().to_string();
-                let _ = io_global_remove
-                    .emit(
-                        "updateName",
-                        &serde_json::json!({
-                            "channel": channel,
-                            "name": display_name
-                        }),
-                    )
-                    .await;
-
-                let channels = {
-                    let csm = csm_global_remove.read().await;
-                    let names = csm.get_global_names();
-                    names.iter().map(|(ch_id, entry)| {
-                        serde_json::json!({
-                            "ch": ch_id.to_global_channel(),
-                            "name": entry.name,
-                            "short": entry.short
-                        })
-                    }).collect::<Vec<_>>()
-                };
-                let _ = io_global_remove
-                    .emit(
-                        "globalNamesLoaded",
-                        &serde_json::json!({
-                            "active": !channels.is_empty(),
-                            "channels": channels,
-                        }),
-                    )
-                    .await;
+                // Broadcast de nomes resolvidos (fonte de verdade única)
+                crate::name_resolver::broadcast(&io_global_remove, &state_global_remove, &csm_global_remove).await;
             },
         );
 
@@ -1106,70 +1024,13 @@ pub fn register_handlers(
         // --- GET ACTIVE CUSTOM CHANNELS ---
         let csm_active = csm_socket.clone();
         let state_active = global_state_socket.clone();
+        let io_active = io.clone();
         socket.on(
             "getActiveCustomChannels",
-            move |socket: SocketRef| async move {
-                tracing::info!("[CUSTOM] getActiveCustomChannels HANDLER EXECUTING");
-                let (scene_number, scene_name) = {
-                    let state = state_active.read().await;
-                    let sn = state.scene_manager.active_scene_index;
-                    let sname = state
-                        .scene_manager
-                        .current_scene
-                        .as_ref()
-                        .map(|s| s.name.clone())
-                        .unwrap_or_default();
-                    (sn, sname)
-                };
-                let base_name = if let Some(pos) = scene_name.find(" - ") {
-                    scene_name[pos + 3..].to_string()
-                } else {
-                    scene_name.clone()
-                };
-                tracing::info!(
-                    "[CUSTOM] getActiveCustomChannels: scene={}, name='{}', base='{}'",
-                    scene_number, scene_name, base_name
-                );
-                if base_name.is_empty() {
-                    tracing::info!("[CUSTOM] getActiveCustomChannels: base_name vazio, active=false");
-                    let _ = socket.emit("activeCustomChannels", &serde_json::json!({ "active": false }));
-                    return;
-                }
-                let mesa_nome = {
-                    let csm = csm_active.read().await;
-                    csm.mesa_nome().to_string()
-                };
-                let filename = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
-                tracing::info!("[CUSTOM] getActiveCustomChannels: filename='{}'", filename);
-                let channels = {
-                    let mut csm = csm_active.write().await;
-                    match csm.get_scene(&filename) {
-                        Some(scene) => {
-                            let count = scene.channels.len();
-                            let arr: Vec<serde_json::Value> = scene.channels.iter().map(|(ch_id, entry)| {
-                                serde_json::json!({
-                                    "ch": ch_id.to_global_channel(),
-                                    "name": entry.name,
-                                    "short": entry.short
-                                })
-                            }).collect();
-                            tracing::info!("[CUSTOM] getActiveCustomChannels: cena encontrada com {} canais", count);
-                            arr
-                        }
-                        None => {
-                            tracing::info!("[CUSTOM] getActiveCustomChannels: arquivo '{}' nao encontrado", filename);
-                            Vec::new()
-                        }
-                    }
-                };
-                if channels.is_empty() {
-                    let _ = socket.emit("activeCustomChannels", &serde_json::json!({ "active": false }));
-                } else {
-                    let _ = socket.emit("activeCustomChannels", &serde_json::json!({
-                        "active": true,
-                        "channels": channels,
-                    }));
-                }
+            move |_socket: SocketRef| async move {
+                tracing::info!("[CUSTOM] getActiveCustomChannels → resolvedNamesUpdated");
+                // Reenvia o mapa completo de nomes resolvidos
+                crate::name_resolver::broadcast(&io_active, &state_active, &csm_active).await;
             },
         );
 
@@ -1406,6 +1267,7 @@ pub fn register_handlers(
         let state_name = global_state_socket.clone();
         let io_name = io.clone();
         let sched_name = scheduler_socket.clone();
+        let csm_name = csm_socket.clone();
         socket.on(
             "updateName",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -1462,13 +1324,8 @@ pub fn register_handlers(
                     }
                 }
 
-                let _ = io_name.emit(
-                    "updateName",
-                    &serde_json::json!({
-                        "channel": channel,
-                        "name": limited.clone()
-                    }),
-                ).await;
+                // The state is updated, now broadcast the fully resolved names
+                crate::name_resolver::broadcast(&io_name, &state_name, &csm_name).await;
 
                 // MIDI write-back: send each char to the mesa with 30ms spacing
                 let padded_bytes: Vec<u8> = padded.bytes().take(4).collect();
@@ -1488,11 +1345,6 @@ pub fn register_handlers(
                     }
                 }
 
-                // Save names to disk after debounce
-                {
-                    let state = state_name.read().await;
-                    crate::config::save_names_to_disk(&state, 1000);
-                }
             },
         );
 

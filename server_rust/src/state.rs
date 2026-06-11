@@ -602,6 +602,7 @@ impl GlobalState {
             crate::midi::protocol::ParsedMidi::MeterData { .. } => {}
             crate::midi::protocol::ParsedMidi::SceneNumber(scene) => {
                 self.scene_number = *scene as usize;
+                self.scene_manager.set_active_scene(*scene);
             }
             crate::midi::protocol::ParsedMidi::UpdateNameChar {
                 channel,
@@ -614,10 +615,18 @@ impl GlobalState {
                 if *char_index < self.scene_chars.len() {
                     self.scene_chars[*char_index] = char.clone();
                     self.scene_name = self.scene_chars.join("").trim().to_string();
+                    if let Some(ref mut cs) = self.scene_manager.current_scene {
+                        cs.name = self.scene_name.clone();
+                    }
                 }
             }
-            crate::midi::protocol::ParsedMidi::PhysicalSceneRecall(_) => {}
-            crate::midi::protocol::ParsedMidi::PhysicalSceneStore(_) => {}
+            crate::midi::protocol::ParsedMidi::PhysicalSceneRecall(idx) => {
+                self.scene_number = *idx as usize;
+                self.scene_manager.set_active_scene(*idx);
+            }
+            crate::midi::protocol::ParsedMidi::PhysicalSceneStore(idx) => {
+                self.scene_manager.set_active_scene(*idx);
+            }
         }
     }
 

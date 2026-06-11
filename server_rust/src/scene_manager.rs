@@ -85,13 +85,23 @@ impl SceneManager {
 
     pub fn set_active_scene(&mut self, index: u8) {
         self.active_scene_index = index;
+        let mut name = String::new();
+        if (index as usize) < self.scenes.len() {
+            if let Some(ref s) = self.scenes[index as usize] {
+                name = s.name.clone();
+            }
+        }
+        
         if let Some(ref mut cs) = self.current_scene {
             cs.index = index;
-            if (index as usize) < self.scenes.len()
-                && let Some(ref s) = self.scenes[index as usize]
-            {
-                cs.name = s.name.clone();
+            if !name.is_empty() {
+                cs.name = name;
             }
+        } else {
+            self.current_scene = Some(SceneData {
+                index,
+                name,
+            });
         }
     }
 }

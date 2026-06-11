@@ -6,6 +6,7 @@ pub mod dmx;
 mod env_config;
 mod midi;
 mod midi_receiver;
+pub mod name_resolver;
 mod network;
 mod scene_manager;
 mod socket_handlers;
@@ -58,10 +59,7 @@ async fn async_main(
         app_config.in_idx, app_config.out_idx
     );
 
-    {
-        let mut state = global_state.write().await;
-        state.inject_names(&app_config.names);
-    }
+    // inject_names foi removido — nomes físicos chegam via MIDI dump no sync
 
     let master_meter = Arc::new(RwLock::new(midi::master_meter::MasterMeter::new()));
     {

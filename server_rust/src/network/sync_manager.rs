@@ -318,6 +318,27 @@ fn push_req(requests: &mut Vec<Vec<u8>>, name: &str, channel: u8) {
     }
 }
 
+fn get_physical_short(state: &GlobalState, global_ch: u8) -> String {
+    let name = if global_ch < 32 {
+        state.channels.get(&(global_ch as usize)).map(|c| c.name.clone()).unwrap_or_default()
+    } else if (60..=67).contains(&global_ch) {
+        let st_idx = (global_ch - 60) / 2;
+        let local = 32 + st_idx;
+        state.channels.get(&(local as usize)).map(|c| c.name.clone()).unwrap_or_default()
+    } else if (36..=43).contains(&global_ch) {
+        let local = global_ch - 36;
+        state.mixes.get(&(local as usize)).map(|m| m.name.clone()).unwrap_or_default()
+    } else if (44..=51).contains(&global_ch) {
+        let local = global_ch - 44;
+        state.buses.get(&(local as usize)).map(|b| b.name.clone()).unwrap_or_default()
+    } else if global_ch == 52 {
+        state.master.name.clone()
+    } else {
+        String::new()
+    };
+    crate::custom_scenes::to_short_name(&name)
+}
+
 async fn queue_all_params_inner(
     sched: Arc<MidiScheduler>,
     io: SocketIo,
@@ -328,6 +349,79 @@ async fn queue_all_params_inner(
     _has_synced_names: bool,
     csm: Arc<RwLock<CustomSceneManager>>,
 ) {
+    let mut pending_corrections: Vec<Vec<u8>> = Vec::new();
+    if force_names {
+        let mut name_requests: Vec<Vec<u8>> = Vec::new();
+        
+        // 1. Inputs (0..32)
+        for i in 0u8..32 {
+            for c in 0..4u8 {
+                if let Some(req) = midi::protocol::build_name_request(i, c) { name_requests.push(req); }
+            }
+        }
+        // 2. Stereo In (60, 62, 64, 66)
+        for st in 0..4u8 {
+            let gid = 60 + (st * 2);
+            for c in 0..4u8 {
+                if let Some(req) = midi::protocol::build_name_request(gid, c) { name_requests.push(req); }
+            }
+        }
+        // 3. Mixes, Buses, Master
+        let mut outs: Vec<u8> = (36..=43).collect();
+        outs.extend(44..=51);
+        outs.push(52);
+        for idx in outs {
+            for c in 0..8u8 {
+                if let Some(req) = midi::protocol::build_name_request(idx, c) { name_requests.push(req); }
+            }
+        }
+
+        let total_names = name_requests.len();
+        tracing::info!("📦 [SyncNames] Enfileirando {} requests de nomes...", total_names);
+        sched.enqueue_batch(name_requests, 1).await;
+        
+        let mut last_log = 0u32;
+        loop {
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            let st = sched.state.lock().await;
+            let remaining = st.q0.len() + st.q1.len();
+            if remaining == 0 { break; }
+            if last_log != remaining as u32 {
+                tracing::info!("⏳ [SyncNames] Aguardando {} requests de nomes...", remaining);
+                last_log = remaining as u32;
+                let current = if remaining < total_names { total_names - remaining } else { 0 };
+                let _ = io.emit("syncStatus", &serde_json::json!({
+                    "active": true,
+                    "type": "names",
+                    "progress": current,
+                    "total": total_names
+                })).await;
+            }
+        }
+        
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+
+        let resolved = crate::name_resolver::resolve_all(&state, &csm).await;
+        {
+            let state_guard = state.read().await;
+            for r in &resolved {
+                if r.source != crate::name_resolver::NameSource::Physical {
+                    let physical_short = get_physical_short(&state_guard, r.ch);
+                    if physical_short != r.short {
+                        tracing::info!("🔄 [SyncNames] Corrigindo nome na mesa para CH {}: de '{}' para '{}' (será enviado após o sync principal)", r.ch, physical_short, r.short);
+                        let bytes: Vec<u8> = r.short.bytes().take(4).collect();
+                        for (ci, &code) in bytes.iter().enumerate() {
+                            for req in crate::midi::protocol::build_name_change(r.ch as u8, ci as u8, code) {
+                                pending_corrections.push(req);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        crate::name_resolver::broadcast(&io, &state, &csm).await;
+    }
     let mut requests: Vec<Vec<u8>> = Vec::with_capacity(700);
 
     requests.push(midi::master_meter::MasterMeter::build_stop_request());
@@ -382,13 +476,6 @@ async fn queue_all_params_inner(
         if i % 2 == 0 {
             push_req(&mut requests, "kInputPair/kPair", i);
         }
-        if force_names {
-            for c in 0..4u8 {
-                if let Some(req) = midi::protocol::build_name_request(i, c) {
-                    requests.push(req);
-                }
-            }
-        }
     }
 
     for i in 32u8..40 {
@@ -401,17 +488,6 @@ async fn queue_all_params_inner(
             push_req(&mut requests, &format!("kInputEQ/kEQ{}F", band), i);
             push_req(&mut requests, &format!("kInputEQ/kEQ{}G", band), i);
             push_req(&mut requests, &format!("kInputEQ/kEQ{}Q", band), i);
-        }
-    }
-
-    if force_names {
-        for st in 0..4u8 {
-            let gid = 60 + (st * 2);
-            for c in 0..4u8 {
-                if let Some(req) = midi::protocol::build_name_request(gid, c) {
-                    requests.push(req);
-                }
-            }
         }
     }
 
@@ -481,19 +557,6 @@ async fn queue_all_params_inner(
         push_req(&mut requests, &format!("kStereoComp/{}", p), 0);
     }
 
-    if force_names {
-        let mut outs: Vec<u8> = (36..=43).collect();
-        outs.extend(44..=51);
-        outs.push(52);
-        for idx in outs {
-            for c in 0..8u8 {
-                if let Some(req) = midi::protocol::build_name_request(idx, c) {
-                    requests.push(req);
-                }
-            }
-        }
-    }
-
     info!(
         "📦 [Sync] {} requests preparados. Enfileirando em lote...",
         requests.len()
@@ -555,6 +618,18 @@ async fn queue_all_params_inner(
     // Wait a bit more for last responses to arrive
     tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
+    // Send pending name corrections now that the massive sync is over
+    if !pending_corrections.is_empty() {
+        tracing::info!("📦 [SyncNames] Enviando {} correções pendentes de nomes para a mesa...", pending_corrections.len());
+        sched.enqueue_batch(pending_corrections, 1).await;
+        loop {
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            let st = sched.state.lock().await;
+            if st.q0.len() + st.q1.len() == 0 { break; }
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+    }
+
     // Garante que scene_number e scene_name reflitam o scene_manager (fonte canônica)
     // antes de emitir o sync. O fire_params_only não re-lê dados de cena, então
     // o scene_number vindo do MIDI kSceneNumber pode estar defasado.
@@ -601,52 +676,14 @@ async fn queue_all_params_inner(
             .emit("syncStatus", &serde_json::json!({ "active": false }))
             .await;
 
-        // Emit global names BEFORE sync para eliminar flicker no frontend
-        {
-            let csm_guard = csm.read().await;
-            let gnames = csm_guard.get_global_names();
-            if !gnames.is_empty() {
-                let channels: Vec<serde_json::Value> = gnames
-                    .iter()
-                    .map(|(ch_id, entry)| {
-                        serde_json::json!({
-                            "ch": ch_id.to_global_channel(),
-                            "name": entry.name,
-                            "short": entry.short
-                        })
-                    })
-                    .collect();
-                let _ = io
-                    .emit(
-                        "globalNamesLoaded",
-                        &serde_json::json!({
-                            "active": true,
-                            "channels": channels,
-                        }),
-                    )
-                    .await;
-            } else {
-                let _ = io
-                    .emit(
-                        "globalNamesLoaded",
-                        &serde_json::json!({
-                            "active": false,
-                            "channels": [],
-                        }),
-                    )
-                    .await;
-            }
-        }
+        // Emite nomes resolvidos (Global > Custom > Físico) antes do sync
+        // para eliminar qualquer flicker no frontend
+        crate::name_resolver::broadcast(&io, &state, &csm).await;
 
         let _ = io.emit("sync", &state_json).await;
     }
     drop(state_guard);
 
-    // Save names after sync
-    {
-        let state_guard = state.read().await;
-        crate::config::save_names_to_disk(&state_guard, 0);
-    }
 
     is_syncing.store(false, Ordering::SeqCst);
     is_fully_synced.store(true, Ordering::SeqCst);

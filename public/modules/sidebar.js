@@ -429,6 +429,8 @@ window.saveChannelName = function () {
         }
         if (!window.globalNames) window.globalNames = {};
         window.globalNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4) };
+        if (!window.resolvedNames) window.resolvedNames = {};
+        window.resolvedNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4), source: 'global' };
     } else if (isCustom) {
         newName = normalizeNameEditor(newName).substring(0, 10);
         socket.emit('saveCustomName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
@@ -437,12 +439,16 @@ window.saveChannelName = function () {
         }
         if (!window.activeCustomSceneChannels) window.activeCustomSceneChannels = {};
         window.activeCustomSceneChannels[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4) };
+        if (!window.resolvedNames) window.resolvedNames = {};
+        window.resolvedNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4), source: 'custom' };
     } else {
         newName = newName.toUpperCase().substring(0, 4);
         socket.emit('updateName', { channel: ch, name: newName });
         if (typeof window.updateNameUI === 'function') {
             window.updateNameUI(ch, newName);
         }
+        if (!window.resolvedNames) window.resolvedNames = {};
+        window.resolvedNames[ch] = { name: newName, short: newName, source: 'physical' };
     }
 
     document.getElementById('nameEditorModal').style.display = 'none';

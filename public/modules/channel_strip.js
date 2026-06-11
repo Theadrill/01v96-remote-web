@@ -441,9 +441,10 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         title = `CH ${i + 1} + ${i + 2}`;
     }
 
-    let nameDiv = isMaster ? "MASTER" : (s.name !== undefined ? s.name : "...");
-    if (!isMaster && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
-        nameDiv = window.activeCustomSceneChannels[i].name;
+    let nameDiv = isMaster ? "MASTER" : title;
+    const globalId = isMaster ? 52 : i;
+    if (window.resolvedNames && window.resolvedNames[globalId]) {
+        nameDiv = window.resolvedNames[globalId].name;
     }
     let customClass = isMaster ? "master-card" : "";
     if (!isMaster) {
@@ -517,9 +518,9 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         stateRef = channelStates[ch];
     }
 
-    let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
-    if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
-        nameDiv = window.activeCustomSceneChannels[configId].name;
+    let nameDiv = title;
+    if (window.resolvedNames && window.resolvedNames[configId]) {
+        nameDiv = window.resolvedNames[configId].name;
     }
     const actionCh = type === 'stIn' ? configId : ch;
 
@@ -571,9 +572,9 @@ function createOutputStrip(i, type, idPrefix = "") {
         stateRef = channelStates[ch];
     }
 
-    let nameDiv = (stateRef && stateRef.name !== undefined) ? stateRef.name : title;
-    if (type === 'stIn' && window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[configId]) {
-        nameDiv = window.activeCustomSceneChannels[configId].name;
+    let nameDiv = title;
+    if (window.resolvedNames && window.resolvedNames[configId]) {
+        nameDiv = window.resolvedNames[configId].name;
     }
     const actionCh = type === 'stIn' ? configId : ch;
 
@@ -739,9 +740,10 @@ function initUI() {
             }
             const nameEl = document.getElementById(`name${i}`);
             if (nameEl) {
-                let dName = state.name !== undefined ? state.name : `CH ${i + 1}`;
-                if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[i]) {
-                    dName = window.activeCustomSceneChannels[i].name;
+                let dName = `CH ${i + 1}`;
+                const globalId = i;
+                if (window.resolvedNames && window.resolvedNames[globalId]) {
+                    dName = window.resolvedNames[globalId].name;
                 }
                 nameEl.innerText = dName;
             }

@@ -436,17 +436,11 @@ socket.on('sync', (s) => {
                 const soloBool = !!ch.solo;
                 const onBool = !!o;
 
-                // Canais 0-31 mantêm o ID. ST IN (32-35) mapeiam para 60-63.
-                const globalId = (i >= 32) ? (60 + (i - 32)) : i;
+                const globalId = (i >= 32) ? (60 + (i - 32) * 2) : i;
 
                 updateUI(globalId, v, onBool, soloBool);
-                let newName = ch.name || (i < 32 ? `CH ${i + 1}` : `ST IN ${i - 32 + 1}`);
-                if (window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[globalId]) {
-                    newName = window.activeCustomSceneChannels[globalId].name;
-                }
-                if (typeof window.updateNameUI === 'function') {
-                    window.updateNameUI(globalId, newName);
-                }
+                // Nomes são atualizados via resolvedNamesUpdated (emitido antes do sync)
+                // Não chamamos updateNameUI aqui para evitar flash com nome físico.
             }
         }
     }
@@ -509,7 +503,8 @@ socket.on('sync', (s) => {
             console.log("🔍 [DEBUG SYNC] CH2 state:", channelStates[1].paired, "pairedWith:", channelStates[1].pairedWith);
         }
         initUI();
-        requestGlobalNames();
+        // 🔑 NÃO chamamos requestGlobalNames() aqui — os globals já estão em memória
+        // (foram carregados no connect). Recarregar a cada sync causava o flash de nomes.
     }
 });
 
@@ -530,12 +525,14 @@ socket.on('scenesUpdated', (data) => {
 
 function requestActiveCustomChannels() {
     if (typeof socket !== 'undefined' && socket.connected) {
+        // Solicita o mapa resolvido unificado (Global > Custom > Físico)
         socket.emit('getActiveCustomChannels');
     }
 }
 
 function requestGlobalNames() {
     if (typeof socket !== 'undefined' && socket.connected) {
+        // Solicita o mapa resolvido unificado
         socket.emit('getGlobalNames');
     }
 }
@@ -578,58 +575,53 @@ socket.on('saveSceneResult', (data) => {
 });
 
 
-socket.on('activeCustomChannels', (data) => {
-    if (data && data.active && data.channels) {
-        window.activeCustomSceneChannels = {};
+// --- RESOLVED NAMES (fonte de verdade única) ---
+// O servidor emite este evento antes do 'sync' para eliminar qualquer
+// flash de nome físico → nome global/custom durante troca de tela.
+socket.on('resolvedNamesUpdated', (data) => {
+    if (!data || !data.channels) return;
+    
+    // Limpar estado antigo
+    window.globalNames = {};
+    window.activeCustomSceneChannels = {};
+    window.resolvedNames = {}; // <-- NOVO: Objeto absoluto que a UI vai usar para renderizar
+
+    if (typeof window.updateNameUI === 'function') {
         for (const entry of data.channels) {
-            window.activeCustomSceneChannels[entry.ch] = { name: entry.name, short: entry.short };
-            if (typeof window.updateNameUI === 'function') {
-                window.updateNameUI(entry.ch, entry.name);
+            // Popular o estado local para as checkboxes do modal de edição (sidebar.js)
+            if (entry.source === 'global') {
+                window.globalNames[entry.ch] = { name: entry.name, short: entry.short };
+            } else if (entry.source === 'custom') {
+                window.activeCustomSceneChannels[entry.ch] = { name: entry.name, short: entry.short };
             }
+
+            // Armazena o nome final decidido pelo backend no objeto absoluto
+            window.resolvedNames[entry.ch] = { name: entry.name, short: entry.short, source: entry.source };
+
+            window.updateNameUI(entry.ch, entry.name);
         }
-        console.log('[CUSTOM] activeCustomChannels carregado:', data.channels.length, 'canais');
-        requestGlobalNames();
-    } else {
-        window.activeCustomSceneChannels = null;
-        console.log('[CUSTOM] activeCustomChannels: nenhuma cena ativa');
-        requestGlobalNames();
     }
 });
 
-socket.on('globalNamesLoaded', (data) => {
-    if (data && data.channels) {
-        window.globalNames = {};
-        for (const entry of data.channels) {
-            window.globalNames[entry.ch] = { name: entry.name, short: entry.short };
-            if (typeof window.updateNameUI === 'function') {
-                window.updateNameUI(entry.ch, entry.name);
-            }
-        }
-        console.log('[GLOBAL] globalNamesLoaded:', Object.keys(window.globalNames).length, 'canais');
-    } else {
-        window.globalNames = null;
-        console.log('[GLOBAL] globalNamesLoaded: nenhum nome global');
-    }
+// Stubs de compatibilidade — mantidos para não errar caso outros paths
+// ainda emitam estes eventos. A lógica de prioridade está no backend.
+socket.on('activeCustomChannels', (_data) => {
+    // Substituído por resolvedNamesUpdated
+});
+
+socket.on('globalNamesLoaded', (_data) => {
+    // Substituído por resolvedNamesUpdated
 });
 
 socket.on('customSceneLoaded', (data) => {
-    if (data && data.active && data.channels) {
-        window.activeCustomSceneChannels = {};
-        for (const entry of data.channels) {
-            window.activeCustomSceneChannels[entry.ch] = { name: entry.name, short: entry.short };
-            if (typeof window.updateNameUI === 'function') {
-                window.updateNameUI(entry.ch, entry.name);
-            }
-        }
-        console.log('[CUSTOM] customSceneLoaded:', data.scene_name, '-', data.channels.length, 'canais');
-        requestGlobalNames();
+    if (data && data.active) {
+        console.log('[CUSTOM] customSceneLoaded:', data.scene_name);
+        // Nomes já vêm via resolvedNamesUpdated — aqui só tratamos UI de feedback
     } else {
-        window.activeCustomSceneChannels = null;
         console.log('[CUSTOM] customSceneLoaded: nenhuma cena ativa');
         if (window.customNamesEnabled) {
             socket.emit('ensureCurrentCustomScene', { syncShared: window.customScenesSyncEnabled });
         }
-        requestGlobalNames();
     }
 });
 
