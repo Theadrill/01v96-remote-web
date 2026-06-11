@@ -547,6 +547,17 @@ async fn queue_all_params_inner(
     // Wait a bit more for last responses to arrive
     tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
+    // Garante que scene_number e scene_name reflitam o scene_manager (fonte canônica)
+    // antes de emitir o sync. O fire_params_only não re-lê dados de cena, então
+    // o scene_number vindo do MIDI kSceneNumber pode estar defasado.
+    {
+        let mut state_guard = state.write().await;
+        state_guard.scene_number = state_guard.scene_manager.active_scene_index as usize;
+        if let Some(ref cs) = state_guard.scene_manager.current_scene.clone() {
+            state_guard.scene_name = cs.name.clone();
+        }
+    }
+
     let state_guard = state.read().await;
     if let Ok(state_json) = serde_json::to_value(&*state_guard) {
         let json_str = serde_json::to_string(&*state_guard).unwrap_or_default();
