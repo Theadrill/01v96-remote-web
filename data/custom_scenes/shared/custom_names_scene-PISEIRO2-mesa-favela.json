@@ -2,169 +2,17 @@
   "scene_name": "PISEIRO2",
   "scene_id": 38,
   "channels": {
-    "11": {
-      "name": "",
-      "short": "    "
-    },
-    "31": {
-      "name": "MIC S FIO",
-      "short": "MICS"
-    },
-    "32": {
-      "name": "",
-      "short": "    "
-    },
-    "18": {
-      "name": "DJJ",
-      "short": "DJJ "
-    },
-    "26": {
-      "name": "",
-      "short": "    "
-    },
-    "38": {
-      "name": "CH 38",
-      "short": "CH38"
-    },
-    "27": {
-      "name": "",
-      "short": "    "
-    },
-    "25": {
-      "name": "",
-      "short": "    "
-    },
-    "12": {
-      "name": "",
-      "short": "    "
-    },
-    "4": {
-      "name": "",
-      "short": "    "
-    },
-    "29": {
-      "name": "",
-      "short": "    "
-    },
-    "28": {
-      "name": "",
-      "short": "    "
-    },
-    "17": {
-      "name": "",
-      "short": "    "
-    },
-    "15": {
-      "name": "",
-      "short": "    "
-    },
-    "14": {
-      "name": "",
-      "short": "    "
-    },
-    "16": {
-      "name": "",
-      "short": "    "
-    },
-    "23": {
-      "name": "MICD",
-      "short": "MICD"
-    },
-    "5": {
-      "name": "",
-      "short": "    "
-    },
-    "30": {
-      "name": "MIC S FIO2",
-      "short": "MICS"
-    },
-    "6": {
-      "name": "",
-      "short": "    "
-    },
-    "39": {
-      "name": "STI4",
-      "short": "STI4"
-    },
-    "37": {
-      "name": "STI3",
-      "short": "STI3"
-    },
-    "2": {
-      "name": "",
-      "short": "    "
-    },
-    "33": {
-      "name": "STI1",
-      "short": "STI1"
-    },
-    "24": {
-      "name": "",
-      "short": "    "
-    },
-    "7": {
-      "name": "",
-      "short": "    "
-    },
-    "36": {
-      "name": "CH 36",
-      "short": "CH36"
-    },
-    "35": {
-      "name": "STI2",
-      "short": "STI2"
-    },
-    "34": {
-      "name": "CH 34",
-      "short": "CH34"
-    },
-    "1": {
-      "name": "",
-      "short": "    "
-    },
-    "22": {
-      "name": "R-CL",
-      "short": "RCL "
-    },
     "20": {
-      "name": "CELU",
+      "name": "CELULAR",
       "short": "CELU"
     },
-    "9": {
-      "name": "",
-      "short": "    "
+    "23": {
+      "name": "MIC DJ",
+      "short": "MICD"
     },
-    "master": {
-      "name": "ST",
-      "short": "ST  "
-    },
-    "3": {
-      "name": "",
-      "short": "    "
-    },
-    "8": {
-      "name": "",
-      "short": "    "
-    },
-    "21": {
-      "name": "LR",
-      "short": "LR  "
-    },
-    "10": {
-      "name": "",
-      "short": "    "
-    },
-    "40": {
-      "name": "CH 40",
-      "short": "CH40"
-    },
-    "13": {
-      "name": "",
-      "short": "    "
-    },
-    "19": {
-      "name": "",
-      "short": "    "
+    "18": {
+      "name": "DJ",
+      "short": "DJ  "
     }
   }
 }
