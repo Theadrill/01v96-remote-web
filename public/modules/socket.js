@@ -85,7 +85,7 @@ socket.on('syncStatus', (data) => {
         console.log('✅ [SYNC COMPLETO] syncStatus=false → estado atual dos pares:');
         for (let i = 0; i < 4; i++) {
             if (channelStates[i]) {
-                console.log(`  CH${i+1}: paired=${channelStates[i].paired}, pairedWith=${channelStates[i].pairedWith}`);
+                console.log(`  CH${i + 1}: paired=${channelStates[i].paired}, pairedWith=${channelStates[i].pairedWith}`);
             }
         }
     }
@@ -215,7 +215,7 @@ socket.on('update', (d) => {
     } // FIM DO BLOCO DE INPUTS (0-31)
 
     // --- HANDLERS UNIVERSAIS (INPUTS E OUTS) ---
-    
+
     // Suporte a Pan em Tempo Real
     if (d.type === 'kPan') {
         const s = getChannelStateById(d.channel);
@@ -357,7 +357,7 @@ socket.on('updateName', (data) => {
                 stateObj.name = data.name;
             }
         }
-        
+
         window.updateNameUI(data.channel, data.name);
     }
 });
@@ -544,6 +544,17 @@ socket.on('saveSceneResult', (data) => {
         const name = data.scene_name ? ' - ' + data.scene_name : '';
         window.currentSceneNumber = data.index;
         window.currentSceneName = data.scene_name || '';
+
+        // Atualiza a biblioteca local para refletir a nova cena salva na grade imediatamente
+        if (!window.scenesLibrary) window.scenesLibrary = [];
+        const existingIdx = window.scenesLibrary.findIndex(s => s.index === data.index);
+        const sceneData = { index: data.index, name: data.scene_name || '', isEmpty: false };
+        if (existingIdx >= 0) {
+            window.scenesLibrary[existingIdx] = sceneData;
+        } else {
+            window.scenesLibrary.push(sceneData);
+        }
+
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         OverlayInfo.show('success', 'CENA ' + num + name + ' SALVA');
         requestActiveCustomChannels();
@@ -551,6 +562,7 @@ socket.on('saveSceneResult', (data) => {
         OverlayInfo.show('error', 'ERRO AO SALVAR CENA');
     }
 });
+
 
 socket.on('activeCustomChannels', (data) => {
     if (data && data.active && data.channels) {
@@ -755,11 +767,11 @@ function clearAllMeters() {
     for (let i = 0; i < meterElementsCache.length; i++) {
         const cached = meterElementsCache[i];
         if (!cached || !cached.card) continue;
-        
+
         cached.card.classList.remove('has-meter', 'has-paired-meter', 'peak-glow');
         cached.hasMeter = false;
         cached.card.style.backgroundSize = '';
-        
+
         if (cached.curtains) {
             cached.curtains.forEach(curtain => {
                 if (curtain) curtain.style.transform = '';
@@ -838,8 +850,37 @@ socket.on('meterData', (levels) => {
                     smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.05) + (targetPercent * 0.95);
                     const finalPercent = smoothedLevels[levelIdx];
 
+                    let isPeaking = finalPercent >= 98;
+
                     if (cached.curtains && cached.curtains.length > 0) {
                         cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+
+                        if (cached.curtains.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
+                            const pIdx = levelIdx + 1;
+                            if (pIdx < levels.length) {
+                                const pTarget = calibrateStep(levels[pIdx], false);
+                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.05) + (pTarget * 0.95);
+                                const partnerPercent = smoothedLevels[pIdx];
+                                cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                                if (partnerPercent >= 98) isPeaking = true;
+                            }
+                        }
+                    } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
+                        if (!cached.card.classList.contains('has-paired-meter')) {
+                            cached.card.classList.add('has-paired-meter');
+                        }
+                        cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
+
+                        if (cached.mobileBgs.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
+                            const pIdx = levelIdx + 1;
+                            if (pIdx < levels.length) {
+                                const pTarget = calibrateStep(levels[pIdx], false);
+                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.05) + (pTarget * 0.95);
+                                const partnerPercent = smoothedLevels[pIdx];
+                                cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
+                                if (partnerPercent >= 98) isPeaking = true;
+                            }
+                        }
                     } else {
                         if (!cached.hasMeter) {
                             cached.card.classList.add('has-meter');
@@ -849,7 +890,7 @@ socket.on('meterData', (levels) => {
                     }
 
                     if (cached.peakLed) {
-                        if (finalPercent >= 98) {
+                        if (isPeaking) {
                             if (!cached.isPeakActive) {
                                 cached.peakLed.classList.add('active');
                                 cached.card.classList.add('peak-glow');
@@ -887,10 +928,12 @@ socket.on('meterData', (levels) => {
                         // Main curtain
                         cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
 
-                        // Check if channel is paired via channelStates
+                        // Check if channel is paired via channelStates or is a Stereo IN
                         const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                        if (s && s.paired && s.pairedWith !== null && cached.curtains.length > 1) {
-                            const pIdx = s.pairedWith;
+                        const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+
+                        if (pIdx !== null && cached.curtains.length > 1) {
                             if (pIdx < levels.length) {
                                 const pTarget = calibrateStep(levels[pIdx], false);
                                 smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
@@ -906,8 +949,10 @@ socket.on('meterData', (levels) => {
                         cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
 
                         const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                        if (s && s.paired && s.pairedWith !== null && cached.mobileBgs.length > 1) {
-                            const pIdx = s.pairedWith;
+                        const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+
+                        if (pIdx !== null && cached.mobileBgs.length > 1) {
                             if (pIdx < levels.length) {
                                 const pTarget = calibrateStep(levels[pIdx], false);
                                 smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
@@ -946,22 +991,44 @@ socket.on('meterData', (levels) => {
 
         // --- Suporte ao METER do Mini Fader (no modal de config) ---
         if (activeConfigChannel !== null) {
-            const miniCard = document.getElementById(`mini-card${activeConfigChannel}`);
+            let miniCardId = `mini-card${activeConfigChannel}`;
+            if (activeConfigChannel === 52) miniCardId = 'mini-cardmaster';
+            else if (activeConfigChannel >= 36 && activeConfigChannel <= 43) miniCardId = `mini-cardm${activeConfigChannel - 36}`;
+            else if (activeConfigChannel >= 44 && activeConfigChannel <= 51) miniCardId = `mini-cardb${activeConfigChannel - 44}`;
+            else if (activeConfigChannel >= 60 && activeConfigChannel <= 67) miniCardId = `mini-cardst${Math.floor((activeConfigChannel - 60) / 2)}`;
+
+            const miniCard = document.getElementById(miniCardId);
             if (miniCard) {
                 const levelIdx = activeConfigChannel;
                 const finalPercent = smoothedLevels[levelIdx];
 
-                const meterCurtain = miniCard.querySelector('.desk-meter-curtain');
+                const meterCurtains = miniCard.querySelectorAll('.desk-meter-curtain');
                 const peakLed = miniCard.querySelector('.desk-peak-led') || miniCard.querySelector('.mobile-peak-led');
 
-                if (meterCurtain) {
-                    meterCurtain.style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                let isPeaking = finalPercent >= 98;
+
+                if (meterCurtains.length > 0) {
+                    meterCurtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                    
+                    if (meterCurtains.length > 1) {
+                        const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
+                        const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith : 
+                                     ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+                        
+                        if (pIdx !== null && pIdx < levels.length) {
+                            const pTarget = calibrateStep(levels[pIdx], false);
+                            smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
+                            const partnerPercent = smoothedLevels[pIdx];
+                            meterCurtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                            if (partnerPercent >= 98) isPeaking = true;
+                        }
+                    }
                 } else {
                     if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
                     miniCard.style.backgroundSize = `100% ${finalPercent}%`;
                 }
 
-                if (finalPercent >= 98) {
+                if (isPeaking) {
                     if (peakLed) peakLed.classList.add('active');
                     miniCard.classList.add('peak-glow');
                 } else {

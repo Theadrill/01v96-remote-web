@@ -322,7 +322,7 @@ window.openNameEditor = function () {
     const removeBtn = document.getElementById('btnRemoveCustomName');
 
     const customCh = window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[ch];
-    const hasCustomName = !!(customCh && customCh.name);
+    const hasCustomName = !!(customCh && typeof customCh.name === 'string');
 
     checkbox.checked = hasCustomName;
     removeBtn.style.display = hasCustomName ? 'block' : 'none';

@@ -256,13 +256,13 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 if (34..=41).contains(&target_ch) {
                     levels.insert(target_ch, val);
                 }
-            } else if group == 33 && element == 0 && parameter == 4 {
-                // ST IN 1-4 L/R
+            } else if group == 33 && element == 0 && parameter == 0 && channel == 32 {
+                // ST IN 1-4 L/R (channel 32 = 0x20)
                 let target_ch = 60 + i;
                 if (60..=67).contains(&target_ch) {
                     levels.insert(target_ch, val);
                 }
-            } else if group == 33 && element == 0 && parameter == 5 {
+            } else if group == 33 && element == 0 && parameter == 5 && channel == 32 {
                 // FX Returns 1-4 L/R
                 let target_ch = 68 + i;
                 if (68..=75).contains(&target_ch) {
@@ -641,15 +641,27 @@ pub fn build_name_request(channel: u8, char_index: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
-pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Option<Vec<u8>> {
+pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Vec<Vec<u8>> {
     let (element, local_ch) = name_channel_mapping(channel);
-    let parameter = 4 + char_index;
-    let mut packet = vec![
-        HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, parameter, local_ch, 0, 0, 0,
+    let mut packets = Vec::with_capacity(2);
+    
+    // Short Name
+    let mut packet_short = vec![
+        HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, char_index, local_ch, 0, 0, 0,
         char_code,
     ];
-    packet.extend_from_slice(FOOTER);
-    Some(packet)
+    packet_short.extend_from_slice(FOOTER);
+    packets.push(packet_short);
+
+    // Long Name
+    let mut packet_long = vec![
+        HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, 4 + char_index, local_ch, 0, 0, 0,
+        char_code,
+    ];
+    packet_long.extend_from_slice(FOOTER);
+    packets.push(packet_long);
+
+    packets
 }
 
 fn name_channel_mapping(channel: u8) -> (u8, u8) {

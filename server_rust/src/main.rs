@@ -34,8 +34,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn async_main(
     shutdown_rx: tokio::sync::oneshot::Receiver<()>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt::init();
+    use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+    
+    let root = config::get_project_root();
+    let log_dir = root.join("log");
+    let _ = std::fs::create_dir_all(&log_dir);
+    let log_file = std::fs::File::create(log_dir.join("server_rust_log.txt"))
+        .expect("Nao foi possivel criar o arquivo de log do servidor");
 
+    let env_filter = EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| EnvFilter::new("info"));
+
+    tracing_subscriber::registry()
+        .with(env_filter)
+        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().with_writer(log_file).with_ansi(false))
+        .init();
     let global_state = Arc::new(RwLock::new(state::GlobalState::new()));
 
     let app_config = config::AppConfig::load();

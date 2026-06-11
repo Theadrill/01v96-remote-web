@@ -388,6 +388,7 @@ async fn queue_all_params_inner(
         push_req(&mut requests, "kInputChannelOn/kChannelOn", i);
         push_req(&mut requests, "kInputAttenuator/kAtt", i);
         push_req(&mut requests, "kInputEQ/kEQOn", i);
+        push_req(&mut requests, "kChannelInput/kChannelIn", i);
         for band in &["Low", "LowMid", "HiMid", "Hi"] {
             push_req(&mut requests, &format!("kInputEQ/kEQ{}F", band), i);
             push_req(&mut requests, &format!("kInputEQ/kEQ{}G", band), i);

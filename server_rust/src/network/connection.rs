@@ -316,7 +316,10 @@ impl ConnectionManager {
                     .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 0, 0, 32, 247], 2) // Inputs 1-32
                     .await;
                 this.scheduler
-                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 4, 0, 0, 32, 247], 2) // ST IN 1-4 L/R
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 0, 32, 0, 16, 247], 2) // ST IN 1-4 L/R (channel=32, length=16)
+                    .await;
+                this.scheduler
+                    .enqueue(vec![240, 67, 48, 62, 13, 33, 0, 5, 32, 0, 16, 247], 2) // FX Returns 1-4 L/R (channel=32, length=16)
                     .await;
                 this.scheduler
                     .enqueue(vec![240, 67, 48, 62, 13, 33, 1, 0, 0, 0, 16, 247], 2) // Bus 1-8

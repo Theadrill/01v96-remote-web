@@ -482,11 +482,9 @@ pub fn register_handlers(
                                     if token.is_cancelled() {
                                         return;
                                     }
-                                    if let Some(req) =
-                                        crate::midi::protocol::build_name_change(
-                                            global_ch, ci as u8, byte,
-                                        )
-                                    {
+                                    for req in crate::midi::protocol::build_name_change(
+                                        global_ch, ci as u8, byte,
+                                    ) {
                                         sched_clone.enqueue(req, 0).await;
                                     }
                                     if ci < short_bytes.len() - 1 {
@@ -664,7 +662,7 @@ pub fn register_handlers(
                                 if token.is_cancelled() {
                                     return;
                                 }
-                                if let Some(req) = crate::midi::protocol::build_name_change(
+                                for req in crate::midi::protocol::build_name_change(
                                     channel, ci as u8, byte,
                                 ) {
                                     sched_op.enqueue(req, 0).await;
@@ -1270,9 +1268,7 @@ pub fn register_handlers(
                 // MIDI write-back: send each char to the mesa with 30ms spacing
                 let padded_bytes: Vec<u8> = padded.bytes().take(4).collect();
                 for (ci, &code) in padded_bytes.iter().enumerate() {
-                    if let Some(req) =
-                        crate::midi::protocol::build_name_change(channel as u8, ci as u8, code)
-                    {
+                    for req in crate::midi::protocol::build_name_change(channel as u8, ci as u8, code) {
                         sched_name.enqueue(req, 0).await;
                     }
                     if ci < padded_bytes.len() - 1 {
@@ -1401,11 +1397,9 @@ pub fn register_handlers(
                                 if token.is_cancelled() {
                                     return;
                                 }
-                                if let Some(req) =
-                                    crate::midi::protocol::build_name_change(
-                                        global_ch, ci as u8, byte,
-                                    )
-                                {
+                                for req in crate::midi::protocol::build_name_change(
+                                    global_ch, ci as u8, byte,
+                                ) {
                                     sched_clone.enqueue(req, 0).await;
                                 }
                                 if ci < short_bytes.len() - 1 {
@@ -1539,11 +1533,9 @@ pub fn register_handlers(
                                 if token.is_cancelled() {
                                     return;
                                 }
-                                if let Some(req) =
-                                    crate::midi::protocol::build_name_change(
-                                        global_ch, ci as u8, byte,
-                                    )
-                                {
+                                for req in crate::midi::protocol::build_name_change(
+                                    global_ch, ci as u8, byte,
+                                ) {
                                     sched_clone.enqueue(req, 0).await;
                                 }
                                 if ci < short_bytes.len() - 1 {
