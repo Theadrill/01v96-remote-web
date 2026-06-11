@@ -8,6 +8,10 @@
     "20": {
       "name": "CELULAR",
       "short": "CELU"
+    },
+    "23": {
+      "name": "MIC DJ",
+      "short": "MICD"
     }
   }
 }
