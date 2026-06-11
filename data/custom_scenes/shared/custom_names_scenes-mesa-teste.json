@@ -12,6 +12,12 @@
       "physical_scene": "CENA TESTE 22",
       "physical_id": 2,
       "file": "custom_names_scene-CENA TESTE 22-mesa-teste.json"
+    },
+    {
+      "custom_name": "CENA TESTE 3",
+      "physical_scene": "CENA TESTE 3",
+      "physical_id": 3,
+      "file": "custom_names_scene-CENA TESTE 3-mesa-teste.json"
     }
   ]
 }

@@ -1,0 +1,170 @@
+{
+  "scene_name": "CENA TESTE 3",
+  "scene_id": 3,
+  "channels": {
+    "25": {
+      "name": "CH25",
+      "short": "CH25"
+    },
+    "31": {
+      "name": "CH31",
+      "short": "CH31"
+    },
+    "16": {
+      "name": "CH16",
+      "short": "CH16"
+    },
+    "27": {
+      "name": "CH27",
+      "short": "CH27"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "7": {
+      "name": "CH7",
+      "short": "CH7 "
+    },
+    "26": {
+      "name": "CH26",
+      "short": "CH26"
+    },
+    "39": {
+      "name": "CH40",
+      "short": "CH40"
+    },
+    "29": {
+      "name": "CH29",
+      "short": "CH29"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "10": {
+      "name": "CH10",
+      "short": "CH10"
+    },
+    "30": {
+      "name": "CH30",
+      "short": "CH30"
+    },
+    "37": {
+      "name": "CH38",
+      "short": "CH38"
+    },
+    "22": {
+      "name": "CH22",
+      "short": "CH22"
+    },
+    "13": {
+      "name": "CH13",
+      "short": "CH13"
+    },
+    "8": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "23": {
+      "name": "CH23",
+      "short": "CH23"
+    },
+    "35": {
+      "name": "CH36",
+      "short": "CH36"
+    },
+    "14": {
+      "name": "CH14",
+      "short": "CH14"
+    },
+    "6": {
+      "name": "CH6",
+      "short": "CH6 "
+    },
+    "12": {
+      "name": "VOZ2",
+      "short": "VOZ2"
+    },
+    "1": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "17": {
+      "name": "CH17",
+      "short": "CH17"
+    },
+    "4": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "24": {
+      "name": "CH24",
+      "short": "CH24"
+    },
+    "5": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "19": {
+      "name": "CH19",
+      "short": "CH19"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "11": {
+      "name": "VOZ1",
+      "short": "VOZ1"
+    },
+    "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "21": {
+      "name": "CH21",
+      "short": "CH21"
+    },
+    "20": {
+      "name": "CH20",
+      "short": "CH20"
+    },
+    "9": {
+      "name": "TEST",
+      "short": "TEST"
+    },
+    "28": {
+      "name": "CH28",
+      "short": "CH28"
+    },
+    "15": {
+      "name": "CH15",
+      "short": "CH15"
+    },
+    "18": {
+      "name": "CH18",
+      "short": "CH18"
+    },
+    "2": {
+      "name": "CHIM",
+      "short": "CHIM"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "32": {
+      "name": "CH32",
+      "short": "CH32"
+    }
+  }
+}
