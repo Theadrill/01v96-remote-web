@@ -1,0 +1,170 @@
+{
+  "scene_name": "CENA TESTE 22",
+  "scene_id": 2,
+  "channels": {
+    "22": {
+      "name": "CH22",
+      "short": "CH22"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "25": {
+      "name": "CH25",
+      "short": "CH25"
+    },
+    "9": {
+      "name": "CH9",
+      "short": "CH9 "
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "8": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "32": {
+      "name": "CH32",
+      "short": "CH32"
+    },
+    "19": {
+      "name": "CH19",
+      "short": "CH19"
+    },
+    "1": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "17": {
+      "name": "CH17",
+      "short": "CH17"
+    },
+    "18": {
+      "name": "CH18",
+      "short": "CH18"
+    },
+    "11": {
+      "name": "CH11",
+      "short": "CH11"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "7": {
+      "name": "CH7",
+      "short": "CH7 "
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "14": {
+      "name": "CH14",
+      "short": "CH14"
+    },
+    "21": {
+      "name": "CH21",
+      "short": "CH21"
+    },
+    "5": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "16": {
+      "name": "CH16",
+      "short": "CH16"
+    },
+    "31": {
+      "name": "CH31",
+      "short": "CH31"
+    },
+    "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "29": {
+      "name": "CH29",
+      "short": "CH29"
+    },
+    "27": {
+      "name": "CH27",
+      "short": "CH27"
+    },
+    "23": {
+      "name": "CH23",
+      "short": "CH23"
+    },
+    "26": {
+      "name": "CH26",
+      "short": "CH26"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "12": {
+      "name": "CH12",
+      "short": "CH12"
+    },
+    "2": {
+      "name": "CHIM",
+      "short": "CHIM"
+    },
+    "30": {
+      "name": "CH30",
+      "short": "CH30"
+    },
+    "28": {
+      "name": "CH28",
+      "short": "CH28"
+    },
+    "4": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "6": {
+      "name": "CH6",
+      "short": "CH6 "
+    },
+    "15": {
+      "name": "CH15",
+      "short": "CH15"
+    },
+    "13": {
+      "name": "CH13",
+      "short": "CH13"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "10": {
+      "name": "CH10",
+      "short": "CH10"
+    },
+    "20": {
+      "name": "CH20",
+      "short": "CH20"
+    },
+    "24": {
+      "name": "CH24",
+      "short": "CH24"
+    }
+  }
+}
