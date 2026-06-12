@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
 
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Habilita modo App/Fullscreen nativo no iOS e Android via "Adicionar à Tela de Início" -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="01V96 LIVE">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>01V96 - LIVE SAFE</title>
-    <link rel="stylesheet" href="style.css?v=48">
-    <!-- UI UPDATE: 2026-06-07 -->
-    <script src="/vendor/socket.io.min.js"></script>
-    <script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<!-- Habilita modo App/Fullscreen nativo no iOS e Android via "Adicionar à Tela de Início" -->
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="01V96 LIVE" name="apple-mobile-web-app-title"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<title>01V96 - LIVE SAFE</title>
+<link href="style.css?v=48" rel="stylesheet"/>
+<!-- UI UPDATE: 2026-06-07 -->
+<script src="/vendor/socket.io.min.js"></script>
+<script>
         // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
         document.addEventListener('DOMContentLoaded', function () {
             // Marca como standalone se estiver rodando como App Nativo PWA
@@ -60,588 +60,452 @@
         });
     </script>
 </head>
-
 <body>
-
-    <!-- Offline Overlay (aparece quando a mesa estiver desconectada) -->
-    <div id="offlineOverlay" style="display:none;">
-        <div class="offline-inner">MESA OFFLINE</div>
-    </div>
-
-    <!-- Blocking Overlay (para Cenas) -->
-    <div id="blockingOverlay" class="blocking-overlay" style="display: none;"></div>
-
-    <!-- Splash Screen Overlay -->
-    <div id="splashScreen" class="splash-overlay">
-        <!-- Botão de Fullscreen para Splash -->
-        <button id="fsBtnSplash" class="fs-btn"
-            style="position:fixed; bottom:20px; right:20px; z-index:10001; width:44px; height:44px; border-radius:50%; background:rgba(85,85,85,0.8); border:1px solid #666; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer;"
-            onclick="toggleFullScreen()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
-                </path>
-            </svg>
-        </button>
-        <div class="splash-container">
-            <div class="splash-logo">
-                <h1 class="splash-title">01V96</h1>
-                <p class="splash-subtitle">LIVE SAFE</p>
-            </div>
-
-            <!-- Initial Choice -->
-            <div id="splashInitial" class="splash-step">
-                <button class="splash-btn btn-tecnico" onclick="showSplashStep('tecnico')">TÉCNICO</button>
-                <button class="splash-btn btn-musico" onclick="showSplashStep('musico')">MÚSICO</button>
-            </div>
-
-            <!-- Tecnico Password -->
-            <div id="splashTecnico" class="splash-step" style="display: none;">
-                <p class="splash-msg">ENTRADA TÉCNICO</p>
-                <input type="password" id="tecnicoPass" class="splash-input" placeholder="••••" maxlength="4"
-                    inputmode="numeric">
-                <div class="splash-actions">
-                    <button class="splash-btn btn-back" onclick="showSplashStep('initial')">VOLTAR</button>
-                    <button class="splash-btn btn-confirm" onclick="checkTecnicoPass()">ENTRAR</button>
-                </div>
-            </div>
-
-            <!-- Musico Buttons -->
-            <div id="splashMusico" class="splash-step" style="display: none;">
-                <p class="splash-msg">SELECIONE SEU FONE</p>
-                <div class="musico-grid">
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(1)">FONE 1</button>
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(2)">FONE 2</button>
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(3)">FONE 3</button>
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(4)">FONE 4</button>
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(5)">FONE 5</button>
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(6)">FONE 6</button>
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(7)">FONE 7</button>
-                    <button class="splash-btn btn-fone" onclick="musicoAlert(8)">FONE 8</button>
-                </div>
-                <button class="splash-btn btn-back" onclick="showSplashStep('initial')"
-                    style="margin-top: 20px;">VOLTAR</button>
-            </div>
-
-            <!-- Setup Inicial do Servidor -->
-            <div id="splashSetup" class="splash-step" style="display: none;">
-                <p class="splash-msg">CONFIGURAÇÃO INICIAL DO SERVIDOR</p>
-                <p id="setupHelpText" class="splash-help"
-                    style="font-size: 11px; color: #888; margin-bottom: 14px; line-height: 1.4;">
+<!-- Offline Overlay (aparece quando a mesa estiver desconectada) -->
+<div class="styled-offlineOverlay" id="offlineOverlay">
+<div class="offline-inner">MESA OFFLINE</div>
+</div>
+<!-- Blocking Overlay (para Cenas) -->
+<div class="blocking-overlay styled-blockingOverlay" id="blockingOverlay"></div>
+<!-- Splash Screen Overlay -->
+<div class="splash-overlay" id="splashScreen">
+<!-- Botão de Fullscreen para Splash -->
+<button class="fs-btn styled-fsBtnSplash" id="fsBtnSplash" onclick="toggleFullScreen()">
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24">
+<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+</path>
+</svg>
+</button>
+<div class="splash-container">
+<div class="splash-logo">
+<h1 class="splash-title">01V96</h1>
+<p class="splash-subtitle">LIVE SAFE</p>
+</div>
+<!-- Initial Choice -->
+<div class="splash-step" id="splashInitial">
+<button class="splash-btn btn-tecnico" onclick="showSplashStep('tecnico')">TÉCNICO</button>
+<button class="splash-btn btn-musico" onclick="showSplashStep('musico')">MÚSICO</button>
+</div>
+<!-- Tecnico Password -->
+<div class="splash-step styled-blockingOverlay" id="splashTecnico">
+<p class="splash-msg">ENTRADA TÉCNICO</p>
+<input class="splash-input" id="tecnicoPass" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<div class="splash-actions">
+<button class="splash-btn btn-back" onclick="showSplashStep('initial')">VOLTAR</button>
+<button class="splash-btn btn-confirm" onclick="checkTecnicoPass()">ENTRAR</button>
+</div>
+</div>
+<!-- Musico Buttons -->
+<div class="splash-step styled-blockingOverlay" id="splashMusico">
+<p class="splash-msg">SELECIONE SEU FONE</p>
+<div class="musico-grid">
+<button class="splash-btn btn-fone" onclick="musicoAlert(1)">FONE 1</button>
+<button class="splash-btn btn-fone" onclick="musicoAlert(2)">FONE 2</button>
+<button class="splash-btn btn-fone" onclick="musicoAlert(3)">FONE 3</button>
+<button class="splash-btn btn-fone" onclick="musicoAlert(4)">FONE 4</button>
+<button class="splash-btn btn-fone" onclick="musicoAlert(5)">FONE 5</button>
+<button class="splash-btn btn-fone" onclick="musicoAlert(6)">FONE 6</button>
+<button class="splash-btn btn-fone" onclick="musicoAlert(7)">FONE 7</button>
+<button class="splash-btn btn-fone" onclick="musicoAlert(8)">FONE 8</button>
+</div>
+<button class="splash-btn btn-back inline-style-1" onclick="showSplashStep('initial')">VOLTAR</button>
+</div>
+<!-- Setup Inicial do Servidor -->
+<div class="splash-step styled-blockingOverlay" id="splashSetup">
+<p class="splash-msg">CONFIGURAÇÃO INICIAL DO SERVIDOR</p>
+<p class="splash-help styled-setupHelpText" id="setupHelpText">
                     Cadastre o nome e a senha de acesso (4 dígitos).
                 </p>
-                <input type="text" id="setupName" class="splash-input" placeholder="ex: mesa-do-joao" maxlength="30"
-                    autocomplete="off"
-                    style="text-transform: lowercase; text-align: center; letter-spacing: 1px; font-size: 18px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-                <input type="password" id="setupPassword" class="splash-input" placeholder="••••" maxlength="4"
-                    inputmode="numeric" autocomplete="new-password">
-                <input type="password" id="setupPasswordConfirm" class="splash-input" placeholder="Confirme a senha"
-                    maxlength="4" inputmode="numeric" autocomplete="new-password">
-                <p id="setupError" class="splash-error"
-                    style="display: none; color: #ff6b6b; font-size: 12px; margin: 8px 0 0 0; line-height: 1.3;">
-                </p>
-                <div class="splash-actions">
-                    <button class="splash-btn btn-back" onclick="cancelSetup()">VOLTAR</button>
-                    <button class="splash-btn btn-confirm" onclick="submitSetup()">CONTINUAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="faders-area" id="faders-container"></div>
-    <div id="master-container" style="display: flex; align-items: stretch; flex-shrink: 0;"></div>
-
-    <div class="sidebar">
-        <!-- PANEL 1: Informação (fixa) -->
-        <div id="sidebarInfo" class="sidebar-panel sidebar-info">
-            <div id="scn" class="color-green font-13-bold">01V96</div>
-            <div id="scene-info">SINCRONIZANDO...</div>
-            <div id="chSideTitle" class="ch-side-title" style="display:none;" onclick="openNameEditor()">1 - CH 1</div>
-            <div id="techMixTitle" class="ch-side-title" style="display:none; color:#ffcc00;" onclick="">MIX 1</div>
-            <div id="foneIndicatorSidebar" class="fone-indicator" style="display:none;">FONE 1</div>
-
-            <!-- Navegação entre canais/mixes (aparece em channelConfig e techMix) -->
-            <div id="sidebarNav" class="sidebar-nav" style="display:none;">
-                <button id="navPrev" class="nav-btn sidebar-nav-btn" onclick="changeConfigChannel(-1)">&lt;</button>
-                <button id="navNext" class="nav-btn sidebar-nav-btn" onclick="changeConfigChannel(1)">&gt;</button>
-            </div>
-        </div>
-
-        <!-- PANEL 2: Dock de Botões (scrollável) -->
-        <div id="sidebarDock" class="sidebar-panel sidebar-dock">
-            <div class="scroll-indicator-v scroll-indicator-top">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-                    <path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </div>
-            <div class="scroll-indicator-v scroll-indicator-bottom">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-                    <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </div>
-            <div class="scroll-indicator-h scroll-indicator-left">
-                <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
-                    <path d="M5 9L1 5L5 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </div>
-            <div class="scroll-indicator-h scroll-indicator-right">
-                <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
-                    <path d="M1 9L5 5L1 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </div>
-            <div id="buttonDock" class="button-dock"></div>
-        </div>
-
-        <!-- PANEL 3: Macros (fixo) -->
-        <div id="sidebarMacros" class="sidebar-panel sidebar-macros">
-            <button class="side-btn btn-macros"
-                onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
-            <button id="fsBtnMacros" class="side-btn btn-fs-macros" onclick="toggleFullScreen()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;">
-                    <path
-                        d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
-                    </path>
-                </svg>
-            </button>
-            <button id="exitBtnMacros" class="side-btn btn-exit-macros" onclick="triggerExitActiveMode()">SAIR</button>
-        </div>
-
-        <button id="musicianMetersBtn" class="side-btn btn-meters-musician" onclick="toggleMusicianMeters()">MOSTRAR
+<input autocomplete="off" class="splash-input styled-setupName" id="setupName" maxlength="30" placeholder="ex: mesa-do-joao" type="text"/>
+<input autocomplete="new-password" class="splash-input" id="setupPassword" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<input autocomplete="new-password" class="splash-input" id="setupPasswordConfirm" inputmode="numeric" maxlength="4" placeholder="Confirme a senha" type="password"/>
+<p class="splash-error styled-setupError" id="setupError">
+</p>
+<div class="splash-actions">
+<button class="splash-btn btn-back" onclick="cancelSetup()">VOLTAR</button>
+<button class="splash-btn btn-confirm" onclick="submitSetup()">CONTINUAR</button>
+</div>
+</div>
+</div>
+</div>
+<div class="faders-area" id="faders-container"></div>
+<div class="styled-master-container" id="master-container"></div>
+<div class="sidebar">
+<!-- PANEL 1: Informação (fixa) -->
+<div class="sidebar-panel sidebar-info" id="sidebarInfo">
+<div class="color-green font-13-bold" id="scn">01V96</div>
+<div id="scene-info">SINCRONIZANDO...</div>
+<div class="ch-side-title styled-offlineOverlay" id="chSideTitle" onclick="openNameEditor()">1 - CH 1</div>
+<div class="ch-side-title styled-techMixTitle" id="techMixTitle" onclick="">MIX 1</div>
+<div class="fone-indicator styled-offlineOverlay" id="foneIndicatorSidebar">FONE 1</div>
+<!-- Navegação entre canais/mixes (aparece em channelConfig e techMix) -->
+<div class="sidebar-nav styled-offlineOverlay" id="sidebarNav">
+<button class="nav-btn sidebar-nav-btn" id="navPrev" onclick="changeConfigChannel(-1)">&lt;</button>
+<button class="nav-btn sidebar-nav-btn" id="navNext" onclick="changeConfigChannel(1)">&gt;</button>
+</div>
+</div>
+<!-- PANEL 2: Dock de Botões (scrollável) -->
+<div class="sidebar-panel sidebar-dock" id="sidebarDock">
+<div class="scroll-indicator-v scroll-indicator-top">
+<svg fill="none" height="6" viewbox="0 0 10 6" width="10">
+<path d="M1 5L5 1L9 5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<div class="scroll-indicator-v scroll-indicator-bottom">
+<svg fill="none" height="6" viewbox="0 0 10 6" width="10">
+<path d="M1 1L5 5L9 1" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<div class="scroll-indicator-h scroll-indicator-left">
+<svg fill="none" height="10" viewbox="0 0 6 10" width="6">
+<path d="M5 9L1 5L5 1" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<div class="scroll-indicator-h scroll-indicator-right">
+<svg fill="none" height="10" viewbox="0 0 6 10" width="6">
+<path d="M1 9L5 5L1 1" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<div class="button-dock" id="buttonDock"></div>
+</div>
+<!-- PANEL 3: Macros (fixo) -->
+<div class="sidebar-panel sidebar-macros" id="sidebarMacros">
+<button class="side-btn btn-macros" onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
+<button class="side-btn btn-fs-macros" id="fsBtnMacros" onclick="toggleFullScreen()">
+<svg class="inline-style-2" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24">
+<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+</path>
+</svg>
+</button>
+<button class="side-btn btn-exit-macros" id="exitBtnMacros" onclick="triggerExitActiveMode()">SAIR</button>
+</div>
+<button class="side-btn btn-meters-musician" id="musicianMetersBtn" onclick="toggleMusicianMeters()">MOSTRAR
             NÍVEIS</button>
-        <button id="musicianFsBtn" class="side-btn btn-fs-musician" onclick="toggleFullScreen()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-            </svg>
-        </button>
-        <button id="musicianExitBtn" class="side-btn btn-exit-musician" onclick="triggerExitActiveMode()">SAIR</button>
-    </div>
-
-    <div id="configModal" class="modal-overlay" style="z-index: 9900;">
-        <div class="modal-content">
-            <p class="config-modal-title">01V96 — LIVE CONTROL</p>
-            <p class="config-section-header" style="margin-top: 6px;">Entradas · Saídas · Configuração</p>
-
-            <!-- Selects ocultos usados por conn() para índices de porta MIDI -->
-            <select id="sin" class="modal-select" style="display:none;"></select>
-            <select id="sout" class="modal-select" style="display:none;"></select>
-
-            <button class="btn-connect" style="width: 100%; margin-bottom: 12px; background: #007bff;"
-                onclick="forceSync()">MANUAL SYNC</button>
-
-            <button class="btn-connect" style="width: 100%; margin-bottom: 0; background: #ff9800;"
-                onclick="restartServer()">REINICIAR SERVIDOR</button>
-
-            <!-- Seção de Cenas (Visual) -->
-            <div class="config-section">
-                <p class="config-section-header">Gerenciamento de Cenas</p>
-                <div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                    <span id="configSceneDisplay"
-                        style="font-size: 18px; color: #ffcc00; font-weight: bold; letter-spacing: 1px;">SINCRONIZANDO...</span>
-                </div>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                    <button class="btn-connect" onclick="showSceneGrid('save')"
-                        style="flex: 1 1 110px; margin:0; background:#dc3545; font-size:11px; white-space:nowrap;">SALVAR
+<button class="side-btn btn-fs-musician" id="musicianFsBtn" onclick="toggleFullScreen()">
+<svg class="inline-style-2" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24">
+<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+</svg>
+</button>
+<button class="side-btn btn-exit-musician" id="musicianExitBtn" onclick="triggerExitActiveMode()">SAIR</button>
+</div>
+<div class="modal-overlay styled-configModal" id="configModal">
+<div class="modal-content">
+<p class="config-modal-title">01V96 — LIVE CONTROL</p>
+<p class="config-section-header inline-style-3">Entradas · Saídas · Configuração</p>
+<!-- Selects ocultos usados por conn() para índices de porta MIDI -->
+<select class="modal-select styled-offlineOverlay" id="sin"></select>
+<select class="modal-select styled-offlineOverlay" id="sout"></select>
+<button class="btn-connect inline-style-4" onclick="forceSync()">MANUAL SYNC</button>
+<button class="btn-connect inline-style-5" onclick="restartServer()">REINICIAR SERVIDOR</button>
+<!-- Seção de Cenas (Visual) -->
+<div class="config-section">
+<p class="config-section-header">Gerenciamento de Cenas</p>
+<div class="inline-style-6">
+<span class="styled-configSceneDisplay" id="configSceneDisplay">SINCRONIZANDO...</span>
+</div>
+<div class="inline-style-7">
+<button class="btn-connect inline-style-8" onclick="showSceneGrid('save')">SALVAR
                         CENA</button>
-                    <button class="btn-connect" onclick="showSceneGrid('load')"
-                        style="flex: 1 1 110px; margin:0; background:#28a745; font-size:11px; white-space:nowrap;">CARREGAR
+<button class="btn-connect inline-style-9" onclick="showSceneGrid('load')">CARREGAR
                         CENA</button>
-                    <button class="btn-connect" onclick="showCustomScenes()"
-                        style="flex: 1 1 150px; margin:0; background:#5a4a8a; font-size:11px; white-space:nowrap;">NOMES
+<button class="btn-connect inline-style-10" onclick="showCustomScenes()">NOMES
                         CUSTOMIZADOS</button>
-                </div>
-            </div>
-
-            <!-- Seção DMX (Reset) -->
-            <div class="config-section">
-                <p class="config-section-header">Sistema de Iluminação</p>
-                <button class="btn-connect" onclick="resetDmx()"
-                    style="width: 100%; margin: 0; background: #6a1b9a; font-size: 12px; font-weight: bold; height: 45px;">RESETAR
+</div>
+</div>
+<!-- Seção DMX (Reset) -->
+<div class="config-section">
+<p class="config-section-header">Sistema de Iluminação</p>
+<button class="btn-connect inline-style-11" onclick="resetDmx()">RESETAR
                     LUZ</button>
-                <p style="font-size: 9px; color: #555; margin-top: 8px;">Mata processo, reseta USB e reinicia
+<p class="inline-style-12">Mata processo, reseta USB e reinicia
                     ArtNetToDMX</p>
-            </div>
-
-            <div class="config-section">
-                <p class="config-section-header">Modo de Visualização</p>
-                <div style="display: flex; gap: 10px;">
-                    <button id="btnLayoutMobile" onclick="setLayoutMode('mobile')" class="btn-connect"
-                        style="background:#555;">MOBILE</button>
-                    <button id="btnLayoutDesktop" onclick="setLayoutMode('desktop')" class="btn-connect"
-                        style="background:#555;">DESKTOP</button>
-                </div>
-            </div>
-
-            <div class="config-section">
-                <p class="config-section-header">Painel de Macros</p>
-                <div
-                    style="display: flex; align-items: center; justify-content: space-between; background: #222; padding: 10px 15px; border-radius: 8px;">
-                    <span style="font-size: 13px; color: #fff;">Habilitar Macros</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleMacrosEnable" checked
-                            onclick="toggleMacrosPanel(this.checked)">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Seção de Configuração do Servidor -->
-            <div class="config-section">
-                <p class="config-section-header">Servidor</p>
-                <p id="configServerNameDisplay"
-                    style="font-size: 16px; color: #5cacee; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">
+</div>
+<div class="config-section">
+<p class="config-section-header">Modo de Visualização</p>
+<div class="inline-style-13">
+<button class="btn-connect styled-btnLayoutMobile" id="btnLayoutMobile" onclick="setLayoutMode('mobile')">MOBILE</button>
+<button class="btn-connect styled-btnLayoutMobile" id="btnLayoutDesktop" onclick="setLayoutMode('desktop')">DESKTOP</button>
+</div>
+</div>
+<div class="config-section">
+<p class="config-section-header">Painel de Macros</p>
+<div class="inline-style-14">
+<span class="inline-style-15">Habilitar Macros</span>
+<label class="switch">
+<input checked="" id="toggleMacrosEnable" onclick="toggleMacrosPanel(this.checked)" type="checkbox"/>
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<!-- Seção de Configuração do Servidor -->
+<div class="config-section">
+<p class="config-section-header">Servidor</p>
+<p class="styled-configServerNameDisplay" id="configServerNameDisplay">
                     --
                 </p>
-                <input type="text" id="inputServerName" maxlength="30" placeholder="nome-do-servidor" autocomplete="off"
-                    style="width: 100%; box-sizing: border-box; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; font-size: 14px; text-transform: lowercase; letter-spacing: 1px; margin-bottom: 10px; outline: none;">
-                <button class="btn-connect" onclick="saveServerName()"
-                    style="width: 100%; margin-bottom: 10px; background: #007bff; font-size: 12px;">SALVAR NOME</button>
-                <button class="btn-connect" onclick="confirmResetConfig()"
-                    style="width: 100%; margin: 0; background: #6c757d; font-size: 11px;">RESETAR CONFIGURAÇÃO</button>
-                <p id="serverConfigStatus"
-                    style="font-size: 10px; color: #aaa; margin-top: 8px; min-height: 14px; line-height: 1.3;">
-                </p>
-            </div>
-
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #444;">
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
-                    <div>
-                        <p
-                            style="font-size: 12px; color: #bbb; margin: 0; letter-spacing: 1px; font-weight: 700; text-transform: uppercase;">
+<input autocomplete="off" class="styled-inputServerName" id="inputServerName" maxlength="30" placeholder="nome-do-servidor" type="text"/>
+<button class="btn-connect inline-style-16" onclick="saveServerName()">SALVAR NOME</button>
+<button class="btn-connect inline-style-17" onclick="confirmResetConfig()">RESETAR CONFIGURAÇÃO</button>
+<p class="styled-serverConfigStatus" id="serverConfigStatus">
+</p>
+</div>
+<div class="inline-style-18">
+<div class="inline-style-19">
+<div>
+<p class="inline-style-20">
                             Abrir interface
                             automaticamente</p>
-                        <p style="font-size: 9px; color: #555; margin: 4px 0 0 0;">Ao iniciar o servidor</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleOpenBrowser" onchange="updateOpenBrowser(this.checked)">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="modal-actions" style="margin-top: 20px;">
-                <button onclick="conn()" class="btn-connect">CONECTAR</button>
-                <button onclick="document.getElementById('configModal').style.display='none'"
-                    class="btn-close">FECHAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Configuração de Canal (Sem Header para ganhar espaço) -->
-    <div id="chConfigModal" class="ch-modal-overlay">
-        <div style="display: flex; height: 100%; width: 100%; overflow: hidden;">
-            <div id="chModalContent" class="ch-modal-body" style="flex: 1;">
-                <!-- Conteúdo (EQ, AUXs, etc) -->
+<p class="inline-style-21">Ao iniciar o servidor</p>
+</div>
+<label class="switch">
+<input id="toggleOpenBrowser" onchange="updateOpenBrowser(this.checked)" type="checkbox"/>
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<div class="modal-actions inline-style-1">
+<button class="btn-connect" onclick="conn()">CONECTAR</button>
+<button class="btn-close" onclick="document.getElementById('configModal').style.display='none'">FECHAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Configuração de Canal (Sem Header para ganhar espaço) -->
+<div class="ch-modal-overlay" id="chConfigModal">
+<div class="inline-style-22">
+<div class="ch-modal-body styled-chModalContent" id="chModalContent">
+<!-- Conteúdo (EQ, AUXs, etc) -->
                 Área Reservada...
             </div>
-            <!-- Mini Channel Strip fixo à direita -->
-            <div id="miniFaderContainer"
-                style="min-width: 85px; width: auto; height: 100%; padding: 10px 5px; box-sizing: border-box; border-left: 1px solid #333; background: #111; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
-                <div id="miniFaderContext" style="height: 100%; width: 100%; display: flex; justify-content: center;">
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal de Confirmação Customizado para EQ -->
-    <div id="customConfirmModal" class="modal-overlay" style="z-index:9999; display:none;">
-        <div class="modal-content"
-            style="max-width:400px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #333; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <h3 style="margin-top:0; color:#5cacee; font-size:16px; letter-spacing:1px; text-transform:uppercase;">
+<!-- Mini Channel Strip fixo à direita -->
+<div class="styled-miniFaderContainer" id="miniFaderContainer">
+<div class="styled-miniFaderContext" id="miniFaderContext">
+</div>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmação Customizado para EQ -->
+<div class="modal-overlay styled-customConfirmModal" id="customConfirmModal">
+<div class="modal-content inline-style-23">
+<h3 class="inline-style-24">
                 Confirmação de Cópia</h3>
-            <p id="customConfirmMsg" style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja
+<p class="styled-customConfirmMsg" id="customConfirmMsg">Deseja
                 colar as definições para este canal?</p>
-            <div style="display:flex; gap:15px;">
-                <button id="customConfirmOk"
-                    style="flex:1; border-radius:10px; padding:15px; font-size:13px; background:#007bff; color:#fff; border:none; cursor:pointer;">SIM,
+<div class="inline-style-25">
+<button class="styled-customConfirmOk" id="customConfirmOk">SIM,
                     COLAR</button>
-                <button id="customConfirmCancel"
-                    style="flex:1; border-radius:10px; padding:15px; font-size:13px; background:#444; color:#fff; border:none; cursor:pointer;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Edição de Nome do Canal -->
-    <div id="nameEditorModal" class="modal-overlay" style="z-index:10000; display:none;">
-        <div class="modal-content"
-            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<button class="styled-customConfirmCancel" id="customConfirmCancel">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Edição de Nome do Canal -->
+<div class="modal-overlay styled-nameEditorModal" id="nameEditorModal">
+<div class="modal-content inline-style-26">
+<p class="inline-style-27">
                 Editar Nome do Canal</p>
-            <input type="text" id="inputChName" maxlength="4"
-                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:22px; font-weight:bold; border-radius:8px; margin-bottom:15px; outline:none; text-transform:uppercase;">
-            <label id="lblCustomName"
-                style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:5px; cursor:pointer; font-size:13px; color:#aaa;">
-                <input type="checkbox" id="chkCustomName" onchange="toggleCustomNameEditor()">
+<input class="styled-inputChName" id="inputChName" maxlength="4" type="text"/>
+<label class="styled-lblCustomName" id="lblCustomName">
+<input id="chkCustomName" onchange="toggleCustomNameEditor()" type="checkbox"/>
                 Criar nome customizado
             </label>
-            <label id="lblGlobalName"
-                style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:15px; cursor:pointer; font-size:13px; color:#8cf;">
-                <input type="checkbox" id="chkGlobalName" onchange="toggleGlobalNameEditor()">
+<label class="styled-lblGlobalName" id="lblGlobalName">
+<input id="chkGlobalName" onchange="toggleGlobalNameEditor()" type="checkbox"/>
                 Nome customizado GLOBAL
             </label>
-            <div id="namePreview"
-                style="display:none; background:#111; border-radius:6px; padding:10px; margin-bottom:15px; font-size:11px; text-align:left;">
-                <div style="color:#8cf;"><span class="preview-app"></span></div>
-                <div style="color:#fa8;"><span class="preview-mesa"></span></div>
-            </div>
-            <button id="btnRemoveCustomName" onclick="removeCustomName()"
-                style="display:none; width:100%; background:#3a1a1a; border:1px solid #622; color:#e88; border-radius:6px; padding:8px; margin-bottom:12px; font-size:11px; cursor:pointer;">
+<div class="styled-namePreview" id="namePreview">
+<div class="inline-style-28"><span class="preview-app"></span></div>
+<div class="inline-style-29"><span class="preview-mesa"></span></div>
+</div>
+<button class="styled-btnRemoveCustomName" id="btnRemoveCustomName" onclick="removeCustomName()">
                 Remover nome customizado
             </button>
-            <div style="display:flex; gap:10px;">
-                <button onclick="saveChannelName()" class="btn-connect"
-                    style="flex:1; margin:0; height:45px;">SALVAR</button>
-                <button onclick="document.getElementById('nameEditorModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Gerenciamento de Custom Scenes -->
-    <div id="customScenesModal" class="modal-overlay" style="z-index:10000; display:none;">
-        <div class="modal-content"
-            style="max-width:500px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<div class="inline-style-30">
+<button class="btn-connect inline-style-31" onclick="saveChannelName()">SALVAR</button>
+<button class="btn-close inline-style-31" onclick="document.getElementById('nameEditorModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Gerenciamento de Custom Scenes -->
+<div class="modal-overlay styled-nameEditorModal" id="customScenesModal">
+<div class="modal-content inline-style-32">
+<p class="inline-style-27">
                 Cenas Customizadas</p>
-            <div
-                style="display: flex; align-items: center; justify-content: space-between; background: #222; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px;">
-                <span style="font-size: 13px; color: #fff;">Habilitar Nomes Customizados</span>
-                <label class="switch">
-                    <input type="checkbox" id="toggleCustomNames" checked
-                        onclick="toggleCustomNamesSetting(this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div
-                style="display: flex; align-items: center; justify-content: space-between; background: #2a3a2a; border: 1px solid #4a4; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px;">
-                <span style="font-size: 13px; color: #4caf50; font-weight: bold; text-transform: uppercase;">Sincronizar
+<div class="inline-style-33">
+<span class="inline-style-15">Habilitar Nomes Customizados</span>
+<label class="switch">
+<input checked="" id="toggleCustomNames" onclick="toggleCustomNamesSetting(this.checked)" type="checkbox"/>
+<span class="slider"></span>
+</label>
+</div>
+<div class="inline-style-34">
+<span class="inline-style-35">Sincronizar
                     com a Nuvem</span>
-                <label class="switch">
-                    <input type="checkbox" id="toggleCustomScenesSync" checked
-                        onclick="toggleCustomScenesSyncSetting(this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div id="customScenesList" style="max-height:400px; overflow-y:auto; margin-bottom:15px;">
-                <p style="color:#666; font-size:12px;">Carregando...</p>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="document.getElementById('customScenesModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">FECHAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Renomear Cena Customizada -->
-    <div id="renameSceneModal" class="modal-overlay" style="z-index:11000; display:none;">
-        <div class="modal-content"
-            style="max-width:400px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<label class="switch">
+<input checked="" id="toggleCustomScenesSync" onclick="toggleCustomScenesSyncSetting(this.checked)" type="checkbox"/>
+<span class="slider"></span>
+</label>
+</div>
+<div class="styled-customScenesList" id="customScenesList">
+<p class="inline-style-36">Carregando...</p>
+</div>
+<div class="inline-style-30">
+<button class="btn-close inline-style-31" onclick="document.getElementById('customScenesModal').style.display='none'">FECHAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Renomear Cena Customizada -->
+<div class="modal-overlay styled-renameSceneModal" id="renameSceneModal">
+<div class="modal-content inline-style-37">
+<p class="inline-style-27">
                 Renomear Cena Customizada</p>
-            <p id="renameSceneFileName" style="font-size:12px; color:#888; margin-bottom:10px;"></p>
-            <input type="text" id="renameSceneInput"
-                style="width:100%; background:#222; border:1px solid #444; color:#fff; border-radius:6px; padding:10px; font-size:14px; margin-bottom:20px; box-sizing:border-box;"
-                placeholder="Digite o novo nome...">
-            <div style="display:flex; gap:10px;">
-                <button id="btnConfirmRename" onclick="confirmRenameScene()" class="btn-connect"
-                    style="flex:1; margin:0; height:45px;">SALVAR</button>
-                <button onclick="document.getElementById('renameSceneModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Copiar Nomes da Cena -->
-    <div id="copySceneModal" class="modal-overlay" style="z-index:11000; display:none;">
-        <div class="modal-content"
-            style="max-width:400px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<p class="styled-renameSceneFileName" id="renameSceneFileName"></p>
+<input class="styled-renameSceneInput" id="renameSceneInput" placeholder="Digite o novo nome..." type="text"/>
+<div class="inline-style-30">
+<button class="btn-connect inline-style-31" id="btnConfirmRename" onclick="confirmRenameScene()">SALVAR</button>
+<button class="btn-close inline-style-31" onclick="document.getElementById('renameSceneModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Copiar Nomes da Cena -->
+<div class="modal-overlay styled-renameSceneModal" id="copySceneModal">
+<div class="modal-content inline-style-37">
+<p class="inline-style-27">
                 Copiar Nomes da Cena</p>
-            <p id="copySceneNameDisplay" style="font-size:14px; color:#fff; margin-bottom:10px; font-weight:bold;"></p>
-            <p style="font-size:12px; color:#aaa; margin-bottom:20px; line-height:1.5;">Deseja sobrescrever os nomes da cena FÍSICA atual com os nomes desta cena customizada?</p>
-            <div style="display:flex; gap:10px;">
-                <button id="btnConfirmCopy" onclick="confirmCopyScene()" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#007bff;">SIM, COPIAR</button>
-                <button onclick="document.getElementById('copySceneModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Atribuição de Cena Física -->
-    <div id="assignSceneModal" class="modal-overlay" style="z-index:11000; display:none;">
-        <div class="modal-content"
-            style="max-width:400px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<p class="styled-copySceneNameDisplay" id="copySceneNameDisplay"></p>
+<p class="inline-style-38">Deseja sobrescrever os nomes da cena FÍSICA atual com os nomes desta cena customizada?</p>
+<div class="inline-style-30">
+<button class="btn-connect styled-btnConfirmCopy" id="btnConfirmCopy" onclick="confirmCopyScene()">SIM, COPIAR</button>
+<button class="btn-close inline-style-31" onclick="document.getElementById('copySceneModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Atribuição de Cena Física -->
+<div class="modal-overlay styled-renameSceneModal" id="assignSceneModal">
+<div class="modal-content inline-style-37">
+<p class="inline-style-27">
                 Atribuir a Cena Física</p>
-            <p id="assignSceneName" style="font-size:14px; color:#fff; margin-bottom:15px;"></p>
-            <div id="physicalSceneList" style="max-height:300px; overflow-y:auto; margin-bottom:15px; text-align:left;">
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button id="btnConfirmAssign" onclick="confirmAssignScene()" class="btn-connect"
-                    style="flex:1; margin:0; height:45px;">CONFIRMAR</button>
-                <button onclick="document.getElementById('assignSceneModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Detalhes da Custom Scene -->
-    <div id="sceneDetailsModal" class="modal-overlay" style="z-index:12000; display:none;">
-        <div class="modal-content"
-            style="max-width:600px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<p class="styled-assignSceneName" id="assignSceneName"></p>
+<div class="styled-physicalSceneList" id="physicalSceneList">
+</div>
+<div class="inline-style-30">
+<button class="btn-connect inline-style-31" id="btnConfirmAssign" onclick="confirmAssignScene()">CONFIRMAR</button>
+<button class="btn-close inline-style-31" onclick="document.getElementById('assignSceneModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Detalhes da Custom Scene -->
+<div class="modal-overlay styled-sceneDetailsModal" id="sceneDetailsModal">
+<div class="modal-content inline-style-39">
+<p class="inline-style-27">
                 Detalhes da Cena</p>
-            <p id="detailsSceneName" style="font-size:14px; color:#fff; margin-bottom:15px;"></p>
-            <div style="overflow-x:auto;">
-                <table id="detailsTable" style="width:100%; border-collapse:collapse; font-size:11px;">
-                    <thead>
-                        <tr style="border-bottom:1px solid #444;">
-                            <th style="padding:8px; color:#888; text-align:left;">Canal</th>
-                            <th style="padding:8px; color:#888; text-align:left;">Nome Customizado</th>
-                            <th style="padding:8px; color:#888; text-align:left;">Nome na Mesa</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detailsTableBody"></tbody>
-                </table>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="document.getElementById('sceneDetailsModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">FECHAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação de Logout -->
-    <div id="logoutConfirmModal" class="modal-overlay" style="z-index:11000; display:none;">
-        <div class="modal-content"
-            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #333; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<p class="styled-assignSceneName" id="detailsSceneName"></p>
+<div class="inline-style-40">
+<table class="styled-detailsTable" id="detailsTable">
+<thead>
+<tr class="inline-style-41">
+<th class="inline-style-42">Canal</th>
+<th class="inline-style-42">Nome Customizado</th>
+<th class="inline-style-42">Nome na Mesa</th>
+</tr>
+</thead>
+<tbody id="detailsTableBody"></tbody>
+</table>
+</div>
+<div class="inline-style-43">
+<button class="btn-close inline-style-31" onclick="document.getElementById('sceneDetailsModal').style.display='none'">FECHAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmação de Logout -->
+<div class="modal-overlay styled-renameSceneModal" id="logoutConfirmModal">
+<div class="modal-content inline-style-44">
+<p class="inline-style-27">
                 Confirmação</p>
-            <h3 style="margin-top:0; color:#f44336; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+<h3 class="inline-style-45">
                 Desconectar?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente sair e voltar
+<p class="styled-customConfirmMsg">Deseja realmente sair e voltar
                 para a tela inicial?</p>
-            <div style="display:flex; gap:15px;">
-                <button onclick="clearRole(); location.reload();" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">SIM, SAIR</button>
-                <button onclick="document.getElementById('logoutConfirmModal').style.display='none'" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Seleção de Patch -->
-    <div id="patchSelectorModal" class="modal-overlay" style="z-index:12000; display:none;">
-        <div class="modal-content"
-            style="max-width:98%; width: 1050px; max-height: 85vh; display: flex; flex-direction: column; background:#111; border: 2px solid #333; border-radius: 15px; padding: 25px;">
-            <p
-                style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align: center;">
+<div class="inline-style-25">
+<button class="btn-close inline-style-31" onclick="clearRole(); location.reload();">SIM, SAIR</button>
+<button class="btn-connect inline-style-46" onclick="document.getElementById('logoutConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Seleção de Patch -->
+<div class="modal-overlay styled-sceneDetailsModal" id="patchSelectorModal">
+<div class="modal-content inline-style-47">
+<p class="inline-style-48">
                 Selecionar Entrada (Patch)</p>
-            <div id="patchGrid" class="patch-grid" style="flex: 1; overflow-y: auto;">
-                <!-- Botões gerados via JS -->
-            </div>
-            <button onclick="document.getElementById('patchSelectorModal').style.display='none'" class="btn-close"
-                style="width: 100%; height: 50px; margin-top: 20px;">CANCELAR</button>
-        </div>
-    </div>
-
-    <!-- Modal de Seleção de Cenas -->
-    <div id="sceneGridModal" class="modal-overlay" style="z-index:12500; display:none;">
-        <div class="modal-content"
-            style="max-width:90%; width: 500px; height: 95vh; max-height: 95vh; display: flex; flex-direction: column; background:#111; border: 2px solid #ffcc00; border-radius: 15px; padding: 20px;">
-            <p id="sceneGridTitle"
-                style="font-size:12px; color:#ffcc00; font-weight:bold; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align: center;">
+<div class="patch-grid styled-patchGrid" id="patchGrid">
+<!-- Botões gerados via JS -->
+</div>
+<button class="btn-close inline-style-49" onclick="document.getElementById('patchSelectorModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+<!-- Modal de Seleção de Cenas -->
+<div class="modal-overlay styled-sceneGridModal" id="sceneGridModal">
+<div class="modal-content inline-style-50">
+<p class="styled-sceneGridTitle" id="sceneGridTitle">
                 SELECIONE A CENA</p>
-            <div id="sceneGrid"
-                style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding-right: 5px; margin-bottom: 15px;">
-                <!-- Cenas geradas via JS -->
-            </div>
+<div class="styled-sceneGrid" id="sceneGrid">
+<!-- Cenas geradas via JS -->
+</div>
+<!-- Teclado Virtual para Pesquisa -->
+<div class="styled-virtualKeyboardSearch" id="virtualKeyboardSearch">
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('1', 'sceneSearchInput')" type="button">1</button>
+<button class="vk-btn" onclick="vkType('2', 'sceneSearchInput')" type="button">2</button>
+<button class="vk-btn" onclick="vkType('3', 'sceneSearchInput')" type="button">3</button>
+<button class="vk-btn" onclick="vkType('4', 'sceneSearchInput')" type="button">4</button>
+<button class="vk-btn" onclick="vkType('5', 'sceneSearchInput')" type="button">5</button>
+<button class="vk-btn" onclick="vkType('6', 'sceneSearchInput')" type="button">6</button>
+<button class="vk-btn" onclick="vkType('7', 'sceneSearchInput')" type="button">7</button>
+<button class="vk-btn" onclick="vkType('8', 'sceneSearchInput')" type="button">8</button>
+<button class="vk-btn" onclick="vkType('9', 'sceneSearchInput')" type="button">9</button>
+<button class="vk-btn" onclick="vkType('0', 'sceneSearchInput')" type="button">0</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('Q', 'sceneSearchInput')" type="button">Q</button>
+<button class="vk-btn" onclick="vkType('W', 'sceneSearchInput')" type="button">W</button>
+<button class="vk-btn" onclick="vkType('E', 'sceneSearchInput')" type="button">E</button>
+<button class="vk-btn" onclick="vkType('R', 'sceneSearchInput')" type="button">R</button>
+<button class="vk-btn" onclick="vkType('T', 'sceneSearchInput')" type="button">T</button>
+<button class="vk-btn" onclick="vkType('Y', 'sceneSearchInput')" type="button">Y</button>
+<button class="vk-btn" onclick="vkType('U', 'sceneSearchInput')" type="button">U</button>
+<button class="vk-btn" onclick="vkType('I', 'sceneSearchInput')" type="button">I</button>
+<button class="vk-btn" onclick="vkType('O', 'sceneSearchInput')" type="button">O</button>
+<button class="vk-btn" onclick="vkType('P', 'sceneSearchInput')" type="button">P</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('A', 'sceneSearchInput')" type="button">A</button>
+<button class="vk-btn" onclick="vkType('S', 'sceneSearchInput')" type="button">S</button>
+<button class="vk-btn" onclick="vkType('D', 'sceneSearchInput')" type="button">D</button>
+<button class="vk-btn" onclick="vkType('F', 'sceneSearchInput')" type="button">F</button>
+<button class="vk-btn" onclick="vkType('G', 'sceneSearchInput')" type="button">G</button>
+<button class="vk-btn" onclick="vkType('H', 'sceneSearchInput')" type="button">H</button>
+<button class="vk-btn" onclick="vkType('J', 'sceneSearchInput')" type="button">J</button>
+<button class="vk-btn" onclick="vkType('K', 'sceneSearchInput')" type="button">K</button>
+<button class="vk-btn" onclick="vkType('L', 'sceneSearchInput')" type="button">L</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('Z', 'sceneSearchInput')" type="button">Z</button>
+<button class="vk-btn" onclick="vkType('X', 'sceneSearchInput')" type="button">X</button>
+<button class="vk-btn" onclick="vkType('C', 'sceneSearchInput')" type="button">C</button>
+<button class="vk-btn" onclick="vkType('V', 'sceneSearchInput')" type="button">V</button>
+<button class="vk-btn" onclick="vkType('B', 'sceneSearchInput')" type="button">B</button>
+<button class="vk-btn" onclick="vkType('N', 'sceneSearchInput')" type="button">N</button>
+<button class="vk-btn" onclick="vkType('M', 'sceneSearchInput')" type="button">M</button>
+<button class="vk-btn vk-backspace" onmousedown="startVkBackspace('sceneSearchInput', event)" onmouseleave="stopVkBackspace()" onmouseup="stopVkBackspace()" ontouchcancel="stopVkBackspace()" ontouchend="stopVkBackspace()" ontouchstart="startVkBackspace('sceneSearchInput', event)" type="button">⌫</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn vk-space" onclick="vkType(' ', 'sceneSearchInput')" type="button">ESPAÇO</button>
+</div>
+</div>
+<button class="btn-close inline-style-52" onclick="document.getElementById('sceneGridModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
 
-            <!-- Teclado Virtual para Pesquisa -->
-            <div id="virtualKeyboardSearch"
-                style="display: flex; flex-direction: column; gap: 6px; user-select: none; margin-bottom: 15px; flex-shrink: 0;">
-                <div style="display: flex; gap: 6px; justify-content: center;">
-                    <button type="button" class="vk-btn" onclick="vkType('1', 'sceneSearchInput')">1</button>
-                    <button type="button" class="vk-btn" onclick="vkType('2', 'sceneSearchInput')">2</button>
-                    <button type="button" class="vk-btn" onclick="vkType('3', 'sceneSearchInput')">3</button>
-                    <button type="button" class="vk-btn" onclick="vkType('4', 'sceneSearchInput')">4</button>
-                    <button type="button" class="vk-btn" onclick="vkType('5', 'sceneSearchInput')">5</button>
-                    <button type="button" class="vk-btn" onclick="vkType('6', 'sceneSearchInput')">6</button>
-                    <button type="button" class="vk-btn" onclick="vkType('7', 'sceneSearchInput')">7</button>
-                    <button type="button" class="vk-btn" onclick="vkType('8', 'sceneSearchInput')">8</button>
-                    <button type="button" class="vk-btn" onclick="vkType('9', 'sceneSearchInput')">9</button>
-                    <button type="button" class="vk-btn" onclick="vkType('0', 'sceneSearchInput')">0</button>
-                </div>
-                <div style="display: flex; gap: 6px; justify-content: center;">
-                    <button type="button" class="vk-btn" onclick="vkType('Q', 'sceneSearchInput')">Q</button>
-                    <button type="button" class="vk-btn" onclick="vkType('W', 'sceneSearchInput')">W</button>
-                    <button type="button" class="vk-btn" onclick="vkType('E', 'sceneSearchInput')">E</button>
-                    <button type="button" class="vk-btn" onclick="vkType('R', 'sceneSearchInput')">R</button>
-                    <button type="button" class="vk-btn" onclick="vkType('T', 'sceneSearchInput')">T</button>
-                    <button type="button" class="vk-btn" onclick="vkType('Y', 'sceneSearchInput')">Y</button>
-                    <button type="button" class="vk-btn" onclick="vkType('U', 'sceneSearchInput')">U</button>
-                    <button type="button" class="vk-btn" onclick="vkType('I', 'sceneSearchInput')">I</button>
-                    <button type="button" class="vk-btn" onclick="vkType('O', 'sceneSearchInput')">O</button>
-                    <button type="button" class="vk-btn" onclick="vkType('P', 'sceneSearchInput')">P</button>
-                </div>
-                <div style="display: flex; gap: 6px; justify-content: center;">
-                    <button type="button" class="vk-btn" onclick="vkType('A', 'sceneSearchInput')">A</button>
-                    <button type="button" class="vk-btn" onclick="vkType('S', 'sceneSearchInput')">S</button>
-                    <button type="button" class="vk-btn" onclick="vkType('D', 'sceneSearchInput')">D</button>
-                    <button type="button" class="vk-btn" onclick="vkType('F', 'sceneSearchInput')">F</button>
-                    <button type="button" class="vk-btn" onclick="vkType('G', 'sceneSearchInput')">G</button>
-                    <button type="button" class="vk-btn" onclick="vkType('H', 'sceneSearchInput')">H</button>
-                    <button type="button" class="vk-btn" onclick="vkType('J', 'sceneSearchInput')">J</button>
-                    <button type="button" class="vk-btn" onclick="vkType('K', 'sceneSearchInput')">K</button>
-                    <button type="button" class="vk-btn" onclick="vkType('L', 'sceneSearchInput')">L</button>
-                </div>
-                <div style="display: flex; gap: 6px; justify-content: center;">
-                    <button type="button" class="vk-btn" onclick="vkType('Z', 'sceneSearchInput')">Z</button>
-                    <button type="button" class="vk-btn" onclick="vkType('X', 'sceneSearchInput')">X</button>
-                    <button type="button" class="vk-btn" onclick="vkType('C', 'sceneSearchInput')">C</button>
-                    <button type="button" class="vk-btn" onclick="vkType('V', 'sceneSearchInput')">V</button>
-                    <button type="button" class="vk-btn" onclick="vkType('B', 'sceneSearchInput')">B</button>
-                    <button type="button" class="vk-btn" onclick="vkType('N', 'sceneSearchInput')">N</button>
-                    <button type="button" class="vk-btn" onclick="vkType('M', 'sceneSearchInput')">M</button>
-                    <button type="button" class="vk-btn vk-backspace"
-                        onmousedown="startVkBackspace('sceneSearchInput', event)" onmouseup="stopVkBackspace()"
-                        onmouseleave="stopVkBackspace()" ontouchstart="startVkBackspace('sceneSearchInput', event)"
-                        ontouchend="stopVkBackspace()" ontouchcancel="stopVkBackspace()">⌫</button>
-                </div>
-                <div style="display: flex; gap: 6px; justify-content: center;">
-                    <button type="button" class="vk-btn vk-space"
-                        onclick="vkType(' ', 'sceneSearchInput')">ESPAÇO</button>
-                </div>
-            </div>
-
-            <button onclick="document.getElementById('sceneGridModal').style.display='none'" class="btn-close"
-                style="width: 100%; height: 50px; flex: 0 0 50px; margin-top: 0; flex-shrink: 0;">CANCELAR</button>
-        </div>
-    </div>
-
-    <style>
-        @media (max-height: 450px) and (orientation: landscape) {
-            #macrosModal .modal-content {
-                height: 100vh !important;
-                max-height: 100vh !important;
-                border-radius: 0 !important;
-                padding: 10px 20px !important;
-            }
-
-            #macrosCloseBtn {
-                min-height: 50px !important;
-                max-height: 50px !important;
-            }
-        }
-    </style>
-    <!-- Script para mover os botões de ação do painel de macros -->
-    <script>
+<!-- Script para mover os botões de ação do painel de macros -->
+<script>
         function updateMacrosLayout() {
             const mql = window.matchMedia("(max-height: 450px) and (orientation: landscape)");
             const actionBtns = document.getElementById('macrosActionButtons');
@@ -669,534 +533,397 @@
         window.addEventListener('resize', updateMacrosLayout);
         document.addEventListener('DOMContentLoaded', updateMacrosLayout);
     </script>
-    <!-- Modal de Macros Dinâmico -->
-    <div id="macrosModal" class="modal-overlay" style="z-index:13000; display:none; background: rgba(0,0,0,0.75);">
-        <div class="modal-content"
-            style="max-width:550px; display:flex; flex-direction:column; overflow:hidden; background:rgba(26, 26, 26, 0.85); border:2px solid #6a1b9a; border-radius:15px; padding:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div id="macrosHeaderContainer"
-                style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px; flex-shrink:0;">
-                <div id="macrosTitleBlock">
-                    <h2 style="margin:0; font-size:18px; letter-spacing:1px;">PAINEL DE MACROS</h2>
-                    <span id="currentPresetLabel"
-                        style="font-size:10px; color:#666; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">PRESET:
+<!-- Modal de Macros Dinâmico -->
+<div class="modal-overlay styled-macrosModal" id="macrosModal">
+<div class="modal-content inline-style-53">
+<div class="styled-macrosHeaderContainer" id="macrosHeaderContainer">
+<div id="macrosTitleBlock">
+<h2 class="inline-style-54">PAINEL DE MACROS</h2>
+<span class="styled-currentPresetLabel" id="currentPresetLabel">PRESET:
                         ...</span>
-                </div>
-                <div id="macrosActionButtons" style="display:flex; gap:8px;">
-                    <div id="macroSharedSyncHeader"
-                        style="display:flex; align-items:center; gap:8px; margin-right:6px;">
-                        <label id="lblSharedSync" for="chkSharedSync"
-                            title="Ao ligar, alterações neste preset serão espelhadas na nuvem."
-                            style="display:inline-flex; align-items:center; gap:8px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.04); padding:6px 10px; border-radius:20px; cursor:pointer;">
-                            <input type="checkbox" id="chkSharedSync" style="width:16px; height:16px; cursor:pointer;"
-                                onchange="toggleSharedSync(this.checked)">
-                            <span
-                                style="color:#00e676; font-size:11px; font-weight:800; text-transform:uppercase;">Sincronizar
+</div>
+<div class="styled-macrosActionButtons" id="macrosActionButtons">
+<div class="styled-macroSharedSyncHeader" id="macroSharedSyncHeader">
+<label class="styled-lblSharedSync" for="chkSharedSync" id="lblSharedSync" title="Ao ligar, alterações neste preset serão espelhadas na nuvem.">
+<input class="styled-chkSharedSync" id="chkSharedSync" onchange="toggleSharedSync(this.checked)" type="checkbox"/>
+<span class="inline-style-55">Sincronizar
                                 com a nuvem</span>
-                        </label>
-                    </div>
-                    <button onclick="openSaveAsModal()" class="btn-connect"
-                        style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#2e7d32;">💾
+</label>
+</div>
+<button class="btn-connect inline-style-56" onclick="openSaveAsModal()">💾
                         SALVAR NOVO PRESET</button>
-                    <button onclick="openPresetPicker()" class="btn-connect"
-                        style="margin:0; width:auto; padding:0 12px; height:35px; font-size:10px; background:#333;">🔄
+<button class="btn-connect inline-style-57" onclick="openPresetPicker()">🔄
                         LOAD PRESET</button>
-                </div>
-            </div>
+</div>
+</div>
+<!-- Scrollable middle area for Grid + Mobile Actions -->
+<div class="styled-macrosMiddleScroll" id="macrosMiddleScroll">
+<!-- Grid de slots que será populado via JS -->
+<div class="styled-macroSlotsGrid" id="macroSlotsGrid">
 
-            <!-- Scrollable middle area for Grid + Mobile Actions -->
-            <div id="macrosMiddleScroll"
-                style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-height: 0; padding-right: 5px; margin-bottom: 20px;">
-                <!-- Grid de slots que será populado via JS -->
-                <div id="macroSlotsGrid"
-                    style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; scrollbar-width:none; flex-shrink:0;">
-                    <style>
-                        #macroSlotsGrid::-webkit-scrollbar {
-                            display: none;
-                        }
-                    </style>
-                </div>
-                <!-- Container para receber os botões em mobile landscape -->
-                <div id="macrosMobileActions"></div>
-            </div>
-
-            <button id="macrosCloseBtn" onclick="document.getElementById('macrosModal').style.display='none'"
-                class="btn-close"
-                style="width: 100%; height: 50px; min-height: 50px; max-height: 50px; border-radius:10px; flex-shrink:0; margin:0;">FECHAR
+</div>
+<!-- Container para receber os botões em mobile landscape -->
+<div id="macrosMobileActions"></div>
+</div>
+<button class="btn-close styled-macrosCloseBtn" id="macrosCloseBtn" onclick="document.getElementById('macrosModal').style.display='none'">FECHAR
                 PAINEL</button>
-        </div>
-    </div>
-
-    <!-- Modal de confirmação ao desmarcar Sync (Unshare) -->
-    <div id="macroUnshareConfirmModal" class="modal-overlay" style="z-index:16000; display:none;">
-        <div class="modal-content"
-            style="max-width:480px; background:#111; border:1px solid #444; border-radius:12px; padding:20px; text-align:center;">
-            <h3 style="margin-top:0; color:#ffcc00;">Remover da Nuvem?</h3>
-            <p id="macroUnshareText" style="color:#ddd; font-size:13px; line-height:1.4;">Ao desmarcar, este preset será
+</div>
+</div>
+<!-- Modal de confirmação ao desmarcar Sync (Unshare) -->
+<div class="modal-overlay styled-macroUnshareConfirmModal" id="macroUnshareConfirmModal">
+<div class="modal-content inline-style-58">
+<h3 class="inline-style-59">Remover da Nuvem?</h3>
+<p class="styled-macroUnshareText" id="macroUnshareText">Ao desmarcar, este preset será
                 mantido apenas neste computador. A versão compartilhada na nuvem será removida. Se quiser manter uma
                 cópia remota, cancele e use a opção de salvar com sincronização ativada.</p>
-            <div style="display:flex; gap:8px; justify-content:center; margin-top:18px;">
-                <button id="cancelUnshareBtn" class="btn-connect"
-                    style="background:#333; padding:8px 14px;">Cancelar</button>
-                <button id="confirmUnshareBtn" class="btn-connect" style="background:#c62828; padding:8px 14px;">Remover
+<div class="inline-style-60">
+<button class="btn-connect styled-cancelUnshareBtn" id="cancelUnshareBtn">Cancelar</button>
+<button class="btn-connect styled-confirmUnshareBtn" id="confirmUnshareBtn">Remover
                     da Nuvem</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Biblioteca de Macros (Listagem da pasta) -->
-    <div id="macroLibraryModal" class="modal-overlay" style="z-index:14000; display:none;">
-        <div class="modal-content"
-            style="max-width:400px; background:#111; border:1px solid #444; border-radius:12px; padding:20px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; text-align:center;">
+</div>
+</div>
+</div>
+<!-- Modal de Biblioteca de Macros (Listagem da pasta) -->
+<div class="modal-overlay styled-macroLibraryModal" id="macroLibraryModal">
+<div class="modal-content inline-style-61">
+<p class="inline-style-62">
                 Biblioteca de Scripts (.js)</p>
-            <div id="macroLibraryList"
-                style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; margin-bottom:20px;">
-                <!-- Lista será preenchida via API -->
-            </div>
-            <button onclick="document.getElementById('macroLibraryModal').style.display='none'" class="btn-close"
-                style="width:100%; height:45px;">CANCELAR</button>
-        </div>
-    </div>
-
-    <!-- Menu Contextual de Macros (Toque Longo) -->
-    <div id="macroContextModal" class="modal-overlay" style="z-index:15000; display:none;">
-        <div class="modal-content"
-            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #6a1b9a; border-radius:12px; padding:25px;">
-            <p id="ctxMacroName" style="color:#6a1b9a; font-weight:bold; margin-bottom:20px; font-size:16px;">Macro
+<div class="styled-macroLibraryList" id="macroLibraryList">
+<!-- Lista será preenchida via API -->
+</div>
+<button class="btn-close inline-style-63" onclick="document.getElementById('macroLibraryModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+<!-- Menu Contextual de Macros (Toque Longo) -->
+<div class="modal-overlay styled-macroContextModal" id="macroContextModal">
+<div class="modal-content inline-style-64">
+<p class="styled-ctxMacroName" id="ctxMacroName">Macro
                 Config</p>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <button class="btn-connect" style="background:#555; margin:0; height:50px;"
-                    onclick="openMacroNameEditor()">✏️ MUDAR NOME</button>
-                <div style="position:relative; width:100%; margin:0; padding:0;">
-                    <button class="btn-connect" style="background:#555; margin:0; height:50px; width:100%;"
-                        onclick="document.getElementById('macroColorPicker').click()">🎨 MUDAR COR</button>
-                    <input type="color" id="macroColorPicker"
-                        style="position:absolute; width:1px; height:1px; top:50%; left:50%; opacity:0; pointer-events:none;"
-                        onchange="saveMacroColor(this.value)">
-                </div>
-                <button class="btn-connect" style="background:#555; margin:0; height:50px;"
-                    onclick="changeSelectedMacro()">🔄 TROCAR MOD MACRO</button>
-                <button class="btn-connect" style="background:#1976d2; margin:0; height:50px;"
-                    onclick="startMovingMacro()">↕️ MOVER DE LUGAR</button>
-                <button class="btn-connect" style="background:#6a1b9a; margin:0; height:50px;"
-                    onclick="openMacroSettings()">⚙️ CONFIGURAR</button>
-                <button class="btn-connect" style="background:#c62828; margin:0; height:40px; font-size:10px;"
-                    onclick="removeMacroFromSlot()">🗑️ REMOVER MACRO</button>
-                <button class="btn-close" style="margin-top:10px; background:#444;"
-                    onclick="document.getElementById('macroContextModal').style.display='none'">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Edição de Nome da Macro -->
-    <div id="macroNameEditorModal" class="modal-overlay" style="z-index:17000; display:none;">
-        <div class="modal-content"
-            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #444; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<div class="inline-style-65">
+<button class="btn-connect inline-style-66" onclick="openMacroNameEditor()">✏️ MUDAR NOME</button>
+<div class="inline-style-67">
+<button class="btn-connect inline-style-68" onclick="document.getElementById('macroColorPicker').click()">🎨 MUDAR COR</button>
+<input class="styled-macroColorPicker" id="macroColorPicker" onchange="saveMacroColor(this.value)" type="color"/>
+</div>
+<button class="btn-connect inline-style-66" onclick="changeSelectedMacro()">🔄 TROCAR MOD MACRO</button>
+<button class="btn-connect inline-style-69" onclick="startMovingMacro()">↕️ MOVER DE LUGAR</button>
+<button class="btn-connect inline-style-70" onclick="openMacroSettings()">⚙️ CONFIGURAR</button>
+<button class="btn-connect inline-style-71" onclick="removeMacroFromSlot()">🗑️ REMOVER MACRO</button>
+<button class="btn-close inline-style-72" onclick="document.getElementById('macroContextModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Edição de Nome da Macro -->
+<div class="modal-overlay styled-macroNameEditorModal" id="macroNameEditorModal">
+<div class="modal-content inline-style-26">
+<p class="inline-style-27">
                 Nome do Botão</p>
-            <input type="text" id="inputMacroName" maxlength="12" placeholder="MACRO X"
-                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:18px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
-            <div style="display:flex; gap:10px;">
-                <button onclick="saveMacroName()" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#28a745;">OK</button>
-                <button onclick="document.getElementById('macroNameEditorModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">VOLTAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Configurações Avançadas da Macro (Ex: Seleção de Gp de Canais) -->
-    <div id="macroSettingsModal" class="modal-overlay" style="z-index:16000; display:none;">
-        <div class="modal-content"
-            style="max-width:600px; background:#111; border:2px solid #6a1b9a; border-radius:15px; padding:25px;">
-            <p id="settingsMacroTitle" style="color:#6a1b9a; font-weight:bold; margin-bottom:10px; font-size:16px;">
+<input class="styled-inputMacroName" id="inputMacroName" maxlength="12" placeholder="MACRO X" type="text"/>
+<div class="inline-style-30">
+<button class="btn-connect inline-style-73" onclick="saveMacroName()">OK</button>
+<button class="btn-close inline-style-31" onclick="document.getElementById('macroNameEditorModal').style.display='none'">VOLTAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Configurações Avançadas da Macro (Ex: Seleção de Gp de Canais) -->
+<div class="modal-overlay styled-macroUnshareConfirmModal" id="macroSettingsModal">
+<div class="modal-content inline-style-74">
+<p class="styled-settingsMacroTitle" id="settingsMacroTitle">
                 Configuração da Macro</p>
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:20px; letter-spacing:1px;">
+<p class="inline-style-75">
                 Selecione os canais desejados abaixo:</p>
+<div class="macro-settings-grid styled-macroSettingsGrid" id="macroSettingsGrid">
 
-            <div id="macroSettingsGrid" class="macro-settings-grid"
-                style="max-height:400px; overflow-y:auto; margin-bottom:25px; scrollbar-width:none;">
-                <style>
-                    ::-webkit-scrollbar {
-                        display: none !important;
-                    }
-
-                    * {
-                        scrollbar-width: none !important;
-                    }
-                </style>
-                <!-- Grid de 32 botões gerado via JS -->
-            </div>
-
-            <div class="macro-settings-actions">
-                <button id="btnMacroSave" class="btn-connect" style="flex:1; height:50px; background:#28a745;"
-                    onclick="window.saveCurrentMacroSettings()">SALVAR</button>
-                <button id="btnMacroClear" class="btn-connect" style="flex:1; height:50px; background:#dc3545;"
-                    onclick="window.clearCurrentMacroSettings()">LIMPAR</button>
-                <button class="btn-close" style="flex:1; height:50px; background:#444;"
-                    onclick="document.getElementById('macroSettingsModal').style.display='none'">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Instalação iOS (PWA) -->
-    <div id="iosInstallModal" class="modal-overlay" style="z-index:20000; display:none;">
-        <div class="modal-content"
-            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #007bff; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <h2
-                style="margin-top:0; color:#fff; font-size:22px; letter-spacing:1px; text-transform:uppercase; margin-bottom: 25px;">
+<!-- Grid de 32 botões gerado via JS -->
+</div>
+<div class="macro-settings-actions">
+<button class="btn-connect styled-btnMacroSave" id="btnMacroSave" onclick="window.saveCurrentMacroSettings()">SALVAR</button>
+<button class="btn-connect styled-btnMacroClear" id="btnMacroClear" onclick="window.clearCurrentMacroSettings()">LIMPAR</button>
+<button class="btn-close inline-style-76" onclick="document.getElementById('macroSettingsModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Instalação iOS (PWA) -->
+<div class="modal-overlay styled-iosInstallModal" id="iosInstallModal">
+<div class="modal-content inline-style-77">
+<h2 class="inline-style-78">
                 TELA CHEIA NO IOS</h2>
-
-            <div id="iosSafariInstructions">
-                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia o botão de
+<div id="iosSafariInstructions">
+<p class="inline-style-79">A Apple bloqueia o botão de
                     tela cheia automática pelo navegador. Para usar este app em <strong>TELA CHEIA</strong>, você deve
                     adicionar esta página à tela inicial do seu aparelho:</p>
-                <div style="background:#222; padding:15px; border-radius:8px; margin-bottom:20px; text-align:left;">
-                    <p style="margin:0 0 10px 0; color:#ddd; font-size:13px;">1. Toque no ícone de
-                        <strong>Compartilhar</strong> <span style="font-size:16px;">( <svg
-                                style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16"
-                                height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                                <polyline points="16 6 12 2 8 6"></polyline>
-                                <line x1="12" y1="2" x2="12" y2="15"></line>
-                            </svg> )</span> na barra inferior do Safari.
+<div class="inline-style-80">
+<p class="inline-style-81">1. Toque no ícone de
+                        <strong>Compartilhar</strong> <span class="inline-style-82">( <svg class="inline-style-83" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16">
+<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+<polyline points="16 6 12 2 8 6"></polyline>
+<line x1="12" x2="12" y1="2" y2="15"></line>
+</svg> )</span> na barra inferior do Safari.
                     </p>
-                    <p style="margin:0; color:#ddd; font-size:13px;">2. Escolha <strong>Adicionar à Tela de
-                            Início</strong> <span style="font-size:16px;">( <svg
-                                style="display:inline-block; vertical-align:middle; margin-bottom:2px;" width="16"
-                                height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="12" y1="8" x2="12" y2="16"></line>
-                                <line x1="8" y1="12" x2="16" y2="12"></line>
-                            </svg> )</span>.</p>
-                </div>
-            </div>
-
-            <div id="iosOtherBrowserInstructions" style="display:none;">
-                <p style="font-size:14px; color:#aaa; margin:0 0 20px 0; line-height:1.5;">A Apple bloqueia a função de
+<p class="inline-style-84">2. Escolha <strong>Adicionar à Tela de
+                            Início</strong> <span class="inline-style-82">( <svg class="inline-style-83" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
+<line x1="12" x2="12" y1="8" y2="16"></line>
+<line x1="8" x2="16" y1="12" y2="12"></line>
+</svg> )</span>.</p>
+</div>
+</div>
+<div class="styled-offlineOverlay" id="iosOtherBrowserInstructions">
+<p class="inline-style-79">A Apple bloqueia a função de
                     tela cheia fora do Safari. Para usar este app em <strong>TELA CHEIA</strong>, você deve copiar o
                     link abaixo, abrir pelo navegador <strong>Safari</strong>, e então adicionar à tela inicial.</p>
-                <div style="background:#222; padding:15px; border-radius:8px; margin-bottom:20px;">
-                    <button onclick="copyAppUrl()" class="btn-connect"
-                        style="width:100%; height:45px; background:#007bff; font-size:14px; margin:0; font-weight: bold;">📋
+<div class="inline-style-85">
+<button class="btn-connect inline-style-86" onclick="copyAppUrl()">📋
                         COPIAR LINK</button>
-                </div>
-            </div>
-
-            <button onclick="document.getElementById('iosInstallModal').style.display='none'" class="btn-close"
-                style="width:100%; height:45px; margin:0;">FECHAR</button>
-        </div>
-    </div>
-
-    <!-- Modal de Salvar Preset Como -->
-    <div id="macroSaveAsModal" class="modal-overlay" style="z-index:18500; display:none;">
-        <div class="modal-content"
-            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #2e7d32; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+</div>
+</div>
+<button class="btn-close inline-style-87" onclick="document.getElementById('iosInstallModal').style.display='none'">FECHAR</button>
+</div>
+</div>
+<!-- Modal de Salvar Preset Como -->
+<div class="modal-overlay styled-macroSaveAsModal" id="macroSaveAsModal">
+<div class="modal-content inline-style-88">
+<p class="inline-style-27">
                 Salvar como Novo Preset...</p>
-            <input type="text" id="inputNewPresetName" maxlength="15" placeholder="NOME DO PRESET"
-                style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:16px; font-weight:bold; border-radius:8px; margin-bottom:20px; outline:none; text-transform:uppercase;">
-            <div style="display:flex; gap:10px;">
-                <button onclick="savePresetAs()" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#2e7d32;">SALVAR</button>
-                <button onclick="document.getElementById('macroSaveAsModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px;">VOLTAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação de Deleção -->
-    <div id="macroDeleteConfirmModal" class="modal-overlay" style="z-index:19000; display:none;">
-        <div class="modal-content"
-            style="max-width:320px; text-align:center; background:#1a1a1a; border:1px solid #c62828; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<input class="styled-inputNewPresetName" id="inputNewPresetName" maxlength="15" placeholder="NOME DO PRESET" type="text"/>
+<div class="inline-style-30">
+<button class="btn-connect inline-style-89" onclick="savePresetAs()">SALVAR</button>
+<button class="btn-close inline-style-31" onclick="document.getElementById('macroSaveAsModal').style.display='none'">VOLTAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmação de Deleção -->
+<div class="modal-overlay styled-macroDeleteConfirmModal" id="macroDeleteConfirmModal">
+<div class="modal-content inline-style-90">
+<p class="inline-style-27">
                 Atenção!</p>
-            <p id="deleteConfirmText" style="color:#fff; font-weight:bold; margin-bottom:25px;">Deseja deletar o preset?
+<p class="styled-deleteConfirmText" id="deleteConfirmText">Deseja deletar o preset?
             </p>
-            <div style="display:flex; gap:10px;">
-                <button onclick="confirmDeletePreset()" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#c62828;">DELETAR</button>
-                <button onclick="document.getElementById('macroDeleteConfirmModal').style.display='none'"
-                    class="btn-close" style="flex:1; margin:0; height:45px;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação ao Desfazer Sincronização -->
-    <div id="macroUnshareConfirmModal" class="modal-overlay" style="z-index:19010; display:none;">
-        <div class="modal-content"
-            style="max-width:420px; text-align:center; background:#1a1a1a; border:1px solid #ff9800; border-radius:12px; padding:25px;">
-            <p style="font-size:10px; color:#ffb74d; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<div class="inline-style-30">
+<button class="btn-connect inline-style-91" onclick="confirmDeletePreset()">DELETAR</button>
+<button class="btn-close inline-style-31" onclick="document.getElementById('macroDeleteConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmação ao Desfazer Sincronização -->
+<div class="modal-overlay styled-macroUnshareConfirmModal" id="macroUnshareConfirmModal">
+<div class="modal-content inline-style-92">
+<p class="inline-style-93">
                 Aviso</p>
-            <p id="unshareConfirmText" style="color:#fff; font-size:14px; margin-bottom:18px; line-height:1.4;">Ao
+<p class="styled-unshareConfirmText" id="unshareConfirmText">Ao
                 desmarcar, este preset será mantido apenas no seu computador e o arquivo compartilhado será removido da
                 nuvem. Outras pessoas não verão mais suas alterações. Deseja continuar?</p>
-            <div style="display:flex; gap:10px;">
-                <button id="confirmUnshareBtn" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#ff9800;">SIM, REMOVER DA NUVEM</button>
-                <button onclick="document.getElementById('macroUnshareConfirmModal').style.display='none'"
-                    class="btn-close" style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Seleção de Presets Globais -->
-    <div id="macroPresetModal" class="modal-overlay" style="z-index:18000; display:none;">
-        <div class="modal-content"
-            style="max-width:350px; background:#111; border:2px solid #555; border-radius:12px; padding:25px;">
-            <p
-                style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; text-align:center;">
+<div class="inline-style-30">
+<button class="btn-connect styled-confirmUnshareBtn" id="confirmUnshareBtn">SIM, REMOVER DA NUVEM</button>
+<button class="btn-close inline-style-46" onclick="document.getElementById('macroUnshareConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Seleção de Presets Globais -->
+<div class="modal-overlay styled-macroPresetModal" id="macroPresetModal">
+<div class="modal-content inline-style-94">
+<p class="inline-style-95">
                 Escolha o Preset</p>
-            <div id="macroPresetList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-                <!-- Lista de presets do slots.json -->
-            </div>
-            <!-- Sincronização agora acessível no cabeçalho do Painel de Macros -->
-            <button onclick="document.getElementById('macroPresetModal').style.display='none'" class="btn-close"
-                style="width:100%; height:45px; margin-top:15px;">CANCELAR</button>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação de Delete de Cena -->
-    <div id="sceneDeleteModal" class="modal-overlay" style="z-index:19500; display:none;">
-        <div class="modal-content"
-            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #c62828; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <p style="font-size:10px; color:#c62828; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<div class="styled-macroPresetList" id="macroPresetList">
+<!-- Lista de presets do slots.json -->
+</div>
+<!-- Sincronização agora acessível no cabeçalho do Painel de Macros -->
+<button class="btn-close inline-style-96" onclick="document.getElementById('macroPresetModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+<!-- Modal de Confirmação de Delete de Cena -->
+<div class="modal-overlay styled-sceneDeleteModal" id="sceneDeleteModal">
+<div class="modal-content inline-style-97">
+<p class="inline-style-98">
                 ⚠️ Deleção</p>
-            <h3 style="margin-top:0; color:#c62828; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+<h3 class="inline-style-99">
                 DELETAR CENA?</h3>
-            <p id="sceneDeleteText" style="font-size:14px; color:#aaa; margin:20px 0 10px 0; line-height:1.5;"></p>
-            <p style="font-size:11px; color:#888; margin-bottom:20px;">Esta ação não pode ser desfeita.</p>
-            <div style="display:flex; gap:15px;">
-                <button id="sceneDeleteActionBtn" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#c62828;">DELETAR</button>
-                <button onclick="document.getElementById('sceneDeleteModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação de Cena -->
-    <div id="sceneConfirmModal" class="modal-overlay" style="z-index:19000; display:none;">
-        <div class="modal-content"
-            style="max-width:90%; width: 450px; height: 95vh; max-height: 95vh; display: flex; flex-direction: column; justify-content: center; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #ffcc00; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<p class="styled-sceneDeleteText" id="sceneDeleteText"></p>
+<p class="inline-style-100">Esta ação não pode ser desfeita.</p>
+<div class="inline-style-25">
+<button class="btn-connect inline-style-91" id="sceneDeleteActionBtn">DELETAR</button>
+<button class="btn-close inline-style-46" onclick="document.getElementById('sceneDeleteModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmação de Cena -->
+<div class="modal-overlay styled-macroDeleteConfirmModal" id="sceneConfirmModal">
+<div class="modal-content inline-style-101">
+<p class="inline-style-27">
                 Atenção!</p>
-            <h3 id="sceneConfirmTitle"
-                style="margin-top:0; color:#ffcc00; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+<h3 class="styled-sceneConfirmTitle" id="sceneConfirmTitle">
                 CARREGAR CENA?</h3>
-            <p id="sceneConfirmText" style="font-size:14px; color:#aaa; margin:20px 0 10px 0; line-height:1.5;">Deseja
+<p class="styled-sceneDeleteText" id="sceneConfirmText">Deseja
                 realmente carregar a cena?</p>
-
-            <!-- Campo de Renomeação (Apenas para modo SAVE) -->
-            <div id="sceneRenameContainer" style="display:none; margin-bottom:20px;">
-                <p style="font-size:10px; color:#888; text-transform:uppercase; margin-bottom:8px;">NOME DA CENA (16
+<!-- Campo de Renomeação (Apenas para modo SAVE) -->
+<div class="styled-sceneRenameContainer" id="sceneRenameContainer">
+<p class="inline-style-102">NOME DA CENA (16
                     chars)</p>
-                <input type="text" id="sceneRenameInput" maxlength="16"
-                    style="width:100%; height:45px; background:#222; border:1px solid #444; color:#fff; text-align:center; font-size:18px; font-weight:bold; border-radius:8px; outline:none; text-transform:uppercase;">
-
-                <!-- Teclado Virtual Integrado -->
-                <div id="virtualKeyboard"
-                    style="margin-top: 15px; display: flex; flex-direction: column; gap: 6px; user-select: none;">
-                    <div style="display: flex; gap: 6px; justify-content: center;">
-                        <button type="button" class="vk-btn" onclick="vkType('1')">1</button>
-                        <button type="button" class="vk-btn" onclick="vkType('2')">2</button>
-                        <button type="button" class="vk-btn" onclick="vkType('3')">3</button>
-                        <button type="button" class="vk-btn" onclick="vkType('4')">4</button>
-                        <button type="button" class="vk-btn" onclick="vkType('5')">5</button>
-                        <button type="button" class="vk-btn" onclick="vkType('6')">6</button>
-                        <button type="button" class="vk-btn" onclick="vkType('7')">7</button>
-                        <button type="button" class="vk-btn" onclick="vkType('8')">8</button>
-                        <button type="button" class="vk-btn" onclick="vkType('9')">9</button>
-                        <button type="button" class="vk-btn" onclick="vkType('0')">0</button>
-                    </div>
-                    <div style="display: flex; gap: 6px; justify-content: center;">
-                        <button type="button" class="vk-btn" onclick="vkType('Q')">Q</button>
-                        <button type="button" class="vk-btn" onclick="vkType('W')">W</button>
-                        <button type="button" class="vk-btn" onclick="vkType('E')">E</button>
-                        <button type="button" class="vk-btn" onclick="vkType('R')">R</button>
-                        <button type="button" class="vk-btn" onclick="vkType('T')">T</button>
-                        <button type="button" class="vk-btn" onclick="vkType('Y')">Y</button>
-                        <button type="button" class="vk-btn" onclick="vkType('U')">U</button>
-                        <button type="button" class="vk-btn" onclick="vkType('I')">I</button>
-                        <button type="button" class="vk-btn" onclick="vkType('O')">O</button>
-                        <button type="button" class="vk-btn" onclick="vkType('P')">P</button>
-                    </div>
-                    <div style="display: flex; gap: 6px; justify-content: center;">
-                        <button type="button" class="vk-btn" onclick="vkType('A')">A</button>
-                        <button type="button" class="vk-btn" onclick="vkType('S')">S</button>
-                        <button type="button" class="vk-btn" onclick="vkType('D')">D</button>
-                        <button type="button" class="vk-btn" onclick="vkType('F')">F</button>
-                        <button type="button" class="vk-btn" onclick="vkType('G')">G</button>
-                        <button type="button" class="vk-btn" onclick="vkType('H')">H</button>
-                        <button type="button" class="vk-btn" onclick="vkType('J')">J</button>
-                        <button type="button" class="vk-btn" onclick="vkType('K')">K</button>
-                        <button type="button" class="vk-btn" onclick="vkType('L')">L</button>
-                    </div>
-                    <div style="display: flex; gap: 6px; justify-content: center;">
-                        <button type="button" class="vk-btn" onclick="vkType('Z')">Z</button>
-                        <button type="button" class="vk-btn" onclick="vkType('X')">X</button>
-                        <button type="button" class="vk-btn" onclick="vkType('C')">C</button>
-                        <button type="button" class="vk-btn" onclick="vkType('V')">V</button>
-                        <button type="button" class="vk-btn" onclick="vkType('B')">B</button>
-                        <button type="button" class="vk-btn" onclick="vkType('N')">N</button>
-                        <button type="button" class="vk-btn" onclick="vkType('M')">M</button>
-                        <button type="button" class="vk-btn vk-backspace"
-                            onmousedown="startVkBackspace('sceneRenameInput', event)" onmouseup="stopVkBackspace()"
-                            onmouseleave="stopVkBackspace()" ontouchstart="startVkBackspace('sceneRenameInput', event)"
-                            ontouchend="stopVkBackspace()" ontouchcancel="stopVkBackspace()">⌫</button>
-                    </div>
-                    <div style="display: flex; gap: 6px; justify-content: center;">
-                        <button type="button" class="vk-btn vk-space" onclick="vkType(' ')">ESPAÇO</button>
-                    </div>
-                </div>
-            </div>
-
-            <div style="display:flex; gap:15px;">
-                <button id="sceneConfirmActionBtn" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#28a745;">SIM</button>
-                <button onclick="document.getElementById('sceneConfirmModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Modal de Confirmação de Reset DMX -->
-    <div id="dmxResetConfirmModal" class="modal-overlay" style="z-index:20000; display:none;">
-        <div class="modal-content"
-            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #6a1b9a; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<input class="styled-sceneRenameInput" id="sceneRenameInput" maxlength="16" type="text"/>
+<!-- Teclado Virtual Integrado -->
+<div class="styled-virtualKeyboard" id="virtualKeyboard">
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('1')" type="button">1</button>
+<button class="vk-btn" onclick="vkType('2')" type="button">2</button>
+<button class="vk-btn" onclick="vkType('3')" type="button">3</button>
+<button class="vk-btn" onclick="vkType('4')" type="button">4</button>
+<button class="vk-btn" onclick="vkType('5')" type="button">5</button>
+<button class="vk-btn" onclick="vkType('6')" type="button">6</button>
+<button class="vk-btn" onclick="vkType('7')" type="button">7</button>
+<button class="vk-btn" onclick="vkType('8')" type="button">8</button>
+<button class="vk-btn" onclick="vkType('9')" type="button">9</button>
+<button class="vk-btn" onclick="vkType('0')" type="button">0</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('Q')" type="button">Q</button>
+<button class="vk-btn" onclick="vkType('W')" type="button">W</button>
+<button class="vk-btn" onclick="vkType('E')" type="button">E</button>
+<button class="vk-btn" onclick="vkType('R')" type="button">R</button>
+<button class="vk-btn" onclick="vkType('T')" type="button">T</button>
+<button class="vk-btn" onclick="vkType('Y')" type="button">Y</button>
+<button class="vk-btn" onclick="vkType('U')" type="button">U</button>
+<button class="vk-btn" onclick="vkType('I')" type="button">I</button>
+<button class="vk-btn" onclick="vkType('O')" type="button">O</button>
+<button class="vk-btn" onclick="vkType('P')" type="button">P</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('A')" type="button">A</button>
+<button class="vk-btn" onclick="vkType('S')" type="button">S</button>
+<button class="vk-btn" onclick="vkType('D')" type="button">D</button>
+<button class="vk-btn" onclick="vkType('F')" type="button">F</button>
+<button class="vk-btn" onclick="vkType('G')" type="button">G</button>
+<button class="vk-btn" onclick="vkType('H')" type="button">H</button>
+<button class="vk-btn" onclick="vkType('J')" type="button">J</button>
+<button class="vk-btn" onclick="vkType('K')" type="button">K</button>
+<button class="vk-btn" onclick="vkType('L')" type="button">L</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn" onclick="vkType('Z')" type="button">Z</button>
+<button class="vk-btn" onclick="vkType('X')" type="button">X</button>
+<button class="vk-btn" onclick="vkType('C')" type="button">C</button>
+<button class="vk-btn" onclick="vkType('V')" type="button">V</button>
+<button class="vk-btn" onclick="vkType('B')" type="button">B</button>
+<button class="vk-btn" onclick="vkType('N')" type="button">N</button>
+<button class="vk-btn" onclick="vkType('M')" type="button">M</button>
+<button class="vk-btn vk-backspace" onmousedown="startVkBackspace('sceneRenameInput', event)" onmouseleave="stopVkBackspace()" onmouseup="stopVkBackspace()" ontouchcancel="stopVkBackspace()" ontouchend="stopVkBackspace()" ontouchstart="startVkBackspace('sceneRenameInput', event)" type="button">⌫</button>
+</div>
+<div class="inline-style-51">
+<button class="vk-btn vk-space" onclick="vkType(' ')" type="button">ESPAÇO</button>
+</div>
+</div>
+</div>
+<div class="inline-style-25">
+<button class="btn-connect inline-style-73" id="sceneConfirmActionBtn">SIM</button>
+<button class="btn-close inline-style-46" onclick="document.getElementById('sceneConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmação de Reset DMX -->
+<div class="modal-overlay styled-iosInstallModal" id="dmxResetConfirmModal">
+<div class="modal-content inline-style-103">
+<p class="inline-style-27">
                 Atenção!</p>
-            <h3 style="margin-top:0; color:#ffcc00; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+<h3 class="styled-sceneConfirmTitle">
                 RESETAR ILUMINAÇÃO?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">Deseja realmente resetar o
+<p class="styled-customConfirmMsg">Deseja realmente resetar o
                 sistema DMX? O hardware USB e o ArtNetToDMX serão reiniciados.</p>
-            <div style="display:flex; gap:15px;">
-                <button id="dmxResetConfirmBtn" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#6a1b9a;">SIM, RESETAR</button>
-                <button onclick="document.getElementById('dmxResetConfirmModal').style.display='none'" class="btn-close"
-                    style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Modal de Confirmacao de Reinicio do Servidor -->
-    <div id="serverRestartConfirmModal" class="modal-overlay" style="z-index:20010; display:none;">
-        <div class="modal-content"
-            style="max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #ff9800; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<div class="inline-style-25">
+<button class="btn-connect styled-dmxResetConfirmBtn" id="dmxResetConfirmBtn">SIM, RESETAR</button>
+<button class="btn-close inline-style-46" onclick="document.getElementById('dmxResetConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmacao de Reinicio do Servidor -->
+<div class="modal-overlay styled-serverRestartConfirmModal" id="serverRestartConfirmModal">
+<div class="modal-content inline-style-104">
+<p class="inline-style-27">
                 Atencao!</p>
-            <h3 style="margin-top:0; color:#ffcc00; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+<h3 class="styled-sceneConfirmTitle">
                 REINICIAR SERVIDOR?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">A interface vai desconectar
+<p class="styled-customConfirmMsg">A interface vai desconectar
                 por alguns segundos enquanto o servidor reinicia.</p>
-            <div style="display:flex; gap:15px;">
-                <button id="serverRestartConfirmBtn" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#ff9800;">SIM, REINICIAR</button>
-                <button onclick="document.getElementById('serverRestartConfirmModal').style.display='none'"
-                    class="btn-close" style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmacao de Reset de Configuracao -->
-    <div id="resetConfigConfirmModal" class="modal-overlay" style="z-index:20020; display:none;">
-        <div class="modal-content"
-            style="max-width:360px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid #dc3545; background:#1a1a1a; padding:30px; border-radius:15px;">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<div class="inline-style-25">
+<button class="btn-connect styled-confirmUnshareBtn" id="serverRestartConfirmBtn">SIM, REINICIAR</button>
+<button class="btn-close inline-style-46" onclick="document.getElementById('serverRestartConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Modal de Confirmacao de Reset de Configuracao -->
+<div class="modal-overlay styled-resetConfigConfirmModal" id="resetConfigConfirmModal">
+<div class="modal-content inline-style-105">
+<p class="inline-style-27">
                 Atencao!</p>
-            <h3 style="margin-top:0; color:#dc3545; font-size:18px; letter-spacing:1px; text-transform:uppercase;">
+<h3 class="inline-style-106">
                 RESETAR CONFIGURAÇÃO?</h3>
-            <p style="font-size:14px; color:#aaa; margin:20px 0 30px 0; line-height:1.5;">O arquivo .env será apagado.
+<p class="styled-customConfirmMsg">O arquivo .env será apagado.
                 Você precisará cadastrar nome e senha novamente.</p>
-            <div style="display:flex; gap:15px;">
-                <button id="resetConfigConfirmBtn" class="btn-connect"
-                    style="flex:1; margin:0; height:45px; background:#dc3545;">SIM, RESETAR</button>
-                <button onclick="document.getElementById('resetConfigConfirmModal').style.display='none'"
-                    class="btn-close" style="flex:1; margin:0; height:45px; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Sync Shield Overlay (Movido para o fim para garantir z-index no topo) -->
-    <!-- Modal de Pair (Seleção de Direção) -->
-    <div id="pairModal" class="modal-overlay" style="z-index:20500; display:none;">
-        <div class="modal-content"
-            style="max-width:340px; background:#111; border:1px solid #5cacee; border-radius:15px; padding:25px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
-            <p style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:10px; letter-spacing:1px;">
+<div class="inline-style-25">
+<button class="btn-connect styled-resetConfigConfirmBtn" id="resetConfigConfirmBtn">SIM, RESETAR</button>
+<button class="btn-close inline-style-46" onclick="document.getElementById('resetConfigConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Sync Shield Overlay (Movido para o fim para garantir z-index no topo) -->
+<!-- Modal de Pair (Seleção de Direção) -->
+<div class="modal-overlay styled-pairModal" id="pairModal">
+<div class="modal-content inline-style-107">
+<p class="inline-style-108">
                 Pair de Canais</p>
-            <h3 id="pairModalSubtitle" style="margin:0 0 25px 0; color:#5cacee; font-size:20px; letter-spacing:1px;">CH
+<h3 class="styled-pairModalSubtitle" id="pairModalSubtitle">CH
                 X + CH Y</h3>
-
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <button id="pairBtn_AtoB" onclick="confirmPairDirection('a_to_b')" class="pair-direction-btn">
+<div class="inline-style-65">
+<button class="pair-direction-btn" id="pairBtn_AtoB" onclick="confirmPairDirection('a_to_b')">
                     CH X → CH Y
                 </button>
-                <button id="pairBtn_BtoA" onclick="confirmPairDirection('b_to_a')" class="pair-direction-btn">
+<button class="pair-direction-btn" id="pairBtn_BtoA" onclick="confirmPairDirection('b_to_a')">
                     CH Y → CH X
                 </button>
-                <button id="pairBtn_Reset" onclick="confirmPairDirection('reset')" class="pair-direction-btn"
-                    style="border-color: #ffa726; color: #ffa726;">
-                    RESETAR E PAREAR AMBOS<br>
-                    <small style="font-size:10px; opacity:0.7;">Limpa as configs e ativa o Pair</small>
-                </button>
-            </div>
-
-            <button onclick="document.getElementById('pairModal').style.display='none'" class="btn-close"
-                style="width:100%; height:45px; margin-top:20px; background:#444;">CANCELAR</button>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação de Pair -->
-    <div id="pairConfirmModal" class="modal-overlay" style="z-index:21000; display:none;">
-        <div class="modal-content"
-            style="max-width:340px; background:#111; border:1px solid #28a745; border-radius:15px; padding:30px; text-align:center; box-shadow:0 10px 50px rgba(0,0,0,0.9);">
-            <p id="pairConfirmTitle"
-                style="font-size:10px; color:#666; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px;">
+<button class="pair-direction-btn styled-pairBtn_Reset" id="pairBtn_Reset" onclick="confirmPairDirection('reset')">
+                    RESETAR E PAREAR AMBOS<br/>
+<small class="inline-style-109">Limpa as configs e ativa o Pair</small>
+</button>
+</div>
+<button class="btn-close inline-style-110" onclick="document.getElementById('pairModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+<!-- Modal de Confirmação de Pair -->
+<div class="modal-overlay styled-pairConfirmModal" id="pairConfirmModal">
+<div class="modal-content inline-style-111">
+<p class="inline-style-27" id="pairConfirmTitle">
                 Confirmar Pair</p>
-            <p id="pairConfirmText" style="color:#fff; font-size:15px; line-height:1.5; margin-bottom:30px;">Parear
+<p class="styled-pairConfirmText" id="pairConfirmText">Parear
                 canal X + Y, copiando as informações do canal X</p>
-
-            <div style="display:flex; gap:15px;">
-                <button id="pairConfirmOkBtn" class="btn-connect"
-                    style="flex:1; height:50px; background:#28a745; margin:0;">CONFIRMAR</button>
-                <button onclick="document.getElementById('pairConfirmModal').style.display='none'" class="btn-close"
-                    style="flex:1; height:50px; margin:0; background:#444;">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Overlay Info (gerenciado por overlay_info.js) -->
-    <div id="overlayInfo" class="overlay-info" style="display: none;"></div>
-
-    <script src="modules/globals.js?v=3"></script>
-    <script src="modules/macros/core.js"></script>
-    <script src="modules/macros.js"></script>
-    <script src="modules/channel_strip.js?v=19"></script>
-    <script src="modules/eq.js?v=5"></script>
-    <script src="modules/gate.js"></script>
-    <script src="modules/compressor.js"></script>
-    <script src="modules/dynamics.js"></script>
-    <script src="modules/auxs_sends.js"></script>
-    <script src="modules/events.js?v=11"></script>
-    <script src="modules/steps.js"></script>
-    <script src="modules/macro_fader.js"></script>
-    <script src="modules/overlay_info.js"></script>
-    <script src="modules/socket.js?v=8"></script>
-    <script src="modules/sidebar.js?v=9"></script>
-    <script src="modules/routing.js?v=10"></script>
-    <script src="modules/scroll.js"></script>
-    <script src="modules/setup.js?v=6"></script>
-    <script src="modules/splash_screen.js?v=7"></script>
-    <script src="modules/search.js?v=4"></script>
-    <script src="modules/scene_grid.js"></script>
-    <script src="modules/custom_scenes.js?v=3"></script>
-
-    <script>
+<div class="inline-style-25">
+<button class="btn-connect styled-pairConfirmOkBtn" id="pairConfirmOkBtn">CONFIRMAR</button>
+<button class="btn-close inline-style-112" onclick="document.getElementById('pairConfirmModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
+<!-- Overlay Info (gerenciado por overlay_info.js) -->
+<div class="overlay-info styled-blockingOverlay" id="overlayInfo"></div>
+<script src="modules/globals.js?v=3"></script>
+<script src="modules/macros/core.js"></script>
+<script src="modules/macros.js"></script>
+<script src="modules/channel_strip.js?v=19"></script>
+<script src="modules/eq.js?v=5"></script>
+<script src="modules/gate.js"></script>
+<script src="modules/compressor.js"></script>
+<script src="modules/dynamics.js"></script>
+<script src="modules/auxs_sends.js"></script>
+<script src="modules/events.js?v=11"></script>
+<script src="modules/steps.js"></script>
+<script src="modules/macro_fader.js"></script>
+<script src="modules/overlay_info.js"></script>
+<script src="modules/socket.js?v=8"></script>
+<script src="modules/sidebar.js?v=9"></script>
+<script src="modules/routing.js?v=10"></script>
+<script src="modules/scroll.js"></script>
+<script src="modules/setup.js?v=6"></script>
+<script src="modules/splash_screen.js?v=7"></script>
+<script src="modules/search.js?v=4"></script>
+<script src="modules/scene_grid.js"></script>
+<script src="modules/custom_scenes.js?v=3"></script>
+<script>
         // Função para detectar se é um celular normal (telas pequenas)
         function isPhoneSize() {
             return window.innerWidth <= 767 || window.innerHeight <= 500;
@@ -1267,8 +994,6 @@
             clearInterval(vkBackspaceInterval);
         }
     </script>
-    <script src="app.js"></script>
-
+<script src="app.js"></script>
 </body>
-
 </html>
