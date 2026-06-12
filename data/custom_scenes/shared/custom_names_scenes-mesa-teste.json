@@ -18,6 +18,12 @@
       "physical_scene": "TESTE 2",
       "physical_id": 2,
       "file": "custom_names_scene-TESTE 2-mesa-teste.json"
+    },
+    {
+      "custom_name": "TESTE 1",
+      "physical_scene": "TESTE 1",
+      "physical_id": 1,
+      "file": "custom_names_scene-TESTE 1-mesa-teste.json"
     }
   ]
 }
