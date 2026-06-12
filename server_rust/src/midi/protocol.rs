@@ -81,29 +81,49 @@ pub fn build_change(
     packet.push(0x10); // Parameter Change
     packet.push(MODEL_ID);
 
-    packet.push(coords[0]);
-    packet.push(coords[1]);
-    packet.push(coords[2]);
-    packet.push(coords[3]);
+    if command_name == "kOutputPatch/kSlot" {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(channel); // MSB (port index)
+        packet.push(0);       // LSB (Slot=0)
+    } else if command_name == "kOutputPatch/kAdat" {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(channel); // MSB (port index)
+        packet.push(1);       // LSB (Adat=1)
+    } else if command_name == "kOutputPatch/kOmni" || command_name == "kOutputPatch/kFx" || command_name == "kOutputPatch/k2tr" {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(0);       // MSB
+        packet.push(channel); // LSB (port index)
+    } else {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(coords[3]);
 
-    let mut final_channel = channel;
-    if command_name.contains("EQ/")
-        || command_name.contains("Comp/")
-        || command_name == "kInputAttenuator/kAtt"
-    {
-        if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
-            final_channel = channel - 36;
-        } else if command_name.starts_with("kBus") && (44..=51).contains(&channel) {
-            final_channel = channel - 44;
-        } else if command_name.starts_with("kStereo") && channel == 52 {
-            final_channel = 0;
+        let mut final_channel = channel;
+        if command_name.contains("EQ/")
+            || command_name.contains("Comp/")
+            || command_name == "kInputAttenuator/kAtt"
+        {
+            if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
+                final_channel = channel - 36;
+            } else if command_name.starts_with("kBus") && (44..=51).contains(&channel) {
+                final_channel = channel - 44;
+            } else if command_name.starts_with("kStereo") && channel == 52 {
+                final_channel = 0;
+            } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
+                final_channel = 32 + (channel - 60);
+            }
         } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
             final_channel = 32 + (channel - 60);
         }
-    } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
-        final_channel = 32 + (channel - 60);
+        packet.push(final_channel);
     }
-    packet.push(final_channel);
 
     let data_bytes = convert_to_bytes(value, &converter);
     packet.extend_from_slice(&data_bytes);
@@ -119,12 +139,31 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     packet.push(0x30); // Parameter Request
     packet.push(MODEL_ID);
 
-    packet.push(coords[0]);
-    packet.push(coords[1]);
-    packet.push(coords[2]);
-    packet.push(coords[3]);
+    if command_name == "kOutputPatch/kSlot" {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(channel); // MSB is port index
+        let _ = coords[3]; // unused LSB definition from dictionary
+    } else if command_name == "kOutputPatch/kAdat" {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(channel); // MSB is port index
+        let _ = coords[3]; // unused LSB definition from dictionary
+    } else {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(coords[3]);
+    }
 
     let mut final_channel = channel;
+    if command_name == "kOutputPatch/kSlot" {
+        final_channel = 0;
+    } else if command_name == "kOutputPatch/kAdat" {
+        final_channel = 1;
+    }
 
     // Map ST IN channels for any Input command
     if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
@@ -604,19 +643,63 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             );
         }
 
-        // --- PATCH (section 13, group 2, element 1, parameter 0) ---
-        if section == 13 && group == 2 && element == 1 && parameter == 0 {
-            return cc(
-                "kChannelInput/kChannelIn",
-                channel,
-                bytes_to_fader(data_bytes) as f64,
-            );
+        // --- PATCH (section 13, group 2) ---
+        if section == 13 && group == 2 {
+            let val = bytes_to_fader(data_bytes) as f64;
+            let param_msb = parameter as usize;
+            let param_lsb = channel; // Remember, in parse_message, `parameter` is message[7] and `channel` is message[8] as usize
+            
+            if element == 1 {
+                // kChannelIn: MSB=0, LSB=chIdx
+                if param_msb == 0 {
+                    return cc("kChannelInput/kChannelIn", param_lsb, val);
+                }
+            } else if element == 2 {
+                // kInsertIn: MSB=0, LSB=chIdx
+                if param_msb == 0 {
+                    println!("DEBUG kInsertIn: param_lsb={} val={} bytes={:?}", param_lsb, val, data_bytes);
+                    return cc("kChannelInsertIn/kInsertIn", param_lsb, val);
+                }
+            } else if element == 3 {
+                // kFx: MSB=0, LSB=0..7
+                if param_msb == 0 {
+                    return cc("kOutputPatch/kFx", param_lsb, val);
+                }
+            } else if element == 5 {
+                // Element 5 can be SLOT (LSB=0) or ADAT (LSB=1)
+                // For these, MSB is the port index!
+                if param_lsb == 0 {
+                    return cc("kOutputPatch/kSlot", param_msb, val);
+                } else if param_lsb == 1 {
+                    return cc("kOutputPatch/kAdat", param_msb, val);
+                }
+            } else if element == 6 {
+                // kOmni: MSB=0, LSB=0..3
+                if param_msb == 0 {
+                    return cc("kOutputPatch/kOmni", param_lsb, val);
+                }
+            } else if element == 12 {
+                // k2tr: MSB=0, LSB=0..1
+                if param_msb == 0 {
+                    return cc("kOutputPatch/k2tr", param_lsb, val);
+                }
+            }
         }
 
         // --- PAIR (element 24, parameter 0) ---
         if element == 24 && parameter == 0 {
             let val = *data_bytes.last().unwrap_or(&0);
             return cc("kInputPair/kPair", channel, val as f64);
+        }
+
+        // --- INSERT ON / LOCATION (element 25) ---
+        if element == 25 {
+            let val = *data_bytes.last().unwrap_or(&0) as f64;
+            if parameter == 0 {
+                return cc("kInputInsert/kInsertOn", channel, val);
+            } else if parameter == 2 {
+                return cc("kInputInsert/kInsertLocInsert", channel, val);
+            }
         }
     }
 

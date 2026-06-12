@@ -204,6 +204,18 @@ pub fn register_handlers(
             },
         );
 
+        let scheduler_sysex = scheduler_socket.clone();
+        socket.on(
+            "sendSysex",
+            move |socket: SocketRef, data: Data<Vec<u8>>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                info!("SysEx raw recebido: {:?}", *data);
+                scheduler_sysex.enqueue((*data).clone(), 0).await;
+            },
+        );
+
         let conn_mgr_view = conn_mgr_handler.clone();
         socket.on(
             "set_active_view",
@@ -427,7 +439,6 @@ pub fn register_handlers(
                         let csm_clone = csm_scene.clone();
                         let io_clone = io_scene.clone();
                         let state_clone = state_scene.clone();
-                        let sched_clone = scheduler_scene.clone();
                         let _mesa_nome = csm.mesa_nome().to_string();
                         let _data_dir = csm.data_dir().to_path_buf();
                         drop(csm);
@@ -441,7 +452,7 @@ pub fn register_handlers(
                                 }
                             }
 
-                            let (scene_opt, current_names) = {
+                            let scene_opt = {
                                 let state = state_clone.read().await;
                                 let scene_number = state.scene_manager.active_scene_index;
                                 let scene_name = state
@@ -450,14 +461,10 @@ pub fn register_handlers(
                                     .as_ref()
                                     .map(|s| s.name.clone())
                                     .unwrap_or_default();
-                                let names = collect_current_names(&state);
                                 drop(state);
 
                                 let mut csm = csm_clone.write().await;
-                                (
-                                    csm.find_scene_for_physical(scene_number, &scene_name),
-                                    names,
-                                )
+                                csm.find_scene_for_physical(scene_number, &scene_name)
                             };
 
                             let scene = match scene_opt {

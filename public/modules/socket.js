@@ -199,6 +199,29 @@ socket.on('update', (d) => {
             }
         }
 
+        // Suporte a Insert (ETC)
+        if (d.type === 'kInputInsert/kInsertOn') {
+            const state = getChannelStateById(d.channel);
+            if (state && state.insert) state.insert.on = !!d.value;
+            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+                renderRouting(d.channel);
+            }
+        }
+        if (d.type === 'kInputInsert/kInsertLocInsert') {
+            const state = getChannelStateById(d.channel);
+            if (state && state.insert) state.insert.position = d.value;
+            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+                renderRouting(d.channel);
+            }
+        }
+        if (d.type === 'kChannelInsertIn/kInsertIn') {
+            const state = getChannelStateById(d.channel);
+            if (state && state.insert) state.insert.patch_in = d.value;
+            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+                renderRouting(d.channel);
+            }
+        }
+
         // Suporte a BUS / STEREO (ETC)
         if (d.type && d.type.startsWith('kInputBus/k')) {
             const state = getChannelStateById(d.channel);
@@ -226,6 +249,25 @@ socket.on('update', (d) => {
         if (s) s.pan = d.value;
         if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function') {
             window.updatePanIndicator(d.channel, d.value);
+        }
+    }
+
+    // Suporte a Output Patches Globais
+    if (d.type.startsWith('kOutputPatch/')) {
+        if (!window.globalOutPatches) {
+            window.globalOutPatches = { omni: {}, adat: {}, fx: {}, slot: {}, '2tr': {} };
+        }
+        const port = d.channel;
+        const src = d.value;
+        if (d.type === 'kOutputPatch/kOmni') window.globalOutPatches.omni[port] = src;
+        if (d.type === 'kOutputPatch/kAdat') window.globalOutPatches.adat[port] = src;
+        if (d.type === 'kOutputPatch/kFx') window.globalOutPatches.fx[port] = src;
+        if (d.type === 'kOutputPatch/kSlot') window.globalOutPatches.slot[port] = src;
+        if (d.type === 'kOutputPatch/k2tr') window.globalOutPatches['2tr'][port] = src;
+        
+        // Se a tela de config do insert estiver aberta, re-renderizar para atualizar o patch selecionado
+        if (activeConfigTab === 'etc' && typeof renderRouting === 'function') {
+            renderRouting(activeConfigChannel);
         }
     }
 
@@ -444,6 +486,15 @@ socket.on('sync', (s) => {
             }
         }
     }
+    
+    window.globalOutPatches = {
+        omni: s.outPatchesOmni || {},
+        adat: s.outPatchesAdat || {},
+        fx: s.outPatchesFx || {},
+        slot: s.outPatchesSlot || {},
+        '2tr': s.outPatches2tr || {}
+    };
+
     // ... rest of sync (mixes/buses)
     if (s.mixes) {
         for (let i = 0; i < 8; i++) {

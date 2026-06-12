@@ -147,6 +147,20 @@ window.renderRouting = function(chIdx) {
                     }).join('')}
                 </div>
 
+                <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-top: 1px solid #333; padding-top: 20px;">Inserts</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+                    <button class="insert-btn" 
+                        onclick="window.openInsertModal(${chIdx})"
+                        style="flex: 1; height: 50px; background: #222; 
+                               border: 1px solid ${(chData.insert && chData.insert.on) ? '#5cacee' : '#444'}; 
+                               color: ${(chData.insert && chData.insert.on) ? '#5cacee' : '#aaa'}; 
+                               border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer;
+                               display: flex; align-items: center; justify-content: center; gap: 10px;
+                               box-shadow: ${(chData.insert && chData.insert.on) ? '0 0 10px rgba(92,172,238,0.3)' : 'none'};">
+                        <i class="fas fa-random"></i> CONFIGURAR INSERT
+                    </button>
+                </div>
+
                 <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-top: 1px solid #333; padding-top: 20px;">Saída Master</p>
                 <button class="stereo-btn" 
                     onclick="toggleStereoAssignment(${chIdx})"
@@ -239,37 +253,38 @@ window.openPatchSelector = function(logicChIdx, uiChIdx) {
         justify-content: flex-start; align-items: flex-start;
     `;
     
-    // Categorias Finais (Slot movido pro final apenas visualmente)
+    // Categorias reais do 01v96
     const categories = [
-        { name: 'MIXER / ANALOG', options: [] },
-        { name: 'ADAT (ÓPTICO)', options: [] },
-        { name: 'EFFECTS / FX', options: [] },
-        { name: 'DIGITAL / 2TD', options: [] },
-        { name: 'SLOT (S1)', options: [] }
+        { name: "NONE", options: [{ id: 0, name: "NONE" }] },
+        { name: "ADAT (ÓPTICO)", options: [] },
+        { name: "MIXER / ANALOG", options: [] },
+        { name: "DIGITAL / 2TD", options: [] },
+        { name: "SLOT (S1)", options: [] },
+        { name: 'EFFECTS / FX', options: [] }
     ];
-    
-    // Analog (1-16) -> Categoria 0
-    categories[0].options.push({ id: 0, name: 'NONE' });
-    for(let i=1; i<=16; i++) categories[0].options.push({ id: i, name: `AD${i}` });
-    
+
+    // Popula conforme a tabela da Yamaha
+    // AD (1-16) -> Categoria 2
+    for(let i=1; i<=16; i++) categories[2].options.push({ id: i, name: `AD ${i}` });
+
+    // Slot (25-40) -> Categoria 4
+    for(let i=1; i<=16; i++) categories[4].options.push({ id: 24+i, name: `S1-${i}` });
+
     // ADAT (41-48) -> Categoria 1
     for(let i=1; i<=8; i++) categories[1].options.push({ id: 40+i, name: `ADT${i}` });
     
-    // FX (IDs Fixos) -> Categoria 2
+    // FX (IDs Fixos) -> Categoria 5
     const fxOpts = [
         { id: 121, n: "FX1-1" }, { id: 122, n: "FX1-2" },
         { id: 129, n: "FX2-1" }, { id: 130, n: "FX2-2" },
         { id: 137, n: "FX3-1" }, { id: 138, n: "FX3-2" },
         { id: 139, n: "FX4-1" }, { id: 140, n: "FX4-2" }
     ];
-    fxOpts.forEach(o => categories[2].options.push({ id: o.id, name: o.n }));
+    fxOpts.forEach(o => categories[5].options.push({ id: o.id, name: o.n }));
     
     // Digital (149-150) -> Categoria 3
     categories[3].options.push({ id: 149, name: '2TD-L' });
     categories[3].options.push({ id: 150, name: '2TD-R' });
-
-    // Slot (25-40) -> Categoria 4 (FINAL)
-    for(let i=1; i<=16; i++) categories[4].options.push({ id: 24+i, name: `S1-${i}` });
 
     categories.forEach(cat => {
         if (cat.options.length === 0) return;

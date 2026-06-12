@@ -12,6 +12,7 @@ for (let i = 0; i < 40; i++) {
         patch: 1, // AD1 padrão
         buses: Array(8).fill(false), // Novo: Assignments Bus 1-8
         stereo: true, // Novo: On/Off no barramento L/R Stereo
+        insert: { on: false, position: 0, patch_in: 0 },
         eq: { on: false },
         paired: false,      // bool: este canal está em pair?
         pairedWith: null,   // number|null: índice 0-based do canal parceiro

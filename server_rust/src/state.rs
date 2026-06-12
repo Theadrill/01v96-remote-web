@@ -44,6 +44,13 @@ pub struct GateState {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InsertState {
+    pub on: bool,
+    pub position: f64,
+    pub patch_in: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChannelState {
     pub value: f64,
     pub on: bool,
@@ -55,6 +62,7 @@ pub struct ChannelState {
     #[serde(rename = "nameChars")]
     pub name_chars: Vec<String>,
     pub name: String,
+    pub insert: InsertState,
     pub gate: GateState,
     pub comp: CompState,
     pub buses: Vec<bool>,
@@ -137,6 +145,16 @@ pub struct GlobalState {
     pub mixes: HashMap<usize, MixBusState>,
     pub buses: HashMap<usize, MixBusState>,
     pub master: MasterState,
+    #[serde(rename = "outPatchesOmni")]
+    pub out_patches_omni: HashMap<usize, f64>,
+    #[serde(rename = "outPatchesAdat")]
+    pub out_patches_adat: HashMap<usize, f64>,
+    #[serde(rename = "outPatchesFx")]
+    pub out_patches_fx: HashMap<usize, f64>,
+    #[serde(rename = "outPatchesSlot")]
+    pub out_patches_slot: HashMap<usize, f64>,
+    #[serde(rename = "outPatches2tr")]
+    pub out_patches_2tr: HashMap<usize, f64>,
 }
 
 impl GlobalState {
@@ -155,6 +173,11 @@ impl GlobalState {
                     patch: 1.0,
                     name_chars: vec![" ".to_string(); 4],
                     name: format!("CH {}", i + 1),
+                    insert: InsertState {
+                        on: false,
+                        position: 0.0,
+                        patch_in: 0.0,
+                    },
                     gate: GateState {
                         on: false,
                         thresh: -260.0,
@@ -342,6 +365,11 @@ impl GlobalState {
                     },
                 },
             },
+            out_patches_omni: HashMap::new(),
+            out_patches_adat: HashMap::new(),
+            out_patches_fx: HashMap::new(),
+            out_patches_slot: HashMap::new(),
+            out_patches_2tr: HashMap::new(),
         }
     }
     pub fn handle_raw_midi(&mut self, message: &[u8]) -> bool {
@@ -470,6 +498,28 @@ impl GlobalState {
                     if let Some(s) = self.get_target_for_mt(mt, *channel) {
                         s.set_att(v);
                     }
+                } else if mt == "kInputInsert/kInsertOn" {
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.insert.on = cv;
+                    }
+                } else if mt == "kInputInsert/kInsertLocInsert" {
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.insert.position = v;
+                    }
+                } else if mt == "kChannelInsertIn/kInsertIn" {
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.insert.patch_in = v;
+                    }
+                } else if mt == "kOutputPatch/kOmni" {
+                    self.out_patches_omni.insert(*channel, v);
+                } else if mt == "kOutputPatch/kAdat" {
+                    self.out_patches_adat.insert(*channel, v);
+                } else if mt == "kOutputPatch/kFx" {
+                    self.out_patches_fx.insert(*channel, v);
+                } else if mt == "kOutputPatch/kSlot" {
+                    self.out_patches_slot.insert(*channel, v);
+                } else if mt == "kOutputPatch/k2tr" {
+                    self.out_patches_2tr.insert(*channel, v);
                 } else if mt == "kChannelInput/kChannelIn" {
                     if let Some(ch) = self.channels.get_mut(channel) {
                         ch.patch = v;

@@ -4865,6 +4865,42 @@
     1,
     0
   ],
+  "kChannelInsertIn/kInsertIn": [
+    13,
+    2,
+    2,
+    0
+  ],
+  "kOutputPatch/kFx": [
+    13,
+    2,
+    3,
+    0
+  ],
+  "kOutputPatch/kAdat": [
+    13,
+    2,
+    5,
+    0
+  ],
+  "kOutputPatch/kOmni": [
+    13,
+    2,
+    6,
+    0
+  ],
+  "kOutputPatch/kSlot": [
+    13,
+    2,
+    5,
+    0
+  ],
+  "kOutputPatch/k2tr": [
+    13,
+    2,
+    12,
+    0
+  ],
   "kChannelInsertInput/kChannelInsert": [
     13,
     2,

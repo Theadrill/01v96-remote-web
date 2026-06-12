@@ -432,6 +432,7 @@ async fn queue_all_params_inner(
             push_req(&mut requests, &format!("kInputComp/{}", p), i);
         }
         push_req(&mut requests, "kChannelInput/kChannelIn", i);
+        push_req(&mut requests, "kChannelInsertIn/kInsertIn", i);
         push_req(&mut requests, "kInputBus/kStereo", i);
         for b in 1..=8 {
             push_req(&mut requests, &format!("kInputBus/kBus{}", b), i);
@@ -525,6 +526,23 @@ async fn queue_all_params_inner(
         "kCompThreshold",
     ] {
         push_req(&mut requests, &format!("kStereoComp/{}", p), 0);
+    }
+
+    // Output Patches
+    for i in 0..4u8 {
+        push_req(&mut requests, "kOutputPatch/kOmni", i);
+    }
+    for i in 0..8u8 {
+        push_req(&mut requests, "kOutputPatch/kAdat", i);
+    }
+    for i in 0..16u8 {
+        push_req(&mut requests, "kOutputPatch/kSlot", i);
+    }
+    for i in 0..8u8 {
+        push_req(&mut requests, "kOutputPatch/kFx", i);
+    }
+    for i in 0..2u8 {
+        push_req(&mut requests, "kOutputPatch/k2tr", i);
     }
 
     if force_names {
