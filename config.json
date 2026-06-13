@@ -9,7 +9,7 @@
     "192.168.1.111"
   ],
   "meter_fps_desktop": 30,
-  "meter_fps_mobile": 30,
+  "meter_fps_mobile": 15,
   "watchdog_timeout_ms": 5000,
   "meter_poll_interval_ms": 33,
   "name_save_debounce_ms": 1000,
@@ -32,7 +32,5 @@
   "remote_midi_port": 4200,
   "remote_midi_last_host": "pcfavela",
   "port": 4000,
-  "meter_opacity": 1.0,
-  "meter_fps_desktop": 30,
-  "meter_fps_mobile": 30
+  "meter_opacity": 1.0
 }

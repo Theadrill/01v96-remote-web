@@ -71,11 +71,11 @@ pub fn register_handlers(
         info!("Cliente web conectado: {}", socket.id);
 
         let state_arc_connect = global_state_socket.clone();
-        let config_arc = app_config_clone.clone();
         let socket_initial = socket.clone();
         let conn_mgr_connect = conn_mgr_handler.clone();
         let csm_connect = csm_socket.clone();
         tokio::spawn(async move {
+            let config_arc = crate::config::AppConfig::load();
             let current_state = state_arc_connect.read().await;
             let is_syncing = conn_mgr_connect.is_syncing();
             
