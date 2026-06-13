@@ -68,3 +68,17 @@ O objetivo do WASM não é desenhar na tela (o Canvas/CSS é mais rápido pra is
       requestAnimationFrame(loopRender);
   }
   ```
+
+---
+
+## 4. Status Atual (Progresso)
+
+**O que já foi concluído (Preparação Inicial do Módulo):**
+- [x] Criação deste documento de planejamento em `docs/`.
+- [x] Inclusão do `client_wasm` nos `members` do workspace no `Cargo.toml` raiz.
+- [x] Criação do pacote `client_wasm` com seu próprio `Cargo.toml`, configurado para `cdylib` e importando a dependência `midi_common`.
+- [x] Criação do arquivo `client_wasm/src/lib.rs` com a estrutura base e anotações `#[wasm_bindgen]`.
+- [x] Criação do arquivo `client_wasm/src/meters.rs` contendo o esqueleto da `MeterEngine` (motor físico) e métodos `processar_pacote_sysex` e `render_frame`.
+- [x] Código inicial commitado e enviado ao repositório remoto.
+
+*(Nenhum código do servidor existente ou do frontend JS foi alterado ainda, o ambiente está pronto para iniciarmos a programação da balística em Rust no próximo acesso).*
