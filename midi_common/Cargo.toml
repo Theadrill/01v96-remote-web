@@ -3,5 +3,9 @@ name = "midi_common"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["network"]
+network = ["dep:tokio"]
+
 [dependencies]
-tokio = { version = "1.52.3", features = ["io-util", "net"] }
+tokio = { version = "1.52.3", features = ["io-util", "net"], optional = true }

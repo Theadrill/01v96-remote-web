@@ -426,6 +426,7 @@ dependencies = [
 name = "client_wasm"
 version = "0.1.0"
 dependencies = [
+ "midi_common",
  "wasm-bindgen",
 ]
 

@@ -32,5 +32,7 @@
   "remote_midi_port": 4200,
   "remote_midi_last_host": "pcfavela",
   "port": 4000,
-  "meter_opacity": 1.0
+  "meter_opacity": 1.0,
+  "meter_fps_desktop": 30,
+  "meter_fps_mobile": 30
 }

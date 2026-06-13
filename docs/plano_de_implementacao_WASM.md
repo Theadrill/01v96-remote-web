@@ -45,10 +45,9 @@ O objetivo do WASM não é desenhar na tela (o Canvas/CSS é mais rápido pra is
 
 ### Passo 2: O Crate `client_wasm`
 
-> [!WARNING]
-> **Aviso para próximas implementações (Macete do `midi_common`)**
-> Atualmente, o módulo `midi_common` possui dependência do `tokio` (com as features de rede habilitadas). Isso quebra a compilação do WASM, pois o navegador não tem acesso a portas TCP/UDP nativas.
-> **Para a próxima IA/Desenvolvedor:** Nós removemos temporariamente o `midi_common` do `client_wasm/Cargo.toml` para permitir que o WASM compile com a matemática isolada. Antes de tentar importar as structs do `midi_common` no WASM, **você deve refatorar o `midi_common`**, separando a lógica pura de parsing e structs (sem `std::net` ou `tokio`) das funcionalidades de rede.
+> [!TIP]
+> **Refatoração do `midi_common` Concluída!**
+> A dependência `tokio` foi movida para uma feature `network` (ativada por padrão) no `midi_common/Cargo.toml`. Agora, o pacote `client_wasm` importa o `midi_common` com `default-features = false`, permitindo compilação WASM nativa perfeitamente usando as structs compartilhadas.
 
 - **Implementação Física:** Desenvolver a struct `MeterEngine` no Rust que guarda o estado anterior do medidor e calcula a física de queda logarítmica (release) baseada no tempo passado.
 
@@ -61,17 +60,29 @@ O objetivo do WASM não é desenhar na tela (o Canvas/CSS é mais rápido pra is
   opt-level = 'z' # Otimiza para tamanho
   ```
 
-### Passo 4: Integração com o Javascript
-- No arquivo `index.html`, importar o pacote WASM recém-gerado: `import init, { processar_meters } from './wasm/client_wasm.js'`.
-- Desviar a escuta do WebSocket no `socket.js` para não desenhar diretamente o medidor, mas sim alimentar o motor WASM.
-- Criar o loop de renderização nativo:
-  ```javascript
-  function loopRender() {
-      const valores = processar_meters(); // Retorna o Float32Array do WASM
-      desenharMeters(valores); // Atualiza os faders em tela a 60fps
-      requestAnimationFrame(loopRender);
-  }
-  ```
+### 🚧 Passo 4: Integração Frontend (JS) - **CONCLUÍDO**
+
+- No arquivo `socket.js`, utilizar o `import('./wasm/client_wasm.js')` dinâmico para inicializar o WASM no carregamento.
+- Desviar a escuta do WebSocket no `socket.js` para não desenhar diretamente o medidor, mas sim alimentar o motor WASM usando `update_targets(wasmTargetLevels)`.
+- Criar o loop de renderização nativo `requestAnimationFrame` dissociado do rate do websocket, garantindo interpolação (decay rate) nativa a 60fps no frontend.
+
+---
+
+### 🚧 Passo 5: Passthrough de SysEx e Desacoplamento do Backend (Planejamento)
+
+Para alcançar o objetivo de **zero processamento no servidor**, o fluxo de envio e cálculo da balística precisa ser migrado para leitura de SysEx cru:
+
+1. **WASM (`client_wasm/src/meters.rs`)**:
+   - Adicionar estado interno para `input_calibration` e `master_calibration`.
+   - Criar `set_calibration_tables(&[f32], &[f32])` exportada pro JS.
+   - Atualizar `parse_meter_message` para mapear os bytes de step originais da Yamaha (0-32) DIRETAMENTE para porcentagens usando as tabelas injetadas.
+2. **Frontend (`socket.js`)**:
+   - No carregamento, invocar `wasm.set_calibration_tables()` injetando os arrays calculados dinamicamente via `calibrateStep()`.
+   - Modificar/Criar o listener para o novo evento `socket.on('meterDataRaw')`.
+   - Jogar a `Uint8Array` recebida direto em `wasm.processar_pacote_sysex()`.
+3. **Backend (`server_rust/src/midi_receiver.rs`)**:
+   - Identificar os pacotes de Meter no momento em que chegam na porta MIDI e enviá-los imediatamente via WebSocket com a tag `meterDataRaw`.
+   - Omitir o cálculo massivo e throttling da thread do NodeJS/Rust antigo assim que confirmarmos o funcionamento, ou emitir em paralelo para não quebrar setups velhos.
 
 ---
 
@@ -83,9 +94,8 @@ O objetivo do WASM não é desenhar na tela (o Canvas/CSS é mais rápido pra is
 - [x] Criação do pacote `client_wasm` com seu próprio `Cargo.toml`, configurado para `cdylib` e importando a dependência `midi_common`.
 - [x] Criação do arquivo `client_wasm/src/lib.rs` com a estrutura base e anotações `#[wasm_bindgen]`.
 - [x] Criação do arquivo `client_wasm/src/meters.rs` contendo o esqueleto da `MeterEngine` (motor físico) e métodos `processar_pacote_sysex` e `render_frame`.
-- [x] Remoção temporária da dependência `midi_common` para contornar o erro de compilação da porta de rede (Tokio).
-- [x] Compilação do compilador local `wasm-pack`.
-- [x] Compilação do projeto WASM finalizada! Os arquivos `client_wasm_bg.wasm` e `client_wasm.js` foram gerados com sucesso na pasta `public/wasm/` (Passo 3 Concluído).
-- [x] Código inicial enviado ao repositório remoto (as anotações recentes aguardam o seu comando de commit).
+- [x] Compilação do projeto WASM finalizada (`client_wasm_bg.wasm` e `client_wasm.js`).
+- [x] **Integração Frontend:** Instanciação do `MeterEngine` via WASM e injeção do rendering 60fps usando `requestAnimationFrame`.
 
-*(Nenhum código do servidor existente ou do frontend JS foi alterado ainda, o ambiente está pronto para iniciarmos a programação da balística em Rust no próximo acesso).*
+> [!WARNING]
+> **REVISÃO DO USUÁRIO:** O Passo 5 acima detalha como migraremos o WASM para digerir SysEx puro direto da mesa de som, com o `server_rust` funcionando como uma ponte invisível sem overhead. Você aprova a arquitetura do Passo 5 para continuarmos a execução?

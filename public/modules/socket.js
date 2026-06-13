@@ -264,7 +264,7 @@ socket.on('update', (d) => {
         if (d.type === 'kOutputPatch/kFx') window.globalOutPatches.fx[port] = src;
         if (d.type === 'kOutputPatch/kSlot') window.globalOutPatches.slot[port] = src;
         if (d.type === 'kOutputPatch/k2tr') window.globalOutPatches['2tr'][port] = src;
-        
+
         // Se a tela de config do insert estiver aberta, re-renderizar para atualizar o patch selecionado
         if (activeConfigTab === 'etc' && typeof renderRouting === 'function') {
             renderRouting(activeConfigChannel);
@@ -486,7 +486,7 @@ socket.on('sync', (s) => {
             }
         }
     }
-    
+
     window.globalOutPatches = {
         omni: s.outPatchesOmni || {},
         adat: s.outPatchesAdat || {},
@@ -631,7 +631,7 @@ socket.on('saveSceneResult', (data) => {
 // flash de nome físico → nome global/custom durante troca de tela.
 socket.on('resolvedNamesUpdated', (data) => {
     if (!data || !data.channels) return;
-    
+
     // Limpar estado antigo
     window.globalNames = {};
     window.activeCustomSceneChannels = {};
@@ -751,8 +751,8 @@ socket.on('portsList', (data) => {
     if (data.savedConfig) {
         window.isDemoMode = !!data.savedConfig.demo_mode;
 
-        const fpsMobile = data.savedConfig.meter_fps_mobile || 15;
-        const fpsDesktop = data.savedConfig.meter_fps_desktop || 30;
+        const fpsMobile = data.savedConfig.meter_fps_mobile !== undefined ? data.savedConfig.meter_fps_mobile : 15;
+        const fpsDesktop = data.savedConfig.meter_fps_desktop !== undefined ? data.savedConfig.meter_fps_desktop : 30;
         currentMeterFPS = isMobileAgent ? fpsMobile : fpsDesktop;
 
         if (demoBtn) {
@@ -888,176 +888,102 @@ function toggleMusicianMeters() {
 }
 window.toggleMusicianMeters = toggleMusicianMeters;
 
-socket.on('meterData', (levels) => {
-    if (musicianMode && !window.showMetersInMusicianMode) return;
+// --- WASM Meter Engine Globals ---
+let wasmMeterEngine = null;
+let lastWasmRenderTime = performance.now();
+const wasmTargetLevels = new Float32Array(80);
 
-    if (currentMeterFPS > 0) {
-        const now = performance.now();
-        const renderInterval = 1000 / currentMeterFPS;
-        if (now - lastMeterRenderTime < renderInterval) return;
-        lastMeterRenderTime = now;
+import('../wasm/client_wasm.js').then(async (wasm) => {
+    await wasm.default();
+    wasmMeterEngine = new wasm.MeterEngine(80);
+    wasmMeterEngine.set_decay_rate(0.1); // Queda suave calibrada para escala 0-100
+    console.log("[WASM] MeterEngine initialized");
+    tryLoadWasmCalibration(); // Injeta calibrações no WASM
+    requestAnimationFrame(wasmRenderLoop);
+}).catch(err => {
+    console.error("[WASM] Failed to load MeterEngine:", err);
+});
+
+let calibrationLoadedToWasm = false;
+function tryLoadWasmCalibration() {
+    if (calibrationLoadedToWasm || !wasmMeterEngine) return;
+    if (!window.meterCalibration || !window.meterCalibration.inputs) {
+        setTimeout(tryLoadWasmCalibration, 100);
+        return;
     }
-
-    // Cache preenchido na primeira vez ou após resetFaderCache
-    if (!faderCardsCache) {
-        faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
-        buildMeterCache();
+    const inputsArray = new Float32Array(33);
+    const masterArray = new Float32Array(33);
+    for (let i = 0; i <= 32; i++) {
+        inputsArray[i] = calibrateStep(i, false);
+        masterArray[i] = calibrateStep(i, true);
     }
+    wasmMeterEngine.set_calibration_tables(inputsArray, masterArray);
+    calibrationLoadedToWasm = true;
+    console.log("[WASM] Calibration tables loaded into MeterEngine");
+}
 
-    requestAnimationFrame(() => {
-        // Se o cache falhou por algum motivo de race condition
-        if (!meterElementsCache) return;
+function applyMetersToDOM(smoothedLevels, now) {
+    if (!meterElementsCache) return;
 
-        const now = Date.now(); // Otimização (Plano D): Date.now() chamado apenas uma vez por frame
+    if (outsMode) {
+        // No modo OUTS, mapeamos os índices recebidos para Mix/Bus/Master
+        for (let i = 0; i < meterElementsCache.length; i++) {
+            const cached = meterElementsCache[i];
+            if (!cached || !cached.card || !cached.isVisible) continue;
 
-        if (outsMode) {
-            // No modo OUTS, mapeamos os índices recebidos para Mix/Bus/Master
-            for (let i = 0; i < meterElementsCache.length; i++) {
-                const cached = meterElementsCache[i];
-                if (!cached || !cached.card || !cached.isVisible) continue;
+            let levelIdx = -1;
+            if (cached.dataCh === 'master') levelIdx = 32;
+            else if (i < 8) levelIdx = 34 + i;       // Mix 1-8
+            else if (i < 16) levelIdx = 42 + (i - 8); // Bus 1-8
+            else levelIdx = parseInt(cached.dataCh);
 
-                let levelIdx = -1;
-                if (cached.dataCh === 'master') levelIdx = 32;
-                else if (i < 8) levelIdx = 34 + i;       // Mix 1-8
-                else if (i < 16) levelIdx = 42 + (i - 8); // Bus 1-8
-                else levelIdx = parseInt(cached.dataCh);
+            if (levelIdx >= 0 && levelIdx < smoothedLevels.length) {
+                const finalPercent = smoothedLevels[levelIdx];
+                let isPeaking = finalPercent >= 98;
 
-                if (levelIdx >= 0 && levelIdx < levels.length) {
-                    const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
-                    smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.05) + (targetPercent * 0.95);
-                    const finalPercent = smoothedLevels[levelIdx];
+                if (cached.curtains && cached.curtains.length > 0) {
+                    cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
 
-                    let isPeaking = finalPercent >= 98;
-
-                    if (cached.curtains && cached.curtains.length > 0) {
-                        cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
-
-                        if (cached.curtains.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
-                            const pIdx = levelIdx + 1;
-                            if (pIdx < levels.length) {
-                                const pTarget = calibrateStep(levels[pIdx], false);
-                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.05) + (pTarget * 0.95);
-                                const partnerPercent = smoothedLevels[pIdx];
-                                cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
-                                if (partnerPercent >= 98) isPeaking = true;
-                            }
-                        }
-                    } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
-                        if (!cached.card.classList.contains('has-paired-meter')) {
-                            cached.card.classList.add('has-paired-meter');
-                        }
-                        cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
-
-                        if (cached.mobileBgs.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
-                            const pIdx = levelIdx + 1;
-                            if (pIdx < levels.length) {
-                                const pTarget = calibrateStep(levels[pIdx], false);
-                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.05) + (pTarget * 0.95);
-                                const partnerPercent = smoothedLevels[pIdx];
-                                cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
-                                if (partnerPercent >= 98) isPeaking = true;
-                            }
-                        }
-                    } else {
-                        if (!cached.hasMeter) {
-                            cached.card.classList.add('has-meter');
-                            cached.hasMeter = true;
-                        }
-                        cached.card.style.backgroundSize = `100% ${finalPercent}%`;
-                    }
-
-                    if (cached.peakLed) {
-                        if (isPeaking) {
-                            if (!cached.isPeakActive) {
-                                cached.peakLed.classList.add('active');
-                                cached.card.classList.add('peak-glow');
-                                cached.isPeakActive = true;
-                            }
-                        } else {
-                            if (cached.isPeakActive) {
-                                cached.peakLed.classList.remove('active');
-                                cached.card.classList.remove('peak-glow');
-                                cached.isPeakActive = false;
-                            }
+                    if (cached.curtains.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
+                        const pIdx = levelIdx + 1;
+                        if (pIdx < smoothedLevels.length) {
+                            const partnerPercent = smoothedLevels[pIdx];
+                            cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                            if (partnerPercent >= 98) isPeaking = true;
                         }
                     }
+                } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
+                    if (!cached.card.classList.contains('has-paired-meter')) {
+                        cached.card.classList.add('has-paired-meter');
+                    }
+                    cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
+
+                    if (cached.mobileBgs.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
+                        const pIdx = levelIdx + 1;
+                        if (pIdx < smoothedLevels.length) {
+                            const partnerPercent = smoothedLevels[pIdx];
+                            cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
+                            if (partnerPercent >= 98) isPeaking = true;
+                        }
+                    }
+                } else {
+                    if (!cached.hasMeter) {
+                        cached.card.classList.add('has-meter');
+                        cached.hasMeter = true;
+                    }
+                    cached.card.style.backgroundSize = `100% ${finalPercent}%`;
                 }
-            }
-        } else {
-            // Modo normal: 0-31 Canais e Master
-            for (let i = 0; i < meterElementsCache.length; i++) {
-                const cached = meterElementsCache[i];
-                if (!cached || !cached.card || !cached.isVisible) continue;
 
-                let levelIdx = (cached.dataCh === 'master') ? 32 : parseInt(cached.dataCh);
-
-                if (levelIdx >= 0 && levelIdx < (levels ? levels.length : 0)) {
-                    // Update main level
-                    const targetPercent = calibrateStep(levels[levelIdx], levelIdx === 32);
-                    smoothedLevels[levelIdx] = (smoothedLevels[levelIdx] * 0.2) + (targetPercent * 0.8);
-                    const finalPercent = smoothedLevels[levelIdx];
-
-                    let isPeaking = finalPercent >= 98;
-                    let partnerPercent = 0;
-
-                    // Support for dual meters (Paired channels)
-                    if (cached.curtains && cached.curtains.length > 0) {
-                        // Main curtain
-                        cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
-
-                        // Check if channel is paired via channelStates or is a Stereo IN
-                        const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                        const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
-
-                        if (pIdx !== null && cached.curtains.length > 1) {
-                            if (pIdx < levels.length) {
-                                const pTarget = calibrateStep(levels[pIdx], false);
-                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
-                                partnerPercent = smoothedLevels[pIdx];
-                                cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
-                                if (partnerPercent >= 98) isPeaking = true;
-                            }
-                        }
-                    } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
-                        if (!cached.card.classList.contains('has-paired-meter')) {
-                            cached.card.classList.add('has-paired-meter');
-                        }
-                        cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
-
-                        const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                        const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
-
-                        if (pIdx !== null && cached.mobileBgs.length > 1) {
-                            if (pIdx < levels.length) {
-                                const pTarget = calibrateStep(levels[pIdx], false);
-                                smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
-                                partnerPercent = smoothedLevels[pIdx];
-                                cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
-                                if (partnerPercent >= 98) isPeaking = true;
-                            }
-                        }
-                    } else {
-                        // Mobile layout regular
-                        if (!cached.hasMeter) {
-                            cached.card.classList.add('has-meter');
-                            cached.hasMeter = true;
-                        }
-                        cached.card.style.backgroundSize = `100% ${finalPercent}%`;
-                    }
-
-                    // Peak LED and Glow handling with condition logic
+                if (cached.peakLed) {
                     if (isPeaking) {
-                        lastPeakTime[levelIdx] = now;
                         if (!cached.isPeakActive) {
-                            if (cached.peakLed) cached.peakLed.classList.add('active');
+                            cached.peakLed.classList.add('active');
                             cached.card.classList.add('peak-glow');
                             cached.isPeakActive = true;
                         }
-                    } else if (now - lastPeakTime[levelIdx] > 1000) {
+                    } else {
                         if (cached.isPeakActive) {
-                            if (cached.peakLed) cached.peakLed.classList.remove('active');
+                            cached.peakLed.classList.remove('active');
                             cached.card.classList.remove('peak-glow');
                             cached.isPeakActive = false;
                         }
@@ -1065,72 +991,173 @@ socket.on('meterData', (levels) => {
                 }
             }
         }
+    } else {
+        // Modo normal: 0-31 Canais e Master
+        for (let i = 0; i < meterElementsCache.length; i++) {
+            const cached = meterElementsCache[i];
+            if (!cached || !cached.card || !cached.isVisible) continue;
 
-        // --- Suporte ao METER do Mini Fader (no modal de config) ---
-        if (activeConfigChannel !== null) {
-            let miniCardId = `mini-card${activeConfigChannel}`;
-            if (activeConfigChannel === 52) miniCardId = 'mini-cardmaster';
-            else if (activeConfigChannel >= 36 && activeConfigChannel <= 43) miniCardId = `mini-cardm${activeConfigChannel - 36}`;
-            else if (activeConfigChannel >= 44 && activeConfigChannel <= 51) miniCardId = `mini-cardb${activeConfigChannel - 44}`;
-            else if (activeConfigChannel >= 60 && activeConfigChannel <= 67) miniCardId = `mini-cardst${Math.floor((activeConfigChannel - 60) / 2)}`;
+            let levelIdx = (cached.dataCh === 'master') ? 32 : parseInt(cached.dataCh);
 
-            const miniCard = document.getElementById(miniCardId);
-            if (miniCard) {
-                const levelIdx = activeConfigChannel;
+            if (levelIdx >= 0 && levelIdx < smoothedLevels.length) {
                 const finalPercent = smoothedLevels[levelIdx];
-
-                const meterCurtains = miniCard.querySelectorAll('.desk-meter-curtain');
-                const peakLed = miniCard.querySelector('.desk-peak-led') || miniCard.querySelector('.mobile-peak-led');
-
                 let isPeaking = finalPercent >= 98;
+                let partnerPercent = 0;
 
-                if (meterCurtains.length > 0) {
-                    meterCurtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
-                    
-                    if (meterCurtains.length > 1) {
-                        const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                        const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith : 
-                                     ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
-                        
-                        if (pIdx !== null && pIdx < levels.length) {
-                            const pTarget = calibrateStep(levels[pIdx], false);
-                            smoothedLevels[pIdx] = (smoothedLevels[pIdx] * 0.2) + (pTarget * 0.8);
-                            const partnerPercent = smoothedLevels[pIdx];
-                            meterCurtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
-                            if (partnerPercent >= 98) isPeaking = true;
-                        }
+                if (cached.curtains && cached.curtains.length > 0) {
+                    cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+
+                    const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
+                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+
+                    if (pIdx !== null && cached.curtains.length > 1 && pIdx < smoothedLevels.length) {
+                        partnerPercent = smoothedLevels[pIdx];
+                        cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                        if (partnerPercent >= 98) isPeaking = true;
+                    }
+                } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
+                    if (!cached.card.classList.contains('has-paired-meter')) {
+                        cached.card.classList.add('has-paired-meter');
+                    }
+                    cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
+
+                    const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
+                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+
+                    if (pIdx !== null && cached.mobileBgs.length > 1 && pIdx < smoothedLevels.length) {
+                        partnerPercent = smoothedLevels[pIdx];
+                        cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
+                        if (partnerPercent >= 98) isPeaking = true;
                     }
                 } else {
-                    if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
-                    miniCard.style.backgroundSize = `100% ${finalPercent}%`;
+                    if (!cached.hasMeter) {
+                        cached.card.classList.add('has-meter');
+                        cached.hasMeter = true;
+                    }
+                    cached.card.style.backgroundSize = `100% ${finalPercent}%`;
                 }
 
                 if (isPeaking) {
-                    if (peakLed) peakLed.classList.add('active');
-                    miniCard.classList.add('peak-glow');
-                } else {
-                    if (peakLed) peakLed.classList.remove('active');
-                    miniCard.classList.remove('peak-glow');
+                    lastPeakTime[levelIdx] = now;
+                    if (!cached.isPeakActive) {
+                        if (cached.peakLed) cached.peakLed.classList.add('active');
+                        cached.card.classList.add('peak-glow');
+                        cached.isPeakActive = true;
+                    }
+                } else if (now - lastPeakTime[levelIdx] > 1000) {
+                    if (cached.isPeakActive) {
+                        if (cached.peakLed) cached.peakLed.classList.remove('active');
+                        cached.card.classList.remove('peak-glow');
+                        cached.isPeakActive = false;
+                    }
                 }
             }
         }
-    });
+    }
+
+    // --- Suporte ao METER do Mini Fader (no modal de config) ---
+    if (activeConfigChannel !== null) {
+        let miniCardId = `mini-card${activeConfigChannel}`;
+        if (activeConfigChannel === 52) miniCardId = 'mini-cardmaster';
+        else if (activeConfigChannel >= 36 && activeConfigChannel <= 43) miniCardId = `mini-cardm${activeConfigChannel - 36}`;
+        else if (activeConfigChannel >= 44 && activeConfigChannel <= 51) miniCardId = `mini-cardb${activeConfigChannel - 44}`;
+        else if (activeConfigChannel >= 60 && activeConfigChannel <= 67) miniCardId = `mini-cardst${Math.floor((activeConfigChannel - 60) / 2)}`;
+
+        const miniCard = document.getElementById(miniCardId);
+        if (miniCard) {
+            const levelIdx = activeConfigChannel;
+            const finalPercent = smoothedLevels[levelIdx] || 0;
+
+            const meterCurtains = miniCard.querySelectorAll('.desk-meter-curtain');
+            const peakLed = miniCard.querySelector('.desk-peak-led') || miniCard.querySelector('.mobile-peak-led');
+
+            let isPeaking = finalPercent >= 98;
+
+            if (meterCurtains.length > 0) {
+                meterCurtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+
+                if (meterCurtains.length > 1) {
+                    const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
+                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+
+                    if (pIdx !== null && pIdx < smoothedLevels.length) {
+                        const partnerPercent = smoothedLevels[pIdx];
+                        meterCurtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                        if (partnerPercent >= 98) isPeaking = true;
+                    }
+                }
+            } else {
+                if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
+                miniCard.style.backgroundSize = `100% ${finalPercent}%`;
+            }
+
+            if (isPeaking) {
+                if (peakLed) peakLed.classList.add('active');
+                miniCard.classList.add('peak-glow');
+            } else {
+                if (peakLed) peakLed.classList.remove('active');
+                miniCard.classList.remove('peak-glow');
+            }
+        }
+    }
+}
+
+function wasmRenderLoop(now) {
+    requestAnimationFrame(wasmRenderLoop);
+    if (!wasmMeterEngine || !meterElementsCache || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
+        lastWasmRenderTime = now;
+        return;
+    }
+
+    if (currentMeterFPS > 0) {
+        const renderInterval = 1000 / currentMeterFPS;
+        if (now - lastWasmRenderTime < renderInterval) return;
+    }
+
+    // Calcula tempo decorrido para balística correta a qualquer frame rate
+    const deltaMs = now - lastWasmRenderTime;
+    lastWasmRenderTime = now;
+
+    // Limita deltaMs caso a aba fique inativa por muito tempo (evita pulos absurdos e cálculos longos)
+    if (deltaMs > 100) return;
+
+    // Obtém barras do WASM (Float32Array interligado com a memória do Rust)
+    const smoothedLevels = wasmMeterEngine.render_frame(deltaMs);
+
+    // Desenha as barras!
+    applyMetersToDOM(smoothedLevels, now);
+}
+
+socket.on('meterDataRaw', (rawBytes) => {
+    if (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode) return;
+
+    // Cache preenchido na primeira vez ou após resetFaderCache
+    if (!faderCardsCache) {
+        faderCardsCache = document.querySelectorAll('.faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
+        buildMeterCache();
+    }
+
+    if (wasmMeterEngine) {
+        wasmMeterEngine.processar_pacote_sysex(new Uint8Array(rawBytes));
+    }
 
     // --- Atualização em tempo real das meters internas de Gate/Comp se o modal estiver aberto ---
-    if (activeConfigChannel !== null) {
+    if (activeConfigChannel !== null && wasmMeterEngine) {
         const isMaster = activeConfigChannel === 'master';
         const levelIdx = isMaster ? 32 : activeConfigChannel;
-        if (levelIdx < levels.length) {
-            const source = isMaster ? (window.meterCalibration ? window.meterCalibration.master : null) : (window.meterCalibration ? window.meterCalibration.inputs : null);
-            const dbVal = (source && source[levels[levelIdx]]) !== undefined ? source[levels[levelIdx]] : -138;
+        const rawStep = wasmMeterEngine.get_raw_step(levelIdx);
 
-            const gateMeter = document.getElementById('gateMeter');
-            if (gateMeter) gateMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'gate')}%`;
+        const source = isMaster ? (window.meterCalibration ? window.meterCalibration.master : null) : (window.meterCalibration ? window.meterCalibration.inputs : null);
+        const dbVal = (source && source[rawStep]) !== undefined ? source[rawStep] : -138;
 
-            const compMeter = document.getElementById('compMeter');
-            if (compMeter) compMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'comp')}%`;
-        }
+        const gateMeter = document.getElementById('gateMeter');
+        if (gateMeter) gateMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'gate')}%`;
 
+        const compMeter = document.getElementById('compMeter');
+        if (compMeter) compMeter.style.width = `${mapDynDbToPercent(dbVal * 10, 'comp')}%`;
     }
 });
 

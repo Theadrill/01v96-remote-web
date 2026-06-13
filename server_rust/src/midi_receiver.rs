@@ -69,6 +69,7 @@ pub fn start_rx_loop(
                 // Process state and collect emissions to send after releasing lock
                 let mut emission: Option<(&str, serde_json::Value)> = None;
                 let mut meter_emission: Option<Vec<u8>> = None;
+                let mut meter_raw_emission: Option<Vec<u8>> = None;
                 let mut scenes_emission: Option<serde_json::Value> = None;
                 let mut current_scene_emission: Option<serde_json::Value> = None;
 
@@ -95,6 +96,7 @@ pub fn start_rx_loop(
                                 is_master,
                                 ..
                             } => {
+                                meter_raw_emission = Some(packet.clone());
                                 {
                                     if is_master {
                                         let mm = master_meter_recv.read().await;
@@ -193,6 +195,9 @@ pub fn start_rx_loop(
                         // tracing::info!("📡 emit meterData #{} ({} bytes)", c, buf.len());
                     }
                     let _ = io_clone.emit("meterData", &buf).await;
+                }
+                if let Some(raw_buf) = meter_raw_emission {
+                    let _ = io_clone.emit("meterDataRaw", &raw_buf).await;
                 }
             }
         }
