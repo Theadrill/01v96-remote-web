@@ -44,8 +44,12 @@ O objetivo do WASM não é desenhar na tela (o Canvas/CSS é mais rápido pra is
 - Configuraremos o `client_wasm/Cargo.toml` para usar `wasm-bindgen` e o tipo `cdylib` (necessário para gerar bibliotecas C dinâmicas pro WASM).
 
 ### Passo 2: O Crate `client_wasm`
-- Importaremos a biblioteca `midi_common` existente como dependência do `client_wasm`.
-- Criaremos o módulo interno `src/meters.rs`.
+
+> [!WARNING]
+> **Aviso para próximas implementações (Macete do `midi_common`)**
+> Atualmente, o módulo `midi_common` possui dependência do `tokio` (com as features de rede habilitadas). Isso quebra a compilação do WASM, pois o navegador não tem acesso a portas TCP/UDP nativas.
+> **Para a próxima IA/Desenvolvedor:** Nós removemos temporariamente o `midi_common` do `client_wasm/Cargo.toml` para permitir que o WASM compile com a matemática isolada. Antes de tentar importar as structs do `midi_common` no WASM, **você deve refatorar o `midi_common`**, separando a lógica pura de parsing e structs (sem `std::net` ou `tokio`) das funcionalidades de rede.
+
 - **Implementação Física:** Desenvolver a struct `MeterEngine` no Rust que guarda o estado anterior do medidor e calcula a física de queda logarítmica (release) baseada no tempo passado.
 
 ### Passo 3: Compilação e Tooling (`wasm-pack`)
@@ -79,6 +83,9 @@ O objetivo do WASM não é desenhar na tela (o Canvas/CSS é mais rápido pra is
 - [x] Criação do pacote `client_wasm` com seu próprio `Cargo.toml`, configurado para `cdylib` e importando a dependência `midi_common`.
 - [x] Criação do arquivo `client_wasm/src/lib.rs` com a estrutura base e anotações `#[wasm_bindgen]`.
 - [x] Criação do arquivo `client_wasm/src/meters.rs` contendo o esqueleto da `MeterEngine` (motor físico) e métodos `processar_pacote_sysex` e `render_frame`.
-- [x] Código inicial commitado e enviado ao repositório remoto.
+- [x] Remoção temporária da dependência `midi_common` para contornar o erro de compilação da porta de rede (Tokio).
+- [x] Compilação do compilador local `wasm-pack`.
+- [x] Compilação do projeto WASM finalizada! Os arquivos `client_wasm_bg.wasm` e `client_wasm.js` foram gerados com sucesso na pasta `public/wasm/` (Passo 3 Concluído).
+- [x] Código inicial enviado ao repositório remoto (as anotações recentes aguardam o seu comando de commit).
 
 *(Nenhum código do servidor existente ou do frontend JS foi alterado ainda, o ambiente está pronto para iniciarmos a programação da balística em Rust no próximo acesso).*
