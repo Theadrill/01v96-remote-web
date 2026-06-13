@@ -397,9 +397,11 @@ function createMobileStrip(config) {
     return `
         <div class="fader-card ${customClass}" id="${cardId}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
             ${isPaired ? `
-            <div class="mobile-paired-meter left"></div>
-            <div class="mobile-paired-meter right"></div>
-            ` : ''}
+            <div class="mobile-meter-bg left"><div class="mobile-meter-curtain"></div></div>
+            <div class="mobile-meter-bg right"><div class="mobile-meter-curtain"></div></div>
+            ` : `
+            <div class="mobile-meter-bg"><div class="mobile-meter-curtain"></div></div>
+            `}
             ${getMobileScaleHTML()}
             ${onTop ? onBtn : ''}
             <div class="ch-clickable-zone" onclick="${configAction}">
@@ -582,9 +584,11 @@ function createOutputStrip(i, type, idPrefix = "") {
     return `
         <div class="fader-card ${customClass}" id="${pfx}card${prefix}${i}" ${type === 'stIn' ? `data-ch="${configId}" data-partner-ch="${configId + 1}"` : ''}>
             ${type === 'stIn' ? `
-            <div class="mobile-paired-meter left"></div>
-            <div class="mobile-paired-meter right"></div>
-            ` : ''}
+            <div class="mobile-meter-bg left"><div class="mobile-meter-curtain"></div></div>
+            <div class="mobile-meter-bg right"><div class="mobile-meter-curtain"></div></div>
+            ` : `
+            <div class="mobile-meter-bg"><div class="mobile-meter-curtain"></div></div>
+            `}
             ${getMobileScaleHTML()}
             <div class="ch-clickable-zone" onclick="${idPrefix ? "" : `openChannelConfig(event, ${configId})`}">
                 <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : type === 'bus' ? '#00ffcc' : '#ff00ff'}">${title}</h2>

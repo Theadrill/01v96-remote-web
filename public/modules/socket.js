@@ -753,7 +753,18 @@ socket.on('portsList', (data) => {
 
         const fpsMobile = data.savedConfig.meter_fps_mobile !== undefined ? data.savedConfig.meter_fps_mobile : 15;
         const fpsDesktop = data.savedConfig.meter_fps_desktop !== undefined ? data.savedConfig.meter_fps_desktop : 30;
-        currentMeterFPS = isMobileAgent ? fpsMobile : fpsDesktop;
+        
+        let localFps = localStorage.getItem('meter_fps_override');
+        if (localFps && !isNaN(localFps)) {
+            currentMeterFPS = parseInt(localFps);
+        } else {
+            currentMeterFPS = isMobileAgent ? fpsMobile : fpsDesktop;
+        }
+
+        const inputLocalFps = document.getElementById('inputLocalFps');
+        if (inputLocalFps) {
+            inputLocalFps.value = currentMeterFPS;
+        }
 
         if (demoBtn) {
             const isDemo = !!data.savedConfig.demo_mode;
@@ -828,7 +839,7 @@ function buildMeterCache() {
             dataCh: card.getAttribute('data-ch'),
             partnerCh: card.getAttribute('data-partner-ch'),
             curtains: Array.from(card.querySelectorAll('.desk-meter-curtain')),
-            mobileBgs: Array.from(card.querySelectorAll('.mobile-paired-meter')),
+            mobileCurtains: Array.from(card.querySelectorAll('.mobile-meter-curtain')),
             peakLed: card.querySelector('.desk-peak-led') || card.querySelector('.mobile-peak-led'),
             hasMeter: card.classList.contains('has-meter') || card.classList.contains('has-paired-meter'),
             isPeakActive: false,
@@ -847,16 +858,15 @@ function clearAllMeters() {
 
         cached.card.classList.remove('has-meter', 'has-paired-meter', 'peak-glow');
         cached.hasMeter = false;
-        cached.card.style.backgroundSize = '';
 
         if (cached.curtains) {
             cached.curtains.forEach(curtain => {
                 if (curtain) curtain.style.transform = '';
             });
         }
-        if (cached.mobileBgs) {
-            cached.mobileBgs.forEach(bg => {
-                if (bg) bg.style.backgroundSize = '';
+        if (cached.mobileCurtains) {
+            cached.mobileCurtains.forEach(curtain => {
+                if (curtain) curtain.style.transform = '';
             });
         }
         if (cached.peakLed) {
@@ -942,36 +952,31 @@ function applyMetersToDOM(smoothedLevels, now) {
                 let isPeaking = finalPercent >= 98;
 
                 if (cached.curtains && cached.curtains.length > 0) {
-                    cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                    cached.curtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
                     if (cached.curtains.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
                         const pIdx = levelIdx + 1;
                         if (pIdx < smoothedLevels.length) {
                             const partnerPercent = smoothedLevels[pIdx];
-                            cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                            cached.curtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
                             if (partnerPercent >= 98) isPeaking = true;
                         }
                     }
-                } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
-                    if (!cached.card.classList.contains('has-paired-meter')) {
-                        cached.card.classList.add('has-paired-meter');
-                    }
-                    cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
-
-                    if (cached.mobileBgs.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
-                        const pIdx = levelIdx + 1;
-                        if (pIdx < smoothedLevels.length) {
-                            const partnerPercent = smoothedLevels[pIdx];
-                            cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
-                            if (partnerPercent >= 98) isPeaking = true;
-                        }
-                    }
-                } else {
+                } else if (cached.mobileCurtains && cached.mobileCurtains.length > 0) {
                     if (!cached.hasMeter) {
                         cached.card.classList.add('has-meter');
                         cached.hasMeter = true;
                     }
-                    cached.card.style.backgroundSize = `100% ${finalPercent}%`;
+                    cached.mobileCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
+
+                    if (cached.mobileCurtains.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
+                        const pIdx = levelIdx + 1;
+                        if (pIdx < smoothedLevels.length) {
+                            const partnerPercent = smoothedLevels[pIdx];
+                            cached.mobileCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
+                            if (partnerPercent >= 98) isPeaking = true;
+                        }
+                    }
                 }
 
                 if (cached.peakLed) {
@@ -1005,7 +1010,7 @@ function applyMetersToDOM(smoothedLevels, now) {
                 let partnerPercent = 0;
 
                 if (cached.curtains && cached.curtains.length > 0) {
-                    cached.curtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                    cached.curtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                     const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
@@ -1013,30 +1018,25 @@ function applyMetersToDOM(smoothedLevels, now) {
 
                     if (pIdx !== null && cached.curtains.length > 1 && pIdx < smoothedLevels.length) {
                         partnerPercent = smoothedLevels[pIdx];
-                        cached.curtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                        cached.curtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
                         if (partnerPercent >= 98) isPeaking = true;
                     }
-                } else if (cached.mobileBgs && cached.mobileBgs.length > 0) {
-                    if (!cached.card.classList.contains('has-paired-meter')) {
-                        cached.card.classList.add('has-paired-meter');
+                } else if (cached.mobileCurtains && cached.mobileCurtains.length > 0) {
+                    if (!cached.hasMeter) {
+                        cached.card.classList.add('has-meter');
+                        cached.hasMeter = true;
                     }
-                    cached.mobileBgs[0].style.backgroundSize = `100% ${finalPercent}%`;
+                    cached.mobileCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                     const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
                         ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
 
-                    if (pIdx !== null && cached.mobileBgs.length > 1 && pIdx < smoothedLevels.length) {
+                    if (pIdx !== null && cached.mobileCurtains.length > 1 && pIdx < smoothedLevels.length) {
                         partnerPercent = smoothedLevels[pIdx];
-                        cached.mobileBgs[1].style.backgroundSize = `100% ${partnerPercent}%`;
+                        cached.mobileCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
                         if (partnerPercent >= 98) isPeaking = true;
                     }
-                } else {
-                    if (!cached.hasMeter) {
-                        cached.card.classList.add('has-meter');
-                        cached.hasMeter = true;
-                    }
-                    cached.card.style.backgroundSize = `100% ${finalPercent}%`;
                 }
 
                 if (isPeaking) {
@@ -1076,7 +1076,7 @@ function applyMetersToDOM(smoothedLevels, now) {
             let isPeaking = finalPercent >= 98;
 
             if (meterCurtains.length > 0) {
-                meterCurtains[0].style.transform = `scaleY(${1 - (finalPercent / 100)})`;
+                meterCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
                 if (meterCurtains.length > 1) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
@@ -1085,7 +1085,7 @@ function applyMetersToDOM(smoothedLevels, now) {
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
                         const partnerPercent = smoothedLevels[pIdx];
-                        meterCurtains[1].style.transform = `scaleY(${1 - (partnerPercent / 100)})`;
+                        meterCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
                         if (partnerPercent >= 98) isPeaking = true;
                     }
                 }
@@ -1230,3 +1230,16 @@ socket.on('resetResult', (data) => {
 socket.on('configReset', () => {
     if (typeof window.onConfigReset === 'function') window.onConfigReset();
 });
+
+window.saveLocalFps = function(val) {
+    if (!val || isNaN(val)) {
+        localStorage.removeItem('meter_fps_override');
+        alert("FPS Local removido. Recarregue a página para usar o padrão.");
+        return;
+    }
+    const newFps = parseInt(val);
+    if (newFps >= 5 && newFps <= 60) {
+        localStorage.setItem('meter_fps_override', newFps);
+        currentMeterFPS = newFps;
+    }
+};
