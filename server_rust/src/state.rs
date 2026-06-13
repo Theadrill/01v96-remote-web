@@ -782,32 +782,31 @@ impl GlobalState {
             "kEQHiQ",
             "kEQHiF",
             "kEQHiG",
-            "kEQLPFOn",
             "kEQOn",
         ];
-        let found = eq_keys.iter().position(|&k| k == key);
 
-        if let Some(s) = self.get_target_for_mt(mt, channel)
-            && let Some(idx) = found
-        {
-            match idx {
-                0 => s.eq_mut().mode = value,
-                1 => s.eq_mut().low.q = value,
-                2 => s.eq_mut().low.f = value,
-                3 => s.eq_mut().low.g = value,
-                4 => s.eq_mut().low.hpf_on = Some(value),
-                5 => s.eq_mut().lowmid.q = value,
-                6 => s.eq_mut().lowmid.f = value,
-                7 => s.eq_mut().lowmid.g = value,
-                8 => s.eq_mut().himid.q = value,
-                9 => s.eq_mut().himid.f = value,
-                10 => s.eq_mut().himid.g = value,
-                11 => s.eq_mut().high.q = value,
-                12 => s.eq_mut().high.f = value,
-                13 => s.eq_mut().high.g = value,
-                14 => s.eq_mut().high.lpf_on = Some(value),
-                15 => s.eq_mut().on = value > 0.0,
-                _ => {}
+        if let Some(s) = self.get_target_for_mt(mt, channel) {
+            if key == "kEQLPFOn" {
+                s.eq_mut().high.lpf_on = Some(value);
+            } else if let Some(idx) = eq_keys.iter().position(|&k| k == key) {
+                match idx {
+                    0 => s.eq_mut().mode = value,
+                    1 => s.eq_mut().low.q = value,
+                    2 => s.eq_mut().low.f = value,
+                    3 => s.eq_mut().low.g = value,
+                    4 => s.eq_mut().low.hpf_on = Some(value),
+                    5 => s.eq_mut().lowmid.q = value,
+                    6 => s.eq_mut().lowmid.f = value,
+                    7 => s.eq_mut().lowmid.g = value,
+                    8 => s.eq_mut().himid.q = value,
+                    9 => s.eq_mut().himid.f = value,
+                    10 => s.eq_mut().himid.g = value,
+                    11 => s.eq_mut().high.q = value,
+                    12 => s.eq_mut().high.f = value,
+                    13 => s.eq_mut().high.g = value,
+                    14 => s.eq_mut().on = value > 0.0,
+                    _ => {}
+                }
             }
         }
     }

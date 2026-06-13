@@ -373,22 +373,22 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         if eq_map.contains_key(&element) && parameter <= 15 && group == 1 {
             let eq_keys = [
-                "kEQMode",
-                "kEQLowQ",
-                "kEQLowF",
-                "kEQLowG",
-                "kEQHPFOn",
-                "kEQLowMidQ",
-                "kEQLowMidF",
-                "kEQLowMidG",
-                "kEQHiMidQ",
-                "kEQHiMidF",
-                "kEQHiMidG",
-                "kEQHiQ",
-                "kEQHiF",
-                "kEQHiG",
-                "kEQLPFOn",
-                "kEQOn",
+                "kEQMode",      // 0
+                "kEQLowQ",      // 1
+                "kEQLowF",      // 2
+                "kEQLowG",      // 3
+                "kEQHPFOn",     // 4
+                "kEQLowMidQ",   // 5
+                "kEQLowMidF",   // 6
+                "kEQLowMidG",   // 7
+                "kEQHiMidQ",    // 8
+                "kEQHiMidF",    // 9
+                "kEQHiMidG",    // 10
+                "kEQHiQ",       // 11
+                "kEQHiF",       // 12
+                "kEQHiG",       // 13
+                "kEQLPFOn",     // 14
+                "kEQOn",        // 15
             ];
             let key = eq_keys[parameter as usize];
             let prefix = eq_map[&element];

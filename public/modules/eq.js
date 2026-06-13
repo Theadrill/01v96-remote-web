@@ -69,7 +69,6 @@ let selectedBandIdx = -1; // Banda focada para o ajuste de Q e visibilidade de U
 let longPressTimeout = null;
 let longPressOccurred = false;
 let startPos = { x: 0, y: 0 };
-let eqClipboard = null; // Buffer para Copiar/Colar EQ
 let bubbleHideTimer = null; // Timer para ocultar o balão de Q
 let showBubbleRequest = false; // Flag de controle de visibilidade temporária do balão
 
@@ -171,7 +170,7 @@ function renderEQ(ch) {
                     <button id="headerBtnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:80px; height:38px; font-size:11px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
                     <button id="headerBtnFlat" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#dc3545; border-color:#dc3545; color:#fff;" onclick="flatEQ(${ch})">FLAT</button>
                     <button id="headerBtnCopy" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#007bff; color:#fff;" onclick="copyEQ(${ch})">COPIAR</button>
-                    <button id="headerBtnPaste" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:${eqClipboard ? '#fff' : '#444'}; color:${eqClipboard ? '#000' : '#fff'}; opacity:${eqClipboard ? '1' : '0.4'};" ${eqClipboard ? '' : 'disabled'} onclick="pasteEQ(${ch})">COLAR</button>
+                    <button id="headerBtnPaste" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:${window.clipboardMode ? '#fff' : '#444'}; color:${window.clipboardMode ? '#000' : '#fff'}; opacity:${window.clipboardMode ? '1' : '0.4'};" ${window.clipboardMode ? '' : 'disabled'} onclick="pasteClipboard(${ch})">COLAR</button>
                     <button id="headerBtnATT" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#444; color:#fff;" onclick="toggleATTModal(true)">EQ ATT</button>
                     <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:80px; height:38px; font-size:11px; margin:0; color:#fff;" onclick="toggleEQ(${ch})">EQ ON</button>
                 </div>
@@ -444,7 +443,7 @@ function onEQMove(e, ch) {
     const rawF = Math.round(freqToRaw(newF));
     const rawG = Math.round(gainToRaw(newG));
     
-    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'High' };
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
     const label = labelMap[b.key] || 'Low';
     
     // ATUALIZAÇÃO DO ESTADO LOCAL (MEMÓRIA)
@@ -482,7 +481,7 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
 
     if (type.includes('kEQHPFOn')) chState.eq.low.hpfOn = val;
     if (type.includes('kEQLPFOn')) chState.eq.high.lpfOn = val;
-    if (type.includes('kEQOn')) chState.eq.on = (val === 1 || val === true);
+    if (type.endsWith('kEQOn')) chState.eq.on = (val === 1 || val === true);
     
     // ATENÇÃO: o regex deve cobrir TODOS os prefixos (kInput, kAUX, kBus, kStereo)
     // Se ficar hardcoded em kInputEQ, os canais Out (Bus/Mix) nunca sincronizam no gráfico.
@@ -983,91 +982,6 @@ function nudgeGain(dir) {
         info.innerText = `${label.toUpperCase()}: ${Math.round(f)}Hz | ${newG.toFixed(1)}dB`;
     }
 }
-
-// Funções de Cópia e Cola
-window.copyEQ = function(ch) {
-    const state = getChannelStateById(ch);
-    const s = state ? state.eq : null;
-    if (!s) return console.warn(`Sem dados de EQ para o canal ${ch + 1}`);
-    
-    eqClipboard = JSON.parse(JSON.stringify(s));
-
-    // Habilita o botão de Colar no header
-    const b = document.getElementById('headerBtnPaste');
-    if (b) {
-        b.disabled = false;
-        b.style.background = '#fff';
-        b.style.color = '#000';
-        b.style.opacity = '1';
-    }
-};
-
-window.showCustomConfirm = function(msg, onOk) {
-    const modal = document.getElementById('customConfirmModal');
-    const msgEl = document.getElementById('customConfirmMsg');
-    const okBtn = document.getElementById('customConfirmOk');
-    const cancelBtn = document.getElementById('customConfirmCancel');
-
-    msgEl.innerText = msg;
-    modal.style.display = 'flex';
-
-    okBtn.onclick = () => {
-        modal.style.display = 'none';
-        onOk();
-    };
-    cancelBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
-};
-
-window.pasteEQ = function(ch) {
-    if (!eqClipboard) return;
-    showCustomConfirm(`Deseja colar as definições de EQ para o Canal ${ch + 1}?`, () => {
-        console.log(`n📥 [COLAR] Aplicando no Canal ${ch + 1}...`);
-    
-    const prefix = getChannelParamPrefix(ch);
-
-    // Mapeamento necessário para os nomes de comando da 01V96
-    const bMap = [
-        { key: 'low', label: 'Low' },
-        { key: 'lowmid', label: 'LowMid' },
-        { key: 'himid', label: 'HiMid' },
-        { key: 'high', label: 'Hi' }
-    ];
-
-    bMap.forEach(b => {
-        const data = eqClipboard[b.key];
-        if (!data) return;
-
-        // Frequência, Ganho e Q - Garantindo que enviamos números decimais (decodificados do SysEx se necessário)
-        if (data.f !== undefined) socket.emit('control', { type: `${prefix}EQ/kEQ${b.label}F`, channel: ch, value: sysexToVal(data.f) });
-        if (data.g !== undefined) socket.emit('control', { type: `${prefix}EQ/kEQ${b.label}G`, channel: ch, value: sysexToVal(data.g) });
-        if (data.q !== undefined) socket.emit('control', { type: `${prefix}EQ/kEQ${b.label}Q`, channel: ch, value: sysexToVal(data.q) });
-
-        // HPF On (apenas banda Low)
-        if (b.key === 'low' && data.hpfOn !== undefined) {
-            socket.emit('control', { type: `${prefix}EQ/kEQHPFOn`, channel: ch, value: sysexToVal(data.hpfOn) });
-        }
-        // LPF On (apenas banda High)
-        if (b.key === 'high' && data.lpfOn !== undefined) {
-            socket.emit('control', { type: `${prefix}EQ/kEQLPFOn`, channel: ch, value: sysexToVal(data.lpfOn) });
-        }
-    });
-
-    // EQ Global ON/OFF
-    if (eqClipboard.on !== undefined) {
-        socket.emit('control', { type: `${prefix}EQ/kEQOn`, channel: ch, value: (eqClipboard.on === 1 || eqClipboard.on === true) ? 1 : 0 });
-    }
-
-    // Opcional: atualização visual imediata se estivemos vendo o canal colado
-    if (activeConfigChannel === ch) {
-        // O servidor emitirá de volta os parâmetros via 'update', o que atualizará o channelStates.
-        // Mas para feedback instantâneo, poderíamos forçar um render aqui.
-        // O usuário pediu "puxando da mesa", então vamos deixar o 'update' vindo da mesa atualizar.
-        console.log(`[PASTE] Dados enviados para a mesa. Aguardando atualização...`);
-    }
-    }); // Fim do callback do confirm
-};
 
 window.eqGainInput = function(e) {
     if (!appReady) return;

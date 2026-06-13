@@ -283,6 +283,19 @@
 </div>
 </div>
 </div>
+<!-- Modal de Opções de Cópia -->
+<div class="modal-overlay styled-customConfirmModal" id="copyOptionsModal">
+<div class="modal-content inline-style-23">
+<h3 class="inline-style-24">
+                Opções de Cópia</h3>
+<p class="styled-customConfirmMsg">O que você deseja copiar deste canal?</p>
+<div class="inline-style-25" style="flex-direction:column; gap:10px;">
+<button class="styled-customConfirmOk" style="width:100%" onclick="executeCopyEQOnly()">COPIAR APENAS EQ</button>
+<button class="styled-customConfirmOk" style="width:100%; background:#8e44ad;" onclick="executeCopyFullChannel()">COPIAR CANAL TODO</button>
+<button class="styled-customConfirmCancel" style="width:100%" onclick="document.getElementById('copyOptionsModal').style.display='none'">CANCELAR</button>
+</div>
+</div>
+</div>
 <!-- Modal de Confirmação Customizado para EQ -->
 <div class="modal-overlay styled-customConfirmModal" id="customConfirmModal">
 <div class="modal-content inline-style-23">
@@ -906,6 +919,7 @@
 <script src="modules/macros.js"></script>
 <script src="modules/channel_strip.js?v=19"></script>
 <script src="modules/eq.js?v=5"></script>
+<script src="modules/copy_paste.js"></script>
 <script src="modules/gate.js"></script>
 <script src="modules/compressor.js"></script>
 <script src="modules/dynamics.js"></script>
