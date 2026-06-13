@@ -18,21 +18,23 @@ A feature "Custom Layer" (Visão de Grupos) tem como objetivo permitir que o usu
      - Terá um campo editável para o **Título do Grupo** (ex: "VOZES").
      - Opção para **escolher uma cor** de identificação para o grupo.
      - Botão **"Editar"** (habilita modo de edição, veja abaixo).
+     - Botão de **"X" (Excluir Grupo)** visível ao entrar no modo de edição. Excluir o grupo fará com que todos os canais dentro dele voltem ao estado inicial, desaparecendo do Custom Layer.
    - **Corpo do Grupo:**
      - Conterá um botão de **"+" (Adicionar Canal)** bem grande.
-     - Clicar neste botão abrirá uma lista em formato de grid (semelhante ao grid de seleção de canais já existente na configuração de macro ou no *channel toggler*).
+     - Clicar neste botão abrirá uma lista em formato de grid (semelhante ao grid de seleção de canais).
      - Os canais selecionados passarão a compor os faders daquele grupo.
-     - Não haverá limite para o número de canais inseridos em um grupo.
+     - A largura do grupo vai se ajustando e crescendo dinamicamente dependendo da quantidade de faders que ele possuir, sem limites.
    - **Group Master Fader (Macro de Grupo):**
-     - Ao lado dos canais de cada grupo, existirá um fader mais fino (estilo macro, mas sem botão de engrenagem).
-     - Esse fader ajustará o volume (+ ou -) de todos os canais pertencentes àquele grupo de forma relativa, ao ser movido.
+     - Terá exatamente a mesma aparência e comportamento do *channel strip* do **canal macro**.
+     - Ao tocar nos botões de `+` ou `-`, os valores de volume de todos os canais atrelados ao grupo serão alterados simultaneamente e em tempo real.
+     - Ele já virá automaticamente atrelado aos canais presentes dentro daquele grupo, sem necessidade de configuração manual.
 
 4. **Modo de Edição, Reordenação (Drag and Drop) e Exclusão**
    - Ao clicar em **Editar** no cabeçalho do grupo:
      - Os *meters* de áudio são desabilitados temporariamente para melhorar a performance.
-     - Um botão circular com um "X" aparece sobre cada canal do grupo. Ao clicar, um modal de confirmação é exibido antes de excluir o canal do grupo.
+     - Um botão de "X" aparece sobre cada canal do grupo e no cabeçalho do grupo.
      - O recurso de **Drag and Drop** é habilitado.
-     - O usuário pode arrastar um canal para reordená-lo dentro do próprio grupo ou soltá-lo em **outro grupo**.
+     - O usuário pode arrastar um canal para reordená-lo dentro do próprio grupo, ou soltá-lo em **outro grupo**.
      - Os próprios grupos também poderão ser reordenados via Drag and Drop na tela principal.
    
 5. **Adicionando Múltiplos Grupos**
@@ -40,8 +42,8 @@ A feature "Custom Layer" (Visão de Grupos) tem como objetivo permitir que o usu
    - Clicar nele repete o processo, criando um novo container com título, cor e a área para adicionar canais.
 
 6. **Layout e Visualização (Aesthetics)**
-   - O layout resultante será composto por blocos de faders agrupados.
-   - Os faders na Custom Layer terão exatamente o mesmo visual e comportamento dos faders normais (mostrando meters, mute, solo, select), adotando o modelo mobile ou desktop conforme configurado na tela principal.
+   - O layout resultante será composto por blocos de faders agrupados que crescem horizontalmente.
+   - Os faders na Custom Layer terão exatamente o mesmo visual e comportamento dos faders normais, adotando o modelo mobile ou desktop conforme configurado na tela principal.
    - Haverá um espaçamento visual claro separando os grupos.
 
 ## Arquitetura e Persistência de Dados
@@ -52,12 +54,13 @@ A feature "Custom Layer" (Visão de Grupos) tem como objetivo permitir que o usu
   - O esquema será o mesmo "Ninja Sync" das *custom name scenes*.
   - A persistência ocorrerá em `data/custom_layer_scenes/local` (e `/shared`).
   - Nomenclatura do arquivo: `custom_layer_scene-[nome_da_cena_atual_da_mesa]-[nome_da_mesa].json`.
+- **Regras do Ninja Sync Atuais (Explicação):**
+  - Todas as alterações feitas pelo usuário na interface são salvas primeiramente na pasta `local`.
+  - O sistema sempre tenta ler o arquivo da pasta `local` primeiro. Se ele não existir lá, ele lê da pasta `shared`.
+  - Quando a sincronização remota (via Git) ocorre em *background*, os arquivos salvos em `shared` são atualizados. Dessa forma, as alterações da nuvem chegam no `shared`, mas edições pontuais do aparelho (`local`) prevalecem sobre a nuvem naquele dispositivo específico até que um sincronismo suba ou sobreescreva as modificações.
 
-## Dúvidas em Aberto (Para quando você voltar)
+## Novas Dúvidas em Aberto
 > [!NOTE]
-> Por favor, responda a estas perguntas quando tiver um tempo para refinarmos o design da funcionalidade:
-
-1. **Master Fader de Grupo (Macro Fader):** O fader fino do grupo vai enviar os comandos MIDI de forma contínua durante o arraste em tempo real (o que pode gerar muito tráfego dependendo do tamanho do grupo) ou só vai calcular e enviar as diferenças quando o usuário soltar o fader (on release/debounce)?
-2. **Exclusão de Grupo Completo:** O botão para excluir o grupo inteiro vai ficar junto do cabeçalho durante o "Modo Editar"? Ao excluir um grupo, os canais que estavam dentro dele são apenas removidos do grupo (apagando o grupo junto) com uma única confirmação?
-3. **Scroll em Dispositivos Móveis:** Em telas menores, como não há limite de canais por grupo, se o grupo for muito largo, o usuário fará *scroll horizontal* individualmente dentro do próprio grupo (cada grupo rola independente), ou a tela inteira rola para o lado com todos os grupos fixos nela?
-4. **Prioridade do Ninja Sync:** Ao iniciar, as regras de conflito/prioridade entre os arquivos do diretório `shared` e `local` serão estritamente iguais as já implementadas em `custom_names_scenes`?
+> 1. **Visual do Macro Fader do Grupo:** Já que o *master* do grupo será o mesmo componente do Canal Macro, ele deverá exibir os botões de Mute e Solo para aplicar Mute/Solo no grupo todo, ou apenas os botões de `+` e `-` de volume junto com o nome do grupo?
+> 2. **Espaço para Descarte:** Ao arrastar (Drag and Drop) um canal para retirá-lo de um grupo, haverá alguma área de "soltar" específica (como uma lixeira) no fundo da tela, ou basta soltar o canal fora da área de qualquer grupo para ele ser removido?
+> 3. **Indicação Visual de Grupo Selecionado:** Quando um grupo possuir muitos canais e estiver ocorrendo um *scroll horizontal* contínuo, devemos travar o "Group Master Fader" no canto do grupo para ele estar sempre visível, ou ele "rola" junto com os canais e pode sumir da tela?
