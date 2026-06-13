@@ -3,6 +3,7 @@ members = [
     "midi_common",
     "remote_midi_server",
     "server_rust",
+    "client_wasm",
 ]
 resolver = "2"
 default-members = [
