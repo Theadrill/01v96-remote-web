@@ -10,7 +10,7 @@
 <meta content="01V96 LIVE" name="apple-mobile-web-app-title"/>
 <meta content="yes" name="mobile-web-app-capable"/>
 <title>01V96 - LIVE SAFE</title>
-<link href="style.css?v=48" rel="stylesheet"/>
+<link href="style.css?v=51" rel="stylesheet"/>
 <!-- UI UPDATE: 2026-06-07 -->
 <script src="/vendor/socket.io.min.js"></script>
 <script>
@@ -168,6 +168,13 @@
 </div>
 <div class="button-dock" id="buttonDock"></div>
 </div>
+
+<div id="mobilePortraitActions" class="mobile-portrait-actions-container">
+    <button id="mobileMenuBtn" class="mobile-action-btn btn-menu-yellow">MENU</button>
+    <button id="mobileMacrosBtn" class="mobile-action-btn menu-btn-solid-purple" onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
+    <button id="mobileSairBtn" class="mobile-action-btn">SAIR</button>
+</div>
+
 <!-- PANEL 3: Macros (fixo) -->
 <div class="sidebar-panel sidebar-macros" id="sidebarMacros">
 <button class="side-btn btn-macros" onclick="document.getElementById('macrosModal').style.display='flex'">MACROS</button>
@@ -1017,5 +1024,14 @@
         }
     </script>
 <script src="app.js"></script>
+
+<!-- Mobile Menu Modal Overlay -->
+<div id="mobileMenuModal" class="mobile-menu-modal-overlay">
+    <div class="mobile-menu-content">
+        <div id="mobileMenuList" class="mobile-menu-list">
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

@@ -5727,3 +5727,168 @@ body.layout-desktop .btn-macros {
     margin: 0;
     background: #444;
 }
+
+/* ==========================================================================
+   REESTRUTURAÇÃO MOBILE RETRATO - NOVO FLUXO DE DOCK
+   ========================================================================== */
+
+/* Por padrão, esconde os novos elementos no desktop e landscape */
+#mobilePortraitActions,
+#mobileMenuModal {
+    display: none;
+}
+
+/* Regra aplicada estritamente no Mobile Retrato */
+body:not(.layout-desktop).is-portrait #sidebarDock {
+    display: none !important; /* Esconde a dock antiga em formato de scroll horizontal */
+}
+
+body:not(.layout-desktop).is-portrait #mobilePortraitActions {
+    display: flex !important; /* Exibe os botões Menu e Sair fixos */
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ocultar a área inteira de macros original no mobile portrait (movido para a dock principal) */
+body:not(.layout-desktop).is-portrait #sidebarMacros {
+    display: none !important;
+}
+
+/* Estilo dos novos botões da Bottom Bar */
+.mobile-action-btn {
+    background: #333;
+    border: 1px solid #555;
+    color: #ccc;
+    padding: 2px 4px;
+    font-weight: bold;
+    font-size: 11px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 6px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.1;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+.mobile-action-btn:active {
+    opacity: 0.8;
+    transform: scale(0.96);
+}
+
+#mobileSairBtn {
+    background: #dc3545 !important;
+    color: white !important;
+    border: 1px solid #721c24 !important;
+}
+
+/* Cor amarela específica para o botão MENU combinando com o Config */
+.btn-menu-yellow,
+.menu-btn-solid-yellow {
+    background: #ffcc00 !important;
+    color: #111 !important;
+    border: none !important;
+}
+
+.menu-btn-solid-green {
+    background: #28a745 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.menu-btn-solid-blue {
+    background: #0056b3 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.menu-btn-solid-red {
+    background: #dc3545 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.menu-btn-solid-purple {
+    background: #6a1b9a !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* Estilo do Modal de Menu em Tela Cheia */
+.mobile-menu-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Deixa o modal exatamente acima da bottom bar baseando-se no z-index ou na altura */
+    bottom: 100px; /* Ajuste para a altura exata da sua bottom bar se necessário */
+    background: rgba(10, 10, 10, 0.95);
+    z-index: 9999; /* Garanta que fique abaixo apenas da bottom bar se ela for fixa por cima */
+    display: none;
+    flex-direction: column;
+    justify-content: flex-end; /* Inicia os botões de baixo para cima para facilitar o alcance do dedão */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.mobile-menu-modal-overlay.active {
+    display: flex !important;
+}
+
+/* Lista de botões dispostos verticalmente */
+.mobile-menu-content {
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-right: 8px;
+    box-sizing: border-box;
+}
+
+.mobile-menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Botões de Opção dentro do Modal */
+.mobile-menu-item {
+    width: 100%;
+    background: #333;
+    border: none;
+    color: #fff;
+    padding: 18px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* Destaque removido, agora usa classe direta menu-btn-solid-yellow */
+
+/* Barra de rolagem estilizada para indicar mais conteúdo */
+.mobile-menu-content::-webkit-scrollbar {
+    width: 6px;
+    display: block !important;
+}
+
+.mobile-menu-content::-webkit-scrollbar-track {
+    background: #111;
+}
+
+.mobile-menu-content::-webkit-scrollbar-thumb {
+    background: #ffcc00; /* Cor de destaque para indicar a presença da barra */
+    border-radius: 3px;
+}

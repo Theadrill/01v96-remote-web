@@ -694,6 +694,11 @@ function renderDock(mode) {
     dock.innerHTML = buttons.map(b =>
         `<button class="dock-btn ${b.cls || ''}" onclick="${b.action}"${b.id ? ` id="${b.id}"` : ''}>${b.label}</button>`
     ).join('');
+
+    // Sincroniza o novo menu mobile se ele não estiver ativo
+    if (typeof renderMobileMenu === 'function' && document.getElementById('mobileMenuModal') && !document.getElementById('mobileMenuModal').classList.contains('active')) {
+        renderMobileMenu(mode);
+    }
 }
 
 function triggerExitActiveMode() {
@@ -871,5 +876,173 @@ if (inputChName) {
             }
             updateNamePreview();
         }
+    });
+}
+
+/* ==========================================================================
+   REESTRUTURAÇÃO MOBILE RETRATO - DOCK E MENU MODAL
+   ========================================================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+    const menuBtn = document.getElementById("mobileMenuBtn");
+    const sairBtn = document.getElementById("mobileSairBtn");
+
+    if (menuBtn) {
+        menuBtn.addEventListener("click", () => {
+            toggleMobileMenu();
+        });
+    }
+
+    if (sairBtn) {
+        sairBtn.addEventListener("click", () => {
+            handleMobileSairAction();
+        });
+    }
+});
+
+function handleMobileSairAction() {
+    const modal = document.getElementById("mobileMenuModal");
+    
+    // PRIORIDADE 1: Se o menu estiver aberto, apenas fecha o menu
+    if (modal && modal.classList.contains("active")) {
+        closeMobileMenu();
+        return;
+    }
+
+    // PRIORIDADE 2: Executa o fechamento/desconexão contextual com base no estado atual da aplicação
+    const currentMode = window.currentDockMode || 'main';
+
+    switch (currentMode) {
+        case 'main':
+            // Abre o modal padrão de confirmação de logout/desconexão
+            if (document.getElementById('logoutConfirmModal')) {
+                document.getElementById('logoutConfirmModal').style.display = 'flex';
+            }
+            break;
+            
+        case 'channelConfig':
+            // Executa a função nativa para fechar a tela individual do canal
+            if (typeof closeChannelConfig === 'function') {
+                closeChannelConfig();
+            }
+            break;
+            
+        case 'outs':
+            // Executa a função nativa para fechar a tela de mix/bus masters
+            if (typeof toggleOuts === 'function') {
+                toggleOuts();
+            }
+            break;
+            
+        case 'techMix':
+            // Executa a função nativa para fechar o modo técnico/Sends on Faders
+            if (typeof exitTechnicianMixMode === 'function') {
+                exitTechnicianMixMode();
+            }
+            break;
+
+        default:
+            console.log("Ação de Sair executada para o modo: " + currentMode);
+            break;
+    }
+}
+
+function toggleMobileMenu() {
+    const modal = document.getElementById("mobileMenuModal");
+    if (!modal) return;
+
+    if (modal.classList.contains("active")) {
+        closeMobileMenu();
+    } else {
+        // Renderiza as opções atualizadas com base no modo ativo antes de exibir
+        const currentMode = window.currentDockMode || 'main';
+        renderMobileMenu(currentMode);
+        modal.classList.add("active");
+    }
+}
+
+function closeMobileMenu() {
+    const modal = document.getElementById("mobileMenuModal");
+    if (modal) {
+        modal.classList.remove("active");
+    }
+}
+
+function renderMobileMenu(mode) {
+    const menuList = document.getElementById("mobileMenuList");
+    if (!menuList) return;
+
+    // Limpa os itens anteriores
+    menuList.innerHTML = "";
+
+    let buttonsConfig = [];
+
+    // Definição dos botões baseado no escopo aprovado
+    switch (mode) {
+        case 'main':
+            buttonsConfig = [
+                { label: 'Configurações do App', isConfig: true, action: "document.getElementById('configModal').style.display='flex';" },
+                { label: 'MIX / BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" }
+            ];
+            break;
+
+        case 'channelConfig':
+        case 'techMix': // O modo de edição de barramento herda a mesma estrutura de canal
+            buttonsConfig = [
+                { label: 'Configurações do App', isConfig: true, action: "document.getElementById('configModal').style.display='flex';" },
+                { label: 'EQ', cls: 'menu-btn-solid-blue', action: "if(typeof switchTab === 'function') { switchTab('eq'); }" },
+                { label: 'DYN', action: "if(typeof switchTab === 'function') { switchTab('dyn'); }" },
+                { label: 'AUX', cls: 'menu-btn-solid-green', action: "if(typeof switchTab === 'function') { switchTab('aux'); }" },
+                { label: 'ROUTING / ETC', cls: 'menu-btn-solid-red', action: "if(typeof switchTab === 'function') { switchTab('etc'); }" }
+            ];
+            break;
+
+        case 'outs':
+            buttonsConfig = [
+                { label: 'Configurações do App', isConfig: true, action: "document.getElementById('configModal').style.display='flex';" }
+            ];
+            break;
+
+        default:
+            buttonsConfig = [
+                { label: 'Configurações do App', isConfig: true, action: "document.getElementById('configModal').style.display='flex';" }
+            ];
+            break;
+    }
+
+    // SEMPRE adiciona a opção Fullscreen no final de qualquer menu
+    buttonsConfig.push({
+        label: 'FULLSCREEN',
+        action: "if(typeof toggleFullScreen === 'function') { toggleFullScreen(); } else { if(!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { document.exitFullscreen(); } }"
+    });
+
+    // Injeta os elementos HTML mapeados no container do modal
+    buttonsConfig.forEach(btn => {
+        const buttonElement = document.createElement("button");
+        buttonElement.innerText = btn.label;
+        buttonElement.className = "mobile-menu-item";
+        
+        if (btn.isConfig) {
+            buttonElement.classList.add("menu-btn-solid-yellow"); // Aplica a cor de fundo amarela
+        }
+        
+        if (btn.cls) {
+            buttonElement.classList.add(btn.cls);
+        }
+
+        // Configura o evento de clique injetando a ação string ou função nativa correspondente
+        buttonElement.onclick = () => {
+            // Fecha o menu antes de disparar a ação para limpar o fluxo visual
+            closeMobileMenu();
+            
+            // Executa a ação
+            if (typeof btn.action === 'string') {
+                new Function(btn.action)();
+            } else if (typeof btn.action === 'function') {
+                btn.action();
+            }
+        };
+
+        menuList.appendChild(buttonElement);
     });
 }
