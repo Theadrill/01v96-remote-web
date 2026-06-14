@@ -222,6 +222,9 @@ impl ConnectionManager {
                         this.is_connected.store(true, Ordering::SeqCst);
                         this.emit_connection_state();
 
+                        info!("🧹 [Conexão Remota] Solicitando flush do buffer de RX antes do cooldown...");
+                        let _ = this.midi_in_tx.try_send(vec![0xFF, 0xFE, 0xFD]);
+
                         info!("⏳ [Conexão Remota] Cooldown de 5s antes de sincronizar...");
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
@@ -389,6 +392,9 @@ impl ConnectionManager {
 
         self.is_connected.store(true, Ordering::SeqCst);
         self.emit_connection_state();
+
+        info!("🧹 Solicitando flush do buffer de RX antes do cooldown...");
+        let _ = self.midi_in_tx.try_send(vec![0xFF, 0xFE, 0xFD]);
 
         info!("⏳ Cooldown de 5s antes da sincronia...");
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;

@@ -121,7 +121,13 @@ async fn async_main(
         &data_dir, &mesa_nome,
     )));
 
-    let sync_manager = Arc::new(network::SyncManager::new(scheduler.clone(), io.clone(), custom_scene_manager.clone()));
+    let sync_manager = Arc::new(network::SyncManager::new(
+        scheduler.clone(), 
+        io.clone(), 
+        custom_scene_manager.clone(),
+        app_config.sync_chunk_size,
+        app_config.sync_chunk_delay_ms,
+    ));
     let sync_manager_socket = sync_manager.clone();
 
     let conn_mgr = network::ConnectionManager::new(

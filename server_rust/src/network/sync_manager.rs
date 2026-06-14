@@ -14,10 +14,12 @@ pub struct SyncManager {
     is_fully_synced: Arc<AtomicBool>,
     has_synced_names: AtomicBool,
     csm: Arc<RwLock<CustomSceneManager>>,
+    chunk_size: u32,
+    chunk_delay_ms: u64,
 }
 
 impl SyncManager {
-    pub fn new(scheduler: Arc<MidiScheduler>, io: SocketIo, csm: Arc<RwLock<CustomSceneManager>>) -> Self {
+    pub fn new(scheduler: Arc<MidiScheduler>, io: SocketIo, csm: Arc<RwLock<CustomSceneManager>>, chunk_size: u32, chunk_delay_ms: u64) -> Self {
         Self {
             scheduler,
             io,
@@ -25,6 +27,8 @@ impl SyncManager {
             is_fully_synced: Arc::new(AtomicBool::new(false)),
             has_synced_names: AtomicBool::new(false),
             csm,
+            chunk_size,
+            chunk_delay_ms,
         }
     }
 
@@ -54,6 +58,8 @@ impl SyncManager {
         let has_synced_names = self.has_synced_names.load(Ordering::SeqCst);
         let _sync_type = sync_type.to_string();
         let csm = self.csm.clone();
+        let chunk_size = self.chunk_size;
+        let chunk_delay_ms = self.chunk_delay_ms;
 
         tokio::spawn(async move {
             tracing::info!("🔄 [SyncManager] Task de sync iniciada");
@@ -157,6 +163,8 @@ impl SyncManager {
                 force_names,
                 has_synced_names,
                 csm,
+                chunk_size,
+                chunk_delay_ms,
             )
             .await;
         });
@@ -220,6 +228,8 @@ impl SyncManager {
         let is_fully_synced = self.is_fully_synced.clone();
         let has_synced_names = self.has_synced_names.load(Ordering::SeqCst);
         let csm = self.csm.clone();
+        let chunk_size = self.chunk_size;
+        let chunk_delay_ms = self.chunk_delay_ms;
 
         tokio::spawn(async move {
             queue_all_params_inner(
@@ -231,6 +241,8 @@ impl SyncManager {
                 force_names,
                 has_synced_names,
                 csm,
+                chunk_size,
+                chunk_delay_ms,
             )
             .await;
         });
@@ -348,6 +360,8 @@ async fn queue_all_params_inner(
     force_names: bool,
     _has_synced_names: bool,
     csm: Arc<RwLock<CustomSceneManager>>,
+    chunk_size: u32,
+    chunk_delay_ms: u64,
 ) {
     let mut pending_corrections: Vec<Vec<u8>> = Vec::new();
 
@@ -589,28 +603,55 @@ async fn queue_all_params_inner(
         info!("📦 [Sync] CH1 on request: {} bytes: {}", req.len(), hex);
     }
 
-    // Batch enqueue — all at once (single lock), matching Node.js synchronous behavior
     let total_reqs = requests.len();
-    sched.enqueue_batch(requests, 1).await;
+    
+    // Batch enqueue — em blocos (chunks) com delay, para não saturar o buffer da mesa
+    let chunk_size = chunk_size as usize;
+    let mut sent = 0;
+    for chunk in requests.chunks(chunk_size) {
+        sched.enqueue_batch(chunk.to_vec(), 1).await;
+        sent += chunk.len();
+        
+        let st = sched.state.lock().await;
+        let remaining_in_queue = st.q0.len() + st.q1.len();
+        let not_yet_enqueued = total_reqs.saturating_sub(sent);
+        let total_remaining = remaining_in_queue + not_yet_enqueued;
+        let current_progress = total_reqs.saturating_sub(total_remaining);
+
+        let _ = io.emit("syncStatus", &serde_json::json!({
+            "active": true,
+            "type": "channels",
+            "progress": current_progress,
+            "total": total_reqs
+        })).await;
+
+        tokio::time::sleep(std::time::Duration::from_millis(chunk_delay_ms)).await;
+    }
 
     // Wait for Q0+Q1 to drain
     let mut last_log = 0u32;
     loop {
-        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
         let st = sched.state.lock().await;
         let remaining = st.q0.len() + st.q1.len();
         if remaining == 0 {
+            let _ = io.emit("syncStatus", &serde_json::json!({
+                "active": true,
+                "type": "channels",
+                "progress": total_reqs,
+                "total": total_reqs
+            })).await;
             break;
         }
         if last_log != remaining as u32 {
             tracing::info!("⏳ [Sync] Aguardando {} requests na fila...", remaining);
             last_log = remaining as u32;
             
-            let current = if remaining < total_reqs { total_reqs - remaining } else { 0 };
+            let current_progress = total_reqs.saturating_sub(remaining);
             let _ = io.emit("syncStatus", &serde_json::json!({
                 "active": true,
                 "type": "channels",
-                "progress": current,
+                "progress": current_progress,
                 "total": total_reqs
             })).await;
         }

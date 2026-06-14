@@ -24,6 +24,14 @@ pub struct AppConfig {
     pub watchdog_normal_ms: u64,
     pub watchdog_sync_ms: u64,
     pub meter_poll_interval_ms: u64,
+
+    #[serde(default = "default_sync_chunk_size")]
+    pub sync_chunk_size: u32,
+    #[serde(default = "default_sync_chunk_delay_ms")]
+    pub sync_chunk_delay_ms: u64,
+    #[serde(default = "default_wasm_throttle_ms")]
+    pub wasm_throttle_ms: u64,
+
     pub name_save_debounce_ms: u64,
     pub scene_recall_delay_ms: u64,
     pub scene_save_delay_ms: u64,
@@ -61,6 +69,18 @@ pub struct AppConfig {
 
 fn default_port() -> u16 {
     4000
+}
+
+fn default_sync_chunk_size() -> u32 {
+    50
+}
+
+fn default_sync_chunk_delay_ms() -> u64 {
+    25
+}
+
+fn default_wasm_throttle_ms() -> u64 {
+    16
 }
 
 fn default_meter_opacity() -> f64 {
@@ -188,6 +208,9 @@ impl AppConfig {
             watchdog_normal_ms: 5000,
             watchdog_sync_ms: 20000,
             meter_poll_interval_ms: 33,
+            sync_chunk_size: default_sync_chunk_size(),
+            sync_chunk_delay_ms: default_sync_chunk_delay_ms(),
+            wasm_throttle_ms: default_wasm_throttle_ms(),
             name_save_debounce_ms: 1000,
             scene_recall_delay_ms: 2000,
             scene_save_delay_ms: 500,

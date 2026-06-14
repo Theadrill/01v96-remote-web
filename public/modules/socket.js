@@ -766,6 +766,10 @@ socket.on('portsList', (data) => {
             inputLocalFps.value = currentMeterFPS;
         }
 
+        if (data.savedConfig.wasm_throttle_ms !== undefined && wasmMidiDispatcher) {
+            wasmMidiDispatcher.set_throttle(data.savedConfig.wasm_throttle_ms);
+        }
+
         if (demoBtn) {
             const isDemo = !!data.savedConfig.demo_mode;
             demoBtn.innerText = isDemo ? 'DEMO OFF' : 'DEMO ON';
@@ -903,15 +907,37 @@ let wasmMeterEngine = null;
 let lastWasmRenderTime = performance.now();
 const wasmTargetLevels = new Float32Array(80);
 
+// --- WASM Throttler Globals ---
+let wasmMidiDispatcher = null;
+const originalSocketEmit = typeof socket !== 'undefined' ? socket.emit : null;
+
+if (originalSocketEmit && typeof socket !== 'undefined') {
+    socket.emit = function(eventName, data) {
+        if (eventName === 'control' && wasmMidiDispatcher && typeof data === 'object') {
+            const { type, channel, value } = data;
+            if (type !== undefined && channel !== undefined && value !== undefined) {
+                const now = performance.now();
+                const canSend = wasmMidiDispatcher.push_event(type, channel, value, now);
+                if (!canSend) return this; // Retido pelo WASM
+            }
+        }
+        return originalSocketEmit.apply(this, arguments);
+    };
+}
+
 import('../wasm/client_wasm.js').then(async (wasm) => {
     await wasm.default();
     wasmMeterEngine = new wasm.MeterEngine(80);
     wasmMeterEngine.set_decay_rate(0.1); // Queda suave calibrada para escala 0-100
     console.log("[WASM] MeterEngine initialized");
+    
+    wasmMidiDispatcher = new wasm.MidiDispatcher(16); // Default 16ms
+    console.log("[WASM] MidiDispatcher initialized");
+
     tryLoadWasmCalibration(); // Injeta calibrações no WASM
     requestAnimationFrame(wasmRenderLoop);
 }).catch(err => {
-    console.error("[WASM] Failed to load MeterEngine:", err);
+    console.error("[WASM] Failed to load MeterEngine/MidiDispatcher:", err);
 });
 
 let calibrationLoadedToWasm = false;
@@ -1129,6 +1155,21 @@ function wasmRenderLoop(now) {
 
     // Desenha as barras!
     applyMetersToDOM(smoothedLevels, now);
+
+    // --- WASM Throttler (despachante) ---
+    if (wasmMidiDispatcher) {
+        const pending = wasmMidiDispatcher.tick(now);
+        for (let i = 0; i < pending.length; i++) {
+            const parts = pending[i].split(':');
+            if (parts.length === 3) {
+                originalSocketEmit.call(socket, 'control', {
+                    type: parts[0],
+                    channel: parseInt(parts[1], 10),
+                    value: parseFloat(parts[2])
+                });
+            }
+        }
+    }
 }
 
 socket.on('meterDataRaw', (rawBytes) => {

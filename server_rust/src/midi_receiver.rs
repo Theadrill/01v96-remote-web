@@ -55,6 +55,17 @@ pub fn start_rx_loop(
     tokio::spawn(async move {
         let mut assembler = crate::midi::MidiAssembler::new();
         while let Some(msg) = midi_in_rx.recv().await {
+            // Verifica sinal especial de FLUSH disparado pelo ConnectionManager
+            if msg.len() == 3 && msg[0] == 0xFF && msg[1] == 0xFE && msg[2] == 0xFD {
+                tracing::info!("🧹 [RX] Sinal de FLUSH recebido. Esvaziando pacotes órfãos da fila...");
+                let mut dropped = 0;
+                while let Ok(_) = midi_in_rx.try_recv() {
+                    dropped += 1;
+                }
+                tracing::info!("🧹 [RX] {} pacotes órfãos descartados com sucesso.", dropped);
+                continue;
+            }
+
             recv_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
             conn_mgr_recv.reset_activity();
             let packets = if is_remote_midi {
