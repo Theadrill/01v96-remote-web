@@ -153,15 +153,13 @@ body.layout-horizontal .faders-area {
     box-shadow: 0 0 10px #ff0000;
 }
 
-.fader-card.has-meter>*:not(.mobile-meter-bg):not(.btn-state),
-.fader-card.has-paired-meter>*:not(.mobile-meter-bg):not(.btn-state) {
+.fader-card > *:not(.mobile-meter-bg):not(.btn-state):not(.mobile-db-scale-overlay) {
     position: relative;
     z-index: 2;
     text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
 }
 
-.fader-card.has-meter>.btn-state,
-.fader-card.has-paired-meter>.btn-state {
+.fader-card > .btn-state {
     position: relative;
     z-index: 2;
 }

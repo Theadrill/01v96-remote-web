@@ -270,7 +270,6 @@ impl ConnectionManager {
 
         let this = self.clone();
         let interval_ms = self.config.meter_poll_interval_ms;
-        let watchdog_timeout = self.config.watchdog_timeout_ms;
 
         let handle = tokio::spawn(async move {
             let mut interval = tokio::time::interval(std::time::Duration::from_millis(interval_ms));
@@ -283,8 +282,13 @@ impl ConnectionManager {
 
                 if !this.config.remote_midi {
                     let expired = {
+                        let timeout = if this.sync_manager.is_busy() {
+                            this.config.watchdog_sync_ms
+                        } else {
+                            this.config.watchdog_normal_ms
+                        };
                         let last = this.last_activity.lock().unwrap();
-                        Self::now_ms() - *last > watchdog_timeout
+                        Self::now_ms() - *last > timeout
                     };
                     if expired {
                         warn!("⚠️ Watchdog: Timeout de conexao. Mesa parou de responder.");
