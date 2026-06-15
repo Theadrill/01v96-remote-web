@@ -1,16 +1,16 @@
 # Graph Report - 01v96-remote-web  (2026-06-15)
 
 ## Corpus Check
-- 536 files · ~598,708 words
+- 534 files · ~2,869,878 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 10984 nodes · 11755 edges · 1601 communities (1543 shown, 58 thin omitted)
+- 10759 nodes · 11533 edges · 1534 communities (1474 shown, 60 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 160 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d2875612`
+- Built from commit: `1441964d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1311,68 +1311,7 @@
 - [[_COMMUNITY_Community 1314|Community 1314]]
 - [[_COMMUNITY_Community 1315|Community 1315]]
 - [[_COMMUNITY_Community 1316|Community 1316]]
-- [[_COMMUNITY_Community 1317|Community 1317]]
-- [[_COMMUNITY_Community 1318|Community 1318]]
-- [[_COMMUNITY_Community 1319|Community 1319]]
-- [[_COMMUNITY_Community 1320|Community 1320]]
-- [[_COMMUNITY_Community 1321|Community 1321]]
-- [[_COMMUNITY_Community 1322|Community 1322]]
-- [[_COMMUNITY_Community 1323|Community 1323]]
-- [[_COMMUNITY_Community 1324|Community 1324]]
-- [[_COMMUNITY_Community 1325|Community 1325]]
-- [[_COMMUNITY_Community 1326|Community 1326]]
-- [[_COMMUNITY_Community 1327|Community 1327]]
-- [[_COMMUNITY_Community 1328|Community 1328]]
-- [[_COMMUNITY_Community 1329|Community 1329]]
-- [[_COMMUNITY_Community 1330|Community 1330]]
-- [[_COMMUNITY_Community 1331|Community 1331]]
-- [[_COMMUNITY_Community 1332|Community 1332]]
-- [[_COMMUNITY_Community 1333|Community 1333]]
-- [[_COMMUNITY_Community 1334|Community 1334]]
-- [[_COMMUNITY_Community 1335|Community 1335]]
-- [[_COMMUNITY_Community 1336|Community 1336]]
-- [[_COMMUNITY_Community 1337|Community 1337]]
-- [[_COMMUNITY_Community 1338|Community 1338]]
-- [[_COMMUNITY_Community 1339|Community 1339]]
-- [[_COMMUNITY_Community 1340|Community 1340]]
-- [[_COMMUNITY_Community 1341|Community 1341]]
-- [[_COMMUNITY_Community 1342|Community 1342]]
-- [[_COMMUNITY_Community 1343|Community 1343]]
-- [[_COMMUNITY_Community 1344|Community 1344]]
-- [[_COMMUNITY_Community 1345|Community 1345]]
-- [[_COMMUNITY_Community 1346|Community 1346]]
-- [[_COMMUNITY_Community 1347|Community 1347]]
-- [[_COMMUNITY_Community 1348|Community 1348]]
-- [[_COMMUNITY_Community 1349|Community 1349]]
 - [[_COMMUNITY_Community 1350|Community 1350]]
-- [[_COMMUNITY_Community 1351|Community 1351]]
-- [[_COMMUNITY_Community 1352|Community 1352]]
-- [[_COMMUNITY_Community 1353|Community 1353]]
-- [[_COMMUNITY_Community 1354|Community 1354]]
-- [[_COMMUNITY_Community 1355|Community 1355]]
-- [[_COMMUNITY_Community 1356|Community 1356]]
-- [[_COMMUNITY_Community 1357|Community 1357]]
-- [[_COMMUNITY_Community 1358|Community 1358]]
-- [[_COMMUNITY_Community 1359|Community 1359]]
-- [[_COMMUNITY_Community 1360|Community 1360]]
-- [[_COMMUNITY_Community 1361|Community 1361]]
-- [[_COMMUNITY_Community 1362|Community 1362]]
-- [[_COMMUNITY_Community 1363|Community 1363]]
-- [[_COMMUNITY_Community 1364|Community 1364]]
-- [[_COMMUNITY_Community 1365|Community 1365]]
-- [[_COMMUNITY_Community 1366|Community 1366]]
-- [[_COMMUNITY_Community 1367|Community 1367]]
-- [[_COMMUNITY_Community 1368|Community 1368]]
-- [[_COMMUNITY_Community 1369|Community 1369]]
-- [[_COMMUNITY_Community 1370|Community 1370]]
-- [[_COMMUNITY_Community 1371|Community 1371]]
-- [[_COMMUNITY_Community 1372|Community 1372]]
-- [[_COMMUNITY_Community 1373|Community 1373]]
-- [[_COMMUNITY_Community 1374|Community 1374]]
-- [[_COMMUNITY_Community 1375|Community 1375]]
-- [[_COMMUNITY_Community 1376|Community 1376]]
-- [[_COMMUNITY_Community 1377|Community 1377]]
-- [[_COMMUNITY_Community 1378|Community 1378]]
 - [[_COMMUNITY_Community 1379|Community 1379]]
 - [[_COMMUNITY_Community 1380|Community 1380]]
 - [[_COMMUNITY_Community 1381|Community 1381]]
@@ -1458,7 +1397,6 @@
 - [[_COMMUNITY_Community 1461|Community 1461]]
 - [[_COMMUNITY_Community 1462|Community 1462]]
 - [[_COMMUNITY_Community 1463|Community 1463]]
-- [[_COMMUNITY_Community 1464|Community 1464]]
 - [[_COMMUNITY_Community 1465|Community 1465]]
 - [[_COMMUNITY_Community 1466|Community 1466]]
 - [[_COMMUNITY_Community 1467|Community 1467]]
@@ -1572,7 +1510,6 @@
 - [[_COMMUNITY_Community 1577|Community 1577]]
 - [[_COMMUNITY_Community 1578|Community 1578]]
 - [[_COMMUNITY_Community 1579|Community 1579]]
-- [[_COMMUNITY_Community 1580|Community 1580]]
 - [[_COMMUNITY_Community 1581|Community 1581]]
 - [[_COMMUNITY_Community 1582|Community 1582]]
 - [[_COMMUNITY_Community 1583|Community 1583]]
@@ -1585,20 +1522,18 @@
 - [[_COMMUNITY_Community 1590|Community 1590]]
 - [[_COMMUNITY_Community 1591|Community 1591]]
 - [[_COMMUNITY_Community 1592|Community 1592]]
-- [[_COMMUNITY_Community 1593|Community 1593]]
 - [[_COMMUNITY_Community 1594|Community 1594]]
 - [[_COMMUNITY_Community 1595|Community 1595]]
-- [[_COMMUNITY_Community 1596|Community 1596]]
 - [[_COMMUNITY_Community 1598|Community 1598]]
 - [[_COMMUNITY_Community 1599|Community 1599]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `getChannelStateById()` - 57 edges
 2. `channels` - 46 edges
-3. `channels` - 46 edges
+3. `channels` - 43 edges
 4. `channels` - 43 edges
 5. `channels` - 43 edges
-6. `channels` - 42 edges
+6. `channels` - 43 edges
 7. `channels` - 42 edges
 8. `channels` - 42 edges
 9. `channels` - 42 edges
@@ -1651,7 +1586,7 @@
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 - **14-bit Master Meter via native 0x21 with steps.json calibration (dB = (raw - 4493) / 63.66)** —  [INFERRED 0.90]
 
-## Communities (1601 total, 58 thin omitted)
+## Communities (1534 total, 60 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
 Cohesion: 0.11
@@ -1659,7 +1594,7 @@ Nodes (26): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOu
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
-Nodes (37): CancellationToken, D, Deserialize, Display, Err, Formatter, FromStr, Ok (+29 more)
+Nodes (36): CancellationToken, D, Display, Err, Formatter, FromStr, Ok, S (+28 more)
 
 ### Community 2 - "Migration Audit (Rust/Node.js Dead Code)"
 Cohesion: 0.05
@@ -1690,12 +1625,12 @@ Cohesion: 0.00
 Nodes (500): kAUXAttenuator/kAtt, kAUXAttenuator/kAttBitShift, kAUXBalance/kBalance, kAUXChannelOn/kChannelOn, kAUXComp/kCompAttack, kAUXComp/kCompGain, kAUXComp/kCompKnee, kAUXComp/kCompLink (+492 more)
 
 ### Community 9 - "Macros Engine & Host Profiles"
-Cohesion: 0.40
-Nodes (5): 2, color, config, name, scriptId
+Cohesion: 0.28
+Nodes (9): 2, color, config, name, scriptId, config, config, extras (+1 more)
 
 ### Community 10 - "Node.js Legacy MIDI Functions"
-Cohesion: 0.06
-Nodes (36): 0, config, name, scriptId, 1, config, name, scriptId (+28 more)
+Cohesion: 0.13
+Nodes (14): 0, config, name, scriptId, 1, config, name, scriptId (+6 more)
 
 ### Community 11 - "Rust Migration Governance Rules"
 Cohesion: 0.20
@@ -1754,8 +1689,8 @@ Cohesion: 0.11
 Nodes (16): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1), Documentation style guide, I. Core principles (+8 more)
 
 ### Community 32 - "FX Slot Scanner & Elevation Test"
-Cohesion: 0.09
-Nodes (20): cachedTextDecoder, cachedTextEncoder, decodeText(), getArrayF32FromWasm0(), getArrayJsValueFromWasm0(), getDataViewMemory0(), getFloat32ArrayMemory0(), getStringFromWasm0() (+12 more)
+Cohesion: 0.17
+Nodes (11): name, short, name, short, name, short, channels, 15 (+3 more)
 
 ### Community 33 - "Community 33"
 Cohesion: 0.11
@@ -1843,7 +1778,7 @@ Nodes (38): 1.1 As Duas DLLs e seus Papéis, 1.2 Diagrama de Comunicação, 1.3 
 
 ### Community 68 - "Community 68"
 Cohesion: 0.08
-Nodes (69): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+61 more)
+Nodes (70): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+62 more)
 
 ### Community 69 - "Community 69"
 Cohesion: 0.06
@@ -2346,8 +2281,8 @@ Cohesion: 0.40
 Nodes (5): 3, color, config, name, scriptId
 
 ### Community 196 - "Community 196"
-Cohesion: 0.28
-Nodes (9): 4, color, config, name, scriptId, config, config, extras (+1 more)
+Cohesion: 0.40
+Nodes (5): 4, color, config, name, scriptId
 
 ### Community 197 - "Community 197"
 Cohesion: 0.40
@@ -3774,16 +3709,16 @@ Cohesion: 0.29
 Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 574 - "Community 574"
-Cohesion: 0.17
-Nodes (11): name, short, name, short, name, short, channels, 18 (+3 more)
+Cohesion: 0.22
+Nodes (8): 0, config, name, scriptId, 1, config, name, scriptId
 
 ### Community 575 - "Community 575"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 23, 36
+Nodes (7): name, short, name, short, channels, 36, 5
 
 ### Community 576 - "Community 576"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 577 - "Community 577"
 Cohesion: 0.29
@@ -3795,7 +3730,7 @@ Nodes (4): createFuzzySearch(), fuzzyMatch(), isPhoneSize(), normalizeStr()
 
 ### Community 579 - "Community 579"
 Cohesion: 0.29
-Nodes (7): channels, master, name, short, mix1, name, short
+Nodes (7): name, short, channels, 36, mix1, name, short
 
 ### Community 580 - "Community 580"
 Cohesion: 0.22
@@ -3811,51 +3746,51 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 583 - "Community 583"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 584 - "Community 584"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 585 - "Community 585"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 36, 8
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 587 - "Community 587"
 Cohesion: 0.25
 Nodes (7): files, main, name, sideEffects, type, types, version
 
 ### Community 588 - "Community 588"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 1, 12
+Cohesion: 0.39
+Nodes (9): config, config, config, config, config, config, config, extras (+1 more)
 
 ### Community 589 - "Community 589"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 24, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 590 - "Community 590"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Cohesion: 0.22
+Nodes (8): 1, config, name, scriptId, globalConfig, lumikit, ip, port
 
 ### Community 591 - "Community 591"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, channels, 36, mix1, name, short
 
 ### Community 592 - "Community 592"
 Cohesion: 0.29
-Nodes (6): name, short, channels, 36, scene_id, scene_name
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 593 - "Community 593"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 594 - "Community 594"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 595 - "Community 595"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, channels, 36, mix1, name, short
 
 ### Community 596 - "Community 596"
 Cohesion: 0.29
@@ -4057,57 +3992,61 @@ Nodes (3): name, short, 9
 Cohesion: 0.17
 Nodes (11): 1. Visão Geral do Fluxo, 2. Implementação no Servidor (Backend Rust), 3. Implementação no Cliente (Frontend e WASM), 4. Estratégia Passo a Passo, Adições Necessárias (`server_rust/Cargo.toml`):, Arquitetura de Threads para Áudio:, Estados e Decisões:, Plano de Implementação: Pseudo RTA (Real-Time Analyzer) (+3 more)
 
+### Community 653 - "Community 653"
+Cohesion: 0.33
+Nodes (6): 10, color, config, name, scriptId, scenes
+
 ### Community 654 - "Community 654"
-Cohesion: 0.67
-Nodes (3): name, short, 10
+Cohesion: 0.33
+Nodes (6): 2, color, config, name, scriptId, extras
 
 ### Community 655 - "Community 655"
-Cohesion: 0.67
-Nodes (3): name, short, 11
+Cohesion: 0.40
+Nodes (5): 3, color, config, name, scriptId
 
 ### Community 656 - "Community 656"
-Cohesion: 0.67
-Nodes (3): name, short, 13
+Cohesion: 0.40
+Nodes (5): 4, color, config, name, scriptId
 
 ### Community 657 - "Community 657"
-Cohesion: 0.67
-Nodes (3): name, short, 14
+Cohesion: 0.40
+Nodes (5): 5, color, config, name, scriptId
 
 ### Community 658 - "Community 658"
-Cohesion: 0.67
-Nodes (3): name, short, 15
+Cohesion: 0.40
+Nodes (5): 6, color, config, name, scriptId
 
 ### Community 659 - "Community 659"
-Cohesion: 0.67
-Nodes (3): name, short, 16
+Cohesion: 0.40
+Nodes (5): 8, color, config, name, scriptId
 
 ### Community 660 - "Community 660"
-Cohesion: 0.67
-Nodes (3): name, short, 17
+Cohesion: 0.50
+Nodes (4): 2, color, name, scriptId
 
 ### Community 661 - "Community 661"
-Cohesion: 0.67
-Nodes (3): name, short, 18
+Cohesion: 0.50
+Nodes (4): 3, color, name, scriptId
 
 ### Community 662 - "Community 662"
-Cohesion: 0.67
-Nodes (3): name, short, 19
+Cohesion: 0.50
+Nodes (4): 4, color, name, scriptId
 
 ### Community 663 - "Community 663"
-Cohesion: 0.67
-Nodes (3): name, short, 20
+Cohesion: 0.50
+Nodes (4): 5, color, name, scriptId
 
 ### Community 664 - "Community 664"
-Cohesion: 0.25
-Nodes (7): files, main, name, sideEffects, type, types, version
+Cohesion: 0.50
+Nodes (4): 6, color, name, scriptId
 
 ### Community 665 - "Community 665"
-Cohesion: 0.67
-Nodes (3): name, short, 22
+Cohesion: 0.50
+Nodes (4): 7, color, name, scriptId
 
 ### Community 666 - "Community 666"
-Cohesion: 0.67
-Nodes (3): name, short, 23
+Cohesion: 0.50
+Nodes (4): 8, color, name, scriptId
 
 ### Community 668 - "Community 668"
 Cohesion: 0.67
@@ -4158,8 +4097,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 680 - "Community 680"
-Cohesion: 0.67
-Nodes (3): name, short, 24
+Cohesion: 0.50
+Nodes (4): globalConfig, lumikit, ip, port
 
 ### Community 681 - "Community 681"
 Cohesion: 0.67
@@ -4298,8 +4237,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 17
 
 ### Community 716 - "Community 716"
-Cohesion: 0.67
-Nodes (3): name, short, 25
+Cohesion: 0.50
+Nodes (4): 0, config, name, scriptId
 
 ### Community 717 - "Community 717"
 Cohesion: 0.67
@@ -4318,8 +4257,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 22
 
 ### Community 721 - "Community 721"
-Cohesion: 0.24
-Nodes (7): Arc, Mutex, Option, Self, Sender, SocketRef, RtaManager
+Cohesion: 0.23
+Nodes (9): Arc, Mutex, Option, Self, Sender, SocketIo, SocketRef, String (+1 more)
 
 ### Community 722 - "Community 722"
 Cohesion: 0.67
@@ -4398,8 +4337,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 4
 
 ### Community 741 - "Community 741"
-Cohesion: 0.67
-Nodes (3): name, short, 5
+Cohesion: 0.50
+Nodes (4): 0, config, name, scriptId
 
 ### Community 742 - "Community 742"
 Cohesion: 0.67
@@ -4467,15 +4406,11 @@ Nodes (3): name, short, 20
 
 ### Community 759 - "Community 759"
 Cohesion: 0.67
-Nodes (3): name, short, 26
+Nodes (3): master, name, short
 
 ### Community 760 - "Community 760"
 Cohesion: 0.67
 Nodes (3): name, short, 22
-
-### Community 761 - "Community 761"
-Cohesion: 0.67
-Nodes (3): name, short, 27
 
 ### Community 762 - "Community 762"
 Cohesion: 0.67
@@ -4623,7 +4558,7 @@ Nodes (3): name, short, 20
 
 ### Community 799 - "Community 799"
 Cohesion: 0.67
-Nodes (3): name, short, 28
+Nodes (3): name, short, 10
 
 ### Community 800 - "Community 800"
 Cohesion: 0.67
@@ -4631,7 +4566,7 @@ Nodes (3): name, short, 22
 
 ### Community 801 - "Community 801"
 Cohesion: 0.67
-Nodes (3): name, short, 29
+Nodes (3): name, short, 11
 
 ### Community 802 - "Community 802"
 Cohesion: 0.67
@@ -4719,7 +4654,7 @@ Nodes (3): name, short, 6
 
 ### Community 823 - "Community 823"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 3, 36
 
 ### Community 824 - "Community 824"
 Cohesion: 0.67
@@ -4735,103 +4670,107 @@ Nodes (3): master, name, short
 
 ### Community 830 - "Community 830"
 Cohesion: 0.67
-Nodes (3): name, short, 2
+Nodes (3): name, short, 12
 
 ### Community 831 - "Community 831"
 Cohesion: 0.67
-Nodes (3): name, short, 30
+Nodes (3): name, short, 13
 
 ### Community 832 - "Community 832"
 Cohesion: 0.67
-Nodes (3): name, short, 31
+Nodes (3): name, short, 14
 
 ### Community 833 - "Community 833"
 Cohesion: 0.67
-Nodes (3): name, short, 32
+Nodes (3): name, short, 15
 
 ### Community 834 - "Community 834"
 Cohesion: 0.67
-Nodes (3): name, short, 33
+Nodes (3): name, short, 16
 
 ### Community 835 - "Community 835"
 Cohesion: 0.67
-Nodes (3): name, short, 34
+Nodes (3): name, short, 17
 
 ### Community 836 - "Community 836"
 Cohesion: 0.67
-Nodes (3): name, short, 35
+Nodes (3): name, short, 18
 
 ### Community 837 - "Community 837"
 Cohesion: 0.67
-Nodes (3): name, short, 36
+Nodes (3): name, short, 19
 
 ### Community 838 - "Community 838"
 Cohesion: 0.67
-Nodes (3): name, short, 37
+Nodes (3): name, short, 1
 
 ### Community 839 - "Community 839"
 Cohesion: 0.67
-Nodes (3): name, short, 38
+Nodes (3): name, short, 20
 
 ### Community 840 - "Community 840"
 Cohesion: 0.67
-Nodes (3): name, short, 39
+Nodes (3): name, short, 21
 
 ### Community 841 - "Community 841"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 22
 
 ### Community 842 - "Community 842"
 Cohesion: 0.67
-Nodes (3): name, short, 40
+Nodes (3): name, short, 23
 
 ### Community 843 - "Community 843"
 Cohesion: 0.67
-Nodes (3): name, short, 4
+Nodes (3): name, short, 24
 
 ### Community 844 - "Community 844"
 Cohesion: 0.67
-Nodes (3): name, short, 5
+Nodes (3): name, short, 25
 
 ### Community 845 - "Community 845"
 Cohesion: 0.67
-Nodes (3): name, short, 6
+Nodes (3): name, short, 26
 
 ### Community 846 - "Community 846"
 Cohesion: 0.67
-Nodes (3): name, short, 7
+Nodes (3): name, short, 27
 
 ### Community 847 - "Community 847"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 28
 
 ### Community 848 - "Community 848"
 Cohesion: 0.67
-Nodes (3): name, short, 9
+Nodes (3): name, short, 29
 
 ### Community 849 - "Community 849"
 Cohesion: 0.67
-Nodes (3): name, short, bus1
+Nodes (3): name, short, 2
 
 ### Community 850 - "Community 850"
 Cohesion: 0.67
-Nodes (3): name, short, bus2
+Nodes (3): name, short, 30
 
 ### Community 851 - "Community 851"
 Cohesion: 0.67
-Nodes (3): name, short, bus3
+Nodes (3): name, short, 31
 
 ### Community 852 - "Community 852"
 Cohesion: 0.67
-Nodes (3): name, short, bus4
+Nodes (3): name, short, 32
 
 ### Community 853 - "Community 853"
 Cohesion: 0.67
-Nodes (3): master, name, short
+Nodes (3): name, short, 33
+
+### Community 854 - "Community 854"
+Cohesion: 0.67
+Nodes (3): name, short, 34
 
 ### Community 856 - "Community 856"
 Cohesion: 0.67
-Nodes (3): name, short, 10
+Nodes (3): name, short, 35
 
 ### Community 858 - "Community 858"
 Cohesion: 0.67
@@ -4839,7 +4778,7 @@ Nodes (3): name, short, 10
 
 ### Community 859 - "Community 859"
 Cohesion: 0.67
-Nodes (3): name, short, 11
+Nodes (3): name, short, 37
 
 ### Community 860 - "Community 860"
 Cohesion: 0.67
@@ -4923,7 +4862,7 @@ Nodes (3): name, short, 17
 
 ### Community 881 - "Community 881"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 38
 
 ### Community 882 - "Community 882"
 Cohesion: 0.67
@@ -4946,8 +4885,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 24
 
 ### Community 887 - "Community 887"
-Cohesion: 0.50
-Nodes (4): 10, config, name, scriptId
+Cohesion: 0.67
+Nodes (3): name, short, 39
 
 ### Community 888 - "Community 888"
 Cohesion: 0.67
@@ -5010,8 +4949,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 39
 
 ### Community 903 - "Community 903"
-Cohesion: 0.33
-Nodes (5): InitInput, InitOutput, MeterEngine, MidiDispatcher, SyncInitInput
+Cohesion: 0.67
+Nodes (3): name, short, 3
 
 ### Community 904 - "Community 904"
 Cohesion: 0.67
@@ -5283,15 +5222,15 @@ Nodes (3): name, short, 21
 
 ### Community 972 - "Community 972"
 Cohesion: 0.22
-Nodes (8): 0, config, name, scriptId, 11, config, name, scriptId
+Nodes (8): 10, config, name, scriptId, 11, config, name, scriptId
 
 ### Community 973 - "Community 973"
 Cohesion: 0.67
-Nodes (3): name, short, 12
+Nodes (3): name, short, 40
 
 ### Community 974 - "Community 974"
 Cohesion: 0.67
-Nodes (3): name, short, 13
+Nodes (3): name, short, 4
 
 ### Community 975 - "Community 975"
 Cohesion: 0.67
@@ -5371,7 +5310,7 @@ Nodes (3): name, short, 20
 
 ### Community 995 - "Community 995"
 Cohesion: 0.67
-Nodes (3): name, short, 14
+Nodes (3): name, short, 5
 
 ### Community 996 - "Community 996"
 Cohesion: 0.67
@@ -5531,7 +5470,7 @@ Nodes (3): name, short, 20
 
 ### Community 1036 - "Community 1036"
 Cohesion: 0.67
-Nodes (3): name, short, 15
+Nodes (3): name, short, 6
 
 ### Community 1037 - "Community 1037"
 Cohesion: 0.67
@@ -5643,7 +5582,7 @@ Nodes (3): master, name, short
 
 ### Community 1064 - "Community 1064"
 Cohesion: 0.67
-Nodes (3): name, short, 16
+Nodes (3): name, short, 7
 
 ### Community 1065 - "Community 1065"
 Cohesion: 0.67
@@ -5691,7 +5630,7 @@ Nodes (3): name, short, 20
 
 ### Community 1076 - "Community 1076"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 8
 
 ### Community 1077 - "Community 1077"
 Cohesion: 0.67
@@ -5807,7 +5746,7 @@ Nodes (3): name, short, 21
 
 ### Community 1105 - "Community 1105"
 Cohesion: 0.67
-Nodes (3): name, short, 36
+Nodes (3): name, short, 9
 
 ### Community 1107 - "Community 1107"
 Cohesion: 0.67
@@ -5843,7 +5782,7 @@ Nodes (3): name, short, 17
 
 ### Community 1115 - "Community 1115"
 Cohesion: 0.67
-Nodes (3): name, short, 17
+Nodes (3): master, name, short
 
 ### Community 1116 - "Community 1116"
 Cohesion: 0.67
@@ -5864,10 +5803,6 @@ Nodes (3): name, short, 21
 ### Community 1120 - "Community 1120"
 Cohesion: 0.67
 Nodes (3): name, short, 22
-
-### Community 1121 - "Community 1121"
-Cohesion: 0.67
-Nodes (3): name, short, 21
 
 ### Community 1122 - "Community 1122"
 Cohesion: 0.67
@@ -5955,7 +5890,7 @@ Nodes (3): name, short, 7
 
 ### Community 1143 - "Community 1143"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 10
 
 ### Community 1144 - "Community 1144"
 Cohesion: 0.67
@@ -5967,11 +5902,11 @@ Nodes (3): master, name, short
 
 ### Community 1146 - "Community 1146"
 Cohesion: 0.67
-Nodes (3): name, short, 19
+Nodes (3): name, short, 11
 
 ### Community 1147 - "Community 1147"
 Cohesion: 0.67
-Nodes (3): name, short, 1
+Nodes (3): name, short, 12
 
 ### Community 1148 - "Community 1148"
 Cohesion: 0.50
@@ -5979,903 +5914,651 @@ Nodes (3): INSERT IN (Entradas do Canal), INSERT OUT (Saídas do Canal), MAPEAME
 
 ### Community 1149 - "Community 1149"
 Cohesion: 0.67
-Nodes (3): name, short, 20
+Nodes (3): name, short, 13
 
 ### Community 1150 - "Community 1150"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 14
 
 ### Community 1151 - "Community 1151"
 Cohesion: 0.67
-Nodes (3): name, short, 22
+Nodes (3): name, short, 15
 
 ### Community 1152 - "Community 1152"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 16
 
 ### Community 1153 - "Community 1153"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 17
 
 ### Community 1154 - "Community 1154"
 Cohesion: 0.67
-Nodes (3): name, short, 25
+Nodes (3): name, short, 19
 
 ### Community 1155 - "Community 1155"
 Cohesion: 0.67
-Nodes (3): name, short, 26
+Nodes (3): name, short, 1
 
 ### Community 1156 - "Community 1156"
 Cohesion: 0.67
-Nodes (3): name, short, 27
+Nodes (3): name, short, 20
 
 ### Community 1157 - "Community 1157"
 Cohesion: 0.67
-Nodes (3): name, short, 28
+Nodes (3): name, short, 21
 
 ### Community 1158 - "Community 1158"
 Cohesion: 0.67
-Nodes (3): name, short, 29
+Nodes (3): name, short, 22
 
 ### Community 1159 - "Community 1159"
 Cohesion: 0.67
-Nodes (3): name, short, 2
+Nodes (3): name, short, 23
 
 ### Community 1160 - "Community 1160"
 Cohesion: 0.67
-Nodes (3): name, short, 30
+Nodes (3): name, short, 24
 
 ### Community 1161 - "Community 1161"
 Cohesion: 0.67
-Nodes (3): name, short, 31
+Nodes (3): name, short, 25
 
 ### Community 1162 - "Community 1162"
 Cohesion: 0.67
-Nodes (3): name, short, 32
+Nodes (3): name, short, 26
 
 ### Community 1163 - "Community 1163"
 Cohesion: 0.67
-Nodes (3): name, short, 33
+Nodes (3): name, short, 27
 
 ### Community 1164 - "Community 1164"
 Cohesion: 0.67
-Nodes (3): name, short, 34
+Nodes (3): name, short, 28
 
 ### Community 1165 - "Community 1165"
 Cohesion: 0.67
-Nodes (3): name, short, 35
+Nodes (3): name, short, 29
 
 ### Community 1166 - "Community 1166"
 Cohesion: 0.67
-Nodes (3): name, short, 37
+Nodes (3): name, short, 2
 
 ### Community 1167 - "Community 1167"
 Cohesion: 0.67
-Nodes (3): name, short, 38
+Nodes (3): name, short, 30
 
 ### Community 1168 - "Community 1168"
 Cohesion: 0.67
-Nodes (3): name, short, 39
+Nodes (3): name, short, 31
 
 ### Community 1169 - "Community 1169"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 32
 
 ### Community 1170 - "Community 1170"
 Cohesion: 0.67
-Nodes (3): name, short, 40
+Nodes (3): name, short, 33
 
 ### Community 1171 - "Community 1171"
 Cohesion: 0.67
-Nodes (3): name, short, 4
+Nodes (3): name, short, 34
 
 ### Community 1172 - "Community 1172"
 Cohesion: 0.67
-Nodes (3): name, short, 5
+Nodes (3): name, short, 35
 
 ### Community 1173 - "Community 1173"
 Cohesion: 0.67
-Nodes (3): name, short, 6
+Nodes (3): name, short, 37
 
 ### Community 1174 - "Community 1174"
 Cohesion: 0.67
-Nodes (3): name, short, 7
+Nodes (3): name, short, 38
 
 ### Community 1175 - "Community 1175"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 39
 
 ### Community 1176 - "Community 1176"
 Cohesion: 0.67
-Nodes (3): name, short, 9
+Nodes (3): name, short, 3
 
 ### Community 1177 - "Community 1177"
 Cohesion: 0.67
-Nodes (3): master, name, short
+Nodes (3): name, short, 40
+
+### Community 1178 - "Community 1178"
+Cohesion: 0.67
+Nodes (3): name, short, 4
 
 ### Community 1179 - "Community 1179"
 Cohesion: 0.67
-Nodes (3): name, short, 10
+Nodes (3): name, short, 5
 
 ### Community 1180 - "Community 1180"
 Cohesion: 0.67
-Nodes (3): name, short, 11
+Nodes (3): name, short, 6
 
 ### Community 1181 - "Community 1181"
 Cohesion: 0.67
-Nodes (3): name, short, 12
+Nodes (3): name, short, 7
 
 ### Community 1182 - "Community 1182"
 Cohesion: 0.67
-Nodes (3): name, short, 13
+Nodes (3): name, short, 8
 
 ### Community 1183 - "Community 1183"
 Cohesion: 0.67
-Nodes (3): name, short, 14
+Nodes (3): name, short, 9
 
 ### Community 1184 - "Community 1184"
 Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1185 - "Community 1185"
-Cohesion: 0.67
-Nodes (3): name, short, 16
+Nodes (3): master, name, short
 
 ### Community 1186 - "Community 1186"
 Cohesion: 0.67
-Nodes (3): name, short, 17
+Nodes (3): name, short, 10
 
 ### Community 1187 - "Community 1187"
 Cohesion: 0.67
-Nodes (3): name, short, 19
+Nodes (3): name, short, 11
 
 ### Community 1188 - "Community 1188"
 Cohesion: 0.67
-Nodes (3): name, short, 1
+Nodes (3): name, short, 12
 
 ### Community 1189 - "Community 1189"
 Cohesion: 0.67
-Nodes (3): name, short, 20
+Nodes (3): name, short, 13
 
 ### Community 1190 - "Community 1190"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 14
 
 ### Community 1191 - "Community 1191"
 Cohesion: 0.67
-Nodes (3): name, short, 22
+Nodes (3): name, short, 15
 
 ### Community 1192 - "Community 1192"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 16
 
 ### Community 1193 - "Community 1193"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 17
 
 ### Community 1194 - "Community 1194"
 Cohesion: 0.67
-Nodes (3): name, short, 25
+Nodes (3): name, short, 19
 
 ### Community 1195 - "Community 1195"
 Cohesion: 0.67
-Nodes (3): name, short, 26
+Nodes (3): name, short, 1
 
 ### Community 1196 - "Community 1196"
 Cohesion: 0.67
-Nodes (3): name, short, 27
+Nodes (3): name, short, 20
 
 ### Community 1197 - "Community 1197"
 Cohesion: 0.67
-Nodes (3): name, short, 28
+Nodes (3): name, short, 21
 
 ### Community 1198 - "Community 1198"
 Cohesion: 0.67
-Nodes (3): name, short, 29
+Nodes (3): name, short, 22
 
 ### Community 1199 - "Community 1199"
 Cohesion: 0.67
-Nodes (3): name, short, 2
+Nodes (3): name, short, 23
 
 ### Community 1200 - "Community 1200"
 Cohesion: 0.67
-Nodes (3): name, short, 30
+Nodes (3): name, short, 24
 
 ### Community 1201 - "Community 1201"
 Cohesion: 0.67
-Nodes (3): name, short, 31
+Nodes (3): name, short, 25
 
 ### Community 1202 - "Community 1202"
 Cohesion: 0.67
-Nodes (3): name, short, 32
+Nodes (3): name, short, 26
 
 ### Community 1203 - "Community 1203"
 Cohesion: 0.67
-Nodes (3): name, short, 33
+Nodes (3): name, short, 27
 
 ### Community 1204 - "Community 1204"
 Cohesion: 0.67
-Nodes (3): name, short, 34
+Nodes (3): name, short, 28
 
 ### Community 1205 - "Community 1205"
 Cohesion: 0.67
-Nodes (3): name, short, 35
+Nodes (3): name, short, 29
 
 ### Community 1206 - "Community 1206"
 Cohesion: 0.67
-Nodes (3): name, short, 37
+Nodes (3): name, short, 2
 
 ### Community 1207 - "Community 1207"
 Cohesion: 0.67
-Nodes (3): name, short, 38
+Nodes (3): name, short, 30
 
 ### Community 1208 - "Community 1208"
 Cohesion: 0.67
-Nodes (3): name, short, 39
+Nodes (3): name, short, 31
 
 ### Community 1209 - "Community 1209"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 32
 
 ### Community 1210 - "Community 1210"
 Cohesion: 0.67
-Nodes (3): name, short, 40
+Nodes (3): name, short, 33
 
 ### Community 1211 - "Community 1211"
 Cohesion: 0.67
-Nodes (3): name, short, 4
+Nodes (3): name, short, 34
 
 ### Community 1212 - "Community 1212"
 Cohesion: 0.67
-Nodes (3): name, short, 5
+Nodes (3): name, short, 35
 
 ### Community 1213 - "Community 1213"
 Cohesion: 0.67
-Nodes (3): name, short, 6
+Nodes (3): name, short, 37
 
 ### Community 1214 - "Community 1214"
 Cohesion: 0.67
-Nodes (3): name, short, 7
+Nodes (3): name, short, 38
 
 ### Community 1215 - "Community 1215"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 39
 
 ### Community 1216 - "Community 1216"
 Cohesion: 0.67
-Nodes (3): name, short, 9
+Nodes (3): name, short, 3
 
 ### Community 1217 - "Community 1217"
 Cohesion: 0.67
-Nodes (3): master, name, short
+Nodes (3): name, short, 40
 
 ### Community 1218 - "Community 1218"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 4
 
 ### Community 1219 - "Community 1219"
 Cohesion: 0.67
-Nodes (3): name, short, 10
+Nodes (3): name, short, 5
 
 ### Community 1220 - "Community 1220"
 Cohesion: 0.67
-Nodes (3): name, short, 11
+Nodes (3): name, short, 6
 
 ### Community 1221 - "Community 1221"
 Cohesion: 0.67
-Nodes (3): name, short, 12
+Nodes (3): name, short, 7
 
 ### Community 1222 - "Community 1222"
 Cohesion: 0.67
-Nodes (3): name, short, 13
+Nodes (3): name, short, 8
 
 ### Community 1223 - "Community 1223"
 Cohesion: 0.67
-Nodes (3): name, short, 14
+Nodes (3): name, short, 9
 
 ### Community 1224 - "Community 1224"
 Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1225 - "Community 1225"
-Cohesion: 0.67
-Nodes (3): name, short, 16
+Nodes (3): master, name, short
 
 ### Community 1226 - "Community 1226"
 Cohesion: 0.67
-Nodes (3): name, short, 17
+Nodes (3): name, short, 10
 
 ### Community 1227 - "Community 1227"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 11
 
 ### Community 1228 - "Community 1228"
 Cohesion: 0.67
-Nodes (3): name, short, 19
+Nodes (3): name, short, 12
 
 ### Community 1229 - "Community 1229"
 Cohesion: 0.67
-Nodes (3): name, short, 1
+Nodes (3): name, short, 13
 
 ### Community 1230 - "Community 1230"
 Cohesion: 0.67
-Nodes (3): name, short, 20
+Nodes (3): name, short, 14
 
 ### Community 1231 - "Community 1231"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 15
 
 ### Community 1232 - "Community 1232"
 Cohesion: 0.67
-Nodes (3): name, short, 22
+Nodes (3): name, short, 16
 
 ### Community 1233 - "Community 1233"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 17
 
 ### Community 1234 - "Community 1234"
 Cohesion: 0.67
-Nodes (3): name, short, 25
+Nodes (3): name, short, 18
 
 ### Community 1235 - "Community 1235"
 Cohesion: 0.67
-Nodes (3): name, short, 26
+Nodes (3): name, short, 19
 
 ### Community 1236 - "Community 1236"
 Cohesion: 0.67
-Nodes (3): name, short, 27
+Nodes (3): name, short, 1
 
 ### Community 1237 - "Community 1237"
 Cohesion: 0.67
-Nodes (3): name, short, 28
+Nodes (3): name, short, 20
 
 ### Community 1238 - "Community 1238"
 Cohesion: 0.67
-Nodes (3): name, short, 29
+Nodes (3): name, short, 22
 
 ### Community 1239 - "Community 1239"
 Cohesion: 0.67
-Nodes (3): name, short, 2
+Nodes (3): name, short, 23
 
 ### Community 1240 - "Community 1240"
 Cohesion: 0.67
-Nodes (3): name, short, 30
+Nodes (3): name, short, 24
 
 ### Community 1241 - "Community 1241"
 Cohesion: 0.67
-Nodes (3): name, short, 31
+Nodes (3): name, short, 25
 
 ### Community 1242 - "Community 1242"
 Cohesion: 0.67
-Nodes (3): name, short, 32
+Nodes (3): name, short, 26
 
 ### Community 1243 - "Community 1243"
 Cohesion: 0.67
-Nodes (3): name, short, 33
+Nodes (3): name, short, 27
 
 ### Community 1244 - "Community 1244"
 Cohesion: 0.67
-Nodes (3): name, short, 34
+Nodes (3): name, short, 28
 
 ### Community 1245 - "Community 1245"
 Cohesion: 0.67
-Nodes (3): name, short, 35
+Nodes (3): name, short, 29
 
 ### Community 1246 - "Community 1246"
 Cohesion: 0.67
-Nodes (3): name, short, 37
+Nodes (3): name, short, 2
 
 ### Community 1247 - "Community 1247"
 Cohesion: 0.67
-Nodes (3): name, short, 38
+Nodes (3): name, short, 30
 
 ### Community 1248 - "Community 1248"
 Cohesion: 0.67
-Nodes (3): name, short, 39
+Nodes (3): name, short, 31
 
 ### Community 1249 - "Community 1249"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 32
 
 ### Community 1250 - "Community 1250"
 Cohesion: 0.67
-Nodes (3): name, short, 40
+Nodes (3): name, short, 33
 
 ### Community 1251 - "Community 1251"
 Cohesion: 0.67
-Nodes (3): name, short, 4
+Nodes (3): name, short, 34
 
 ### Community 1252 - "Community 1252"
 Cohesion: 0.67
-Nodes (3): name, short, 5
+Nodes (3): name, short, 35
 
 ### Community 1253 - "Community 1253"
 Cohesion: 0.67
-Nodes (3): name, short, 6
+Nodes (3): name, short, 37
 
 ### Community 1254 - "Community 1254"
 Cohesion: 0.67
-Nodes (3): name, short, 7
+Nodes (3): name, short, 38
 
 ### Community 1255 - "Community 1255"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 39
 
 ### Community 1256 - "Community 1256"
 Cohesion: 0.67
-Nodes (3): name, short, 9
+Nodes (3): name, short, 3
 
 ### Community 1257 - "Community 1257"
 Cohesion: 0.67
-Nodes (3): master, name, short
+Nodes (3): name, short, 40
+
+### Community 1258 - "Community 1258"
+Cohesion: 0.67
+Nodes (3): name, short, 4
 
 ### Community 1259 - "Community 1259"
 Cohesion: 0.67
-Nodes (3): name, short, 10
+Nodes (3): name, short, 5
 
 ### Community 1260 - "Community 1260"
 Cohesion: 0.67
-Nodes (3): name, short, 11
+Nodes (3): name, short, 6
 
 ### Community 1261 - "Community 1261"
 Cohesion: 0.67
-Nodes (3): name, short, 12
+Nodes (3): name, short, 7
 
 ### Community 1262 - "Community 1262"
 Cohesion: 0.67
-Nodes (3): name, short, 13
+Nodes (3): name, short, 8
 
 ### Community 1263 - "Community 1263"
 Cohesion: 0.67
-Nodes (3): name, short, 14
+Nodes (3): name, short, 9
 
 ### Community 1264 - "Community 1264"
 Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1265 - "Community 1265"
-Cohesion: 0.67
-Nodes (3): name, short, 16
+Nodes (3): master, name, short
 
 ### Community 1266 - "Community 1266"
 Cohesion: 0.67
-Nodes (3): name, short, 17
+Nodes (3): name, short, 10
 
 ### Community 1267 - "Community 1267"
 Cohesion: 0.67
-Nodes (3): name, short, 19
+Nodes (3): name, short, 11
 
 ### Community 1268 - "Community 1268"
 Cohesion: 0.67
-Nodes (3): name, short, 1
+Nodes (3): name, short, 12
 
 ### Community 1269 - "Community 1269"
 Cohesion: 0.67
-Nodes (3): name, short, 20
+Nodes (3): name, short, 13
 
 ### Community 1270 - "Community 1270"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 14
 
 ### Community 1271 - "Community 1271"
 Cohesion: 0.67
-Nodes (3): name, short, 22
+Nodes (3): name, short, 15
 
 ### Community 1272 - "Community 1272"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 16
 
 ### Community 1273 - "Community 1273"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 17
 
 ### Community 1274 - "Community 1274"
 Cohesion: 0.67
-Nodes (3): name, short, 25
+Nodes (3): name, short, 18
 
 ### Community 1275 - "Community 1275"
 Cohesion: 0.67
-Nodes (3): name, short, 26
+Nodes (3): name, short, 19
 
 ### Community 1276 - "Community 1276"
 Cohesion: 0.67
-Nodes (3): name, short, 27
+Nodes (3): name, short, 1
 
 ### Community 1277 - "Community 1277"
 Cohesion: 0.67
-Nodes (3): name, short, 28
+Nodes (3): name, short, 20
 
 ### Community 1278 - "Community 1278"
 Cohesion: 0.67
-Nodes (3): name, short, 29
+Nodes (3): name, short, 21
 
 ### Community 1279 - "Community 1279"
 Cohesion: 0.67
-Nodes (3): name, short, 2
+Nodes (3): name, short, 22
 
 ### Community 1280 - "Community 1280"
 Cohesion: 0.67
-Nodes (3): name, short, 30
+Nodes (3): name, short, 23
 
 ### Community 1281 - "Community 1281"
 Cohesion: 0.67
-Nodes (3): name, short, 31
+Nodes (3): name, short, 24
 
 ### Community 1282 - "Community 1282"
 Cohesion: 0.67
-Nodes (3): name, short, 32
+Nodes (3): name, short, 25
 
 ### Community 1283 - "Community 1283"
 Cohesion: 0.67
-Nodes (3): name, short, 33
+Nodes (3): name, short, 26
 
 ### Community 1284 - "Community 1284"
 Cohesion: 0.67
-Nodes (3): name, short, 34
+Nodes (3): name, short, 27
 
 ### Community 1285 - "Community 1285"
 Cohesion: 0.67
-Nodes (3): name, short, 35
+Nodes (3): name, short, 28
 
 ### Community 1286 - "Community 1286"
 Cohesion: 0.67
-Nodes (3): name, short, 37
+Nodes (3): name, short, 29
 
 ### Community 1287 - "Community 1287"
 Cohesion: 0.67
-Nodes (3): name, short, 38
+Nodes (3): name, short, 2
 
 ### Community 1288 - "Community 1288"
 Cohesion: 0.67
-Nodes (3): name, short, 39
+Nodes (3): name, short, 30
 
 ### Community 1289 - "Community 1289"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 31
 
 ### Community 1290 - "Community 1290"
 Cohesion: 0.67
-Nodes (3): name, short, 40
+Nodes (3): name, short, 32
 
 ### Community 1291 - "Community 1291"
 Cohesion: 0.67
-Nodes (3): name, short, 4
+Nodes (3): name, short, 33
 
 ### Community 1292 - "Community 1292"
 Cohesion: 0.67
-Nodes (3): name, short, 5
+Nodes (3): name, short, 34
 
 ### Community 1293 - "Community 1293"
 Cohesion: 0.67
-Nodes (3): name, short, 6
+Nodes (3): name, short, 35
 
 ### Community 1294 - "Community 1294"
 Cohesion: 0.67
-Nodes (3): name, short, 7
+Nodes (3): name, short, 37
 
 ### Community 1295 - "Community 1295"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 38
 
 ### Community 1296 - "Community 1296"
 Cohesion: 0.67
-Nodes (3): name, short, 9
+Nodes (3): name, short, 39
 
 ### Community 1297 - "Community 1297"
 Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1299 - "Community 1299"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1300 - "Community 1300"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1301 - "Community 1301"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1302 - "Community 1302"
-Cohesion: 0.67
-Nodes (3): name, short, 13
-
-### Community 1303 - "Community 1303"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1304 - "Community 1304"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1305 - "Community 1305"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1306 - "Community 1306"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1307 - "Community 1307"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1308 - "Community 1308"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1309 - "Community 1309"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1310 - "Community 1310"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1311 - "Community 1311"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1312 - "Community 1312"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1313 - "Community 1313"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1314 - "Community 1314"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1315 - "Community 1315"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1316 - "Community 1316"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1317 - "Community 1317"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1318 - "Community 1318"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1319 - "Community 1319"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1320 - "Community 1320"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1321 - "Community 1321"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1322 - "Community 1322"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1323 - "Community 1323"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1324 - "Community 1324"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1325 - "Community 1325"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1326 - "Community 1326"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1327 - "Community 1327"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1328 - "Community 1328"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1329 - "Community 1329"
-Cohesion: 0.67
 Nodes (3): name, short, 3
 
-### Community 1330 - "Community 1330"
+### Community 1298 - "Community 1298"
 Cohesion: 0.67
 Nodes (3): name, short, 40
 
-### Community 1331 - "Community 1331"
+### Community 1299 - "Community 1299"
 Cohesion: 0.67
 Nodes (3): name, short, 4
 
-### Community 1332 - "Community 1332"
+### Community 1300 - "Community 1300"
 Cohesion: 0.67
 Nodes (3): name, short, 5
 
-### Community 1333 - "Community 1333"
+### Community 1301 - "Community 1301"
 Cohesion: 0.67
 Nodes (3): name, short, 6
 
-### Community 1334 - "Community 1334"
+### Community 1302 - "Community 1302"
 Cohesion: 0.67
 Nodes (3): name, short, 7
 
-### Community 1335 - "Community 1335"
+### Community 1303 - "Community 1303"
 Cohesion: 0.67
 Nodes (3): name, short, 8
 
-### Community 1336 - "Community 1336"
+### Community 1304 - "Community 1304"
 Cohesion: 0.67
 Nodes (3): name, short, 9
 
-### Community 1337 - "Community 1337"
+### Community 1305 - "Community 1305"
 Cohesion: 0.67
 Nodes (3): master, name, short
 
-### Community 1339 - "Community 1339"
+### Community 1308 - "Community 1308"
 Cohesion: 0.67
-Nodes (3): name, short, 10
+Nodes (3): name, short, 23
 
-### Community 1340 - "Community 1340"
+### Community 1309 - "Community 1309"
 Cohesion: 0.67
-Nodes (3): name, short, 11
+Nodes (3): name, short, 18
 
-### Community 1341 - "Community 1341"
+### Community 1310 - "Community 1310"
 Cohesion: 0.67
-Nodes (3): name, short, 12
+Nodes (3): name, short, 24
 
-### Community 1342 - "Community 1342"
+### Community 1311 - "Community 1311"
 Cohesion: 0.67
-Nodes (3): name, short, 13
+Nodes (3): name, short, 21
 
-### Community 1343 - "Community 1343"
+### Community 1312 - "Community 1312"
 Cohesion: 0.67
-Nodes (3): name, short, 14
+Nodes (3): name, short, 21
 
-### Community 1344 - "Community 1344"
+### Community 1313 - "Community 1313"
 Cohesion: 0.67
-Nodes (3): name, short, 15
+Nodes (3): name, short, 18
 
-### Community 1345 - "Community 1345"
+### Community 1314 - "Community 1314"
 Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1346 - "Community 1346"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1347 - "Community 1347"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1348 - "Community 1348"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1349 - "Community 1349"
-Cohesion: 0.67
-Nodes (3): name, short, 20
+Nodes (3): name, short, 8
 
 ### Community 1350 - "Community 1350"
 Cohesion: 0.67
 Nodes (3): name, short, 21
-
-### Community 1351 - "Community 1351"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1352 - "Community 1352"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1353 - "Community 1353"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1354 - "Community 1354"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1355 - "Community 1355"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1356 - "Community 1356"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1357 - "Community 1357"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1358 - "Community 1358"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1359 - "Community 1359"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1360 - "Community 1360"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1361 - "Community 1361"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1362 - "Community 1362"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1363 - "Community 1363"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1364 - "Community 1364"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1365 - "Community 1365"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1366 - "Community 1366"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1367 - "Community 1367"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1368 - "Community 1368"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1369 - "Community 1369"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1370 - "Community 1370"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1371 - "Community 1371"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1372 - "Community 1372"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1373 - "Community 1373"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1374 - "Community 1374"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
-### Community 1375 - "Community 1375"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1376 - "Community 1376"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1377 - "Community 1377"
-Cohesion: 0.67
-Nodes (3): master, name, short
 
 ### Community 1379 - "Community 1379"
 Cohesion: 0.67
@@ -7204,10 +6887,6 @@ Nodes (3): name, short, 10
 ### Community 1463 - "Community 1463"
 Cohesion: 0.67
 Nodes (3): name, short, 3
-
-### Community 1464 - "Community 1464"
-Cohesion: 0.67
-Nodes (3): name, short, 18
 
 ### Community 1465 - "Community 1465"
 Cohesion: 0.67
@@ -7653,10 +7332,6 @@ Nodes (3): name, short, 38
 Cohesion: 0.67
 Nodes (3): name, short, 39
 
-### Community 1580 - "Community 1580"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
 ### Community 1581 - "Community 1581"
 Cohesion: 0.67
 Nodes (3): name, short, 40
@@ -7705,17 +7380,9 @@ Nodes (3): name, short, 23
 Cohesion: 0.67
 Nodes (3): name, short, 23
 
-### Community 1593 - "Community 1593"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
 ### Community 1595 - "Community 1595"
 Cohesion: 0.67
 Nodes (3): name, short, 24
-
-### Community 1596 - "Community 1596"
-Cohesion: 0.67
-Nodes (3): name, short, 18
 
 ### Community 1598 - "Community 1598"
 Cohesion: 0.67
@@ -7726,9 +7393,9 @@ Cohesion: 0.67
 Nodes (3): name, short, 24
 
 ## Knowledge Gaps
-- **7511 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+7506 more)
+- **7372 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+7367 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **58 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **60 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -7742,8 +7409,8 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 41 inferred relationships involving `getChannelStateById()` (e.g. with `execute()` and `auxWheelInput()`) actually correct?**
   _`getChannelStateById()` has 41 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `contentHash`, `downloadedAt`, `contentHash` to the rest of the system?**
-  _7542 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _7403 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` be split into smaller, more focused modules?**
   _Cohesion score 0.10574712643678161 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.06107594936708861 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.062317429406037 - nodes in this community are weakly interconnected._

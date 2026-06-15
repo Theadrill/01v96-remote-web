@@ -100,8 +100,8 @@
     "semantic_hash": ""
   },
   "public/modules/eq.js": {
-    "mtime": 1781317321.1894574,
-    "ast_hash": "2d040d4421bcb8bce2b06c0d1f705a3f",
+    "mtime": 1781508677.7896783,
+    "ast_hash": "3929f3923ebc0a60852b28210f8c5d95",
     "semantic_hash": ""
   },
   "public/modules/events.js": {
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
-    "mtime": 1781490727.6394813,
-    "ast_hash": "e70d92d3f00e9a2bc16f49b24e4b367c",
+    "mtime": 1781504852.1983814,
+    "ast_hash": "e93fcea1c7addcd4ad905f819113d2b3",
     "semantic_hash": ""
   },
   "public/modules/splash_screen.js": {
@@ -270,8 +270,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/main.rs": {
-    "mtime": 1781489964.523207,
-    "ast_hash": "abd2b127992e2337d2b45ebb9d652f31",
+    "mtime": 1781504310.72009,
+    "ast_hash": "d5c813de6fff2faa23ded2d5fc6b6d96",
     "semantic_hash": ""
   },
   "server_rust/src/midi/assembler.rs": {
@@ -360,8 +360,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/socket_handlers.rs": {
-    "mtime": 1781489964.527733,
-    "ast_hash": "a95e8eff0a96b6e00e19107f241046b7",
+    "mtime": 1781504329.2986362,
+    "ast_hash": "9c00088d924f1b839dc8c011b346ffe0",
     "semantic_hash": ""
   },
   "server_rust/src/state.rs": {
@@ -2465,8 +2465,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-REGIS-mesa-favela.json": {
-    "mtime": 1781143915.3086777,
-    "ast_hash": "7022872ab5bebf9737c214e831ca5f76",
+    "mtime": 1781494365.67632,
+    "ast_hash": "852e6ff1edc6d5f31e2305b4f8f7de5d",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CENA TESTE 222-mesa-teste.json": {
@@ -2530,13 +2530,13 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1781490905.6619883,
-    "ast_hash": "52dd48e19eed04ffa483a3c8d19fe7bd",
+    "mtime": 1781508892.6755018,
+    "ast_hash": "da4f36a18c093494dd84b5aefd57c3d5",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
-    "mtime": 1781489964.5050728,
-    "ast_hash": "ebc35751997292b14c8a7919d67b1d08",
+    "mtime": 1781506384.2439227,
+    "ast_hash": "dbad8b0e8751bf7dcdc954328376ab3b",
     "semantic_hash": ""
   },
   "client_wasm/src/meters.rs": {
@@ -2565,8 +2565,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-REGIS-mesa-favela.json": {
-    "mtime": 1781143915.3076773,
-    "ast_hash": "7022872ab5bebf9737c214e831ca5f76",
+    "mtime": 1781494365.67529,
+    "ast_hash": "852e6ff1edc6d5f31e2305b4f8f7de5d",
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-SARU-mesa-favela.json": {
@@ -2630,22 +2630,22 @@
     "semantic_hash": ""
   },
   "public/wasm/client_wasm.d.ts": {
-    "mtime": 1781325788.8155687,
-    "ast_hash": "7f5ef2be1a839f779b9ac8b3976b680f",
+    "mtime": 1781506406.5251741,
+    "ast_hash": "909c3a33c4da1b7b31bc26762cf1a511",
     "semantic_hash": ""
   },
   "public/wasm/client_wasm.js": {
-    "mtime": 1781325788.8155687,
-    "ast_hash": "26db129fb76cc7dcc7c0c2b4c0bbc1dc",
+    "mtime": 1781506406.5251741,
+    "ast_hash": "80ea06191f111982e45899f5183282e9",
     "semantic_hash": ""
   },
   "public/wasm/client_wasm_bg.wasm.d.ts": {
-    "mtime": 1781325788.8169298,
-    "ast_hash": "6ec4e2904ec5ba802bfe12bea32a6ed1",
+    "mtime": 1781506406.526306,
+    "ast_hash": "c2f8357e9a7d13753ef93870984ee2b8",
     "semantic_hash": ""
   },
   "public/wasm/package.json": {
-    "mtime": 1781325789.2329893,
+    "mtime": 1781506408.7846491,
     "ast_hash": "9348063a05b968be30963f6172ebb426",
     "semantic_hash": ""
   },
@@ -2702,6 +2702,21 @@
   "docs/plano_de_implementa\u00e7\u00e3o_fluxo_de_dados.md": {
     "mtime": 1781489964.5101776,
     "ast_hash": "34e3a8836b2b314a17dab3335281e52b",
+    "semantic_hash": ""
+  },
+  "server_rust/src/rta_manager.rs": {
+    "mtime": 1781508763.1972013,
+    "ast_hash": "667a69f03f6502f19cd73e42199c50a9",
+    "semantic_hash": ""
+  },
+  "tmp/fix_eq.ps1": {
+    "mtime": 1781508665.1342523,
+    "ast_hash": "72c19baa0cba2144f52ddbfbaf63ba84",
+    "semantic_hash": ""
+  },
+  "docs/plano_de_implementacao_RTA.md": {
+    "mtime": 1781504094.376961,
+    "ast_hash": "4e6c1c5f12d1449381597142fa6ca36c",
     "semantic_hash": ""
   }
 }
