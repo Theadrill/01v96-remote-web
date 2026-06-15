@@ -913,6 +913,7 @@ if (originalSocketEmit && typeof socket !== 'undefined') {
 
 import('../wasm/client_wasm.js').then(async (wasm) => {
     await wasm.default();
+    window.wasm = wasm; // EXPOSING GLOBALLY FOR EQ.JS
     wasmMeterEngine = new wasm.MeterEngine(80);
     wasmMeterEngine.set_decay_rate(0.1); // Queda suave calibrada para escala 0-100
     console.log("[WASM] MeterEngine initialized");

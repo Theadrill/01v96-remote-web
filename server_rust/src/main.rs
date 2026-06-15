@@ -11,6 +11,7 @@ mod network;
 mod scene_manager;
 mod socket_handlers;
 mod state;
+mod rta_manager;
 
 use axum::Router;
 use socketioxide::SocketIo;
@@ -143,6 +144,7 @@ async fn async_main(
     );
 
     let global_state_api = global_state.clone();
+    let rta_manager = Arc::new(tokio::sync::Mutex::new(crate::rta_manager::RtaManager::new()));
 
     socket_handlers::register_handlers(
         io.clone(),
@@ -152,6 +154,7 @@ async fn async_main(
         conn_mgr.clone(),
         sync_manager_socket,
         custom_scene_manager.clone(),
+        rta_manager,
     );
 
     // --- LOCALIZAR PASTA PUBLIC ---

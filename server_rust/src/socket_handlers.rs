@@ -57,6 +57,7 @@ pub fn register_handlers(
     conn_mgr: Arc<ConnectionManager>,
     sync_manager: Arc<SyncManager>,
     custom_scene_manager: Arc<RwLock<CustomSceneManager>>,
+    rta_manager: Arc<tokio::sync::Mutex<crate::rta_manager::RtaManager>>,
 ) {
     let sync_manager_socket = sync_manager.clone();
     let scheduler_socket = scheduler.clone();
@@ -64,6 +65,7 @@ pub fn register_handlers(
     let app_config_clone = app_config.clone();
     let conn_mgr_handler = conn_mgr.clone();
     let csm_socket = custom_scene_manager.clone();
+    let rta_socket_main = rta_manager.clone();
     let io_for_ns = io.clone();
 
     io.ns("/", move |socket: SocketRef| async move {
@@ -74,6 +76,7 @@ pub fn register_handlers(
         let socket_initial = socket.clone();
         let conn_mgr_connect = conn_mgr_handler.clone();
         let csm_connect = csm_socket.clone();
+        let rta_handler = rta_socket_main.clone();
         tokio::spawn(async move {
             let config_arc = crate::config::AppConfig::load();
             let is_syncing = conn_mgr_connect.is_syncing();
@@ -243,6 +246,23 @@ pub fn register_handlers(
             let mut current_views = conn_mgr_disconnect.active_views.lock().unwrap();
             current_views.remove(&socket.id.to_string());
         });
+
+        let rta_manager_socket = rta_handler.clone();
+        socket.on(
+            "rtaControl",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let action = data.get("action").and_then(|v| v.as_str()).unwrap_or("");
+                if action == "start_server_mic" {
+                    tracing::info!("🎤 [RTA] Recebido comando para iniciar microfone do servidor");
+                    let mut rta = rta_manager_socket.lock().await;
+                    rta.start(socket.clone());
+                } else if action == "stop_server_mic" {
+                    tracing::info!("🎤 [RTA] Recebido comando para parar microfone do servidor");
+                    let mut rta = rta_manager_socket.lock().await;
+                    rta.stop();
+                }
+            },
+        );
 
         let scheduler_pan = scheduler_socket.clone();
         let state_pan = global_state_socket.clone();

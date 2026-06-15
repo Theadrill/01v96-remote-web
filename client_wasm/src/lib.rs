@@ -92,3 +92,49 @@ impl MidiDispatcher {
         result
     }
 }
+
+use rustfft::{num_complex::Complex, FftPlanner};
+use std::sync::Arc;
+use rustfft::Fft;
+
+#[wasm_bindgen]
+pub struct WasmRta {
+    fft: Arc<dyn Fft<f32>>,
+}
+
+#[wasm_bindgen]
+impl WasmRta {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        let mut planner = FftPlanner::<f32>::new();
+        let fft = planner.plan_fft_forward(4096);
+        Self { fft }
+    }
+
+    #[wasm_bindgen]
+    pub fn process_audio(&self, input: &[f32]) -> js_sys::Float32Array {
+        let len = input.len().min(4096);
+        let mut buffer: Vec<Complex<f32>> = input[..len]
+            .iter()
+            .enumerate()
+            .map(|(i, &v)| {
+                // Hanning window
+                let window = 0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / (len as f32 - 1.0)).cos());
+                Complex { re: v * window, im: 0.0 }
+            })
+            .collect();
+            
+        while buffer.len() < 4096 {
+            buffer.push(Complex { re: 0.0, im: 0.0 });
+        }
+
+        self.fft.process(&mut buffer);
+
+        let magnitudes: Vec<f32> = buffer.iter()
+            .take(2048)
+            .map(|c| c.norm())
+            .collect();
+
+        js_sys::Float32Array::from(magnitudes.as_slice())
+    }
+}

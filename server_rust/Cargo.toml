@@ -23,4 +23,5 @@ windows-sys = { version = "0.61.2", features = ["Win32_UI_WindowsAndMessaging", 
 midi_common = { path = "../midi_common" }
 tokio-util = "0.7"
 unicode-normalization = "0.1"
-
+cpal = "0.15.3"
+rustfft = "6.2.0"
