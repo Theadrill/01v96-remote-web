@@ -808,7 +808,7 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
 /* Sidebar e botÃƒÂµes globais */
 /* Sidebar e botÃƒÂµes globais */
 .sidebar {
-    width: 100px;
+    width: 115px;
     background: #222;
     border-left: 1px solid #444;
     box-sizing: border-box;
@@ -1948,7 +1948,7 @@ body.layout-desktop .ch-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    right: 100px;
+    right: 115px;
     height: 100vh;
     height: 100dvh;
     background: #111;

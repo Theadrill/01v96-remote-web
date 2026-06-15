@@ -1082,22 +1082,38 @@ function applyMetersToDOM(smoothedLevels, now) {
             const levelIdx = activeConfigChannel;
             const finalPercent = smoothedLevels[levelIdx] || 0;
 
-            const meterCurtains = miniCard.querySelectorAll('.desk-meter-curtain');
+            const deskCurtains = miniCard.querySelectorAll('.desk-meter-curtain');
+            const mobileCurtains = miniCard.querySelectorAll('.mobile-meter-curtain');
             const peakLed = miniCard.querySelector('.desk-peak-led') || miniCard.querySelector('.mobile-peak-led');
 
             let isPeaking = finalPercent >= 98;
 
-            if (meterCurtains.length > 0) {
-                meterCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
+            if (deskCurtains.length > 0) {
+                deskCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
-                if (meterCurtains.length > 1) {
+                if (deskCurtains.length > 1) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                     const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
                         ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
                         const partnerPercent = smoothedLevels[pIdx];
-                        meterCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
+                        deskCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
+                        if (partnerPercent >= 98) isPeaking = true;
+                    }
+                }
+            } else if (mobileCurtains.length > 0) {
+                if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
+                mobileCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
+
+                if (mobileCurtains.length > 1) {
+                    const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
+                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+
+                    if (pIdx !== null && pIdx < smoothedLevels.length) {
+                        const partnerPercent = smoothedLevels[pIdx];
+                        mobileCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
                         if (partnerPercent >= 98) isPeaking = true;
                     }
                 }
