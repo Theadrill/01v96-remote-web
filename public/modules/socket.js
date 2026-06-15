@@ -48,11 +48,11 @@ function requestSetupStatus() {
 }
 socket.on('connect', function () {
     requestSetupStatus();
-    requestGlobalNames();
+    // requestGlobalNames() removido: o servidor agora faz o push passivo (resolvedNamesUpdated)
 });
 if (typeof socket !== 'undefined' && socket.connected) {
     requestSetupStatus();
-    requestGlobalNames();
+    // requestGlobalNames() removido
 }
 
 // 🚨 [CRITICAL SYNC LOGIC] - LISTENER DE UPDATES E DINÂMICAS
@@ -569,24 +569,12 @@ socket.on('scenesUpdated', (data) => {
         window.currentSceneName = data.currentScene.name;
         console.log(`🎬 Cena Atual Atualizada (scenesUpdated): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
-        requestActiveCustomChannels();
-        requestGlobalNames();
+        // requestActiveCustomChannels() e requestGlobalNames() removidos para evitar flood
     }
 });
 
-function requestActiveCustomChannels() {
-    if (typeof socket !== 'undefined' && socket.connected) {
-        // Solicita o mapa resolvido unificado (Global > Custom > Físico)
-        socket.emit('getActiveCustomChannels');
-    }
-}
-
-function requestGlobalNames() {
-    if (typeof socket !== 'undefined' && socket.connected) {
-        // Solicita o mapa resolvido unificado
-        socket.emit('getGlobalNames');
-    }
-}
+// requestActiveCustomChannels() removido: o backend faz o push proativo
+// requestGlobalNames() removido: o backend faz o push proativo
 
 socket.on('currentScene', (data) => {
     if (data) {
@@ -594,8 +582,7 @@ socket.on('currentScene', (data) => {
         window.currentSceneName = data.name;
         console.log(`🎬 Cena Atual Atualizada (currentScene): ${window.currentSceneNumber} - ${window.currentSceneName}`);
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
-        requestActiveCustomChannels();
-        requestGlobalNames();
+        // requestActiveCustomChannels() e requestGlobalNames() removidos
     }
 });
 
@@ -618,8 +605,7 @@ socket.on('saveSceneResult', (data) => {
 
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         OverlayInfo.show('success', 'CENA ' + num + name + ' SALVA');
-        requestActiveCustomChannels();
-        requestGlobalNames();
+        // requestActiveCustomChannels() e requestGlobalNames() removidos
     } else if (data && !data.success) {
         OverlayInfo.show('error', 'ERRO AO SALVAR CENA');
     }

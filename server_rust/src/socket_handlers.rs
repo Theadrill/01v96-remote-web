@@ -76,7 +76,6 @@ pub fn register_handlers(
         let csm_connect = csm_socket.clone();
         tokio::spawn(async move {
             let config_arc = crate::config::AppConfig::load();
-            let current_state = state_arc_connect.read().await;
             let is_syncing = conn_mgr_connect.is_syncing();
             
             // Send the resolved names BEFORE the sync event so the frontend is prepared
@@ -96,10 +95,15 @@ pub fn register_handlers(
                 socket_initial.emit("resolvedNamesUpdated", &serde_json::json!({ "channels": payload })).ok();
             }
 
-            if !is_syncing
-                && let Ok(state_json) = serde_json::to_value(&*current_state) {
-                    socket_initial.emit("sync", &state_json).ok();
-                    let _ = socket_initial.emit("scenesUpdated", &current_state.scene_manager.get_state());
+            if !is_syncing {
+                let (state_json, scenes_state) = {
+                    let current_state = state_arc_connect.read().await;
+                    let sj = serde_json::to_value(&*current_state).unwrap_or_default();
+                    let ss = current_state.scene_manager.get_state();
+                    (sj, ss)
+                };
+                socket_initial.emit("sync", &state_json).ok();
+                let _ = socket_initial.emit("scenesUpdated", &scenes_state);
             }
 
             let (inputs, outputs) = crate::midi::MidiEngine::get_available_ports();
@@ -127,9 +131,12 @@ pub fn register_handlers(
                 )
                 .ok();
 
-            socket_initial
-                .emit("scenesUpdated", &current_state.scene_manager.get_state())
-                .ok();
+            {
+                let current_state = state_arc_connect.read().await;
+                socket_initial
+                    .emit("scenesUpdated", &current_state.scene_manager.get_state())
+                    .ok();
+            }
 
             socket_initial
                 .emit(

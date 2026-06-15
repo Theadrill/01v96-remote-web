@@ -15,6 +15,7 @@ pub fn start_rx_loop(
     sync_counter: Arc<SyncCounter>,
     conn_mgr: Arc<ConnectionManager>,
     master_meter: Arc<RwLock<MasterMeter>>,
+    csm: Arc<RwLock<crate::custom_scenes::CustomSceneManager>>,
     meter_fps: u32,
     is_remote_midi: bool,
 ) {
@@ -27,6 +28,7 @@ pub fn start_rx_loop(
     let parsed_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
     let recv_count_log = recv_count.clone();
     let parsed_count_log = parsed_count.clone();
+    let csm_clone = csm.clone();
 
     // Meter buffer + FPS throttle (like Node.js)
     let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> =
@@ -81,8 +83,9 @@ pub fn start_rx_loop(
                 let mut emission: Option<(&str, serde_json::Value)> = None;
                 let mut meter_emission: Option<Vec<u8>> = None;
                 let mut meter_raw_emission: Option<Vec<u8>> = None;
-                let mut scenes_emission: Option<serde_json::Value> = None;
-                let mut current_scene_emission: Option<serde_json::Value> = None;
+                let mut scenes_emission = None;
+                let mut current_scene_emission = None;
+                let mut should_broadcast_names = false;
 
                 {
                     let mut state = state_arc_in.write().await;
@@ -184,6 +187,24 @@ pub fn start_rx_loop(
                                     .as_ref()
                                     .and_then(|cs| serde_json::to_value(cs).ok());
                             }
+                            crate::midi::protocol::ParsedMidi::UpdateNameChar { char_index, .. } => {
+                                if char_index == 3 {
+                                    should_broadcast_names = true;
+                                }
+                            }
+                            crate::midi::protocol::ParsedMidi::UpdateSceneChar { char_index, .. } => {
+                                if char_index == 15 {
+                                    scenes_emission = Some(
+                                        serde_json::to_value(state.scene_manager.get_state())
+                                            .unwrap_or_default(),
+                                    );
+                                    current_scene_emission = state
+                                        .scene_manager
+                                        .current_scene
+                                        .as_ref()
+                                        .and_then(|cs| serde_json::to_value(cs).ok());
+                                }
+                            }
                             _ => {}
                         }
                     }
@@ -194,6 +215,9 @@ pub fn start_rx_loop(
                 }
                 if let Some(v) = current_scene_emission {
                     let _ = io_clone.emit("currentScene", &v).await;
+                }
+                if should_broadcast_names {
+                    crate::name_resolver::broadcast(&io_clone, &state_arc_in, &csm_clone).await;
                 }
                 if let Some((event, data)) = emission {
                     let _ = io_clone.emit(event, &data).await;

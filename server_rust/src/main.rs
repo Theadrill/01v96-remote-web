@@ -221,6 +221,7 @@ async fn async_main(
         sync_counter.clone(),
         conn_mgr.clone(),
         master_meter.clone(),
+        custom_scene_manager.clone(),
         app_config.meter_fps_desktop,
         app_config.remote_midi,
     );

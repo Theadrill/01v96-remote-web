@@ -742,11 +742,17 @@ function updateSidebarInfo() {
     if (activeConfigChannel !== null) {
         const ch = activeConfigChannel;
         const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-        const name = stateRef ? stateRef.name : '';
+        let name = '';
+        if (window.resolvedNames && window.resolvedNames[ch]) {
+            name = window.resolvedNames[ch].name;
+        } else if (stateRef && stateRef.name) {
+            name = stateRef.name;
+        }
         const label = typeof getChannelLabel === 'function' ? getChannelLabel(ch) : `CH ${ch + 1}`;
         if (chTitle) {
             chTitle.style.display = 'block';
-            chTitle.innerText = `${label} - ${name || label}`;
+            chTitle.innerText = `${label} - ${name || '...'}`;
+            if (window.autoScaleTitle) window.autoScaleTitle();
         }
         if (tmTitle) tmTitle.style.display = 'none';
         if (fiSidebar) fiSidebar.style.display = 'none';
