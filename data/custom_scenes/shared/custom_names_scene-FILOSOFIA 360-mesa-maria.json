@@ -1,0 +1,170 @@
+{
+  "scene_name": "FILOSOFIA 360",
+  "scene_id": 5,
+  "channels": {
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "39": {
+      "name": "CH40",
+      "short": "CH40"
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
+    },
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "11": {
+      "name": "MIC CAV",
+      "short": "MICC"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "7": {
+      "name": "",
+      "short": "    "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "16": {
+      "name": "NOTEBOOK",
+      "short": "NOTE"
+    },
+    "3": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "18": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "13": {
+      "name": "MIC VIOL",
+      "short": "MICV"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "33": {
+      "name": "CH34",
+      "short": "CH34"
+    },
+    "6": {
+      "name": "REP ANEL",
+      "short": "REPA"
+    },
+    "35": {
+      "name": "CH36",
+      "short": "CH36"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "19": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "20": {
+      "name": "VOCALISTA",
+      "short": "VOCA"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "37": {
+      "name": "CH38",
+      "short": "CH38"
+    },
+    "17": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "12": {
+      "name": "MIC TANT",
+      "short": "MICT"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    }
+  }
+}
