@@ -153,13 +153,13 @@ body.layout-horizontal .faders-area {
     box-shadow: 0 0 10px #ff0000;
 }
 
-.fader-card > *:not(.mobile-meter-bg):not(.btn-state):not(.mobile-db-scale-overlay) {
+.fader-card>*:not(.mobile-meter-bg):not(.btn-state):not(.mobile-db-scale-overlay) {
     position: relative;
     z-index: 2;
     text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
 }
 
-.fader-card > .btn-state {
+.fader-card>.btn-state {
     position: relative;
     z-index: 2;
 }
@@ -5740,16 +5740,22 @@ body.layout-desktop .btn-macros {
 
 /* Regra aplicada estritamente no Mobile Retrato */
 body:not(.layout-desktop).is-portrait #sidebarDock {
-    display: none !important; /* Esconde a dock antiga em formato de scroll horizontal */
+    display: none !important;
+    /* Esconde a dock antiga em formato de scroll horizontal */
 }
 
 body:not(.layout-desktop).is-portrait #mobilePortraitActions {
-    display: flex !important; /* Exibe os botões Menu e Sair fixos */
+    display: flex !important;
+    /* Exibe os botões Menu e Sair fixos */
     gap: 10px;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100%;
+}
+
+body:not(.layout-desktop).is-portrait.screen-musician #mobilePortraitActions {
+    display: none !important;
 }
 
 /* Ocultar a área inteira de macros original no mobile portrait (movido para a dock principal) */
@@ -5830,12 +5836,15 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     left: 0;
     right: 0;
     /* Deixa o modal exatamente acima da bottom bar baseando-se no z-index ou na altura */
-    bottom: 100px; /* Ajuste para a altura exata da sua bottom bar se necessário */
+    bottom: 100px;
+    /* Ajuste para a altura exata da sua bottom bar se necessário */
     background: rgba(10, 10, 10, 0.95);
-    z-index: 9999; /* Garanta que fique abaixo apenas da bottom bar se ela for fixa por cima */
+    z-index: 9999;
+    /* Garanta que fique abaixo apenas da bottom bar se ela for fixa por cima */
     display: none;
     flex-direction: column;
-    justify-content: flex-end; /* Inicia os botões de baixo para cima para facilitar o alcance do dedão */
+    justify-content: flex-end;
+    /* Inicia os botões de baixo para cima para facilitar o alcance do dedão */
     padding: 20px;
     box-sizing: border-box;
 }
@@ -5889,6 +5898,7 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
 }
 
 .mobile-menu-content::-webkit-scrollbar-thumb {
-    background: #ffcc00; /* Cor de destaque para indicar a presença da barra */
+    background: #ffcc00;
+    /* Cor de destaque para indicar a presença da barra */
     border-radius: 3px;
 }

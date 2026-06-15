@@ -739,7 +739,7 @@ socket.on('portsList', (data) => {
 
         const fpsMobile = data.savedConfig.meter_fps_mobile !== undefined ? data.savedConfig.meter_fps_mobile : 15;
         const fpsDesktop = data.savedConfig.meter_fps_desktop !== undefined ? data.savedConfig.meter_fps_desktop : 30;
-        
+
         let localFps = localStorage.getItem('meter_fps_override');
         if (localFps && !isNaN(localFps)) {
             currentMeterFPS = parseInt(localFps);
@@ -898,7 +898,7 @@ let wasmMidiDispatcher = null;
 const originalSocketEmit = typeof socket !== 'undefined' ? socket.emit : null;
 
 if (originalSocketEmit && typeof socket !== 'undefined') {
-    socket.emit = function(eventName, data) {
+    socket.emit = function (eventName, data) {
         if (eventName === 'control' && wasmMidiDispatcher && typeof data === 'object') {
             const { type, channel, value } = data;
             if (type !== undefined && channel !== undefined && value !== undefined) {
@@ -916,7 +916,7 @@ import('../wasm/client_wasm.js').then(async (wasm) => {
     wasmMeterEngine = new wasm.MeterEngine(80);
     wasmMeterEngine.set_decay_rate(0.1); // Queda suave calibrada para escala 0-100
     console.log("[WASM] MeterEngine initialized");
-    
+
     wasmMidiDispatcher = new wasm.MidiDispatcher(16); // Default 16ms
     console.log("[WASM] MidiDispatcher initialized");
 
@@ -1258,7 +1258,7 @@ socket.on('configReset', () => {
     if (typeof window.onConfigReset === 'function') window.onConfigReset();
 });
 
-window.saveLocalFps = function(val) {
+window.saveLocalFps = function (val) {
     if (!val || isNaN(val)) {
         localStorage.removeItem('meter_fps_override');
         alert("FPS Local removido. Recarregue a página para usar o padrão.");
