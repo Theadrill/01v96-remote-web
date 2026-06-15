@@ -3899,10 +3899,10 @@ body:not(.layout-desktop).screen-outs #scene-info {
     display: none !important;
 }
 
-/* Ocultar botão de fullscreen no mobile em telas secundárias APENAS no modo retrato */
-body:not(.layout-desktop).is-portrait.screen-config .btn-fs-macros,
-body:not(.layout-desktop).is-portrait.screen-techmix .btn-fs-macros,
-body:not(.layout-desktop).is-portrait.screen-outs .btn-fs-macros {
+/* Ocultar botão de fullscreen no mobile em telas secundárias (config de canal, mix do técnico, saídas) */
+body:not(.layout-desktop).screen-config .btn-fs-macros,
+body:not(.layout-desktop).screen-techmix .btn-fs-macros,
+body:not(.layout-desktop).screen-outs .btn-fs-macros {
     display: none !important;
 }
 
