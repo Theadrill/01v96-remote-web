@@ -1,4 +1,4 @@
-﻿// --- CONSTANTES DA MESA 01V96 ---
+// --- CONSTANTES DA MESA 01V96 ---
 const EQ_MIN_FREQ = 20;
 const EQ_MAX_FREQ = 20000;
 const EQ_MIN_GAIN = -18;
@@ -144,8 +144,9 @@ function initEQEngine(ch) {
 
 function renderEQ(ch) {
     selectedBandIdx = -1; // Reseta seleção de banda ao abrir novo canal
+    initEQEngine(ch); // Inicializa os filtros biquad e preenche eqBands
     socket.emit('requestEqAtt', { channel: ch }); // Reabre sync do ganho ao entrar na tela da mesa
-    initEQEngine(ch);
+
     const state = getChannelStateById(ch) || { eq: {} };
     const isEqOn = state.eq ? !!state.eq.on : false;
     const isPhase = !!state.phase;
@@ -180,7 +181,7 @@ function renderEQ(ch) {
                 <div class="eq-main-area" style="flex:1; display:flex; flex-direction:column; min-width:0;">
                     <div class="eq-graph-container" style="position:relative;">
                         <canvas id="eqCanvas" style="display:block; width:100%; height:100%; position:absolute; top:0; left:0; z-index:1;"></canvas>
-                        <canvas id="rtaCanvas" style="display:block; width:100%; height:100%; position:absolute; top:0; left:0; z-index:99999; pointer-events:none;"></canvas>
+                        <canvas id="rtaCanvas" style="display:block; width:100%; height:100%; position:absolute; top:0; left:0; z-index:0; pointer-events:none;"></canvas>
                         
                         <!-- Balão de ajuste de Q (Aparece ao lado da banda selecionada) -->
                         <div id="eqBubble" onpointerdown="resetBubbleTimer()" style="display:none; position:absolute; background:#222; border:1px solid #444; border-radius:12px; padding:6px; z-index:100; flex-direction:row; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.6); pointer-events:auto; transform:translate(15px, -50%);">
@@ -241,14 +242,44 @@ function renderEQ(ch) {
             <!-- Modal do RTA -->
             <div id="rtaModal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#181818; border:1px solid #444; border-radius:15px; padding:25px; z-index:6000; box-shadow:0 15px 50px rgba(0,0,0,0.9); flex-direction:column; align-items:center; width:85%; max-width:400px; max-height:90dvh; overflow-y:auto; gap:25px;">
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center; border-bottom:1px solid #333; padding-bottom:10px;">
-                    <span style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Fonte do RTA</span>
+                    <span id="rtaModalTitle" style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Fonte do RTA</span>
                     <button onclick="document.getElementById('rtaModal').style.display='none'" style="background:none; border:none; color:#777; font-size:24px; cursor:pointer; padding:0 5px;">&times;</button>
                 </div>
-                <div style="width:100%; display:flex; flex-direction:column; gap:10px;">
-                    <button onclick="window.selectRTASource('local')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px;">Microfone do Dispositivo Atual</button>
-                    <button onclick="window.selectRTASource('server')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px;">Microfone do Servidor</button>
-                    <button onclick="window.selectRTASource('simulated')" class="nav-btn" style="width:100%; height:45px; background:#005cbf; border-radius:8px; margin-top: 5px;">Áudio Simulado (Modo Teste)</button>
-                    <button onclick="window.disableRTA()" class="nav-btn" style="width:100%; height:45px; background:#8b0000; border-radius:8px; margin-top: 10px;">DESATIVAR RTA</button>
+                
+                <!-- Step 1: Choose Source Type -->
+                <div id="rtaStep1" style="width:100%; display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; flex-direction:column; gap:5px; margin-bottom: 5px;">
+                        <div style="display:flex; gap:10px;">
+                            <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
+                                <label style="color:#aaa; font-size:11px;">Resolução (FFT Size)</label>
+                                <input type="number" id="rtaFftSize" value="4096" min="256" max="32768" step="256" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
+                                <label style="color:#aaa; font-size:11px;">Suavização (%)</label>
+                                <input type="number" id="rtaSmoothing" value="90" min="0" max="100" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            </div>
+                        </div>
+                        <button onclick="window.applyRTASettings()" class="nav-btn" style="width:100%; height:35px; background:#28a745; border-radius:5px; font-size:12px; margin-top:5px; color:#fff;">Aplicar Alterações</button>
+                    </div>
+                    <button onclick="window.showRtaStep2('local')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Microfone do Dispositivo Atual</button>
+                    <button onclick="window.showRtaStep2('server')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Dispositivo do Servidor</button>
+                    <button onclick="window.selectRTASource('simulated', 'default_in', parseInt(document.getElementById('rtaFftSize').value) || 4096, parseInt(document.getElementById('rtaSmoothing').value) || 90)" class="nav-btn" style="width:100%; height:45px; background:#005cbf; border-radius:8px; margin-top: 5px; color:#fff;">Áudio Simulado (Modo Teste)</button>
+                    <button onclick="window.disableRTA()" class="nav-btn" style="width:100%; height:45px; background:#8b0000; border-radius:8px; margin-top: 10px; color:#fff;">DESATIVAR RTA</button>
+                </div>
+
+                <!-- Step 2: Configure and Connect -->
+                <div id="rtaStep2" style="width:100%; display:none; flex-direction:column; gap:10px;">
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <label id="rtaDeviceLabel" style="color:#aaa; font-size:11px;">Dispositivo de Áudio</label>
+                        <select id="rtaServerDevice" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            <option value="default_in">Carregando dispositivos...</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display:flex; gap:10px; margin-top: 15px;">
+                        <button onclick="window.showRtaStep1()" class="nav-btn" style="flex:1; height:45px; background:#555; border-radius:8px; color:#fff;">VOLTAR</button>
+                        <button onclick="window.connectRTA()" class="nav-btn" style="flex:1; height:45px; background:#28a745; border-radius:8px; color:#fff;">CONECTAR</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -620,7 +651,7 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
     updateEQFadersUI();
 }
 
-function startEQAnimation() {
+window.startEQAnimation = function() {
     if (eqAnimationId) cancelAnimationFrame(eqAnimationId);
     const run = () => {
         if (!eqCanvas || !eqCtx) return;
@@ -773,7 +804,7 @@ function startEQAnimation() {
         eqAnimationId = requestAnimationFrame(run);
     };
     run();
-}
+};
 
 function stopEQAnimation() {
     if (eqAnimationId) cancelAnimationFrame(eqAnimationId);
@@ -781,9 +812,115 @@ function stopEQAnimation() {
     window.pauseRTA(); // Pausa o RTA
 }
 
+let pendingRtaSource = null;
+
+window.showRtaStep1 = function() {
+    document.getElementById('rtaStep1').style.display = 'flex';
+    document.getElementById('rtaStep2').style.display = 'none';
+    document.getElementById('rtaModalTitle').innerText = 'Fonte do RTA';
+};
+
+window.showRtaStep2 = async function(source) {
+    pendingRtaSource = source;
+    document.getElementById('rtaStep1').style.display = 'none';
+    document.getElementById('rtaStep2').style.display = 'flex';
+    
+    const select = document.getElementById('rtaServerDevice');
+    select.innerHTML = '<option value="default_in">Carregando dispositivos...</option>';
+    
+    if (source === 'server') {
+        document.getElementById('rtaModalTitle').innerText = 'Servidor - Configuração';
+        document.getElementById('rtaDeviceLabel').innerText = 'Dispositivo do Servidor';
+        socket.emit('requestRtaDevices');
+    } else if (source === 'local') {
+        document.getElementById('rtaModalTitle').innerText = 'Local - Configuração';
+        document.getElementById('rtaDeviceLabel').innerText = 'Microfone Local';
+        
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            stream.getTracks().forEach(t => t.stop());
+            
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const audioInputs = devices.filter(d => d.kind === 'audioinput');
+            
+            select.innerHTML = '';
+            if (audioInputs.length === 0) {
+                select.innerHTML = '<option value="default_in">Nenhum microfone encontrado</option>';
+            } else {
+                audioInputs.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.deviceId || 'default_in';
+                    opt.innerText = d.label || 'Microfone ' + (select.options.length + 1);
+                    select.appendChild(opt);
+                });
+            }
+        } catch (err) {
+            console.error(err);
+            select.innerHTML = '<option value="default_in">Microfone Padrão</option>';
+        }
+    }
+    
+    const savedSource = localStorage.getItem('rtaSource');
+    if (savedSource === source) {
+        const savedDevice = localStorage.getItem('rtaDeviceId');
+        if (savedDevice) {
+            setTimeout(() => {
+                if (Array.from(select.options).some(o => o.value === savedDevice)) {
+                    select.value = savedDevice;
+                }
+            }, 500); 
+        }
+    }
+};
+
+window.connectRTA = function() {
+    const fftSize = parseInt(document.getElementById('rtaFftSize').value) || 4096;
+    let smoothing = parseInt(document.getElementById('rtaSmoothing').value) || 90;
+    const deviceId = document.getElementById('rtaServerDevice').value;
+    
+    if (smoothing > 99) smoothing = 99;
+    if (smoothing < 1) smoothing = 1;
+    document.getElementById('rtaSmoothing').value = smoothing;
+
+    localStorage.setItem('rtaFftSize', fftSize);
+    localStorage.setItem('rtaSmoothing', smoothing);
+    localStorage.setItem('rtaDeviceId', deviceId);
+    
+    window.selectRTASource(pendingRtaSource, deviceId, fftSize, smoothing);
+};
+
+window.applyRTASettings = function() {
+    const fftSize = parseInt(document.getElementById('rtaFftSize').value) || 4096;
+    let smoothing = parseInt(document.getElementById('rtaSmoothing').value) || 90;
+    
+    if (smoothing > 99) smoothing = 99;
+    if (smoothing < 1) smoothing = 1;
+    document.getElementById('rtaSmoothing').value = smoothing;
+
+    localStorage.setItem('rtaFftSize', fftSize);
+    localStorage.setItem('rtaSmoothing', smoothing);
+    window.rtaSmoothingFactor = smoothing / 100;
+    
+    if (rtaIsActive && rtaSource && rtaSource !== 'none') {
+        const deviceId = localStorage.getItem('rtaDeviceId') || 'default_in';
+        window.selectRTASource(rtaSource, deviceId, fftSize, smoothing);
+    }
+};
+
 window.toggleRTAModal = function() {
     const modal = document.getElementById('rtaModal');
-    if(modal) modal.style.display = 'flex';
+    if(modal) {
+        const savedFft = localStorage.getItem('rtaFftSize');
+        if (savedFft && document.getElementById('rtaFftSize')) {
+            document.getElementById('rtaFftSize').value = savedFft;
+        }
+        const savedSmoothing = localStorage.getItem('rtaSmoothing');
+        if (savedSmoothing && document.getElementById('rtaSmoothing')) {
+            document.getElementById('rtaSmoothing').value = savedSmoothing;
+        }
+        modal.style.display = 'flex';
+        window.showRtaStep1();
+    }
 };
 
 window.resetBubbleTimer = function() {
@@ -1265,36 +1402,65 @@ window.updateRtaBtnUI = function(isActive) {
     }
 };
 
-window.selectRTASource = async function(source) {
+window.selectRTASource = async function(source, deviceId = 'default_in', fftSize = 4096, smoothing = 90) {
     localStorage.setItem('rtaSource', source);
+    localStorage.setItem('rtaSmoothing', smoothing);
+    window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, smoothing / 100));
+    
     rtaSource = source;
     const modal = document.getElementById('rtaModal');
     if(modal) modal.style.display = 'none';
+
+    // Stop current stream if changing
+    if (rtaLocalStream) {
+        rtaLocalStream.getTracks().forEach(t => t.stop());
+        rtaLocalStream = null;
+    }
+    if (rtaAudioContext) {
+        rtaAudioContext.close();
+        rtaAudioContext = null;
+    }
     
     if (source === 'local') {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert("O navegador bloqueou o microfone local porque você não está usando HTTPS ou localhost.");
-            window.disableRTA();
-            return;
-        }
         try {
-            rtaLocalStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            const constraints = { audio: true, video: false };
+            if (deviceId && deviceId !== 'default' && deviceId !== 'default_in' && deviceId !== '') {
+                constraints.audio = { deviceId: { exact: deviceId } };
+            }
+            rtaLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
             window.rtaCtxLocal = new window.AudioContext();
             let audioInput = window.rtaCtxLocal.createMediaStreamSource(rtaLocalStream);
             rtaAnalyzer = window.rtaCtxLocal.createAnalyser();
-            rtaAnalyzer.fftSize = 4096;
+            rtaAnalyzer.fftSize = fftSize;
             audioInput.connect(rtaAnalyzer);
             rtaIsActive = true;
             window.updateRtaBtnUI(true);
             startRtaLoop();
         } catch(e) {
             console.error("Microphone access denied:", e);
-            alert("Permissão de microfone negada ou sem microfone.");
+            alert("Permissão de microfone negada ou erro ao iniciar.");
             window.disableRTA();
             return;
         }
     } else if (source === 'server') {
-        socket.emit('rtaControl', { action: 'start_server_mic' });
+        let deviceName = null;
+        let isOutput = false;
+        if (deviceId && !deviceId.startsWith('default')) {
+            if (deviceId.startsWith('out:')) {
+                isOutput = true;
+                deviceName = deviceId.substring(4);
+            } else if (deviceId.startsWith('in:')) {
+                isOutput = false;
+                deviceName = deviceId.substring(3);
+            }
+        }
+        
+        socket.emit('rtaControl', { 
+            action: 'start_server_mic',
+            deviceName: deviceName,
+            isOutput: isOutput,
+            fftSize: fftSize
+        });
         rtaIsActive = true;
         window.updateRtaBtnUI(true);
         startRtaLoop();
@@ -1363,12 +1529,12 @@ window.pauseRTA = function() {
 };
 
 window.resumeRTA = function() {
-    if (rtaSource !== 'none') {
-        rtaIsActive = true;
-        if (rtaSource === 'server') {
-            socket.emit('rtaControl', { action: 'start_server_mic' });
-        }
-        startRtaLoop();
+    const savedSource = localStorage.getItem('rtaSource');
+    if (savedSource && savedSource !== 'none') {
+        const savedDevice = localStorage.getItem('rtaDeviceId') || 'default_in';
+        const savedFft = parseInt(localStorage.getItem('rtaFftSize')) || 4096;
+        const savedSmoothing = parseInt(localStorage.getItem('rtaSmoothing')) || 90;
+        window.selectRTASource(savedSource, savedDevice, savedFft, savedSmoothing);
     }
 };
 
@@ -1433,16 +1599,19 @@ function drawRtaData(mags) {
         window.rtaSmoothMags = new Float32Array(len);
     }
     
-    const smoothFactor = 0.82; // O quão lenta a barra de EQ desce
+    // Ler o fator de suavização customizado pelo usuário ou fallback para 0.90
+    const smoothFactor = window.rtaSmoothingFactor !== undefined ? window.rtaSmoothingFactor : 0.90;
+
+    let buckets = [];
+    let currentX = -1;
+    let maxDbInBucket = -140;
 
     for(let i=0; i<len; i++) {
         let f = (i / len) * nyquist;
         if (f < EQ_MIN_FREQ) continue;
         if (f > EQ_MAX_FREQ) break;
         
-        let x = fToX(f, w);
-        
-        // Normalização matemática do tamanho da Janela Hanning no FFTSize
+        let x = Math.round(fToX(f, w));
         let rawMag = mags[i] / len;
         
         // Aplicando a Suavização no tempo (Smoothing)
@@ -1451,24 +1620,67 @@ function drawRtaData(mags) {
         let db = window.rtaSmoothMags[i] > 0.0000001 ? 20 * Math.log10(window.rtaSmoothMags[i]) : -140;
         
         // Compensação TILT de 3dB/Octave (Padrão de VSTs como FabFilter)
-        // Isso nivela o 'Ruído Rosa' como uma reta, abaixando graves inchados e subindo agudos puros
         let tilt_db = Math.log2(f / 1000.0) * 3.0; 
         db += tilt_db;
 
         if (db > maxDb) maxDb = db;
         
-        // Mapeamento: Topo da tela (y=0) é 0dB. Base da tela (y=h) é -90dB.
-        let y = h - ((db + 90) / 90) * h;
-        if (y < 0) y = 0;
-        if (y > h) y = h;
-        
-        ctx.lineTo(x, y);
+        if (x !== currentX) {
+            if (currentX !== -1) {
+                buckets.push({ x: currentX, db: maxDbInBucket });
+            }
+            currentX = x;
+            maxDbInBucket = db;
+        } else {
+            if (db > maxDbInBucket) maxDbInBucket = db;
+        }
+    }
+    if (currentX !== -1) buckets.push({ x: currentX, db: maxDbInBucket });
+
+    if (buckets.length > 0) {
+        // Suavização Espacial (Frequência) usando Média Móvel
+        const spaceSmoothWindow = 3; // Janela de pixels
+        let smoothedBuckets = [];
+        for (let b = 0; b < buckets.length; b++) {
+            let sumDb = 0;
+            let count = 0;
+            for (let j = Math.max(0, b - spaceSmoothWindow); j <= Math.min(buckets.length - 1, b + spaceSmoothWindow); j++) {
+                sumDb += buckets[j].db;
+                count++;
+            }
+            smoothedBuckets.push({ x: buckets[b].x, db: sumDb / count });
+        }
+
+        let firstY = h - ((smoothedBuckets[0].db + 90) / 90) * h;
+        if (firstY < 0) firstY = 0; if (firstY > h) firstY = h;
+        ctx.lineTo(smoothedBuckets[0].x, firstY);
+
+        for (let i = 1; i < smoothedBuckets.length - 1; i++) {
+            let b0 = smoothedBuckets[i];
+            let b1 = smoothedBuckets[i + 1];
+            
+            let y0 = h - ((b0.db + 90) / 90) * h;
+            if (y0 < 0) y0 = 0; if (y0 > h) y0 = h;
+            
+            let y1 = h - ((b1.db + 90) / 90) * h;
+            if (y1 < 0) y1 = 0; if (y1 > h) y1 = h;
+
+            let xc = (b0.x + b1.x) / 2;
+            let yc = (y0 + y1) / 2;
+            
+            ctx.quadraticCurveTo(b0.x, y0, xc, yc);
+        }
+
+        let lastB = smoothedBuckets[smoothedBuckets.length - 1];
+        let lastY = h - ((lastB.db + 90) / 90) * h;
+        if (lastY < 0) lastY = 0; if (lastY > h) lastY = h;
+        ctx.lineTo(lastB.x, lastY);
     }
     
     ctx.lineTo(w, h);
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.4)'; 
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.2)'; 
     ctx.fill();
-    ctx.strokeStyle = '#fff';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.stroke();
 
     // Textos de debug renderizados por cima pra entendermos os dados
@@ -1503,12 +1715,34 @@ try {
         }
     });
 
-    // Auto-reativação em caso de F5 (Recarregar Página) do navegador
-    setTimeout(() => {
-        // Redesenha para garantir update do arrasto em tempo real
-        setupEQInteractions(ch);
-        drawEQ();
-    }, 800); // Aguarda a conexão do Socket ser concluída antes de emitir
+    socket.on('rtaDevicesList', (data) => {
+        const select = document.getElementById('rtaServerDevice');
+        if (select) {
+            select.innerHTML = '<option value="default_in">Dispositivo Padrão do Windows</option>';
+            if (data.inputs && data.inputs.length > 0) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = 'Entradas (Microfones)';
+                data.inputs.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = 'in:' + d;
+                    opt.innerText = d;
+                    optgroup.appendChild(opt);
+                });
+                select.appendChild(optgroup);
+            }
+            if (data.outputs && data.outputs.length > 0) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = 'Saídas (Loopback / Caixas)';
+                data.outputs.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = 'out:' + d;
+                    opt.innerText = d;
+                    optgroup.appendChild(opt);
+                });
+                select.appendChild(optgroup);
+            }
+        }
+    });
 
 } catch(e) {
     console.error("Falha ao adicionar rtaData event listener:", e);

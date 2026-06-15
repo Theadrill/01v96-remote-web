@@ -1,12 +1,16 @@
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use rustfft::{num_complex::Complex, FftPlanner};
-use socketioxide::extract::SocketRef;
+use socketioxide::SocketIo;
 use std::sync::{Arc, Mutex};
 use tokio::sync::mpsc;
 
 pub struct RtaManager {
     is_active: Arc<Mutex<bool>>,
     stop_tx: Option<tokio::sync::oneshot::Sender<()>>,
+    current_device: Option<String>,
+    current_is_output: bool,
+    current_fft_size: usize,
+    current_sample_rate: Arc<Mutex<u32>>,
 }
 
 impl RtaManager {
@@ -14,73 +18,118 @@ impl RtaManager {
         Self {
             is_active: Arc::new(Mutex::new(false)),
             stop_tx: None,
+            current_device: None,
+            current_is_output: false,
+            current_fft_size: 4096,
+            current_sample_rate: Arc::new(Mutex::new(48000)),
         }
     }
 
-    pub fn start(&mut self, socket: SocketRef) {
-        // Se a thread está viva de uma sessão passada/recarregada, mata ela para o novo Socket e SampleRate serem injetados.
+    pub fn start(&mut self, io: SocketIo, device_name: Option<String>, is_output: bool, fft_size: usize) {
+        // Sempre reinicia a stream para garantir a saúde da captura e nova task tokio.
+        tracing::info!("🎤 [RTA] Solicitado start. Reiniciando stream para garantir saúde da captura.");
         self.stop();
 
         *self.is_active.lock().unwrap() = true;
+        self.current_device = device_name.clone();
+        self.current_is_output = is_output;
+        self.current_fft_size = fft_size;
+        
         let is_active_clone = self.is_active.clone();
+        let sample_rate_arc = self.current_sample_rate.clone();
 
         // Canal para o worker enviar os dados ao websocket
         let (tx, mut rx) = mpsc::channel::<Vec<f32>>(10);
         let (stop_tx, mut stop_rx) = tokio::sync::oneshot::channel::<()>();
         self.stop_tx = Some(stop_tx);
 
-        let socket_for_tokio = socket.clone();
+        let io_for_tokio = io.clone();
         
         // Task assíncrona para encaminhar dados ao socket
         tokio::spawn(async move {
             loop {
                 tokio::select! {
                     Some(magnitudes) = rx.recv() => {
-                        let _ = socket_for_tokio.emit("rtaData", &magnitudes);
+                        // tracing::info!("Enviando pacote RTA... tamanho: {}", magnitudes.len());
+                        let res = io_for_tokio.emit("rtaData", &magnitudes).await;
+                        if let Err(e) = res {
+                            tracing::error!("Erro ao emitir rtaData: {:?}", e);
+                        }
                     }
                     _ = &mut stop_rx => {
+                        tracing::info!("Parando RTA loop.");
                         break;
                     }
                 }
             }
         });
 
+        // Captura o Handle do tokio para spawnar futures da thread nativa
+        let rt = tokio::runtime::Handle::current();
+
         // Thread nativa para Captura de Áudio (Core Isolado)
         std::thread::spawn(move || {
             let host = cpal::default_host();
-            
-            // Log de todos os devices (DEBUG)
-            if let Ok(devices) = host.input_devices() {
-                let mut found_any = false;
-                tracing::info!("--- Dispositivos de Gravação Disponíveis no SO ---");
-                for d in devices {
-                    if let Ok(name) = d.name() {
-                        tracing::info!("   -> {}", name);
-                        found_any = true;
+
+            let device = if let Some(name) = &device_name {
+                let mut found_device = None;
+                if is_output {
+                    if let Ok(devices) = host.output_devices() {
+                        for d in devices {
+                            if let Ok(d_name) = d.name() {
+                                if &d_name == name {
+                                    found_device = Some(d);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if let Ok(devices) = host.input_devices() {
+                        for d in devices {
+                            if let Ok(d_name) = d.name() {
+                                if &d_name == name {
+                                    found_device = Some(d);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
-                if !found_any {
-                    tracing::info!("   (Nenhum dispositivo encontrado na lista)");
-                }
-                tracing::info!("--------------------------------------------------");
-            }
-
-            let device = match host.default_input_device() {
-                Some(d) => d,
-                None => {
-                    tracing::error!("🎤 [RTA] Nenhum dispositivo de entrada default encontrado.");
+                
+                if found_device.is_none() {
+                    tracing::error!("🎤 [RTA] Dispositivo especificado '{}' não encontrado.", name);
                     return;
+                }
+                found_device.unwrap()
+            } else {
+                match host.default_input_device() {
+                    Some(d) => d,
+                    None => {
+                        tracing::error!("🎤 [RTA] Nenhum dispositivo de entrada default encontrado.");
+                        return;
+                    }
                 }
             };
 
             let dev_name = device.name().unwrap_or_else(|_| "Desconhecido".to_string());
-            tracing::info!("🎤 [RTA] O Windows selecionou o dispositivo default: '{}'", dev_name);
+            tracing::info!("🎤 [RTA] Usando dispositivo de {}: '{}'", if is_output { "saída" } else { "entrada" }, dev_name);
 
-            let config = match device.default_input_config() {
-                Ok(c) => c,
-                Err(e) => {
-                    tracing::error!("🎤 [RTA] Falha ao obter config padrão: {}", e);
-                    return;
+            let config = if is_output {
+                match device.default_output_config() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        tracing::error!("🎤 [RTA] Falha ao obter config de saída: {}", e);
+                        return;
+                    }
+                }
+            } else {
+                match device.default_input_config() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        tracing::error!("🎤 [RTA] Falha ao obter config de entrada: {}", e);
+                        return;
+                    }
                 }
             };
 
@@ -89,11 +138,16 @@ impl RtaManager {
                 config.sample_rate().0
             );
             
+            *sample_rate_arc.lock().unwrap() = config.sample_rate().0;
+
             // Envia a sample rate para o front-end sincronizar a tela
-            let _ = socket.emit("rtaConfig", &serde_json::json!({ "sampleRate": config.sample_rate().0 }));
+            let sr = config.sample_rate().0;
+            let io_clone2 = io.clone();
+            rt.spawn(async move {
+                let _ = io_clone2.emit("rtaConfig", &serde_json::json!({ "sampleRate": sr })).await;
+            });
 
             let err_fn = |err| tracing::error!("🎤 [RTA] Erro na stream: {}", err);
-            let fft_size = 4096;
             let mut planner = FftPlanner::new();
             let fft = planner.plan_fft_forward(fft_size);
             let buffer = Arc::new(Mutex::new(Vec::new()));
@@ -171,8 +225,8 @@ impl RtaManager {
     }
 
     pub fn stop(&mut self) {
-        let mut active = self.is_active.lock().unwrap();
-        *active = false;
+        *self.is_active.lock().unwrap() = false;
+        self.current_device = None;
         if let Some(tx) = self.stop_tx.take() {
             let _ = tx.send(());
         }

@@ -4,7 +4,6 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::info;
 
-use crate::config::AppConfig;
 use crate::custom_scenes::{ChannelId, CustomSceneManager};
 use crate::midi::MidiScheduler;
 use crate::network::{ConnectionManager, SyncManager};
@@ -53,7 +52,6 @@ pub fn register_handlers(
     io: SocketIo,
     scheduler: Arc<MidiScheduler>,
     global_state: Arc<RwLock<GlobalState>>,
-    app_config: AppConfig,
     conn_mgr: Arc<ConnectionManager>,
     sync_manager: Arc<SyncManager>,
     custom_scene_manager: Arc<RwLock<CustomSceneManager>>,
@@ -62,7 +60,6 @@ pub fn register_handlers(
     let sync_manager_socket = sync_manager.clone();
     let scheduler_socket = scheduler.clone();
     let global_state_socket = global_state.clone();
-    let app_config_clone = app_config.clone();
     let conn_mgr_handler = conn_mgr.clone();
     let csm_socket = custom_scene_manager.clone();
     let rta_socket_main = rta_manager.clone();
@@ -248,20 +245,55 @@ pub fn register_handlers(
         });
 
         let rta_manager_socket = rta_handler.clone();
+        let io_rta = io.clone();
         socket.on(
             "rtaControl",
-            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
                 let action = data.get("action").and_then(|v| v.as_str()).unwrap_or("");
                 if action == "start_server_mic" {
                     tracing::info!("🎤 [RTA] Recebido comando para iniciar microfone do servidor");
                     let mut rta = rta_manager_socket.lock().await;
-                    rta.start(socket.clone());
+                    let device_name = data.get("deviceName").and_then(|v| v.as_str()).map(|s| s.to_string());
+                    let is_output = data.get("isOutput").and_then(|v| v.as_bool()).unwrap_or(false);
+                    let fft_size = data.get("fftSize").and_then(|v| v.as_u64()).unwrap_or(4096) as usize;
+                    rta.start(io_rta.clone(), device_name, is_output, fft_size);
                 } else if action == "stop_server_mic" {
                     tracing::info!("🎤 [RTA] Recebido comando para parar microfone do servidor");
                     let mut rta = rta_manager_socket.lock().await;
                     rta.stop();
                 }
             },
+        );
+
+        socket.on(
+            "requestRtaDevices",
+            move |socket: SocketRef| async move {
+                let host = cpal::default_host();
+                use cpal::traits::{HostTrait, DeviceTrait};
+                
+                let mut inputs = Vec::new();
+                if let Ok(devices) = host.input_devices() {
+                    for d in devices {
+                        if let Ok(name) = d.name() {
+                            inputs.push(name);
+                        }
+                    }
+                }
+                
+                let mut outputs = Vec::new();
+                if let Ok(devices) = host.output_devices() {
+                    for d in devices {
+                        if let Ok(name) = d.name() {
+                            outputs.push(name);
+                        }
+                    }
+                }
+                
+                let _ = socket.emit("rtaDevicesList", &serde_json::json!({
+                    "inputs": inputs,
+                    "outputs": outputs
+                }));
+            }
         );
 
         let scheduler_pan = scheduler_socket.clone();

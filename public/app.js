@@ -17,11 +17,25 @@ document.addEventListener("visibilitychange", () => {
         if (typeof socket !== 'undefined' && socket.connected) {
             console.log("⏸️ Aba oculta. Desconectando socket para poupar recursos.");
             socket.disconnect();
+            if (window.activeConfigTab === 'eq' && typeof window.pauseRTA === 'function') {
+                window.pauseRTA();
+            }
         }
     } else {
         if (typeof socket !== 'undefined' && socket.disconnected) {
             console.log("▶️ Aba visível. Reconectando socket.");
             socket.connect();
         }
+        
+        setTimeout(() => {
+            if (typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && typeof activeConfigTab !== 'undefined' && activeConfigTab === 'eq') {
+                if (typeof window.renderEQ === 'function') {
+                    window.renderEQ(activeConfigChannel);
+                } else {
+                    if (typeof window.resumeRTA === 'function') window.resumeRTA();
+                    if (typeof window.startEQAnimation === 'function') window.startEQAnimation();
+                }
+            }
+        }, 500);
     }
 });

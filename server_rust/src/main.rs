@@ -150,7 +150,6 @@ async fn async_main(
         io.clone(),
         scheduler.clone(),
         global_state.clone(),
-        app_config.clone(),
         conn_mgr.clone(),
         sync_manager_socket,
         custom_scene_manager.clone(),
