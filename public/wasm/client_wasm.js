@@ -1,5 +1,3 @@
-/* @ts-self-types="./client_wasm.d.ts" */
-
 /**
  * Motor físico dos medidores.
  * Guarda o estado (nível atual) de cada canal para poder aplicar
