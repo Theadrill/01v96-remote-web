@@ -22,20 +22,21 @@ use tracing::info;
 
 mod tray;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel::<()>();
+    let (shutdown_tx, shutdown_rx) = tokio::sync::mpsc::channel::<()>(1);
     let config = config::AppConfig::load();
     let tray_app = tray::TrayApp::new(config.port, config.remote_midi)?;
-    *tray_app.shutdown_tx.lock().unwrap() = Some(shutdown_tx);
+    *tray_app.shutdown_tx.lock().unwrap() = Some(shutdown_tx.clone());
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
-        let _ = rt.block_on(async_main(shutdown_rx));
+        let _ = rt.block_on(async_main(shutdown_rx, shutdown_tx));
     });
     tray_app.run_message_loop();
     Ok(())
 }
 
 async fn async_main(
-    shutdown_rx: tokio::sync::oneshot::Receiver<()>,
+    mut shutdown_rx: tokio::sync::mpsc::Receiver<()>,
+    shutdown_tx: tokio::sync::mpsc::Sender<()>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
     
@@ -142,6 +143,7 @@ async fn async_main(
         engine,
         remote_client,
         midi_in_tx.clone(),
+        shutdown_tx.clone(),
     );
 
     let global_state_api = global_state.clone();
@@ -232,8 +234,8 @@ async fn async_main(
     );
 
     axum::serve(listener, app)
-        .with_graceful_shutdown(async {
-            let _ = shutdown_rx.await;
+        .with_graceful_shutdown(async move {
+            let _ = shutdown_rx.recv().await;
             tracing::info!("🔁 Shutdown graceful recebido — liberando porta e reiniciando...");
         })
         .await?;

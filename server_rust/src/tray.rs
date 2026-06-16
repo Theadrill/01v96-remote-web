@@ -17,7 +17,7 @@ pub struct TrayApp {
     pub quit_id: MenuId,
     port: u16,
     remote_midi: bool,
-    pub shutdown_tx: Mutex<Option<tokio::sync::oneshot::Sender<()>>>,
+    pub shutdown_tx: Mutex<Option<tokio::sync::mpsc::Sender<()>>>,
 }
 
 pub fn load_icon(path: &Path) -> Result<Icon, Box<dyn std::error::Error>> {
@@ -132,10 +132,10 @@ impl TrayApp {
                 config.save();
 
                 println!("Reiniciando servidor após alterar Modo Remoto...");
-                if let Ok(mut tx_guard) = self.shutdown_tx.lock()
-                    && let Some(tx) = tx_guard.take()
+                if let Ok(tx_guard) = self.shutdown_tx.lock()
+                    && let Some(tx) = tx_guard.as_ref()
                 {
-                    let _ = tx.send(());
+                    let _ = tx.try_send(());
                     return;
                 }
                 let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();
@@ -143,10 +143,10 @@ impl TrayApp {
             }
         } else if event.id == self.restart_id {
             println!("Reiniciando servidor...");
-            if let Ok(mut tx_guard) = self.shutdown_tx.lock()
-                && let Some(tx) = tx_guard.take()
+            if let Ok(tx_guard) = self.shutdown_tx.lock()
+                && let Some(tx) = tx_guard.as_ref()
             {
-                let _ = tx.send(());
+                let _ = tx.try_send(());
                 return;
             }
             let _ = std::process::Command::new(std::env::current_exe().unwrap()).spawn();

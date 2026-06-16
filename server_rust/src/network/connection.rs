@@ -25,6 +25,7 @@ pub struct ConnectionManager {
     meter_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
     demo_handle: Arc<std::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
     pub active_views: Arc<std::sync::Mutex<std::collections::HashMap<String, String>>>,
+    shutdown_tx: mpsc::Sender<()>,
 }
 
 impl ConnectionManager {
@@ -38,6 +39,7 @@ impl ConnectionManager {
         engine: Option<Arc<tokio::sync::Mutex<MidiEngine>>>,
         remote_client: Option<Arc<midi::RemoteClient>>,
         midi_in_tx: mpsc::Sender<Vec<u8>>,
+        shutdown_tx: mpsc::Sender<()>,
     ) -> Arc<Self> {
         Arc::new(Self {
             config,
@@ -56,6 +58,7 @@ impl ConnectionManager {
             meter_handle: Arc::new(std::sync::Mutex::new(None)),
             demo_handle: Arc::new(std::sync::Mutex::new(None)),
             active_views: Arc::new(std::sync::Mutex::new(std::collections::HashMap::new())),
+            shutdown_tx,
         })
     }
 
@@ -295,7 +298,8 @@ impl ConnectionManager {
                     };
                     if expired {
                         warn!("⚠️ Watchdog: Timeout de conexao. Mesa parou de responder.");
-                        this.handle_disconnection(true).await;
+                        warn!("🔄 Watchdog: Solicitando reinicio completo do servidor...");
+                        let _ = this.shutdown_tx.try_send(());
                         break;
                     }
                 }
