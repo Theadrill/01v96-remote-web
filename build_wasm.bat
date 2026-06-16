@@ -4,7 +4,7 @@ echo 🚀 Compilando client_wasm para public/wasm...
 echo ==============================================
 
 cd client_wasm
-wasm-pack build --target web --out-dir ../public/wasm
+wasm-pack build --target web --no-typescript --out-dir ../public/wasm
 
 if %errorlevel% neq 0 (
     echo.
