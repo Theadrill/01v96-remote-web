@@ -155,6 +155,8 @@ pub struct GlobalState {
     pub out_patches_slot: HashMap<usize, f64>,
     #[serde(rename = "outPatches2tr")]
     pub out_patches_2tr: HashMap<usize, f64>,
+    #[serde(rename = "tailscaleUrl")]
+    pub tailscale_url: Option<String>,
 }
 
 impl GlobalState {
@@ -370,6 +372,7 @@ impl GlobalState {
             out_patches_fx: HashMap::new(),
             out_patches_slot: HashMap::new(),
             out_patches_2tr: HashMap::new(),
+            tailscale_url: None,
         }
     }
     pub fn handle_raw_midi(&mut self, message: &[u8]) -> bool {

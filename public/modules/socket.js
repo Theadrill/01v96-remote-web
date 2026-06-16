@@ -688,6 +688,11 @@ socket.on('connectionState', (state) => {
 });
 
 socket.on('portsList', (data) => {
+    if (data.tailscaleUrl && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        window.location.href = data.tailscaleUrl;
+        return;
+    }
+
     if (data.tecnicoPassword) {
         tecnicoPassword = data.tecnicoPassword;
         window.tecnicoPassword = data.tecnicoPassword;
@@ -767,6 +772,12 @@ socket.on('portsList', (data) => {
 window.updateOpenBrowser = function (enabled) {
     socket.emit('updateOpenBrowser', { enabled: enabled });
 };
+
+socket.on('tailscaleUrl', (data) => {
+    if (data.url && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        window.location.href = data.url;
+    }
+});
 
 window.resetFaderCache = () => {
     faderCardsCache = null;

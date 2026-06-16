@@ -12,6 +12,7 @@ mod scene_manager;
 mod socket_handlers;
 mod state;
 mod rta_manager;
+mod tailscale_http;
 
 use axum::Router;
 use socketioxide::SocketIo;
@@ -200,6 +201,8 @@ async fn async_main(
         "🎧 Servidor estatico e WebSocket rodando em http://localhost:{}",
         port
     );
+
+    tailscale_http::setup_tailscale_serve(port, global_state.clone(), io.clone());
 
     if app_config.open_browser_startup {
         let url = format!("http://localhost:{}", port);

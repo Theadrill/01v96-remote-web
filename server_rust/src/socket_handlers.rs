@@ -115,6 +115,7 @@ pub fn register_handlers(
                 .into_iter()
                 .map(|(id, name)| serde_json::json!({ "id": id, "name": name }))
                 .collect();
+            let ts_url = { state_arc_connect.read().await.tailscale_url.clone() };
             socket_initial
                 .emit(
                     "portsList",
@@ -126,7 +127,8 @@ pub fn register_handlers(
                         "savedConfig": config_arc,
                         "tecnicoPassword": crate::env_config::load_password(),
                         "serverName": crate::env_config::load_server_name(),
-                        "envStatus": crate::env_config::detect_env_status().as_str()
+                        "envStatus": crate::env_config::detect_env_status().as_str(),
+                        "tailscaleUrl": ts_url
                     }),
                 )
                 .ok();
