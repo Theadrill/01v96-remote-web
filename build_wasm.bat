@@ -15,6 +15,7 @@ if %errorlevel% neq 0 (
     echo.
     echo ✅ WASM compilado com sucesso!
     echo.
+    if exist "..\public\wasm\.gitignore" del /Q "..\public\wasm\.gitignore"
 )
 
 cd ..
