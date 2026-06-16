@@ -62,6 +62,18 @@ pub struct AppConfig {
     #[serde(default = "default_meter_opacity")]
     pub meter_opacity: f64,
 
+    #[serde(default = "default_rta_decay_rate")]
+    pub rta_decay_rate: f64,
+
+    #[serde(default = "default_rta_peak_hold_time")]
+    pub rta_peak_hold_time: u32,
+
+    #[serde(default = "default_rta_smoothing")]
+    pub rta_smoothing: u32,
+
+    #[serde(default = "default_rta_fft_size")]
+    pub rta_fft_size: u32,
+
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub steps: serde_json::Value,
@@ -89,6 +101,22 @@ fn default_meter_opacity() -> f64 {
 
 fn default_remote_midi_port() -> u16 {
     4200
+}
+
+fn default_rta_decay_rate() -> f64 {
+    0.10
+}
+
+fn default_rta_peak_hold_time() -> u32 {
+    5
+}
+
+fn default_rta_smoothing() -> u32 {
+    90
+}
+
+fn default_rta_fft_size() -> u32 {
+    4096
 }
 
 impl AppConfig {
@@ -227,6 +255,10 @@ impl AppConfig {
             remote_midi_last_host: "".to_string(),
             port: default_port(),
             meter_opacity: 1.0,
+            rta_decay_rate: default_rta_decay_rate(),
+            rta_peak_hold_time: default_rta_peak_hold_time(),
+            rta_smoothing: default_rta_smoothing(),
+            rta_fft_size: default_rta_fft_size(),
             steps: serde_json::Value::Null,
         }
     }

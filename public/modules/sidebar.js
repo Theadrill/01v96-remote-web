@@ -458,15 +458,27 @@ window.saveChannelName = function () {
 updateViewportInfo();
 
 // Fechar modais ao clicar fora do conteúdo (no fundo/backdrop)
-window.addEventListener('mousedown', (e) => {
+window.addEventListener('pointerdown', (e) => {
+    let closedAny = false;
     if (e.target.classList.contains('modal-overlay')) {
         e.target.style.display = 'none';
+        closedAny = true;
     }
     if (e.target.classList.contains('ch-modal-overlay')) {
         if (typeof closeChannelConfig === 'function') closeChannelConfig();
         else e.target.style.display = 'none';
+        closedAny = true;
     }
-});
+    if (e.target.classList.contains('mobile-menu-modal-overlay')) {
+        e.target.classList.remove('active');
+        closedAny = true;
+    }
+    
+    if (closedAny) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+}, true);
 
 function resetDmx() {
     document.getElementById('dmxResetConfirmModal').style.display = 'flex';

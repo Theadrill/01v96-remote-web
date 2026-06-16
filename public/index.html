@@ -1109,7 +1109,7 @@
     <script src="app.js"></script>
 
     <!-- Mobile Menu Modal Overlay -->
-    <div id="mobileMenuModal" class="mobile-menu-modal-overlay">
+    <div id="mobileMenuModal" class="mobile-menu-modal-overlay" onclick="if(!event.target.closest('.mobile-menu-item')) this.classList.remove('active')">
         <div class="mobile-menu-content">
             <div id="mobileMenuList" class="mobile-menu-list">
             </div>

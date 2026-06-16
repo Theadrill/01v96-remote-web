@@ -5902,3 +5902,23 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     /* Cor de destaque para indicar a presença da barra */
     border-radius: 3px;
 }
+
+/* Modal RTA em telas pequenas landscape */
+@media screen and (max-width: 950px) and (orientation: landscape) {
+    #rtaModal {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        padding: env(safe-area-inset-top, 10px) env(safe-area-inset-right, 15px) env(safe-area-inset-bottom, 10px) env(safe-area-inset-left, 15px) !important;
+        box-sizing: border-box !important;
+        gap: 10px !important;
+        margin: 0 !important;
+        position: fixed !important;
+    }
+}

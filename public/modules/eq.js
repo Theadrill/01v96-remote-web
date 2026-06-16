@@ -249,21 +249,36 @@ function renderEQ(ch) {
                 <!-- Step 1: Choose Source Type -->
                 <div id="rtaStep1" style="width:100%; display:flex; flex-direction:column; gap:10px;">
                     <div style="display:flex; flex-direction:column; gap:5px; margin-bottom: 5px;">
-                        <div style="display:flex; gap:10px;">
-                            <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
-                                <label style="color:#aaa; font-size:11px;">Resolução (FFT Size)</label>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div style="display:flex; flex-direction:column; gap:5px;">
+                                <label style="color:#aaa; font-size:11px;">Resolução (FFT)</label>
                                 <input type="number" id="rtaFftSize" value="4096" min="256" max="32768" step="256" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
                             </div>
-                            <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
+                            <div style="display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#aaa; font-size:11px;">Suavização (%)</label>
                                 <input type="number" id="rtaSmoothing" value="90" min="0" max="100" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
                             </div>
+                            <div style="display:flex; flex-direction:column; gap:5px;">
+                                <label style="color:#aaa; font-size:11px;">Pico (Segs)</label>
+                                <input type="number" id="rtaPeakHoldTime" value="5" min="1" max="20" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:5px;">
+                                <label style="color:#aaa; font-size:11px;">Queda (vel)</label>
+                                <input type="number" id="rtaDecayRate" value="10" min="1" max="100" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding: 10px 0; border-top: 1px solid #333; margin-top: 5px;">
+                            <span style="color:#bbb; font-size:13px;">Mostrar Infos (Fonte, Max Sinal)</span>
+                            <label class="switch" style="margin:0;">
+                                <input type="checkbox" id="rtaShowStatus" checked onchange="window.applyRTASettings()">
+                                <span class="slider"></span>
+                            </label>
                         </div>
                         <button onclick="window.applyRTASettings()" class="nav-btn" style="width:100%; height:35px; background:#28a745; border-radius:5px; font-size:12px; margin-top:5px; color:#fff;">Aplicar Alterações</button>
                     </div>
                     <button onclick="window.showRtaStep2('local')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Microfone do Dispositivo Atual</button>
                     <button onclick="window.showRtaStep2('server')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Dispositivo do Servidor</button>
-                    <button onclick="window.selectRTASource('simulated', 'default_in', parseInt(document.getElementById('rtaFftSize').value) || 4096, parseInt(document.getElementById('rtaSmoothing').value) || 90)" class="nav-btn" style="width:100%; height:45px; background:#005cbf; border-radius:8px; margin-top: 5px; color:#fff;">Áudio Simulado (Modo Teste)</button>
+                    <button onclick="window.selectRTASource('simulated', 'default_in', parseInt(document.getElementById('rtaFftSize').value) || 4096, parseInt(document.getElementById('rtaSmoothing').value) || 90, parseInt(document.getElementById('rtaPeakHoldTime').value) || 5)" class="nav-btn" style="width:100%; height:45px; background:#005cbf; border-radius:8px; margin-top: 5px; color:#fff;">Áudio Simulado (Modo Teste)</button>
                     <button onclick="window.disableRTA()" class="nav-btn" style="width:100%; height:45px; background:#8b0000; border-radius:8px; margin-top: 10px; color:#fff;">DESATIVAR RTA</button>
                 </div>
 
@@ -301,12 +316,26 @@ function setupCanvas(ch) {
     eqCtx = eqCanvas.getContext('2d');
 
     const doResize = () => {
+        if (!eqCanvas.parentElement) return;
         const rect = eqCanvas.parentElement.getBoundingClientRect();
         eqCanvas.width = rect.width * (window.devicePixelRatio || 1);
         eqCanvas.height = rect.height * (window.devicePixelRatio || 1);
         eqCtx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+        if (window.redrawEQ) window.redrawEQ();
     };
+
+    const eqResizeObserver = new ResizeObserver(() => {
+        doResize();
+    });
+    if (eqCanvas.parentElement) {
+        eqResizeObserver.observe(eqCanvas.parentElement);
+    }
     window.addEventListener('resize', doResize);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(doResize, 100);
+        setTimeout(doResize, 300);
+        setTimeout(doResize, 600);
+    });
     doResize();
 
     // RTA Canvas setup
@@ -314,12 +343,24 @@ function setupCanvas(ch) {
     if (rtaCanvas) {
         window.rtaCtx = rtaCanvas.getContext('2d');
         const doRtaResize = () => {
+            if (!rtaCanvas.parentElement) return;
             const rect = rtaCanvas.parentElement.getBoundingClientRect();
             rtaCanvas.width = rect.width * (window.devicePixelRatio || 1);
             rtaCanvas.height = rect.height * (window.devicePixelRatio || 1);
             window.rtaCtx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
         };
+        const rtaResizeObserver = new ResizeObserver(() => {
+            doRtaResize();
+        });
+        if (rtaCanvas.parentElement) {
+            rtaResizeObserver.observe(rtaCanvas.parentElement);
+        }
         window.addEventListener('resize', doRtaResize);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(doRtaResize, 100);
+            setTimeout(doRtaResize, 300);
+            setTimeout(doRtaResize, 600);
+        });
         doRtaResize();
     }
 
@@ -1266,4 +1307,33 @@ window.eqATTInput = function(e) {
     // Envia para mesa
     socket.emit('control', { type: 'kInputAttenuator/kAtt', channel: ch, value: rawVal });
 };
+
+// NOVO: Fechar modais ao clicar fora (capture phase para garantir execução antes do stopPropagation)
+document.addEventListener('pointerdown', (e) => {
+    let closedAny = false;
+    // Fecha RTA Modal se clicar fora
+    const rtaModal = document.getElementById('rtaModal');
+    if (rtaModal && rtaModal.style.display !== 'none') {
+        const rtaBtn = document.getElementById('headerBtnRTA');
+        if (!rtaModal.contains(e.target) && (!rtaBtn || !rtaBtn.contains(e.target))) {
+            rtaModal.style.display = 'none';
+            closedAny = true;
+        }
+    }
+    
+    // Fecha EQ ATT Modal se clicar fora
+    const attModal = document.getElementById('eqATTModal');
+    if (attModal && attModal.style.display !== 'none') {
+        const attBtn = document.getElementById('headerBtnATT');
+        if (!attModal.contains(e.target) && (!attBtn || !attBtn.contains(e.target))) {
+            window.toggleATTModal(false);
+            closedAny = true;
+        }
+    }
+
+    if (closedAny) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+}, true);
 

@@ -36,5 +36,9 @@
   "remote_midi_port": 4200,
   "remote_midi_last_host": "pcfavela",
   "port": 4000,
-  "meter_opacity": 1.0
+  "meter_opacity": 1.0,
+  "rta_decay_rate": 0.03,
+  "rta_peak_hold_time": 5,
+  "rta_smoothing": 90,
+  "rta_fft_size": 4096
 }
