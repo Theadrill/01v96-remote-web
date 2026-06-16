@@ -1383,6 +1383,7 @@ window.eqATTInput = function(e) {
 let rtaSource = localStorage.getItem('rtaSource') || 'none'; 
 let rtaWasmInst = null;
 let rtaAudioContext = null;
+let rtaAnalyzer = null;
 let rtaIsActive = false;
 let rtaAnimId = null;
 let rtaLocalStream = null;
@@ -1432,6 +1433,9 @@ window.selectRTASource = async function(source, deviceId = 'default_in', fftSize
             let audioInput = window.rtaCtxLocal.createMediaStreamSource(rtaLocalStream);
             rtaAnalyzer = window.rtaCtxLocal.createAnalyser();
             rtaAnalyzer.fftSize = fftSize;
+            rtaAnalyzer.minDecibels = -140;
+            rtaAnalyzer.maxDecibels = 0;
+            rtaAnalyzer.smoothingTimeConstant = 0;
             audioInput.connect(rtaAnalyzer);
             rtaIsActive = true;
             window.updateRtaBtnUI(true);
@@ -1543,25 +1547,28 @@ function startRtaLoop() {
         if (!rtaIsActive || !window.rtaCtx) return;
         
         let magnitudes = null;
-        if (rtaSource === 'local' && rtaAnalyzer && rtaWasmInst) {
-            let pcm = new Float32Array(rtaAnalyzer.fftSize);
-            rtaAnalyzer.getFloatTimeDomainData(pcm);
-            magnitudes = rtaWasmInst.process_audio(pcm);
+        if (rtaSource === 'local' && rtaAnalyzer) {
+            let dataArray = new Float32Array(rtaAnalyzer.frequencyBinCount);
+            rtaAnalyzer.getFloatFrequencyData(dataArray);
+            magnitudes = new Float32Array(dataArray.length);
+            for(let i=0; i<dataArray.length; i++) {
+                magnitudes[i] = dataArray.length * Math.pow(10, dataArray[i] / 20);
+            }
             window.rtaPacketCount = (window.rtaPacketCount || 0) + 1;
         } else if (rtaSource === 'server') {
             magnitudes = rtaServerData;
-        } else if (rtaSource === 'simulated' && rtaWasmInst) {
-            // Cria um buffer contendo senóides e ruídos virtuais p testar o FFT e o Visual do RTA!
-            let pcm = new Float32Array(4096);
+        } else if (rtaSource === 'simulated') {
             const time = performance.now() / 1000;
-            for(let i=0; i<4096; i++) {
-                let t = i / 48000;
-                // Sinal que varia entre 60hz (grave) e varreduras agudas pra ver o visual mover
-                pcm[i] = Math.sin(2 * Math.PI * 60 * t) * 0.1 
-                       + Math.sin(2 * Math.PI * (1000 + Math.sin(time)*500) * t) * 0.05
-                       + (Math.random() * 0.01 - 0.005); // ruido de fundo em aprox -60dB
+            const len = 2048; 
+            magnitudes = new Float32Array(len);
+            for(let i=0; i<len; i++) {
+                let f = (i / len) * 24000;
+                let mag = 0.001;
+                if (f > 50 && f < 70) mag += 0.1;
+                let sweepF = 1000 + Math.sin(time)*500;
+                if (Math.abs(f - sweepF) < 50) mag += 0.05;
+                magnitudes[i] = mag * len;
             }
-            magnitudes = rtaWasmInst.process_audio(pcm);
             window.rtaPacketCount = (window.rtaPacketCount || 0) + 1;
         }
 

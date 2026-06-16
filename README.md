@@ -97,6 +97,36 @@ Para compilar a versão final otimizada dos servidores:
    ```
 Os executáveis finais (`server_rust.exe` e `remote_midi_server.exe`) serão gerados em `target/release/` e estarão prontos para serem iniciados pelos atalhos do root.
 
+---
+
+### 🎤 Usando o Microfone do Dispositivo para o RTA do Equalizador (Acesso Seguro via Tailscale)
+
+Para que o operador de áudio consiga usar o **Microfone do seu próprio Celular/Tablet/PC** para alimentar o gráfico do **RTA (Real-Time Analyzer)** direto na tela do Equalizador, os navegadores modernos exigem que o site seja acessado de forma totalmente segura (HTTPS). Sem o HTTPS, o navegador bloqueia a caixinha que pede permissão para acessar o microfone.
+
+Para resolver isso de forma mágica, sem precisar abrir porta no roteador da igreja ou pagar por domínios, nós integramos a mesa ao **Tailscale**. Abaixo está o passo a passo detalhado, feito para que qualquer técnico consiga fazer:
+
+**Passo 1: Instalar o Tailscale no computador da mesa de som**
+1. Acesse o site oficial [tailscale.com](https://tailscale.com/) e crie uma conta gratuita.
+2. Baixe o instalador para o Windows e instale como qualquer outro programa (basta ir clicando em "Next" ou "Avançar").
+3. Após instalar, procure pelo ícone do Tailscale escondido perto do relógio do Windows, no canto inferior direito da tela.
+4. Clique com o botão direito nesse ícone e escolha "Log in" para entrar com a conta que você acabou de criar.
+
+**Passo 2: Ativar o HTTPS no Painel do Tailscale (Apenas na primeira vez)**
+1. Pelo computador, acesse sua conta no site do Tailscale pelo navegador.
+2. No menu que fica do lado esquerdo da tela, procure e clique na aba chamada **DNS**.
+3. Role a página para baixo até ver uma opção chamada **MagicDNS** e clique no botão para **Ativar (Enable)**.
+4. Quase na mesma tela, um pouco mais abaixo, procure pela área **HTTPS Certificates** e clique também em **Enable HTTPS**.
+*(Isso diz para a VPN que ela tem permissão de criar aquele cadeado verde de segurança para nós).*
+
+**Passo 3: Abrir o Servidor da Mesa de Som**
+1. Inicie o nosso servidor normalmente (clicando duas vezes no atalho ou rodando o terminal).
+2. O servidor é muito inteligente e vai perceber sozinho que o Tailscale está lá. Ele vai solicitar e configurar tudo sozinho nos bastidores.
+3. Fique de olho na tela preta (terminal), lá vai aparecer uma mensagem de sucesso, parecida com isso:
+   `✅ [TAILSCALE] Tudo pronto! O Microfone esta liberado pelo link: https://...`
+4. **A Mágica:** O operador pode continuar acessando pelo endereço local normal da rede (exemplo: `http://192.168.0.X:3000`). O nosso sistema vai entender a situação e a página vai "piscar" rapidamente, redirecionando o celular sozinho para o link seguro (`https`) do Tailscale! O celular vai pedir a permissão de usar o microfone e estará pronto para o uso.
+
+---
+
 ### 🟢 Node.js (Obsoleto)
 
 O servidor legado em Node.js continua funcional para testes básicos, mas possui menos recursos e não recebe novas atualizações. Seus arquivos de código e configuração foram compactados para manter a raiz limpa.
