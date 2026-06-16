@@ -79,39 +79,83 @@ window.showRtaStep2 = async function(source) {
 window.connectRTA = function() {
     const fftSize = parseInt(document.getElementById('rtaFftSize').value) || 4096;
     let smoothing = parseInt(document.getElementById('rtaSmoothing').value) || 90;
-    const deviceId = document.getElementById('rtaServerDevice').value;
+    let peakHoldTime = parseInt(document.getElementById('rtaPeakHoldTime').value) || 5;
+    let decayRateUI = parseFloat(document.getElementById('rtaDecayRate').value) || 10;
+    let decayRate = decayRateUI / 100.0;
+    
+    const selectEl = document.getElementById('rtaServerDevice');
+    const deviceId = selectEl.value;
+    const deviceLabel = selectEl.options.length > 0 && selectEl.selectedIndex >= 0 ? selectEl.options[selectEl.selectedIndex].text : deviceId;
     
     if (smoothing > 99) smoothing = 99;
     if (smoothing < 1) smoothing = 1;
     document.getElementById('rtaSmoothing').value = smoothing;
+    document.getElementById('rtaPeakHoldTime').value = peakHoldTime;
+    document.getElementById('rtaDecayRate').value = decayRateUI;
 
     localStorage.setItem('rtaFftSize', fftSize);
     localStorage.setItem('rtaSmoothing', smoothing);
+    localStorage.setItem('rtaPeakHoldTime', peakHoldTime);
+    localStorage.setItem('rtaDecayRate', decayRateUI);
     localStorage.setItem('rtaDeviceId', deviceId);
     if (pendingRtaSource === 'server') {
         localStorage.setItem('rtaDeviceId_server', deviceId);
     } else if (pendingRtaSource === 'local') {
         localStorage.setItem('rtaDeviceId_local', deviceId);
     }
+
+    if (typeof socket !== 'undefined' && socket.connected) {
+        socket.emit('updateRtaConfig', {
+            rta_decay_rate: decayRate,
+            rta_peak_hold_time: peakHoldTime,
+            rta_smoothing: smoothing,
+            rta_fft_size: fftSize
+        });
+    }
     
-    window.selectRTASource(pendingRtaSource, deviceId, fftSize, smoothing);
+    window.selectRTASource(pendingRtaSource, deviceId, fftSize, smoothing, peakHoldTime, deviceLabel);
 };
 
 window.applyRTASettings = function() {
     const fftSize = parseInt(document.getElementById('rtaFftSize').value) || 4096;
     let smoothing = parseInt(document.getElementById('rtaSmoothing').value) || 90;
+    let peakHoldTime = parseInt(document.getElementById('rtaPeakHoldTime').value) || 5;
+    let decayRateUI = parseFloat(document.getElementById('rtaDecayRate').value) || 10;
+    let decayRate = decayRateUI / 100.0;
+    const showStatus = document.getElementById('rtaShowStatus') ? document.getElementById('rtaShowStatus').checked : true;
     
     if (smoothing > 99) smoothing = 99;
     if (smoothing < 1) smoothing = 1;
     document.getElementById('rtaSmoothing').value = smoothing;
+    document.getElementById('rtaPeakHoldTime').value = peakHoldTime;
+    document.getElementById('rtaDecayRate').value = decayRateUI;
 
     localStorage.setItem('rtaFftSize', fftSize);
     localStorage.setItem('rtaSmoothing', smoothing);
+    localStorage.setItem('rtaPeakHoldTime', peakHoldTime);
+    localStorage.setItem('rtaDecayRate', decayRateUI);
+    localStorage.setItem('rtaShowStatus', showStatus);
     window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, smoothing / 100));
+    window.rtaPeakHoldTimeMs = peakHoldTime * 1000;
+    window.rtaDecayRate = decayRate;
+    window.rtaShowStatus = showStatus;
+
+    if (typeof socket !== 'undefined' && socket.connected) {
+        socket.emit('updateRtaConfig', {
+            rta_decay_rate: decayRate,
+            rta_peak_hold_time: peakHoldTime,
+            rta_smoothing: smoothing,
+            rta_fft_size: fftSize
+        });
+    }
     
+    window.restartRtaIfActive(fftSize, smoothing, peakHoldTime);
+};
+
+window.restartRtaIfActive = function(fftSize, smoothing, peakHoldTime) {
     if (rtaIsActive && window.rtaSource && window.rtaSource !== 'none') {
         const deviceId = localStorage.getItem('rtaDeviceId') || 'default_in';
-        window.selectRTASource(window.rtaSource, deviceId, fftSize, smoothing);
+        window.selectRTASource(window.rtaSource, deviceId, fftSize, smoothing, peakHoldTime);
     }
 };
 
@@ -126,15 +170,47 @@ window.toggleRTAModal = function() {
         if (savedSmoothing && document.getElementById('rtaSmoothing')) {
             document.getElementById('rtaSmoothing').value = savedSmoothing;
         }
+        const savedPeakHold = localStorage.getItem('rtaPeakHoldTime');
+        if (savedPeakHold && document.getElementById('rtaPeakHoldTime')) {
+            document.getElementById('rtaPeakHoldTime').value = savedPeakHold;
+        }
+        const savedDecayRate = localStorage.getItem('rtaDecayRate');
+        if (savedDecayRate && document.getElementById('rtaDecayRate')) {
+            document.getElementById('rtaDecayRate').value = savedDecayRate;
+        }
+        const savedShowStatus = localStorage.getItem('rtaShowStatus');
+        if (savedShowStatus !== null && document.getElementById('rtaShowStatus')) {
+            document.getElementById('rtaShowStatus').checked = (savedShowStatus === 'true');
+        }
         modal.style.display = 'flex';
         window.showRtaStep1();
     }
 };
 
-window.selectRTASource = async function(source, deviceId = 'default_in', fftSize = 4096, smoothing = 90) {
+window.selectRTASource = async function(source, deviceId = 'default_in', fftSize = 4096, smoothing = 90, peakHoldTime = 5, deviceLabel = null) {
     localStorage.setItem('rtaSource', source);
     localStorage.setItem('rtaSmoothing', smoothing);
+    localStorage.setItem('rtaPeakHoldTime', peakHoldTime);
     window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, smoothing / 100));
+    window.rtaPeakHoldTimeMs = peakHoldTime * 1000;
+    
+    let decayRateUI = parseFloat(localStorage.getItem('rtaDecayRate')) || 10;
+    window.rtaDecayRate = decayRateUI / 100.0;
+    
+    if (deviceLabel) {
+        localStorage.setItem('rtaDeviceLabel', deviceLabel);
+        window.rtaDeviceName = deviceLabel;
+    } else {
+        const savedLabel = localStorage.getItem('rtaDeviceLabel');
+        if (savedLabel && deviceId === localStorage.getItem('rtaDeviceId')) {
+            window.rtaDeviceName = savedLabel;
+        } else {
+            window.rtaDeviceName = deviceId;
+        }
+    }
+
+    const savedShowStatus = localStorage.getItem('rtaShowStatus');
+    window.rtaShowStatus = savedShowStatus !== null ? (savedShowStatus === 'true') : true;
     
     window.rtaSource = source;
     const modal = document.getElementById('rtaModal');
@@ -271,7 +347,8 @@ window.resumeRTA = function() {
         }
         const savedFft = parseInt(localStorage.getItem('rtaFftSize')) || 4096;
         const savedSmoothing = parseInt(localStorage.getItem('rtaSmoothing')) || 90;
-        window.selectRTASource(savedSource, savedDevice, savedFft, savedSmoothing);
+        const savedPeakHoldTime = parseInt(localStorage.getItem('rtaPeakHoldTime')) || 5;
+        window.selectRTASource(savedSource, savedDevice, savedFft, savedSmoothing, savedPeakHoldTime);
     }
 };
 
@@ -335,9 +412,13 @@ function drawRtaData(mags) {
     
     if (!window.rtaSmoothMags || window.rtaSmoothMags.length !== len) {
         window.rtaSmoothMags = new Float32Array(len);
+        window.rtaPeakMags = new Float32Array(len);
+        window.rtaPeakMags.fill(-140);
+        window.rtaPeakHold = new Float64Array(len);
     }
     
     const smoothFactor = window.rtaSmoothingFactor !== undefined ? window.rtaSmoothingFactor : 0.90;
+    const now = performance.now();
 
     let buckets = [];
     let currentX = -1;
@@ -355,13 +436,25 @@ function drawRtaData(mags) {
         }
         
         let rawMag = mags[i] / len;
-        
-        window.rtaSmoothMags[i] = window.rtaSmoothMags[i] * smoothFactor + rawMag * (1.0 - smoothFactor);
-        
-        let db = window.rtaSmoothMags[i] > 0.0000001 ? 20 * Math.log10(window.rtaSmoothMags[i]) : -140;
-        
+        let rawDb = rawMag > 0.0000001 ? 20 * Math.log10(rawMag) : -140;
         let tilt_db = Math.log2(f / 1000.0) * 3.0; 
-        db += tilt_db;
+        rawDb += tilt_db;
+
+        if (!window.rtaSmoothDb || window.rtaSmoothDb.length !== len) {
+            window.rtaSmoothDb = new Float32Array(len).fill(-140);
+        }
+
+        if (rawDb > window.rtaSmoothDb[i]) {
+            // Ataque: pode ser instantâneo ou suavizado com base no smoothFactor se quiser
+            window.rtaSmoothDb[i] = window.rtaSmoothDb[i] * smoothFactor + rawDb * (1.0 - smoothFactor);
+        } else {
+            // Decaimento: linear (em dB por frame)
+            let decay = window.rtaDecayRate !== undefined ? window.rtaDecayRate : 0.1;
+            window.rtaSmoothDb[i] -= decay;
+            if (window.rtaSmoothDb[i] < rawDb) window.rtaSmoothDb[i] = rawDb;
+        }
+
+        let db = window.rtaSmoothDb[i];
 
         if (db > maxDb) maxDb = db;
         
@@ -383,11 +476,35 @@ function drawRtaData(mags) {
         for (let b = 0; b < buckets.length; b++) {
             let sumDb = 0;
             let count = 0;
+            
             for (let j = Math.max(0, b - spaceSmoothWindow); j <= Math.min(buckets.length - 1, b + spaceSmoothWindow); j++) {
                 sumDb += buckets[j].db;
                 count++;
             }
+            
             smoothedBuckets.push({ x: buckets[b].x, db: sumDb / count });
+        }
+
+        if (!window.rtaScreenPeaks || window.rtaScreenPeaks.length !== smoothedBuckets.length) {
+            window.rtaScreenPeaks = new Float32Array(smoothedBuckets.length).fill(-140);
+            window.rtaScreenHold = new Float64Array(smoothedBuckets.length).fill(0);
+        }
+
+        let holdTimeMs = window.rtaPeakHoldTimeMs !== undefined ? window.rtaPeakHoldTimeMs : 5000;
+        let peakDecay = window.rtaDecayRate !== undefined ? window.rtaDecayRate : 0.1;
+        
+        for (let b = 0; b < smoothedBuckets.length; b++) {
+            let sdb = smoothedBuckets[b].db;
+            if (sdb >= window.rtaScreenPeaks[b]) {
+                window.rtaScreenPeaks[b] = sdb;
+                window.rtaScreenHold[b] = now + holdTimeMs;
+            } else {
+                if (now >= window.rtaScreenHold[b]) {
+                    window.rtaScreenPeaks[b] -= peakDecay;
+                    if (window.rtaScreenPeaks[b] < sdb) window.rtaScreenPeaks[b] = sdb;
+                }
+            }
+            smoothedBuckets[b].peak_db = window.rtaScreenPeaks[b];
         }
 
         let firstY = h - ((smoothedBuckets[0].db + 90) / 90) * h;
@@ -414,20 +531,65 @@ function drawRtaData(mags) {
         let lastY = h - ((lastB.db + 90) / 90) * h;
         if (lastY < 0) lastY = 0; if (lastY > h) lastY = h;
         ctx.lineTo(lastB.x, lastY);
-    }
-    
-    ctx.lineTo(w, h);
-    ctx.fillStyle = 'rgba(200, 200, 200, 0.2)'; 
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.stroke();
+        
+        ctx.lineTo(w, h);
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.2)'; 
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.stroke();
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '10px monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('FONTE: ' + window.rtaSource, 10, 20);
-    ctx.fillText('MAX SINAL: ' + maxDb.toFixed(1) + ' dB', 10, 35);
-    ctx.fillText('PACOTES: ' + (window.rtaPacketCount || 0), 10, 50);
+        // Path do Peak Hold
+        ctx.beginPath();
+        let firstPeakY = h - ((smoothedBuckets[0].peak_db + 90) / 90) * h;
+        if (firstPeakY < 0) firstPeakY = 0; if (firstPeakY > h) firstPeakY = h;
+        ctx.moveTo(smoothedBuckets[0].x, firstPeakY);
+
+        for (let i = 1; i < smoothedBuckets.length - 1; i++) {
+            let b0 = smoothedBuckets[i];
+            let b1 = smoothedBuckets[i + 1];
+            
+            let y0 = h - ((b0.peak_db + 90) / 90) * h;
+            if (y0 < 0) y0 = 0; if (y0 > h) y0 = h;
+            
+            let y1 = h - ((b1.peak_db + 90) / 90) * h;
+            if (y1 < 0) y1 = 0; if (y1 > h) y1 = h;
+
+            let xc = (b0.x + b1.x) / 2;
+            let yc = (y0 + y1) / 2;
+            
+            ctx.quadraticCurveTo(b0.x, y0, xc, yc);
+        }
+
+        let lastPeakY = h - ((lastB.peak_db + 90) / 90) * h;
+        if (lastPeakY < 0) lastPeakY = 0; if (lastPeakY > h) lastPeakY = h;
+        ctx.lineTo(lastB.x, lastPeakY);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; // Linha mais nítida
+        ctx.stroke();
+    } else {
+        ctx.lineTo(w, h);
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.2)'; 
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.stroke();
+    }
+
+    if (window.rtaShowStatus !== false) {
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'left';
+        
+        let sourceText = window.rtaSource;
+        if (window.rtaDeviceName) {
+            let devName = window.rtaDeviceName;
+            if (devName === 'default_in' || devName === 'default') devName = 'Padrão';
+            sourceText += ' / ' + devName;
+        }
+        
+        ctx.fillText('FONTE: ' + sourceText.toUpperCase(), 10, 20);
+        ctx.fillText('MAX SINAL: ' + maxDb.toFixed(1) + ' dB', 10, 35);
+        ctx.fillText('PACOTES: ' + (window.rtaPacketCount || 0), 10, 50);
+    }
 }
 
 try {

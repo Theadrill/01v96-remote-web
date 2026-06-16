@@ -1957,7 +1957,43 @@ pub fn register_handlers(
                         );
                     }
                 }
-            },
+            }
+        );
+
+        socket.on(
+            "updateRtaConfig",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                tracing::info!("🎤 [RTA] Received updateRtaConfig: {:?}", data.0);
+                let mut config = crate::config::AppConfig::load();
+                let mut updated = false;
+
+                if let Some(decay) = data.get("rta_decay_rate").and_then(|v| v.as_f64()) {
+                    config.rta_decay_rate = decay;
+                    updated = true;
+                }
+                if let Some(peak) = data.get("rta_peak_hold_time").and_then(|v| v.as_u64()) {
+                    config.rta_peak_hold_time = peak as u32;
+                    updated = true;
+                }
+                if let Some(smoothing) = data.get("rta_smoothing").and_then(|v| v.as_u64()) {
+                    config.rta_smoothing = smoothing as u32;
+                    updated = true;
+                }
+                if let Some(fft) = data.get("rta_fft_size").and_then(|v| v.as_u64()) {
+                    config.rta_fft_size = fft as u32;
+                    updated = true;
+                }
+
+                if updated {
+                    config.save();
+                    let _ = socket.broadcast().emit("rtaConfigUpdated", &serde_json::json!({
+                        "rta_decay_rate": config.rta_decay_rate,
+                        "rta_peak_hold_time": config.rta_peak_hold_time,
+                        "rta_smoothing": config.rta_smoothing,
+                        "rta_fft_size": config.rta_fft_size
+                    })).await;
+                }
+            }
         );
     });
 }
