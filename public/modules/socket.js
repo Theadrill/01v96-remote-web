@@ -86,12 +86,8 @@ socket.on('syncStatus', (data) => {
     }
 
     if (!isActive) {
-        console.log('✅ [SYNC COMPLETO] syncStatus=false → estado atual dos pares:');
-        for (let i = 0; i < 4; i++) {
-            if (channelStates[i]) {
-                console.log(`  CH${i + 1}: paired=${channelStates[i].paired}, pairedWith=${channelStates[i].pairedWith}`);
-            }
-        }
+        console.log('✅ [SYNC COMPLETO]');
+
     }
 });
 socket.on('update', (d) => {
@@ -545,14 +541,7 @@ socket.on('sync', (s) => {
 
     if (typeof initUI === 'function') {
         console.log("♻️ [SOCKET] Re-inicializando UI após Sync Completo");
-        const ch0 = getCh(s.channels || {}, 0);
-        const ch1 = getCh(s.channels || {}, 1);
-        if (ch0 && ch1) {
-            console.log("🔍 [DEBUG SYNC] CH1 from server:", ch0.paired, "pairedWith:", ch0.pairedWith);
-            console.log("🔍 [DEBUG SYNC] CH2 from server:", ch1.paired, "pairedWith:", ch1.pairedWith);
-            console.log("🔍 [DEBUG SYNC] CH1 state:", channelStates[0].paired, "pairedWith:", channelStates[0].pairedWith);
-            console.log("🔍 [DEBUG SYNC] CH2 state:", channelStates[1].paired, "pairedWith:", channelStates[1].pairedWith);
-        }
+        
         initUI();
         // 🔑 NÃO chamamos requestGlobalNames() aqui — os globals já estão em memória
         // (foram carregados no connect). Recarregar a cada sync causava o flash de nomes.
@@ -562,7 +551,6 @@ socket.on('sync', (s) => {
 socket.on('scenesUpdated', (data) => {
     if (data.scenes) {
         window.scenesLibrary = data.scenes;
-        console.log(`📚 Biblioteca de Cenas atualizada: ${data.scenes.length} cenas.`);
     }
     if (data.currentScene) {
         window.currentSceneNumber = data.currentScene.index;
