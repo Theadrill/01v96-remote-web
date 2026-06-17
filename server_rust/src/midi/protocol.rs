@@ -119,7 +119,7 @@ pub fn build_change(
             } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
                 final_channel = 32 + (channel - 60);
             }
-        } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
+        } else if (command_name.starts_with("kInput") || command_name == "kSetupSoloChOn/kSoloChOn") && (60..=67).contains(&channel) {
             final_channel = 32 + (channel - 60);
         }
         packet.push(final_channel);
@@ -166,7 +166,7 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     }
 
     // Map ST IN channels for any Input command
-    if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
+    if (command_name.starts_with("kInput") || command_name == "kSetupSoloChOn/kSoloChOn") && (60..=67).contains(&channel) {
         final_channel = 32 + (channel - 60);
     }
 

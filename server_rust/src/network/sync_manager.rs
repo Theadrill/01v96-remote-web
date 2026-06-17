@@ -479,6 +479,7 @@ async fn queue_all_params_inner(
     for i in 0u8..8 {
         push_req(&mut requests, "kAUXFader/kFader", i);
         push_req(&mut requests, "kAUXChannelOn/kChannelOn", i);
+        push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", 40 + i);
         push_req(&mut requests, "kAUXEQ/kEQOn", i);
         push_req(&mut requests, "kAUXEQ/kEQHPFOn", i);
         push_req(&mut requests, "kAUXEQ/kEQLPFOn", i);
@@ -500,6 +501,7 @@ async fn queue_all_params_inner(
         }
         push_req(&mut requests, "kBusFader/kFader", i);
         push_req(&mut requests, "kBusChannelOn/kChannelOn", i);
+        push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", 48 + i);
         push_req(&mut requests, "kBusEQ/kEQOn", i);
         push_req(&mut requests, "kBusEQ/kEQHPFOn", i);
         push_req(&mut requests, "kBusEQ/kEQLPFOn", i);

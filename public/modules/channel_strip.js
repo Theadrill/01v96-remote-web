@@ -63,10 +63,19 @@ function updateUI(ch, val, onState, soloState) {
         stateRef = mixesState[ch.substring(1)];
     } else if (typeof ch === 'string' && ch.startsWith('b')) {
         stateRef = busesState[ch.substring(1)];
+    } else if (typeof ch === 'number' && ch >= 36 && ch <= 43) {
+        stateRef = mixesState[ch - 36];
+        uiId = `m${ch - 36}`;
+    } else if (typeof ch === 'number' && ch >= 44 && ch <= 51) {
+        stateRef = busesState[ch - 44];
+        uiId = `b${ch - 44}`;
     } else if (typeof ch === 'number' && ch >= 60 && ch <= 67) {
         stateRef = channelStates[32 + (ch - 60)];
         const stIndex = Math.floor((ch - 60) / 2);
         uiId = `st${stIndex}`;
+    } else if (ch === 52) {
+        stateRef = masterState;
+        uiId = 'master';
     } else {
         stateRef = channelStates[ch];
     }
@@ -114,14 +123,16 @@ function updateUI(ch, val, onState, soloState) {
         const elLabelMini = document.getElementById(`mini-label${uiId}`);
         if (elLabelMini) elLabelMini.classList.toggle('label-on', onState);
     }
-    if (typeof ch === 'number' && soloState !== undefined && soloState !== null) {
+    if (soloState !== undefined && soloState !== null) {
         if (stateRef) stateRef.solo = soloState;
         const elSolo = document.getElementById(`solo${uiId}`);
         if (elSolo) elSolo.classList.toggle('solo-active', soloState);
         const elSoloMini = document.getElementById(`mini-solo${uiId}`);
         if (elSoloMini) elSoloMini.classList.toggle('solo-active', soloState);
         // Atualiza o indicador de SOLO no master sempre que qualquer solo muda
-        checkMasterSoloIndicator();
+        if (typeof checkMasterSoloIndicator === 'function') {
+            checkMasterSoloIndicator();
+        }
     }
 }
 /**
@@ -532,6 +543,8 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         onAction: `toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})`,
         configAction: `openChannelConfig(event, ${configId})`,
         type: "output",
+        hasSolo: true,
+        solo: stateRef.solo,
         isPaired: type === 'stIn',
         partnerId: type === 'stIn' ? configId + 1 : null,
         hasPan: type === 'stIn', // Apenas ST IN tem Pan nas saídas
@@ -591,6 +604,7 @@ function createOutputStrip(i, type, idPrefix = "") {
                 <div id="${pfx}name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>
             
+            <button id="${pfx}solo${prefix}${i}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${actionCh})">Solo</button>
             <button id="${pfx}on${prefix}${i}" class="btn-state" onclick="toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})">On</button>
 
             <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">

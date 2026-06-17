@@ -111,6 +111,7 @@ pub struct ChannelState {
 pub struct MixBusState {
     pub value: f64,
     pub on: bool,
+    pub solo: bool,
     pub name: String,
     #[serde(rename = "nameChars")]
     pub name_chars: Vec<String>,
@@ -122,6 +123,7 @@ pub struct MixBusState {
 pub struct MasterState {
     pub value: f64,
     pub on: bool,
+    pub solo: bool,
     pub att: f64,
     pub pan: f64,
     pub name: String,
@@ -260,6 +262,7 @@ impl GlobalState {
             let mix_bus_state = MixBusState {
                 value: 0.0,
                 on: false,
+                solo: false,
                 name: format!("MIX {}", i + 1),
                 name_chars: vec![" ".to_string(); 16],
                 comp: CompState {
@@ -321,6 +324,7 @@ impl GlobalState {
             master: MasterState {
                 value: 0.0,
                 on: false,
+                solo: false,
                 att: 0.0,
                 pan: 0.0,
                 name: "MASTER".to_string(),
@@ -490,8 +494,16 @@ impl GlobalState {
                     }
                 // --- Solo / Phase / Att / Patch ---
                 } else if mt == "kSetupSoloChOn/kSoloChOn" {
-                    if let Some(ch) = self.channels.get_mut(channel) {
+                    if let Some(ch) = self.channels.get_mut(&local_ch) {
                         ch.solo = cv;
+                    } else if (40..=47).contains(&local_ch) {
+                        if let Some(m) = self.mixes.get_mut(&(local_ch - 40)) {
+                            m.solo = cv;
+                        }
+                    } else if (48..=55).contains(&local_ch) {
+                        if let Some(b) = self.buses.get_mut(&(local_ch - 48)) {
+                            b.solo = cv;
+                        }
                     }
                 } else if mt == "kInputPhase/kPhase" {
                     if let Some(ch) = self.channels.get_mut(channel) {

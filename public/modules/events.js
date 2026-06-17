@@ -167,8 +167,18 @@ function toggleState(type, ch) {
     // Importante: verificar 'master' primeiro para não confundir com Mixes (que começam com 'm')
     if (!appReady) return;
     let emitCh = ch;
-    if (ch === 'master' || ch === 52) emitCh = 0;
-    else if (typeof ch === 'string' && (ch.startsWith('m') || ch.startsWith('b'))) emitCh = parseInt(ch.substring(1));
+    if (ch === 'master' || ch === 52) {
+        emitCh = 0;
+    } else if (typeof ch === 'string' && ch.startsWith('m')) {
+        emitCh = parseInt(ch.substring(1));
+        if (actualType === 'kSetupSoloChOn/kSoloChOn') emitCh += 40;
+    } else if (typeof ch === 'string' && ch.startsWith('b')) {
+        emitCh = parseInt(ch.substring(1));
+        if (actualType === 'kSetupSoloChOn/kSoloChOn') emitCh += 48;
+    } else if (typeof ch === 'string' && (ch.startsWith('st') || ch.startsWith('CH'))) {
+        // Fallback or ST IN parsing if ever passed as string
+        emitCh = parseInt(ch.substring(2)) || parseInt(ch.substring(1));
+    }
     socket.emit('control', { type: actualType, channel: emitCh, value: val ? 1 : 0 });
 }
 

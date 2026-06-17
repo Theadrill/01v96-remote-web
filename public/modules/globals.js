@@ -29,11 +29,11 @@ const DEFAULT_OUT_EQ = () => ({
 let mixesState = [];
 let busesState = [];
 for (let i = 0; i < 8; i++) {
-    mixesState.push({ value: 0, on: false, name: `MIX ${i+1}`, eq: DEFAULT_OUT_EQ() });
-    busesState.push({ value: 0, on: false, name: `BUS ${i+1}`, eq: DEFAULT_OUT_EQ() });
+    mixesState.push({ value: 0, on: false, solo: false, name: `MIX ${i+1}`, eq: DEFAULT_OUT_EQ() });
+    busesState.push({ value: 0, on: false, solo: false, name: `BUS ${i+1}`, eq: DEFAULT_OUT_EQ() });
 }
 
-let masterState = { value: 0, on: false, eq: DEFAULT_OUT_EQ() };
+let masterState = { value: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };
 let activeConfigChannel = null;
 let activeConfigTab = "aux"; // Auxiliares por padrão
 let appOrientation = 'vertical';

@@ -126,13 +126,18 @@ socket.on('update', (d) => {
         return;
     }
 
-    if (typeof d.channel === 'number' && (d.channel < NUM_CHANNELS || (d.channel >= 60 && d.channel <= 67))) {
+    if (typeof d.channel === 'number' && (d.channel < 56 || (d.channel >= 60 && d.channel <= 67))) {
         // No modo músico ou técnico mix, ignoramos updates dos faders principais para não bagunçar a visão do AUX
         if (!musicianMode && !technicianMixMode) {
             if (d.type === 'kInputFader/kFader') updateUI(d.channel, d.value, undefined, undefined);
             if (d.type === 'kInputChannelOn/kChannelOn') updateUI(d.channel, undefined, isTrue, undefined);
         }
-        if (d.type === 'kSetupSoloChOn/kSoloChOn') updateUI(d.channel, undefined, undefined, isTrue);
+        let mappedSoloCh = d.channel;
+        if (d.type === 'kSetupSoloChOn/kSoloChOn') {
+            if (d.channel >= 40 && d.channel <= 47) mappedSoloCh = d.channel - 4;
+            else if (d.channel >= 48 && d.channel <= 55) mappedSoloCh = d.channel - 4;
+            updateUI(mappedSoloCh, undefined, undefined, isTrue);
+        }
 
         if (d.type === 'kInputPhase/kPhase') {
             const state = getChannelStateById(d.channel);
