@@ -25,7 +25,7 @@
                         const parts = scene.split(':');
                         p = parseInt(parts[0]); s = parseInt(parts[1]);
                     }
-                    window.fetch(`${baseUrl}/services/edmx_change_scene/${p}/${s}`, { mode: 'no-cors' }).catch(() => {});
+                    MixerAPI.network.fetch(`${baseUrl}/services/edmx_change_scene/${p}/${s}`, { fireAndForget: true }).catch(() => {});
                 } catch (e) { }
             }
         }
@@ -52,7 +52,7 @@
                     console.log(`[LUMIKIT DEBUG] Status Final: ${isActive ? 'ON' : 'OFF'}. Enviando: ${isActive ? 'liberar' : 'pressionar'}`);
 
                     const actionType = isActive ? "release" : "press";
-                    window.fetch(`${baseUrl}/services/main_${actionType}_ef/${extra}`, { mode: 'no-cors' }).catch(() => {});
+                    MixerAPI.network.fetch(`${baseUrl}/services/main_${actionType}_ef/${extra}`, { fireAndForget: true }).catch(() => {});
                 } catch (e) { console.error("[LUMIKIT] Falha ao alternar extra:", e); }
             }
         }
