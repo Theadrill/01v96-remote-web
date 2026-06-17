@@ -102,11 +102,21 @@ pub fn build_change(
     } else {
         packet.push(coords[0]);
         packet.push(coords[1]);
-        packet.push(coords[2]);
-        packet.push(coords[3]);
 
+        let mut element = coords[2];
         let mut final_channel = channel;
-        if command_name.contains("EQ/")
+
+        if command_name == "kSetupSoloChOn/kSoloChOn" {
+            if (40..=47).contains(&channel) {
+                element = 47; // 2F (Output Solo)
+                final_channel = channel - 32; // 40 -> 8 (Mix 1)
+            } else if (48..=55).contains(&channel) {
+                element = 47; // 2F (Output Solo)
+                final_channel = channel - 48; // 48 -> 0 (Bus 1)
+            } else if (60..=67).contains(&channel) {
+                final_channel = 32 + (channel - 60);
+            }
+        } else if command_name.contains("EQ/")
             || command_name.contains("Comp/")
             || command_name == "kInputAttenuator/kAtt"
         {
@@ -119,9 +129,12 @@ pub fn build_change(
             } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
                 final_channel = 32 + (channel - 60);
             }
-        } else if (command_name.starts_with("kInput") || command_name == "kSetupSoloChOn/kSoloChOn") && (60..=67).contains(&channel) {
+        } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
             final_channel = 32 + (channel - 60);
         }
+
+        packet.push(element);
+        packet.push(coords[3]);
         packet.push(final_channel);
     }
 
@@ -634,13 +647,31 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             }
         }
 
-        // --- SOLO (group 3, element 46) ---
-        if group == 3 && element == 46 {
-            return cc(
-                "kSetupSoloChOn/kSoloChOn",
-                channel,
-                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
-            );
+        // --- SOLO (group 3, element 46=Input, 47=Output) ---
+        if group == 3 {
+            if element == 46 {
+                let mut mapped_ch = channel;
+                if (32..=39).contains(&channel) {
+                    mapped_ch = 60 + (channel - 32);
+                }
+                return cc(
+                    "kSetupSoloChOn/kSoloChOn",
+                    mapped_ch,
+                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+                );
+            } else if element == 47 {
+                let mut mapped_ch = channel;
+                if (0..=7).contains(&channel) {
+                    mapped_ch = channel + 48; // Bus 1..8
+                } else if (8..=15).contains(&channel) {
+                    mapped_ch = channel + 32; // Mix 1..8 (8 + 32 = 40)
+                }
+                return cc(
+                    "kSetupSoloChOn/kSoloChOn",
+                    mapped_ch,
+                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+                );
+            }
         }
 
         // --- PATCH (section 13, group 2) ---
