@@ -187,11 +187,10 @@ function createDesktopStrip(config) {
             <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${configAction}">${title}</div>
             
             ${hasSolo ?
-            `<button id="solo${id}" class="btn-cue" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">SOLO</button>` :
+            `<button id="solo${id}" class="btn-cue" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})">SOLO</button>` :
             isMaster ?
                 `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
-                `<div class="btn-cue-placeholder"></div>`}
-            
+                `<div class="btn-cue-placeholder"></div>`}    
             <div class="desk-ch-name-zone" onclick="${configAction}">
                 <div id="${nameId}" class="desk-ch-name">${name}</div>
             </div>
@@ -416,7 +415,7 @@ function createMobileStrip(config) {
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
             
-            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${id})">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
+            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
             ${!onTop ? onBtn : ''}
 
             <div class="nudge-zone" onpointerdown="${onNudgeStartAction}(${evtCh}, 1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" oncontextmenu="return false;" onclick="event.stopPropagation()">
