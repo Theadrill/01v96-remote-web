@@ -260,11 +260,11 @@ function renderEQ(ch) {
                             </div>
                             <div style="display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#aaa; font-size:11px;">Pico (Segs)</label>
-                                <input type="number" id="rtaPeakHoldTime" value="5" min="1" max="20" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                                <input type="number" id="rtaPeakHoldTime" value="7" min="1" max="20" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
                             </div>
                             <div style="display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#aaa; font-size:11px;">Queda (vel)</label>
-                                <input type="number" id="rtaDecayRate" value="10" min="1" max="100" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                                <input type="number" id="rtaDecayRate" value="9" min="1" max="100" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
                             </div>
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding: 10px 0; border-top: 1px solid #333; margin-top: 5px;">
@@ -278,7 +278,7 @@ function renderEQ(ch) {
                     </div>
                     <button onclick="window.showRtaStep2('local')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Microfone do Dispositivo Atual</button>
                     <button onclick="window.showRtaStep2('server')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Dispositivo do Servidor</button>
-                    <button onclick="window.selectRTASource('simulated', 'default_in', parseInt(document.getElementById('rtaFftSize').value) || 4096, parseInt(document.getElementById('rtaSmoothing').value) || 90, parseInt(document.getElementById('rtaPeakHoldTime').value) || 5)" class="nav-btn" style="width:100%; height:45px; background:#005cbf; border-radius:8px; margin-top: 5px; color:#fff;">Áudio Simulado (Modo Teste)</button>
+                    <button onclick="window.selectRTASource('simulated', 'default_in', parseInt(document.getElementById('rtaFftSize').value) || 4096, parseInt(document.getElementById('rtaSmoothing').value) || 90, parseInt(document.getElementById('rtaPeakHoldTime').value) || 7)" class="nav-btn" style="width:100%; height:45px; background:#005cbf; border-radius:8px; margin-top: 5px; color:#fff;">Áudio Simulado (Modo Teste)</button>
                     <button onclick="window.disableRTA()" class="nav-btn" style="width:100%; height:45px; background:#8b0000; border-radius:8px; margin-top: 10px; color:#fff;">DESATIVAR RTA</button>
                 </div>
 

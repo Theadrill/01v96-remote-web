@@ -79,8 +79,8 @@ window.showRtaStep2 = async function(source) {
 window.connectRTA = function() {
     const fftSize = parseInt(document.getElementById('rtaFftSize').value) || 4096;
     let smoothing = parseInt(document.getElementById('rtaSmoothing').value) || 90;
-    let peakHoldTime = parseInt(document.getElementById('rtaPeakHoldTime').value) || 5;
-    let decayRateUI = parseFloat(document.getElementById('rtaDecayRate').value) || 10;
+    let peakHoldTime = parseInt(document.getElementById('rtaPeakHoldTime').value) || 7;
+    let decayRateUI = parseFloat(document.getElementById('rtaDecayRate').value) || 9;
     let decayRate = decayRateUI / 100.0;
     
     const selectEl = document.getElementById('rtaServerDevice');
@@ -119,8 +119,8 @@ window.connectRTA = function() {
 window.applyRTASettings = function() {
     const fftSize = parseInt(document.getElementById('rtaFftSize').value) || 4096;
     let smoothing = parseInt(document.getElementById('rtaSmoothing').value) || 90;
-    let peakHoldTime = parseInt(document.getElementById('rtaPeakHoldTime').value) || 5;
-    let decayRateUI = parseFloat(document.getElementById('rtaDecayRate').value) || 10;
+    let peakHoldTime = parseInt(document.getElementById('rtaPeakHoldTime').value) || 7;
+    let decayRateUI = parseFloat(document.getElementById('rtaDecayRate').value) || 9;
     let decayRate = decayRateUI / 100.0;
     const showStatus = document.getElementById('rtaShowStatus') ? document.getElementById('rtaShowStatus').checked : true;
     
@@ -187,14 +187,14 @@ window.toggleRTAModal = function() {
     }
 };
 
-window.selectRTASource = async function(source, deviceId = 'default_in', fftSize = 4096, smoothing = 90, peakHoldTime = 5, deviceLabel = null) {
+window.selectRTASource = async function(source, deviceId = 'default_in', fftSize = 4096, smoothing = 90, peakHoldTime = 7, deviceLabel = null) {
     localStorage.setItem('rtaSource', source);
     localStorage.setItem('rtaSmoothing', smoothing);
     localStorage.setItem('rtaPeakHoldTime', peakHoldTime);
     window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, smoothing / 100));
     window.rtaPeakHoldTimeMs = peakHoldTime * 1000;
     
-    let decayRateUI = parseFloat(localStorage.getItem('rtaDecayRate')) || 10;
+    let decayRateUI = parseFloat(localStorage.getItem('rtaDecayRate')) || 9;
     window.rtaDecayRate = decayRateUI / 100.0;
     
     if (deviceLabel) {
@@ -347,7 +347,7 @@ window.resumeRTA = function() {
         }
         const savedFft = parseInt(localStorage.getItem('rtaFftSize')) || 4096;
         const savedSmoothing = parseInt(localStorage.getItem('rtaSmoothing')) || 90;
-        const savedPeakHoldTime = parseInt(localStorage.getItem('rtaPeakHoldTime')) || 5;
+        const savedPeakHoldTime = parseInt(localStorage.getItem('rtaPeakHoldTime')) || 7;
         window.selectRTASource(savedSource, savedDevice, savedFft, savedSmoothing, savedPeakHoldTime);
     }
 };
@@ -449,7 +449,7 @@ function drawRtaData(mags) {
             window.rtaSmoothDb[i] = window.rtaSmoothDb[i] * smoothFactor + rawDb * (1.0 - smoothFactor);
         } else {
             // Decaimento: linear (em dB por frame)
-            let decay = window.rtaDecayRate !== undefined ? window.rtaDecayRate : 0.1;
+            let decay = window.rtaDecayRate !== undefined ? window.rtaDecayRate : 0.09;
             window.rtaSmoothDb[i] -= decay;
             if (window.rtaSmoothDb[i] < rawDb) window.rtaSmoothDb[i] = rawDb;
         }
@@ -491,7 +491,7 @@ function drawRtaData(mags) {
         }
 
         let holdTimeMs = window.rtaPeakHoldTimeMs !== undefined ? window.rtaPeakHoldTimeMs : 5000;
-        let peakDecay = window.rtaDecayRate !== undefined ? window.rtaDecayRate : 0.1;
+        let peakDecay = window.rtaDecayRate !== undefined ? window.rtaDecayRate : 0.09;
         
         for (let b = 0; b < smoothedBuckets.length; b++) {
             let sdb = smoothedBuckets[b].db;
