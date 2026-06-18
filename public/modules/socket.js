@@ -771,33 +771,37 @@ socket.on('portsList', (data) => {
         }
 
         if (data.savedConfig.rta_decay_rate !== undefined) {
-            window.rtaDecayRate = data.savedConfig.rta_decay_rate;
-            if (document.getElementById('rtaDecayRate')) {
-                let uiValue = Math.round(data.savedConfig.rta_decay_rate * 100.0);
-                document.getElementById('rtaDecayRate').value = uiValue;
-            }
-            localStorage.setItem('rtaDecayRate', Math.round(data.savedConfig.rta_decay_rate * 100.0));
+            window.rtaConfig.decayRate = data.savedConfig.rta_decay_rate;
         }
         if (data.savedConfig.rta_peak_hold_time !== undefined) {
-            window.rtaPeakHoldTimeMs = data.savedConfig.rta_peak_hold_time * 1000;
-            if (document.getElementById('rtaPeakHoldTime')) {
-                document.getElementById('rtaPeakHoldTime').value = data.savedConfig.rta_peak_hold_time;
-            }
-            localStorage.setItem('rtaPeakHoldTime', data.savedConfig.rta_peak_hold_time);
+            window.rtaConfig.peakHoldTime = data.savedConfig.rta_peak_hold_time;
         }
         if (data.savedConfig.rta_smoothing !== undefined) {
-            window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, data.savedConfig.rta_smoothing / 100));
-            if (document.getElementById('rtaSmoothing')) {
-                document.getElementById('rtaSmoothing').value = data.savedConfig.rta_smoothing;
-            }
-            localStorage.setItem('rtaSmoothing', data.savedConfig.rta_smoothing);
+            window.rtaConfig.smoothing = data.savedConfig.rta_smoothing;
         }
         if (data.savedConfig.rta_fft_size !== undefined) {
-            if (document.getElementById('rtaFftSize')) {
-                document.getElementById('rtaFftSize').value = data.savedConfig.rta_fft_size;
-            }
-            localStorage.setItem('rtaFftSize', data.savedConfig.rta_fft_size);
+            window.rtaConfig.fftSize = data.savedConfig.rta_fft_size;
         }
+        
+        if (typeof window.updateRtaInputsUI === 'function') {
+            window.updateRtaInputsUI();
+        }
+
+        window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, window.rtaConfig.smoothing / 100));
+        window.rtaPeakHoldTimeMs = window.rtaConfig.peakHoldTime * 1000;
+        window.rtaDecayRate = window.rtaConfig.decayRate;
+
+        console.log("[RTA SOCKET LOG] portsList recebeu dados do config.json e atualizou memória (window):", {
+            rtaSmoothingFactor: window.rtaSmoothingFactor,
+            rtaPeakHoldTimeMs: window.rtaPeakHoldTimeMs,
+            rtaDecayRate: window.rtaDecayRate,
+            rtaConfig: window.rtaConfig ? { ...window.rtaConfig } : null
+        });
+
+        if (typeof window.restartRtaIfActive === 'function') {
+            window.restartRtaIfActive(window.rtaConfig.fftSize, window.rtaConfig.smoothing, window.rtaConfig.peakHoldTime);
+        }
+
         // Atualiza a UI inicial
         updateSceneDisplay();
     }
@@ -805,39 +809,35 @@ socket.on('portsList', (data) => {
 
 socket.on('rtaConfigUpdated', (cfg) => {
     if (cfg.rta_decay_rate !== undefined) {
-        window.rtaDecayRate = cfg.rta_decay_rate;
-        if (document.getElementById('rtaDecayRate')) {
-            let uiValue = Math.round(cfg.rta_decay_rate * 100.0);
-            document.getElementById('rtaDecayRate').value = uiValue;
-        }
-        localStorage.setItem('rtaDecayRate', Math.round(cfg.rta_decay_rate * 100.0));
+        window.rtaConfig.decayRate = cfg.rta_decay_rate;
     }
     if (cfg.rta_peak_hold_time !== undefined) {
-        window.rtaPeakHoldTimeMs = cfg.rta_peak_hold_time * 1000;
-        if (document.getElementById('rtaPeakHoldTime')) {
-            document.getElementById('rtaPeakHoldTime').value = cfg.rta_peak_hold_time;
-        }
-        localStorage.setItem('rtaPeakHoldTime', cfg.rta_peak_hold_time);
+        window.rtaConfig.peakHoldTime = cfg.rta_peak_hold_time;
     }
     if (cfg.rta_smoothing !== undefined) {
-        window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, cfg.rta_smoothing / 100));
-        if (document.getElementById('rtaSmoothing')) {
-            document.getElementById('rtaSmoothing').value = cfg.rta_smoothing;
-        }
-        localStorage.setItem('rtaSmoothing', cfg.rta_smoothing);
+        window.rtaConfig.smoothing = cfg.rta_smoothing;
     }
     if (cfg.rta_fft_size !== undefined) {
-        if (document.getElementById('rtaFftSize')) {
-            document.getElementById('rtaFftSize').value = cfg.rta_fft_size;
-        }
-        localStorage.setItem('rtaFftSize', cfg.rta_fft_size);
+        window.rtaConfig.fftSize = cfg.rta_fft_size;
     }
     
+    if (typeof window.updateRtaInputsUI === 'function') {
+        window.updateRtaInputsUI();
+    }
+
+    window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, window.rtaConfig.smoothing / 100));
+    window.rtaPeakHoldTimeMs = window.rtaConfig.peakHoldTime * 1000;
+    window.rtaDecayRate = window.rtaConfig.decayRate;
+    
+    console.log("[RTA SOCKET LOG] rtaConfigUpdated recebeu dados e atualizou memória (window):", {
+        rtaSmoothingFactor: window.rtaSmoothingFactor,
+        rtaPeakHoldTimeMs: window.rtaPeakHoldTimeMs,
+        rtaDecayRate: window.rtaDecayRate,
+        rtaConfig: window.rtaConfig ? { ...window.rtaConfig } : null
+    });
+
     if (typeof window.restartRtaIfActive === 'function') {
-        const fftSize = parseInt(localStorage.getItem('rtaFftSize')) || 4096;
-        const smoothing = parseInt(localStorage.getItem('rtaSmoothing')) || 90;
-        const peakHoldTime = parseInt(localStorage.getItem('rtaPeakHoldTime')) || 7;
-        window.restartRtaIfActive(fftSize, smoothing, peakHoldTime);
+        window.restartRtaIfActive(window.rtaConfig.fftSize, window.rtaConfig.smoothing, window.rtaConfig.peakHoldTime);
     }
 });
 

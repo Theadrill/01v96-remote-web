@@ -104,11 +104,11 @@ fn default_remote_midi_port() -> u16 {
 }
 
 fn default_rta_decay_rate() -> f64 {
-    0.09
+    0.10
 }
 
 fn default_rta_peak_hold_time() -> u32 {
-    7
+    8
 }
 
 fn default_rta_smoothing() -> u32 {

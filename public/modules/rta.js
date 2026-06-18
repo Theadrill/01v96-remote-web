@@ -11,6 +11,33 @@ let rtaServerData = new Float32Array(256);
 let rtaPauseTimeout = null;
 let pendingRtaSource = null;
 
+// RTA configuration from server (populated via portsList/rtaConfigUpdated events)
+const savedShowStatus = localStorage.getItem('rtaShowStatus');
+window.rtaConfig = {
+    decayRate: 0.10,
+    peakHoldTime: 8,
+    smoothing: 90,
+    fftSize: 4096,
+    showStatus: savedShowStatus !== null ? (savedShowStatus === 'true') : true
+};
+
+window.updateRtaInputsUI = function() {
+    const elDecay = document.getElementById('rtaDecayRate');
+    if (elDecay) elDecay.value = Math.round(window.rtaConfig.decayRate * 100.0);
+    
+    const elPeak = document.getElementById('rtaPeakHoldTime');
+    if (elPeak) elPeak.value = window.rtaConfig.peakHoldTime;
+    
+    const elSmoothing = document.getElementById('rtaSmoothing');
+    if (elSmoothing) elSmoothing.value = window.rtaConfig.smoothing;
+    
+    const elFft = document.getElementById('rtaFftSize');
+    if (elFft) elFft.value = window.rtaConfig.fftSize;
+
+    const elShowStatus = document.getElementById('rtaShowStatus');
+    if (elShowStatus) elShowStatus.checked = window.rtaConfig.showStatus;
+};
+
 window.updateRtaBtnUI = function(isActive) {
     const btn = document.getElementById('headerBtnRTA');
     if (btn) {
@@ -89,14 +116,14 @@ window.connectRTA = function() {
     
     if (smoothing > 99) smoothing = 99;
     if (smoothing < 1) smoothing = 1;
-    document.getElementById('rtaSmoothing').value = smoothing;
-    document.getElementById('rtaPeakHoldTime').value = peakHoldTime;
-    document.getElementById('rtaDecayRate').value = decayRateUI;
 
-    localStorage.setItem('rtaFftSize', fftSize);
-    localStorage.setItem('rtaSmoothing', smoothing);
-    localStorage.setItem('rtaPeakHoldTime', peakHoldTime);
-    localStorage.setItem('rtaDecayRate', decayRateUI);
+    window.rtaConfig.fftSize = fftSize;
+    window.rtaConfig.smoothing = smoothing;
+    window.rtaConfig.peakHoldTime = peakHoldTime;
+    window.rtaConfig.decayRate = decayRate;
+
+    window.updateRtaInputsUI();
+
     localStorage.setItem('rtaDeviceId', deviceId);
     if (pendingRtaSource === 'server') {
         localStorage.setItem('rtaDeviceId_server', deviceId);
@@ -126,19 +153,21 @@ window.applyRTASettings = function() {
     
     if (smoothing > 99) smoothing = 99;
     if (smoothing < 1) smoothing = 1;
-    document.getElementById('rtaSmoothing').value = smoothing;
-    document.getElementById('rtaPeakHoldTime').value = peakHoldTime;
-    document.getElementById('rtaDecayRate').value = decayRateUI;
 
-    localStorage.setItem('rtaFftSize', fftSize);
-    localStorage.setItem('rtaSmoothing', smoothing);
-    localStorage.setItem('rtaPeakHoldTime', peakHoldTime);
-    localStorage.setItem('rtaDecayRate', decayRateUI);
-    localStorage.setItem('rtaShowStatus', showStatus);
+    window.rtaConfig.fftSize = fftSize;
+    window.rtaConfig.smoothing = smoothing;
+    window.rtaConfig.peakHoldTime = peakHoldTime;
+    window.rtaConfig.decayRate = decayRate;
+    window.rtaConfig.showStatus = showStatus;
+
+    window.updateRtaInputsUI();
+
     window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, smoothing / 100));
     window.rtaPeakHoldTimeMs = peakHoldTime * 1000;
     window.rtaDecayRate = decayRate;
     window.rtaShowStatus = showStatus;
+
+    localStorage.setItem('rtaShowStatus', showStatus);
 
     if (typeof socket !== 'undefined' && socket.connected) {
         socket.emit('updateRtaConfig', {
@@ -162,40 +191,28 @@ window.restartRtaIfActive = function(fftSize, smoothing, peakHoldTime) {
 window.toggleRTAModal = function() {
     const modal = document.getElementById('rtaModal');
     if(modal) {
-        const savedFft = localStorage.getItem('rtaFftSize');
-        if (savedFft && document.getElementById('rtaFftSize')) {
-            document.getElementById('rtaFftSize').value = savedFft;
-        }
-        const savedSmoothing = localStorage.getItem('rtaSmoothing');
-        if (savedSmoothing && document.getElementById('rtaSmoothing')) {
-            document.getElementById('rtaSmoothing').value = savedSmoothing;
-        }
-        const savedPeakHold = localStorage.getItem('rtaPeakHoldTime');
-        if (savedPeakHold && document.getElementById('rtaPeakHoldTime')) {
-            document.getElementById('rtaPeakHoldTime').value = savedPeakHold;
-        }
-        const savedDecayRate = localStorage.getItem('rtaDecayRate');
-        if (savedDecayRate && document.getElementById('rtaDecayRate')) {
-            document.getElementById('rtaDecayRate').value = savedDecayRate;
-        }
-        const savedShowStatus = localStorage.getItem('rtaShowStatus');
-        if (savedShowStatus !== null && document.getElementById('rtaShowStatus')) {
-            document.getElementById('rtaShowStatus').checked = (savedShowStatus === 'true');
-        }
+        window.updateRtaInputsUI();
         modal.style.display = 'flex';
         window.showRtaStep1();
     }
 };
 
-window.selectRTASource = async function(source, deviceId = 'default_in', fftSize = 4096, smoothing = 90, peakHoldTime = 7, deviceLabel = null) {
+window.selectRTASource = async function(source, deviceId = 'default_in', fftSize = null, smoothing = null, peakHoldTime = null, deviceLabel = null) {
+    if (rtaAnimId) {
+        cancelAnimationFrame(rtaAnimId);
+        rtaAnimId = null;
+    }
+    window.rtaCurrentLoopToken = null; // Invalida qualquer loop ativo concorrente
+
     localStorage.setItem('rtaSource', source);
-    localStorage.setItem('rtaSmoothing', smoothing);
-    localStorage.setItem('rtaPeakHoldTime', peakHoldTime);
-    window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, smoothing / 100));
-    window.rtaPeakHoldTimeMs = peakHoldTime * 1000;
-    
-    let decayRateUI = parseFloat(localStorage.getItem('rtaDecayRate')) || 9;
-    window.rtaDecayRate = decayRateUI / 100.0;
+    if (deviceId) {
+        localStorage.setItem('rtaDeviceId', deviceId);
+        if (source === 'server') {
+            localStorage.setItem('rtaDeviceId_server', deviceId);
+        } else if (source === 'local') {
+            localStorage.setItem('rtaDeviceId_local', deviceId);
+        }
+    }
     
     if (deviceLabel) {
         localStorage.setItem('rtaDeviceLabel', deviceLabel);
@@ -209,8 +226,15 @@ window.selectRTASource = async function(source, deviceId = 'default_in', fftSize
         }
     }
 
-    const savedShowStatus = localStorage.getItem('rtaShowStatus');
-    window.rtaShowStatus = savedShowStatus !== null ? (savedShowStatus === 'true') : true;
+    const finalFftSize = fftSize !== null ? fftSize : window.rtaConfig.fftSize;
+    const finalSmoothing = smoothing !== null ? smoothing : window.rtaConfig.smoothing;
+    const finalPeakHoldTime = peakHoldTime !== null ? peakHoldTime : window.rtaConfig.peakHoldTime;
+
+    window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, finalSmoothing / 100));
+    window.rtaPeakHoldTimeMs = finalPeakHoldTime * 1000;
+    
+    window.rtaDecayRate = window.rtaConfig.decayRate;
+    window.rtaShowStatus = window.rtaConfig.showStatus;
     
     window.rtaSource = source;
     const modal = document.getElementById('rtaModal');
@@ -235,7 +259,7 @@ window.selectRTASource = async function(source, deviceId = 'default_in', fftSize
             window.rtaCtxLocal = new (window.AudioContext || window.webkitAudioContext)();
             let audioInput = window.rtaCtxLocal.createMediaStreamSource(rtaLocalStream);
             rtaAnalyzer = window.rtaCtxLocal.createAnalyser();
-            rtaAnalyzer.fftSize = fftSize;
+            rtaAnalyzer.fftSize = finalFftSize;
             rtaAnalyzer.minDecibels = -140;
             rtaAnalyzer.maxDecibels = 0;
             rtaAnalyzer.smoothingTimeConstant = 0;
@@ -266,7 +290,7 @@ window.selectRTASource = async function(source, deviceId = 'default_in', fftSize
             action: 'start_server_mic',
             deviceName: deviceName,
             isOutput: isOutput,
-            fftSize: fftSize
+            fftSize: finalFftSize
         });
         rtaIsActive = true;
         window.updateRtaBtnUI(true);
@@ -345,15 +369,36 @@ window.resumeRTA = function() {
         } else if (savedSource === 'local' && localStorage.getItem('rtaDeviceId_local')) {
             savedDevice = localStorage.getItem('rtaDeviceId_local');
         }
-        const savedFft = parseInt(localStorage.getItem('rtaFftSize')) || 4096;
-        const savedSmoothing = parseInt(localStorage.getItem('rtaSmoothing')) || 90;
-        const savedPeakHoldTime = parseInt(localStorage.getItem('rtaPeakHoldTime')) || 7;
-        window.selectRTASource(savedSource, savedDevice, savedFft, savedSmoothing, savedPeakHoldTime);
+        window.selectRTASource(savedSource, savedDevice, window.rtaConfig.fftSize, window.rtaConfig.smoothing, window.rtaConfig.peakHoldTime);
     }
 };
 
 function startRtaLoop() {
+    if (rtaAnimId) {
+        cancelAnimationFrame(rtaAnimId);
+        rtaAnimId = null;
+    }
+    
+    // Gera um token único para este loop de renderização específico
+    const currentLoopToken = Math.random();
+    window.rtaCurrentLoopToken = currentLoopToken;
+
+    console.log("[RTA LOOP START] Iniciando loop do RTA (Token: " + currentLoopToken + "). Valores ativos na memória (window):", {
+        rtaSource: window.rtaSource,
+        rtaSmoothingFactor: window.rtaSmoothingFactor,
+        rtaPeakHoldTimeMs: window.rtaPeakHoldTimeMs,
+        rtaDecayRate: window.rtaDecayRate,
+        rtaShowStatus: window.rtaShowStatus,
+        rtaConfig: window.rtaConfig ? { ...window.rtaConfig } : null
+    });
+
     const run = () => {
+        // Se o token em memória mudou, encerra este loop concorrente imediatamente
+        if (window.rtaCurrentLoopToken !== currentLoopToken) {
+            console.log("[RTA LOOP STOP] Detectado loop concorrente ou antigo com token diferente (" + currentLoopToken + " vs ativo: " + window.rtaCurrentLoopToken + "). Finalizando este thread de animação.");
+            return;
+        }
+
         if (!rtaIsActive || !window.rtaCtx) return;
         
         let magnitudes = null;
@@ -419,6 +464,21 @@ function drawRtaData(mags) {
     
     const smoothFactor = window.rtaSmoothingFactor !== undefined ? window.rtaSmoothingFactor : 0.90;
     const now = performance.now();
+
+    if (!window.lastRtaLogTime || now - window.lastRtaLogTime > 3000) {
+        window.lastRtaLogTime = now;
+        console.log("[RTA ACTIVE VALUES] Valores ativos em memória sendo usados pelo desenho do RTA:", {
+            rtaSource: window.rtaSource,
+            rtaSmoothingFactor: window.rtaSmoothingFactor,
+            rtaPeakHoldTimeMs: window.rtaPeakHoldTimeMs,
+            rtaDecayRate: window.rtaDecayRate,
+            rtaShowStatus: window.rtaShowStatus,
+            smoothFactorCalculated: smoothFactor,
+            decayRateCalculated: window.rtaDecayRate !== undefined ? window.rtaDecayRate : 0.09,
+            peakHoldTimeMsCalculated: window.rtaPeakHoldTimeMs !== undefined ? window.rtaPeakHoldTimeMs : 5000,
+            rtaConfig: window.rtaConfig ? { ...window.rtaConfig } : null
+        });
+    }
 
     let buckets = [];
     let currentX = -1;
