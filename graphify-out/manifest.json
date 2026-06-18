@@ -2530,8 +2530,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1781763730.1672482,
-    "ast_hash": "69084b220fe493eb09d229ee5b5157d1",
+    "mtime": 1781764254.3610322,
+    "ast_hash": "1371749f50cf64310e410c5381ab831b",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
