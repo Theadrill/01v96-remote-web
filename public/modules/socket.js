@@ -836,7 +836,7 @@ socket.on('rtaConfigUpdated', (cfg) => {
     if (typeof window.restartRtaIfActive === 'function') {
         const fftSize = parseInt(localStorage.getItem('rtaFftSize')) || 4096;
         const smoothing = parseInt(localStorage.getItem('rtaSmoothing')) || 90;
-        const peakHoldTime = parseInt(localStorage.getItem('rtaPeakHoldTime')) || 5;
+        const peakHoldTime = parseInt(localStorage.getItem('rtaPeakHoldTime')) || 7;
         window.restartRtaIfActive(fftSize, smoothing, peakHoldTime);
     }
 });
