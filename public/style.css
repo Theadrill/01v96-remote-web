@@ -699,6 +699,41 @@ html.legacy-ios body:not(.layout-horizontal) .fader-card input[type=range] {
     background: linear-gradient(to right, #555, #555) no-repeat center / 100% 6px !important;
 }
 
+html.legacy-ios .fader-card input[type=range]::-webkit-slider-thumb {
+    /* Inverte width/height para compensar o rotate(270deg) do input */
+    width: 40px !important;
+    height: 40px !important;
+}
+
+html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+@media (max-height: 500px) {
+    html.legacy-ios .fader-card input[type=range]::-webkit-slider-thumb {
+        width: 30px !important;
+        height: 38px !important;
+    }
+
+    html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
+        width: 30px !important;
+        height: 38px !important;
+    }
+}
+
+@media (max-height: 350px) {
+    html.legacy-ios .fader-card input[type=range]::-webkit-slider-thumb {
+        width: 18px !important;
+        height: 32px !important;
+    }
+
+    html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
+        width: 18px !important;
+        height: 32px !important;
+    }
+}
+
 .fader-card input[type=range]:disabled {
     opacity: 1 !important;
 }
