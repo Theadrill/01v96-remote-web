@@ -167,20 +167,24 @@ impl MeterEngine {
     }
 
     /// Chamado pelo JS a 60fps dentro do requestAnimationFrame.
-    /// Retorna as alturas exatas de cada barra para aquele milissegundo.
+    /// Calcula a balística e atualiza o buffer in-place.
     #[wasm_bindgen]
-    pub fn render_frame(&mut self, delta_time_ms: f64) -> Vec<f32> {
+    pub fn render_frame(&mut self, delta_time_ms: f64) {
         let decay = self.decay_rate * (delta_time_ms as f32);
         for i in 0..self.num_channels {
-            // Se o nível atual for maior que o alvo, aplique o Release (queda)
             if self.current_levels[i] > self.target_levels[i] {
                 self.current_levels[i] -= decay;
-                // Não deixa cair abaixo do alvo
                 if self.current_levels[i] < self.target_levels[i] {
                     self.current_levels[i] = self.target_levels[i];
                 }
             }
         }
-        self.current_levels.clone()
+    }
+
+    /// Retorna o ponteiro para o buffer de níveis. O JS usa isso para criar
+    /// uma view zero-copy na memória do WASM, sem custo de bindgen.
+    #[wasm_bindgen]
+    pub fn get_levels_ptr(&self) -> *const f32 {
+        self.current_levels.as_ptr()
     }
 }

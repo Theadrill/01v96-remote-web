@@ -55,14 +55,23 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
 
     let canvasLastPeakTime = new Array(64).fill(0);
 
+    // View será construída sob demanda quando o WASM estiver pronto
+    let meterView = null;
+
     function loop(now) {
         const delta = now - lastTime;
         lastTime = now;
 
-        // Extrai níveis de pico (meters) do WASM (Float32Array)
-        let meterValues = null;
-        if (meterEngine && typeof meterEngine.render_frame === 'function') {
-            meterValues = meterEngine.render_frame(delta);
+        // Pega as globais dinamicamente (pois o WASM carrega assíncrono)
+        const currentMeterEngine = window.wasmMeterEngine;
+        if (!meterView && currentMeterEngine && window.wasmExports) {
+            const ptr = currentMeterEngine.get_levels_ptr();
+            meterView = new Float32Array(window.wasmExports.memory.buffer, ptr, 80);
+        }
+
+        // Executa a balística dos meters no WASM in-place (void)
+        if (currentMeterEngine && typeof currentMeterEngine.render_frame === 'function') {
+            currentMeterEngine.render_frame(delta);
         }
 
         // Limpa o canvas (agora ajustado pelo DPR via ctx.scale)
@@ -94,20 +103,22 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
             // Lógica de Medidores para Master ou Canais normais
             let meterVal = 0;
             let meterIdx = chIndex;
-            if (meterValues) {
-                if (chIndex === 52) {
-                    // MASTER usa geralmente o meterIdx 32 e 33 (L e R). Vamos usar o L para simplificar visual.
+            if (meterView) {
+                if (chIndex === 52) { // MASTER (fader canvas trata como 52 mas buffer tem em 32/33)
                     meterIdx = 32;
-                    meterVal = meterValues[32] !== undefined ? meterValues[32] : 0;
+                    meterVal = meterView[32] || 0;
                 } else if (chIndex < 64) {
-                    meterVal = meterValues[chIndex] !== undefined ? meterValues[chIndex] : 0;
+                    meterVal = meterView[chIndex] || 0;
                 }
+            } else if (meterValues) {
+                // Fallback para non-WASM if needed
+                meterVal = meterValues[chIndex] !== undefined ? meterValues[chIndex] : 0;
             }
 
             let isPeaking = meterVal >= 98;
             if (isPeaking) {
-                canvasLastPeakTime[meterIdx] = now;
-            } else if (now - canvasLastPeakTime[meterIdx] <= 100) {
+                canvasLastPeakTime[chIndex] = now;
+            } else if (now - canvasLastPeakTime[chIndex] <= 100) {
                 isPeaking = true;
             }
             

@@ -15,6 +15,15 @@ export class MeterEngine {
         wasm.__wbg_meterengine_free(ptr, 0);
     }
     /**
+     * Retorna o ponteiro para o buffer de níveis. O JS usa isso para criar
+     * uma view zero-copy na memória do WASM, sem custo de bindgen.
+     * @returns {number}
+     */
+    get_levels_ptr() {
+        const ret = wasm.meterengine_get_levels_ptr(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
      * @param {number} ch
      * @returns {number}
      */
@@ -42,7 +51,7 @@ export class MeterEngine {
     }
     /**
      * Chamado pelo JS a 60fps dentro do requestAnimationFrame.
-     * Retorna as alturas exatas de cada barra para aquele milissegundo.
+     * Calcula a balística e retorna o buffer de níveis atual.
      * @param {number} delta_time_ms
      * @returns {Float32Array}
      */

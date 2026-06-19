@@ -961,6 +961,7 @@ window.toggleMusicianMeters = toggleMusicianMeters;
 
 // --- WASM Meter Engine Globals ---
 let wasmMeterEngine = null;
+let wasmMeterView = null; // TRUE zero-copy view da memória
 let lastWasmRenderTime = performance.now();
 const wasmTargetLevels = new Float32Array(80);
 
@@ -983,11 +984,18 @@ if (originalSocketEmit && typeof socket !== 'undefined') {
 }
 
 import('../wasm/client_wasm.js').then(async (wasm) => {
-    await wasm.default();
-    window.wasm = wasm; // EXPOSING GLOBALLY FOR EQ.JS
+    const wasmExports = await wasm.default();
+    window.wasmExports = wasmExports; // Exporta as instâncias internas e a memória WASM
+    window.wasm = wasm; // EXPOSING GLOBALLY FOR EQ.JS (As classes MeterEngine, etc)
     wasmMeterEngine = new wasm.MeterEngine(80);
+    window.wasmMeterEngine = wasmMeterEngine; // Expose globally for canvas_engine.js
     wasmMeterEngine.set_decay_rate(0.1); // Queda suave calibrada para escala 0-100
-    console.log("[WASM] MeterEngine initialized");
+
+    // TRUE ZERO COPY: Criamos um Float32Array apontando exatamente para o ponteiro de memória no WASM
+    const ptr = wasmMeterEngine.get_levels_ptr();
+    wasmMeterView = new Float32Array(wasmExports.memory.buffer, ptr, 80);
+    
+    console.log("[WASM] MeterEngine initialized (TRUE zero-copy view)");
 
     wasmMidiDispatcher = new wasm.MidiDispatcher(16); // Default 16ms
     console.log("[WASM] MidiDispatcher initialized");
@@ -1224,11 +1232,11 @@ function wasmRenderLoop(now) {
     // Limita deltaMs caso a aba fique inativa por muito tempo (evita pulos absurdos e cálculos longos)
     if (deltaMs > 100) return;
 
-    // Obtém barras do WASM (Float32Array interligado com a memória do Rust)
-    const smoothedLevels = wasmMeterEngine.render_frame(deltaMs);
-
-    // Desenha as barras!
-    applyMetersToDOM(smoothedLevels, now);
+    // Executa a balística in-place no WASM (void, sem alocação)
+    wasmMeterEngine.render_frame(deltaMs);
+    
+    // Lê diretamente da memória do WASM — sem cópia, sem GC
+    applyMetersToDOM(wasmMeterView, now);
 
     // --- WASM Throttler (despachante) ---
     if (wasmMidiDispatcher) {
