@@ -268,6 +268,13 @@
                         style="width: 70px; text-align: center; padding: 5px;" min="5" max="60"
                         onchange="saveLocalFps(this.value)">
                 </div>
+                <div class="inline-style-14" style="margin-top: 8px;">
+                    <span class="inline-style-15">Mostrar FPS</span>
+                    <label class="switch">
+                        <input id="toggleFpsMeter" onchange="toggleFpsMeter(this.checked)" type="checkbox" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
             <div class="config-section">
                 <p class="config-section-header">Painel de Macros</p>
@@ -1042,6 +1049,7 @@
     <script src="modules/search.js?v=4"></script>
     <script src="modules/scene_grid.js"></script>
     <script src="modules/custom_scenes.js?v=3"></script>
+    <script src="modules/fps_meter.js"></script>
     <script>
         // Função para detectar se é um celular normal (telas pequenas)
         function isPhoneSize() {
