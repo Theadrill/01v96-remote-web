@@ -27,11 +27,11 @@ window.ensureCanvasExists = function() {
                         // 1. Main Canvas (32 channels)
                         const mainChannels = Array.from({length: 32}, (_, i) => i);
                         engines.main = initCanvas('faders-container', wasmMeterEngine, channelStates, { channels: mainChannels });
-                        setupCanvasEvents(engines.main.canvas, channelStates, engines.main.stripWidth, mainChannels, window.socket);
+                        setupCanvasEvents(engines.main.canvas, channelStates, mainChannels, window.socket);
                         
                         // 2. Macro Canvas
                         engines.macro = initCanvas('faders-container', wasmMeterEngine, channelStates, { channels: [-1], isMacro: true });
-                        setupCanvasEvents(engines.macro.canvas, channelStates, engines.macro.stripWidth, [-1], window.socket);
+                        setupCanvasEvents(engines.macro.canvas, channelStates, [-1], window.socket);
                         
                         console.log("🎨 Canvas Engines (Main + Macro) inicializados!");
                     } else {
@@ -46,7 +46,7 @@ window.ensureCanvasExists = function() {
                         masterContainer.innerHTML = '';
                         if (!engines.master) {
                             engines.master = initCanvas('master-container', wasmMeterEngine, channelStates, { channels: [52] });
-                            setupCanvasEvents(engines.master.canvas, channelStates, engines.master.stripWidth, [52], window.socket);
+                            setupCanvasEvents(engines.master.canvas, channelStates, [52], window.socket);
                             console.log("🎨 Canvas Engine (Master) inicializado!");
                         } else {
                             masterContainer.appendChild(engines.master.canvas);

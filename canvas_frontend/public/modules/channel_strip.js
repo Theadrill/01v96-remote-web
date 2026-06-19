@@ -723,23 +723,26 @@ function initUI() {
 
     const masterContainer = document.getElementById('master-container');
     const isCanvasActive = window.location.pathname.startsWith('/canvas') && !musicianMode && !technicianMixMode && !outsMode;
+    document.body.classList.toggle('canvas-active', isCanvasActive);
 
     if (layoutMode === 'desktop' && !musicianMode) {
         if (!isCanvasActive) {
             container.innerHTML = html;
+            if (masterContainer) masterContainer.innerHTML = masterHtml;
         } else {
             container.innerHTML = '';
             if (typeof window.ensureCanvasExists === 'function') window.ensureCanvasExists();
+            // In canvas mode, we do not render DOM master to masterContainer
         }
-        if (masterContainer) masterContainer.innerHTML = masterHtml;
     } else {
         if (!isCanvasActive) {
             container.innerHTML = html + masterHtml;
+            if (masterContainer) masterContainer.innerHTML = '';
         } else {
-            container.innerHTML = masterHtml;
+            container.innerHTML = '';
             if (typeof window.ensureCanvasExists === 'function') window.ensureCanvasExists();
+            // Don't clear masterContainer here, the Canvas Engine is managing it!
         }
-        if (masterContainer) masterContainer.innerHTML = '';
     }
 
     // Atualiza os estados visuais

@@ -24,7 +24,17 @@ body.layout-horizontal {
     flex-direction: column;
 }
 
-/* ÃƒÂ rea dos faders com rolagem lateral fluida */
+/* Wrapper do Mixer para manter faders e master lado a lado sempre */
+.mixer-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    min-height: 0;
+    min-width: 0;
+}
+
+/* Área dos faders com rolagem lateral fluida */
 .faders-area {
     flex: 1;
     display: flex;
@@ -49,6 +59,12 @@ body.layout-horizontal .faders-area {
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+body.canvas-active.layout-horizontal .faders-area {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .faders-area::-webkit-scrollbar {
@@ -3338,6 +3354,16 @@ body:not(.layout-desktop).is-portrait #master-container {
     padding-bottom: 0 !important;
 }
 
+/* Em modo Canvas, desativa o 100vw do modo retrato para manter lado a lado */
+body.canvas-active:not(.layout-desktop).is-portrait .faders-area {
+    width: auto !important;
+    height: auto !important;
+}
+body.canvas-active:not(.layout-desktop).is-portrait #master-container {
+    width: auto !important;
+    height: auto !important;
+}
+
 body:not(.layout-desktop).is-portrait .sidebar {
     width: 100vw !important;
     box-sizing: border-box !important;
@@ -4255,6 +4281,7 @@ body.layout-desktop .btn-macros {
     display: flex;
     align-items: stretch;
     flex-shrink: 0;
+    order: 2;
 }
 
 .styled-techMixTitle {

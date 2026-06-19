@@ -1,4 +1,4 @@
-import { drawChannelStrip } from './canvas_strip.js';
+import { drawChannelStrip, getStripWidth } from './canvas_strip.js';
 
 /**
  * Inicializa e gerencia o loop de requestAnimationFrame do Canvas.
@@ -18,11 +18,11 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
 
     const canvas = document.createElement('canvas');
     container.appendChild(canvas);
-    
+    canvas.style.flexShrink = '0';
     // Otimização: alpha false se o fundo for sempre sólido
     const ctx = canvas.getContext('2d', { alpha: false }); 
 
-    const stripWidth = 80; // largura de cada strip
+    // A largura será resolvida dinamicamente via getStripWidth()
     // Default para os 32 canais principais se config.channels não for fornecido
     const channels = config.channels || Array.from({length: 32}, (_, i) => i);
     const numChannels = channels.length;
@@ -31,6 +31,7 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
     const dpr = window.devicePixelRatio || 1;
     
     function resizeCanvas() {
+        const stripWidth = getStripWidth();
         const h = container.clientHeight || 600;
         const w = stripWidth * numChannels;
         
@@ -48,9 +49,11 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
 
     let lastTime = performance.now();
 
-    function loop(timestamp) {
-        const delta = timestamp - lastTime;
-        lastTime = timestamp;
+    let canvasLastPeakTime = new Array(64).fill(0);
+
+    function loop(now) {
+        const delta = now - lastTime;
+        lastTime = now;
 
         // Extrai níveis de pico (meters) do WASM (Float32Array)
         let meterValues = null;
@@ -66,6 +69,7 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
         ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
         // Iterar pelos canais mapeados e desenhar
+        const stripWidth = getStripWidth();
         for (let i = 0; i < numChannels; i++) {
             const chIndex = channels[i];
             const x = i * stripWidth;
@@ -82,16 +86,25 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
             
             // Lógica de Medidores para Master ou Canais normais
             let meterVal = 0;
+            let meterIdx = chIndex;
             if (meterValues) {
                 if (chIndex === 52) {
                     // MASTER usa geralmente o meterIdx 32 e 33 (L e R). Vamos usar o L para simplificar visual.
+                    meterIdx = 32;
                     meterVal = meterValues[32] !== undefined ? meterValues[32] : 0;
                 } else if (chIndex < 64) {
                     meterVal = meterValues[chIndex] !== undefined ? meterValues[chIndex] : 0;
                 }
             }
+
+            let isPeaking = meterVal >= 98;
+            if (isPeaking) {
+                canvasLastPeakTime[meterIdx] = now;
+            } else if (now - canvasLastPeakTime[meterIdx] <= 100) {
+                isPeaking = true;
+            }
             
-            drawChannelStrip(ctx, chIndex, x, 0, stripWidth, logicalHeight, state, meterVal);
+            drawChannelStrip(ctx, chIndex, x, 0, stripWidth, logicalHeight, state, meterVal, false, isPeaking);
         }
 
         requestAnimationFrame(loop);
@@ -100,5 +113,5 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
     // Iniciar loop
     requestAnimationFrame(loop);
     
-    return { canvas, ctx, stripWidth, resizeCanvas };
+    return { canvas, ctx, get stripWidth() { return getStripWidth(); }, resizeCanvas };
 }
