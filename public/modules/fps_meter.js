@@ -18,8 +18,9 @@
         if (!isRunning) return;
         const now = performance.now();
         frameCountFps++;
-        if (now - lastTimeFps >= 1000) {
-            fpsMeterEl.textContent = `FPS: ${frameCountFps}`;
+        const elapsed = now - lastTimeFps;
+        if (elapsed >= 1000) {
+            fpsMeterEl.textContent = `FPS: ${Math.round(frameCountFps / elapsed * 1000)}`;
             frameCountFps = 0;
             lastTimeFps = now;
         }
