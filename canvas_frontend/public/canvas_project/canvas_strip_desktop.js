@@ -55,11 +55,35 @@ export function drawDesktopChannelStrip(ctx, channelIndex, x, y, width, height, 
     // 2. SOLO Button
     const soloHeight = 28;
     const btnPadding = 6;
-    if (state.solo) {
+    let hasAnySolo = false;
+    if (isMaster && window.channelStates) {
+        hasAnySolo = window.channelStates.some(s => s && s.solo);
+    }
+
+    if (state.solo && !isMaster) {
         ctx.fillStyle = '#ffb700'; // Active SOLO
         roundRect(ctx, x + btnPadding, currentY, width - 2 * btnPadding, soloHeight, 4);
         ctx.fill();
         ctx.fillStyle = '#000000';
+    } else if (isMaster && hasAnySolo) {
+        const time = performance.now();
+        if (time % 1000 < 500) {
+            ctx.fillStyle = '#c0000a'; 
+            roundRect(ctx, x + btnPadding, currentY, width - 2 * btnPadding, soloHeight, 4);
+            ctx.fill();
+            ctx.shadowColor = 'rgba(220, 0, 10, 0.8)';
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+        } else {
+            ctx.fillStyle = '#333333';
+            roundRect(ctx, x + btnPadding, currentY, width - 2 * btnPadding, soloHeight, 4);
+            ctx.fill();
+            ctx.strokeStyle = '#444';
+            ctx.stroke();
+            ctx.fillStyle = '#555555';
+        }
     } else {
         ctx.fillStyle = '#2a2a2a';
         roundRect(ctx, x + btnPadding, currentY, width - 2 * btnPadding, soloHeight, 4);

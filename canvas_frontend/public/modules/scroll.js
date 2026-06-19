@@ -18,6 +18,7 @@ function enableDragScroll(el) {
     // Drag to scroll
     el.addEventListener('mousedown', (e) => {
         if (['INPUT', 'BUTTON', 'SELECT'].includes(e.target.tagName)) return;
+        if (window.isCanvasFaderDragging) return; // Prevent horizontal scroll if dragging a fader in canvas
         isDragging = true;
         el.style.cursor = 'grabbing';
         startX = e.pageX - el.offsetLeft;

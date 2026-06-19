@@ -527,6 +527,7 @@ let scrollLeft;
 
 document.addEventListener('mousedown', (e) => {
     if (layoutMode !== 'desktop') return;
+    if (window.isCanvasFaderDragging) return; // Prevent horizontal scroll if dragging a fader in canvas
     const area = e.target.closest('.faders-area');
     if (area && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('.desk-pan-indicator')) {
         isMouseDown = true;

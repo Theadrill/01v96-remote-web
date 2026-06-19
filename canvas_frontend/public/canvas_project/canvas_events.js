@@ -81,6 +81,7 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
         }
 
         if (isThumbHit || channelIndex === -1) {
+            window.isCanvasFaderDragging = true;
             activeTouches.set(e.pointerId, { 
                 type: 'fader',
                 channelIndex, 
@@ -102,7 +103,11 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
                 pendingAction = () => { if (typeof window.openChannelConfig === 'function' && channelIndex !== -1) window.openChannelConfig(e, channelIndex === 52 ? 52 : channelIndex); };
             } else if (y >= 38 && y <= 66 && inBtnX) {
                 pendingAction = () => {
-                    if (channelIndex !== -1 && channelIndex !== 52) {
+                    if (channelIndex === 52) {
+                        if (typeof window.clearAllSolos === 'function' && window.channelStates.some(s => s && s.solo)) {
+                            window.clearAllSolos();
+                        }
+                    } else if (channelIndex !== -1) {
                         if (typeof window.toggleState === 'function') {
                             let actionCh = channelIndex;
                             if (channelIndex >= 36 && channelIndex <= 43) actionCh = `'m${channelIndex-36}'`;
@@ -166,7 +171,11 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
                 pendingAction = () => { if (typeof window.openChannelConfig === 'function' && channelIndex !== -1) window.openChannelConfig(e, channelIndex === 52 ? 52 : channelIndex); };
             } else if (y >= 44 && y <= 70 && inBtnX) {
                 pendingAction = () => {
-                    if (channelIndex !== -1 && channelIndex !== 52) {
+                    if (channelIndex === 52) {
+                        if (typeof window.clearAllSolos === 'function' && window.channelStates.some(s => s && s.solo)) {
+                            window.clearAllSolos();
+                        }
+                    } else if (channelIndex !== -1) {
                         if (typeof window.toggleState === 'function') {
                             let actionCh = channelIndex;
                             if (channelIndex >= 36 && channelIndex <= 43) actionCh = `'m${channelIndex-36}'`;
@@ -306,6 +315,7 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
             touchInfo.action();
         } else if (touchInfo.type === 'fader') {
             try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+            window.isCanvasFaderDragging = false;
         }
 
         activeTouches.delete(e.pointerId);
@@ -319,6 +329,7 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
         const touchInfo = activeTouches.get(e.pointerId);
         if (touchInfo.type === 'fader') {
             try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+            window.isCanvasFaderDragging = false;
         }
         
         activeTouches.delete(e.pointerId);

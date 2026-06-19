@@ -75,11 +75,35 @@ export function drawMobileChannelStrip(ctx, channelIndex, x, y, width, height, s
 
     // 3. SOLO Button
     const soloHeight = 26;
-    if (state.solo) {
+    let hasAnySolo = false;
+    if (isMaster && window.channelStates) {
+        hasAnySolo = window.channelStates.some(s => s && s.solo);
+    }
+
+    if (state.solo && !isMaster) {
         ctx.fillStyle = '#00ff00'; // Green when active
         roundRect(ctx, x + 4, currentY, w - 8, soloHeight, 4);
         ctx.fill();
         ctx.fillStyle = '#ffffff';
+    } else if (isMaster && hasAnySolo) {
+        const time = performance.now();
+        if (time % 1000 < 500) {
+            ctx.fillStyle = '#c0000a'; 
+            roundRect(ctx, x + 4, currentY, w - 8, soloHeight, 4);
+            ctx.fill();
+            ctx.shadowColor = 'rgba(220, 0, 10, 0.7)';
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+        } else {
+            ctx.fillStyle = '#333333';
+            roundRect(ctx, x + 4, currentY, w - 8, soloHeight, 4);
+            ctx.fill();
+            ctx.strokeStyle = '#222';
+            ctx.stroke();
+            ctx.fillStyle = '#555555';
+        }
     } else {
         ctx.fillStyle = '#333333';
         roundRect(ctx, x + 4, currentY, w - 8, soloHeight, 4);
