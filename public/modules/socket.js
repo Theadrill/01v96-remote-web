@@ -735,8 +735,8 @@ socket.on('portsList', (data) => {
     if (data.savedConfig) {
         window.isDemoMode = !!data.savedConfig.demo_mode;
 
-        const fpsMobile = data.savedConfig.meter_fps_mobile !== undefined ? data.savedConfig.meter_fps_mobile : 15;
-        const fpsDesktop = data.savedConfig.meter_fps_desktop !== undefined ? data.savedConfig.meter_fps_desktop : 30;
+        const fpsMobile = data.savedConfig.meter_fps_mobile !== undefined ? data.savedConfig.meter_fps_mobile : 60;
+        const fpsDesktop = data.savedConfig.meter_fps_desktop !== undefined ? data.savedConfig.meter_fps_desktop : 60;
 
         let localFps = localStorage.getItem('meter_fps_override');
         if (localFps && !isNaN(localFps)) {
@@ -1020,7 +1020,9 @@ import('../wasm/client_wasm.js').then(async (wasm) => {
     console.log("[WASM] MidiDispatcher initialized");
 
     tryLoadWasmCalibration(); // Injeta calibrações no WASM
-    requestAnimationFrame(wasmRenderLoop);
+    if (!window.location.pathname.startsWith('/canvas')) {
+        requestAnimationFrame(wasmRenderLoop);
+    }
 }).catch(err => {
     console.error("[WASM] Failed to load MeterEngine/MidiDispatcher:", err);
 });
@@ -1234,7 +1236,28 @@ function applyMetersToDOM(smoothedLevels, now) {
 
 function wasmRenderLoop(now) {
     requestAnimationFrame(wasmRenderLoop);
-    if (!wasmMeterEngine || !meterElementsCache || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
+
+    // Em modo canvas, apenas faz o tick do MIDI dispatcher — o canvas_engine gerencia render
+    const isCanvasMode = window.location.pathname.startsWith('/canvas');
+
+    if (!wasmMeterEngine) { lastWasmRenderTime = now; return; }
+
+    // --- WASM Throttler (despachante) ---
+    if (wasmMidiDispatcher) {
+        const pending = wasmMidiDispatcher.tick(now);
+        for (let i = 0; i < pending.length; i++) {
+            const parts = pending[i].split(':');
+            if (parts.length === 3) {
+                originalSocketEmit.call(socket, 'control', {
+                    type: parts[0],
+                    channel: parseInt(parts[1], 10),
+                    value: parseFloat(parts[2])
+                });
+            }
+        }
+    }
+
+    if (isCanvasMode || !meterElementsCache || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
         lastWasmRenderTime = now;
         return;
     }
@@ -1253,24 +1276,9 @@ function wasmRenderLoop(now) {
 
     // Executa a balística in-place no WASM (void, sem alocação)
     wasmMeterEngine.render_frame(deltaMs);
-    
+
     // Lê diretamente da memória do WASM — sem cópia, sem GC
     applyMetersToDOM(wasmMeterView, now);
-
-    // --- WASM Throttler (despachante) ---
-    if (wasmMidiDispatcher) {
-        const pending = wasmMidiDispatcher.tick(now);
-        for (let i = 0; i < pending.length; i++) {
-            const parts = pending[i].split(':');
-            if (parts.length === 3) {
-                originalSocketEmit.call(socket, 'control', {
-                    type: parts[0],
-                    channel: parseInt(parts[1], 10),
-                    value: parseFloat(parts[2])
-                });
-            }
-        }
-    }
 }
 
 socket.on('meterDataRaw', (rawBytes) => {

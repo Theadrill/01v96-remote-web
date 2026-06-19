@@ -51,15 +51,11 @@ export class MeterEngine {
     }
     /**
      * Chamado pelo JS a 60fps dentro do requestAnimationFrame.
-     * Calcula a balística e retorna o buffer de níveis atual.
+     * Calcula a balística e atualiza o buffer in-place.
      * @param {number} delta_time_ms
-     * @returns {Float32Array}
      */
     render_frame(delta_time_ms) {
-        const ret = wasm.meterengine_render_frame(this.__wbg_ptr, delta_time_ms);
-        var v1 = getArrayF32FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
-        return v1;
+        wasm.meterengine_render_frame(this.__wbg_ptr, delta_time_ms);
     }
     /**
      * Recebe as tabelas de calibração pre-calculadas do JS (0 a 32 steps)
