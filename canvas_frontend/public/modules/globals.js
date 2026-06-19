@@ -53,6 +53,7 @@ window.layoutMode = layoutMode;
 document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
 window.customNamesEnabled = localStorage.getItem('custom_names_enabled') !== 'false';
 window.globalNames = null;
+window.channelStates = channelStates;
 
 const container = document.getElementById('faders-container');
 

@@ -104,7 +104,7 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
             } else if (y >= 38 && y <= 66 && inBtnX) {
                 pendingAction = () => {
                     if (channelIndex === 52) {
-                        if (typeof window.clearAllSolos === 'function' && window.channelStates.some(s => s && s.solo)) {
+                        if (typeof window.clearAllSolos === 'function' && channelStates.some(s => s && s.solo)) {
                             window.clearAllSolos();
                         }
                     } else if (channelIndex !== -1) {
@@ -172,7 +172,7 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
             } else if (y >= 44 && y <= 70 && inBtnX) {
                 pendingAction = () => {
                     if (channelIndex === 52) {
-                        if (typeof window.clearAllSolos === 'function' && window.channelStates.some(s => s && s.solo)) {
+                        if (typeof window.clearAllSolos === 'function' && channelStates.some(s => s && s.solo)) {
                             window.clearAllSolos();
                         }
                     } else if (channelIndex !== -1) {
