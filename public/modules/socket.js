@@ -1240,7 +1240,7 @@ function wasmRenderLoop(now) {
     // Em modo canvas, apenas faz o tick do MIDI dispatcher — o canvas_engine gerencia render
     const isCanvasMode = window.location.pathname.startsWith('/canvas');
 
-    if (!wasmMeterEngine) { lastWasmRenderTime = now; return; }
+    if (!wasmMeterEngine) return;
 
     // --- WASM Throttler (despachante) ---
     if (wasmMidiDispatcher) {
@@ -1258,7 +1258,6 @@ function wasmRenderLoop(now) {
     }
 
     if (isCanvasMode || !meterElementsCache || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
-        lastWasmRenderTime = now;
         return;
     }
 
