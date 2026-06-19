@@ -39,3 +39,30 @@ document.addEventListener("visibilitychange", () => {
         }, 500);
     }
 });
+
+// Criação do elemento visual para exibir o FPS
+const fpsMeter = document.createElement('div');
+fpsMeter.style.cssText = 'position:fixed;top:10px;right:10px;background:rgba(0,0,0,0.8);color:#0f0;padding:5px 10px;font-family:monospace;z-index:9999;border-radius:5px;pointer-events:none;';
+document.body.appendChild(fpsMeter);
+
+// Variáveis de controle de tempo e quadros
+let lastTimeFps = performance.now();
+let frameCountFps = 0;
+
+// Função principal de cálculo
+function updateFPS() {
+    const now = performance.now();
+    frameCountFps++;
+
+    // Atualiza o display a cada 1 segundo (1000 ms)
+    if (now - lastTimeFps >= 1000) {
+        fpsMeter.textContent = `FPS: ${frameCountFps}`;
+        frameCountFps = 0;
+        lastTimeFps = now;
+    }
+    
+    requestAnimationFrame(updateFPS);
+}
+
+// Inicia o loop
+updateFPS();

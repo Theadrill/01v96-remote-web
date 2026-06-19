@@ -34,6 +34,7 @@ for (let i = 0; i < 8; i++) {
 }
 
 let masterState = { value: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };
+channelStates[52] = masterState; // Map for canvas engine
 let activeConfigChannel = null;
 let activeConfigTab = "aux"; // Auxiliares por padrão
 let appOrientation = 'vertical';
@@ -48,6 +49,7 @@ window.envStatus = 'not_found';
 window.serverName = null;
 const savedRole = localStorage.getItem('01v96_role');
 let layoutMode = savedRole === 'musician' ? 'mobile' : (localStorage.getItem('mixer_layout') || 'mobile');
+window.layoutMode = layoutMode;
 document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
 window.customNamesEnabled = localStorage.getItem('custom_names_enabled') !== 'false';
 window.globalNames = null;

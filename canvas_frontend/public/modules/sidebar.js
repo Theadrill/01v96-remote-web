@@ -158,6 +158,7 @@ function fallbackCopyTextToClipboard(text) {
 
 function setLayoutMode(mode) {
     layoutMode = mode;
+    window.layoutMode = mode;
     localStorage.setItem('mixer_layout', mode);
     document.body.classList.toggle('layout-desktop', mode === 'desktop');
     updateLayoutButtons();

@@ -21,21 +21,38 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
         return Math.max(0, Math.min(1023, raw));
     }
 
+    function getChannelFromX(x, stripWidth, isMobile) {
+        if (!isMobile) return { colIndex: Math.floor(x / stripWidth), startX: Math.floor(x / stripWidth) * stripWidth };
+        // mobile has 15px gap every 8 channels
+        const blockWidth = 8 * stripWidth + 15;
+        const blockIndex = Math.floor(x / blockWidth);
+        const xInBlock = x - blockIndex * blockWidth;
+        if (xInBlock > 8 * stripWidth) {
+            return { colIndex: -1, startX: -1 }; // clicked in the gap
+        }
+        const colInBlock = Math.floor(xInBlock / stripWidth);
+        const colIndex = blockIndex * 8 + colInBlock;
+        const startX = blockIndex * blockWidth + colInBlock * stripWidth;
+        return { colIndex, startX };
+    }
+
     canvas.addEventListener('pointerdown', (e) => {
         const stripWidth = getStripWidth();
+        const mode = typeof window !== 'undefined' && window.layoutMode ? window.layoutMode : 'desktop';
+        const isMobile = mode === 'mobile';
+        
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        const colIndex = Math.floor(x / stripWidth);
+        const { colIndex, startX } = getChannelFromX(x, stripWidth, isMobile);
         if (colIndex < 0 || colIndex >= channels.length) return;
+        
         const channelIndex = channels[colIndex];
         const state = channelStates[channelIndex];
         if (!state) return;
 
-        const startX = colIndex * stripWidth;
         const localX = x - startX;
-        const mode = typeof window !== 'undefined' && window.layoutMode ? window.layoutMode : 'desktop';
         const h = canvas.clientHeight || 600;
 
         let isThumbHit = false;
@@ -51,11 +68,12 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
                 isThumbHit = true;
             }
         } else {
-            const trackY = 80;
-            const trackHeight = h - 130;
+            const trackY = 140;
+            const trackHeight = h - 194;
             const pct = state.value / 1023;
             const knobY = trackY + (trackHeight * (1 - pct));
-            const faderCenterX = stripWidth / 2 - 7;
+            const w = stripWidth - 4;
+            const faderCenterX = w / 2;
             if (localX >= faderCenterX - 25 && localX <= faderCenterX + 25 &&
                 y >= knobY - 30 && y <= knobY + 30) {
                 isThumbHit = true;
@@ -123,47 +141,83 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
                     }
                 };
             } else if (y >= 157 && y <= 181 && inBtnX) {
-                pendingAction = () => {
-                    if (channelIndex !== -1 && typeof window.startNudge === 'function') {
-                        const evtCh = channelIndex === 52 ? "'master'" : channelIndex;
-                        window.startNudge(evtCh, 1);
-                    }
-                };
+                if (channelIndex !== -1 && typeof window.startNudge === 'function') {
+                    const evtCh = channelIndex === 52 ? "'master'" : channelIndex;
+                    window.startNudge(evtCh, 1);
+                }
+                activeTouches.set(e.pointerId, { type: 'nudge' });
+                return;
             } else {
                 const minusY = h - 62;
                 if (y >= minusY && y <= minusY + 24 && inBtnX) {
-                    pendingAction = () => {
-                        if (channelIndex !== -1 && typeof window.startNudge === 'function') {
-                            const evtCh = channelIndex === 52 ? "'master'" : channelIndex;
-                            window.startNudge(evtCh, -1);
-                        }
-                    };
+                    if (channelIndex !== -1 && typeof window.startNudge === 'function') {
+                        const evtCh = channelIndex === 52 ? "'master'" : channelIndex;
+                        window.startNudge(evtCh, -1);
+                    }
+                    activeTouches.set(e.pointerId, { type: 'nudge' });
+                    return;
                 }
             }
         } else {
-            const btnW = 30;
-            const btnH = 20;
-            const onX = stripWidth/2 - btnW - 5;
-            const onY = 10;
-            
-            if (localX >= onX && localX <= onX + btnW && y >= onY && y <= onY + btnH) {
+            const w = stripWidth - 4;
+            const inBtnX = localX >= 4 && localX <= w - 4;
+
+            if (y >= 5 && y <= 39) {
+                pendingAction = () => { if (typeof window.openChannelConfig === 'function' && channelIndex !== -1) window.openChannelConfig(e, channelIndex === 52 ? 52 : channelIndex); };
+            } else if (y >= 44 && y <= 70 && inBtnX) {
                 pendingAction = () => {
-                    if (typeof window.toggleState === 'function') {
-                        window.toggleState('kInputChannelOn/kChannelOn', channelIndex);
-                    } else {
-                        state.on = !state.on;
-                    }
-                };
-            } else {
-                const soloX = stripWidth/2 + 5;
-                if (localX >= soloX && localX <= soloX + btnW && y >= onY && y <= onY + btnH && channelIndex !== -1) {
-                    pendingAction = () => {
+                    if (channelIndex !== -1 && channelIndex !== 52) {
                         if (typeof window.toggleState === 'function') {
-                            window.toggleState('kSetupSoloChOn/kSoloChOn', channelIndex);
+                            let actionCh = channelIndex;
+                            if (channelIndex >= 36 && channelIndex <= 43) actionCh = `'m${channelIndex-36}'`;
+                            else if (channelIndex >= 44 && channelIndex <= 51) actionCh = `'b${channelIndex-44}'`;
+                            window.toggleState('kSetupSoloChOn/kSoloChOn', actionCh);
                         } else {
                             state.solo = !state.solo;
                         }
-                    };
+                    }
+                };
+            } else if (y >= 75 && y <= 101 && inBtnX) {
+                pendingAction = () => {
+                    if (channelIndex !== -1) {
+                        if (typeof window.toggleState === 'function') {
+                            let cmd = 'kInputChannelOn/kChannelOn';
+                            let actionCh = channelIndex;
+                            if (channelIndex === 52) {
+                                cmd = 'kStereoChannelOn/kChannelOn';
+                                actionCh = "'master'"; 
+                            } else if (channelIndex >= 36 && channelIndex <= 43) {
+                                cmd = 'kAUXChannelOn/kChannelOn';
+                                actionCh = `'m${channelIndex-36}'`;
+                            } else if (channelIndex >= 44 && channelIndex <= 51) {
+                                cmd = 'kBusChannelOn/kChannelOn';
+                                actionCh = `'b${channelIndex-44}'`;
+                            }
+                            if (typeof actionCh === 'string' && actionCh.startsWith("'")) {
+                                actionCh = actionCh.replace(/'/g, "");
+                            }
+                            window.toggleState(cmd, actionCh);
+                        } else {
+                            state.on = !state.on;
+                        }
+                    }
+                };
+            } else if (y >= 111 && y <= 135) {
+                if (channelIndex !== -1 && typeof window.startNudge === 'function') {
+                    const evtCh = channelIndex === 52 ? "'master'" : channelIndex;
+                    window.startNudge(evtCh, 1);
+                }
+                activeTouches.set(e.pointerId, { type: 'nudge' });
+                return;
+            } else {
+                const minusY = h - 44;
+                if (y >= minusY && y <= minusY + 24) {
+                    if (channelIndex !== -1 && typeof window.startNudge === 'function') {
+                        const evtCh = channelIndex === 52 ? "'master'" : channelIndex;
+                        window.startNudge(evtCh, -1);
+                    }
+                    activeTouches.set(e.pointerId, { type: 'nudge' });
+                    return;
                 }
             }
         }
@@ -204,11 +258,11 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
         if (mode === 'desktop') {
             trackHeight = h - 296;
         } else {
-            trackHeight = h - 130;
+            trackHeight = h - 194;
         }
 
         if (touchInfo.channelIndex === -1) {
-            const trackY = mode === 'desktop' ? 219 : 80;
+            const trackY = mode === 'desktop' ? 219 : 140;
             const absoluteRaw = interpolateYToRaw(y, trackY, trackHeight);
             const diff = absoluteRaw - touchInfo.lastRaw;
             if (Math.abs(diff) > 20) {
@@ -272,11 +326,15 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
 
     // Evento de Wheel (Mouse Scroll) para alterar o volume quando em cima do Fader
     canvas.addEventListener('wheel', (e) => {
+        const stripWidth = getStripWidth();
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        const colIndex = Math.floor(x / stripWidth);
+        const mode = typeof window !== 'undefined' && window.layoutMode ? window.layoutMode : 'desktop';
+        const isMobile = mode === 'mobile';
+        
+        const { colIndex } = getChannelFromX(x, stripWidth, isMobile);
         if (colIndex < 0 || colIndex >= channels.length) return;
         
         const channelIndex = channels[colIndex];
@@ -284,15 +342,14 @@ export function setupCanvasEvents(canvas, channelStates, channels, socket) {
         if (!state) return;
 
         const h = canvas.clientHeight || 600;
-        const mode = typeof window !== 'undefined' && window.layoutMode ? window.layoutMode : 'desktop';
         
         let trackY, trackHeight;
         if (mode === 'desktop') {
             trackY = 219;
             trackHeight = h - 296;
         } else {
-            trackY = 80;
-            trackHeight = h - 130;
+            trackY = 140;
+            trackHeight = h - 194;
         }
 
         // Permitir folga de 20px pra cima e baixo no track para ser mais amigável

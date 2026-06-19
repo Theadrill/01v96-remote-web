@@ -1,4 +1,5 @@
 import { drawChannelStrip, getStripWidth } from './canvas_strip.js';
+import { MOBILE_STRIP_WIDTH } from './canvas_strip_mobile.js';
 
 /**
  * Inicializa e gerencia o loop de requestAnimationFrame do Canvas.
@@ -33,7 +34,10 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
     function resizeCanvas() {
         const stripWidth = getStripWidth();
         const h = container.clientHeight || 600;
-        const w = stripWidth * numChannels;
+        let w = stripWidth * numChannels;
+        if (stripWidth === MOBILE_STRIP_WIDTH) { // mobile has gaps
+            w += Math.floor((numChannels - 1) / 8) * 15; // 15px gap after 8 channels
+        }
         
         canvas.width = w * dpr;
         canvas.height = h * dpr;
@@ -72,7 +76,10 @@ export function initCanvas(containerId, meterEngine, channelStates, config = {})
         const stripWidth = getStripWidth();
         for (let i = 0; i < numChannels; i++) {
             const chIndex = channels[i];
-            const x = i * stripWidth;
+            let x = i * stripWidth;
+            if (stripWidth === MOBILE_STRIP_WIDTH) {
+                x += Math.floor(i / 8) * 15;
+            }
 
             // Se for o canal Macro (-1), a lógica é diferente e passamos state customizado
             if (chIndex === -1 && config.isMacro) {

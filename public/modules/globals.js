@@ -34,6 +34,7 @@ for (let i = 0; i < 8; i++) {
 }
 
 let masterState = { value: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };
+channelStates[52] = masterState; // Map for canvas engine
 let activeConfigChannel = null;
 let activeConfigTab = "aux"; // Auxiliares por padrão
 let appOrientation = 'vertical';

@@ -1,6 +1,6 @@
 import { interpolateFaderY, getChannelColor, roundRect } from './canvas_strip_utils.js';
 
-export const DESKTOP_STRIP_WIDTH = 80;
+export const DESKTOP_STRIP_WIDTH = 100;
 
 export function drawDesktopChannelStrip(ctx, channelIndex, x, y, width, height, state, meterValueDb, isMacro = false, isPeaking = false) {
     const isMaster = channelIndex === 52;
