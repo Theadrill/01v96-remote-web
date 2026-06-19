@@ -1720,6 +1720,21 @@ pub fn register_handlers(
             },
         );
 
+        // --- UPDATE CANVAS MODE ---
+        socket.on(
+            "updateCanvasMode",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                if let Some(enabled) = data.get("enabled").and_then(|v| v.as_bool()) {
+                    let mut config = crate::config::AppConfig::load();
+                    config.use_canvas = enabled;
+                    config.save();
+                }
+            },
+        );
+
         // --- RESTART SERVER ---
         socket.on(
             "restartServer",

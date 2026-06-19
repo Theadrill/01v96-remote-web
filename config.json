@@ -3,6 +3,7 @@
   "outIdx": 3,
   "loopmidi-monitor": false,
   "open_browser_startup": false,
+  "use_canvas": true,
   "demo_mode": false,
   "lumikit_ips": [
     "192.168.15.99",

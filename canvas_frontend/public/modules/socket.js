@@ -775,8 +775,8 @@ socket.on('portsList', (data) => {
             toggleCanvas.checked = data.savedConfig.use_canvas === true;
         }
 
-        if (data.savedConfig.use_canvas === true && !window.location.pathname.startsWith('/canvas')) {
-            window.location.href = '/canvas/index.html';
+        if (data.savedConfig.use_canvas !== true && window.location.pathname.startsWith('/canvas')) {
+            window.location.href = '/index.html';
             return;
         }
 

@@ -770,16 +770,6 @@ socket.on('portsList', (data) => {
             toggleBrowser.checked = data.savedConfig.open_browser_startup !== false;
         }
 
-        const toggleCanvas = document.getElementById('toggleCanvasMode');
-        if (toggleCanvas) {
-            toggleCanvas.checked = data.savedConfig.use_canvas === true;
-        }
-
-        if (data.savedConfig.use_canvas === true && !window.location.pathname.startsWith('/canvas')) {
-            window.location.href = '/canvas/index.html';
-            return;
-        }
-
         if (data.savedConfig.rta_decay_rate !== undefined) {
             window.rtaConfig.decayRate = data.savedConfig.rta_decay_rate;
         }
@@ -853,15 +843,6 @@ socket.on('rtaConfigUpdated', (cfg) => {
 
 window.updateOpenBrowser = function (enabled) {
     socket.emit('updateOpenBrowser', { enabled: enabled });
-};
-
-window.toggleCanvasMode = function (enabled) {
-    socket.emit('updateCanvasMode', { enabled: enabled });
-    if (enabled) {
-        window.location.href = '/canvas/index.html';
-    } else {
-        window.location.href = '/index.html';
-    }
 };
 
 socket.on('tailscaleUrl', (data) => {

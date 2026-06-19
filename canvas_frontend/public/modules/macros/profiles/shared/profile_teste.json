@@ -1,0 +1,99 @@
+{
+  "0": {
+    "scriptId": "channel_toggler",
+    "name": "MACRO 1",
+    "config": [
+      0,
+      1
+    ]
+  },
+  "1": {
+    "scriptId": "channel_toggler",
+    "name": "MACRO 2",
+    "config": [
+      2,
+      3
+    ]
+  },
+  "2": {
+    "scriptId": "lumikit",
+    "name": "palco",
+    "color": "#919a19",
+    "config": {
+      "scenes": [
+        "0:0"
+      ],
+      "extras": []
+    }
+  },
+  "3": {
+    "scriptId": "lumikit",
+    "name": "refrao",
+    "color": "#f08c00",
+    "config": {
+      "scenes": [
+        "0:14"
+      ],
+      "extras": []
+    }
+  },
+  "4": {
+    "scriptId": "lumikit",
+    "name": "auto",
+    "color": "#fb24ff",
+    "config": {
+      "scenes": [
+        "0:15"
+      ],
+      "extras": []
+    }
+  },
+  "5": {
+    "scriptId": "lumikit",
+    "name": "dj",
+    "color": "#ff2424",
+    "config": {
+      "scenes": [
+        "0:13"
+      ],
+      "extras": []
+    }
+  },
+  "6": {
+    "scriptId": "lumikit",
+    "name": "strobo",
+    "color": "#ffccbd",
+    "config": {
+      "scenes": [
+        "0:7"
+      ],
+      "extras": []
+    }
+  },
+  "8": {
+    "scriptId": "lumikit",
+    "name": "fog",
+    "color": "#ff24d7",
+    "config": {
+      "scenes": [],
+      "extras": [
+        0
+      ]
+    }
+  },
+  "10": {
+    "scriptId": "lumikit",
+    "name": "blackout",
+    "color": "#9e9e9e",
+    "config": {
+      "scenes": [],
+      "extras": []
+    }
+  },
+  "globalConfig": {
+    "lumikit": {
+      "ip": "pcmaria",
+      "port": 5000
+    }
+  }
+}

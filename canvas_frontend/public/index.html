@@ -1113,7 +1113,10 @@
             clearInterval(vkBackspaceInterval);
         }
     </script>
-    <script src="app.js"></script>
+    <script type="module" src="canvas_project/canvas_engine.js"></script>
+    <script type="module" src="canvas_project/canvas_strip.js"></script>
+    <script type="module" src="canvas_project/canvas_events.js"></script>
+    <script src="app.js" type="module"></script>
 
     <!-- Mobile Menu Modal Overlay -->
     <div id="mobileMenuModal" class="mobile-menu-modal-overlay" onclick="if(!event.target.closest('.mobile-menu-item')) this.classList.remove('active')">

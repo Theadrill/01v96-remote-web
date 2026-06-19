@@ -15,6 +15,8 @@ pub struct AppConfig {
     pub loopmidi_monitor: bool,
 
     pub open_browser_startup: bool,
+    #[serde(default)]
+    pub use_canvas: bool,
     pub demo_mode: bool,
     pub lumikit_ips: Vec<String>,
 
@@ -229,6 +231,7 @@ impl AppConfig {
             out_idx: 1,
             loopmidi_monitor: false,
             open_browser_startup: false,
+            use_canvas: false,
             demo_mode: false,
             lumikit_ips: vec![],
             meter_fps_desktop: 30,
