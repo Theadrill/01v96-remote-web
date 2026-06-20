@@ -3559,6 +3559,12 @@ body:not(.layout-desktop):not(.is-portrait) .dock-btn {
     font-size: 11px !important;
 }
 
+/* Garante que o botão de SAIR fique sempre no topo na dock (modo mobile deitado) */
+body:not(.layout-desktop):not(.is-portrait) .dock-close,
+body:not(.layout-desktop):not(.is-portrait) .dock-exit {
+    order: -1 !important;
+}
+
 /* Oculta o botão de fullscreen da dock em modo landscape no mobile/Steam Deck */
 body:not(.layout-desktop):not(.is-portrait) .dock-fs {
     display: none !important;
@@ -3927,10 +3933,9 @@ body:not(.is-portrait) .sidebar-musician #musicianExitBtn {
     margin-top: 10px !important;
 }
 
-/* Ocultar nome da cena no mobile em telas secundárias (config de canal, mix do técnico, saídas) */
+/* Ocultar nome da cena no mobile em telas secundárias (config de canal, mix do técnico) */
 body:not(.layout-desktop).screen-config #scene-info,
-body:not(.layout-desktop).screen-techmix #scene-info,
-body:not(.layout-desktop).screen-outs #scene-info {
+body:not(.layout-desktop).screen-techmix #scene-info {
     display: none !important;
 }
 
