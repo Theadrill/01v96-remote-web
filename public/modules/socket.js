@@ -693,7 +693,8 @@ socket.on('connectionState', (state) => {
 });
 
 socket.on('portsList', (data) => {
-    if (data.tailscaleUrl && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    const autoRedirect = localStorage.getItem('auto_redirect_https') === 'true';
+    if (autoRedirect && data.tailscaleUrl && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         window.location.href = data.tailscaleUrl;
         return;
     }
@@ -768,6 +769,11 @@ socket.on('portsList', (data) => {
         const toggleBrowser = document.getElementById('toggleOpenBrowser');
         if (toggleBrowser) {
             toggleBrowser.checked = data.savedConfig.open_browser_startup !== false;
+        }
+
+        const toggleAutoRedirect = document.getElementById('toggleAutoRedirectHttps');
+        if (toggleAutoRedirect) {
+            toggleAutoRedirect.checked = localStorage.getItem('auto_redirect_https') === 'true';
         }
 
         const toggleCanvas = document.getElementById('toggleCanvasMode');
@@ -855,6 +861,10 @@ window.updateOpenBrowser = function (enabled) {
     socket.emit('updateOpenBrowser', { enabled: enabled });
 };
 
+window.updateAutoRedirectHttps = function (enabled) {
+    localStorage.setItem('auto_redirect_https', enabled);
+};
+
 window.toggleCanvasMode = function (enabled) {
     socket.emit('updateCanvasMode', { enabled: enabled });
     if (enabled) {
@@ -865,7 +875,8 @@ window.toggleCanvasMode = function (enabled) {
 };
 
 socket.on('tailscaleUrl', (data) => {
-    if (data.url && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    const autoRedirect = localStorage.getItem('auto_redirect_https') === 'true';
+    if (autoRedirect && data.url && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         window.location.href = data.url;
     }
 });
