@@ -20,7 +20,12 @@ function renderAuxs(ch) {
             const state = getChannelStateById(i);
             const currentVal = (state && state[`aux${auxIdx}`]) || 0;
             const isOn = (state && state[`aux${auxIdx}On`]) || false;
-            let chName = `CH ${i+1}`;
+            let baseTitle = `CH ${i+1}`;
+            if (state && state.paired) {
+                baseTitle = `CH ${i+1} + ${i+2}`;
+            }
+
+            let chName = baseTitle;
             if (window.resolvedNames && window.resolvedNames[i]) {
                 chName = window.resolvedNames[i].name;
             } else if (state && state.name && state.name.trim() !== "") {
@@ -29,7 +34,7 @@ function renderAuxs(ch) {
 
             const config = {
                 id: i,
-                title: chName,
+                title: baseTitle,
                 name: chName,
                 customClass: "fader-group-aux-send",
                 onAction: `toggleAuxOn(${i}, ${auxIdx})`,
@@ -52,7 +57,8 @@ function renderAuxs(ch) {
             const currentVal = (state && state[`aux${i}`]) || 0;
             const isOn = (state && state[`aux${i}On`]) || false;
             
-            let auxName = `AUX ${i}`;
+            let baseTitle = `AUX ${i}`;
+            let auxName = baseTitle;
             let globalMixId = 35 + i;
             if (window.resolvedNames && window.resolvedNames[globalMixId]) {
                 auxName = window.resolvedNames[globalMixId].name;
@@ -60,7 +66,7 @@ function renderAuxs(ch) {
 
             const config = {
                 id: i,
-                title: auxName,
+                title: baseTitle,
                 name: auxName,
                 customClass: "fader-group-aux",
                 onAction: `toggleAuxOn(${ch}, ${i})`,
