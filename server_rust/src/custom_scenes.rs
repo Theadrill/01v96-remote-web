@@ -558,6 +558,10 @@ impl CustomSceneManager {
         self.dirty_files.insert(filename.to_string());
     }
 
+    pub fn mark_registry_dirty(&mut self) {
+        self.registry_dirty = true;
+    }
+
     pub fn create_scene(
         &mut self,
         filename: &str,

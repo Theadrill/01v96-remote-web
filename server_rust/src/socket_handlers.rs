@@ -1437,6 +1437,7 @@ pub fn register_handlers(
                 let fname = format!("custom_names_scene-{}-{}.json", base_name, mesa_nome);
 
                 let mut scene_created = false;
+                let mut needs_shared_sync = false;
                 {
                     let mut mgr = csm_ensure.write().await;
                     if mgr.get_scene(&fname).is_none() {
@@ -1447,6 +1448,16 @@ pub fn register_handlers(
                         mgr.ensure_registry_entry(&scene_name, scene_number, &fname);
                         mgr.persist(sync_shared);
                         scene_created = true;
+                    } else if sync_shared {
+                        let shared_path = mgr.data_dir().join("shared").join(&fname);
+                        if !shared_path.exists() {
+                            mgr.mark_dirty(&fname);
+                            mgr.mark_registry_dirty();
+                            needs_shared_sync = true;
+                        }
+                    }
+                    if needs_shared_sync {
+                        mgr.persist(sync_shared);
                     }
                 }
 

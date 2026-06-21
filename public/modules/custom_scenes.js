@@ -7,6 +7,9 @@ window.toggleCustomScenesSyncSetting = function(enabled) {
     window.customScenesSyncEnabled = enabled;
     localStorage.setItem('custom_scenes_sync', enabled ? 'true' : 'false');
     console.log('[CUSTOM] customScenesSyncEnabled changed to:', enabled);
+    if (enabled && typeof socket !== 'undefined' && socket) {
+        socket.emit('ensureCurrentCustomScene', { syncShared: true });
+    }
 };
 
 window.showCustomScenes = function() {
