@@ -30,6 +30,12 @@
       "physical_scene": "SKEMA BOM",
       "physical_id": 11,
       "file": "custom_names_scene-SKEMA BOM-mesa-maria.json"
+    },
+    {
+      "custom_name": "CHOCO 360",
+      "physical_scene": "CHOCO 360",
+      "physical_id": 33,
+      "file": "custom_names_scene-CHOCO 360-mesa-maria.json"
     }
   ]
 }
