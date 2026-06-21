@@ -20,7 +20,12 @@ function renderAuxs(ch) {
             const state = getChannelStateById(i);
             const currentVal = (state && state[`aux${auxIdx}`]) || 0;
             const isOn = (state && state[`aux${auxIdx}On`]) || false;
-            const chName = (state && state.name && state.name.trim() !== "") ? state.name : `CH ${i+1}`;
+            let chName = `CH ${i+1}`;
+            if (window.resolvedNames && window.resolvedNames[i]) {
+                chName = window.resolvedNames[i].name;
+            } else if (state && state.name && state.name.trim() !== "") {
+                chName = state.name;
+            }
 
             const config = {
                 id: i,
@@ -47,10 +52,16 @@ function renderAuxs(ch) {
             const currentVal = (state && state[`aux${i}`]) || 0;
             const isOn = (state && state[`aux${i}On`]) || false;
             
+            let auxName = `AUX ${i}`;
+            let globalMixId = 35 + i;
+            if (window.resolvedNames && window.resolvedNames[globalMixId]) {
+                auxName = window.resolvedNames[globalMixId].name;
+            }
+
             const config = {
                 id: i,
-                title: `AUX ${i}`,
-                name: `AUX ${i}`,
+                title: auxName,
+                name: auxName,
                 customClass: "fader-group-aux",
                 onAction: `toggleAuxOn(${ch}, ${i})`,
                 onInputAction: "auxLevelInput",
