@@ -2,11 +2,13 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use rustfft::{num_complex::Complex, FftPlanner};
 use socketioxide::SocketIo;
 use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
 
 pub struct RtaManager {
     is_active: Arc<Mutex<bool>>,
-    stop_tx: Option<tokio::sync::oneshot::Sender<()>>,
+    last_heartbeat: Arc<Mutex<Option<Instant>>>,
+    stop_tx: Arc<Mutex<Option<tokio::sync::oneshot::Sender<()>>>>,
     current_device: Option<String>,
     current_is_output: bool,
     current_fft_size: usize,
@@ -17,11 +19,18 @@ impl RtaManager {
     pub fn new() -> Self {
         Self {
             is_active: Arc::new(Mutex::new(false)),
-            stop_tx: None,
+            last_heartbeat: Arc::new(Mutex::new(None)),
+            stop_tx: Arc::new(Mutex::new(None)),
             current_device: None,
             current_is_output: false,
             current_fft_size: 4096,
             current_sample_rate: Arc::new(Mutex::new(48000)),
+        }
+    }
+
+    pub fn receive_heartbeat(&self) {
+        if *self.is_active.lock().unwrap() {
+            *self.last_heartbeat.lock().unwrap() = Some(Instant::now());
         }
     }
 
@@ -31,6 +40,7 @@ impl RtaManager {
         self.stop();
 
         *self.is_active.lock().unwrap() = true;
+        *self.last_heartbeat.lock().unwrap() = Some(Instant::now());
         self.current_device = device_name.clone();
         self.current_is_output = is_output;
         self.current_fft_size = fft_size;
@@ -41,7 +51,7 @@ impl RtaManager {
         // Canal para o worker enviar os dados ao websocket
         let (tx, mut rx) = mpsc::channel::<Vec<f32>>(10);
         let (stop_tx, mut stop_rx) = tokio::sync::oneshot::channel::<()>();
-        self.stop_tx = Some(stop_tx);
+        *self.stop_tx.lock().unwrap() = Some(stop_tx);
 
         let io_for_tokio = io.clone();
         
@@ -60,6 +70,40 @@ impl RtaManager {
                         tracing::info!("Parando RTA loop.");
                         break;
                     }
+                }
+            }
+        });
+
+        // Watchdog: monitora heartbeats e para a captura se ficar 5s sem heartbeat
+        let wd_is_active = self.is_active.clone();
+        let wd_last_hb = self.last_heartbeat.clone();
+        let wd_stop_tx = self.stop_tx.clone();
+        let io_watchdog = io.clone();
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(Duration::from_millis(1000)).await;
+                if !*wd_is_active.lock().unwrap() {
+                    break;
+                }
+                let now = Instant::now();
+                let expired = {
+                    let guard = wd_last_hb.lock().unwrap();
+                    match *guard {
+                        Some(t) => now.duration_since(t) >= Duration::from_secs(5),
+                        None => {
+                            tracing::warn!("🎤 [RTA] Watchdog: last_heartbeat é None (aguardando primeiro heartbeat)");
+                            false
+                        }
+                    }
+                };
+                if expired {
+                    tracing::info!("🎤 [RTA] Watchdog: sem heartbeat há 5s, parando captura.");
+                    *wd_is_active.lock().unwrap() = false;
+                    if let Some(tx) = wd_stop_tx.lock().unwrap().take() {
+                        let _ = tx.send(());
+                    }
+                    let _ = io_watchdog.emit("rtaControl", &serde_json::json!({"status": "stopped"})).await;
+                    break;
                 }
             }
         });
@@ -226,8 +270,9 @@ impl RtaManager {
 
     pub fn stop(&mut self) {
         *self.is_active.lock().unwrap() = false;
+        *self.last_heartbeat.lock().unwrap() = None;
         self.current_device = None;
-        if let Some(tx) = self.stop_tx.take() {
+        if let Some(tx) = self.stop_tx.lock().unwrap().take() {
             let _ = tx.send(());
         }
     }

@@ -267,6 +267,15 @@ pub fn register_handlers(
             },
         );
 
+        let rta_heartbeat = rta_handler.clone();
+        socket.on(
+            "rtaHeartbeat",
+            move |_socket: SocketRef| async move {
+                let rta = rta_heartbeat.lock().await;
+                rta.receive_heartbeat();
+            },
+        );
+
         socket.on(
             "requestRtaDevices",
             move |socket: SocketRef| async move {

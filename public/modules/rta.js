@@ -10,6 +10,7 @@ let rtaLocalStream = null;
 let rtaServerData = new Float32Array(256);
 let rtaPauseTimeout = null;
 let pendingRtaSource = null;
+let rtaHeartbeatInterval = null;
 
 // RTA configuration from server (populated via portsList/rtaConfigUpdated events)
 const savedShowStatus = localStorage.getItem('rtaShowStatus');
@@ -202,6 +203,10 @@ window.selectRTASource = async function(source, deviceId = 'default_in', fftSize
         cancelAnimationFrame(rtaAnimId);
         rtaAnimId = null;
     }
+    if (rtaHeartbeatInterval) {
+        clearInterval(rtaHeartbeatInterval);
+        rtaHeartbeatInterval = null;
+    }
     window.rtaCurrentLoopToken = null; // Invalida qualquer loop ativo concorrente
 
     localStorage.setItem('rtaSource', source);
@@ -292,6 +297,9 @@ window.selectRTASource = async function(source, deviceId = 'default_in', fftSize
             isOutput: isOutput,
             fftSize: finalFftSize
         });
+        rtaHeartbeatInterval = setInterval(() => {
+            socket.emit('rtaHeartbeat');
+        }, 2000);
         rtaIsActive = true;
         window.updateRtaBtnUI(true);
         startRtaLoop();
@@ -316,6 +324,10 @@ window.disableRTA = function() {
         rtaAnimId = null;
     }
     if (rtaPauseTimeout) clearTimeout(rtaPauseTimeout);
+    if (rtaHeartbeatInterval) {
+        clearInterval(rtaHeartbeatInterval);
+        rtaHeartbeatInterval = null;
+    }
 
     const modal = document.getElementById('rtaModal');
     if(modal) modal.style.display = 'none';
@@ -344,10 +356,16 @@ window.pauseRTA = function() {
     }
     rtaIsActive = false;
     
+    // Para os heartbeats imediatamente; o watchdog do servidor irá
+    // parar a captura automaticamente após 5s sem heartbeats de nenhum cliente
+    if (rtaHeartbeatInterval) {
+        clearInterval(rtaHeartbeatInterval);
+        rtaHeartbeatInterval = null;
+    }
+    
     if (rtaPauseTimeout) clearTimeout(rtaPauseTimeout);
     rtaPauseTimeout = setTimeout(() => {
         if (!rtaIsActive) {
-            socket.emit('rtaControl', { action: 'stop_server_mic' });
             if (rtaLocalStream) {
                 rtaLocalStream.getTracks().forEach(t => t.stop());
                 rtaLocalStream = null;
