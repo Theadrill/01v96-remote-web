@@ -189,7 +189,7 @@ function createDesktopStrip(config) {
             <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${configAction}">${title}</div>
             
             ${hasSolo ?
-            `<button id="${soloId}" class="btn-cue ${solo ? 'solo-active' : ''}" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})">SOLO</button>` :
+            `<button id="${soloId}" class="btn-cue ${solo ? 'solo-active' : ''}" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">SOLO</button>` :
             isMaster ?
                 `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
                 `<div class="btn-cue-placeholder"></div>`}    
@@ -417,7 +417,7 @@ function createMobileStrip(config) {
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
             
-            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
+            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
             ${!onTop ? onBtn : ''}
 
             <div class="nudge-zone" onpointerdown="${onNudgeStartAction}(${evtCh}, 1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" oncontextmenu="return false;" onclick="event.stopPropagation()">
@@ -605,7 +605,7 @@ function createOutputStrip(i, type, idPrefix = "") {
                 <div id="${pfx}name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>
             
-            <button id="${pfx}solo${prefix}${i}" class="btn-state" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${actionCh})">Solo</button>
+            <button id="${pfx}solo${prefix}${i}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${actionCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${actionCh})`}">Solo</button>
             <button id="${pfx}on${prefix}${i}" class="btn-state" onclick="toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})">On</button>
 
             <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
@@ -790,6 +790,82 @@ function initUI() {
 
     // Verifica estado inicial dos solos após renderizar a UI
     checkMasterSoloIndicator();
+}
+
+/**
+ * Substitui o solo: limpa todos os canais solados e ativa o solo no canal alvo.
+ * Usado no mini fader (tela de config individual) para comportamento "solo replace"
+ * — diferente do toggleState aditivo usado na tela principal.
+ * Envia comandos sequenciais com delay de 30ms para não congestionar a fila MIDI.
+ */
+async function soloReplace(type, ch) {
+    // Converte o identificador do canal para global ID numérico
+    const targetCh = (typeof ch === 'string' && ch.startsWith('m')) ? 36 + parseInt(ch.substring(1), 10)
+                  : (typeof ch === 'string' && ch.startsWith('b')) ? 44 + parseInt(ch.substring(1), 10)
+                  : (ch === 'master' || ch === 52) ? 52
+                  : ch;
+
+    const toClear = [];
+
+    // Inputs 0-31
+    for (let i = 0; i < NUM_CHANNELS; i++) {
+        if (channelStates[i]?.solo) toClear.push(i);
+    }
+    // ST IN (channelStates 32-35)
+    for (let i = 0; i < 4; i++) {
+        if (channelStates[32 + i]?.solo) toClear.push(60 + i * 2);
+    }
+    // Mixes
+    for (let i = 0; i < 8; i++) {
+        if (mixesState[i]?.solo) toClear.push(36 + i);
+    }
+    // Buses
+    for (let i = 0; i < 8; i++) {
+        if (busesState[i]?.solo) toClear.push(44 + i);
+    }
+    // Master
+    if (masterState?.solo) toClear.push(52);
+
+    // Se o alvo já está solado, apenas dessola (toggle off) — não mexe nos outros
+    if (getChannelStateById(targetCh)?.solo) {
+        updateUI(targetCh, undefined, undefined, false);
+        if (appReady) {
+            let emitCh = targetCh;
+            if (targetCh === 52) emitCh = 0;
+            else if (targetCh >= 36 && targetCh <= 43) emitCh = 40 + (targetCh - 36);
+            else if (targetCh >= 44 && targetCh <= 51) emitCh = 48 + (targetCh - 44);
+            socket.emit('control', { type, channel: emitCh, value: 0 });
+        }
+        return;
+    }
+
+    // Remove o alvo da lista para evitar flicker (desligar e religar)
+    const filtered = toClear.filter(id => id !== targetCh);
+
+    console.log(`[SOLO REPLACE] Alvo: ${targetCh}. Limpando solo de:`, filtered);
+
+    // Desliga todos os outros solados
+    for (const globalId of filtered) {
+        updateUI(globalId, undefined, undefined, false);
+        if (appReady) {
+            let emitCh = globalId;
+            if (globalId === 52) emitCh = 0;
+            else if (globalId >= 36 && globalId <= 43) emitCh = 40 + (globalId - 36);
+            else if (globalId >= 44 && globalId <= 51) emitCh = 48 + (globalId - 44);
+            socket.emit('control', { type, channel: emitCh, value: 0 });
+        }
+        await new Promise(r => setTimeout(r, 30));
+    }
+
+    // Solo o alvo
+    updateUI(targetCh, undefined, undefined, true);
+    if (appReady) {
+        let emitCh = targetCh;
+        if (targetCh === 52) emitCh = 0;
+        else if (targetCh >= 36 && targetCh <= 43) emitCh = 40 + (targetCh - 36);
+        else if (targetCh >= 44 && targetCh <= 51) emitCh = 48 + (targetCh - 44);
+        socket.emit('control', { type, channel: emitCh, value: 1 });
+    }
 }
 
 /**
