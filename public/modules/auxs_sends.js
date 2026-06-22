@@ -18,6 +18,7 @@ function renderAuxs(ch) {
         const auxIdx = ch - 35; // Mix 1 (36) vira Aux 1
         for (let i = 0; i < 32; i++) {
             const state = getChannelStateById(i);
+            if (state && state.paired && i % 2 !== 0) continue;
             const currentVal = (state && state[`aux${auxIdx}`]) || 0;
             const isOn = (state && state[`aux${auxIdx}On`]) || false;
             let baseTitle = `CH ${i+1}`;

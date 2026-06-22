@@ -499,6 +499,9 @@ async fn queue_all_params_inner(
         ] {
             push_req(&mut requests, &format!("kAUXComp/{}", p), i);
         }
+        if i % 2 == 0 {
+            push_req(&mut requests, "kAUXPair/kPair", i);
+        }
         push_req(&mut requests, "kBusFader/kFader", i);
         push_req(&mut requests, "kBusChannelOn/kChannelOn", i);
         push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", 48 + i);
@@ -520,6 +523,9 @@ async fn queue_all_params_inner(
             "kCompThreshold",
         ] {
             push_req(&mut requests, &format!("kBusComp/{}", p), i);
+        }
+        if i % 2 == 0 {
+            push_req(&mut requests, "kBusPair/kPair", i);
         }
     }
 

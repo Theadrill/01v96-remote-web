@@ -1035,7 +1035,7 @@ mod tests {
             },
         );
         manager.create_scene(filename, "test-scene", 1, channels);
-        manager.persist();
+        manager.persist(false);
 
         assert!(dir.join(filename).exists());
 

@@ -769,10 +769,21 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             }
         }
 
-        // --- PAIR (element 24, parameter 0) ---
+        // --- PAIR ---
+        // Input pair: element 24, parameter 0
         if element == 24 && parameter == 0 {
             let val = *data_bytes.last().unwrap_or(&0);
             return cc("kInputPair/kPair", channel, val as f64);
+        }
+        // Bus pair: element 39, parameter 0 (section 127, group 1)
+        if element == 39 && parameter == 0 {
+            let val = *data_bytes.last().unwrap_or(&0);
+            return cc("kBusPair/kPair", channel, val as f64);
+        }
+        // AUX/Mix pair: element 52, parameter 0 (section 127, group 1)
+        if element == 52 && parameter == 0 {
+            let val = *data_bytes.last().unwrap_or(&0);
+            return cc("kAUXPair/kPair", channel, val as f64);
         }
 
         // --- INSERT ON / LOCATION (element 25) ---

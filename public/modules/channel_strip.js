@@ -532,6 +532,10 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
     if (window.resolvedNames && window.resolvedNames[configId]) {
         nameDiv = window.resolvedNames[configId].name;
     }
+    if (stateRef && stateRef.paired && i % 2 === 0 && (type === 'mix' || type === 'bus')) {
+        const label = type === 'mix' ? 'MIX' : 'BUS';
+        title = `${label} ${i + 1} + ${i + 2}`;
+    }
     const actionCh = type === 'stIn' ? configId : ch;
 
     return createDesktopStrip({
@@ -587,6 +591,10 @@ function createOutputStrip(i, type, idPrefix = "") {
     let nameDiv = title;
     if (window.resolvedNames && window.resolvedNames[configId]) {
         nameDiv = window.resolvedNames[configId].name;
+    }
+    if (stateRef && stateRef.paired && i % 2 === 0 && (type === 'mix' || type === 'bus')) {
+        const label = type === 'mix' ? 'MIX' : 'BUS';
+        title = `${label} ${i + 1} + ${i + 2}`;
     }
     const actionCh = type === 'stIn' ? configId : ch;
 
@@ -695,8 +703,14 @@ function initUI() {
     }
 
     if (outsMode && !musicianMode && !technicianMixMode) {
-        for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'mix');
-        for (let i = 0; i < 8; i++) html += createOutputStrip(i, 'bus');
+        for (let i = 0; i < 8; i++) {
+            if (mixesState[i] && mixesState[i].paired && i % 2 !== 0) continue;
+            html += createOutputStrip(i, 'mix');
+        }
+        for (let i = 0; i < 8; i++) {
+            if (busesState[i] && busesState[i].paired && i % 2 !== 0) continue;
+            html += createOutputStrip(i, 'bus');
+        }
         for (let i = 0; i < 4; i++) html += createOutputStrip(i, 'stIn');
     } else {
         for (let i = 0; i < NUM_CHANNELS; i++) {

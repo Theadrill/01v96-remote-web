@@ -117,6 +117,11 @@ pub struct MixBusState {
     pub name_chars: Vec<String>,
     pub comp: CompState,
     pub eq: EqState,
+    pub paired: bool,
+    #[serde(rename = "pairedWith")]
+    pub paired_with: Option<usize>,
+    #[serde(rename = "pairSource")]
+    pub pair_source: Option<usize>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -306,6 +311,9 @@ impl GlobalState {
                         lpf_on: Some(0.0),
                     },
                 },
+                paired: false,
+                paired_with: None,
+                pair_source: None,
             };
             mixes.insert(i, mix_bus_state.clone());
             let mut bus_state = mix_bus_state.clone();
@@ -572,6 +580,66 @@ impl GlobalState {
                         channel - 1
                     };
                     if let Some(partner) = self.channels.get_mut(&partner_idx) {
+                        partner.paired = cv;
+                        partner.paired_with = if cv { Some(*channel) } else { None };
+                        partner.pair_source = if cv {
+                            Some((*channel).min(partner_idx))
+                        } else {
+                            None
+                        };
+                    }
+                } else if mt == "kAUXPair/kPair" {
+                    if let Some(mix) = self.mixes.get_mut(channel) {
+                        let is_paired = cv;
+                        let partner_idx = if channel % 2 == 0 {
+                            channel + 1
+                        } else {
+                            channel - 1
+                        };
+                        mix.paired = is_paired;
+                        mix.paired_with = if is_paired { Some(partner_idx) } else { None };
+                        mix.pair_source = if is_paired {
+                            Some((*channel).min(partner_idx))
+                        } else {
+                            None
+                        };
+                    }
+                    let partner_idx = if channel % 2 == 0 {
+                        channel + 1
+                    } else {
+                        channel - 1
+                    };
+                    if let Some(partner) = self.mixes.get_mut(&partner_idx) {
+                        partner.paired = cv;
+                        partner.paired_with = if cv { Some(*channel) } else { None };
+                        partner.pair_source = if cv {
+                            Some((*channel).min(partner_idx))
+                        } else {
+                            None
+                        };
+                    }
+                } else if mt == "kBusPair/kPair" {
+                    if let Some(bus) = self.buses.get_mut(channel) {
+                        let is_paired = cv;
+                        let partner_idx = if channel % 2 == 0 {
+                            channel + 1
+                        } else {
+                            channel - 1
+                        };
+                        bus.paired = is_paired;
+                        bus.paired_with = if is_paired { Some(partner_idx) } else { None };
+                        bus.pair_source = if is_paired {
+                            Some((*channel).min(partner_idx))
+                        } else {
+                            None
+                        };
+                    }
+                    let partner_idx = if channel % 2 == 0 {
+                        channel + 1
+                    } else {
+                        channel - 1
+                    };
+                    if let Some(partner) = self.buses.get_mut(&partner_idx) {
                         partner.paired = cv;
                         partner.paired_with = if cv { Some(*channel) } else { None };
                         partner.pair_source = if cv {

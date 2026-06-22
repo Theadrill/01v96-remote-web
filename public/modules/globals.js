@@ -29,8 +29,8 @@ const DEFAULT_OUT_EQ = () => ({
 let mixesState = [];
 let busesState = [];
 for (let i = 0; i < 8; i++) {
-    mixesState.push({ value: 0, on: false, solo: false, name: `MIX ${i+1}`, eq: DEFAULT_OUT_EQ() });
-    busesState.push({ value: 0, on: false, solo: false, name: `BUS ${i+1}`, eq: DEFAULT_OUT_EQ() });
+    mixesState.push({ value: 0, on: false, solo: false, name: `MIX ${i+1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null });
+    busesState.push({ value: 0, on: false, solo: false, name: `BUS ${i+1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null });
 }
 
 let masterState = { value: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };

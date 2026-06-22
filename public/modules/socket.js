@@ -388,6 +388,52 @@ socket.on('update', (d) => {
             initUI();
         }
     }
+
+    // Suporte a Pair de MIX/AUX
+    if (d.type === 'kAUXPair/kPair') {
+        const chA = d.channel;
+        const partnerIdx = chA % 2 === 0 ? chA + 1 : chA - 1;
+        const isPaired = !!d.value;
+
+        console.log(`🔗 [SOCKET] Atualização de Pair AUX: MIX ${chA + 1} + MIX ${partnerIdx + 1} = ${isPaired}`);
+
+        if (mixesState[chA]) {
+            mixesState[chA].paired = isPaired;
+            mixesState[chA].pairedWith = isPaired ? partnerIdx : null;
+        }
+        if (mixesState[partnerIdx]) {
+            mixesState[partnerIdx].paired = isPaired;
+            mixesState[partnerIdx].pairedWith = isPaired ? chA : null;
+        }
+
+        if (typeof initUI === 'function') {
+            console.log("♻️ [SOCKET] Re-inicializando UI devido a mudança de Pair AUX");
+            initUI();
+        }
+    }
+
+    // Suporte a Pair de BUS
+    if (d.type === 'kBusPair/kPair') {
+        const chA = d.channel;
+        const partnerIdx = chA % 2 === 0 ? chA + 1 : chA - 1;
+        const isPaired = !!d.value;
+
+        console.log(`🔗 [SOCKET] Atualização de Pair BUS: BUS ${chA + 1} + BUS ${partnerIdx + 1} = ${isPaired}`);
+
+        if (busesState[chA]) {
+            busesState[chA].paired = isPaired;
+            busesState[chA].pairedWith = isPaired ? partnerIdx : null;
+        }
+        if (busesState[partnerIdx]) {
+            busesState[partnerIdx].paired = isPaired;
+            busesState[partnerIdx].pairedWith = isPaired ? chA : null;
+        }
+
+        if (typeof initUI === 'function') {
+            console.log("♻️ [SOCKET] Re-inicializando UI devido a mudança de Pair BUS");
+            initUI();
+        }
+    }
 });
 
 function updateSceneDisplay() {
