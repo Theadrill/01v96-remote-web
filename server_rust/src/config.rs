@@ -76,6 +76,9 @@ pub struct AppConfig {
     #[serde(default = "default_rta_fft_size")]
     pub rta_fft_size: u32,
 
+    #[serde(default)]
+    pub eq_flat_skip_hpf_lpf: bool,
+
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub steps: serde_json::Value,
@@ -180,6 +183,23 @@ impl AppConfig {
             }
         }
 
+        // Migração: adicionar eq_flat_skip_hpf_lpf se ausente
+        if let Ok(contents) = fs::read_to_string(&config_path)
+            && let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&contents)
+            && !json.get("eq_flat_skip_hpf_lpf").is_some()
+        {
+            if let Some(obj) = json.as_object_mut() {
+                obj.insert("eq_flat_skip_hpf_lpf".to_string(), serde_json::Value::Bool(false));
+            }
+            if let Ok(pretty) = serde_json::to_string_pretty(&json) {
+                if let Err(e) = fs::write(&config_path, pretty) {
+                    error!("[CONFIG] Falha ao adicionar eq_flat_skip_hpf_lpf ao config.json: {}", e);
+                } else {
+                    info!("[CONFIG] eq_flat_skip_hpf_lpf adicionado ao config.json");
+                }
+            }
+        }
+
         let mut config = match fs::read_to_string(&config_path) {
             Ok(contents) => match serde_json::from_str::<AppConfig>(&contents) {
                 Ok(c) => c,
@@ -262,6 +282,7 @@ impl AppConfig {
             rta_peak_hold_time: default_rta_peak_hold_time(),
             rta_smoothing: default_rta_smoothing(),
             rta_fft_size: default_rta_fft_size(),
+            eq_flat_skip_hpf_lpf: false,
             steps: serde_json::Value::Null,
         }
     }

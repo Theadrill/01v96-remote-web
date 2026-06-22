@@ -818,10 +818,32 @@ socket.on('portsList', (data) => {
             window.restartRtaIfActive(window.rtaConfig.fftSize, window.rtaConfig.smoothing, window.rtaConfig.peakHoldTime);
         }
 
+        // Configuração do FLAT EQ
+        window.eqFlatSkipHpfLpf = data.savedConfig.eq_flat_skip_hpf_lpf === true;
+        const toggleFlat = document.getElementById('toggleEqFlatSkipHpfLpf');
+        if (toggleFlat) {
+            toggleFlat.checked = window.eqFlatSkipHpfLpf;
+        }
+
         // Atualiza a UI inicial
         updateSceneDisplay();
     }
 });
+
+socket.on('eqFlatConfigUpdated', (data) => {
+    if (data && data.skip_hpf_lpf !== undefined) {
+        window.eqFlatSkipHpfLpf = data.skip_hpf_lpf === true;
+        const toggleFlat = document.getElementById('toggleEqFlatSkipHpfLpf');
+        if (toggleFlat) toggleFlat.checked = window.eqFlatSkipHpfLpf;
+    }
+});
+
+window.updateEqFlatConfig = function(enabled) {
+    window.eqFlatSkipHpfLpf = !!enabled;
+    if (appReady) {
+        socket.emit('updateEqFlatConfig', { skip_hpf_lpf: !!enabled });
+    }
+};
 
 socket.on('rtaConfigUpdated', (cfg) => {
     if (cfg.rta_decay_rate !== undefined) {

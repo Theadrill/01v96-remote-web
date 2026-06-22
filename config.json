@@ -41,5 +41,6 @@
   "rta_decay_rate": 0.1,
   "rta_peak_hold_time": 8,
   "rta_smoothing": 90,
-  "rta_fft_size": 4096
+  "rta_fft_size": 4096,
+  "eq_flat_skip_hpf_lpf": true
 }

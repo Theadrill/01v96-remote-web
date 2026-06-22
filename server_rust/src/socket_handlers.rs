@@ -2030,6 +2030,19 @@ pub fn register_handlers(
                 }
             }
         );
+
+        socket.on(
+            "updateEqFlatConfig",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let skip = data.get("skip_hpf_lpf").and_then(|v| v.as_bool()).unwrap_or(false);
+                let mut config = crate::config::AppConfig::load();
+                config.eq_flat_skip_hpf_lpf = skip;
+                config.save();
+                let _ = socket.emit("eqFlatConfigUpdated", &serde_json::json!({
+                    "skip_hpf_lpf": config.eq_flat_skip_hpf_lpf
+                }));
+            }
+        );
     });
 }
 

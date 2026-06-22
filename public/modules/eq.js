@@ -897,22 +897,49 @@ window.togglePhase = function(ch) {
     socket.emit('control', { type: `${prefix}Phase/kPhase`, channel: ch, value: s.phase ? 1 : 0 });
 }
 
+const DEFAULT_EQ_FREQ = { low: 36, lowmid: 72, himid: 96, high: 112 };
+
 window.flatEQ = function(ch) {
     const prefix = getChannelParamPrefix(ch);
     const chState = getChannelStateById(ch);
+    const skipHpfLpf = window.eqFlatSkipHpfLpf === true;
 
-    // Monta a lista de comandos a enviar com delay escalonado (igual padrão macros)
-    // para evitar que múltiplos socket.emit síncronos sejam descartados pelo scheduler.
+    const isLowHpf   = skipHpfLpf && chState?.eq?.low?.hpfOn === 1;
+    const isHighLpf  = skipHpfLpf && chState?.eq?.high?.lpfOn === 1;
+    const resetLow   = !skipHpfLpf || !isLowHpf;
+    const resetHigh  = !skipHpfLpf || !isHighLpf;
+
+    console.log('[FLAT] skip=%s lowHpf=%s highLpf=%s resetLow=%s resetHigh=%s',
+        skipHpfLpf, isLowHpf, isHighLpf, resetLow, resetHigh);
+
     const cmds = [
-        { type: `${prefix}EQ/kEQHPFOn`, value: 0 },  // Low: desativa HPF/Shelf
-        { type: `${prefix}EQ/kEQLowQ`,  value: 20 },  // Low: Q normal
-        { type: `${prefix}EQ/kEQLowG`,  value: 0 },   // Low: gain flat
-        { type: `${prefix}EQ/kEQLowMidG`, value: 0 }, // LowMid: gain flat
-        { type: `${prefix}EQ/kEQHiMidG`, value: 0 },  // HiMid: gain flat
-        { type: `${prefix}EQ/kEQLPFOn`, value: 0 },   // High: desativa LPF/Shelf
-        { type: `${prefix}EQ/kEQHiQ`,   value: 20 },  // High: Q normal
-        { type: `${prefix}EQ/kEQHiG`,   value: 0 },   // High: gain flat
+        { type: `${prefix}EQ/kEQLowG`,     value: 0 },
+        { type: `${prefix}EQ/kEQLowMidG`,  value: 0 },
+        { type: `${prefix}EQ/kEQHiMidG`,   value: 0 },
+        { type: `${prefix}EQ/kEQHiG`,      value: 0 },
     ];
+
+    // LowMid e HiMid sempre resetam frequência
+    const freqCmds = [
+        { type: `${prefix}EQ/kEQLowMidF`, value: DEFAULT_EQ_FREQ.lowmid },
+        { type: `${prefix}EQ/kEQHiMidF`,  value: DEFAULT_EQ_FREQ.himid },
+    ];
+    if (resetLow)  freqCmds.unshift({ type: `${prefix}EQ/kEQLowF`, value: DEFAULT_EQ_FREQ.low });
+    if (resetHigh) freqCmds.push(   { type: `${prefix}EQ/kEQHiF`,  value: DEFAULT_EQ_FREQ.high });
+    cmds.push(...freqCmds);
+
+    if (resetLow) {
+        cmds.unshift(
+            { type: `${prefix}EQ/kEQHPFOn`, value: 0 },
+            { type: `${prefix}EQ/kEQLowQ`,  value: 20 },
+        );
+    }
+    if (resetHigh) {
+        cmds.push(
+            { type: `${prefix}EQ/kEQLPFOn`, value: 0 },
+            { type: `${prefix}EQ/kEQHiQ`,   value: 20 },
+        );
+    }
 
     cmds.forEach((cmd, idx) => {
         setTimeout(() => {
@@ -920,26 +947,31 @@ window.flatEQ = function(ch) {
         }, idx * 30);
     });
 
-    // Atualiza gráfico e state local imediatamente (não precisa esperar MIDI)
     const bandMap = {
-        low:    { bandName: 'Low',    hasMode: true },
-        lowmid: { bandName: 'LowMid', hasMode: false },
-        himid:  { bandName: 'HiMid',  hasMode: false },
-        high:   { bandName: 'Hi',     hasMode: true }
+        low:    { defaultF: DEFAULT_EQ_FREQ.low,    skip: !resetLow  },
+        lowmid: { defaultF: DEFAULT_EQ_FREQ.lowmid, skip: false       },
+        himid:  { defaultF: DEFAULT_EQ_FREQ.himid,  skip: false       },
+        high:   { defaultF: DEFAULT_EQ_FREQ.high,   skip: !resetHigh },
     };
-    Object.entries(bandMap).forEach(([key, { hasMode }]) => {
+    Object.entries(bandMap).forEach(([key, { defaultF, skip }]) => {
         const band = eqBands.find(x => x.key === key);
         if (band) {
-            band.filter.gain.value = 0;
-            if (hasMode) {
-                band.filter.type = 'peaking';
-                band.filter.Q.value = rawToQ(20);
+            if (!skip) {
+                band.filter.frequency.value = rawToFreq(defaultF);
+                if (key === 'low' || key === 'high') {
+                    band.filter.type = 'peaking';
+                    band.filter.Q.value = rawToQ(20);
+                }
             }
+            band.filter.gain.value = 0;
         }
         if (chState && chState.eq && chState.eq[key]) {
+            if (!skip) chState.eq[key].f = defaultF;
             chState.eq[key].g = 0;
-            if (key === 'low')  { chState.eq[key].hpfOn = 0; chState.eq[key].q = 20; }
-            if (key === 'high') { chState.eq[key].lpfOn = 0; chState.eq[key].q = 20; }
+            if (!skip) {
+                if (key === 'low')  { chState.eq[key].hpfOn = 0; chState.eq[key].q = 20; }
+                if (key === 'high') { chState.eq[key].lpfOn = 0; chState.eq[key].q = 20; }
+            }
         }
     });
 }
