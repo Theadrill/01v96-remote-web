@@ -111,13 +111,30 @@ socket.on('update', (d) => {
     if (d.channel === 'master' || d.type.startsWith('kStereo')) {
         if (d.type === 'kStereoFader/kFader') updateUI('master', d.value, undefined, undefined);
         if (d.type === 'kStereoChannelOn/kChannelOn') updateUI('master', undefined, isTrue, undefined);
+        if (d.type === 'kStereoAttenuator/kAtt') {
+            if (masterState) masterState.att = d.value;
+            const activeIsMaster = activeConfigChannel === 'master' || activeConfigChannel === 52;
+            if (activeIsMaster && window.updateATTUI) window.updateATTUI(d.value);
+        }
         return;
     }
 
     if (d.type === 'kAUXFader/kFader') { updateUI(`m${d.channel}`, d.value, undefined); return; }
     if (d.type === 'kAUXChannelOn/kChannelOn') { updateUI(`m${d.channel}`, undefined, isTrue); return; }
+    if (d.type === 'kAUXAttenuator/kAtt') {
+        const state = getChannelStateById(d.channel < 8 ? 36 + d.channel : d.channel);
+        if (state) state.att = d.value;
+        if (activeConfigChannel === (36 + d.channel) && window.updateATTUI) window.updateATTUI(d.value);
+        return;
+    }
     if (d.type === 'kBusFader/kFader') { updateUI(`b${d.channel}`, d.value, undefined); return; }
     if (d.type === 'kBusChannelOn/kChannelOn') { updateUI(`b${d.channel}`, undefined, isTrue); return; }
+    if (d.type === 'kBusAttenuator/kAtt') {
+        const state = getChannelStateById(d.channel < 8 ? 44 + d.channel : d.channel);
+        if (state) state.att = d.value;
+        if (activeConfigChannel === (44 + d.channel) && window.updateATTUI) window.updateATTUI(d.value);
+        return;
+    }
 
     // Handler para EQ de canais Out (Bus/AUX: channel IDs 36-51)
     // Estes ficam FORA da guarda `d.channel < NUM_CHANNELS` abaixo.

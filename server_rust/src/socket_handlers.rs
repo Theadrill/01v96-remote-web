@@ -459,12 +459,20 @@ pub fn register_handlers(
         socket.on(
             "requestEqAtt",
             move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
-                if let Some(ch) = data.get("channel").and_then(|v| v.as_u64())
-                    && let Some(sysex) =
-                        crate::midi::protocol::build_request("kInputAttenuator/kAtt", ch as u8)
-                    {
-                        scheduler_eq.enqueue(sysex, 0).await;
-                    }
+                let ch_val = data.get("channel");
+                let is_master = ch_val.and_then(|v| v.as_str()) == Some("master")
+                    || ch_val.and_then(|v| v.as_u64()) == Some(52);
+                let ch_num = ch_val.and_then(|v| v.as_u64()).unwrap_or(0) as u8;
+                let att_type = if is_master {
+                    "kStereoAttenuator/kAtt"
+                } else {
+                    "kInputAttenuator/kAtt"
+                };
+                if let Some(sysex) =
+                    crate::midi::protocol::build_request(att_type, ch_num)
+                {
+                    scheduler_eq.enqueue(sysex, 0).await;
+                }
             },
         );
 

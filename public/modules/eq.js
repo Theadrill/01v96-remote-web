@@ -1216,7 +1216,8 @@ function nudgeATT(dir) {
 
     state.att = v;
     if (state.eq) state.eq.att = v;
-    socket.emit('control', { type: 'kInputAttenuator/kAtt', channel: ch, value: v });
+    const attPrefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${attPrefix}Attenuator/kAtt`, channel: ch, value: v });
 
     const fader = document.getElementById('eqATTInput');
     if (fader) fader.value = v;
@@ -1337,7 +1338,8 @@ window.eqATTInput = function(e) {
     if (state) state.att = rawVal;
     
     // Envia para mesa
-    socket.emit('control', { type: 'kInputAttenuator/kAtt', channel: ch, value: rawVal });
+    const attPrefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${attPrefix}Attenuator/kAtt`, channel: ch, value: rawVal });
 };
 
 // NOVO: Fechar modais ao clicar fora (capture phase para garantir execução antes do stopPropagation)

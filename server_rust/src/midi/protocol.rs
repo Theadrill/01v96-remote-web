@@ -86,18 +86,21 @@ pub fn build_change(
         packet.push(coords[1]);
         packet.push(coords[2]);
         packet.push(channel); // MSB (port index)
-        packet.push(0);       // LSB (Slot=0)
+        packet.push(0); // LSB (Slot=0)
     } else if command_name == "kOutputPatch/kAdat" {
         packet.push(coords[0]);
         packet.push(coords[1]);
         packet.push(coords[2]);
         packet.push(channel); // MSB (port index)
-        packet.push(1);       // LSB (Adat=1)
-    } else if command_name == "kOutputPatch/kOmni" || command_name == "kOutputPatch/kFx" || command_name == "kOutputPatch/k2tr" {
+        packet.push(1); // LSB (Adat=1)
+    } else if command_name == "kOutputPatch/kOmni"
+        || command_name == "kOutputPatch/kFx"
+        || command_name == "kOutputPatch/k2tr"
+    {
         packet.push(coords[0]);
         packet.push(coords[1]);
         packet.push(coords[2]);
-        packet.push(0);       // MSB
+        packet.push(0); // MSB
         packet.push(channel); // LSB (port index)
     } else {
         packet.push(coords[0]);
@@ -118,7 +121,7 @@ pub fn build_change(
             }
         } else if command_name.contains("EQ/")
             || command_name.contains("Comp/")
-            || command_name == "kInputAttenuator/kAtt"
+            || command_name.contains("Attenuator/kAtt")
         {
             if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
                 final_channel = channel - 36;
@@ -179,13 +182,15 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     }
 
     // Map ST IN channels for any Input command
-    if (command_name.starts_with("kInput") || command_name == "kSetupSoloChOn/kSoloChOn") && (60..=67).contains(&channel) {
+    if (command_name.starts_with("kInput") || command_name == "kSetupSoloChOn/kSoloChOn")
+        && (60..=67).contains(&channel)
+    {
         final_channel = 32 + (channel - 60);
     }
 
     if command_name.contains("EQ/")
         || command_name.contains("Comp/")
-        || command_name == "kInputAttenuator/kAtt"
+        || command_name.contains("Attenuator/kAtt")
     {
         if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
             final_channel = channel - 36;
@@ -386,22 +391,22 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
         if eq_map.contains_key(&element) && parameter <= 15 && group == 1 {
             let eq_keys = [
-                "kEQMode",      // 0
-                "kEQLowQ",      // 1
-                "kEQLowF",      // 2
-                "kEQLowG",      // 3
-                "kEQHPFOn",     // 4
-                "kEQLowMidQ",   // 5
-                "kEQLowMidF",   // 6
-                "kEQLowMidG",   // 7
-                "kEQHiMidQ",    // 8
-                "kEQHiMidF",    // 9
-                "kEQHiMidG",    // 10
-                "kEQHiQ",       // 11
-                "kEQHiF",       // 12
-                "kEQHiG",       // 13
-                "kEQLPFOn",     // 14
-                "kEQOn",        // 15
+                "kEQMode",    // 0
+                "kEQLowQ",    // 1
+                "kEQLowF",    // 2
+                "kEQLowG",    // 3
+                "kEQHPFOn",   // 4
+                "kEQLowMidQ", // 5
+                "kEQLowMidF", // 6
+                "kEQLowMidG", // 7
+                "kEQHiMidQ",  // 8
+                "kEQHiMidF",  // 9
+                "kEQHiMidG",  // 10
+                "kEQHiQ",     // 11
+                "kEQHiF",     // 12
+                "kEQHiG",     // 13
+                "kEQLPFOn",   // 14
+                "kEQOn",      // 15
             ];
             let key = eq_keys[parameter as usize];
             let prefix = eq_map[&element];
@@ -451,7 +456,11 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 let value = if key == "kGateThreshold" || key == "kGateRange" {
                     bytes_to_signed(data_bytes) as f64
                 } else if key == "kGateOn" || key == "kGateLink" {
-                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 }
+                    if bytes_to_on(data_bytes) {
+                        1.0
+                    } else {
+                        0.0
+                    }
                 } else {
                     bytes_to_fader(data_bytes) as f64
                 };
@@ -493,7 +502,11 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 let value = if key == "kCompThreshold" {
                     bytes_to_signed(data_bytes) as f64
                 } else if key == "kCompOn" || key == "kCompLink" {
-                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 }
+                    if bytes_to_on(data_bytes) {
+                        1.0
+                    } else {
+                        0.0
+                    }
                 } else {
                     bytes_to_fader(data_bytes) as f64
                 };
@@ -579,6 +592,42 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             return cc(
                 "kInputAttenuator/kAtt",
                 final_ch,
+                bytes_to_signed(data_bytes) as f64,
+            );
+        }
+
+        // Bus Attenuator
+        if element == 44 {
+            return cc(
+                "kBusAttenuator/kAtt",
+                channel,
+                bytes_to_signed(data_bytes) as f64,
+            );
+        }
+
+        // AUX Attenuator
+        if element == 58 {
+            return cc(
+                "kAUXAttenuator/kAtt",
+                channel,
+                bytes_to_signed(data_bytes) as f64,
+            );
+        }
+
+        // Matrix Attenuator
+        if element == 70 {
+            return cc(
+                "kMatrixAttenuator/kAtt",
+                channel,
+                bytes_to_signed(data_bytes) as f64,
+            );
+        }
+
+        // Stereo (Master) Attenuator
+        if element == 80 && parameter == 0 {
+            return cc(
+                "kStereoAttenuator/kAtt",
+                0,
                 bytes_to_signed(data_bytes) as f64,
             );
         }
@@ -679,7 +728,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             let val = bytes_to_fader(data_bytes) as f64;
             let param_msb = parameter as usize;
             let param_lsb = channel; // Remember, in parse_message, `parameter` is message[7] and `channel` is message[8] as usize
-            
+
             if element == 1 {
                 // kChannelIn: MSB=0, LSB=chIdx
                 if param_msb == 0 {
@@ -688,7 +737,10 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             } else if element == 2 {
                 // kInsertIn: MSB=0, LSB=chIdx
                 if param_msb == 0 {
-                    println!("DEBUG kInsertIn: param_lsb={} val={} bytes={:?}", param_lsb, val, data_bytes);
+                    println!(
+                        "DEBUG kInsertIn: param_lsb={} val={} bytes={:?}",
+                        param_lsb, val, data_bytes
+                    );
                     return cc("kChannelInsertIn/kInsertIn", param_lsb, val);
                 }
             } else if element == 3 {
@@ -758,7 +810,7 @@ pub fn build_name_request(channel: u8, char_index: u8) -> Option<Vec<u8>> {
 pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Vec<Vec<u8>> {
     let (element, local_ch) = name_channel_mapping(channel);
     let mut packets = Vec::with_capacity(2);
-    
+
     // Short Name
     let mut packet_short = vec![
         HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, char_index, local_ch, 0, 0, 0,
@@ -769,7 +821,18 @@ pub fn build_name_change(channel: u8, char_index: u8, char_code: u8) -> Vec<Vec<
 
     // Long Name
     let mut packet_long = vec![
-        HEADER[0], HEADER[1], 0x10, MODEL_ID, 13, 2, element, 4 + char_index, local_ch, 0, 0, 0,
+        HEADER[0],
+        HEADER[1],
+        0x10,
+        MODEL_ID,
+        13,
+        2,
+        element,
+        4 + char_index,
+        local_ch,
+        0,
+        0,
+        0,
         char_code,
     ];
     packet_long.extend_from_slice(FOOTER);

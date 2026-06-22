@@ -509,7 +509,12 @@ impl GlobalState {
                     if let Some(ch) = self.channels.get_mut(channel) {
                         ch.phase = v;
                     }
-                } else if mt == "kInputAttenuator/kAtt" {
+                } else if mt == "kInputAttenuator/kAtt"
+                    || mt == "kStereoAttenuator/kAtt"
+                    || mt == "kBusAttenuator/kAtt"
+                    || mt == "kAUXAttenuator/kAtt"
+                    || mt == "kMatrixAttenuator/kAtt"
+                {
                     if let Some(s) = self.get_target_for_mt(mt, *channel) {
                         s.set_att(v);
                     }

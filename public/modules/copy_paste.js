@@ -197,7 +197,7 @@ function pasteFullChannelLogic(ch) {
     // Pan
     if (data.pan !== undefined) socket.emit('control', { type: 'kPan', channel: ch, value: sysexToVal(data.pan) });
     // Att
-    if (data.att !== undefined) socket.emit('control', { type: 'kInputAttenuator/kAtt', channel: ch, value: sysexToVal(data.att) });
+    if (data.att !== undefined) socket.emit('control', { type: `${prefix}Attenuator/kAtt`, channel: ch, value: sysexToVal(data.att) });
     // Phase
     if (data.phase !== undefined) socket.emit('control', { type: 'kInputPhase/kPhase', channel: ch, value: (data.phase === 1 || data.phase === true) ? 1 : 0 });
     
