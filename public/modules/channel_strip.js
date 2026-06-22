@@ -163,6 +163,7 @@ function createDesktopStrip(config) {
         val = 0,         // Valor inicial do fader
         dbLabel = "-∞",  // Texto inicial do dB
         isOn = false,    // Estado ON/OFF inicial
+        solo = false,    // Estado SOLO inicial
         isPaired = false,
         partnerId = null,
         hasPan = true,    // Define se exibe o indicador de Pan
@@ -174,6 +175,7 @@ function createDesktopStrip(config) {
     const fId = ids.f || `${pfx}f${id}`;
     const vId = ids.v || `${pfx}v${id}`;
     const onId = ids.on || `${pfx}on${id}`;
+    const soloId = ids.solo || `${pfx}solo${id}`;
     const pId = ids.p || `${pfx}p${id}`;
     const mId = ids.m || `${pfx}m${id}`;
     const nameId = ids.name || `${pfx}name${id}`;
@@ -187,7 +189,7 @@ function createDesktopStrip(config) {
             <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${configAction}">${title}</div>
             
             ${hasSolo ?
-            `<button id="solo${id}" class="btn-cue" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})">SOLO</button>` :
+            `<button id="${soloId}" class="btn-cue ${solo ? 'solo-active' : ''}" onclick="toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})">SOLO</button>` :
             isMaster ?
                 `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
                 `<div class="btn-cue-placeholder"></div>`}    
