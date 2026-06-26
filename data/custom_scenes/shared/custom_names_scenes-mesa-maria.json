@@ -20,12 +20,6 @@
       "file": "custom_names_scene-YEL S 360-mesa-maria.json"
     },
     {
-      "custom_name": "FILOSOFIA 360",
-      "physical_scene": "FILOSOFIA 360",
-      "physical_id": 5,
-      "file": "custom_names_scene-FILOSOFIA 360-mesa-maria.json"
-    },
-    {
       "custom_name": "SKEMA BOM",
       "physical_scene": "SKEMA BOM",
       "physical_id": 11,
@@ -36,6 +30,12 @@
       "physical_scene": "CHOCO 360",
       "physical_id": 33,
       "file": "custom_names_scene-CHOCO 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE 360",
+      "physical_scene": "PGD ONLINE 360",
+      "physical_id": 5,
+      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     }
   ]
 }
