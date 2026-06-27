@@ -32,10 +32,22 @@
       "file": "custom_names_scene-CHOCO 360-mesa-maria.json"
     },
     {
+      "custom_name": "REGIS 360",
+      "physical_scene": "REGIS 360",
+      "physical_id": 12,
+      "file": "custom_names_scene-REGIS 360-mesa-maria.json"
+    },
+    {
       "custom_name": "PGD ONLINE 360",
       "physical_scene": "PGD ONLINE 360",
       "physical_id": 5,
       "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SENSIBLDADE 36",
+      "physical_scene": "SENSIBLDADE 36",
+      "physical_id": 20,
+      "file": "custom_names_scene-SENSIBLDADE 36-mesa-maria.json"
     }
   ]
 }
