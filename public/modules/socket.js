@@ -694,6 +694,10 @@ socket.on('resolvedNamesUpdated', (data) => {
             window.updateNameUI(entry.ch, entry.name);
         }
     }
+
+    if (typeof window.updateBusRoutingLabels === 'function' && activeConfigTab === 'etc' && activeConfigChannel !== null) {
+        window.updateBusRoutingLabels();
+    }
 });
 
 // Stubs de compatibilidade — mantidos para não errar caso outros paths

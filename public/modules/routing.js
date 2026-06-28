@@ -136,13 +136,14 @@ window.renderRouting = function(chIdx) {
                 <div class="bus-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px;">
                     ${Array.from({length: 8}, (_, i) => {
                         const active = chData.buses && chData.buses[i];
+                        const busLabel = getBusButtonLabel(i);
                         return `<button class="bus-btn" 
                             onclick="toggleBusAssignment(${chIdx}, ${i})"
                             style="height: 45px; background: ${active ? '#28a745' : '#333'}; 
                                    border: 1px solid ${active ? '#34c759' : '#444'}; 
                                    color: ${active ? '#fff' : '#aaa'}; 
                                    border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">
-                            BUS ${i+1}
+                            ${busLabel}
                         </button>`;
                     }).join('')}
                 </div>
@@ -484,3 +485,32 @@ function executeResetBoth(chA, chB) {
     console.log(`[PAIR] Resetando: CH ${chA+1} e ${chB+1}`);
     socket.emit('pairChannel', { action: 'reset', chA, chB });
 }
+
+function getBusButtonLabel(busIndex) {
+    const ch = 44 + busIndex;
+    const resolved = window.resolvedNames && window.resolvedNames[ch];
+
+    if (resolved && (resolved.source === 'global' || resolved.source === 'custom')) {
+        const cleanName = (resolved.name || '').replace(/\s+/g, '');
+        if (cleanName.length > 0) {
+            return cleanName.substring(0, 4);
+        }
+        const shortTrimmed = (resolved.short || '').trim();
+        return shortTrimmed.length > 0 ? shortTrimmed : `BUS${busIndex + 1}`;
+    }
+
+    if (resolved) {
+        const shortTrimmed = (resolved.short || '').trim();
+        return shortTrimmed.length > 0 ? shortTrimmed : `BUS${busIndex + 1}`;
+    }
+
+    return `BUS${busIndex + 1}`;
+}
+
+window.updateBusRoutingLabels = function () {
+    const buttons = document.querySelectorAll('.bus-grid .bus-btn');
+    if (!buttons || buttons.length === 0) return;
+    buttons.forEach((btn, i) => {
+        btn.innerText = getBusButtonLabel(i);
+    });
+};
