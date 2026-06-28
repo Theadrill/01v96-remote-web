@@ -2,157 +2,105 @@
   "scene_name": "KALAWE 360",
   "scene_id": 24,
   "channels": {
-    "15": {
-      "name": "REGENCIA",
-      "short": "REGE"
-    },
-    "11": {
-      "name": "MIC PELE",
-      "short": "MICP"
-    },
-    "4": {
-      "name": "PANDEIRO",
-      "short": "PAND"
-    },
-    "28": {
-      "name": "",
-      "short": "    "
-    },
-    "23": {
-      "name": "SURDO BAT",
-      "short": "SURD"
-    },
-    "18": {
-      "name": "MIC DJ",
-      "short": "MICD"
-    },
-    "10": {
-      "name": "VIOLAO",
-      "short": "VIOL"
-    },
-    "master": {
-      "name": "STEREO",
-      "short": "STER"
-    },
-    "33": {
-      "name": "STER",
-      "short": "STER"
-    },
-    "13": {
-      "name": "",
-      "short": "    "
-    },
-    "34": {
-      "name": "CH 34",
-      "short": "CH34"
-    },
-    "12": {
-      "name": "MIC PANDEI",
-      "short": "MICP"
-    },
-    "6": {
-      "name": "RECO",
-      "short": "RECO"
-    },
-    "5": {
-      "name": "TANTAN",
-      "short": "TANT"
-    },
-    "31": {
-      "name": "TANT AGUDO",
-      "short": "TANT"
-    },
-    "9": {
-      "name": "CAVACO",
-      "short": "CAVA"
-    },
-    "2": {
-      "name": "CHIMBAL",
-      "short": "CHIM"
-    },
-    "36": {
-      "name": "CH 36",
-      "short": "CH36"
-    },
     "14": {
       "name": "MIC DIOGUI",
       "short": "MICD"
-    },
-    "1": {
-      "name": "BUMBO",
-      "short": "BUMB"
-    },
-    "22": {
-      "name": "DJ2",
-      "short": "DJ2 "
-    },
-    "21": {
-      "name": "DJ",
-      "short": "DJ  "
-    },
-    "26": {
-      "name": "",
-      "short": "    "
-    },
-    "37": {
-      "name": "STER",
-      "short": "STER"
-    },
-    "39": {
-      "name": "STER",
-      "short": "STER"
-    },
-    "32": {
-      "name": "KICK AGUDO",
-      "short": "KICK"
-    },
-    "8": {
-      "name": "",
-      "short": "    "
-    },
-    "27": {
-      "name": "",
-      "short": "    "
-    },
-    "20": {
-      "name": "CONVIDADO",
-      "short": "CONV"
-    },
-    "29": {
-      "name": "VOZES",
-      "short": "VOZE"
     },
     "3": {
       "name": "SURDAO",
       "short": "SURD"
     },
-    "24": {
-      "name": "TOMS",
-      "short": "TOMS"
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
     },
-    "17": {
-      "name": "CONVIDADO",
-      "short": "CONV"
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
     },
-    "38": {
-      "name": "CH 38",
-      "short": "CH38"
+    "39": {
+      "name": "STER",
+      "short": "STER"
     },
-    "40": {
-      "name": "CH 40",
-      "short": "CH40"
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
+    },
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "12": {
+      "name": "MIC PANDEI",
+      "short": "MICP"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
     },
     "7": {
       "name": "CAIXA",
       "short": "CAIX"
     },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "29": {
+      "name": "VOZES",
+      "short": "VOZE"
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
     "19": {
       "name": "CONVIDADO",
       "short": "CONV"
     },
-    "30": {
-      "name": "PAND AGUDO",
-      "short": "PAND"
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "13": {
+      "name": "",
+      "short": "    "
     },
     "16": {
       "name": "CEL",
@@ -162,9 +110,61 @@
       "name": "STER",
       "short": "STER"
     },
+    "17": {
+      "name": "TIAO",
+      "short": "TIAO"
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "20": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "11": {
+      "name": "MIC PELE",
+      "short": "MICP"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
     "25": {
       "name": "",
       "short": "    "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
     }
   }
 }
