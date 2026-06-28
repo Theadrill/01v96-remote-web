@@ -1,0 +1,170 @@
+{
+  "scene_name": "KALAWE 360",
+  "scene_id": 24,
+  "channels": {
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "1": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "7": {
+      "name": "CAIX",
+      "short": "CAIX"
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "23": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "12": {
+      "name": "MICM",
+      "short": "MICM"
+    },
+    "18": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "9": {
+      "name": "CAVA",
+      "short": "CAVA"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "4": {
+      "name": "pand",
+      "short": "PAND"
+    },
+    "20": {
+      "name": "MICV",
+      "short": "MICV"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "19": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "tant",
+      "short": "TANT"
+    },
+    "33": {
+      "name": "CH34",
+      "short": "CH34"
+    },
+    "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "37": {
+      "name": "CH38",
+      "short": "CH38"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "2": {
+      "name": "CHIM",
+      "short": "CHIM"
+    },
+    "30": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "35": {
+      "name": "CH36",
+      "short": "CH36"
+    },
+    "39": {
+      "name": "CH40",
+      "short": "CH40"
+    },
+    "32": {
+      "name": "KICK",
+      "short": "KICK"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "17": {
+      "name": "CONV",
+      "short": "CONV"
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "11": {
+      "name": "MICH",
+      "short": "MICH"
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "REGE",
+      "short": "REGE"
+    },
+    "31": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "10": {
+      "name": "viol",
+      "short": "VIOL"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    }
+  }
+}
