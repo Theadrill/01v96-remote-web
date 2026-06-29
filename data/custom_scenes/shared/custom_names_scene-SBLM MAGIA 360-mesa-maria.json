@@ -1,0 +1,170 @@
+{
+  "scene_name": "SBLM MAGIA 360",
+  "scene_id": 25,
+  "channels": {
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
+    },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "29": {
+      "name": "VOZES",
+      "short": "VOZE"
+    },
+    "11": {
+      "name": "MIC PELE",
+      "short": "MICP"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "17": {
+      "name": "TIAO",
+      "short": "TIAO"
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "14": {
+      "name": "MIC DIOGUI",
+      "short": "MICD"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "3": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "7": {
+      "name": "",
+      "short": "    "
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "19": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "6": {
+      "name": "REPIQ ANEL",
+      "short": "REPI"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "12": {
+      "name": "MIC PANDEI",
+      "short": "MICP"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    }
+  }
+}

@@ -1626,6 +1626,9 @@ pub fn register_handlers(
                     let io_clone = io_copy.clone();
                     drop(csm);
 
+                    let state_broadcast = state_copy.clone();
+                    let csm_broadcast = csm_copy.clone();
+
                     tokio::spawn(async move {
                         let mut applied = 0u32;
                         let mut skipped = 0u32;
@@ -1685,6 +1688,8 @@ pub fn register_handlers(
                                 }),
                             )
                             .await;
+
+                        crate::name_resolver::broadcast(&io_clone, &state_broadcast, &csm_broadcast).await;
                     });
                 }
             }

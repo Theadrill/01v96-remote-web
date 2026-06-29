@@ -54,6 +54,12 @@
       "physical_scene": "KALAWE 360",
       "physical_id": 24,
       "file": "custom_names_scene-KALAWE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SBLM MAGIA 360",
+      "physical_scene": "SBLM MAGIA 360",
+      "physical_id": 25,
+      "file": "custom_names_scene-SBLM MAGIA 360-mesa-maria.json"
     }
   ]
 }
