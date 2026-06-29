@@ -655,8 +655,10 @@ function initUI() {
     if (!sidebar) return;
     if (musicianMode) {
         sidebar.classList.add('sidebar-musician');
+        document.body.classList.add('musician-active');
     } else {
         sidebar.classList.remove('sidebar-musician');
+        document.body.classList.remove('musician-active');
     }
 
     const isConfig = activeConfigChannel !== null;
@@ -738,12 +740,24 @@ function initUI() {
     }
 
     const masterContainer = document.getElementById('master-container');
-    if (layoutMode === 'desktop' && !musicianMode) {
+    if (musicianMode) {
+        if (masterContainer && typeof getVolumeGeralHtml === 'function') {
+            masterContainer.innerHTML = getVolumeGeralHtml();
+            masterContainer.style.cssText = 'display:flex !important; flex-shrink:0 !important; width:110px !important; max-width:110px !important; min-width:110px !important; order:1 !important; border-left:1px solid #000; background:#111; align-items:stretch;';
+        }
         container.innerHTML = html;
-        if (masterContainer) masterContainer.innerHTML = masterHtml;
+    } else if (layoutMode === 'desktop') {
+        container.innerHTML = html;
+        if (masterContainer) {
+            masterContainer.innerHTML = masterHtml;
+            masterContainer.style.cssText = '';
+        }
     } else {
         container.innerHTML = html + masterHtml;
-        if (masterContainer) masterContainer.innerHTML = '';
+        if (masterContainer) {
+            masterContainer.innerHTML = '';
+            masterContainer.style.cssText = '';
+        }
     }
 
     // Atualiza os estados visuais

@@ -276,3 +276,5 @@ window.mapDynDbToPercent = function(val, type) {
     }
     return 100;
 };
+
+document.addEventListener('contextmenu', e => e.preventDefault());

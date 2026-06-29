@@ -1812,6 +1812,30 @@ body.layout-desktop #master-container {
     display: none !important;
 }
 
+body.musician-active #master-container {
+    display: flex !important;
+    flex-shrink: 0;
+    width: 110px !important;
+    max-width: 110px !important;
+    min-width: 110px !important;
+    border-left: 1px solid #000;
+    background: #111;
+    order: 1;
+    align-items: stretch;
+}
+
+body.musician-active.is-portrait #master-container {
+    position: fixed !important;
+    right: 0;
+    top: 0;
+    height: calc(100vh - 100px) !important;
+    width: 110px !important;
+    z-index: 100;
+    border-left: 1px solid #000;
+    border-right: none;
+    align-items: stretch;
+}
+
 /* Garante que o modal de config de canal respeite a sidebar larga no desktop */
 body.layout-desktop .ch-modal-overlay {
     right: 200px;
