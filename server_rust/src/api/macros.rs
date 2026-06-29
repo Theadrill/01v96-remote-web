@@ -1,6 +1,6 @@
 use axum::{
     Json,
-    extract::{Path, Query, State},
+    extract::{Extension, Path, Query, State},
 };
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -90,7 +90,10 @@ pub async fn enqueue_git_sync(files: Vec<String>, message: String, delay_ms: u64
     }));
 }
 
-pub fn router(state: Arc<RwLock<crate::state::GlobalState>>) -> axum::Router {
+pub fn router(
+    state: Arc<RwLock<crate::state::GlobalState>>,
+    csm: Arc<RwLock<crate::custom_scenes::CustomSceneManager>>,
+) -> axum::Router {
     axum::Router::new()
         .route("/names", axum::routing::get(get_names))
         .route("/macros", axum::routing::get(list_macros))
@@ -113,6 +116,7 @@ pub fn router(state: Arc<RwLock<crate::state::GlobalState>>) -> axum::Router {
         .route("/macros/proxy/http", axum::routing::post(proxy_http))
         .route("/macros/proxy/udp", axum::routing::post(proxy_udp))
         .with_state(state)
+        .layer(Extension(csm))
 }
 
 fn root_dir() -> PathBuf {
@@ -144,26 +148,14 @@ async fn list_macros() -> Json<Value> {
 
 async fn get_names(
     State(state): State<Arc<RwLock<crate::state::GlobalState>>>,
+    Extension(csm): Extension<Arc<RwLock<crate::custom_scenes::CustomSceneManager>>>,
 ) -> Json<serde_json::Value> {
-    let s = state.read().await;
+    let resolved = crate::name_resolver::resolve_all(&state, &csm).await;
     let mut names = serde_json::Map::new();
 
-    for i in 0..32 {
-        if let Some(ch) = s.channels.get(&i) {
-            names.insert(i.to_string(), Value::String(ch.name.clone()));
-        }
+    for entry in &resolved {
+        names.insert(entry.ch.to_string(), Value::String(entry.name.clone()));
     }
-    for i in 0..8 {
-        if let Some(mix) = s.mixes.get(&i) {
-            names.insert((36 + i).to_string(), Value::String(mix.name.clone()));
-        }
-    }
-    for i in 0..8 {
-        if let Some(bus) = s.buses.get(&i) {
-            names.insert((44 + i).to_string(), Value::String(bus.name.clone()));
-        }
-    }
-    names.insert("52".to_string(), Value::String(s.master.name.clone()));
 
     Json(Value::Object(names))
 }

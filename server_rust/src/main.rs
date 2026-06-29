@@ -194,7 +194,7 @@ async fn async_main(
 
     // --- SERVIDOR HTTP SOBE PRIMEIRO (antes de conectar MIDI) ---
     let app = Router::new()
-        .nest("/api", api::macros::router(global_state_api.clone()))
+        .nest("/api", api::macros::router(global_state_api.clone(), custom_scene_manager.clone()))
         .nest_service("/canvas", tower_http::services::ServeDir::new(canvas_dir))
         .fallback_service(tower_http::services::ServeDir::new(public_dir.clone()))
         .layer(layer);

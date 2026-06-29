@@ -50,7 +50,7 @@
 
         grid.innerHTML = '';
         for (let i = 0; i < 32; i++) {
-            const chName = namesMap[i] || (typeof channelStates !== 'undefined' && channelStates[i] ? channelStates[i].name : `CH ${i+1}`);
+            const chName = namesMap[i] || (window.resolvedNames && window.resolvedNames[i] ? window.resolvedNames[i].name : (typeof channelStates !== 'undefined' && channelStates[i] ? channelStates[i].name : `CH ${i+1}`));
             const isSelected = internalSlotConfig.includes(i);
             const isOnMixer = (typeof channelStates !== 'undefined' && channelStates[i] && channelStates[i].on === true);
 

@@ -93,7 +93,7 @@ function renderMacroGrid() {
     for (let i = 0; i < 32; i++) {
         const isSelected = tempMacroSelectedChannels.includes(i);
         const isOnMixer = channelStates[i].on === true;
-        const chName = channelStates[i].name || `CH ${i + 1}`;
+        const chName = (window.resolvedNames && window.resolvedNames[i]) ? window.resolvedNames[i].name : (channelStates[i].name || `CH ${i + 1}`);
 
         const btn = document.createElement('button');
         btn.className = `btn-connect ${isSelected ? 'macro-ch-selected' : ''}`;
