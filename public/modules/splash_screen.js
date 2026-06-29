@@ -81,6 +81,12 @@ function enterMusicianMode(foneId) {
         }
     }
 
+    window.showVolumeGeral = true;
+    const vgBtn = document.getElementById('volumeGeralBtn');
+    if (vgBtn) {
+        vgBtn.classList.add('active');
+    }
+
     // Fecha a splash (se estiver visível)
     const splash = document.getElementById('splashScreen');
     if (splash.style.display !== 'none') {

@@ -689,10 +689,13 @@ function initUI() {
     if (dockPanel) dockPanel.style.display = musicianMode ? 'none' : 'block';
 
     const musicianExitBtn = document.getElementById('musicianExitBtn');
-    if (musicianExitBtn) musicianExitBtn.style.display = musicianMode ? 'flex' : 'none';
+    if (musicianExitBtn) musicianExitBtn.style.setProperty('display', musicianMode ? 'flex' : 'none', 'important');
 
     const musicianMetersBtn = document.getElementById('musicianMetersBtn');
-    if (musicianMetersBtn) musicianMetersBtn.style.display = musicianMode ? 'flex' : 'none';
+    if (musicianMetersBtn) musicianMetersBtn.style.setProperty('display', musicianMode ? 'flex' : 'none', 'important');
+
+    const volumeGeralBtn = document.getElementById('volumeGeralBtn');
+    if (volumeGeralBtn) volumeGeralBtn.style.setProperty('display', musicianMode ? 'flex' : 'none', 'important');
 
     const musicianFsBtn = document.getElementById('musicianFsBtn');
     if (musicianFsBtn) {
@@ -741,9 +744,12 @@ function initUI() {
 
     const masterContainer = document.getElementById('master-container');
     if (musicianMode) {
-        if (masterContainer && typeof getVolumeGeralHtml === 'function') {
+        if (masterContainer && typeof getVolumeGeralHtml === 'function' && window.showVolumeGeral !== false) {
             masterContainer.innerHTML = getVolumeGeralHtml();
             masterContainer.style.cssText = 'display:flex !important; flex-shrink:0 !important; width:110px !important; max-width:110px !important; min-width:110px !important; order:1 !important; border-left:1px solid #000; background:#111; align-items:stretch;';
+        } else if (masterContainer) {
+            masterContainer.innerHTML = '';
+            masterContainer.style.cssText = 'display:none !important;';
         }
         container.innerHTML = html;
     } else if (layoutMode === 'desktop') {

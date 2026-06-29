@@ -2485,6 +2485,7 @@ body.is-portrait .side-btn {
 .sidebar-musician {
     background: linear-gradient(to bottom, #1b5e20, #2e7d32) !important;
     border-left-color: #388e3c !important;
+    gap: 6px;
 }
 
 .sidebar-musician .sidebar-info #scn {
@@ -3881,6 +3882,7 @@ screen and (orientation: landscape) and (min-height: 600px) {
     background: #a71d2a !important;
 }
 
+
 .btn-fs-musician {
     background: #222 !important;
     color: white !important;
@@ -3902,22 +3904,27 @@ screen and (orientation: landscape) and (min-height: 600px) {
 /* Exibe os botões apenas quando a sidebar estiver no modo Musician */
 .sidebar-musician #musicianExitBtn,
 .sidebar-musician #musicianMetersBtn,
+.sidebar-musician #volumeGeralBtn,
 .sidebar-musician #musicianFsBtn {
     display: flex !important;
 }
 
 /* Modo retrato (em pé) */
-body.is-portrait .sidebar-musician #musicianMetersBtn {
+body.is-portrait .sidebar-musician #musicianMetersBtn,
+body.is-portrait .sidebar-musician #volumeGeralBtn {
     width: 72px !important;
     height: 38px !important;
     margin: 0 !important;
     margin-right: 5px !important;
-    margin-left: auto !important;
     font-size: 9px !important;
     line-height: 1.1 !important;
     white-space: normal !important;
     text-align: center;
     padding: 2px !important;
+}
+
+body.is-portrait .sidebar-musician #musicianMetersBtn {
+    margin-left: auto !important;
 }
 
 body.is-portrait .sidebar-musician #musicianFsBtn {
@@ -3934,12 +3941,17 @@ body.is-portrait .sidebar-musician #musicianExitBtn {
 }
 
 /* Modo paisagem (deitado) */
-body:not(.is-portrait) .sidebar-musician #musicianMetersBtn {
+body:not(.is-portrait) .sidebar-musician #musicianMetersBtn,
+body:not(.is-portrait) .sidebar-musician #volumeGeralBtn {
     width: calc(100% - 16px) !important;
     height: 44px !important;
     margin: 8px !important;
     margin-top: auto !important;
     margin-bottom: 0 !important;
+}
+
+body:not(.is-portrait) .sidebar-musician #volumeGeralBtn {
+    padding: 8px 5px !important;
 }
 
 body:not(.is-portrait) .sidebar-musician #musicianFsBtn {

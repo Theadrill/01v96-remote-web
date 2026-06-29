@@ -40,6 +40,7 @@ let activeConfigTab = "aux"; // Auxiliares por padrão
 let appOrientation = 'vertical';
 let musicianMode = false;
 window.showMetersInMusicianMode = localStorage.getItem('01v96_musician_meters') === 'true';
+window.showVolumeGeral = true;
 let outsMode = false;
 let technicianMixMode = false;
 let activeMix = 1;

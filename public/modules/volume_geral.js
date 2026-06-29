@@ -1,3 +1,13 @@
+function toggleVolumeGeral() {
+    window.showVolumeGeral = !window.showVolumeGeral;
+    const btn = document.getElementById('volumeGeralBtn');
+    if (btn) {
+        btn.classList.toggle('active', window.showVolumeGeral);
+    }
+    if (typeof initUI === 'function') initUI();
+}
+window.toggleVolumeGeral = toggleVolumeGeral;
+
 const volumeGeral = createMacroFaderInstance({
     title: 'GERAL',
     titleLong: 'VOLUME GERAL',
