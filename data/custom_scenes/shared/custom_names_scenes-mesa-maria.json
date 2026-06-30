@@ -8,12 +8,6 @@
       "file": "custom_names_scene-LIVRE P SONHAR-mesa-maria.json"
     },
     {
-      "custom_name": "SOMALIA",
-      "physical_scene": "SOMALIA",
-      "physical_id": 34,
-      "file": "custom_names_scene-SOMALIA-mesa-maria.json"
-    },
-    {
       "custom_name": "YEL S 360",
       "physical_scene": "YEL S 360",
       "physical_id": 28,
@@ -60,6 +54,12 @@
       "physical_scene": "SBLM MAGIA 360",
       "physical_id": 25,
       "file": "custom_names_scene-SBLM MAGIA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SOMALIA",
+      "physical_scene": "SOMALIA",
+      "physical_id": 34,
+      "file": "custom_names_scene-SOMALIA-mesa-maria.json"
     }
   ]
 }
