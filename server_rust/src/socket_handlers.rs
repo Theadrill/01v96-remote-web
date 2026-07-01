@@ -276,6 +276,63 @@ pub fn register_handlers(
             },
         );
 
+        // --- MONITORING DE ÁUDIO (rtaAudio) ---
+        let rta_audio_control = rta_handler.clone();
+        let io_audio = io.clone();
+        socket.on(
+            "rtaAudioControl",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let action = data.get("action").and_then(|v| v.as_str()).unwrap_or("");
+                match action {
+                    "start" => {
+                        tracing::info!("[MONITORING] start");
+                        let rta = rta_audio_control.lock().await;
+                        let device_name = data.get("deviceName").and_then(|v| v.as_str()).map(|s| s.to_string());
+                        let fmt = crate::monitoring::MonitoringFormat::from_str(data.get("format").and_then(|v| v.as_str()).unwrap_or("pcm"));
+                        let buf_size = data.get("bufferSize").and_then(|v| v.as_u64()).unwrap_or(960) as usize;
+
+                        if rta.current_device().is_some() && rta.current_device() == device_name {
+                            rta.monitoring.attach(fmt, buf_size, io_audio.clone());
+                        } else {
+                            rta.monitoring.start_standalone(device_name, fmt, buf_size, io_audio.clone());
+                        }
+                        let _ = socket.emit("rtaAudioStatus", &serde_json::json!({"status": "started", "format": fmt.as_str(), "bufferSize": buf_size}));
+                    }
+                    "stop" => {
+                        tracing::info!("[MONITORING] stop");
+                        let rta = rta_audio_control.lock().await;
+                        rta.monitoring.stop();
+                        let _ = socket.emit("rtaAudioStatus", &serde_json::json!({"status": "stopped"}));
+                    }
+                    "reconfigure" => {
+                        tracing::info!("[MONITORING] reconfigure");
+                        let rta = rta_audio_control.lock().await;
+                        let fmt = crate::monitoring::MonitoringFormat::from_str(data.get("format").and_then(|v| v.as_str()).unwrap_or("pcm"));
+                        let buf_size = data.get("bufferSize").and_then(|v| v.as_u64()).unwrap_or(960) as usize;
+                        rta.monitoring.reconfigure(fmt, buf_size);
+                        let _ = socket.emit("rtaAudioStatus", &serde_json::json!({"status": "reconfigured", "format": fmt.as_str(), "bufferSize": buf_size}));
+                    }
+                    "getStatus" => {
+                        let rta = rta_audio_control.lock().await;
+                        let active = rta.monitoring.is_active();
+                        let _ = socket.emit("rtaAudioStatus", &serde_json::json!({"status": if active { "active" } else { "inactive" }}));
+                    }
+                    _ => {
+                        tracing::warn!("[MONITORING] Unknown action: {}", action);
+                    }
+                }
+            },
+        );
+
+        let rta_audio_hb = rta_handler.clone();
+        socket.on(
+            "rtaAudioHeartbeat",
+            move |_socket: SocketRef| async move {
+                let rta = rta_audio_hb.lock().await;
+                rta.monitoring.receive_heartbeat();
+            },
+        );
+
         socket.on(
             "requestRtaDevices",
             move |socket: SocketRef| async move {

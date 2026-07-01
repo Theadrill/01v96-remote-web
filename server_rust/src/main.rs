@@ -11,6 +11,7 @@ mod network;
 mod scene_manager;
 mod socket_handlers;
 mod state;
+mod monitoring;
 mod rta_manager;
 mod tailscale_http;
 

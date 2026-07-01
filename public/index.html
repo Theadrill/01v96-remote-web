@@ -1045,6 +1045,38 @@
             </div>
         </div>
     </div>
+    <!-- Modal de Monitoramento de Áudio (Ouvir Áudio) -->
+    <div class="modal-overlay styled-monitoringModal" id="monitoringModal">
+        <div class="modal-content" style="width:90%; max-width:380px; padding:20px; display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Ouvir Áudio</span>
+                <button onclick="document.getElementById('monitoringModal').style.display='none'" style="background:none; border:none; color:#777; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="color:#aaa; font-size:11px;">DISPOSITIVO DO SERVIDOR</label>
+                <select id="monitoringServerDevice" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                    <option value="default_in">Dispositivo Padrão</option>
+                </select>
+                <button onclick="refreshMonitoringDevices()" style="background:#333; border:1px solid #555; color:#fff; border-radius:5px; padding:6px 12px; font-size:11px; cursor:pointer;">Atualizar Dispositivos</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="color:#aaa; font-size:11px;">FORMATO</label>
+                <div style="display:flex; gap:8px;">
+                    <button id="monitoringFmtPcm" onclick="selectMonitoringFormat('pcm')" style="flex:1; padding:10px; border-radius:8px; border:1px solid #555; background:#007bff; color:#fff; cursor:pointer; font-size:12px;">Puro (PCM)</button>
+                    <button id="monitoringFmtOpus" onclick="selectMonitoringFormat('opus')" style="flex:1; padding:10px; border-radius:8px; border:1px solid #555; background:#333; color:#666; cursor:not-allowed; font-size:12px; opacity:0.5;" title="Opus requer CPU com AVX — indisponível">Comprimido (Opus)</button>
+                </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="color:#aaa; font-size:11px;">BUFFER (amostras, 20ms = 960 @48kHz)</label>
+                <input type="number" id="monitoringBufferSize" value="960" min="240" max="3840" step="240" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+            </div>
+            <div id="monitoringStatus" style="color:#888; font-size:11px; text-align:center; min-height:16px;"></div>
+            <div style="display:flex; gap:10px;">
+                <button id="monitoringToggleBtn" onclick="toggleMonitoring()" style="flex:1; padding:12px; border-radius:8px; border:none; background:#28a745; color:#fff; cursor:pointer; font-size:13px; font-weight:bold;">INICIAR</button>
+                <button onclick="document.getElementById('monitoringModal').style.display='none'" style="padding:12px 20px; border-radius:8px; border:1px solid #555; background:#444; color:#aaa; cursor:pointer; font-size:13px;">FECHAR</button>
+            </div>
+        </div>
+    </div>
     <!-- Overlay Info (gerenciado por overlay_info.js) -->
     <div class="overlay-info styled-blockingOverlay" id="overlayInfo"></div>
     <script src="modules/globals.js?v=3"></script>
@@ -1053,6 +1085,7 @@
     <script src="modules/channel_strip.js?v=19"></script>
     <script src="modules/eq.js?v=5"></script>
     <script src="modules/rta.js?v=1"></script>
+    <script src="modules/monitoring.js?v=1"></script>
     <script src="modules/copy_paste.js"></script>
     <script src="modules/gate.js"></script>
     <script src="modules/compressor.js"></script>

@@ -5,6 +5,8 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
 
+use crate::monitoring::{self, MonitoringManager};
+
 pub struct RtaManager {
     is_active: Arc<Mutex<bool>>,
     last_heartbeat: Arc<Mutex<Option<Instant>>>,
@@ -13,6 +15,7 @@ pub struct RtaManager {
     current_is_output: bool,
     current_fft_size: usize,
     current_sample_rate: Arc<Mutex<u32>>,
+    pub monitoring: MonitoringManager,
 }
 
 impl RtaManager {
@@ -25,7 +28,12 @@ impl RtaManager {
             current_is_output: false,
             current_fft_size: 4096,
             current_sample_rate: Arc::new(Mutex::new(48000)),
+            monitoring: MonitoringManager::new(),
         }
+    }
+
+    pub fn current_device(&self) -> Option<String> {
+        self.current_device.clone()
     }
 
     pub fn receive_heartbeat(&self) {
@@ -35,7 +43,6 @@ impl RtaManager {
     }
 
     pub fn start(&mut self, io: SocketIo, device_name: Option<String>, is_output: bool, fft_size: usize) {
-        // Sempre reinicia a stream para garantir a saúde da captura e nova task tokio.
         tracing::info!("🎤 [RTA] Solicitado start. Reiniciando stream para garantir saúde da captura.");
         self.stop();
 
@@ -44,23 +51,20 @@ impl RtaManager {
         self.current_device = device_name.clone();
         self.current_is_output = is_output;
         self.current_fft_size = fft_size;
-        
-        let is_active_clone = self.is_active.clone();
-        let sample_rate_arc = self.current_sample_rate.clone();
 
-        // Canal para o worker enviar os dados ao websocket
+        let is_active_clone = self.is_active.clone();
+        let _sample_rate_arc = self.current_sample_rate.clone();
+
         let (tx, mut rx) = mpsc::channel::<Vec<f32>>(10);
         let (stop_tx, mut stop_rx) = tokio::sync::oneshot::channel::<()>();
         *self.stop_tx.lock().unwrap() = Some(stop_tx);
 
         let io_for_tokio = io.clone();
-        
-        // Task assíncrona para encaminhar dados ao socket
+
         tokio::spawn(async move {
             loop {
                 tokio::select! {
                     Some(magnitudes) = rx.recv() => {
-                        // tracing::info!("Enviando pacote RTA... tamanho: {}", magnitudes.len());
                         let res = io_for_tokio.emit("rtaData", &magnitudes).await;
                         if let Err(e) = res {
                             tracing::error!("Erro ao emitir rtaData: {:?}", e);
@@ -74,7 +78,6 @@ impl RtaManager {
             }
         });
 
-        // Watchdog: monitora heartbeats e para a captura se ficar 5s sem heartbeat
         let wd_is_active = self.is_active.clone();
         let wd_last_hb = self.last_heartbeat.clone();
         let wd_stop_tx = self.stop_tx.clone();
@@ -108,10 +111,12 @@ impl RtaManager {
             }
         });
 
-        // Captura o Handle do tokio para spawnar futures da thread nativa
         let rt = tokio::runtime::Handle::current();
 
-        // Thread nativa para Captura de Áudio (Core Isolado)
+        // Clones for the cpal callback
+        let monitoring_inner = self.monitoring.inner_arc();
+        let sample_rate_inner = self.current_sample_rate.clone();
+
         std::thread::spawn(move || {
             let host = cpal::default_host();
 
@@ -140,7 +145,7 @@ impl RtaManager {
                         }
                     }
                 }
-                
+
                 if found_device.is_none() {
                     tracing::error!("🎤 [RTA] Dispositivo especificado '{}' não encontrado.", name);
                     return;
@@ -181,10 +186,11 @@ impl RtaManager {
                 "🎤 [RTA] Iniciando captura de áudio. Sample Rate: {}",
                 config.sample_rate().0
             );
-            
-            *sample_rate_arc.lock().unwrap() = config.sample_rate().0;
 
-            // Envia a sample rate para o front-end sincronizar a tela
+            *sample_rate_inner.lock().unwrap() = config.sample_rate().0;
+            // Sync sample rate to monitoring manager for Opus encoder
+            monitoring_inner.lock().unwrap().sample_rate = config.sample_rate().0;
+
             let sr = config.sample_rate().0;
             let io_clone2 = io.clone();
             rt.spawn(async move {
@@ -198,7 +204,7 @@ impl RtaManager {
             let buffer_clone = buffer.clone();
             let is_active_stream = is_active_clone.clone();
             let channels = config.channels() as usize;
-            
+
             let stream_result = match config.sample_format() {
                 cpal::SampleFormat::F32 => device.build_input_stream(
                     &config.into(),
@@ -207,17 +213,14 @@ impl RtaManager {
                             if !*is_active_stream.lock().unwrap() {
                                 return;
                             }
-                            // Ignorar os canais extras (Right, Surround) extraindo apenas a amostra Left (Index 0)
                             let mono_data: Vec<f32> = data.chunks(channels).map(|c| c[0]).collect();
                             buffer.extend_from_slice(&mono_data);
 
-                            // Processa janelas do tamanho exato da FFT
                             while buffer.len() >= fft_size {
                                 let mut fft_buffer: Vec<Complex<f32>> = buffer
                                     .drain(0..fft_size)
                                     .enumerate()
                                     .map(|(i, v)| {
-                                        // Hanning Window para mitigar Spectral Leakage
                                         let window = 0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / (fft_size as f32 - 1.0)).cos());
                                         Complex { re: v * window, im: 0.0 }
                                     })
@@ -225,17 +228,50 @@ impl RtaManager {
 
                                 fft.process(&mut fft_buffer);
 
-                            // Pega as primeiras metades das bandas (Nyquist)
-                            let magnitudes: Vec<f32> = fft_buffer
-                                .iter()
-                                .take(fft_size / 2)
-                                .map(|c| c.norm())
-                                .collect();
+                                let magnitudes: Vec<f32> = fft_buffer
+                                    .iter()
+                                    .take(fft_size / 2)
+                                    .map(|c| c.norm())
+                                    .collect();
 
-                            // Envia pelo canal pro tokio sem bloquear a stream
-                            let _ = tx.try_send(magnitudes);
+                                let _ = tx.try_send(magnitudes);
+                            }
                         }
-                    }
+                        // Audio monitoring: shared pipeline
+                        if let Ok(mut inner) = monitoring_inner.lock() {
+                            if !inner.active {
+                                return;
+                            }
+                            let cfg = match inner.config.clone() {
+                                Some(c) => c,
+                                None => return,
+                            };
+                            let mono_data: Vec<f32> = data.chunks(channels).map(|c| c[0]).collect();
+                            inner.buffer.extend_from_slice(&mono_data);
+                            while inner.buffer.len() >= cfg.buffer_size {
+                                let chunk: Vec<f32> = inner.buffer.drain(..cfg.buffer_size).collect();
+                                let tx_opt = inner.tx.clone();
+                                if let Some(tx) = tx_opt {
+                                    match cfg.format {
+                                        monitoring::MonitoringFormat::Pcm => {
+                                            let _ = tx.try_send(monitoring::MonitoringMessage::Pcm(chunk));
+                                        }
+                                        monitoring::MonitoringFormat::Opus => {
+                                            let mut opus_out = vec![0u8; 1500];
+                                            if let Some(ref mut encoder) = inner.opus_encoder {
+                                                match encoder.encode(&chunk, chunk.len(), &mut opus_out) {
+                                                    Ok(n) => {
+                                                        opus_out.truncate(n);
+                                                        let _ = tx.try_send(monitoring::MonitoringMessage::Opus(opus_out));
+                                                    }
+                                                    Err(e) => tracing::error!("[MONITORING] Opus encode error: {}", e),
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     err_fn,
                     None,
@@ -258,13 +294,11 @@ impl RtaManager {
                 tracing::error!("🎤 [RTA] Erro ao dar play na stream: {}", e);
             }
 
-            // Segura a thread viva enquanto o RTA está ativo
             while *is_active_clone.lock().unwrap() {
                 std::thread::sleep(std::time::Duration::from_millis(100));
             }
 
             tracing::info!("🎤 [RTA] Captura encerrada.");
-            // `stream` sai de escopo e é destruída
         });
     }
 

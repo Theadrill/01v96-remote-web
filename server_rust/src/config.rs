@@ -79,6 +79,12 @@ pub struct AppConfig {
     #[serde(default)]
     pub eq_flat_skip_hpf_lpf: bool,
 
+    #[serde(default = "default_monitoring_buffer_size")]
+    pub monitoring_buffer_size: u32,
+
+    #[serde(default = "default_monitoring_format")]
+    pub monitoring_format: String,
+
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub steps: serde_json::Value,
@@ -122,6 +128,14 @@ fn default_rta_smoothing() -> u32 {
 
 fn default_rta_fft_size() -> u32 {
     4096
+}
+
+fn default_monitoring_buffer_size() -> u32 {
+    960
+}
+
+fn default_monitoring_format() -> String {
+    "pcm".to_string()
 }
 
 impl AppConfig {
@@ -196,6 +210,40 @@ impl AppConfig {
                     error!("[CONFIG] Falha ao adicionar eq_flat_skip_hpf_lpf ao config.json: {}", e);
                 } else {
                     info!("[CONFIG] eq_flat_skip_hpf_lpf adicionado ao config.json");
+                }
+            }
+        }
+
+        // Migração: adicionar monitoring_buffer_size se ausente
+        if let Ok(contents) = fs::read_to_string(&config_path)
+            && let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&contents)
+            && !json.get("monitoring_buffer_size").is_some()
+        {
+            if let Some(obj) = json.as_object_mut() {
+                obj.insert("monitoring_buffer_size".to_string(), serde_json::Value::Number(960.into()));
+            }
+            if let Ok(pretty) = serde_json::to_string_pretty(&json) {
+                if let Err(e) = fs::write(&config_path, pretty) {
+                    error!("[CONFIG] Falha ao adicionar monitoring_buffer_size ao config.json: {}", e);
+                } else {
+                    info!("[CONFIG] monitoring_buffer_size adicionado ao config.json");
+                }
+            }
+        }
+
+        // Migração: adicionar monitoring_format se ausente
+        if let Ok(contents) = fs::read_to_string(&config_path)
+            && let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&contents)
+            && !json.get("monitoring_format").is_some()
+        {
+            if let Some(obj) = json.as_object_mut() {
+                obj.insert("monitoring_format".to_string(), serde_json::Value::String("pcm".to_string()));
+            }
+            if let Ok(pretty) = serde_json::to_string_pretty(&json) {
+                if let Err(e) = fs::write(&config_path, pretty) {
+                    error!("[CONFIG] Falha ao adicionar monitoring_format ao config.json: {}", e);
+                } else {
+                    info!("[CONFIG] monitoring_format adicionado ao config.json");
                 }
             }
         }
@@ -283,6 +331,8 @@ impl AppConfig {
             rta_smoothing: default_rta_smoothing(),
             rta_fft_size: default_rta_fft_size(),
             eq_flat_skip_hpf_lpf: false,
+            monitoring_buffer_size: default_monitoring_buffer_size(),
+            monitoring_format: default_monitoring_format(),
             steps: serde_json::Value::Null,
         }
     }

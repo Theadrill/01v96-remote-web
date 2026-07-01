@@ -1283,3 +1283,35 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
   - `emit_connection_state()`, `iniciar_busca_automatica()`, `iniciar_meter_loop()`, `reset_activity()` sao metodos sincronos (spawnam tasks internamente, mas nao sao async)
 - **Pendencias**: Nenhuma. Fase 10 100% concluida.
 - **Proximo passo**: Fase 11 — Implementar handlers socket faltantes (requestConnect, updateName, forceSync, deleteScene, toggleDemo, etc.)
+
+### 2026-07-01 — Sistema de Monitoramento de Áudio (PCM + Opus)
+- **Status**: [x] Concluido (parcial — Opus bloqueado por falta de AVX no CPU)
+- **O que foi feito**:
+  - **Arquitetura**: Criado `server_rust/src/monitoring.rs` com structs `MonitoringManager`, `Inner`, `MonitoringConfig`, `MonitoringFormat`, `MonitoringMessage`
+  - **Fluxo de captura**: `start_standalone()` — thread nativa cpal para capturar de dispositivo auditivo separado; `attach()` — pipeline compartilhada com o RTA (reusa o mesmo stream cpal e adiciona forwarding de audio)
+  - **Encoder Opus**: Usando `opus-rs = "0.1"` (pure Rust, sem dependencia C). Criado em `attach()` / `start_standalone()` / `reconfigure()` quando formato == Opus
+  - **Forwarding task**: Tokio task que le `mpsc::Receiver<MonitoringMessage>` e emite `rtaAudio` como JSON `{"label":"pcm"|"opus", "data":[...]}`
+  - **Watchdog**: Task separada que verifica heartbeat a cada 1s, para apos 5s de inatividade
+  - **Reconfiguracao em tempo real**: `reconfigure()` troca formato e buffer size sem reiniciar o stream cpal (so muda o encoder e o tamanho dos chunks)
+  - **Handlers socket**: `rtaAudioControl` (start/stop/reconfigure/getStatus) e `rtaAudioHeartbeat` em `socket_handlers.rs`
+  - **RTA pipeline compartilhada**: `rta_manager.rs` integrado — `RtaManager` agora tem campo `pub monitoring: MonitoringManager`, callback do cpal faz RTA FFT + monitoring forwarding no mesmo buffer
+  - **Frontend**: `public/modules/monitoring.js` — modal HTML em `index.html`, botoes formato PCM/Opus, input buffer size, seletor dispositivo servidor, heartbeat, playback PCM via `Float32Array` direto, Opus via WebCodecs `AudioDecoder`
+  - **Config**: campos `monitoring_buffer_size` (u32, default 960) e `monitoring_format` (String, default "pcm") em `config.rs` com migracao automatica do JSON
+  - **Sidebar**: Botao "OUVIR" no dock principal que abre o modal e chama `refreshMonitoringDevices()`
+- **Desvios do plano original**:
+  - Formato de emissao dos dados mudou: em vez de tupla `("pcm", data)`, usa JSON `{"label":"pcm", "data":[...]}` porque socket.io serializava a tupla como array e o handler no cliente esperava dois argumentos separados
+  - `MonitoringMessage` foi tornado `pub` (faltou no plano)
+  - `OpusEncoder::encode()` aceita 3 argumentos (input, frame_size, output) e retorna `Result<usize, &str>` — documentacao do crate diferia
+  - `opus_rs::Encoder` → `opus_rs::OpusEncoder` (API real do crate)
+  - `sample_rate` passado como `i32` na criacao do encoder (nao `u32`)
+  - Metodos mortos removidos: `set_sample_rate()` em monitoring.rs, `current_is_output()` em rta_manager.rs
+  - Buffer size agora lido do `<input>` no frontend a cada start, nao de variavel cacheada
+  - `_sample_rate_arc` prefixado com `_` por ser nao usado (warning)
+- **Problema conhecido — Opus STATUS_ILLEGAL_INSTRUCTION**:
+  - O crate `opus-rs` v0.1.23 usa `#[target_feature(enable = "avx")]` e `#[target_feature(enable = "avx2")]` em multiplas funcoes internas (mdct.rs, celt.rs, bands.rs, pvq.rs, kiss_fft.rs, pitch.rs, silk/sigproc_fix.rs)
+  - Todas tem runtime dispatch via `is_x86_feature_detected!("avx")` com fallback scalar, porem o processo ainda crasha com `STATUS_ILLEGAL_INSTRUCTION` (exit code 0xc000001d) em CPUs sem suporte AVX (Celeron/Pentium)
+  - `rustc --print cfg` mostra apenas `sse`, `sse2`, `sse3` — sem AVX
+  - **Solucao temporaria**: botao Opus desabilitado no frontend (`cursor: not-allowed`, `opacity: 0.5`), `selectMonitoringFormat()` ignora 'opus', server forcado a PCM sempre
+  - **Solucao definitiva pendente**: fork local do `opus-rs` forcando caminho scalar, ou migrar para crate `opus` (bindings FFI libopus)
+- **Pendencias**: Opus bloqueado. PCM funcional.
+- **Proximo passo**: Decidir estrategia de vendoring do opus-rs fork dentro do projeto
