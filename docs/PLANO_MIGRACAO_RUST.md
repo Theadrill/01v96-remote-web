@@ -1323,9 +1323,10 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
   - Fork vendorizado com dispatch AVX forcado a `false` — CPU sem AVX nao crasha mais
   - Opus funcional na maquina local (testado)
 - **Problema conhecido — WebCodecs AudioDecoder indisponivel**:
-  - `AudioDecoder` (WebCodecs API) so existe em Chrome/Edge/Chromium. Firefox e Safari nao suportam.
+  - `AudioDecoder` (WebCodecs API) nao esta disponivel em alguns dispositivos mesmo rodando Chrome/Edge — ocorreu num **Steam Deck com Windows 11** usando navegador Chromium.
+  - Possiveis causas: GPU sem suporte a aceleracao de video, ou WebCodecs desabilitado no flags do navegador/chromium do Steam Deck.
   - Quando nao disponivel, uma mensagem aparece no status: "Opus nao suportado neste navegador. Use PCM."
-  - Usuario precisa manualmente trocar para PCM nesses browsers.
+  - Usuario precisa manualmente trocar para PCM nesses dispositivos.
   - **Solucao pendente**: detectar automaticamente e fazer fallback para PCM no cliente, ou usar um decoder Opus JS puro (ex: `opus-recorder` ou `ogg-opus-decoder` via WASM)
 - **Pendencias**: Fallback automatico PCM quando AudioDecoder nao disponivel.
 - **Proximo passo**: Implementar fallback automatico PCM no cliente para browsers sem WebCodecs, ou adicionar decoder Opus WASM.
