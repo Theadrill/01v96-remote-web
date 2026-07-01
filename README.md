@@ -182,6 +182,18 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 O módulo de integração DMX deste projeto utiliza o motor de tradução ArtNet para DMX baseado no projeto open-source [ArtNetDMX](https://github.com/nt2ds/ArtNetDMX) de **nt2ds**. O executável incluído foi adaptado para suportar o fluxo de auto-recuperação e reset forçado de hardware FTDI integrados à interface da Yamaha 01V96.
 
+### Opus Codec (Fork Vendorizado)
+
+O servidor Rust utiliza o codec **Opus** para compressão de áudio no sistema de monitoramento. Como a implementação pura em Rust — [`opus-rs`](https://github.com/restsend/opus-rs) v0.1.23 de **jinti** — utiliza instruções AVX/AVX2 que causam `STATUS_ILLEGAL_INSTRUCTION` em CPUs sem suporte (Celeron, Pentium, VMs), nós **vendorizamos um fork** em `server_rust/vendor/opus-rs/`.
+
+**O que foi alterado no fork:**
+- Todas as 26 chamadas a `is_x86_feature_detected!("avx"|"avx2"|"avx2,fma")` foram prefixadas com `false &&`, forçando o caminho escalar (sem SIMD). As funções com `#[target_feature]` continuam compilando como código morto, mas nunca são executadas em tempo real.
+- `Cargo.toml` simplificado (apenas a lib, sem testes/exemplos/benches).
+
+**Por que vendorizado:** garantia de que qualquer máquina que clonar o projeto terá o fork disponível imediatamente, sem depender de registry externo ou de suporte AVX na CPU.
+
+**Licença:** O código original do `opus-rs` é distribuído sob **BSD-3-Clause** (mantida no fork).
+
 ---
 **Desenvolvido por Rodrigo (Theadrill) usando Antigravity**  
 *Fazendo sua velha 01v96 soar como 'nova' 😉*

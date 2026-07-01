@@ -2,24 +2,24 @@
 // MONITORING DE ÁUDIO (Ouvir Áudio)
 // ==========================================
 let monitoringActive = false;
-let monitoringFormat = 'pcm'; // Opus requires AVX CPU support; disabled for now
+let monitoringFormat = localStorage.getItem('monitoringFormat') || 'pcm';
 let monitoringBufferSize = parseInt(localStorage.getItem('monitoringBufferSize')) || 960;
 let monitoringAudioCtx = null;
 let monitoringHeartbeatInterval = null;
 let monitoringDeviceName = null;
 
 window.selectMonitoringFormat = function(fmt) {
-    if (fmt === 'opus') return; // Opus disabled (requires AVX CPU)
     monitoringFormat = fmt;
+    localStorage.setItem('monitoringFormat', fmt);
     const btnPcm = document.getElementById('monitoringFmtPcm');
     const btnOpus = document.getElementById('monitoringFmtOpus');
     if (btnPcm) {
-        btnPcm.style.background = '#007bff';
-        btnPcm.style.color = '#fff';
+        btnPcm.style.background = fmt === 'pcm' ? '#007bff' : '#444';
+        btnPcm.style.color = fmt === 'pcm' ? '#fff' : '#aaa';
     }
     if (btnOpus) {
-        btnOpus.style.background = '#333';
-        btnOpus.style.color = '#666';
+        btnOpus.style.background = fmt === 'opus' ? '#007bff' : '#444';
+        btnOpus.style.color = fmt === 'opus' ? '#fff' : '#aaa';
     }
 };
 
@@ -122,40 +122,48 @@ socket.on('rtaAudio', (msg) => {
             console.error('[MONITORING] PCM playback error:', e);
         }
     } else if (label === 'opus') {
+        console.log('[MONITORING] Opus data received, type:', typeof data, 'isArray:', Array.isArray(data), 'length:', data && data.length, 'sample:', data && data[0]);
         try {
-            const opusData = data.buffer ? data.buffer : data;
-            if (typeof AudioDecoder !== 'undefined' && 'AudioDecoder' in window) {
-                const decoder = new AudioDecoder({
-                    output: (audioData) => {
-                        const buf = monitoringAudioCtx.createBuffer(
-                            audioData.numberOfChannels,
-                            audioData.numberOfFrames,
-                            audioData.sampleRate
-                        );
-                        for (let ch = 0; ch < audioData.numberOfChannels; ch++) {
-                            buf.getChannelData(ch).set(audioData.getChannelData(ch));
-                        }
-                        const src = monitoringAudioCtx.createBufferSource();
-                        src.buffer = buf;
-                        src.connect(monitoringAudioCtx.destination);
-                        src.start();
-                        audioData.close();
-                    },
-                    error: (e) => console.error('[MONITORING] Opus decoder error:', e)
-                });
-                decoder.configure({
-                    codec: 'opus',
-                    sampleRate: 48000,
-                    numberOfChannels: 1
-                });
-                const encodedChunk = new EncodedAudioChunk({
-                    type: 'key',
-                    timestamp: 0,
-                    duration: (monitoringBufferSize / 48000) * 1000000,
-                    data: opusData
-                });
-                decoder.decode(encodedChunk);
+            if (typeof AudioDecoder === 'undefined' || !('AudioDecoder' in window)) {
+                console.warn('[MONITORING] WebCodecs AudioDecoder not available');
+                const statusEl = document.getElementById('monitoringStatus');
+                if (statusEl) statusEl.innerText = 'Opus não suportado neste navegador. Use PCM.';
+                return;
             }
+            const opusData = new Uint8Array(data);
+            console.log('[MONITORING] Opus Uint8Array length:', opusData.length);
+            const decoder = new AudioDecoder({
+                output: (audioData) => {
+                    console.log('[MONITORING] Opus decoded:', audioData.numberOfFrames, 'frames,', audioData.numberOfChannels, 'channels');
+                    const buf = monitoringAudioCtx.createBuffer(
+                        audioData.numberOfChannels,
+                        audioData.numberOfFrames,
+                        audioData.sampleRate
+                    );
+                    for (let ch = 0; ch < audioData.numberOfChannels; ch++) {
+                        const dst = buf.getChannelData(ch);
+                        audioData.copyTo(dst, { planeIndex: ch });
+                    }
+                    const src = monitoringAudioCtx.createBufferSource();
+                    src.buffer = buf;
+                    src.connect(monitoringAudioCtx.destination);
+                    src.start();
+                    audioData.close();
+                },
+                error: (e) => console.error('[MONITORING] Opus decoder error:', e)
+            });
+            decoder.configure({
+                codec: 'opus',
+                sampleRate: 48000,
+                numberOfChannels: 1
+            });
+            const encodedChunk = new EncodedAudioChunk({
+                type: 'key',
+                timestamp: 0,
+                duration: (monitoringBufferSize / 48000) * 1000000,
+                data: opusData
+            });
+            decoder.decode(encodedChunk);
         } catch(e) {
             console.error('[MONITORING] Opus playback error:', e);
         }
@@ -191,7 +199,7 @@ socket.on('rtaAudioError', (data) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.selectMonitoringFormat('pcm');
+    window.selectMonitoringFormat(monitoringFormat);
     const bufInput = document.getElementById('monitoringBufferSize');
     if (bufInput) {
         bufInput.addEventListener('change', () => {

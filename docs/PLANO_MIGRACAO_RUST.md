@@ -1284,9 +1284,9 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
 - **Pendencias**: Nenhuma. Fase 10 100% concluida.
 - **Proximo passo**: Fase 11 — Implementar handlers socket faltantes (requestConnect, updateName, forceSync, deleteScene, toggleDemo, etc.)
 
-### 2026-07-01 — Sistema de Monitoramento de Áudio (PCM + Opus)
-- **Status**: [x] Concluido (parcial — Opus bloqueado por falta de AVX no CPU)
-- **O que foi feito**:
+### 2026-07-01 — Sistema de Monitoramento de Áudio (PCM + Opus) — v2
+- **Status**: [x] Concluido (parcial — Opus sem suporte WebCodecs em alguns browsers)
+- **O que foi feito (sessao 1)**:
   - **Arquitetura**: Criado `server_rust/src/monitoring.rs` com structs `MonitoringManager`, `Inner`, `MonitoringConfig`, `MonitoringFormat`, `MonitoringMessage`
   - **Fluxo de captura**: `start_standalone()` — thread nativa cpal para capturar de dispositivo auditivo separado; `attach()` — pipeline compartilhada com o RTA (reusa o mesmo stream cpal e adiciona forwarding de audio)
   - **Encoder Opus**: Usando `opus-rs = "0.1"` (pure Rust, sem dependencia C). Criado em `attach()` / `start_standalone()` / `reconfigure()` quando formato == Opus
@@ -1298,6 +1298,15 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
   - **Frontend**: `public/modules/monitoring.js` — modal HTML em `index.html`, botoes formato PCM/Opus, input buffer size, seletor dispositivo servidor, heartbeat, playback PCM via `Float32Array` direto, Opus via WebCodecs `AudioDecoder`
   - **Config**: campos `monitoring_buffer_size` (u32, default 960) e `monitoring_format` (String, default "pcm") em `config.rs` com migracao automatica do JSON
   - **Sidebar**: Botao "OUVIR" no dock principal que abre o modal e chama `refreshMonitoringDevices()`
+- **O que foi feito (sessao 2 — fork opus-rs + correcoes)**:
+  - **Fork vendorizado**: Criado `server_rust/vendor/opus-rs/` com source do `opus-rs` v0.1.23, apenas `.rs` + `Cargo.toml` + `COPYING`
+    - Todas as 26 chamadas a `is_x86_feature_detected!("avx"|"avx2"|"avx2,fma")` prefixadas com `false &&` para forcar caminho scalar
+    - `Cargo.toml` simplificado (sem testes/exemplos/benches)
+    - `[patch.crates-io]` adicionado ao `Cargo.toml` raiz do workspace
+    - `cargo check` compila sem erros
+  - **Corrigido playback Opus no cliente**: `audioData.getChannelData(ch)` nao existe em `AudioData` (WebCodecs) — trocado por `audioData.copyTo(dst, { planeIndex: ch })`
+  - **Opus reabilitado no frontend**: botoes PCM/Opus funcionais, formato persiste em localStorage
+  - **Adicionado tracing**: logs no servidor para encode Opus (frames -> bytes) e forwarding; logs no cliente para dados recebidos e decoder
 - **Desvios do plano original**:
   - Formato de emissao dos dados mudou: em vez de tupla `("pcm", data)`, usa JSON `{"label":"pcm", "data":[...]}` porque socket.io serializava a tupla como array e o handler no cliente esperava dois argumentos separados
   - `MonitoringMessage` foi tornado `pub` (faltou no plano)
@@ -1307,11 +1316,16 @@ Seguindo as 16 fases na ordem recomendada, o servidor Rust alcancara **100% de p
   - Metodos mortos removidos: `set_sample_rate()` em monitoring.rs, `current_is_output()` em rta_manager.rs
   - Buffer size agora lido do `<input>` no frontend a cada start, nao de variavel cacheada
   - `_sample_rate_arc` prefixado com `_` por ser nao usado (warning)
-- **Problema conhecido — Opus STATUS_ILLEGAL_INSTRUCTION**:
-  - O crate `opus-rs` v0.1.23 usa `#[target_feature(enable = "avx")]` e `#[target_feature(enable = "avx2")]` em multiplas funcoes internas (mdct.rs, celt.rs, bands.rs, pvq.rs, kiss_fft.rs, pitch.rs, silk/sigproc_fix.rs)
-  - Todas tem runtime dispatch via `is_x86_feature_detected!("avx")` com fallback scalar, porem o processo ainda crasha com `STATUS_ILLEGAL_INSTRUCTION` (exit code 0xc000001d) em CPUs sem suporte AVX (Celeron/Pentium)
-  - `rustc --print cfg` mostra apenas `sse`, `sse2`, `sse3` — sem AVX
-  - **Solucao temporaria**: botao Opus desabilitado no frontend (`cursor: not-allowed`, `opacity: 0.5`), `selectMonitoringFormat()` ignora 'opus', server forcado a PCM sempre
-  - **Solucao definitiva pendente**: fork local do `opus-rs` forcando caminho scalar, ou migrar para crate `opus` (bindings FFI libopus)
-- **Pendencias**: Opus bloqueado. PCM funcional.
-- **Proximo passo**: Decidir estrategia de vendoring do opus-rs fork dentro do projeto
+  - Fork do `opus-rs` em vez de crate externa — solucao mais portatil
+  - `AudioData.copyTo()` em vez de `getChannelData()` — API real do WebCodecs diferia
+- **Problema resolvido — Opus STATUS_ILLEGAL_INSTRUCTION**:
+  - O crate `opus-rs` v0.1.23 usa `#[target_feature(enable = "avx")]` em multiplas funcoes
+  - Fork vendorizado com dispatch AVX forcado a `false` — CPU sem AVX nao crasha mais
+  - Opus funcional na maquina local (testado)
+- **Problema conhecido — WebCodecs AudioDecoder indisponivel**:
+  - `AudioDecoder` (WebCodecs API) so existe em Chrome/Edge/Chromium. Firefox e Safari nao suportam.
+  - Quando nao disponivel, uma mensagem aparece no status: "Opus nao suportado neste navegador. Use PCM."
+  - Usuario precisa manualmente trocar para PCM nesses browsers.
+  - **Solucao pendente**: detectar automaticamente e fazer fallback para PCM no cliente, ou usar um decoder Opus JS puro (ex: `opus-recorder` ou `ogg-opus-decoder` via WASM)
+- **Pendencias**: Fallback automatico PCM quando AudioDecoder nao disponivel.
+- **Proximo passo**: Implementar fallback automatico PCM no cliente para browsers sem WebCodecs, ou adicionar decoder Opus WASM.

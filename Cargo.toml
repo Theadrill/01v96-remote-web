@@ -9,3 +9,6 @@ resolver = "2"
 default-members = [
     "server_rust"
 ]
+
+[patch.crates-io]
+opus-rs = { path = "server_rust/vendor/opus-rs" }

@@ -108,6 +108,7 @@ impl MonitoringManager {
         }
 
         let io_fwd = io.clone();
+        let io_fwd2 = io.clone();
         tokio::spawn(async move {
             let mut stop_fwd_rx = stop_fwd_rx;
             let mut mon_rx = mon_rx;
@@ -119,6 +120,7 @@ impl MonitoringManager {
                                 let _ = io_fwd.emit("rtaAudio", &serde_json::json!({"label": "pcm", "data": data})).await;
                             }
                             MonitoringMessage::Opus(data) => {
+                                tracing::info!("[MONITORING] Fwd opus {} bytes", data.len());
                                 let _ = io_fwd.emit("rtaAudio", &serde_json::json!({"label": "opus", "data": data})).await;
                             }
                             MonitoringMessage::Stop => {
@@ -232,6 +234,7 @@ impl MonitoringManager {
                                 let _ = io_fwd.emit("rtaAudio", &serde_json::json!({"label": "pcm", "data": data})).await;
                             }
                             MonitoringMessage::Opus(data) => {
+                                tracing::info!("[MONITORING] Fwd opus {} bytes (standalone)", data.len());
                                 let _ = io_fwd.emit("rtaAudio", &serde_json::json!({"label": "opus", "data": data})).await;
                             }
                             MonitoringMessage::Stop => {
@@ -368,13 +371,17 @@ impl MonitoringManager {
                                         MonitoringFormat::Opus => {
                                             let mut opus_out = vec![0u8; 1500];
                                             if let Some(ref mut encoder) = inner.opus_encoder {
-                                                match encoder.encode(&chunk, chunk.len(), &mut opus_out) {
+                                                let frame_size = chunk.len();
+                                                match encoder.encode(&chunk, frame_size, &mut opus_out) {
                                                     Ok(n) => {
+                                                        tracing::info!("[MONITORING] Opus encoded {} frames -> {} bytes", frame_size, n);
                                                         opus_out.truncate(n);
                                                         let _ = tx.try_send(MonitoringMessage::Opus(opus_out));
                                                     }
                                                     Err(e) => tracing::error!("[MONITORING] Opus encode error: {}", e),
                                                 }
+                                            } else {
+                                                tracing::warn!("[MONITORING] Opus format but no encoder");
                                             }
                                         }
                                     }

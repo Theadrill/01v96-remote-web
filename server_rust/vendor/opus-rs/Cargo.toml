@@ -1,0 +1,11 @@
+[package]
+edition = "2024"
+name = "opus-rs"
+version = "0.1.23"
+authors = ["jinti<shenjindi@fourz.cn>"]
+description = "pure Rust implementation of Opus codec (vendored fork, AVX/AVX2 disabled)"
+license = "BSD-3-Clause"
+
+[lib]
+name = "opus_rs"
+path = "src/lib.rs"
