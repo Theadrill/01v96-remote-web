@@ -480,6 +480,70 @@ window.addEventListener('pointerdown', (e) => {
     }
 }, true);
 
+// Navegação por Teclado (Enter/Escape) para Modais
+(function () {
+    function getTopmostVisibleModal() {
+        const selectors = ['.modal-overlay', '.ch-modal-overlay', '.mobile-menu-modal-overlay'];
+        let best = null;
+        let bestZ = -1;
+
+        selectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                const isVisible = window.getComputedStyle(el).display !== 'none' || el.classList.contains('active');
+                if (isVisible) {
+                    const z = parseInt(window.getComputedStyle(el).zIndex) || 0;
+                    if (z > bestZ) {
+                        bestZ = z;
+                        best = el;
+                    }
+                }
+            });
+        });
+
+        return best;
+    }
+
+    function closeTopmostModal(topmost) {
+        if (topmost.classList.contains('ch-modal-overlay')) {
+            if (typeof closeChannelConfig === 'function') {
+                closeChannelConfig();
+            } else {
+                topmost.style.display = 'none';
+            }
+            return;
+        }
+        if (topmost.classList.contains('mobile-menu-modal-overlay')) {
+            if (typeof closeMobileMenu === 'function') {
+                closeMobileMenu();
+            } else {
+                topmost.classList.remove('active');
+            }
+            return;
+        }
+        topmost.style.display = 'none';
+    }
+
+    document.addEventListener('keydown', function (e) {
+        const topmost = getTopmostVisibleModal();
+        if (!topmost) return;
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            closeTopmostModal(topmost);
+            return;
+        }
+
+        if (e.key === 'Enter' && topmost.id === 'nameEditorModal') {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof saveChannelName === 'function') {
+                saveChannelName();
+            }
+        }
+    }, true);
+})();
+
 function resetDmx() {
     document.getElementById('dmxResetConfirmModal').style.display = 'flex';
     document.getElementById('dmxResetConfirmBtn').onclick = () => {
