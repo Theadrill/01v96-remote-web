@@ -236,7 +236,8 @@ function renderEQ(ch) {
                     <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startATTNudge(1)" onpointerup="stopATTNudge()" onpointerleave="stopATTNudge()" onpointercancel="stopATTNudge()">+</button>
                 </div>
                 <p style="margin:0; font-size:10px; color:#666; text-align:center;">Ajuste o ganho de entrada do equalizador</p>
-                <button onclick="toggleATTModal(false)" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; margin-top:10px;">FECHAR</button>
+                <button onclick="resetEQATT()" class="btn-att-reset">RESETAR</button>
+                <button onclick="toggleATTModal(false)" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; margin-top:4px;">FECHAR</button>
             </div>
             
             <!-- Modal do RTA -->
@@ -1340,6 +1341,19 @@ window.eqATTInput = function(e) {
     // Envia para mesa
     const attPrefix = getChannelParamPrefix(ch);
     socket.emit('control', { type: `${attPrefix}Attenuator/kAtt`, channel: ch, value: rawVal });
+};
+
+window.resetEQATT = function() {
+    const ch = activeConfigChannel;
+    const state = getChannelStateById(ch);
+    if (!state) return;
+    state.att = 0;
+    const input = document.getElementById('eqATTInput');
+    const valEl = document.getElementById('eqATTVal');
+    if (input) input.value = 0;
+    if (valEl) valEl.innerText = '0.0 dB';
+    const attPrefix = getChannelParamPrefix(ch);
+    socket.emit('control', { type: `${attPrefix}Attenuator/kAtt`, channel: ch, value: 0 });
 };
 
 // NOVO: Fechar modais ao clicar fora (capture phase para garantir execução antes do stopPropagation)
