@@ -495,7 +495,7 @@ window.openMacroSettings = function () {
 window.saveCurrentMacroSettings = function () {
     // Suporte especial para o MACRO FADER (que não é via plugin/slot)
     const title = document.getElementById('settingsMacroTitle');
-    if (title && title.innerText.includes("MACRO FADER")) {
+    if (title && (title.innerText.includes("MACRO FADER") || title.innerText.includes("CANAIS PROTEGIDOS"))) {
         if (typeof saveMacroChannels === 'function') saveMacroChannels();
         document.getElementById('macroSettingsModal').style.display = 'none';
         if (typeof renderMacroFader === 'function') renderMacroFader();
@@ -511,9 +511,9 @@ window.saveCurrentMacroSettings = function () {
 };
 
 window.clearCurrentMacroSettings = function () {
-    // Suporte especial para o MACRO FADER
+    // Suporte especial para o MACRO FADER / CANAIS PROTEGIDOS
     const title = document.getElementById('settingsMacroTitle');
-    if (title && title.innerText.includes("MACRO FADER")) {
+    if (title && (title.innerText.includes("MACRO FADER") || title.innerText.includes("CANAIS PROTEGIDOS"))) {
         if (typeof clearMacroSelection === 'function') clearMacroSelection();
         return;
     }

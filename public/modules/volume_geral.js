@@ -12,11 +12,14 @@ const volumeGeral = createMacroFaderInstance({
     title: 'GERAL',
     titleLong: 'VOLUME GERAL',
     getChannelIds: () => {
+        if (musicianMode) {
+            return Array.from({length: 32}, (_, i) => i).filter(i => !macroLockedChannels.includes(i));
+        }
         const all = [];
         for (let i = 0; i < 32; i++) all.push(i);
         return all;
     },
-    showConfig: false,
+    showConfig: true,
     cardId: 'cardVolumeGeral',
     dbDisplayId: 'volume-geral-db-display',
     nudgeStartFn: 'startVolumeGeralNudge',

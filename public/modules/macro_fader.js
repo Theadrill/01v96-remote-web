@@ -1,9 +1,16 @@
-let macroSelectedChannels = JSON.parse(localStorage.getItem('macro_selected_channels')) || [];
+﻿let macroSelectedChannels = JSON.parse(localStorage.getItem('macro_selected_channels')) || [];
 let tempMacroSelectedChannels = [];
+let macroLockedChannels = JSON.parse(localStorage.getItem('macro_locked_channels')) || [];
+let tempMacroLockedChannels = [];
 
 function saveMacroChannels() {
-    macroSelectedChannels = [...tempMacroSelectedChannels];
-    localStorage.setItem('macro_selected_channels', JSON.stringify(macroSelectedChannels));
+    if (musicianMode) {
+        macroLockedChannels = [...tempMacroLockedChannels];
+        localStorage.setItem('macro_locked_channels', JSON.stringify(macroLockedChannels));
+    } else {
+        macroSelectedChannels = [...tempMacroSelectedChannels];
+        localStorage.setItem('macro_selected_channels', JSON.stringify(macroSelectedChannels));
+    }
 }
 
 // --- Factory de Macro Fader ---
@@ -177,11 +184,16 @@ function createMacroFaderInstance(config) {
     return { getHtml, nudge, startNudge, stopNudge };
 }
 
-// --- Instância padrão do Macro Fader ---
+// --- Instancia padrao do Macro Fader ---
 const macroFader = createMacroFaderInstance({
     title: 'MACRO',
     titleLong: 'MACRO FADER',
-    getChannelIds: () => macroSelectedChannels,
+    getChannelIds: () => {
+        if (musicianMode) {
+            return Array.from({length: 32}, (_, i) => i).filter(i => !macroLockedChannels.includes(i));
+        }
+        return macroSelectedChannels;
+    },
     showConfig: true,
     cardId: 'cardMacro',
     dbDisplayId: 'macro-db-display',
@@ -195,39 +207,73 @@ window.startMacroNudge = (dir) => macroFader.startNudge(dir);
 window.stopMacroNudge = () => macroFader.stopNudge();
 window.nudgeMacro = (dir) => macroFader.nudge(dir);
 
-// --- Config Modal (só existe para o Macro Fader principal) ---
+// --- Config Modal (so existe para o Macro Fader principal) ---
 function openMacroConfig() {
     const modal = document.getElementById('macroSettingsModal');
     const title = document.getElementById('settingsMacroTitle');
+    const subtitle = document.getElementById('settingsMacroSubtitle');
 
-    title.innerText = "CONFIGURAÇÃO MACRO FADER";
-    title.style.color = "#00ffcc";
-    modal.style.borderColor = "#00ffcc";
+    if (musicianMode) {
+        title.innerText = "CANAIS PROTEGIDOS";
+        title.style.color = "#ff4444";
+        modal.style.borderColor = "#ff4444";
+        if (subtitle) subtitle.innerText = "Toque nos canais que NÃO quer mexer:";
+        tempMacroLockedChannels = [...macroLockedChannels];
+    } else {
+        title.innerText = "CONFIGURACAO MACRO FADER";
+        title.style.color = "#00ffcc";
+        modal.style.borderColor = "#00ffcc";
+        if (subtitle) subtitle.innerText = "Selecione os canais desejados abaixo:";
+        tempMacroSelectedChannels = [...macroSelectedChannels];
+    }
 
-    tempMacroSelectedChannels = [...macroSelectedChannels];
     renderMacroGrid();
-
     modal.style.display = 'flex';
+    updateMacroModalLayout();
 }
+
+function updateMacroModalLayout() {
+    const el = document.getElementById('macroSettingsModalContent');
+    if (!el) return;
+    const modal = document.getElementById('macroSettingsModal');
+    if (!modal || modal.style.display !== 'flex') return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    el.classList.toggle('compact', h < 500 && w > h);
+}
+
+window.addEventListener('resize', updateMacroModalLayout);
 
 function renderMacroGrid() {
     const grid = document.getElementById('macroSettingsGrid');
     if (!grid) return;
     grid.innerHTML = '';
 
+    const isLockMode = musicianMode;
+    const tempArr = isLockMode ? tempMacroLockedChannels : tempMacroSelectedChannels;
+
     for (let i = 0; i < 32; i++) {
-        const isSelected = tempMacroSelectedChannels.includes(i);
+        const isSelected = tempArr.includes(i);
         const isOnMixer = channelStates[i].on === true;
         const chName = (window.resolvedNames && window.resolvedNames[i]) ? window.resolvedNames[i].name : (channelStates[i].name || `CH ${i + 1}`);
 
         const btn = document.createElement('button');
-        btn.className = `btn-connect ${isSelected ? 'macro-ch-selected' : ''}`;
+        btn.className = `btn-connect ${isSelected ? (isLockMode ? 'macro-ch-locked' : 'macro-ch-selected') : ''}`;
         btn.style.margin = '0';
         btn.style.height = '50px';
         btn.style.fontSize = '11px';
+        btn.style.position = 'relative';
 
-        btn.style.background = isSelected ? '#ffcc00' : '#333';
-        btn.style.color = isSelected ? '#000' : '#fff';
+        if (isLockMode && isSelected) {
+            btn.style.background = '#cc3333';
+            btn.style.color = '#fff';
+        } else if (isSelected) {
+            btn.style.background = '#ffcc00';
+            btn.style.color = '#000';
+        } else {
+            btn.style.background = '#333';
+            btn.style.color = '#fff';
+        }
 
         if (isOnMixer) {
             btn.style.border = '2px solid #ffcc00';
@@ -237,23 +283,37 @@ function renderMacroGrid() {
             btn.style.boxShadow = 'none';
         }
 
-        btn.innerText = `${i + 1}\n${chName}`;
+        const lockIcon = isLockMode && isSelected ? '<span style="position:absolute; top:2px; right:4px; font-size:20px;">🔒</span>' : '';
+        const nameBlank = !chName.trim();
+        if (nameBlank) {
+            btn.innerHTML = `${i + 1}${lockIcon}`;
+            btn.style.color = '#555';
+        } else {
+            const numColor = isLockMode ? '#ccc' : 'inherit';
+            btn.innerHTML = `<span style="color:${numColor}">${i + 1} - </span>${chName.toUpperCase()}${lockIcon}`;
+        }
         btn.onclick = () => toggleMacroChannel(i);
         grid.appendChild(btn);
     }
 }
 
 function clearMacroSelection() {
-    tempMacroSelectedChannels = [];
+    if (musicianMode) {
+        tempMacroLockedChannels = [];
+    } else {
+        tempMacroSelectedChannels = [];
+    }
     renderMacroGrid();
 }
 
 function toggleMacroChannel(i) {
-    const idx = tempMacroSelectedChannels.indexOf(i);
+    const isLockMode = musicianMode;
+    const tempArr = isLockMode ? tempMacroLockedChannels : tempMacroSelectedChannels;
+    const idx = tempArr.indexOf(i);
     if (idx > -1) {
-        tempMacroSelectedChannels.splice(idx, 1);
+        tempArr.splice(idx, 1);
     } else {
-        tempMacroSelectedChannels.push(i);
+        tempArr.push(i);
     }
     renderMacroGrid();
 }
