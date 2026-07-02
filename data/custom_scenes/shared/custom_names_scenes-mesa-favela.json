@@ -38,16 +38,16 @@
       "file": "custom_names_scene-PISEIRO-mesa-favela.json"
     },
     {
-      "custom_name": "PISEIRO",
-      "physical_scene": "PISEIRO",
-      "physical_id": 37,
-      "file": "custom_names_scene-PISEIRO-mesa-favela.json"
-    },
-    {
       "custom_name": "PISEIRO2",
       "physical_scene": "PISEIRO2",
       "physical_id": 38,
       "file": "custom_names_scene-PISEIRO2-mesa-favela.json"
+    },
+    {
+      "custom_name": "PISEIRO",
+      "physical_scene": "PISEIRO",
+      "physical_id": 37,
+      "file": "custom_names_scene-PISEIRO-mesa-favela.json"
     }
   ]
 }
