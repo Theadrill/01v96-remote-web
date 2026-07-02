@@ -8,6 +8,27 @@ let monitoringAudioCtx = null;
 let monitoringHeartbeatInterval = null;
 let monitoringDeviceName = null;
 
+window.toggleOpusBufferOptions = function() {
+    const opts = document.getElementById('monitoringBufferOpusOptions');
+    if (opts) opts.style.display = opts.style.display === 'flex' ? 'none' : 'flex';
+};
+
+window.selectOpusBuffer = function(size) {
+    monitoringBufferSize = size;
+    localStorage.setItem('monitoringBufferSize', size);
+    const btn = document.getElementById('monitoringBufferOpusBtn');
+    if (btn) btn.innerText = 'BUFFER: ' + size;
+    const opts = document.getElementById('monitoringBufferOpusOptions');
+    if (opts) opts.style.display = 'none';
+    if (monitoringActive) {
+        socket.emit('rtaAudioControl', {
+            action: 'reconfigure',
+            format: monitoringFormat,
+            bufferSize: size
+        });
+    }
+};
+
 window.selectMonitoringFormat = function(fmt) {
     monitoringFormat = fmt;
     localStorage.setItem('monitoringFormat', fmt);
@@ -21,6 +42,10 @@ window.selectMonitoringFormat = function(fmt) {
         btnOpus.style.background = fmt === 'opus' ? '#007bff' : '#444';
         btnOpus.style.color = fmt === 'opus' ? '#fff' : '#aaa';
     }
+    const pcmDiv = document.getElementById('monitoringBufferPcm');
+    const opusDiv = document.getElementById('monitoringBufferOpus');
+    if (pcmDiv) pcmDiv.style.display = fmt === 'pcm' ? 'flex' : 'none';
+    if (opusDiv) opusDiv.style.display = fmt === 'opus' ? 'flex' : 'none';
 };
 
 window.refreshMonitoringDevices = function() {
@@ -66,7 +91,10 @@ function startMonitoringAudio() {
     }
 
     monitoringDeviceName = deviceName;
-    monitoringBufferSize = parseInt(document.getElementById('monitoringBufferSize').value) || 960;
+    const bufEl = monitoringFormat === 'opus'
+        ? document.getElementById('monitoringBufferOpusBtn')
+        : document.getElementById('monitoringBufferSize');
+    monitoringBufferSize = parseInt(bufEl ? (monitoringFormat === 'opus' ? bufEl.innerText.replace('BUFFER: ', '') : bufEl.value) : 960) || 960;
     localStorage.setItem('monitoringBufferSize', monitoringBufferSize);
 
     socket.emit('rtaAudioControl', {
@@ -206,4 +234,15 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('monitoringBufferSize', bufInput.value);
         });
     }
+    if (monitoringFormat === 'opus') {
+        const btn = document.getElementById('monitoringBufferOpusBtn');
+        if (btn) btn.innerText = 'BUFFER: ' + monitoringBufferSize;
+    }
+    document.addEventListener('click', (e) => {
+        const opts = document.getElementById('monitoringBufferOpusOptions');
+        const btn = document.getElementById('monitoringBufferOpusBtn');
+        if (opts && btn && !btn.contains(e.target) && !opts.contains(e.target)) {
+            opts.style.display = 'none';
+        }
+    });
 });
