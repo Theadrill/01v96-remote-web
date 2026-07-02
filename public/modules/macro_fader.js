@@ -64,17 +64,21 @@ function createMacroFaderInstance(config) {
         if (!channels.length) return;
 
         const step = musicianMode ? dir * 20 : dir;
+        let anyChanged = false;
 
         channels.forEach(chIdx => {
             let s = channelStates[chIdx];
             if (!s) return;
 
             let currentVal = ((musicianMode || technicianMixMode)) ? (s[`aux${activeMix}`] || 0) : s.value;
-            if (currentVal <= 0) return;
+            if (musicianMode && currentVal <= 0) return;
             let nRaw = currentVal + step;
             if (nRaw < 0) nRaw = 0;
             if (nRaw > 1023) nRaw = 1023;
 
+            if (nRaw === currentVal) return;
+
+            anyChanged = true;
             updateUI(chIdx, nRaw, undefined, undefined);
 
             let typeFader;
@@ -86,6 +90,7 @@ function createMacroFaderInstance(config) {
             }
         });
 
+        if (!anyChanged) return;
         deltaSteps += dir;
         updateDbDisplay();
         resetDbDisplay();
