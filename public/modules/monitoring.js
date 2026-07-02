@@ -7,6 +7,8 @@ let monitoringBufferSize = parseInt(localStorage.getItem('monitoringBufferSize')
 let monitoringAudioCtx = null;
 let monitoringHeartbeatInterval = null;
 let monitoringDeviceName = null;
+let monitoringNextStartTime = 0;
+let monitoringOpusDecoder = null;
 
 window.toggleOpusBufferOptions = function() {
     const opts = document.getElementById('monitoringBufferOpusOptions');
@@ -79,6 +81,7 @@ function startMonitoringAudio() {
         monitoringAudioCtx = null;
     }
     monitoringAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    monitoringNextStartTime = 0;
 
     let deviceId = document.getElementById('monitoringServerDevice').value;
     localStorage.setItem('monitoringDevice', deviceId);
@@ -115,10 +118,15 @@ function stopMonitoringAudio() {
         monitoringHeartbeatInterval = null;
     }
     socket.emit('rtaAudioControl', { action: 'stop' });
+    if (monitoringOpusDecoder) {
+        monitoringOpusDecoder.close();
+        monitoringOpusDecoder = null;
+    }
     if (monitoringAudioCtx) {
         monitoringAudioCtx.close();
         monitoringAudioCtx = null;
     }
+    monitoringNextStartTime = 0;
     document.getElementById('monitoringToggleBtn').innerText = 'INICIAR';
     document.getElementById('monitoringToggleBtn').style.background = '#28a745';
     document.getElementById('monitoringStatus').innerText = '';
@@ -145,7 +153,11 @@ socket.on('rtaAudio', (msg) => {
             const src = monitoringAudioCtx.createBufferSource();
             src.buffer = buf;
             src.connect(monitoringAudioCtx.destination);
-            src.start();
+            if (!monitoringNextStartTime || monitoringNextStartTime < monitoringAudioCtx.currentTime) {
+                monitoringNextStartTime = monitoringAudioCtx.currentTime;
+            }
+            src.start(monitoringNextStartTime);
+            monitoringNextStartTime += floatData.length / monitoringAudioCtx.sampleRate;
         } catch(e) {
             console.error('[MONITORING] PCM playback error:', e);
         }
@@ -159,39 +171,43 @@ socket.on('rtaAudio', (msg) => {
                 return;
             }
             const opusData = new Uint8Array(data);
-            console.log('[MONITORING] Opus Uint8Array length:', opusData.length);
-            const decoder = new AudioDecoder({
-                output: (audioData) => {
-                    console.log('[MONITORING] Opus decoded:', audioData.numberOfFrames, 'frames,', audioData.numberOfChannels, 'channels');
-                    const buf = monitoringAudioCtx.createBuffer(
-                        audioData.numberOfChannels,
-                        audioData.numberOfFrames,
-                        audioData.sampleRate
-                    );
-                    for (let ch = 0; ch < audioData.numberOfChannels; ch++) {
-                        const dst = buf.getChannelData(ch);
-                        audioData.copyTo(dst, { planeIndex: ch });
-                    }
-                    const src = monitoringAudioCtx.createBufferSource();
-                    src.buffer = buf;
-                    src.connect(monitoringAudioCtx.destination);
-                    src.start();
-                    audioData.close();
-                },
-                error: (e) => console.error('[MONITORING] Opus decoder error:', e)
-            });
-            decoder.configure({
-                codec: 'opus',
-                sampleRate: 48000,
-                numberOfChannels: 1
-            });
+            if (!monitoringOpusDecoder) {
+                monitoringOpusDecoder = new AudioDecoder({
+                    output: (audioData) => {
+                        const buf = monitoringAudioCtx.createBuffer(
+                            audioData.numberOfChannels,
+                            audioData.numberOfFrames,
+                            audioData.sampleRate
+                        );
+                        for (let ch = 0; ch < audioData.numberOfChannels; ch++) {
+                            const dst = buf.getChannelData(ch);
+                            audioData.copyTo(dst, { planeIndex: ch });
+                        }
+                        const src = monitoringAudioCtx.createBufferSource();
+                        src.buffer = buf;
+                        src.connect(monitoringAudioCtx.destination);
+                        if (!monitoringNextStartTime || monitoringNextStartTime < monitoringAudioCtx.currentTime) {
+                            monitoringNextStartTime = monitoringAudioCtx.currentTime;
+                        }
+                        src.start(monitoringNextStartTime);
+                        monitoringNextStartTime += audioData.numberOfFrames / audioData.sampleRate;
+                        audioData.close();
+                    },
+                    error: (e) => console.error('[MONITORING] Opus decoder error:', e)
+                });
+                monitoringOpusDecoder.configure({
+                    codec: 'opus',
+                    sampleRate: 48000,
+                    numberOfChannels: 1
+                });
+            }
             const encodedChunk = new EncodedAudioChunk({
                 type: 'key',
                 timestamp: 0,
                 duration: (monitoringBufferSize / 48000) * 1000000,
                 data: opusData
             });
-            decoder.decode(encodedChunk);
+            monitoringOpusDecoder.decode(encodedChunk);
         } catch(e) {
             console.error('[MONITORING] Opus playback error:', e);
         }
