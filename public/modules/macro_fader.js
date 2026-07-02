@@ -26,9 +26,9 @@ function createMacroFaderInstance(config) {
     let dbResetTimer = null;
 
     function deltaToDB(steps) {
-        const db = steps * 0.05;
+        const db = musicianMode ? steps * 1.0 : steps * 0.05;
         const sign = db >= 0 ? '+' : '';
-        return `${sign}${db.toFixed(2)} dB`;
+        return musicianMode ? `${sign}${db.toFixed(0)} dB` : `${sign}${db.toFixed(2)} dB`;
     }
 
     function updateDbDisplay() {
@@ -56,13 +56,15 @@ function createMacroFaderInstance(config) {
         const channels = getChannelIds();
         if (!channels.length) return;
 
+        const step = musicianMode ? dir * 20 : dir;
+
         channels.forEach(chIdx => {
             let s = channelStates[chIdx];
             if (!s) return;
 
             let currentVal = ((musicianMode || technicianMixMode)) ? (s[`aux${activeMix}`] || 0) : s.value;
             if (currentVal <= 0) return;
-            let nRaw = currentVal + dir;
+            let nRaw = currentVal + step;
             if (nRaw < 0) nRaw = 0;
             if (nRaw > 1023) nRaw = 1023;
 
@@ -86,11 +88,13 @@ function createMacroFaderInstance(config) {
         stopNudge();
         nudge(dir);
 
+        const repeatMs = musicianMode ? 160 : 80;
+        const holdMs = musicianMode ? 200 : 500;
         nudgeTimeout = setTimeout(() => {
             nudgeInterval = setInterval(() => {
                 nudge(dir * 3);
-            }, 80);
-        }, 500);
+            }, repeatMs);
+        }, holdMs);
     }
 
     function stopNudge() {
