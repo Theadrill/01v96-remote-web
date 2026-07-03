@@ -63,34 +63,18 @@ pub async fn resolve_all(
         (sn, sname)
     };
 
-    let base_scene_name = if let Some(pos) = scene_name.find(" - ") {
-        scene_name[pos + 3..].to_string()
-    } else {
-        scene_name.clone()
-    };
 
     // Captura snapshot do estado físico (sem manter o lock durante acesso ao CSM)
     let phys = PhysicalSnapshot::from_state(&state_guard);
     drop(state_guard);
 
-    // Acessa o CSM com write (get_scene faz cache check com &mut self)
+    // Acessa o CSM com write (find_scene_for_physical faz cache check internamente)
     let (global_names, custom_channels) = {
         let mut csm_guard = csm.write().await;
-        let mesa_nome = csm_guard.mesa_nome().to_string();
-        let filename = if !base_scene_name.is_empty() {
-            format!("custom_names_scene-{}-{}.json", base_scene_name, mesa_nome)
-        } else {
-            String::new()
-        };
-
-        let custom = if !filename.is_empty() {
-            csm_guard
-                .get_scene(&filename)
-                .map(|s| s.channels.clone())
-                .unwrap_or_default()
-        } else {
-            HashMap::new()
-        };
+        let custom = csm_guard
+            .find_scene_for_physical(scene_number, &scene_name)
+            .map(|s| s.channels.clone())
+            .unwrap_or_default();
 
         let global = csm_guard.get_global_names().clone();
         (global, custom)

@@ -278,13 +278,13 @@ impl CustomSceneManager {
     pub fn find_scene_for_physical(
         &mut self,
         physical_id: u8,
-        physical_scene: &str,
+        _physical_scene: &str,
     ) -> Option<CustomScene> {
         let files: Vec<String> = self
             .registry
             .scenes
             .iter()
-            .filter(|e| e.physical_id == physical_id || e.physical_scene == physical_scene)
+            .filter(|e| e.physical_id == physical_id)
             .map(|e| e.file.clone())
             .collect();
 
@@ -325,6 +325,35 @@ impl CustomSceneManager {
         target_name: &str,
         sync_shared: bool,
     ) -> bool {
+        let safe_name = target_name.replace(|c: char| !c.is_alphanumeric() && c != '-' && c != ' ' && c != '_', "_");
+        let new_file = format!("custom_names_scene-{}-{}.json", safe_name, self.mesa_nome);
+
+        let local_path = self.data_dir.join("local").join(&new_file);
+        let shared_path = self.data_dir.join("shared").join(&new_file);
+        let exists = local_path.exists() || shared_path.exists() || self.cache.contains_key(&new_file);
+
+        if exists {
+            // Se o arquivo de nomes customizados já existe para esse nome de cena,
+            // nós apenas o associamos no registry ao invés de sobrescrever ou copiar da cena anterior.
+            if !self.cache.contains_key(&new_file) {
+                let path = if local_path.exists() { local_path } else { shared_path };
+                if let Ok((scene, mtime)) = load_scene_inner(&path) {
+                    self.cache.insert(new_file.clone(), CachedScene { scene, mtime });
+                }
+            }
+
+            self.registry.scenes.retain(|e| e.physical_id != target_id);
+            self.registry.scenes.push(SceneEntry {
+                custom_name: Some(target_name.to_string()),
+                physical_scene: target_name.to_string(),
+                physical_id: target_id,
+                file: new_file,
+            });
+            self.registry_dirty = true;
+            self.persist(sync_shared);
+            return true;
+        }
+
         let source_entry = self
             .registry
             .scenes
@@ -335,9 +364,6 @@ impl CustomSceneManager {
         if let Some(src) = source_entry {
             // Obtém os dados da cena de origem
             if let Some(cached_src) = self.get_scene(&src.file).cloned() {
-                let safe_name = target_name.replace(|c: char| !c.is_alphanumeric() && c != '-' && c != ' ' && c != '_', "_");
-                let new_file = format!("custom_names_scene-{}-{}.json", safe_name, self.mesa_nome);
-
                 // Cria a nova cena em memória
                 self.create_scene(&new_file, target_name, target_id, cached_src.channels);
 
@@ -361,7 +387,16 @@ impl CustomSceneManager {
     }
 
     pub fn ensure_registry_entry(&mut self, physical_scene: &str, physical_id: u8, filename: &str) {
-        if !self.registry.scenes.iter().any(|e| e.file == filename) {
+        // Remove qualquer entrada anterior para o mesmo physical_id para evitar duplicados
+        self.registry.scenes.retain(|e| e.physical_id != physical_id);
+
+        if let Some(entry) = self.registry.scenes.iter_mut().find(|e| e.file == filename) {
+            if entry.physical_id != physical_id || entry.physical_scene != physical_scene {
+                entry.physical_id = physical_id;
+                entry.physical_scene = physical_scene.to_string();
+                self.registry_dirty = true;
+            }
+        } else {
             // Attempt to extract a default custom name from the filename if we don't have one
             let mut extracted_name = filename.to_string();
             if let Some(stripped) = extracted_name.strip_prefix("custom_names_scene-") {

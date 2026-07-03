@@ -121,11 +121,9 @@ function renderCustomScenesList(scenes) {
         let html = '';
         for (let i = 0; i < scenes.length; i++) {
             const s = scenes[i];
-            console.log('[CUSTOM] rendering scene', i, ':', s.file, 'physical:', s.physical_scene, 'id:', s.physical_id);
             const assigned = s.physical_scene ? s.physical_scene.trim() : '';
-            const prefix = String(s.physical_id + 1).padStart(2, '0');
+            const prefix = String(s.physical_id).padStart(2, '0');
             
-            // Tenta pegar o nome pelo campo novo custom_name, ou extrai via fallback
             let sceneDisplayName = s.custom_name;
             if (!sceneDisplayName) {
                 sceneDisplayName = s.file.replace(/^custom_names_scene-/, '').replace(/\.json$/, '');
@@ -134,7 +132,7 @@ function renderCustomScenesList(scenes) {
                     sceneDisplayName = sceneDisplayName.substring(0, sceneDisplayName.length - suffix.length);
                 }
             }
-            
+
             html += '<div style="background:#222; border:1px solid #333; border-radius:8px; padding:12px; margin-bottom:8px; text-align:left;">';
             html += '<div style="display:flex; justify-content:space-between; align-items:center;">';
             html += '<div style="flex:1;">';
@@ -243,7 +241,7 @@ window.openAssignScene = function(index) {
     for (let i = 0; i < library.length; i++) {
         const libScene = library[i];
         if (!libScene) continue;
-        const idx = String(libScene.index + 1).padStart(2, '0');
+        const idx = String(libScene.index).padStart(2, '0');
         const name = libScene.name || 'Sem nome';
         const checked = (libScene.index === scene.physical_id) ? ' checked' : '';
         html += '<label style="display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:6px; cursor:pointer; background:' + (checked ? '#2a4a2a' : 'transparent') + ';">';

@@ -1089,6 +1089,8 @@ pub fn register_handlers(
 
         // --- ASSIGN CUSTOM SCENE ---
         let csm_assign = csm_socket.clone();
+        let state_assign = global_state_socket.clone();
+        let io_assign = io.clone();
         socket.on(
             "assignCustomScene",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -1118,6 +1120,51 @@ pub fn register_handlers(
                     csm.ensure_registry_entry(&physical_scene, physical_id, &file);
                     csm.persist(sync_shared);
                 }
+
+                // Broadcast de nomes resolvidos e customSceneLoaded para atualizar o frontend
+                let io_broadcast = io_assign.clone();
+                let state_bcast = state_assign.clone();
+                let csm_bcast = csm_assign.clone();
+                tokio::spawn(async move {
+                    crate::name_resolver::broadcast(&io_broadcast, &state_bcast, &csm_bcast).await;
+
+                    // Também emite customSceneLoaded se o ID atribuído for o ID da cena ativa atual
+                    let active_id = {
+                        let state = state_bcast.read().await;
+                        state.scene_manager.active_scene_index
+                    };
+                    if physical_id == active_id {
+                        let scene_opt = {
+                            let mut csm = csm_bcast.write().await;
+                            csm.find_scene_for_physical(physical_id, &physical_scene)
+                        };
+                        if let Some(scene) = scene_opt {
+                            let channels_arr: Vec<serde_json::Value> = scene
+                                .channels
+                                .iter()
+                                .map(|(ch_id, entry)| {
+                                    serde_json::json!({
+                                        "ch": ch_id.to_global_channel(),
+                                        "name": entry.name,
+                                        "short": entry.short
+                                    })
+                                })
+                                .collect();
+
+                            let _ = io_broadcast
+                                .emit(
+                                    "customSceneLoaded",
+                                    &serde_json::json!({
+                                        "active": true,
+                                        "scene_name": scene.scene_name,
+                                        "scene_id": scene.scene_id,
+                                        "channels": channels_arr
+                                    })
+                                )
+                                .await;
+                        }
+                    }
+                });
 
                 let _ = socket.emit(
                     "assignResult",
@@ -1293,8 +1340,15 @@ pub fn register_handlers(
                     {
                         let mut csm = csm_save.write().await;
 
-                        // Se estamos salvando em um slot diferente do atual, duplicamos a cena
-                        if index != original_scene_index {
+                        let name_changed = {
+                            csm.registry().scenes.iter()
+                                .find(|e| e.physical_id == index)
+                                .map(|e| e.physical_scene.trim().to_uppercase() != target_name.trim().to_uppercase())
+                                .unwrap_or(true)
+                        };
+
+                        // Se estamos salvando em um slot diferente do atual, ou se o nome mudou, duplicamos/atualizamos a cena
+                        if index != original_scene_index || name_changed {
                             csm.duplicate_scene_by_id(original_scene_index, index, &target_name, sync_shared);
                         } else {
                             csm.update_physical_scene_name(index, &target_name, sync_shared);
@@ -1304,6 +1358,53 @@ pub fn register_handlers(
                         let m_nome = csm.mesa_nome().to_string();
                         let _ = io_save.emit("customScenesList", &serde_json::json!({ "scenes": list, "mesa_nome": m_nome }));
                     }
+
+                    // Broadcast de nomes resolvidos e customSceneLoaded para atualizar todo o frontend (id, nome da cena e canais)
+                    let io_broadcast = io_save.clone();
+                    let state_bcast = state_save.clone();
+                    let csm_bcast = csm_save.clone();
+                    let target_name_for_spawn = target_name.clone();
+                    tokio::spawn(async move {
+                        crate::name_resolver::broadcast(&io_broadcast, &state_bcast, &csm_bcast).await;
+
+                        let scene_opt = {
+                            let mut csm = csm_bcast.write().await;
+                            csm.find_scene_for_physical(index, &target_name_for_spawn)
+                        };
+                        if let Some(scene) = scene_opt {
+                            let channels_arr: Vec<serde_json::Value> = scene
+                                .channels
+                                .iter()
+                                .map(|(ch_id, entry)| {
+                                    serde_json::json!({
+                                        "ch": ch_id.to_global_channel(),
+                                        "name": entry.name,
+                                        "short": entry.short
+                                    })
+                                })
+                                .collect();
+
+                            let _ = io_broadcast
+                                .emit(
+                                    "customSceneLoaded",
+                                    &serde_json::json!({
+                                        "active": true,
+                                        "scene_name": scene.scene_name,
+                                        "scene_id": scene.scene_id,
+                                        "channels": channels_arr
+                                    })
+                                )
+                                .await;
+                        } else {
+                            let _ = io_broadcast
+                                .emit(
+                                    "customSceneLoaded",
+                                    &serde_json::json!({ "active": false }),
+                                )
+                                .await;
+                        }
+                    });
+
                     let _ = socket.emit(
                         "saveSceneResult",
                         &serde_json::json!({
@@ -1537,7 +1638,7 @@ pub fn register_handlers(
 
                 let scene_opt = {
                     let mut csm = csm_ensure.write().await;
-                    csm.get_scene(&fname).cloned()
+                    csm.find_scene_for_physical(scene_number, &scene_name)
                 };
 
                 if let Some(scene) = scene_opt {
