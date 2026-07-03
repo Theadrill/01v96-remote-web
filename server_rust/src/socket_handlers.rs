@@ -559,12 +559,14 @@ pub fn register_handlers(
 
                     tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
 
-                    {
+                    let (scene_state, current_scene_json) = {
                         let state = state_scene.read().await;
-                        let _ = io_scene.emit("scenesUpdated", &state.scene_manager.get_state());
-                        if let Some(ref cs) = state.scene_manager.current_scene {
-                            let _ = io_scene.emit("currentScene", &serde_json::json!(cs));
-                        }
+                        let cs_json = state.scene_manager.current_scene.as_ref().map(|cs| serde_json::json!(cs));
+                        (state.scene_manager.get_state(), cs_json)
+                    };
+                    let _ = io_scene.emit("scenesUpdated", &scene_state).await;
+                    if let Some(ref cs_json) = current_scene_json {
+                        let _ = io_scene.emit("currentScene", cs_json).await;
                     }
 
                     // --- Custom Scene: enqueue name application ---
@@ -1322,7 +1324,7 @@ pub fn register_handlers(
                     }
 
                     // Update state and emit events only after MIDI commands completed
-                    {
+                    let (current_scene_val, scene_state_val) = {
                         let mut state = state_save.write().await;
                         state.scene_manager.scenes[index as usize] =
                             Some(crate::scene_manager::SceneData {
@@ -1330,14 +1332,18 @@ pub fn register_handlers(
                                 name: target_name.clone(),
                             });
                         state.scene_manager.set_active_scene(index);
-                        let _ =
-                            io_save.emit("currentScene", &state.scene_manager.current_scene);
-                        let _ = io_save.emit("scenesUpdated", &state.scene_manager.get_state());
-                    }
+                        (
+                            state.scene_manager.current_scene.clone(),
+                            state.scene_manager.get_state(),
+                        )
+                    };
+                    // Emite fora do lock e com .await para garantir entrega a todos os clientes
+                    let _ = io_save.emit("currentScene", &current_scene_val).await;
+                    let _ = io_save.emit("scenesUpdated", &scene_state_val).await;
 
                     // Update Custom Scenes Registry to reflect the new physical scene name
                     let sync_shared = data.get("syncShared").and_then(|v| v.as_bool()).unwrap_or(false);
-                    {
+                    let (custom_list, custom_mesa) = {
                         let mut csm = csm_save.write().await;
 
                         let name_changed = {
@@ -1356,8 +1362,9 @@ pub fn register_handlers(
 
                         let list = csm.list_scenes();
                         let m_nome = csm.mesa_nome().to_string();
-                        let _ = io_save.emit("customScenesList", &serde_json::json!({ "scenes": list, "mesa_nome": m_nome }));
-                    }
+                        (list, m_nome)
+                    };
+                    let _ = io_save.emit("customScenesList", &serde_json::json!({ "scenes": custom_list, "mesa_nome": custom_mesa })).await;
 
                     // Broadcast de nomes resolvidos e customSceneLoaded para atualizar todo o frontend (id, nome da cena e canais)
                     let io_broadcast = io_save.clone();
@@ -1434,9 +1441,12 @@ pub fn register_handlers(
                     ];
                     scheduler_delete.enqueue(delete_sysex, 0).await;
 
-                    let mut state = state_delete.write().await;
-                    state.scene_manager.scenes[index as usize] = None;
-                    let _ = io_delete.emit("scenesUpdated", &state.scene_manager.get_state());
+                    let scenes_state = {
+                        let mut state = state_delete.write().await;
+                        state.scene_manager.scenes[index as usize] = None;
+                        state.scene_manager.get_state()
+                    };
+                    let _ = io_delete.emit("scenesUpdated", &scenes_state).await;
                 }
             },
         );
