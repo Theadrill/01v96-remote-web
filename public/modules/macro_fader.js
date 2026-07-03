@@ -1,4 +1,4 @@
-﻿let macroSelectedChannels = JSON.parse(localStorage.getItem('macro_selected_channels')) || [];
+let macroSelectedChannels = JSON.parse(localStorage.getItem('macro_selected_channels')) || [];
 let tempMacroSelectedChannels = [];
 let macroLockedChannels = JSON.parse(localStorage.getItem('macro_locked_channels')) || [];
 let tempMacroLockedChannels = [];
@@ -149,10 +149,10 @@ function createMacroFaderInstance(config) {
                     <div id="${dbDisplayId}" class="macro-db-display">--</div>
                     
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; padding: 5px;">
-                        <div class="macro-nudge-btn-container" style="flex: 1;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big">+</button>
                         </div>
-                        <div class="macro-nudge-btn-container" style="flex: 1;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big">-</button>
                         </div>
                     </div>
@@ -174,10 +174,10 @@ function createMacroFaderInstance(config) {
                     <div id="${dbDisplayId}" class="macro-db-display">--</div>
                     
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; width: 100%;">
-                        <div class="macro-nudge-btn-container" style="flex: 1;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big" style="width: 100%; font-size: 40px;">+</button>
                         </div>
-                        <div class="macro-nudge-btn-container" style="flex: 1;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big" style="width: 100%; font-size: 40px;">-</button>
                         </div>
                     </div>

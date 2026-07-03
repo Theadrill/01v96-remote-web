@@ -3128,6 +3128,9 @@ body.is-portrait .dyn-box {
     line-height: 1;
     -webkit-appearance: none;
     appearance: none;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .btn-nudge-macro-big:active {
