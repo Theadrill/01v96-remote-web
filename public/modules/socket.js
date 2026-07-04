@@ -529,14 +529,26 @@ socket.on('sync', (s) => {
         for (let i = 0; i < 40; i++) {
             const ch = getCh(s.channels, i);
             if (ch) {
+                const prevAuxVal = channelStates[i][`aux${activeMix}`];
+                const prevAuxOn = channelStates[i][`aux${activeMix}On`];
                 Object.assign(channelStates[i], ch);
 
                 let v = ch.value;
                 let o = ch.on;
 
                 if (musicianMode || technicianMixMode) {
-                    v = ch[`aux${activeMix}`] || 0;
-                    o = ch[`aux${activeMix}On`] || false;
+                    v = channelStates[i][`aux${activeMix}`];
+                    o = channelStates[i][`aux${activeMix}On`];
+                    if ((v === 0 || v === null || v === undefined) && (prevAuxVal > 0 || prevAuxVal === true)) {
+                        channelStates[i][`aux${activeMix}`] = prevAuxVal;
+                        v = prevAuxVal;
+                    }
+                    if ((o === false || o === null || o === undefined) && prevAuxOn === true) {
+                        channelStates[i][`aux${activeMix}On`] = true;
+                        o = true;
+                    }
+                    if (v === undefined || v === null) v = 0;
+                    if (o === undefined || o === null) o = false;
                 }
 
                 const soloBool = !!ch.solo;

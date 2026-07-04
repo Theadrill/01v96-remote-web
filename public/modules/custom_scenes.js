@@ -97,7 +97,9 @@ socket.on('customScenesList', (data) => {
 // Update the assign modal dynamically if the scenes are updated while it's open
 socket.on('scenesUpdated', (data) => {
     if (data && data.scenes) {
-        if (window.assignModalOpen && window.currentAssignSceneIndex !== null) {
+        const modal = document.getElementById('assignSceneModal');
+        const isVisible = modal && modal.style.display !== 'none' && window.getComputedStyle(modal).display !== 'none';
+        if (isVisible && window.currentAssignSceneIndex !== null) {
             console.log('[CUSTOM] scenesUpdated received while modal open, refreshing modal...');
             window.openAssignScene(window.currentAssignSceneIndex);
         }
@@ -272,6 +274,8 @@ window.confirmAssignScene = function() {
         physical_scene: libScene.name || '',
         syncShared: window.customScenesSyncEnabled
     });
+    window.assignModalOpen = false;
+    window.currentAssignSceneIndex = null;
     document.getElementById('assignSceneModal').style.display = 'none';
 };
 

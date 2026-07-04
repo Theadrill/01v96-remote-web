@@ -184,6 +184,7 @@ function toggleState(type, ch) {
 
 let nudgeTimeout = null;
 let nudgeInterval = null;
+let nudgeMaxDuration = null;
 
 function startNudge(ch, dir) {
     stopNudge();
@@ -194,13 +195,19 @@ function startNudge(ch, dir) {
             nudgeFader(ch, dir * 3);
         }, 80);
     }, 500);
+
+    nudgeMaxDuration = setTimeout(() => {
+        stopNudge();
+    }, 10000);
 }
 
 function stopNudge() {
     if (nudgeTimeout) clearTimeout(nudgeTimeout);
     if (nudgeInterval) clearInterval(nudgeInterval);
+    if (nudgeMaxDuration) clearTimeout(nudgeMaxDuration);
     nudgeTimeout = null;
     nudgeInterval = null;
+    nudgeMaxDuration = null;
 }
 
 function nudgeFader(ch, dir) {
@@ -609,3 +616,9 @@ function restrictSliderTrackTap(e) {
 
 window.addEventListener('pointerdown', restrictSliderTrackTap, { capture: true });
 window.addEventListener('touchstart', restrictSliderTrackTap, { capture: true, passive: true });
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopNudge();
+    }
+});

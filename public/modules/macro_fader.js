@@ -29,6 +29,7 @@ function createMacroFaderInstance(config) {
 
     let nudgeInterval = null;
     let nudgeTimeout = null;
+    let nudgeMaxDurationTimer = null;
     let deltaSteps = 0;
     let dbResetTimer = null;
 
@@ -107,13 +108,19 @@ function createMacroFaderInstance(config) {
                 nudge(dir * 3);
             }, repeatMs);
         }, holdMs);
+
+        nudgeMaxDurationTimer = setTimeout(() => {
+            stopNudge();
+        }, 10000);
     }
 
     function stopNudge() {
         if (nudgeTimeout) clearTimeout(nudgeTimeout);
         if (nudgeInterval) clearInterval(nudgeInterval);
+        if (nudgeMaxDurationTimer) clearTimeout(nudgeMaxDurationTimer);
         nudgeTimeout = null;
         nudgeInterval = null;
+        nudgeMaxDurationTimer = null;
     }
 
     function getHtml() {
@@ -149,10 +156,10 @@ function createMacroFaderInstance(config) {
                     <div id="${dbDisplayId}" class="macro-db-display">--</div>
                     
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; padding: 5px;">
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big">+</button>
                         </div>
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big">-</button>
                         </div>
                     </div>
@@ -174,10 +181,10 @@ function createMacroFaderInstance(config) {
                     <div id="${dbDisplayId}" class="macro-db-display">--</div>
                     
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; width: 100%;">
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big" style="width: 100%; font-size: 40px;">+</button>
                         </div>
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big" style="width: 100%; font-size: 40px;">-</button>
                         </div>
                     </div>
@@ -332,3 +339,10 @@ function renderMacroFader() {
 
 window.addEventListener('load', renderMacroFader);
 window.addEventListener('resize', renderMacroFader);
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        if (typeof window.stopMacroNudge === 'function') window.stopMacroNudge();
+        if (typeof window.stopVolumeGeralNudge === 'function') window.stopVolumeGeralNudge();
+    }
+});

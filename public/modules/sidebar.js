@@ -461,7 +461,11 @@ updateViewportInfo();
 window.addEventListener('pointerdown', (e) => {
     let closedAny = false;
     if (e.target.classList.contains('modal-overlay')) {
-        e.target.style.display = 'none';
+        if (e.target.id === 'assignSceneModal' && typeof closeAssignSceneModal === 'function') {
+            closeAssignSceneModal();
+        } else {
+            e.target.style.display = 'none';
+        }
         closedAny = true;
     }
     if (e.target.classList.contains('ch-modal-overlay')) {
