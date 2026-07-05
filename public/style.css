@@ -1886,6 +1886,10 @@ body.layout-desktop .ch-modal-overlay {
     align-items: center;
 }
 
+.styled-monitoringModal {
+    z-index: 2500 !important;
+}
+
 .modal-content {
     background: #222;
     padding: 20px;
