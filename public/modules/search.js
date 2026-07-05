@@ -98,7 +98,6 @@ function createFuzzySearch({ container, targetEl, placeholder = '🔍  Buscar...
             'color:#fff',
             'font-size:14px',
             'outline:none',
-            'margin-bottom:12px',
             'flex-shrink:0',
             'transition:border-color 0.2s',
         ].join(';');

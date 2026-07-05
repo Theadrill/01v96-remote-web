@@ -42,7 +42,7 @@ window.showSceneGrid = (action) => {
     });
 
     // --- Busca fuzzy (search.js) ---
-    createFuzzySearch({
+    const searchResult = createFuzzySearch({
         container:   grid.parentNode,
         targetEl:    grid,
         placeholder: '🔍  Buscar cena...',
@@ -59,7 +59,99 @@ window.showSceneGrid = (action) => {
         }
     });
 
+    // Adiciona botão de limpar busca
+    const input = searchResult.input;
+
+    // Move margin-bottom do input para o grid (pai) como margin-top
+    grid.style.marginTop = '12px';
+
+    // Cria um wrapper para o input e botão
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.width = '100%';
+    wrapper.style.gap = '8px'; // Espaço entre input e botão
+    wrapper.style.alignItems = 'center'; // Alinha verticalmente
+
+    // Move o input para dentro do wrapper
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    // Ajusta o input para ocupar o espaço disponível
+    input.style.flex = '1';
+    input.style.paddingRight = '0'; // Remove o padding que adicionamos antes
+    input.style.boxSizing = 'border-box'; // Inclui padding e border na largura total
+
+    // Cria botão de limpar busca
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.innerHTML = '×'; // Símbolo de multiplicação como X
+    clearBtn.title = 'Limpar busca';
+    clearBtn.style.cssText = `
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        padding: 0;
+        border: none;
+        border-radius: 6px;
+        background: rgba(220, 53, 69, 0.8); /* Vermelho semi-transparente */
+        color: white;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+    `;
+
+    // Efeito de hover
+    const updateButtonStyle = (isHovered) => {
+        if (isHovered) {
+            clearBtn.style.background = 'rgba(220, 53, 69, 1)';
+        } else {
+            clearBtn.style.background = 'rgba(220, 53, 69, 0.8)';
+        }
+    };
+
+    clearBtn.addEventListener('mouseenter', () => updateButtonStyle(true));
+    clearBtn.addEventListener('mouseleave', () => updateButtonStyle(false));
+
+    // Manipulador de clique
+    clearBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita disparar eventos de input
+        input.value = '';
+        // Dispara a atualização do filtro
+        if (input._fuzzyHandler) {
+            input._fuzzyHandler();
+        }
+        // Opcionalmente re-foca o input após limpar
+        input.focus();
+    });
+
+    // Adiciona o botão ao wrapper
+    wrapper.appendChild(clearBtn);
+
     modal.style.display = 'flex';
+
+    // Preenche automaticamente o campo de busca com o nome da cena atual ao abrir para salvar
+    if (action === 'save') {
+        const displayEl = document.getElementById('configSceneDisplay');
+        if (displayEl) {
+            const text = displayEl.textContent || displayEl.innerText;
+            const match = text.match(/ - (.+)/);
+            if (match) {
+                const sceneName = match[1].trim();
+                const searchInput = document.getElementById('sceneSearchInput');
+                if (searchInput) {
+                    searchInput.value = sceneName;
+                    // Dispara o evento de busca para filtrar imediatamente
+                    const inputEvent = new Event('input', { bubbles: true });
+                    searchInput.dispatchEvent(inputEvent);
+                }
+            }
+        }
+    }
 };
 
 // ---------------------------------------------------------------------------
