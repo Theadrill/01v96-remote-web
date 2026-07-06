@@ -2,50 +2,326 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Status">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Status do Servidor</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=52">
     <style>
-        /* We can add some specific styles for the status page if needed, but we'll use the existing style.css */
-        #log-view {
-            white-space: pre-wrap;
-            overflow: auto;
-            height: 80vh;
-            border: 1px solid #444;
-            background: #222;
+        /* Status Page Specific Styles */
+        #status-root {
+            display: flex;
+            flex-direction: column;
+            min-height: 100dvh;
+            width: 100vw;
+            background: #111;
             color: #fff;
-            padding: 10px;
-            margin-bottom: 10px;
-            display: block;
-            width: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            overscroll-behavior: none !important;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             box-sizing: border-box;
         }
+
+        .status-header {
+            flex-shrink: 0;
+            padding: 16px 20px 12px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            background: #1a1a1a;
+        }
+
+        .status-title {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #fff;
+            text-transform: uppercase;
+            margin: 0 0 4px;
+        }
+
+        .status-subtitle {
+            font-size: 12px;
+            color: #aaa;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .status-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .status-modal {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            border: 1px solid #2e7d32;
+            border-radius: 16px;
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(46, 125, 50, 0.15), 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 640px) {
+            .status-modal {
+                border-radius: 12px;
+                margin: 0;
+                border: 1px solid #2e7d32;
+            }
+        }
+
+        .status-modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #333;
+            background: #1f1f1f;
+            flex-shrink: 0;
+        }
+
+        .status-modal-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #4caf50;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .status-log-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        #log-view {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monospace', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #e0e0e0;
+            background: #111;
+            padding: 12px 16px;
+            margin: 0;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #log-view::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #log-view::-webkit-scrollbar-track {
+            background: #111;
+        }
+
+        #log-view::-webkit-scrollbar-thumb {
+            background: #2e7d32;
+            border-radius: 3px;
+        }
+
+        .status-modal-footer {
+            flex-shrink: 0;
+            padding: 16px 20px;
+            border-top: 1px solid #333;
+            background: #1f1f1f;
+            display: flex;
+            justify-content: center;
+        }
+
         #restart-btn {
             width: 100%;
-            padding: 15px 5px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            font-weight: bold;
+            max-width: 320px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 15px;
             border: none;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: transform 0.1s ease, filter 0.1s ease, box-shadow 0.2s ease;
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: #fff;
+            border: 1px solid #34ce57;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        #restart-btn:active {
-            transform: scale(0.98);
+
+        #restart-btn:active:not(:disabled) {
+            transform: scale(0.97);
+            filter: brightness(0.9);
         }
-        /* We'll reuse the btn-outs class for the restart button */
+
+        #restart-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+        }
+
+        #restart-btn:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        /* Loading state for log */
+        #log-view.loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+
+        #log-view.loading::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            border: 3px solid #333;
+            border-top-color: #2e7d32;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .status-header {
+                padding: 12px 16px 8px;
+            }
+
+            .status-title {
+                font-size: 18px;
+            }
+
+            .status-content {
+                padding: 12px;
+            }
+
+            .status-modal-header {
+                padding: 14px 16px;
+            }
+
+            #log-view {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            .status-modal-footer {
+                padding: 14px 16px;
+            }
+
+            #restart-btn {
+                padding: 14px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .status-header {
+                padding: 8px 16px 6px;
+            }
+
+            .status-title {
+                font-size: 16px;
+            }
+
+            .status-subtitle {
+                font-size: 10px;
+            }
+
+            .status-content {
+                padding: 10px;
+            }
+
+            .status-modal-header,
+            .status-modal-footer {
+                padding: 10px 14px;
+            }
+
+            #log-view {
+                padding: 8px 10px;
+                font-size: 10px;
+            }
+
+            #restart-btn {
+                padding: 12px 18px;
+                font-size: 13px;
+            }
+        }
+
+        /* Safe area insets for iOS */
+        @supports (padding: max(0px)) {
+            #status-root {
+                padding-top: max(16px, env(safe-area-inset-top));
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-right: max(16px, env(safe-area-inset-right));
+            }
+
+            @media (max-width: 640px) {
+                .status-content {
+                    padding-left: max(12px, env(safe-area-inset-left));
+                    padding-right: max(12px, env(safe-area-inset-right));
+                }
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="log-view">Carregando logs...</div>
-    <button id="restart-btn" class="btn-outs">Reiniciar Servidor</button>
+    <div id="status-root">
+        <header class="status-header">
+            <h1 class="status-title">Status do Servidor</h1>
+            <p class="status-subtitle">01V96 Live Safe</p>
+        </header>
+
+        <main class="status-content">
+            <div class="status-modal">
+                <div class="status-modal-header">
+                    <h2 class="status-modal-title">Log do Servidor</h2>
+                </div>
+
+                <div class="status-log-container">
+                    <pre id="log-view" class="loading">Carregando logs...</pre>
+                </div>
+
+                <footer class="status-modal-footer">
+                    <button id="restart-btn" class="btn-outs">Reiniciar Servidor</button>
+                </footer>
+            </div>
+        </main>
+    </div>
 
     <script>
         const logView = document.getElementById('log-view');
         const restartBtn = document.getElementById('restart-btn');
 
+        let isLoading = false;
+
         // Function to fetch and display logs
         async function loadLogs() {
+            if (isLoading) return;
+            isLoading = true;
+
             try {
                 const response = await fetch('/api/log');
                 if (!response.ok) {
@@ -53,11 +329,16 @@
                 }
                 const text = await response.text();
                 logView.textContent = text;
+                logView.classList.remove('loading');
+
                 // Scroll to bottom
                 logView.scrollTop = logView.scrollHeight;
             } catch (error) {
-                logView.textContent = 'Erro ao carregar logs: ' + error;
+                logView.textContent = 'Erro ao carregar logs: ' + error.message;
+                logView.classList.remove('loading');
                 console.error('Error loading logs:', error);
+            } finally {
+                isLoading = false;
             }
         }
 
@@ -70,6 +351,7 @@
         restartBtn.addEventListener('click', async () => {
             restartBtn.disabled = true;
             restartBtn.textContent = 'Reiniciando...';
+
             try {
                 const response = await fetch('/api/restart', {
                     method: 'POST',
@@ -77,19 +359,28 @@
                         'Content-Type': 'application/json'
                     }
                 });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+
                 const data = await response.json();
                 alert(data.message || 'Servidor reiniciado com sucesso!');
             } catch (error) {
-                alert('Erro ao reiniciar servidor: ' + error);
+                alert('Erro ao reiniciar servidor: ' + error.message);
                 console.error('Error restarting server:', error);
             } finally {
                 restartBtn.disabled = false;
                 restartBtn.textContent = 'Reiniciar Servidor';
             }
         });
+
+        // Prevent double-tap zoom on iOS
+        document.addEventListener('dblclick', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>

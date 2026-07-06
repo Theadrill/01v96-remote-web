@@ -69,8 +69,8 @@ impl TrayApp {
         let remote_i = MenuItem::new(remote_label, true, None);
 
         let browser_i = MenuItem::new("🌐 Abrir no Navegador", true, None);
-        let status_i = MenuItem::new("Status do Servidor", true, None);
-        let restart_i = MenuItem::new("Reiniciar Servidor", true, None);
+        let status_i = MenuItem::new("📊 Status do Servidor", true, None);
+        let restart_i = MenuItem::new("🔄 Reiniciar Servidor", true, None);
         let quit_i = MenuItem::new("❌ Sair e Encerrar", true, None);
 
         let connect_id = connect_i.id().clone();

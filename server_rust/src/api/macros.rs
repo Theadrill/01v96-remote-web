@@ -1,8 +1,8 @@
 use axum::{
     Json,
     extract::{Extension, Path, Query, State},
-    response::{IntoResponse, Response},
     http::StatusCode,
+    response::IntoResponse,
 };
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -10,7 +10,6 @@ use std::collections::{HashMap, HashSet};
 use std::path::{Path as StdPath, PathBuf};
 use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
-use std::fs;
 use crate::SHUTDOWN_TX;
 
 // Git Sync state
