@@ -1,6 +1,8 @@
 use axum::{
     Json,
     extract::{Extension, Path, Query, State},
+    response::{IntoResponse, Response},
+    http::StatusCode,
 };
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -8,6 +10,8 @@ use std::collections::{HashMap, HashSet};
 use std::path::{Path as StdPath, PathBuf};
 use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
+use std::fs;
+use crate::SHUTDOWN_TX;
 
 // Git Sync state
 lazy_static::lazy_static! {
@@ -115,6 +119,9 @@ pub fn router(
         )
         .route("/macros/proxy/http", axum::routing::post(proxy_http))
         .route("/macros/proxy/udp", axum::routing::post(proxy_udp))
+        // New endpoints for status page
+        .route("/log", axum::routing::get(get_log))
+        .route("/restart", axum::routing::post(restart_server))
         .with_state(state)
         .layer(Extension(csm))
 }
@@ -643,6 +650,25 @@ struct ProxyUdpReq {
     host: String,
     port: u16,
     data: Value,
+}
+
+async fn get_log() -> Result<String, (StatusCode, String)> {
+    let log_path = crate::config::get_project_root().join("log").join("server_rust_log.txt");
+    match tokio::fs::read_to_string(log_path).await {
+        Ok(content) => Ok(content),
+        Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to read log: {}", e))),
+    }
+}
+
+async fn restart_server() -> Result<impl IntoResponse, (StatusCode, String)> {
+    let mut lock = SHUTDOWN_TX.lock().await;
+    if let Some(tx) = lock.take() {
+        // Send shutdown signal
+        let _ = tx.send(()).await;
+        Ok(Json(json!({ "success": true, "message": "Server restart initiated" })))
+    } else {
+        Err((StatusCode::INTERNAL_SERVER_ERROR, "Shutdown sender not found".to_string()))
+    }
 }
 
 async fn proxy_udp(Json(req): Json<ProxyUdpReq>) -> Json<Value> {

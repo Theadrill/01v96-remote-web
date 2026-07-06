@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status do Servidor</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* We can add some specific styles for the status page if needed, but we'll use the existing style.css */
+        #log-view {
+            white-space: pre-wrap;
+            overflow: auto;
+            height: 80vh;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #restart-btn {
+            width: 100%;
+            padding: 15px 5px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #restart-btn:active {
+            transform: scale(0.98);
+        }
+        /* We'll reuse the btn-outs class for the restart button */
+    </style>
+</head>
+<body>
+    <div id="log-view">Carregando logs...</div>
+    <button id="restart-btn" class="btn-outs">Reiniciar Servidor</button>
+
+    <script>
+        const logView = document.getElementById('log-view');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Function to fetch and display logs
+        async function loadLogs() {
+            try {
+                const response = await fetch('/api/log');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const text = await response.text();
+                logView.textContent = text;
+                // Scroll to bottom
+                logView.scrollTop = logView.scrollHeight;
+            } catch (error) {
+                logView.textContent = 'Erro ao carregar logs: ' + error;
+                console.error('Error loading logs:', error);
+            }
+        }
+
+        // Load logs every 2 seconds
+        setInterval(loadLogs, 2000);
+        // Load immediately on page load
+        loadLogs();
+
+        // Restart button handler
+        restartBtn.addEventListener('click', async () => {
+            restartBtn.disabled = true;
+            restartBtn.textContent = 'Reiniciando...';
+            try {
+                const response = await fetch('/api/restart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                alert(data.message || 'Servidor reiniciado com sucesso!');
+            } catch (error) {
+                alert('Erro ao reiniciar servidor: ' + error);
+                console.error('Error restarting server:', error);
+            } finally {
+                restartBtn.disabled = false;
+                restartBtn.textContent = 'Reiniciar Servidor';
+            }
+        });
+    </script>
+</body>
+</html>
