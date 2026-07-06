@@ -18,10 +18,16 @@ mod tailscale_http;
 use axum::Router;
 use socketioxide::SocketIo;
 use std::sync::Arc;
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, Mutex};
 use tracing::info;
+use lazy_static::lazy_static;
 
 mod tray;
+
+lazy_static! {
+    pub static ref SHUTDOWN_TX: Mutex<Option<tokio::sync::mpsc::Sender<()>>> = 
+        Mutex::new(None);
+}
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (shutdown_tx, shutdown_rx) = tokio::sync::mpsc::channel::<()>(1);
     let config = config::AppConfig::load();
@@ -39,6 +45,11 @@ async fn async_main(
     mut shutdown_rx: tokio::sync::mpsc::Receiver<()>,
     shutdown_tx: tokio::sync::mpsc::Sender<()>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    // Store the shutdown sender for external shutdown requests
+    {
+        let mut lock = SHUTDOWN_TX.lock().await;
+        *lock = Some(shutdown_tx.clone());
+    }
     use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
     
     let root = config::get_project_root();

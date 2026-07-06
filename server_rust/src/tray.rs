@@ -13,6 +13,7 @@ pub struct TrayApp {
     pub connect_id: MenuId,
     pub remote_midi_id: MenuId,
     pub browser_id: MenuId,
+    pub status_id: MenuId,
     pub restart_id: MenuId,
     pub quit_id: MenuId,
     port: u16,
@@ -68,18 +69,21 @@ impl TrayApp {
         let remote_i = MenuItem::new(remote_label, true, None);
 
         let browser_i = MenuItem::new("🌐 Abrir no Navegador", true, None);
+        let status_i = MenuItem::new("Status do Servidor", true, None);
         let restart_i = MenuItem::new("Reiniciar Servidor", true, None);
         let quit_i = MenuItem::new("❌ Sair e Encerrar", true, None);
 
         let connect_id = connect_i.id().clone();
         let remote_midi_id = remote_i.id().clone();
         let browser_id = browser_i.id().clone();
+        let status_id = status_i.id().clone();
         let restart_id = restart_i.id().clone();
         let quit_id = quit_i.id().clone();
 
         let _ = tray_menu.append(&connect_i);
         let _ = tray_menu.append(&remote_i);
         let _ = tray_menu.append(&browser_i);
+        let _ = tray_menu.append(&status_i);
         let _ = tray_menu.append(&restart_i);
         let _ = tray_menu.append(&PredefinedMenuItem::separator());
         let _ = tray_menu.append(&quit_i);
@@ -95,6 +99,7 @@ impl TrayApp {
             connect_id,
             remote_midi_id,
             browser_id,
+            status_id,
             restart_id,
             quit_id,
             port,
@@ -110,6 +115,17 @@ impl TrayApp {
         } else if event.id == self.browser_id {
             let url = format!("http://localhost:{}", self.port);
             println!("Abrindo navegador: {}", url);
+            #[cfg(target_os = "windows")]
+            let _ = std::process::Command::new("cmd")
+                .args(["/C", "start", &url])
+                .spawn();
+            #[cfg(target_os = "macos")]
+            let _ = std::process::Command::new("open").arg(&url).spawn();
+            #[cfg(target_os = "linux")]
+            let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
+        } else if event.id == self.status_id {
+            let url = format!("http://localhost:{}/status.html", self.port);
+            println!("Abrindo página de status: {}", url);
             #[cfg(target_os = "windows")]
             let _ = std::process::Command::new("cmd")
                 .args(["/C", "start", &url])
