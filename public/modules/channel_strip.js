@@ -193,7 +193,7 @@ function createDesktopStrip(config) {
             isMaster ?
                 `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
                 `<div class="btn-cue-placeholder"></div>`}    
-            <div class="desk-ch-name-zone" onclick="${configAction}">
+            <div class="desk-ch-name-zone" onclick="${pfx && pfx === 'mini-' && config.type === 'main' ? 'openNameEditor()' : configAction}">
                 <div id="${nameId}" class="desk-ch-name">${name}</div>
             </div>
 
