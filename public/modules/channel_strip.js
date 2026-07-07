@@ -412,7 +412,7 @@ function createMobileStrip(config) {
             `}
             ${getMobileScaleHTML()}
             ${onTop ? onBtn : ''}
-            <div class="ch-clickable-zone" onclick="${configAction}">
+            <div class="ch-clickable-zone" onclick="${pfx && pfx === 'mini-' && config.type === 'main' ? 'openNameEditor()' : configAction}">
                 <h2 class="card-title">${title}</h2>
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
@@ -492,6 +492,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         isOn,
         dbLabel: rawToDb(val, true, isMaster),
         configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${isMaster ? 52 : i})`),
+        type: "main",
         dataCh: isMaster ? "master" : i,
         onTop: musicianMode,  // Botão ON no topo apenas no modo músico
         isPaired: !isMaster && s.paired,
