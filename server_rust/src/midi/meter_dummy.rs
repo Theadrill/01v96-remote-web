@@ -63,8 +63,35 @@ pub fn start_meter_simulation(io: SocketIo) -> tokio::task::JoinHandle<()> {
 
             let now = std::time::Instant::now();
             if now.duration_since(last_emit_time).as_millis() >= 30 {
-                if let Err(e) = io.emit("meterData", &meter_buffer[..33]).await {
-                    tracing::error!("Erro ao emitir meterData: {:?}", e);
+                // Constrói pacotes SysEx sintéticos no formato da Yamaha 01V96
+                // (mesmo formato que a mesa física envia), para que o frontend
+                // alimente o MeterEngine WASM via processar_pacote_sysex().
+                //
+                // Pacote 1: Input CH 1-32
+                //   F0 43 10 3E 0D 21 00 00 00 [step1 0 step2 0 ... step32 0] F7
+                // (channel=0 → mapeia para base_ch 0..31, range de inputs 1-32)
+                let mut input_pkt: Vec<u8> = Vec::with_capacity(74);
+                input_pkt.extend_from_slice(&[0xF0, 0x43, 0x10, 0x3E, 0x0D, 0x21, 0x00, 0x00, 0x00]);
+                for i in 0..32 {
+                    let step = meter_buffer[i].clamp(0.0, 32.0) as u8;
+                    input_pkt.push(step);
+                    input_pkt.push(0x00);
+                }
+                input_pkt.push(0xF7);
+
+                // Pacote 2: Master Meter
+                //   F0 43 10 3E 0D 21 04 00 00 [master_step 0 0 0] F7
+                let master_step = meter_buffer[32].clamp(0.0, 32.0) as u8;
+                let master_pkt: Vec<u8> = vec![
+                    0xF0, 0x43, 0x10, 0x3E, 0x0D, 0x21, 0x04, 0x00, 0x00,
+                    master_step, 0x00, 0x00, 0x00, 0xF7,
+                ];
+
+                if let Err(e) = io.emit("meterDataRaw", &input_pkt).await {
+                    tracing::error!("Erro ao emitir meterDataRaw (inputs): {:?}", e);
+                }
+                if let Err(e) = io.emit("meterDataRaw", &master_pkt).await {
+                    tracing::error!("Erro ao emitir meterDataRaw (master): {:?}", e);
                 }
                 last_emit_time = now;
             }

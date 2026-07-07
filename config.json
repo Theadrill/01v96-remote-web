@@ -1,6 +1,6 @@
 {
   "boot_delay_ms": 1500,
-  "demo_mode": false,
+  "demo_mode": true,
   "disable_systray": false,
   "dmx_boot_delay_ms": 3000,
   "eq_flat_skip_hpf_lpf": true,
