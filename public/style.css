@@ -868,6 +868,7 @@ html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
     align-items: center;
     text-align: center;
     width: 100%;
+    margin-bottom: 5px;
 }
 
 .sidebar-nav {
@@ -2047,7 +2048,7 @@ body.layout-desktop .ch-modal-overlay {
     }
 
     #scn {
-        margin-bottom: 5px !important;
+        /* margin-bottom: 5px !important; */
         font-size: 10px !important;
     }
 
@@ -2145,7 +2146,7 @@ body.layout-desktop .ch-modal-overlay {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 24px;
+    /* min-height: 24px; */
     width: 100%;
     box-sizing: border-box;
     color: #0f0;
@@ -3813,7 +3814,7 @@ body:not(.layout-desktop):not(.is-portrait) .sidebar-macros .btn-macros {
 @media screen and (max-height: 500px) and (orientation: landscape) {
     body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician) {
         display: grid !important;
-        grid-template-columns: 120px 60px;
+        grid-template-columns: 100px 60px;
         grid-template-rows: auto minmax(0, 1fr);
         width: auto !important;
     }
@@ -3840,7 +3841,20 @@ body:not(.layout-desktop):not(.is-portrait) .sidebar-macros .btn-macros {
     }
 
     body:not(.layout-desktop):not(.is-portrait) .ch-modal-overlay {
-        right: 230px !important;
+        right: 170px !important;
+    }
+
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician) .btn-exit-macros {
+        display: flex !important;
+    }
+
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician) .btn-fs-macros {
+        display: flex !important;
+    }
+
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician) .dock-exit,
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician) .dock-close {
+        display: none !important;
     }
 }
 
@@ -4336,7 +4350,7 @@ screen and (max-height: 600px) {
     #virtualKeyboardSearch {
         gap: 3px !important;
         margin-top: 5px !important;
-        margin-bottom: 5px !important;
+        /* margin-bottom: 5px !important; */
     }
 
     #virtualKeyboard>div,
