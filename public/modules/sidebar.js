@@ -671,6 +671,24 @@ window.onConfigReset = function () {
     document.querySelectorAll('.modal-overlay').forEach(m => { m.style.display = 'none'; });
 };
 
+window.toggleLayerNav = function (enabled) {
+    try { localStorage.setItem('01v96_layer_nav', enabled ? 'true' : 'false'); } catch (e) {}
+    layerNavEnabled = enabled;
+    activeLayerStart = 0;
+    if (typeof initUI === 'function') initUI();
+};
+
+function setLayer(start) {
+    activeLayerStart = start;
+    if (typeof initUI === 'function') initUI();
+    if (typeof renderDock === 'function') renderDock(window.currentDockMode || 'main');
+    const mobileModal = document.getElementById('mobileMenuModal');
+    if (mobileModal && !mobileModal.classList.contains('active') && typeof renderMobileMenu === 'function') {
+        renderMobileMenu(window.currentDockMode || 'main');
+    }
+}
+window.setLayer = setLayer;
+
 window.toggleMacrosPanel = function (enabled) {
     console.log("🛠️ toggleMacrosPanel chamando com:", enabled);
     localStorage.setItem('01v96_show_macros', enabled ? 'true' : 'false');
@@ -708,6 +726,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (configModal.style.display === 'flex') {
             refreshServerNameDisplay();
             updateMacrosState();
+            const toggleChk = document.getElementById('toggleLayerNav');
+            if (toggleChk) toggleChk.checked = !!layerNavEnabled;
         }
     });
     observer.observe(configModal, { attributes: true, attributeFilter: ['style'] });
@@ -726,6 +746,10 @@ function renderDock(mode) {
             const isOutsOn = typeof window.outsMode !== 'undefined' && outsMode;
             buttons.push({ label: isOutsOn ? 'SAIR' : 'MIX/BUS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
             buttons.push({ label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' });
+            if (typeof layerNavEnabled !== 'undefined' && layerNavEnabled) {
+                buttons.push({ label: '1-16', action: 'setLayer(0)', cls: 'dock-layer' + (activeLayerStart === 0 ? ' active-tab' : '') });
+                buttons.push({ label: '17-32', action: 'setLayer(16)', cls: 'dock-layer' + (activeLayerStart === 16 ? ' active-tab' : '') });
+            }
             buttons.push({ label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-exit' });
             const isStandalone = window.navigator.standalone === true;
             if (!isStandalone) {
@@ -1073,8 +1097,12 @@ function renderMobileMenu(mode) {
         case 'main':
             buttonsConfig = [
                 { label: 'Configurações do App', isConfig: true, action: "document.getElementById('configModal').style.display='flex';" },
-                { label: 'MIX / BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" }
             ];
+            if (typeof layerNavEnabled !== 'undefined' && layerNavEnabled) {
+                buttonsConfig.push({ label: 'LAYER 1-16', cls: activeLayerStart === 0 ? 'menu-btn-solid-blue' : '', action: "if(typeof setLayer === 'function') setLayer(0);" });
+                buttonsConfig.push({ label: 'LAYER 17-32', cls: activeLayerStart === 16 ? 'menu-btn-solid-blue' : '', action: "if(typeof setLayer === 'function') setLayer(16);" });
+            }
+            buttonsConfig.push({ label: 'MIX / BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" });
             break;
 
         case 'channelConfig':

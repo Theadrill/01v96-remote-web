@@ -1015,6 +1015,19 @@ html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
 }
 
+.dock-layer {
+    background: #1e3a5f;
+    color: #fff;
+    border: 1px solid #2c5282;
+}
+
+.dock-layer.active-tab {
+    background: #5cacee !important;
+    color: #fff !important;
+    font-weight: 900 !important;
+    border-color: #7ec8ff !important;
+}
+
 .dock-fs {
     background: #444;
     color: white;

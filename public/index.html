@@ -11,7 +11,7 @@
     <meta content="01V96 LIVE" name="apple-mobile-web-app-title" />
     <meta content="yes" name="mobile-web-app-capable" />
     <title>01V96 - LIVE SAFE</title>
-    <link href="style.css?v=52" rel="stylesheet" />
+    <link href="style.css?v=53" rel="stylesheet" />
     <!-- UI UPDATE: 2026-06-07 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
@@ -294,6 +294,16 @@
                     <span class="inline-style-15">FLAT: não resetar HPF/LPF</span>
                     <label class="switch">
                         <input id="toggleEqFlatSkipHpfLpf" onchange="updateEqFlatConfig(this.checked)" type="checkbox" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="config-section">
+                <p class="config-section-header">Navegação</p>
+                <div class="inline-style-14">
+                    <span class="inline-style-15">Navegação por LAYERS</span>
+                    <label class="switch">
+                        <input id="toggleLayerNav" onchange="toggleLayerNav(this.checked)" type="checkbox" />
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -1091,10 +1101,10 @@
     </div>
     <!-- Overlay Info (gerenciado por overlay_info.js) -->
     <div class="overlay-info styled-blockingOverlay" id="overlayInfo"></div>
-    <script src="modules/globals.js?v=3"></script>
+    <script src="modules/globals.js?v=4"></script>
     <script src="modules/macros/core.js"></script>
     <script src="modules/macros.js"></script>
-    <script src="modules/channel_strip.js?v=19"></script>
+    <script src="modules/channel_strip.js?v=20"></script>
     <script src="modules/eq.js?v=5"></script>
     <script src="modules/rta.js?v=1"></script>
     <script src="modules/monitoring.js?v=1"></script>
@@ -1109,7 +1119,7 @@
     <script src="modules/volume_geral.js"></script>
     <script src="modules/overlay_info.js"></script>
     <script src="modules/socket.js?v=8"></script>
-    <script src="modules/sidebar.js?v=10"></script>
+    <script src="modules/sidebar.js?v=11"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/inserts.js?v=1"></script>
     <script src="modules/scroll.js"></script>

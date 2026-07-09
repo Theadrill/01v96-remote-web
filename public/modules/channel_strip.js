@@ -648,6 +648,13 @@ function getMobileScaleHTML() {
     return html;
 }
 
+function isValidChannelForLayer(i) {
+    if (!layerNavEnabled) return true;
+    const isMain = !musicianMode && !outsMode && !technicianMixMode && activeConfigChannel === null;
+    if (!isMain) return true;
+    return i >= activeLayerStart && i < activeLayerStart + 16;
+}
+
 function initUI() {
     if (typeof resetFaderCache === 'function') resetFaderCache();
     let html = '';
@@ -720,6 +727,7 @@ function initUI() {
         for (let i = 0; i < 4; i++) html += createOutputStrip(i, 'stIn');
     } else {
         for (let i = 0; i < NUM_CHANNELS; i++) {
+            if (!isValidChannelForLayer(i)) continue;
             const state = channelStates[i];
             // Se estiver pareado, pulamos a renderização do canal PAR (o segundo do par)
             if (state && state.paired && i % 2 !== 0) {
@@ -781,6 +789,7 @@ function initUI() {
         }
     } else {
         for (let i = 0; i < NUM_CHANNELS; i++) {
+            if (!isValidChannelForLayer(i)) continue;
             const state = channelStates[i];
             if (!state) continue;
             if (musicianMode || technicianMixMode) {
@@ -812,6 +821,7 @@ function initUI() {
     // Inicializa os indicadores de Pan (apenas no layout desktop)
     if (layoutMode === 'desktop') {
         for (let i = 0; i < NUM_CHANNELS; i++) {
+            if (!isValidChannelForLayer(i)) continue;
             const s = channelStates[i];
             if (s && s.pan !== undefined) updatePanIndicator(i, s.pan);
         }

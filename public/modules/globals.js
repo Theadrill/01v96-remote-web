@@ -52,6 +52,9 @@ const savedRole = localStorage.getItem('01v96_role');
 let layoutMode = savedRole === 'musician' ? 'mobile' : (localStorage.getItem('mixer_layout') || 'mobile');
 document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
 window.customNamesEnabled = localStorage.getItem('custom_names_enabled') !== 'false';
+let layerNavEnabled = false;
+let activeLayerStart = 0;
+try { layerNavEnabled = localStorage.getItem('01v96_layer_nav') === 'true'; } catch(e) {}
 window.globalNames = null;
 
 const container = document.getElementById('faders-container');
