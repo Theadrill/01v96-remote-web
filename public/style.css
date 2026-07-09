@@ -3809,6 +3809,41 @@ body:not(.layout-desktop):not(.is-portrait) .sidebar-macros .btn-macros {
     }
 }
 
+/* Layout de duas colunas na sidebar em celular deitado (tela pequena) */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician) {
+        display: grid !important;
+        grid-template-columns: 120px 60px;
+        grid-template-rows: auto minmax(0, 1fr);
+        width: auto !important;
+    }
+
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician)>.sidebar-info {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician)>.sidebar-dock {
+        grid-column: 1;
+        grid-row: 2;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        min-height: 0 !important;
+    }
+
+    body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician)>.sidebar-macros {
+        grid-column: 2;
+        grid-row: 2;
+        margin-top: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    body:not(.layout-desktop):not(.is-portrait) .ch-modal-overlay {
+        right: 230px !important;
+    }
+}
+
 /* Exibe o botão de fullscreen dentro da área de macros no modo deitado */
 body:not(.layout-desktop):not(.is-portrait) .btn-fs-macros {
     display: flex !important;
