@@ -755,7 +755,7 @@ function initUI() {
     if (musicianMode) {
         if (masterContainer && typeof getVolumeGeralHtml === 'function' && window.showVolumeGeral !== false) {
             masterContainer.innerHTML = getVolumeGeralHtml();
-            masterContainer.style.cssText = 'display:flex !important; flex-shrink:0 !important; width:110px !important; max-width:110px !important; min-width:110px !important; order:1 !important; border-left:1px solid #000; background:#111; align-items:stretch;';
+            masterContainer.style.cssText = 'display:flex !important; flex-shrink:0 !important; order:1 !important; border-left:1px solid #000; background:#111; align-items:stretch;';
         } else if (masterContainer) {
             masterContainer.innerHTML = '';
             masterContainer.style.cssText = 'display:none !important;';

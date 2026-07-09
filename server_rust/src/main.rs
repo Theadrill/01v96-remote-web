@@ -15,12 +15,19 @@ mod monitoring;
 mod rta_manager;
 mod tailscale_http;
 
-use axum::Router;
+use axum::{
+    body::Body,
+    http::{HeaderValue, Request},
+    middleware::{self, Next},
+    response::Response,
+    Router,
+};
 use socketioxide::SocketIo;
 use std::sync::Arc;
 use tokio::sync::{RwLock, Mutex};
 use tracing::info;
 use lazy_static::lazy_static;
+use tower::ServiceBuilder;
 
 mod tray;
 
@@ -39,6 +46,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
     tray_app.run_message_loop();
     Ok(())
+}
+
+async fn no_cache_css_mw(request: Request<Body>, next: Next) -> Response {
+    let is_css = request.uri().path().ends_with(".css");
+    let mut response = next.run(request).await;
+    if is_css {
+        response.headers_mut().insert(
+            "Cache-Control",
+            HeaderValue::from_static("no-cache, no-store, must-revalidate"),
+        );
+    }
+    response
 }
 
 async fn async_main(
@@ -208,7 +227,11 @@ async fn async_main(
     let app = Router::new()
         .nest("/api", api::macros::router(global_state_api.clone(), custom_scene_manager.clone()))
         .nest_service("/canvas", tower_http::services::ServeDir::new(canvas_dir))
-        .fallback_service(tower_http::services::ServeDir::new(public_dir.clone()))
+        .fallback_service(
+            ServiceBuilder::new()
+                .layer(middleware::from_fn(no_cache_css_mw))
+                .service(tower_http::services::ServeDir::new(public_dir.clone()))
+        )
         .layer(layer);
 
     let port = app_config.port;

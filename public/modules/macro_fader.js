@@ -127,65 +127,61 @@ function createMacroFaderInstance(config) {
         const isDesktop = layoutMode === 'desktop';
         const isHorizontal = document.body.classList.contains('layout-horizontal');
 
-        const cardStyle = isDesktop
-            ? 'display: flex !important; flex-direction: column !important; flex: 0 0 74px !important; height: 100%; box-sizing: border-box; overflow: hidden;'
-            : 'display: flex !important; flex-direction: column !important; flex: 0 0 110px !important; height: 100%; box-sizing: border-box; overflow: hidden;';
-
         const configBtn = showConfig ? `
-            <div style="padding: 10px 5px;">
-                <button class="side-btn btn-config" style="margin: 0; width: 100%; height: 35px; font-size: 10px; background: #6a1b9a; color: white; border: none;" onclick="${configFn}()">CONFIG</button>
+            <div class="macro-fader-config-wrap">
+                <button class="side-btn btn-config macro-fader-config-btn" onclick="${configFn}()">CONFIG</button>
             </div>
         ` : '';
 
         const configBtnMobile = showConfig ? `
-            <button class="btn-state" style="width: 90%; margin: 5px auto; padding: 8px 0; background: #6a1b9a; color: white; border: 1px solid #8e24aa;" onclick="${configFn}()">CONFIG</button>
+            <button class="btn-state macro-fader-config-btn-mobile" onclick="${configFn}()">CONFIG</button>
         ` : '';
 
         if (isDesktop) {
             return `
-                <div class="fader-card-desktop macro-fader-card" id="${cardId}" style="${cardStyle}">
-                    <div class="desk-label" style="background: #555 !important; color: #fff !important;">${title}</div>
+                <div class="fader-card-desktop macro-fader-card" id="${cardId}">
+                    <div class="desk-label">${title}</div>
                     <div class="btn-cue-placeholder"></div>
                     
-                    <div class="desk-ch-name-zone" style="display: flex; align-items: center; justify-content: center; overflow: hidden; height: 35px;">
-                        <div class="desk-ch-name" style="color: #fff !important; background: transparent !important; border: none !important; font-size: 11px; white-space: normal; line-height: 1.1; text-align: center; width: 100%;">${titleLong}</div>
+                    <div class="desk-ch-name-zone macro-ch-name-zone">
+                        <div class="desk-ch-name">${titleLong}</div>
                     </div>
 
                     ${configBtn}
 
                     <div id="${dbDisplayId}" class="macro-db-display">--</div>
                     
-                    <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; padding: 5px;">
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
+                    <div class="macro-fader-nudge-wrap">
+                        <div class="macro-nudge-btn-container" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big">+</button>
                         </div>
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
+                        <div class="macro-nudge-btn-container" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
                             <button class="btn-nudge-macro-big">-</button>
                         </div>
                     </div>
                     
-                    <div class="desk-footer-label" style="color: #666;">${title}</div>
+                    <div class="desk-footer-label">${title}</div>
                 </div>
             `;
         } else {
             return `
-                <div class="fader-card macro-fader-card" id="${cardId}" style="${cardStyle}">
-                    <h2 class="card-title" style="color: #333 !important; margin: 5px 0 2px 0; font-size: 10px; text-align: center; font-weight: bold;">${title}</h2>
+                <div class="fader-card macro-fader-card" id="${cardId}">
+                    <h2 class="card-title">${title}</h2>
                     
-                    <div class="ch-clickable-zone" style="background: #000 !important; margin: 0 4px 4px 4px; border-radius: 8px; padding: 8px 2px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                        <div class="ch-name" style="color: #fff !important; background: transparent !important; border: none !important; font-size: 11px; white-space: normal; line-height: 1.1; text-align: center; width: 100%;">${titleLong}</div>
+                    <div class="ch-clickable-zone macro-ch-clickable-zone">
+                        <div class="ch-name">${titleLong}</div>
                     </div>
 
                     ${configBtnMobile}
 
                     <div id="${dbDisplayId}" class="macro-db-display">--</div>
                     
-                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; width: 100%;">
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
-                            <button class="btn-nudge-macro-big" style="width: 100%; font-size: 40px;">+</button>
+                    <div class="macro-fader-nudge-wrap">
+                        <div class="macro-nudge-btn-container" onpointerdown="${nudgeStartFn}(1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
+                            <button class="btn-nudge-macro-big">+</button>
                         </div>
-                        <div class="macro-nudge-btn-container" style="flex: 1; touch-action: manipulation; user-select: none;" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
-                            <button class="btn-nudge-macro-big" style="width: 100%; font-size: 40px;">-</button>
+                        <div class="macro-nudge-btn-container" onpointerdown="${nudgeStartFn}(-1)" onpointerup="${nudgeStopFn}()" onpointerleave="${nudgeStopFn}()" onpointercancel="${nudgeStopFn}()">
+                            <button class="btn-nudge-macro-big">-</button>
                         </div>
                     </div>
                 </div>

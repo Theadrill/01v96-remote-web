@@ -1849,9 +1849,9 @@ body.layout-desktop #master-container {
 body.musician-active #master-container {
     display: flex !important;
     flex-shrink: 0;
-    width: 110px !important;
-    max-width: 110px !important;
-    min-width: 110px !important;
+    width: auto !important;
+    max-width: 80px !important;
+    min-width: auto !important;
     border-left: 1px solid #000;
     background: #111;
     order: 1;
@@ -1863,11 +1863,36 @@ body.musician-active.is-portrait #master-container {
     right: 0;
     top: 0;
     height: calc(100vh - 100px) !important;
-    width: 110px !important;
+    width: auto !important;
     z-index: 100;
     border-left: 1px solid #000;
     border-right: none;
     align-items: stretch;
+}
+
+body.musician-active:not(.is-portrait):not(.layout-desktop) #master-container {
+    width: 80px !important;
+    max-width: 80px !important;
+    min-width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+body.musician-active #cardVolumeGeral {
+    min-width: 80px;
+    /*padding: 8px 4px;*/
+}
+
+body.musician-active #cardVolumeGeral .ch-name {
+    font-size: 10px !important;
+}
+
+body.musician-active #cardVolumeGeral .macro-nudge-btn-container {
+    padding: 0 !important;
+}
+
+body.musician-active #cardVolumeGeral .macro-fader-nudge-wrap {
+    padding: 6px 2px !important;
+    gap: 6px !important;
 }
 
 /* Garante que o modal de config de canal respeite a sidebar larga no desktop */
@@ -3015,15 +3040,44 @@ body.is-portrait .dyn-box {
 /* MACRO FADER STYLES */
 .macro-fader-card {
     background: #e0e0e0 !important;
-    /* Cinza claro */
     border: 2px solid #ccc !important;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0 !important;
 }
 
-.macro-fader-card .card-title,
+.fader-card.macro-fader-card {
+    flex: 0 !important;
+}
+
+.fader-card-desktop.macro-fader-card {
+    flex: 0 0 74px !important;
+}
+
 .macro-fader-card .desk-label {
-    color: #333 !important;
+    background: #555 !important;
+    color: #fff !important;
     font-weight: bold !important;
+}
+
+.macro-fader-card .card-title {
+    color: #333 !important;
+    margin: 5px 0 2px 0;
+    font-size: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.macro-ch-name-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    height: 35px;
 }
 
 .macro-fader-card .ch-name,
@@ -3033,6 +3087,72 @@ body.is-portrait .dyn-box {
     border: none !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
+    font-size: 11px;
+    white-space: normal;
+    line-height: 1.1;
+    text-align: center;
+    width: 100%;
+}
+
+.macro-ch-clickable-zone {
+    background: #000 !important;
+    margin: 0 4px 4px 4px;
+    border-radius: 8px;
+    padding: 8px 2px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.macro-fader-nudge-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.fader-card-desktop.macro-fader-card .macro-fader-nudge-wrap {
+    gap: 5px;
+    padding: 5px;
+}
+
+.fader-card.macro-fader-card .macro-fader-nudge-wrap {
+    gap: 10px;
+    padding: 10px;
+}
+
+.macro-fader-config-wrap {
+    padding: 10px 5px;
+}
+
+.macro-fader-config-btn {
+    margin: 0;
+    width: 100%;
+    height: 35px;
+    font-size: 10px;
+    background: #6a1b9a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.macro-fader-config-btn-mobile {
+    width: 90%;
+    margin: 5px auto;
+    padding: 8px 0;
+    background: #6a1b9a;
+    color: white;
+    border: 1px solid #8e24aa;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block;
+}
+
+.macro-fader-card .desk-footer-label {
+    color: #666;
 }
 
 .macro-fader-card .btn-nudge {
@@ -3122,8 +3242,12 @@ body.is-portrait .dyn-box {
 /* --- Fim Macro dB Delta Display --- */
 
 .macro-nudge-btn-container {
+    flex: 1;
     height: 100%;
     width: 100%;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .btn-nudge-macro-big {
@@ -3451,6 +3575,11 @@ body:not(.layout-desktop).is-portrait #master-container {
     box-sizing: border-box !important;
     margin-right: 0 !important;
     padding-bottom: 0 !important;
+}
+
+body:not(.layout-desktop).is-portrait.musician-active #master-container {
+    width: auto !important;
+    max-width: 80px !important;
 }
 
 body:not(.layout-desktop).is-portrait .sidebar {
@@ -4435,6 +4564,7 @@ body.layout-desktop .btn-macros {
     display: flex;
     align-items: stretch;
     flex-shrink: 0;
+    padding: 0;
 }
 
 .styled-techMixTitle {
@@ -6315,7 +6445,9 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Responsive adjustments */
