@@ -194,6 +194,9 @@ function switchTab(tabId) {
     activeConfigTab = tabId;
     if (window.stopEQAnimation) stopEQAnimation();
 
+    const vgSlot = document.getElementById('miniFaderVolumeGeral');
+    if (vgSlot) vgSlot.remove();
+
     document.querySelectorAll('.dock-tab').forEach(btn => btn.classList.remove('active-tab'));
 
     if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('dock-tab')) {
