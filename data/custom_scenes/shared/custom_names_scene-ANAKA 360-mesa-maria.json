@@ -1,0 +1,170 @@
+{
+  "scene_name": "ANAKA 360",
+  "scene_id": 40,
+  "channels": {
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "19": {
+      "name": "MIC DAVI",
+      "short": "MICD"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "2": {
+      "name": "LR",
+      "short": "LR  "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "3": {
+      "name": "",
+      "short": "    "
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "20": {
+      "name": "MIC VOCALI",
+      "short": "MICV"
+    },
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
+    },
+    "7": {
+      "name": "CAIXA",
+      "short": "CAIX"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "4": {
+      "name": "SUB",
+      "short": "SUB "
+    },
+    "17": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "1": {
+      "name": "LR",
+      "short": "LR  "
+    },
+    "11": {
+      "name": "MIC HAMILT",
+      "short": "MICH"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "29": {
+      "name": "VOZES",
+      "short": "VOZE"
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "12": {
+      "name": "MIC MATH",
+      "short": "MICM"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    }
+  }
+}

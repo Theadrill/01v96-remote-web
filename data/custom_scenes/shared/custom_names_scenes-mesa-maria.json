@@ -8,12 +8,6 @@
       "file": "custom_names_scene-LIVRE P SONHAR-mesa-maria.json"
     },
     {
-      "custom_name": "YEL S 360",
-      "physical_scene": "YEL S 360",
-      "physical_id": 28,
-      "file": "custom_names_scene-YEL S 360-mesa-maria.json"
-    },
-    {
       "custom_name": "SKEMA BOM",
       "physical_scene": "SKEMA BOM",
       "physical_id": 11,
@@ -50,10 +44,16 @@
       "file": "custom_names_scene-SBLM MAGIA 360-mesa-maria.json"
     },
     {
-      "custom_name": "SOMALIA",
-      "physical_scene": "SOMALIA 360",
-      "physical_id": 34,
-      "file": "custom_names_scene-SOMALIA-mesa-maria.json"
+      "custom_name": "SAM LEVY 360",
+      "physical_scene": "SAM LEVY 360",
+      "physical_id": 31,
+      "file": "custom_names_scene-SAM LEVY 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "O PGD DE VCS 360",
+      "physical_scene": "O PGD DE VCS 360",
+      "physical_id": 28,
+      "file": "custom_names_scene-O PGD DE VCS 360-mesa-maria.json"
     },
     {
       "custom_name": "SOMALIA 360",
@@ -66,6 +66,12 @@
       "physical_scene": "PGD ONLINE 360",
       "physical_id": 5,
       "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "ANAKA 360",
+      "physical_scene": "ANAKA 360",
+      "physical_id": 40,
+      "file": "custom_names_scene-ANAKA 360-mesa-maria.json"
     }
   ]
 }
