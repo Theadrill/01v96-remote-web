@@ -2987,7 +2987,7 @@ body.is-portrait .dyn-box {
 
 /* --- RESPONSIVIDADE DA BARRA DE CONFIGURAÇÃO --- */
 @media (max-width: 800px) {
-    #miniFaderContainer {
+    #miniFaderContext {
         display: none !important;
     }
 }
@@ -3057,6 +3057,47 @@ body.is-portrait .dyn-box {
 
 .fader-card-desktop.macro-fader-card {
     flex: 0 0 74px !important;
+}
+
+#cardAuxVolumeGeral,
+#cardMixVolumeGeral {
+    min-width: 80px;
+    flex-shrink: 0;
+    border-left: 1px solid #333;
+}
+
+.macro-fader-zerar-btn {
+    margin: 0;
+    width: 100%;
+    height: 35px;
+    font-size: 10px;
+    background: #c62828;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.macro-fader-zerar-btn:active {
+    background: #b71c1c;
+}
+
+.macro-fader-zerar-btn-mobile {
+    width: 90%;
+    margin: 5px auto;
+    padding: 8px 0;
+    background: #c62828;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.macro-fader-zerar-btn-mobile:active {
+    background: #b71c1c;
 }
 
 .macro-fader-card .desk-label {
@@ -4813,24 +4854,33 @@ body.layout-desktop .btn-macros {
 }
 
 .styled-miniFaderContainer {
-    min-width: 85px;
     width: auto;
     height: 100%;
-    padding: 10px 5px;
+    padding: 0;
     box-sizing: border-box;
     border-left: 1px solid #333;
     background: #111;
     flex-shrink: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    gap: 0;
 }
 
 .styled-miniFaderContext {
     height: 100%;
-    width: 100%;
     display: flex;
     justify-content: center;
+}
+
+#miniFaderContainer .macro-fader-card,
+#miniFaderContainer .macro-fader-card-desktop {
+    flex: 0 0 70px !important;
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+    flex-shrink: 1 !important;
+    max-height: 100%;
 }
 
 .styled-customConfirmModal {

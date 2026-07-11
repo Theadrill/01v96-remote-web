@@ -50,7 +50,7 @@ function renderAuxs(ch) {
             };
             html += (layoutMode === 'desktop') ? createDesktopStrip(config) : createMobileStrip(config);
         }
-    } 
+    }
     // --- MODO 2: ENVIOS DO CANAL (Se clicou em CH 1-32, mostra os 8 botões de Aux) ---
     else {
         const state = getChannelStateById(ch);
@@ -92,6 +92,32 @@ function renderAuxs(ch) {
             ${html}
         </div>
     `;
+
+    if (ch >= 36 && ch <= 43 && typeof getMixVolumeGeralHtml === 'function') {
+        const container = document.getElementById('miniFaderContainer');
+        if (container) {
+            const old = document.getElementById('miniFaderVolumeGeral');
+            if (old) old.remove();
+            const context = document.getElementById('miniFaderContext');
+            const vgSlot = document.createElement('div');
+            vgSlot.id = 'miniFaderVolumeGeral';
+            vgSlot.style.cssText = 'height:100%; display:flex; align-items:stretch;';
+            vgSlot.innerHTML = getMixVolumeGeralHtml();
+            container.insertBefore(vgSlot, context);
+        }
+    } else if (ch <= 31 && typeof getAuxVolumeGeralHtml === 'function') {
+        const container = document.getElementById('miniFaderContainer');
+        if (container) {
+            const old = document.getElementById('miniFaderVolumeGeral');
+            if (old) old.remove();
+            const context = document.getElementById('miniFaderContext');
+            const vgSlot = document.createElement('div');
+            vgSlot.id = 'miniFaderVolumeGeral';
+            vgSlot.style.cssText = 'height:100%; display:flex; align-items:stretch;';
+            vgSlot.innerHTML = getAuxVolumeGeralHtml();
+            container.insertBefore(vgSlot, context);
+        }
+    }
 
     const area = body.querySelector('.drag-scroll-area');
     if (area && window.enableDragScroll) window.enableDragScroll(area);

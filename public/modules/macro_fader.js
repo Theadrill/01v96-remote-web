@@ -340,5 +340,7 @@ document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         if (typeof window.stopMacroNudge === 'function') window.stopMacroNudge();
         if (typeof window.stopVolumeGeralNudge === 'function') window.stopVolumeGeralNudge();
+        if (typeof window.stopAuxVolumeGeralNudge === 'function') window.stopAuxVolumeGeralNudge();
+        if (typeof window.stopMixVolumeGeralNudge === 'function') window.stopMixVolumeGeralNudge();
     }
 });

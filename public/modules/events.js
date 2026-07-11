@@ -122,11 +122,16 @@ function changeConfigChannel(delta) {
 
 function closeChannelConfig() {
     if (window.stopEQAnimation) stopEQAnimation();
+    if (typeof window.stopMixVolumeGeralNudge === 'function') window.stopMixVolumeGeralNudge();
+    if (typeof window.stopAuxVolumeGeralNudge === 'function') window.stopAuxVolumeGeralNudge();
     document.getElementById('chConfigModal').style.display = 'none';
 
     activeConfigChannel = null;
     const miniFader = document.getElementById('miniFaderContext');
     if (miniFader) miniFader.innerHTML = '';
+
+    const vgSlot = document.getElementById('miniFaderVolumeGeral');
+    if (vgSlot) vgSlot.remove();
 
     initUI();
 
