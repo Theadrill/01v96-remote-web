@@ -72,6 +72,12 @@
       "physical_scene": "ANAKA 360",
       "physical_id": 40,
       "file": "custom_names_scene-ANAKA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "MARCELO V 360",
+      "physical_scene": "MARCELO V 360",
+      "physical_id": 39,
+      "file": "custom_names_scene-MARCELO V 360-mesa-maria.json"
     }
   ]
 }
