@@ -8,12 +8,6 @@
       "file": "custom_names_scene-SEXTETO-mesa-favela.json"
     },
     {
-      "custom_name": "SARU",
-      "physical_scene": "SARU",
-      "physical_id": 2,
-      "file": "custom_names_scene-SARU-mesa-favela.json"
-    },
-    {
       "custom_name": "FORRO ENGATILHAD",
       "physical_scene": "FORRO ENGATILHAD",
       "physical_id": 36,
@@ -48,6 +42,12 @@
       "physical_scene": "REGIS",
       "physical_id": 12,
       "file": "custom_names_scene-REGIS-mesa-favela.json"
+    },
+    {
+      "custom_name": "SARU",
+      "physical_scene": "SARU",
+      "physical_id": 2,
+      "file": "custom_names_scene-SARU-mesa-favela.json"
     }
   ]
 }
