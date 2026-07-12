@@ -118,7 +118,26 @@ Para resolver isso de forma mágica, sem precisar abrir porta no roteador da igr
 4. Quase na mesma tela, um pouco mais abaixo, procure pela área **HTTPS Certificates** e clique também em **Enable HTTPS**.
 *(Isso diz para a VPN que ela tem permissão de criar aquele cadeado verde de segurança para nós).*
 
-**Passo 3: Abrir o Servidor da Mesa de Som**
+**Passo 3: Instalar e Conectar o Tailscale nos Dispositivos Clientes (Celular, Tablet ou outro PC)**
+Para que os dispositivos consigam se comunicar de forma segura e o redirecionamento automático para HTTPS funcione, **todos os aparelhos clientes que acessarão a mesa de som também precisam ter o Tailscale instalado e ativo**.
+
+1. **A Regra de Ouro (Mesma Conta):** Ao instalar o Tailscale em qualquer dispositivo novo (seja o celular Android do operador, um iPad/iPhone ou outro notebook Windows), você deve **fazer login usando a mesma conta** que criou no Passo 1. Isso garante que todos eles sejam adicionados automaticamente à mesma rede privada virtual (sua *tailnet*).
+2. **Instalação nos diferentes sistemas:**
+   * **Android:**
+     * Baixe o aplicativo **Tailscale** na **Google Play Store**.
+     * Abra o app, toque em **Get Started** / **Log In** e entre com a mesma conta do servidor.
+     * Ative a chave de conexão principal. O Android solicitará permissão para configurar uma conexão VPN local; aceite e confirme.
+   * **iOS (iPhone / iPad):**
+     * Instale o aplicativo **Tailscale** na **Apple App Store**.
+     * Abra o app e faça login com a mesma conta.
+     * Ative a conexão no interruptor principal. O sistema iOS solicitará permissão para adicionar configurações de VPN; insira sua senha ou use o FaceID/TouchID para autorizar.
+   * **Windows (Outro PC/Notebook):**
+     * Baixe o instalador oficial em [tailscale.com/download/windows](https://tailscale.com/download/windows).
+     * Siga o assistente de instalação padrão.
+     * Clique com o botão direito no ícone do Tailscale na bandeja do sistema (perto do relógio) e selecione **Log in...**. Realize a autenticação com a mesma conta no navegador.
+3. Certifique-se de que a conexão VPN do Tailscale está marcada como conectada/ativa em ambos os lados (no PC da mesa e no dispositivo do operador).
+
+**Passo 4: Abrir o Servidor da Mesa de Som**
 1. Inicie o nosso servidor normalmente (clicando duas vezes no atalho ou rodando o terminal).
 2. O servidor é muito inteligente e vai perceber sozinho que o Tailscale está lá. Ele vai solicitar e configurar tudo sozinho nos bastidores.
 3. Fique de olho na tela preta (terminal), lá vai aparecer uma mensagem de sucesso, parecida com isso:
