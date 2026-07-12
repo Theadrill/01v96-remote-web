@@ -157,12 +157,11 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [x] Modo "Sends on Faders" para Mixes.
 - [x] Ninja Sync (Auto-Git push/pull).
 - [x] **MIDI Bridge over Network**: Bridge de rede TCP ultra-rápida (com heartbeat, reconnect dinâmico e tray autônomo).
-- [ ] Implementação de Meters GPU-Accelerated (Curtain Rendering).
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
 - [x] Fazer o meter do master funcionar.
-- [ ] Sistema de cenas de nomes customizados.
+- [x] Sistema de cenas de nomes customizados.
 - [x] Atribuição de nome ao servidor/mesa.
-- [ ] Patch de INSERTS nos canais.
+- [x] Patch de INSERTS nos canais.
 - [ ] Tela de EFEITOS.
 
 
