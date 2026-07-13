@@ -5,7 +5,7 @@
   "dmx_boot_delay_ms": 3000,
   "eq_flat_skip_hpf_lpf": true,
   "inIdx": 2,
-  "loopmidi-monitor": false,
+  "loopmidi-monitor": true,
   "lumikit_ips": [
     "192.168.15.99",
     "192.168.1.111"

@@ -761,7 +761,7 @@ function renderDock(mode) {
                 buttons.push({ label: '1-16', action: 'setLayer(0)', cls: 'dock-layer' + (activeLayerStart === 0 ? ' active-tab' : '') });
                 buttons.push({ label: '17-32', action: 'setLayer(16)', cls: 'dock-layer' + (activeLayerStart === 16 ? ' active-tab' : '') });
             }
-            buttons.push({ label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-exit' });
+            buttons.push({ label: 'SAIR', action: "var em=document.getElementById('efeitosModal');if(em&&em.style.display==='flex'){closeEffectsModal()}else{document.getElementById('logoutConfirmModal').style.display='flex'}", cls: 'dock-exit' });
             const isStandalone = window.navigator.standalone === true;
             if (!isStandalone) {
                 const fsSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`;
@@ -822,6 +822,11 @@ function renderDock(mode) {
 }
 
 function triggerExitActiveMode() {
+    const efeitosModal = document.getElementById('efeitosModal');
+    if (efeitosModal && efeitosModal.style.display === 'flex') {
+        if (typeof closeEffectsModal === 'function') closeEffectsModal();
+        return;
+    }
     const mode = window.currentDockMode;
     if (mode === 'main' || mode === 'musician') {
         const modal = document.getElementById('logoutConfirmModal');
@@ -1032,6 +1037,13 @@ function handleMobileSairAction() {
     // PRIORIDADE 1: Se o menu estiver aberto, apenas fecha o menu
     if (modal && modal.classList.contains("active")) {
         closeMobileMenu();
+        return;
+    }
+
+    // PRIORIDADE 1.5: Se o modal de efeitos estiver aberto, fecha ele
+    const efeitosModal = document.getElementById('efeitosModal');
+    if (efeitosModal && efeitosModal.style.display === 'flex') {
+        if (typeof closeEffectsModal === 'function') closeEffectsModal();
         return;
     }
 

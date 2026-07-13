@@ -109,8 +109,7 @@
         </div>
         <div class="fx-slots-container">
             ${MOCK_SLOTS.map(renderSlot).join('')}
-        </div>
-        <button class="efeitos-close-btn" onclick="closeEffectsModal()">FECHAR</button>`;
+        </div>`;
 
         container.innerHTML = columnsHTML;
     }

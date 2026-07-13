@@ -1,0 +1,14 @@
+{
+  "name": "01v96-remote-web-monitor",
+  "version": "1.0.0",
+  "description": "MIDI Monitor for 01v96-remote-web",
+  "main": "monitor.js",
+  "scripts": {
+    "start": "node monitor.js"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "midi": "^2.0.0"
+  }
+}

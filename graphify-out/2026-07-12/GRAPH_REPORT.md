@@ -1,16 +1,16 @@
-# Graph Report - 01v96-remote-web  (2026-07-12)
+# Graph Report - 01v96-remote-web  (2026-06-18)
 
 ## Corpus Check
-- 619 files · ~727,561 words
+- 538 files · ~603,859 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 12975 nodes · 15029 edges · 1966 communities (1902 shown, 64 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 663 edges (avg confidence: 0.8)
+- 11007 nodes · 11788 edges · 1601 communities (1543 shown, 58 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 161 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e07eff08`
+- Built from commit: `781f27a3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1591,372 +1591,14 @@
 - [[_COMMUNITY_Community 1596|Community 1596]]
 - [[_COMMUNITY_Community 1598|Community 1598]]
 - [[_COMMUNITY_Community 1599|Community 1599]]
-- [[_COMMUNITY_Community 1601|Community 1601]]
-- [[_COMMUNITY_Community 1602|Community 1602]]
-- [[_COMMUNITY_Community 1603|Community 1603]]
-- [[_COMMUNITY_Community 1604|Community 1604]]
-- [[_COMMUNITY_Community 1605|Community 1605]]
-- [[_COMMUNITY_Community 1606|Community 1606]]
-- [[_COMMUNITY_Community 1607|Community 1607]]
-- [[_COMMUNITY_Community 1608|Community 1608]]
-- [[_COMMUNITY_Community 1609|Community 1609]]
-- [[_COMMUNITY_Community 1610|Community 1610]]
-- [[_COMMUNITY_Community 1611|Community 1611]]
-- [[_COMMUNITY_Community 1612|Community 1612]]
-- [[_COMMUNITY_Community 1613|Community 1613]]
-- [[_COMMUNITY_Community 1614|Community 1614]]
-- [[_COMMUNITY_Community 1615|Community 1615]]
-- [[_COMMUNITY_Community 1616|Community 1616]]
-- [[_COMMUNITY_Community 1617|Community 1617]]
-- [[_COMMUNITY_Community 1618|Community 1618]]
-- [[_COMMUNITY_Community 1619|Community 1619]]
-- [[_COMMUNITY_Community 1620|Community 1620]]
-- [[_COMMUNITY_Community 1622|Community 1622]]
-- [[_COMMUNITY_Community 1623|Community 1623]]
-- [[_COMMUNITY_Community 1624|Community 1624]]
-- [[_COMMUNITY_Community 1625|Community 1625]]
-- [[_COMMUNITY_Community 1626|Community 1626]]
-- [[_COMMUNITY_Community 1627|Community 1627]]
-- [[_COMMUNITY_Community 1628|Community 1628]]
-- [[_COMMUNITY_Community 1629|Community 1629]]
-- [[_COMMUNITY_Community 1631|Community 1631]]
-- [[_COMMUNITY_Community 1632|Community 1632]]
-- [[_COMMUNITY_Community 1633|Community 1633]]
-- [[_COMMUNITY_Community 1634|Community 1634]]
-- [[_COMMUNITY_Community 1635|Community 1635]]
-- [[_COMMUNITY_Community 1636|Community 1636]]
-- [[_COMMUNITY_Community 1637|Community 1637]]
-- [[_COMMUNITY_Community 1638|Community 1638]]
-- [[_COMMUNITY_Community 1639|Community 1639]]
-- [[_COMMUNITY_Community 1640|Community 1640]]
-- [[_COMMUNITY_Community 1641|Community 1641]]
-- [[_COMMUNITY_Community 1642|Community 1642]]
-- [[_COMMUNITY_Community 1643|Community 1643]]
-- [[_COMMUNITY_Community 1644|Community 1644]]
-- [[_COMMUNITY_Community 1645|Community 1645]]
-- [[_COMMUNITY_Community 1646|Community 1646]]
-- [[_COMMUNITY_Community 1647|Community 1647]]
-- [[_COMMUNITY_Community 1648|Community 1648]]
-- [[_COMMUNITY_Community 1649|Community 1649]]
-- [[_COMMUNITY_Community 1650|Community 1650]]
-- [[_COMMUNITY_Community 1651|Community 1651]]
-- [[_COMMUNITY_Community 1652|Community 1652]]
-- [[_COMMUNITY_Community 1653|Community 1653]]
-- [[_COMMUNITY_Community 1654|Community 1654]]
-- [[_COMMUNITY_Community 1655|Community 1655]]
-- [[_COMMUNITY_Community 1656|Community 1656]]
-- [[_COMMUNITY_Community 1657|Community 1657]]
-- [[_COMMUNITY_Community 1658|Community 1658]]
-- [[_COMMUNITY_Community 1659|Community 1659]]
-- [[_COMMUNITY_Community 1660|Community 1660]]
-- [[_COMMUNITY_Community 1661|Community 1661]]
-- [[_COMMUNITY_Community 1662|Community 1662]]
-- [[_COMMUNITY_Community 1663|Community 1663]]
-- [[_COMMUNITY_Community 1664|Community 1664]]
-- [[_COMMUNITY_Community 1665|Community 1665]]
-- [[_COMMUNITY_Community 1666|Community 1666]]
-- [[_COMMUNITY_Community 1667|Community 1667]]
-- [[_COMMUNITY_Community 1668|Community 1668]]
-- [[_COMMUNITY_Community 1669|Community 1669]]
-- [[_COMMUNITY_Community 1670|Community 1670]]
-- [[_COMMUNITY_Community 1671|Community 1671]]
-- [[_COMMUNITY_Community 1672|Community 1672]]
-- [[_COMMUNITY_Community 1673|Community 1673]]
-- [[_COMMUNITY_Community 1674|Community 1674]]
-- [[_COMMUNITY_Community 1675|Community 1675]]
-- [[_COMMUNITY_Community 1676|Community 1676]]
-- [[_COMMUNITY_Community 1677|Community 1677]]
-- [[_COMMUNITY_Community 1678|Community 1678]]
-- [[_COMMUNITY_Community 1679|Community 1679]]
-- [[_COMMUNITY_Community 1680|Community 1680]]
-- [[_COMMUNITY_Community 1681|Community 1681]]
-- [[_COMMUNITY_Community 1682|Community 1682]]
-- [[_COMMUNITY_Community 1683|Community 1683]]
-- [[_COMMUNITY_Community 1684|Community 1684]]
-- [[_COMMUNITY_Community 1685|Community 1685]]
-- [[_COMMUNITY_Community 1686|Community 1686]]
-- [[_COMMUNITY_Community 1687|Community 1687]]
-- [[_COMMUNITY_Community 1688|Community 1688]]
-- [[_COMMUNITY_Community 1689|Community 1689]]
-- [[_COMMUNITY_Community 1690|Community 1690]]
-- [[_COMMUNITY_Community 1691|Community 1691]]
-- [[_COMMUNITY_Community 1692|Community 1692]]
-- [[_COMMUNITY_Community 1693|Community 1693]]
-- [[_COMMUNITY_Community 1694|Community 1694]]
-- [[_COMMUNITY_Community 1695|Community 1695]]
-- [[_COMMUNITY_Community 1696|Community 1696]]
-- [[_COMMUNITY_Community 1697|Community 1697]]
-- [[_COMMUNITY_Community 1698|Community 1698]]
-- [[_COMMUNITY_Community 1699|Community 1699]]
-- [[_COMMUNITY_Community 1700|Community 1700]]
-- [[_COMMUNITY_Community 1701|Community 1701]]
-- [[_COMMUNITY_Community 1702|Community 1702]]
-- [[_COMMUNITY_Community 1703|Community 1703]]
-- [[_COMMUNITY_Community 1704|Community 1704]]
-- [[_COMMUNITY_Community 1705|Community 1705]]
-- [[_COMMUNITY_Community 1706|Community 1706]]
-- [[_COMMUNITY_Community 1707|Community 1707]]
-- [[_COMMUNITY_Community 1708|Community 1708]]
-- [[_COMMUNITY_Community 1709|Community 1709]]
-- [[_COMMUNITY_Community 1710|Community 1710]]
-- [[_COMMUNITY_Community 1711|Community 1711]]
-- [[_COMMUNITY_Community 1712|Community 1712]]
-- [[_COMMUNITY_Community 1713|Community 1713]]
-- [[_COMMUNITY_Community 1714|Community 1714]]
-- [[_COMMUNITY_Community 1715|Community 1715]]
-- [[_COMMUNITY_Community 1716|Community 1716]]
-- [[_COMMUNITY_Community 1717|Community 1717]]
-- [[_COMMUNITY_Community 1718|Community 1718]]
-- [[_COMMUNITY_Community 1719|Community 1719]]
-- [[_COMMUNITY_Community 1720|Community 1720]]
-- [[_COMMUNITY_Community 1721|Community 1721]]
-- [[_COMMUNITY_Community 1722|Community 1722]]
-- [[_COMMUNITY_Community 1723|Community 1723]]
-- [[_COMMUNITY_Community 1724|Community 1724]]
-- [[_COMMUNITY_Community 1725|Community 1725]]
-- [[_COMMUNITY_Community 1726|Community 1726]]
-- [[_COMMUNITY_Community 1727|Community 1727]]
-- [[_COMMUNITY_Community 1728|Community 1728]]
-- [[_COMMUNITY_Community 1729|Community 1729]]
-- [[_COMMUNITY_Community 1730|Community 1730]]
-- [[_COMMUNITY_Community 1731|Community 1731]]
-- [[_COMMUNITY_Community 1732|Community 1732]]
-- [[_COMMUNITY_Community 1733|Community 1733]]
-- [[_COMMUNITY_Community 1734|Community 1734]]
-- [[_COMMUNITY_Community 1735|Community 1735]]
-- [[_COMMUNITY_Community 1736|Community 1736]]
-- [[_COMMUNITY_Community 1737|Community 1737]]
-- [[_COMMUNITY_Community 1738|Community 1738]]
-- [[_COMMUNITY_Community 1739|Community 1739]]
-- [[_COMMUNITY_Community 1740|Community 1740]]
-- [[_COMMUNITY_Community 1741|Community 1741]]
-- [[_COMMUNITY_Community 1742|Community 1742]]
-- [[_COMMUNITY_Community 1743|Community 1743]]
-- [[_COMMUNITY_Community 1744|Community 1744]]
-- [[_COMMUNITY_Community 1745|Community 1745]]
-- [[_COMMUNITY_Community 1746|Community 1746]]
-- [[_COMMUNITY_Community 1747|Community 1747]]
-- [[_COMMUNITY_Community 1748|Community 1748]]
-- [[_COMMUNITY_Community 1749|Community 1749]]
-- [[_COMMUNITY_Community 1750|Community 1750]]
-- [[_COMMUNITY_Community 1751|Community 1751]]
-- [[_COMMUNITY_Community 1752|Community 1752]]
-- [[_COMMUNITY_Community 1753|Community 1753]]
-- [[_COMMUNITY_Community 1754|Community 1754]]
-- [[_COMMUNITY_Community 1755|Community 1755]]
-- [[_COMMUNITY_Community 1756|Community 1756]]
-- [[_COMMUNITY_Community 1757|Community 1757]]
-- [[_COMMUNITY_Community 1758|Community 1758]]
-- [[_COMMUNITY_Community 1759|Community 1759]]
-- [[_COMMUNITY_Community 1760|Community 1760]]
-- [[_COMMUNITY_Community 1761|Community 1761]]
-- [[_COMMUNITY_Community 1762|Community 1762]]
-- [[_COMMUNITY_Community 1763|Community 1763]]
-- [[_COMMUNITY_Community 1764|Community 1764]]
-- [[_COMMUNITY_Community 1765|Community 1765]]
-- [[_COMMUNITY_Community 1766|Community 1766]]
-- [[_COMMUNITY_Community 1767|Community 1767]]
-- [[_COMMUNITY_Community 1768|Community 1768]]
-- [[_COMMUNITY_Community 1769|Community 1769]]
-- [[_COMMUNITY_Community 1770|Community 1770]]
-- [[_COMMUNITY_Community 1771|Community 1771]]
-- [[_COMMUNITY_Community 1772|Community 1772]]
-- [[_COMMUNITY_Community 1773|Community 1773]]
-- [[_COMMUNITY_Community 1774|Community 1774]]
-- [[_COMMUNITY_Community 1775|Community 1775]]
-- [[_COMMUNITY_Community 1776|Community 1776]]
-- [[_COMMUNITY_Community 1777|Community 1777]]
-- [[_COMMUNITY_Community 1778|Community 1778]]
-- [[_COMMUNITY_Community 1779|Community 1779]]
-- [[_COMMUNITY_Community 1780|Community 1780]]
-- [[_COMMUNITY_Community 1781|Community 1781]]
-- [[_COMMUNITY_Community 1782|Community 1782]]
-- [[_COMMUNITY_Community 1783|Community 1783]]
-- [[_COMMUNITY_Community 1784|Community 1784]]
-- [[_COMMUNITY_Community 1785|Community 1785]]
-- [[_COMMUNITY_Community 1786|Community 1786]]
-- [[_COMMUNITY_Community 1787|Community 1787]]
-- [[_COMMUNITY_Community 1788|Community 1788]]
-- [[_COMMUNITY_Community 1789|Community 1789]]
-- [[_COMMUNITY_Community 1790|Community 1790]]
-- [[_COMMUNITY_Community 1791|Community 1791]]
-- [[_COMMUNITY_Community 1792|Community 1792]]
-- [[_COMMUNITY_Community 1793|Community 1793]]
-- [[_COMMUNITY_Community 1794|Community 1794]]
-- [[_COMMUNITY_Community 1795|Community 1795]]
-- [[_COMMUNITY_Community 1796|Community 1796]]
-- [[_COMMUNITY_Community 1797|Community 1797]]
-- [[_COMMUNITY_Community 1798|Community 1798]]
-- [[_COMMUNITY_Community 1799|Community 1799]]
-- [[_COMMUNITY_Community 1800|Community 1800]]
-- [[_COMMUNITY_Community 1801|Community 1801]]
-- [[_COMMUNITY_Community 1802|Community 1802]]
-- [[_COMMUNITY_Community 1803|Community 1803]]
-- [[_COMMUNITY_Community 1804|Community 1804]]
-- [[_COMMUNITY_Community 1805|Community 1805]]
-- [[_COMMUNITY_Community 1806|Community 1806]]
-- [[_COMMUNITY_Community 1807|Community 1807]]
-- [[_COMMUNITY_Community 1808|Community 1808]]
-- [[_COMMUNITY_Community 1809|Community 1809]]
-- [[_COMMUNITY_Community 1810|Community 1810]]
-- [[_COMMUNITY_Community 1811|Community 1811]]
-- [[_COMMUNITY_Community 1812|Community 1812]]
-- [[_COMMUNITY_Community 1813|Community 1813]]
-- [[_COMMUNITY_Community 1814|Community 1814]]
-- [[_COMMUNITY_Community 1815|Community 1815]]
-- [[_COMMUNITY_Community 1816|Community 1816]]
-- [[_COMMUNITY_Community 1817|Community 1817]]
-- [[_COMMUNITY_Community 1818|Community 1818]]
-- [[_COMMUNITY_Community 1819|Community 1819]]
-- [[_COMMUNITY_Community 1820|Community 1820]]
-- [[_COMMUNITY_Community 1821|Community 1821]]
-- [[_COMMUNITY_Community 1822|Community 1822]]
-- [[_COMMUNITY_Community 1823|Community 1823]]
-- [[_COMMUNITY_Community 1824|Community 1824]]
-- [[_COMMUNITY_Community 1825|Community 1825]]
-- [[_COMMUNITY_Community 1826|Community 1826]]
-- [[_COMMUNITY_Community 1827|Community 1827]]
-- [[_COMMUNITY_Community 1828|Community 1828]]
-- [[_COMMUNITY_Community 1829|Community 1829]]
-- [[_COMMUNITY_Community 1830|Community 1830]]
-- [[_COMMUNITY_Community 1831|Community 1831]]
-- [[_COMMUNITY_Community 1832|Community 1832]]
-- [[_COMMUNITY_Community 1833|Community 1833]]
-- [[_COMMUNITY_Community 1834|Community 1834]]
-- [[_COMMUNITY_Community 1835|Community 1835]]
-- [[_COMMUNITY_Community 1836|Community 1836]]
-- [[_COMMUNITY_Community 1837|Community 1837]]
-- [[_COMMUNITY_Community 1838|Community 1838]]
-- [[_COMMUNITY_Community 1839|Community 1839]]
-- [[_COMMUNITY_Community 1840|Community 1840]]
-- [[_COMMUNITY_Community 1841|Community 1841]]
-- [[_COMMUNITY_Community 1842|Community 1842]]
-- [[_COMMUNITY_Community 1843|Community 1843]]
-- [[_COMMUNITY_Community 1844|Community 1844]]
-- [[_COMMUNITY_Community 1845|Community 1845]]
-- [[_COMMUNITY_Community 1846|Community 1846]]
-- [[_COMMUNITY_Community 1847|Community 1847]]
-- [[_COMMUNITY_Community 1848|Community 1848]]
-- [[_COMMUNITY_Community 1849|Community 1849]]
-- [[_COMMUNITY_Community 1850|Community 1850]]
-- [[_COMMUNITY_Community 1851|Community 1851]]
-- [[_COMMUNITY_Community 1852|Community 1852]]
-- [[_COMMUNITY_Community 1853|Community 1853]]
-- [[_COMMUNITY_Community 1854|Community 1854]]
-- [[_COMMUNITY_Community 1855|Community 1855]]
-- [[_COMMUNITY_Community 1856|Community 1856]]
-- [[_COMMUNITY_Community 1857|Community 1857]]
-- [[_COMMUNITY_Community 1858|Community 1858]]
-- [[_COMMUNITY_Community 1859|Community 1859]]
-- [[_COMMUNITY_Community 1860|Community 1860]]
-- [[_COMMUNITY_Community 1861|Community 1861]]
-- [[_COMMUNITY_Community 1862|Community 1862]]
-- [[_COMMUNITY_Community 1863|Community 1863]]
-- [[_COMMUNITY_Community 1864|Community 1864]]
-- [[_COMMUNITY_Community 1865|Community 1865]]
-- [[_COMMUNITY_Community 1866|Community 1866]]
-- [[_COMMUNITY_Community 1867|Community 1867]]
-- [[_COMMUNITY_Community 1868|Community 1868]]
-- [[_COMMUNITY_Community 1869|Community 1869]]
-- [[_COMMUNITY_Community 1870|Community 1870]]
-- [[_COMMUNITY_Community 1871|Community 1871]]
-- [[_COMMUNITY_Community 1872|Community 1872]]
-- [[_COMMUNITY_Community 1873|Community 1873]]
-- [[_COMMUNITY_Community 1874|Community 1874]]
-- [[_COMMUNITY_Community 1875|Community 1875]]
-- [[_COMMUNITY_Community 1876|Community 1876]]
-- [[_COMMUNITY_Community 1877|Community 1877]]
-- [[_COMMUNITY_Community 1878|Community 1878]]
-- [[_COMMUNITY_Community 1879|Community 1879]]
-- [[_COMMUNITY_Community 1880|Community 1880]]
-- [[_COMMUNITY_Community 1881|Community 1881]]
-- [[_COMMUNITY_Community 1882|Community 1882]]
-- [[_COMMUNITY_Community 1883|Community 1883]]
-- [[_COMMUNITY_Community 1884|Community 1884]]
-- [[_COMMUNITY_Community 1885|Community 1885]]
-- [[_COMMUNITY_Community 1886|Community 1886]]
-- [[_COMMUNITY_Community 1887|Community 1887]]
-- [[_COMMUNITY_Community 1888|Community 1888]]
-- [[_COMMUNITY_Community 1889|Community 1889]]
-- [[_COMMUNITY_Community 1890|Community 1890]]
-- [[_COMMUNITY_Community 1891|Community 1891]]
-- [[_COMMUNITY_Community 1892|Community 1892]]
-- [[_COMMUNITY_Community 1893|Community 1893]]
-- [[_COMMUNITY_Community 1894|Community 1894]]
-- [[_COMMUNITY_Community 1895|Community 1895]]
-- [[_COMMUNITY_Community 1896|Community 1896]]
-- [[_COMMUNITY_Community 1897|Community 1897]]
-- [[_COMMUNITY_Community 1898|Community 1898]]
-- [[_COMMUNITY_Community 1899|Community 1899]]
-- [[_COMMUNITY_Community 1900|Community 1900]]
-- [[_COMMUNITY_Community 1901|Community 1901]]
-- [[_COMMUNITY_Community 1902|Community 1902]]
-- [[_COMMUNITY_Community 1903|Community 1903]]
-- [[_COMMUNITY_Community 1904|Community 1904]]
-- [[_COMMUNITY_Community 1905|Community 1905]]
-- [[_COMMUNITY_Community 1906|Community 1906]]
-- [[_COMMUNITY_Community 1907|Community 1907]]
-- [[_COMMUNITY_Community 1908|Community 1908]]
-- [[_COMMUNITY_Community 1909|Community 1909]]
-- [[_COMMUNITY_Community 1910|Community 1910]]
-- [[_COMMUNITY_Community 1911|Community 1911]]
-- [[_COMMUNITY_Community 1912|Community 1912]]
-- [[_COMMUNITY_Community 1913|Community 1913]]
-- [[_COMMUNITY_Community 1914|Community 1914]]
-- [[_COMMUNITY_Community 1915|Community 1915]]
-- [[_COMMUNITY_Community 1916|Community 1916]]
-- [[_COMMUNITY_Community 1917|Community 1917]]
-- [[_COMMUNITY_Community 1918|Community 1918]]
-- [[_COMMUNITY_Community 1919|Community 1919]]
-- [[_COMMUNITY_Community 1920|Community 1920]]
-- [[_COMMUNITY_Community 1921|Community 1921]]
-- [[_COMMUNITY_Community 1922|Community 1922]]
-- [[_COMMUNITY_Community 1923|Community 1923]]
-- [[_COMMUNITY_Community 1924|Community 1924]]
-- [[_COMMUNITY_Community 1925|Community 1925]]
-- [[_COMMUNITY_Community 1926|Community 1926]]
-- [[_COMMUNITY_Community 1927|Community 1927]]
-- [[_COMMUNITY_Community 1928|Community 1928]]
-- [[_COMMUNITY_Community 1929|Community 1929]]
-- [[_COMMUNITY_Community 1930|Community 1930]]
-- [[_COMMUNITY_Community 1931|Community 1931]]
-- [[_COMMUNITY_Community 1932|Community 1932]]
-- [[_COMMUNITY_Community 1933|Community 1933]]
-- [[_COMMUNITY_Community 1934|Community 1934]]
-- [[_COMMUNITY_Community 1935|Community 1935]]
-- [[_COMMUNITY_Community 1936|Community 1936]]
-- [[_COMMUNITY_Community 1937|Community 1937]]
-- [[_COMMUNITY_Community 1938|Community 1938]]
-- [[_COMMUNITY_Community 1939|Community 1939]]
-- [[_COMMUNITY_Community 1940|Community 1940]]
-- [[_COMMUNITY_Community 1941|Community 1941]]
-- [[_COMMUNITY_Community 1942|Community 1942]]
-- [[_COMMUNITY_Community 1943|Community 1943]]
-- [[_COMMUNITY_Community 1944|Community 1944]]
-- [[_COMMUNITY_Community 1945|Community 1945]]
-- [[_COMMUNITY_Community 1946|Community 1946]]
-- [[_COMMUNITY_Community 1947|Community 1947]]
-- [[_COMMUNITY_Community 1948|Community 1948]]
-- [[_COMMUNITY_Community 1949|Community 1949]]
-- [[_COMMUNITY_Community 1950|Community 1950]]
-- [[_COMMUNITY_Community 1951|Community 1951]]
-- [[_COMMUNITY_Community 1952|Community 1952]]
-- [[_COMMUNITY_Community 1953|Community 1953]]
-- [[_COMMUNITY_Community 1954|Community 1954]]
-- [[_COMMUNITY_Community 1955|Community 1955]]
-- [[_COMMUNITY_Community 1956|Community 1956]]
-- [[_COMMUNITY_Community 1957|Community 1957]]
-- [[_COMMUNITY_Community 1958|Community 1958]]
-- [[_COMMUNITY_Community 1959|Community 1959]]
-- [[_COMMUNITY_Community 1960|Community 1960]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `getChannelStateById()` - 58 edges
-2. `silk_smlawb()` - 49 edges
+1. `getChannelStateById()` - 57 edges
+2. `channels` - 46 edges
 3. `channels` - 46 edges
-4. `channels` - 46 edges
+4. `channels` - 43 edges
 5. `channels` - 43 edges
-6. `channels` - 43 edges
+6. `channels` - 42 edges
 7. `channels` - 42 edges
 8. `channels` - 42 edges
 9. `channels` - 42 edges
@@ -1991,10 +1633,10 @@
 - 1-file cycle: `server_rust/src/midi/remote_client.rs -> server_rust/src/midi/remote_client.rs`
 - 1-file cycle: `server_rust/src/midi/scheduler.rs -> server_rust/src/midi/scheduler.rs`
 - 1-file cycle: `server_rust/src/midi_receiver.rs -> server_rust/src/midi_receiver.rs`
-- 1-file cycle: `server_rust/src/monitoring.rs -> server_rust/src/monitoring.rs`
 - 1-file cycle: `server_rust/src/name_resolver.rs -> server_rust/src/name_resolver.rs`
 - 1-file cycle: `server_rust/src/network/sync_manager.rs -> server_rust/src/network/sync_manager.rs`
 - 1-file cycle: `server_rust/src/rta_manager.rs -> server_rust/src/rta_manager.rs`
+- 1-file cycle: `server_rust/src/socket_handlers.rs -> server_rust/src/socket_handlers.rs`
 
 ## Hyperedges (group relationships)
 - **Yamaha 01V96 MIDI integration via loopMIDI with SysEx reassembly** — _monitor_midi_bridge, concept_yamaha_01v96, concept_studio_manager, concept_loopmidi, concept_sysex_reassembly [INFERRED]
@@ -2009,11 +1651,11 @@
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 - **14-bit Master Meter via native 0x21 with steps.json calibration (dB = (raw - 4493) / 63.66)** —  [INFERRED 0.90]
 
-## Communities (1966 total, 64 thin omitted)
+## Communities (1601 total, 58 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
-Cohesion: 0.09
-Nodes (34): updateAuxFromSocket Aux Sync Handler, clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updatePanIndicator Desktop Pan Visual, updateUI Fader/On/Solo UI Sync, renderCompressor(), updateCompFromSocket() (+26 more)
+Cohesion: 0.11
+Nodes (26): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, renderCompressor(), renderDynamics(), startDynNudge/stopDynNudge Dynamics Nudge Controls, toggleState() (+18 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
@@ -2116,8 +1758,8 @@ Cohesion: 0.09
 Nodes (20): cachedTextDecoder, cachedTextEncoder, decodeText(), getArrayF32FromWasm0(), getArrayJsValueFromWasm0(), getDataViewMemory0(), getFloat32ArrayMemory0(), getStringFromWasm0() (+12 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.11
-Nodes (24): execute(), onClear(), onConfigure(), renderUI(), auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge() (+16 more)
+Cohesion: 0.12
+Nodes (28): auxLevelInput(), auxWheelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxManual(), updateAuxFromSocket Aux Sync Handler (+20 more)
 
 ### Community 34 - "UI/UX Pro Max BM25 Search"
 Cohesion: 0.07
@@ -2141,7 +1783,7 @@ Nodes (31): str, BM25, detect_domain(), _load_csv(), BM25 ranking algorithm for 
 
 ### Community 45 - "Community 45"
 Cohesion: 0.08
-Nodes (24): DEFAULT_EQ_FREQ, drawRtaData(), EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), freqToRaw() (+16 more)
+Nodes (27): drawRtaData(), EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer, EQ Engine (WebAudio BiquadFilter 4-Band), freqToRaw(), fToX() (+19 more)
 
 ### Community 46 - "Community 46"
 Cohesion: 0.07
@@ -2192,16 +1834,16 @@ Cohesion: 0.13
 Nodes (14): CI Configuration, Common Options, Configuration, GitHub Actions, GitLab CI, IDE Integration, Ignoring Files, lint-rustfmt-check (+6 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.05
-Nodes (37): Self, Vec, Instant, MidiEngine, MidiOutput, test_engine_initialization(), MidiAssembler, MidiEngine (+29 more)
+Cohesion: 0.06
+Nodes (36): Self, Vec, Instant, MidiEngine, MidiOutput, test_engine_initialization(), MidiAssembler, MidiEngine (+28 more)
 
 ### Community 67 - "Community 67"
 Cohesion: 0.05
 Nodes (38): 1.1 As Duas DLLs e seus Papéis, 1.2 Diagrama de Comunicação, 1.3 Interface COM (não chamadas diretas), 1.4 Registro Windows, 1.5 Classes Internas Principais, 1. ARQUITETURA DO SISTEMA, 2.1 Anatomia de um ID de Propriedade, 2.2 Estatísticas do Mapeamento (+30 more)
 
 ### Community 68 - "Community 68"
-Cohesion: 0.07
-Nodes (77): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+69 more)
+Cohesion: 0.08
+Nodes (70): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_ref(), gh_api_graphql(), gh_pr_view_json(), main() (+62 more)
 
 ### Community 69 - "Community 69"
 Cohesion: 0.06
@@ -2272,16 +1914,16 @@ Cohesion: 0.07
 Nodes (27): 10. Problemas Adicionais, 11. Prioridades de Ação, 1. Socket.IO Event Handlers, 2. Lógica de Orquestração (connection.js + midi-handler.js), 3. State Fields (state.rs) — Definidos mas NUNCA Atualizados, 4. API HTTP (Macros), 4. Config e Persistência, 6. Código Morto no Rust (Definido mas NUNCA chamado) (+19 more)
 
 ### Community 86 - "Community 86"
-Cohesion: 0.05
-Nodes (39): boot_delay_ms, demo_mode, disable_systray, dmx_boot_delay_ms, eq_flat_skip_hpf_lpf, inIdx, loopmidi-monitor, lumikit_ips (+31 more)
+Cohesion: 0.06
+Nodes (35): boot_delay_ms, demo_mode, disable_systray, dmx_boot_delay_ms, inIdx, loopmidi-monitor, lumikit_ips, meter_fps_desktop (+27 more)
 
 ### Community 87 - "Community 87"
 Cohesion: 0.07
 Nodes (26): 1. Interaction to Next Paint (INP) - Crítico, 2. Layerize e Custos de Renderização (8,5 segundos), A. Cache de elementos dos meters (socket.js + channel_strip.js) ✅ FEITO, 📊 Análise Técnica de Performance (Trace Chrome), B. Throttle do canvas EQ para ~20fps (eq.js), C. Throttle dos meters para ~30fps/15fps (socket.js) ✅ FEITO, D. `Date.now()` fora do loop de canais (socket.js) ✅ FEITO, E. Remover `backdrop-filter: blur()` do `.ch-name` (style.css) ✅ FEITO (+18 more)
 
 ### Community 88 - "Community 88"
-Cohesion: 0.11
-Nodes (19): applyMetersToDOM(), applyServerNameToSidebar(), applySetupStatus(), buildMeterCache(), clearAllMeters(), isMobileAgent, lastPeakTime, lastWasmRenderTime (+11 more)
+Cohesion: 0.05
+Nodes (51): assignedMacros, availableScripts, Channel Toggler Macro Mod (ON/OFF Multi-Channel), completeMacroMove(), MixerAPI (mixer/network/utils) Modder Contract, detectCurrentPreset(), Macro Engine (Multi-Preset, Slots, Plugin Registry), executeMacro() (+43 more)
 
 ### Community 89 - "Community 89"
 Cohesion: 0.14
@@ -2293,7 +1935,7 @@ Nodes (13): Benchmarking Profile, Custom Profiles, Default Profile, Dev Dependen
 
 ### Community 91 - "Community 91"
 Cohesion: 0.06
-Nodes (42): initUI(), isValidChannelForLayer(), closeEffectsModal(), stopEQAnimation(), closeChannelConfig(), autoScaleElement(), changeTechnicianMix(), closeMobileMenu() (+34 more)
+Nodes (38): initUI(), changeConfigChannel(), closeChannelConfig(), updateConfigUIForChannel(), autoScaleElement(), changeTechnicianMix(), closeMobileMenu(), enterTechnicianMixMode() (+30 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.09
@@ -2317,11 +1959,11 @@ Nodes (31): Cena default: `custom_names_scene-default-{nome_da_mesa}.json`, Cena
 
 ### Community 97 - "Community 97"
 Cohesion: 0.13
-Nodes (25): updatePanIndicator(), commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition() (+17 more)
+Nodes (24): commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition(), nudgeFader() (+16 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.16
-Nodes (13): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, changeConfigChannel(), Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop), enableDragScroll(), toggleFullScreen / iOS PWA Install (+5 more)
+Cohesion: 0.22
+Nodes (9): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop), enableDragScroll(), Splash Screen (Technician/Musician Login), Channel Config Modal (EQ/DYN/AUX/ETC + Mini Fader) (+1 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.23
@@ -2341,15 +1983,15 @@ Nodes (21): cachedTextDecoder, cachedTextEncoder, decodeText(), getArrayF32FromW
 
 ### Community 103 - "Community 103"
 Cohesion: 0.13
-Nodes (21): GlobalState, HashMap, PathBuf, Self, String, Value, Vec, AppConfig (+13 more)
+Nodes (19): GlobalState, HashMap, PathBuf, Self, String, Value, Vec, AppConfig (+11 more)
 
 ### Community 104 - "Community 104"
 Cohesion: 0.33
 Nodes (16): build_change(), build_name_change(), build_name_request(), build_request(), bytes_to_fader(), bytes_to_on(), bytes_to_signed(), cc() (+8 more)
 
 ### Community 105 - "Community 105"
-Cohesion: 0.09
-Nodes (21): 🚀 Como Iniciar, 🛠️ Compilação e Geração de Releases, 🤝 Contribuição, 💡 Créditos e Referências, 📱 Design Híbrido & Responsivo, ⚡ Inicialização Rápida (Recomendado), 💻 Inicialização via Terminal (Modo Desenvolvimento), 📄 Licença (+13 more)
+Cohesion: 0.10
+Nodes (20): 🚀 Como Iniciar, 🛠️ Compilação e Geração de Releases, 🤝 Contribuição, 💡 Créditos e Referências, 📱 Design Híbrido & Responsivo, ⚡ Inicialização Rápida (Recomendado), 💻 Inicialização via Terminal (Modo Desenvolvimento), 📄 Licença (+12 more)
 
 ### Community 106 - "Community 106"
 Cohesion: 0.11
@@ -2360,8 +2002,8 @@ Cohesion: 0.15
 Nodes (12): Bad, Common Patterns, Disambiguation, doc-intra-links, Good, Link Syntax, Linking to Self Members, Linking to Trait Methods (+4 more)
 
 ### Community 108 - "Community 108"
-Cohesion: 0.16
-Nodes (16): clearMacroSelection(), getMacroFaderHtml(), macroDeltaToDB(), macroFader, nudgeMacro(), openMacroConfig(), renderMacroFader(), renderMacroGrid() (+8 more)
+Cohesion: 0.21
+Nodes (13): clearMacroSelection(), getMacroFaderHtml(), macroDeltaToDB(), nudgeMacro(), openMacroConfig(), renderMacroFader(), renderMacroGrid(), resetMacroDbDisplay() (+5 more)
 
 ### Community 109 - "Community 109"
 Cohesion: 0.21
@@ -2372,8 +2014,8 @@ Cohesion: 0.15
 Nodes (12): Complete Cargo.toml, Configuration, Dependency Issues, Feature Issues, lint-cargo-metadata, Missing Metadata, Multiple Crate Versions, Notable Lints (+4 more)
 
 ### Community 111 - "Community 111"
-Cohesion: 0.12
-Nodes (16): 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles Comuns (Presentes em todos os efeitos), 1. Documentação Técnica, 2.1. Conversão de Frequências (Padrão Yamaha), 2. Estrutura e Arquitetura Proposta, 3.1. Reverb Standard (IDs 0, 1, 2, 3), 3. Mapeamento de Algoritmos, 4. Tabela de Referência: HOLD (0x1C) (+8 more)
+Cohesion: 0.14
+Nodes (13): 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles Comuns (Presentes em todos os efeitos), 1. Documentação Técnica, 2.1. Conversão de Frequências (Padrão Yamaha), 2. Estrutura e Arquitetura Proposta, 3.1. Reverb Standard (IDs 0, 1, 2, 3), 3. Mapeamento de Algoritmos, 4. Tabela de Referência: HOLD (0x1C) (+5 more)
 
 ### Community 112 - "Community 112"
 Cohesion: 0.14
@@ -2392,8 +2034,8 @@ Cohesion: 0.19
 Nodes (6): MasterMeter, HashMap, Option, Self, Value, Vec
 
 ### Community 116 - "Community 116"
-Cohesion: 0.18
-Nodes (24): renderAuxs(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+16 more)
+Cohesion: 0.19
+Nodes (23): renderAuxs(), updateAuxFromSocket(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip() (+15 more)
 
 ### Community 117 - "Community 117"
 Cohesion: 0.15
@@ -2416,8 +2058,8 @@ Cohesion: 0.13
 Nodes (17): busesState, container, curve, dbToRaw(), DEFAULT_OUT_EQ(), getSteppedRaw(), masterState, mixesState (+9 more)
 
 ### Community 122 - "Community 122"
-Cohesion: 0.13
-Nodes (14): name, short, name, short, name, short, name, short (+6 more)
+Cohesion: 0.17
+Nodes (11): name, short, name, short, name, short, channels, 18 (+3 more)
 
 ### Community 123 - "Community 123"
 Cohesion: 0.27
@@ -2489,7 +2131,7 @@ Nodes (4): 1, config, name, scriptId
 
 ### Community 140 - "Community 140"
 Cohesion: 0.22
-Nodes (8): 1, config, name, scriptId, globalConfig, lumikit, ip, port
+Nodes (8): 0, config, name, scriptId, globalConfig, lumikit, ip, port
 
 ### Community 141 - "Community 141"
 Cohesion: 0.15
@@ -2508,8 +2150,8 @@ Cohesion: 0.25
 Nodes (3): AtomicUsize, SyncCounter, Self
 
 ### Community 145 - "Community 145"
-Cohesion: 0.22
-Nodes (9): 2026-05-27 — Fase 1 concluida: Core e Configuracoes, 2026-05-27 — Hotfix: serde default para campos novos do config.json, 2026-05-27 — Sessao Inicial: Diagnostico e Regras, 2026-05-28 — Fase 10 concluida: Connection Manager, 2026-05-28 — Fase 4 concluida: SyncCounter + integracao, 2026-05-28 — Fase 9 concluida: SyncManager, 2026-05-28 — Hotfix: Panico no callback MIDI, 2026-07-01 — Sistema de Monitoramento de Áudio (PCM + Opus) — v2 (+1 more)
+Cohesion: 0.25
+Nodes (8): 2026-05-27 — Fase 1 concluida: Core e Configuracoes, 2026-05-27 — Hotfix: serde default para campos novos do config.json, 2026-05-27 — Sessao Inicial: Diagnostico e Regras, 2026-05-28 — Fase 10 concluida: Connection Manager, 2026-05-28 — Fase 4 concluida: SyncCounter + integracao, 2026-05-28 — Fase 9 concluida: SyncManager, 2026-05-28 — Hotfix: Panico no callback MIDI, LOG DE EXECUCAO (Atualizado a cada passo concluido)
 
 ### Community 146 - "Community 146"
 Cohesion: 0.25
@@ -2524,7 +2166,7 @@ Cohesion: 0.68
 Nodes (7): build_aux_msg(), build_pair(), build_reset(), build_state_msg(), build_unpair(), get_ch_byte(), Vec
 
 ### Community 149 - "Community 149"
-Cohesion: 0.26
+Cohesion: 0.29
 Nodes (9): executePair(), executeResetBoth(), executeUnpair(), getPatchName(), _pairCtx, renderPairSection(), selectPatch(), getPatchName() (+1 more)
 
 ### Community 150 - "Community 150"
@@ -2576,8 +2218,8 @@ Cohesion: 0.29
 Nodes (6): `docs-writer` skill instructions, Step 1: Understand the goal and create a plan, Step 2: Investigate and gather information, Step 3: Write or edit the documentation, Step 4: Verify and finalize, Sub-step: Editing existing documentation (as clarified in Step 1)
 
 ### Community 162 - "Community 162"
-Cohesion: 0.09
-Nodes (60): float32x4_t, KissCpx, KissFftState, Option, Self, Vec, Option, Self (+52 more)
+Cohesion: 0.38
+Nodes (4): execute(), onClear(), onConfigure(), renderUI()
 
 ### Community 163 - "Community 163"
 Cohesion: 0.48
@@ -2600,8 +2242,8 @@ Cohesion: 0.48
 Nodes (6): Path, String, reset_dmx_system(), spawn_dmx(), start_dmx_app(), update_lumikit_config()
 
 ### Community 168 - "Community 168"
-Cohesion: 0.21
-Nodes (12): Body, Next, Request, Response, Box, Error, Receiver, Result (+4 more)
+Cohesion: 0.39
+Nodes (7): Box, Error, Receiver, Result, Sender, async_main(), main()
 
 ### Community 169 - "Community 169"
 Cohesion: 0.33
@@ -4116,8 +3758,8 @@ Cohesion: 0.25
 Nodes (7): computedHash, skillPath, source, sourceType, skills, rust-skills, version
 
 ### Community 569 - "Community 569"
-Cohesion: 0.13
-Nodes (14): name, short, name, short, name, short, name, short (+6 more)
+Cohesion: 0.17
+Nodes (11): name, short, name, short, name, short, channels, 18 (+3 more)
 
 ### Community 571 - "Community 571"
 Cohesion: 0.13
@@ -4129,7 +3771,7 @@ Nodes (11): 1. Análise do Cenário Atual (Meters), 2. A Nova Arquitetura com WA
 
 ### Community 573 - "Community 573"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 574 - "Community 574"
 Cohesion: 0.25
@@ -4145,7 +3787,7 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 577 - "Community 577"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 578 - "Community 578"
 Cohesion: 0.47
@@ -4161,23 +3803,23 @@ Nodes (8): name, short, name, short, channels, 8, 9, mesa_nome
 
 ### Community 581 - "Community 581"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 12, 26
+Nodes (7): name, short, name, short, channels, 1, 12
 
 ### Community 582 - "Community 582"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 583 - "Community 583"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 36, 5
 
 ### Community 584 - "Community 584"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (6): name, short, channels, 36, scene_id, scene_name
 
 ### Community 585 - "Community 585"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 587 - "Community 587"
 Cohesion: 0.25
@@ -4185,11 +3827,11 @@ Nodes (7): files, main, name, sideEffects, type, types, version
 
 ### Community 588 - "Community 588"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 11, 12
+Nodes (7): name, short, name, short, channels, 1, 12
 
 ### Community 589 - "Community 589"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 590 - "Community 590"
 Cohesion: 0.29
@@ -4197,19 +3839,19 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 591 - "Community 591"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 3, 36
 
 ### Community 592 - "Community 592"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 593 - "Community 593"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 594 - "Community 594"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 24, 36
 
 ### Community 595 - "Community 595"
 Cohesion: 0.29
@@ -4217,15 +3859,15 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 596 - "Community 596"
 Cohesion: 0.29
-Nodes (6): name, short, channels, 36, scene_id, scene_name
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 597 - "Community 597"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 598 - "Community 598"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 23, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 599 - "Community 599"
 Cohesion: 0.29
@@ -4428,8 +4070,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 10
 
 ### Community 657 - "Community 657"
-Cohesion: 0.09
-Nodes (36): CeltMode, Default, Option, RangeCoder, Self, Vec, alloc_trim_analysis(), AnalysisInfo (+28 more)
+Cohesion: 0.67
+Nodes (3): name, short, 11
 
 ### Community 658 - "Community 658"
 Cohesion: 0.67
@@ -4501,7 +4143,7 @@ Nodes (3): name, short, 17
 
 ### Community 676 - "Community 676"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 36, 5
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 677 - "Community 677"
 Cohesion: 0.67
@@ -4676,8 +4318,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 22
 
 ### Community 721 - "Community 721"
-Cohesion: 0.18
-Nodes (11): MonitoringManager, Arc, Instant, Mutex, Option, Self, Sender, SocketIo (+3 more)
+Cohesion: 0.23
+Nodes (9): Arc, Mutex, Option, Self, Sender, SocketIo, SocketRef, String (+1 more)
 
 ### Community 722 - "Community 722"
 Cohesion: 0.67
@@ -5191,10 +4833,6 @@ Nodes (3): name, short, bus3
 Cohesion: 0.67
 Nodes (3): name, short, bus4
 
-### Community 855 - "Community 855"
-Cohesion: 0.08
-Nodes (44): CeltMode, RangeCoder, amp2log2(), anti_collapse(), bitexact_cos(), bitexact_log2tan(), celt_atan2p_norm(), celt_lcg_rand() (+36 more)
-
 ### Community 856 - "Community 856"
 Cohesion: 0.67
 Nodes (3): master, name, short
@@ -5456,8 +5094,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 924 - "Community 924"
-Cohesion: 0.09
-Nodes (38): CeltDecoder, CeltEncoder, Box, Option, RangeCoder, Result, Self, SilkEncoderState (+30 more)
+Cohesion: 0.67
+Nodes (3): name, short, 26
 
 ### Community 925 - "Community 925"
 Cohesion: 0.67
@@ -5544,8 +5182,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 4
 
 ### Community 946 - "Community 946"
-Cohesion: 0.07
-Nodes (37): SilkDecoderControl, SilkDecoderState, SilkEncoderStateCommon, NLSFCodebook, NLSFCodebook, SilkEncoderControl, SilkEncoderState, NLSFCodebook (+29 more)
+Cohesion: 0.67
+Nodes (3): name, short, 5
 
 ### Community 947 - "Community 947"
 Cohesion: 0.67
@@ -5912,8 +5550,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 19
 
 ### Community 1039 - "Community 1039"
-Cohesion: 0.08
-Nodes (32): SilkEncoderControl, SilkEncoderState, SilkEncoderState, SilkEncoderState, silk_find_pred_coefs_fix(), silk_ltp_scale_ctrl_fix(), silk_process_gains_fix(), silk_float_to_fixed_q7() (+24 more)
+Cohesion: 0.50
+Nodes (4): 1, config, name, scriptId
 
 ### Community 1040 - "Community 1040"
 Cohesion: 0.67
@@ -6228,8 +5866,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 1119 - "Community 1119"
-Cohesion: 0.09
-Nodes (38): SilkDecoderControl, SilkDecoderState, silk_decode_core(), silk_lpc_analysis_filter_offset(), lpc_inverse_pred_gain_qa(), silk_burg_modified_fix(), silk_residual_energy_fix(), silk_add32() (+30 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1120 - "Community 1120"
 Cohesion: 0.67
@@ -6472,8 +6110,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 1181 - "Community 1181"
-Cohesion: 0.11
-Nodes (41): MaybeUninit, Option, RangeCoder, alg_quant_qext(), alg_quant_resynth_avx2(), alg_quant_resynth_neon(), alg_quant_resynth_scalar(), alg_unquant() (+33 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1182 - "Community 1182"
 Cohesion: 0.67
@@ -6628,16 +6266,16 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 1221 - "Community 1221"
-Cohesion: 0.12
-Nodes (9): Self, Vec, RangeCoder, test_bits_only(), test_icdf_consistency(), test_icdf_decode_terminates(), test_icdf_last_symbol_no_oob(), test_interleaved_bits_entropy() (+1 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1222 - "Community 1222"
 Cohesion: 0.67
 Nodes (3): name, short, 22
 
 ### Community 1223 - "Community 1223"
-Cohesion: 0.09
-Nodes (36): SilkEncoderControl, SilkEncoderState, Vec, silk_find_ltp_fix(), silk_add_rshift32(), silk_add_sat16(), silk_add_sat32(), silk_log2lin() (+28 more)
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 1224 - "Community 1224"
 Cohesion: 0.67
@@ -6772,8 +6410,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 17
 
 ### Community 1258 - "Community 1258"
-Cohesion: 0.12
-Nodes (32): SilkEncoderControl, SilkEncoderState, Default, Self, silk_ana_filt_bank_1(), silk_biquad_alt_stride1(), silk_biquad_alt_stride2(), silk_lpc_fit() (+24 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1259 - "Community 1259"
 Cohesion: 0.67
@@ -6788,8 +6426,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 1262 - "Community 1262"
-Cohesion: 0.10
-Nodes (26): Default, RangeCoder, Self, SilkDecoderState, RangeCoder, SilkDecoderState, RangeCoder, SilkDecoderState (+18 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1263 - "Community 1263"
 Cohesion: 0.67
@@ -6988,8 +6626,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 21
 
 ### Community 1313 - "Community 1313"
-Cohesion: 0.12
-Nodes (32): Option, autocorr(), celt_fir(), celt_fir_neon(), celt_iir(), celt_iir_neon(), lpc(), celt_fir5() (+24 more)
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 1314 - "Community 1314"
 Cohesion: 0.67
@@ -7236,8 +6874,8 @@ Cohesion: 0.67
 Nodes (3): master, name, short
 
 ### Community 1377 - "Community 1377"
-Cohesion: 0.06
-Nodes (31): 1.1 Conceito, 1.2 Estados possíveis, 1.3 Relação com o RTA (compartilhamento de pipeline), 1. Visão Geral do Fluxo, 2.1 config.json (novas chaves), 2.2 Config (Rust) — monitoramento, 2. Estrutura de Dados, 3.1 Dependências (+23 more)
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 1379 - "Community 1379"
 Cohesion: 0.67
@@ -7246,10 +6884,6 @@ Nodes (3): name, short, 3
 ### Community 1380 - "Community 1380"
 Cohesion: 0.67
 Nodes (3): name, short, 11
-
-### Community 1381 - "Community 1381"
-Cohesion: 0.12
-Nodes (24): Into, SilkEncoderStateCommon, RangeCoder, SilkEncoderState, RangeCoder, SilkEncoderState, RangeCoder, SilkEncoderStateCommon (+16 more)
 
 ### Community 1382 - "Community 1382"
 Cohesion: 0.67
@@ -7452,8 +7086,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 1433 - "Community 1433"
-Cohesion: 0.14
-Nodes (21): assignedMacros, availableScripts, completeMacroMove(), detectCurrentPreset(), executeMacro(), fetchProtectedPresets(), handleTouchEnd(), initMacros() (+13 more)
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 1434 - "Community 1434"
 Cohesion: 0.67
@@ -7548,8 +7182,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 6
 
 ### Community 1457 - "Community 1457"
-Cohesion: 0.13
-Nodes (15): OpusEncoder, Arc, Instant, Mutex, Option, Self, Sender, SocketIo (+7 more)
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 1458 - "Community 1458"
 Cohesion: 0.67
@@ -8052,12 +7686,12 @@ Cohesion: 0.67
 Nodes (3): master, name, short
 
 ### Community 1589 - "Community 1589"
-Cohesion: 0.08
-Nodes (23): 1. Visão Geral, 2. Contexto do Projeto (Estrutura Relevante), 3.1 Modal de Configurações — Nova Seção "NAVEGAÇÃO", 3.2 Comportamento dos Botões na Sidebar (apenas `dockMode === 'main'`), 3.3 Renderização Condicionada por Layer, 3. Requisitos Funcionais, 4. Passo a Passo de Implementação, 5. Arquivos a Modificar (resumo) (+15 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1590 - "Community 1590"
-Cohesion: 0.17
-Nodes (15): Default, Option, Self, SilkNSQState, Vec, NLSFCodebook, SideInfoIndices, SilkEncoderControl (+7 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1591 - "Community 1591"
 Cohesion: 0.67
@@ -8072,8 +7706,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 21
 
 ### Community 1594 - "Community 1594"
-Cohesion: 0.10
-Nodes (19): 1. Contexto e Diagnóstico, 2. Solução Implementada — TRUE Zero-Copy (Acesso a Memória Bruta), 3.1 `client_wasm/src/meters.rs` — A Fonte da Verdade, 3.2 `public/modules/socket.js` — Modo DOM (produção), 3.3 `canvas_frontend/public/modules/socket.js` & `canvas_frontend/modules/socket.js`, 3.4 `canvas_frontend/public/canvas_project/canvas_engine.js` — Loop Canvas, 3. Arquivos Modificados, 4. Fluxo de Dados Depois da Otimização (+11 more)
+Cohesion: 0.67
+Nodes (3): name, short, 23
 
 ### Community 1595 - "Community 1595"
 Cohesion: 0.67
@@ -8091,1410 +7725,10 @@ Nodes (3): name, short, 18
 Cohesion: 0.67
 Nodes (3): name, short, 24
 
-### Community 1601 - "Community 1601"
-Cohesion: 0.16
-Nodes (17): auxVG_deltaToDB(), auxVG_resetDbDisplay(), auxVG_updateDbDisplay(), getAuxVolumeGeralHtml(), getMixVolumeGeralHtml(), mixVG_deltaToDB(), mixVG_resetDbDisplay(), mixVG_updateDbDisplay() (+9 more)
-
-### Community 1602 - "Community 1602"
-Cohesion: 0.27
-Nodes (19): SideInfoIndices, SilkEncoderStateCommon, SilkNSQState, silk_add_lshift32(), silk_smlabb(), silk_smlawb(), silk_smulww(), limit_warped_coefs() (+11 more)
-
-### Community 1603 - "Community 1603"
-Cohesion: 0.40
-Nodes (16): Option, CeltMode, RangeCoder, BandCtx, quant_partition(), quant_partition_direct_encode(), quant_partition_encode(), quant_partition_n2_encode() (+8 more)
-
-### Community 1604 - "Community 1604"
-Cohesion: 0.43
-Nodes (13): CeltMode, RangeCoder, loss_distortion(), quant_coarse_energy(), quant_coarse_energy_advanced(), quant_coarse_energy_impl(), quant_energy_finalise(), quant_fine_energy() (+5 more)
-
-### Community 1605 - "Community 1605"
-Cohesion: 0.15
-Nodes (12): 1. `public/modules/volume_geral.js`, 2. `public/modules/channel_strip.js` — `initUI()`, 3. `public/modules/auxs_sends.js` — `renderAuxs(ch)`, 4. `public/style.css`, Alterações por Arquivo, Cenário 1: Technician Mix Mode (sends-on-faders), Cenário 2: Aba AUX de canal individual, Comportamento (+4 more)
-
-### Community 1606 - "Community 1606"
-Cohesion: 0.22
-Nodes (9): Default, NLSFCodebook, Option, Self, SideInfoIndices, SilkCNGState, SilkDecoderControl, SilkDecoderState (+1 more)
-
-### Community 1607 - "Community 1607"
-Cohesion: 0.23
-Nodes (11): Default, Self, SideInfoIndices, SilkEncoderStateCommon, SilkNSQState, NSQDelDecStruct, NSQSampleStruct, silk_lpc_prediction_neon() (+3 more)
-
-### Community 1608 - "Community 1608"
-Cohesion: 0.35
-Nodes (11): Channel Toggler Macro Mod (ON/OFF Multi-Channel), MixerAPI (mixer/network/utils) Modder Contract, Macro Engine (Multi-Preset, Slots, Plugin Registry), Host-to-Preset Mapping Configuration, Lumikit Macro Mod (Lighting Scene+Extra Control), macroDatabase, registerMacro Plugin Registration Function, Macro Profile: pcfavela (Channel Toggler + Lumikit) (+3 more)
-
-### Community 1609 - "Community 1609"
-Cohesion: 0.18
-Nodes (10): dependencies, midi, description, license, main, name, scripts, start (+2 more)
-
-### Community 1610 - "Community 1610"
-Cohesion: 0.25
-Nodes (7): 1. Modificar `server_rust/src/main.rs`, 2. Criar `server_rust/src/api/status.rs`, 3. Atualizar `server_rust/src/api/mod.rs`, 4. Criar `public/status.html`, 5. Verificar e testar, 6. Opcional: Adicionar alias de rota, Plano de Implementação: Página de Status do Servidor
-
-### Community 1611 - "Community 1611"
-Cohesion: 0.29
-Nodes (6): Canvas Channel Strip Feature Implementation Plan, Execution Handoff, Task 1: Create Canvas Frontend Bifurcation & Feature Flag, Task 2: Create Canvas Engine (`canvas_engine.js`), Task 3: Create Render Engine (`canvas_strip.js`), Task 4: Create Interactivity Engine (`canvas_events.js`)
-
-### Community 1612 - "Community 1612"
-Cohesion: 0.43
-Nodes (5): MdctLookup, Self, CeltMode, default_mode(), PulseCache
-
-### Community 1613 - "Community 1613"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
-
-### Community 1614 - "Community 1614"
-Cohesion: 0.29
-Nodes (6): name, short, channels, 13, scene_id, scene_name
-
-### Community 1615 - "Community 1615"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 24, 36
-
-### Community 1616 - "Community 1616"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 23, 36
-
-### Community 1617 - "Community 1617"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
-
-### Community 1618 - "Community 1618"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
-
-### Community 1619 - "Community 1619"
-Cohesion: 0.29
-Nodes (6): name, short, channels, 13, scene_id, scene_name
-
-### Community 1620 - "Community 1620"
-Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
-
-### Community 1622 - "Community 1622"
-Cohesion: 0.80
-Nodes (4): RangeCoder, combine_pulses(), encode_split(), silk_shell_encoder()
-
-### Community 1624 - "Community 1624"
-Cohesion: 0.50
-Nodes (4): 0, config, name, scriptId
-
-### Community 1625 - "Community 1625"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1626 - "Community 1626"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1627 - "Community 1627"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1628 - "Community 1628"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1629 - "Community 1629"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1632 - "Community 1632"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1633 - "Community 1633"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1634 - "Community 1634"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1635 - "Community 1635"
-Cohesion: 0.67
-Nodes (3): name, short, 13
-
-### Community 1636 - "Community 1636"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1637 - "Community 1637"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1638 - "Community 1638"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1639 - "Community 1639"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1640 - "Community 1640"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1641 - "Community 1641"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1642 - "Community 1642"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1643 - "Community 1643"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1644 - "Community 1644"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1645 - "Community 1645"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1646 - "Community 1646"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1647 - "Community 1647"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1648 - "Community 1648"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1649 - "Community 1649"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1650 - "Community 1650"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1651 - "Community 1651"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1652 - "Community 1652"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1653 - "Community 1653"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1654 - "Community 1654"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1655 - "Community 1655"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1656 - "Community 1656"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1657 - "Community 1657"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1658 - "Community 1658"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1659 - "Community 1659"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1660 - "Community 1660"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1661 - "Community 1661"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1662 - "Community 1662"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1663 - "Community 1663"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1664 - "Community 1664"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1665 - "Community 1665"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1666 - "Community 1666"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1667 - "Community 1667"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
-### Community 1668 - "Community 1668"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1669 - "Community 1669"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1670 - "Community 1670"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1671 - "Community 1671"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1672 - "Community 1672"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1673 - "Community 1673"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1674 - "Community 1674"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1675 - "Community 1675"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1676 - "Community 1676"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1677 - "Community 1677"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1678 - "Community 1678"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1679 - "Community 1679"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1680 - "Community 1680"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1681 - "Community 1681"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1682 - "Community 1682"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1683 - "Community 1683"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1684 - "Community 1684"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1685 - "Community 1685"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1686 - "Community 1686"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1687 - "Community 1687"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1688 - "Community 1688"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1689 - "Community 1689"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1690 - "Community 1690"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1691 - "Community 1691"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1692 - "Community 1692"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1693 - "Community 1693"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1694 - "Community 1694"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1695 - "Community 1695"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1696 - "Community 1696"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1697 - "Community 1697"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1698 - "Community 1698"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1699 - "Community 1699"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1700 - "Community 1700"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1701 - "Community 1701"
-Cohesion: 0.67
-Nodes (3): name, short, 36
-
-### Community 1702 - "Community 1702"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1703 - "Community 1703"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1704 - "Community 1704"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1705 - "Community 1705"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1706 - "Community 1706"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1707 - "Community 1707"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1708 - "Community 1708"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1709 - "Community 1709"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1710 - "Community 1710"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1711 - "Community 1711"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1712 - "Community 1712"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1713 - "Community 1713"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1714 - "Community 1714"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1716 - "Community 1716"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1717 - "Community 1717"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1718 - "Community 1718"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1719 - "Community 1719"
-Cohesion: 0.67
-Nodes (3): name, short, 13
-
-### Community 1720 - "Community 1720"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1721 - "Community 1721"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1722 - "Community 1722"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1723 - "Community 1723"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1724 - "Community 1724"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1725 - "Community 1725"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1726 - "Community 1726"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1727 - "Community 1727"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1728 - "Community 1728"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1729 - "Community 1729"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1730 - "Community 1730"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1731 - "Community 1731"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1732 - "Community 1732"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1733 - "Community 1733"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1734 - "Community 1734"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1735 - "Community 1735"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1736 - "Community 1736"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1737 - "Community 1737"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1738 - "Community 1738"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1739 - "Community 1739"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1740 - "Community 1740"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1741 - "Community 1741"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1742 - "Community 1742"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1743 - "Community 1743"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1744 - "Community 1744"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1745 - "Community 1745"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1746 - "Community 1746"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1747 - "Community 1747"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1748 - "Community 1748"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1749 - "Community 1749"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1750 - "Community 1750"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1751 - "Community 1751"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
-### Community 1752 - "Community 1752"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1753 - "Community 1753"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1754 - "Community 1754"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1755 - "Community 1755"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1757 - "Community 1757"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1758 - "Community 1758"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1759 - "Community 1759"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1760 - "Community 1760"
-Cohesion: 0.67
-Nodes (3): name, short, 13
-
-### Community 1761 - "Community 1761"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1762 - "Community 1762"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1763 - "Community 1763"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1764 - "Community 1764"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1765 - "Community 1765"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1766 - "Community 1766"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1767 - "Community 1767"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1768 - "Community 1768"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1769 - "Community 1769"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1770 - "Community 1770"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1771 - "Community 1771"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1772 - "Community 1772"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1773 - "Community 1773"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1774 - "Community 1774"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1775 - "Community 1775"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1776 - "Community 1776"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1777 - "Community 1777"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1778 - "Community 1778"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1779 - "Community 1779"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1780 - "Community 1780"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1781 - "Community 1781"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1782 - "Community 1782"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1783 - "Community 1783"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1784 - "Community 1784"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1785 - "Community 1785"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1786 - "Community 1786"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1787 - "Community 1787"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1788 - "Community 1788"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1789 - "Community 1789"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1790 - "Community 1790"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1791 - "Community 1791"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1792 - "Community 1792"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
-### Community 1793 - "Community 1793"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1794 - "Community 1794"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1795 - "Community 1795"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1796 - "Community 1796"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1798 - "Community 1798"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1799 - "Community 1799"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1801 - "Community 1801"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1802 - "Community 1802"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1803 - "Community 1803"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1804 - "Community 1804"
-Cohesion: 0.67
-Nodes (3): name, short, 13
-
-### Community 1805 - "Community 1805"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1806 - "Community 1806"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1807 - "Community 1807"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1808 - "Community 1808"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1809 - "Community 1809"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1810 - "Community 1810"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1811 - "Community 1811"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1812 - "Community 1812"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1813 - "Community 1813"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1814 - "Community 1814"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1815 - "Community 1815"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1816 - "Community 1816"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1817 - "Community 1817"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1818 - "Community 1818"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1819 - "Community 1819"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1820 - "Community 1820"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1821 - "Community 1821"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1822 - "Community 1822"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1823 - "Community 1823"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1824 - "Community 1824"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1825 - "Community 1825"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1826 - "Community 1826"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1827 - "Community 1827"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1828 - "Community 1828"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1829 - "Community 1829"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1830 - "Community 1830"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1831 - "Community 1831"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1832 - "Community 1832"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1833 - "Community 1833"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1834 - "Community 1834"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1835 - "Community 1835"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1836 - "Community 1836"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
-### Community 1837 - "Community 1837"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1838 - "Community 1838"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1839 - "Community 1839"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1841 - "Community 1841"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1842 - "Community 1842"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1843 - "Community 1843"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1844 - "Community 1844"
-Cohesion: 0.67
-Nodes (3): name, short, 13
-
-### Community 1845 - "Community 1845"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1846 - "Community 1846"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1847 - "Community 1847"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1848 - "Community 1848"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1849 - "Community 1849"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1850 - "Community 1850"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1851 - "Community 1851"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1852 - "Community 1852"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1853 - "Community 1853"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1854 - "Community 1854"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1855 - "Community 1855"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1856 - "Community 1856"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1857 - "Community 1857"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1858 - "Community 1858"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1859 - "Community 1859"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1860 - "Community 1860"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1861 - "Community 1861"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1862 - "Community 1862"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1863 - "Community 1863"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1864 - "Community 1864"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1865 - "Community 1865"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1866 - "Community 1866"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1867 - "Community 1867"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1868 - "Community 1868"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1869 - "Community 1869"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1870 - "Community 1870"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1871 - "Community 1871"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1872 - "Community 1872"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1873 - "Community 1873"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1874 - "Community 1874"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1875 - "Community 1875"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1876 - "Community 1876"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
-### Community 1877 - "Community 1877"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1878 - "Community 1878"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1879 - "Community 1879"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1880 - "Community 1880"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1881 - "Community 1881"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1882 - "Community 1882"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1883 - "Community 1883"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1884 - "Community 1884"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1885 - "Community 1885"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1886 - "Community 1886"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1887 - "Community 1887"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1888 - "Community 1888"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1889 - "Community 1889"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1890 - "Community 1890"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1891 - "Community 1891"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1892 - "Community 1892"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1893 - "Community 1893"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1894 - "Community 1894"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1895 - "Community 1895"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1896 - "Community 1896"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1897 - "Community 1897"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1898 - "Community 1898"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1899 - "Community 1899"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1900 - "Community 1900"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1901 - "Community 1901"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1902 - "Community 1902"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1903 - "Community 1903"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1904 - "Community 1904"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1905 - "Community 1905"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1906 - "Community 1906"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1907 - "Community 1907"
-Cohesion: 0.67
-Nodes (3): name, short, 36
-
-### Community 1908 - "Community 1908"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1909 - "Community 1909"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1910 - "Community 1910"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1911 - "Community 1911"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1912 - "Community 1912"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1913 - "Community 1913"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1914 - "Community 1914"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1915 - "Community 1915"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1916 - "Community 1916"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1917 - "Community 1917"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1918 - "Community 1918"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1920 - "Community 1920"
-Cohesion: 0.67
-Nodes (3): name, short, 10
-
-### Community 1921 - "Community 1921"
-Cohesion: 0.67
-Nodes (3): name, short, 11
-
-### Community 1922 - "Community 1922"
-Cohesion: 0.67
-Nodes (3): name, short, 12
-
-### Community 1923 - "Community 1923"
-Cohesion: 0.67
-Nodes (3): name, short, 13
-
-### Community 1924 - "Community 1924"
-Cohesion: 0.67
-Nodes (3): name, short, 14
-
-### Community 1925 - "Community 1925"
-Cohesion: 0.67
-Nodes (3): name, short, 15
-
-### Community 1926 - "Community 1926"
-Cohesion: 0.67
-Nodes (3): name, short, 16
-
-### Community 1927 - "Community 1927"
-Cohesion: 0.67
-Nodes (3): name, short, 17
-
-### Community 1928 - "Community 1928"
-Cohesion: 0.67
-Nodes (3): name, short, 19
-
-### Community 1929 - "Community 1929"
-Cohesion: 0.67
-Nodes (3): name, short, 1
-
-### Community 1930 - "Community 1930"
-Cohesion: 0.67
-Nodes (3): name, short, 20
-
-### Community 1931 - "Community 1931"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 1932 - "Community 1932"
-Cohesion: 0.67
-Nodes (3): name, short, 22
-
-### Community 1933 - "Community 1933"
-Cohesion: 0.67
-Nodes (3): name, short, 23
-
-### Community 1934 - "Community 1934"
-Cohesion: 0.67
-Nodes (3): name, short, 24
-
-### Community 1935 - "Community 1935"
-Cohesion: 0.67
-Nodes (3): name, short, 25
-
-### Community 1936 - "Community 1936"
-Cohesion: 0.67
-Nodes (3): name, short, 26
-
-### Community 1937 - "Community 1937"
-Cohesion: 0.67
-Nodes (3): name, short, 27
-
-### Community 1938 - "Community 1938"
-Cohesion: 0.67
-Nodes (3): name, short, 28
-
-### Community 1939 - "Community 1939"
-Cohesion: 0.67
-Nodes (3): name, short, 29
-
-### Community 1940 - "Community 1940"
-Cohesion: 0.67
-Nodes (3): name, short, 2
-
-### Community 1941 - "Community 1941"
-Cohesion: 0.67
-Nodes (3): name, short, 30
-
-### Community 1942 - "Community 1942"
-Cohesion: 0.67
-Nodes (3): name, short, 31
-
-### Community 1943 - "Community 1943"
-Cohesion: 0.67
-Nodes (3): name, short, 32
-
-### Community 1944 - "Community 1944"
-Cohesion: 0.67
-Nodes (3): name, short, 33
-
-### Community 1945 - "Community 1945"
-Cohesion: 0.67
-Nodes (3): name, short, 34
-
-### Community 1946 - "Community 1946"
-Cohesion: 0.67
-Nodes (3): name, short, 35
-
-### Community 1947 - "Community 1947"
-Cohesion: 0.67
-Nodes (3): name, short, 37
-
-### Community 1948 - "Community 1948"
-Cohesion: 0.67
-Nodes (3): name, short, 38
-
-### Community 1949 - "Community 1949"
-Cohesion: 0.67
-Nodes (3): name, short, 39
-
-### Community 1950 - "Community 1950"
-Cohesion: 0.67
-Nodes (3): name, short, 3
-
-### Community 1951 - "Community 1951"
-Cohesion: 0.67
-Nodes (3): name, short, 40
-
-### Community 1952 - "Community 1952"
-Cohesion: 0.67
-Nodes (3): name, short, 4
-
-### Community 1953 - "Community 1953"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
-### Community 1954 - "Community 1954"
-Cohesion: 0.67
-Nodes (3): name, short, 6
-
-### Community 1955 - "Community 1955"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
-### Community 1956 - "Community 1956"
-Cohesion: 0.67
-Nodes (3): name, short, 8
-
-### Community 1957 - "Community 1957"
-Cohesion: 0.67
-Nodes (3): name, short, 9
-
-### Community 1958 - "Community 1958"
-Cohesion: 0.67
-Nodes (3): master, name, short
-
-### Community 1959 - "Community 1959"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 1960 - "Community 1960"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
 ## Knowledge Gaps
-- **8335 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+8330 more)
+- **7519 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+7514 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **58 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -9505,11 +7739,11 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **Why does `kStereoEQ/kEQLowG` connect `Community 612` to `Architecture Refactor Plan`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Are the 42 inferred relationships involving `getChannelStateById()` (e.g. with `execute()` and `auxWheelInput()`) actually correct?**
-  _`getChannelStateById()` has 42 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 43 inferred relationships involving `silk_smlawb()` (e.g. with `silk_ana_filt_bank_1()` and `silk_biquad_alt_stride1()`) actually correct?**
-  _`silk_smlawb()` has 43 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 41 inferred relationships involving `getChannelStateById()` (e.g. with `execute()` and `auxWheelInput()`) actually correct?**
+  _`getChannelStateById()` has 41 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `contentHash`, `downloadedAt`, `contentHash` to the rest of the system?**
-  _8366 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _7550 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` be split into smaller, more focused modules?**
-  _Cohesion score 0.08677098150782361 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10574712643678161 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.062317429406037 - nodes in this community are weakly interconnected._

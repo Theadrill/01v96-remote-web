@@ -2110,26 +2110,6 @@ body.layout-desktop .ch-modal-overlay {
     margin-bottom: 14px;
 }
 
-.efeitos-close-btn {
-    margin-top: 20px;
-    align-self: center;
-    min-width: 160px;
-    padding: 12px 0;
-    border-radius: 8px;
-    border: none;
-    background: #dc3545;
-    color: white;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-    letter-spacing: 1px;
-}
-
-.efeitos-close-btn:active {
-    opacity: 0.8;
-    transform: scale(0.97);
-}
-
 .fx-header-row {
     display: flex;
     align-items: center;

@@ -249,3 +249,256 @@ Esta tabela contém o mapeamento absoluto para o parâmetro DECAY, herdado da l�
 - Media query mobile: fios ocultos, processador com `min-width: auto` e `padding: 10px` + `margin: 0 10px`.
 
 **Próxima etapa:** Conectar com dados reais do servidor (socket) e implementar a tela de detalhes de cada máquina de efeitos ao clicar no processador.
+
+---
+
+## 7. Plano de Implementação: Recuperar Nomes dos Efeitos nos Slots FX
+
+### 7.1. Contexto e Descobertas via Engenharia Reversa
+
+Durante a sessão de engenharia reversa (monitor.js), capturamos as seguintes mensagens ao realizar um "Recall" de um preset de efeito pelo Studio Manager:
+
+```
+💻 S→Y (12b): F0 43 10 3E 7F 10 04 00 39 00 00 F7    ← Recall do preset índice 0x39=57 no Slot FX1
+🎹 Y→S (15b): F0 43 10 3E 7F 50 04 00 39 00 00 00 00 00 F7  ← Mesa confirma
+💻 S→Y (15b): F0 43 10 3E 7F 50 04 00 39 00 00 00 00 00 F7  ← Loopback
+```
+
+No log de sincronização inicial (`log/monitor_log(sincronização inicial).txt`), identificamos que o Studio Manager faz um **Bulk Dump** da biblioteca de presets usando o protocolo `F0 43 00 7E` (Identity + Dump Request). As respostas contêm blocos com os nomes dos presets em ASCII nos bytes de offset `[20..28]` de cada entrada. Exemplo capturado:
+
+```
+💻 S→Y (16b): F0 43 20 7E 4C 4D 20 20 38 43 39 33 6D 00 01 F7  ← Request preset #1 da library
+🎹 Y→S (623b): F0 43 00 7E 04 67 ... 54 45 53 54 45 32 20 00 ... ← "TESTE2 " (nome do preset)
+```
+
+**Conclusão crítica:** A mesa Yamaha 01V96 possui dois conceitos distintos:
+- **Algorithm Type (`param 0x31`)**: O motor de efeito em uso (ex.: 0=Hall, 1=Room, 3=Plate). Não é o nome — é o tipo.
+- **Preset Index (`param 0x39`)**: O índice (0-based) na biblioteca de presets que foi carregado no slot. **Este é o link para o nome.**
+
+A biblioteca de presets contém tanto os **presets de fábrica** quanto os **presets customizados do usuário**, todos com seus nomes completos acessíveis via Bulk Dump.
+
+---
+
+### 7.2. Arquitetura da Solução
+
+O fluxo completo para obter os nomes dos efeitos nos slots FX1–FX4 é:
+
+```
+[Boot / Reconexão do Studio Manager]
+          │
+          ▼
+1. Enviar Bulk Dump Request da Library de Presets de Efeito
+          │
+          ▼
+2. Receber e parsear os ~100 presets
+   → Construir mapa: { preset_index: "NOME DO PRESET" }
+          │
+          ▼
+3. Para cada slot FX (FX1=0, FX2=1, FX3=2, FX4=3):
+   Enviar Parameter Request para o Preset Index (param 0x39)
+          │
+          ▼
+4. Resposta da mesa → índice N
+   → fxSlotName[slot] = library[N]
+   → Se N não encontrado: fallback = algorithmName[type]
+          │
+          ▼
+5. Emitir evento Socket.IO "fxSlotsUpdated" para o frontend
+```
+
+---
+
+### 7.3. Mensagens MIDI Necessárias
+
+#### 7.3.1. Bulk Dump Request — Biblioteca de Presets de Efeito
+
+O Studio Manager usa o seguinte padrão para solicitar um preset da library por índice (`IDX` = 0-based):
+
+```
+F0 43 20 7E 4C 4D 20 20 38 43 39 33 6D [BANK] [IDX] F7
+```
+
+- `4C 4D 20 20 38 43 39 33` = ASCII "LM  8C93" (ID do modelo 01V96)
+- `6D` = Tipo de objeto (Effect Library)
+- `[BANK]` = `00` para User presets
+- `[IDX]` = índice do preset (01 a 64 hex = presets 1–100)
+
+A mesa responde com um bloco que começa em:
+```
+F0 43 00 7E [SIZE_H] [SIZE_L] 4C 4D 20 20 38 43 39 33 6D [BANK] [IDX] 00 00 00
+[NOME: 7 bytes ASCII + 00] [padding] [dados dos parâmetros encodados...]
+F7
+```
+
+**O nome do preset está nos bytes de offset 20 a 27 da resposta (após o header `F0 43 00 7E ... 6D [BANK] [IDX] 00 00 00`), como 7 caracteres ASCII + null terminator.**
+
+Para fazer o dump completo:
+- Iterar `IDX` de `01` a `64` (hex) = 100 presets de usuário
+- Ou usar o bulk dump global com `IDX = 7F` (0x7F = "todos") se suportado
+
+#### 7.3.2. Parameter Request — Preset Index no Slot Ativo
+
+Para saber qual preset está carregado **atualmente** em cada slot FX:
+
+```
+Request (S→Y):
+F0 43 10 3E 7F 10 04 [SLOT] 39 00 00 F7
+
+Resposta (Y→S):
+F0 43 10 3E 7F 50 04 [SLOT] 39 00 00 00 00 [IDX] F7
+```
+
+Onde:
+- `[SLOT]`: `00`=FX1, `01`=FX2, `02`=FX3, `03`=FX4
+- `[IDX]` = byte final da resposta = índice do preset na library (0-based)
+
+#### 7.3.3. Parameter Request — Algorithm Type (fallback)
+
+Para obter o tipo de algoritmo rodando no slot (usado como fallback):
+
+```
+Request (S→Y):
+F0 43 10 3E 7F 10 04 [SLOT] 31 00 00 F7
+
+Resposta (Y→S):
+F0 43 10 3E 7F 50 04 [SLOT] 31 00 00 00 00 [ALGO_ID] F7
+```
+
+Tabela de `ALGO_ID` → Nome do Algoritmo (a catalogar conforme manual / reverse engineering):
+
+| ALGO_ID (hex) | Nome |
+|---|---|
+| 00 | REVERB HALL |
+| 01 | REVERB ROOM |
+| 02 | REVERB STAGE |
+| 03 | REVERB PLATE |
+| 04 | REVERB HALL 2 |
+| 05 | REVERB ROOM 2 |
+| ... | *(continuar mapeamento via monitor.js)* |
+
+---
+
+### 7.4. Implementação no Servidor Rust
+
+#### 7.4.1. Novo Estado Global — `FxSlotState`
+
+Em `server_rust/src/state.rs`, adicionar:
+
+```rust
+#[derive(Debug, Clone, serde::Serialize, Default)]
+pub struct FxSlotInfo {
+    pub preset_index: Option<u8>,     // índice na library (None se desconhecido)
+    pub preset_name: Option<String>,  // nome resolvido da library
+    pub algorithm_id: Option<u8>,     // fallback: tipo de algoritmo
+    pub algorithm_name: Option<String>,
+}
+
+// No GlobalState, adicionar:
+pub fx_slots: [FxSlotInfo; 4],  // FX1=0, FX2=1, FX3=2, FX4=3
+pub fx_library: HashMap<u8, String>,  // preset_index -> nome
+```
+
+#### 7.4.2. Novo Módulo — `fx_manager.rs`
+
+Criar `server_rust/src/fx_manager.rs` com:
+
+```rust
+/// Envia bulk dump request para todos os presets da library (índices 1..=100)
+pub async fn fetch_fx_library(midi_out: &MidiOut) { ... }
+
+/// Parseia a resposta do bulk dump e extrai o nome do preset
+/// Offset do nome na resposta: bytes 20..27 após F0 43 00 7E header
+pub fn parse_library_entry(msg: &[u8]) -> Option<(u8, String)> { ... }
+
+/// Solicita o preset_index ativo em cada um dos 4 slots FX
+pub async fn fetch_fx_slot_presets(midi_out: &MidiOut) { ... }
+
+/// Solicita o algorithm_id de cada slot (fallback)
+pub async fn fetch_fx_slot_algorithms(midi_out: &MidiOut) { ... }
+
+/// Resolve nomes: cruza preset_index com fx_library, fallback p/ algorithm_name
+pub fn resolve_fx_slot_names(state: &mut GlobalState) { ... }
+```
+
+#### 7.4.3. Integração no Boot
+
+Em `server_rust/src/boot.rs` (ou equivalente de inicialização), após a conexão MIDI ser estabelecida:
+
+```rust
+fx_manager::fetch_fx_library(&midi_out).await;
+// aguardar 500ms para respostas
+fx_manager::fetch_fx_slot_presets(&midi_out).await;
+fx_manager::fetch_fx_slot_algorithms(&midi_out).await;
+fx_manager::resolve_fx_slot_names(&mut state);
+// emitir evento Socket.IO
+```
+
+#### 7.4.4. Parsing de Mensagens Recebidas
+
+Em `server_rust/src/midi/protocol.rs`, adicionar ao enum `ParsedMidi` e à função `parse_message`:
+
+```rust
+// Novo variant:
+FxLibraryEntry { preset_index: u8, name: String },
+FxSlotPresetIndex { slot: u8, preset_index: u8 },
+FxSlotAlgorithm { slot: u8, algorithm_id: u8 },
+
+// No parse_message, detectar:
+// Bulk dump response: msg[0]=0xF0, msg[1]=0x43, msg[2]=0x00, msg[3]=0x7E
+//   + verificar bytes 6..14 = "LM  8C93" + 0x6D
+// Parameter change response: section=0x7F, group=0x50, element=0x04
+//   + param=0x39 → FxSlotPresetIndex
+//   + param=0x31 → FxSlotAlgorithm
+```
+
+---
+
+### 7.5. Evento Socket.IO para o Frontend
+
+Emitir após resolver todos os slots:
+
+```json
+{
+  "event": "fxSlotsUpdated",
+  "data": {
+    "slots": [
+      { "slot": 1, "presetIndex": 56, "name": "MEU PRESET CUSTOMIZADO", "algorithmId": 0, "algorithmName": "REVERB HALL" },
+      { "slot": 2, "presetIndex": 3,  "name": "REVERB PLATE", "algorithmId": 3, "algorithmName": "REVERB PLATE" },
+      { "slot": 3, "presetIndex": null, "name": null, "algorithmId": 2, "algorithmName": "REVERB STAGE" },
+      { "slot": 4, "presetIndex": 10, "name": "DELAY STEREO", "algorithmId": 8, "algorithmName": "STEREO DELAY" }
+    ]
+  }
+}
+```
+
+**Regra de display no frontend:**
+- Se `name != null` → exibir `name` (vem da library, inclui presets customizados)
+- Se `name == null` e `algorithmName != null` → exibir `algorithmName + " (?)"` (parâmetros editados manualmente, sem vínculo com preset)
+- Se ambos null → exibir `"FX? (carregando...)"` enquanto aguarda resposta da mesa
+
+---
+
+### 7.6. Integração com Frontend (efeitos.js)
+
+Em `public/modules/efeitos.js`, escutar o evento:
+
+```javascript
+socket.on('fxSlotsUpdated', (data) => {
+    data.slots.forEach(slot => {
+        const displayName = slot.name ?? (slot.algorithmName ? `${slot.algorithmName} (?)` : 'Carregando...');
+        updateFxSlotDisplay(slot.slot, displayName, slot.algorithmName);
+    });
+});
+```
+
+Atualizar o elemento do processador no layout (ver Seção 6.1 deste documento) para mostrar o nome dinâmico no lugar do texto estático "REVERB HALL", "M.BAND DYNA." etc.
+
+---
+
+### 7.7. Observações e Riscos
+
+- **O preset index `0x39` precisa ser confirmado experimentalmente:** com o monitor.js rodando, fazer um Recall de um preset conhecido pelo Studio Manager e verificar se a resposta do slot retorna o índice correto.
+- **A numeração da library é 0-based ou 1-based?** No log, o Studio Manager pediu `IDX=01` para o primeiro preset e recebeu "TESTE2" — pode ser que `IDX=00` seja um preset especial (sem recall / "init"). Testar requestando `IDX=00`.
+- **Capacidade da library:** A 01V96 suporta 100 User Presets + presets de fábrica (factory). Mapear se os factory presets usam um bank diferente (`[BANK] != 00`).
+- **Sincronização assíncrona:** O Bulk Dump pode chegar em múltiplas mensagens fragmentadas (o monitor.js já remonta SysEx fragmentados — usar a mesma lógica).
+- **Trigger de re-fetch:** Quando o Studio Manager fizer um Recall de cena (`PhysicalSceneRecall`), re-executar os passos de fetch dos slots (os efeitos podem ter mudado junto com a cena).
