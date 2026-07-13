@@ -195,3 +195,57 @@ Esta tabela contém o mapeamento absoluto para o parâmetro DECAY, herdado da l�
 | 39 | 251ms | | 79 | 1.32s | | 119 | 7.85s | | 159 | 42.3s |
 
 
+
+## REPRESENTAÇÃO EM TEXTO DO LAYOUT DA TELA DE MÁQUINAS DE EFEITOS DA MESA
+
+      [IN PATCH]                       [PROCESSOR]                       [OUT PATCH]
+
+     [   -   ] -- IN1 --.   .-------------------------------.   .-- OUT1 -- [   -   ]
+                        |---| 1     EFFECT1       [>]     L |---|
+     [   -   ] -- IN2 --'   |       REVERB HALL           R |   '-- OUT2 -- [   -   ]
+                            '-------------------------------'
+
+     [INS BUS8]-- IN1 --.   .-------------------------------.   .-- OUT1 -- [INS CH29]
+                        |---| L     EFFECT2       [>]     L |---|
+     [   -   ] -- IN2 --'   | R     M.BAND DYNA.          R |   '-- OUT2 -- [   -   ]
+                            '-------------------------------'
+
+     [   -   ] -- IN1 --.   .-------------------------------.   .-- OUT1 -- [   -   ]
+                        |---| 1     EFFECT3       [>]     L |---|
+     [   -   ] -- IN2 --'   |       REVERB STAGE          R |   '-- OUT2 -- [   -   ]
+                            '-------------------------------'
+
+     [   -   ] -- IN1 --.   .-------------------------------.   .-- OUT1 -- [   -   ]
+                        |---| 1     EFFECT4       [>]     L |---|
+     [   -   ] -- IN2 --'   |       REVERB PLATE          R |   '-- OUT2 -- [   -   ]
+                            '-------------------------------'
+
+---
+
+## 6. Progresso da Implementação (Frontend)
+
+### 6.1. Tela de Máquinas de Efeitos — Etapa 1 (Mockada)
+
+**Status:** ✅ Concluída
+
+**Arquivos criados:**
+- `public/modules/efeitos.js` — Módulo com dados mockados dos 4 slots FX (FX1–FX4), renderização do layout e funções `openEffectsModal()` / `closeEffectsModal()`.
+
+**Arquivos modificados:**
+- `public/index.html` — Modal `<div id="efeitosModal">` e `<script>` tag para `efeitos.js`.
+- `public/modules/sidebar.js` — Botão "EFEITOS" no dock (modo main), no menu mobile (bottom bar), e handlers de fechamento (backdrop click + Escape).
+- `public/style.css` — ~200 linhas de CSS dedicado ao layout de efeitos, incluindo media query mobile.
+
+**Funcionalidades implementadas:**
+- Botão "EFEITOS" na sidebar dock (roxo, classe `dock-efeitos`).
+- Botão "EFEITOS" no menu mobile/bottom bar (roxo, `menu-btn-solid-purple`).
+- Modal fullscreen com o mesmo padrão do `chConfigModal`.
+- Layout de 3 blocos: IN (L/R + patches + wires) → Processador único → OUT (wires + patches + L/R).
+- Header com labels IN PATCH / PROCESSOR / OUT PATCH alinhados ao layout.
+- Título "MÁQUINAS DE EFEITOS (EM CONSTRUÇÃO)".
+- Botão "FECHAR" no rodapé (vermelho, padrão SAIR).
+- Patches com `min-width: 75px`, visual diferenciado (off = cinza, active = azul).
+- Processador e patches com `cursor: pointer` e feedback visual no toque.
+- Media query mobile: fios ocultos, processador com `min-width: auto` e `padding: 10px` + `margin: 0 10px`.
+
+**Próxima etapa:** Conectar com dados reais do servidor (socket) e implementar a tela de detalhes de cada máquina de efeitos ao clicar no processador.

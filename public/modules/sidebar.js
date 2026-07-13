@@ -472,8 +472,13 @@ window.addEventListener('pointerdown', (e) => {
         closedAny = true;
     }
     if (e.target.classList.contains('ch-modal-overlay')) {
-        if (typeof closeChannelConfig === 'function') closeChannelConfig();
-        else e.target.style.display = 'none';
+        if (e.target.id === 'efeitosModal' && typeof closeEffectsModal === 'function') {
+            closeEffectsModal();
+        } else if (typeof closeChannelConfig === 'function') {
+            closeChannelConfig();
+        } else {
+            e.target.style.display = 'none';
+        }
         closedAny = true;
     }
     if (e.target.classList.contains('mobile-menu-modal-overlay')) {
@@ -512,7 +517,9 @@ window.addEventListener('pointerdown', (e) => {
 
     function closeTopmostModal(topmost) {
         if (topmost.classList.contains('ch-modal-overlay')) {
-            if (typeof closeChannelConfig === 'function') {
+            if (topmost.id === 'efeitosModal' && typeof closeEffectsModal === 'function') {
+                closeEffectsModal();
+            } else if (typeof closeChannelConfig === 'function') {
                 closeChannelConfig();
             } else {
                 topmost.style.display = 'none';
@@ -749,6 +756,7 @@ function renderDock(mode) {
             const isOutsOn = typeof window.outsMode !== 'undefined' && outsMode;
             buttons.push({ label: isOutsOn ? 'SAIR' : 'MIX/BUS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
             buttons.push({ label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' });
+            buttons.push({ label: 'EFEITOS', action: 'openEffectsModal()', cls: 'dock-efeitos' });
             if (typeof layerNavEnabled !== 'undefined' && layerNavEnabled) {
                 buttons.push({ label: '1-16', action: 'setLayer(0)', cls: 'dock-layer' + (activeLayerStart === 0 ? ' active-tab' : '') });
                 buttons.push({ label: '17-32', action: 'setLayer(16)', cls: 'dock-layer' + (activeLayerStart === 16 ? ' active-tab' : '') });
@@ -1106,6 +1114,7 @@ function renderMobileMenu(mode) {
                 buttonsConfig.push({ label: 'LAYER 17-32', cls: activeLayerStart === 16 ? 'menu-btn-solid-blue' : '', action: "if(typeof setLayer === 'function') setLayer(16);" });
             }
             buttonsConfig.push({ label: 'MIX / BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" });
+            buttonsConfig.push({ label: 'EFEITOS', cls: 'menu-btn-solid-purple', action: "if(typeof openEffectsModal === 'function') { openEffectsModal(); }" });
             break;
 
         case 'channelConfig':
