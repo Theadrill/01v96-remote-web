@@ -68,9 +68,14 @@ let activeBandIdx = -1; // Banda sendo arrastada no momento
 let selectedBandIdx = -1; // Banda focada para o ajuste de Q e visibilidade de UI
 let longPressTimeout = null;
 let longPressOccurred = false;
+let dragOccurred = false;
 let startPos = { x: 0, y: 0 };
 let bubbleHideTimer = null; // Timer para ocultar o balão de Q
 let showBubbleRequest = false; // Flag de controle de visibilidade temporária do balão
+const DBLTAP_MS = 500; // Janela de tempo p/ considerar dois toques como "duplo-toque"
+let lastTapBandIdx = -1;
+let lastTapTime = 0;
+let lastTapPos = { x: 0, y: 0 };
 
 function initEQEngine(ch) {
     if (!eqContext) eqContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -393,6 +398,7 @@ function onEQDown(e) {
     const py = e.clientY - rect.top;
     activeBandIdx = -1;
     longPressOccurred = false;
+    dragOccurred = false;
     startPos = { x: e.clientX, y: e.clientY };
 
     eqBands.forEach((b, i) => {
@@ -423,6 +429,24 @@ function onEQDown(e) {
     if (activeBandIdx === -1) {
         selectedBandIdx = -1;
         showBubbleRequest = false; 
+        lastTapBandIdx = -1;
+    }
+
+    // Detecção de duplo-toque: dois pointerdown na mesma banda, dentro da janela, sem deslocamento
+    if (activeBandIdx !== -1) {
+        const now = performance.now();
+        const dt = now - lastTapTime;
+        const dist = Math.hypot(e.clientX - lastTapPos.x, e.clientY - lastTapPos.y);
+        if (lastTapBandIdx === activeBandIdx && dt < DBLTAP_MS && dist < 20) {
+            // Cancela o long press pendente para não abrir o menu de modo logo em seguida
+            if (longPressTimeout) { clearTimeout(longPressTimeout); longPressTimeout = null; }
+            resetSingleBandToDefault(activeBandIdx);
+            lastTapBandIdx = -1;
+        } else {
+            lastTapBandIdx = activeBandIdx;
+            lastTapTime = now;
+            lastTapPos = { x: e.clientX, y: e.clientY };
+        }
     }
 
     updateEQFadersUI();
@@ -524,6 +548,8 @@ function onEQMove(e, ch) {
             clearTimeout(longPressTimeout);
             longPressTimeout = null;
         }
+        // Marca que houve drag real; onEQUp usará isso para decidir se invalida o tap pendente
+        dragOccurred = true;
     }
 
     if (longPressOccurred) return; // Não arrasta se o menu estiver aberto
@@ -571,8 +597,12 @@ function onEQMove(e, ch) {
 }
 
 function onEQUp() { 
-    activeBandIdx = -1; // Para de arrastrar imediatamente ao soltar
+    activeBandIdx = -1; // Para de arrastar imediatamente ao soltar
     if (longPressTimeout) clearTimeout(longPressTimeout);
+    // Só invalida o tap pendente se o usuário realmente arrastou a banda;
+    // caso contrário, mantém o tap válido para detectar o duplo-toque.
+    if (dragOccurred) lastTapBandIdx = -1;
+    dragOccurred = false;
 }
 
 window.updateEQParam = function(type, val, mode = null, ch = null) {
@@ -899,6 +929,75 @@ window.togglePhase = function(ch) {
 }
 
 const DEFAULT_EQ_FREQ = { low: 36, lowmid: 72, himid: 96, high: 112 };
+
+// Reseta uma única banda do EQ para o estado default (referência: lógica do botão FLAT).
+// Regras:
+//  - LowMid / HiMid: sempre freq default + gain 0 + Q=20 (são sempre peaking).
+//  - Low / High com HPF/LPF OFF: freq default + gain 0 + Q=20 + modo peaking + HPF/LPF=0.
+//  - Low / High com HPF/LPF ON: apenas freq default + gain 0; modo/Q/HPF/LPF permanecem como estão.
+function resetSingleBandToDefault(bandIdx) {
+    const b = eqBands[bandIdx];
+    if (!b) return;
+    const ch = activeConfigChannel;
+    if (ch === null || ch === undefined) return;
+
+    const labelMap = { 'low': 'Low', 'lowmid': 'LowMid', 'himid': 'HiMid', 'high': 'Hi' };
+    const label = labelMap[b.key] || 'Low';
+    const defaultF = DEFAULT_EQ_FREQ[b.key];
+    const isLowOrHigh = (b.key === 'low' || b.key === 'high');
+    const prefix = getChannelParamPrefix(ch);
+
+    // Estado local
+    const chState = getChannelStateById(ch);
+    if (!chState) return;
+    if (!chState.eq) chState.eq = {};
+    if (!chState.eq[b.key]) chState.eq[b.key] = {};
+
+    // Verifica se HPF/LPF está ligado (Low/High) — nesse caso, só reseta freq + gain
+    const hpfOn = isLowOrHigh ? sysexToVal(chState.eq.low?.hpfOn) : 0;
+    const lpfOn = isLowOrHigh ? sysexToVal(chState.eq.high?.lpfOn) : 0;
+    const passFilterActive = (b.key === 'low'  && hpfOn === 1) ||
+                              (b.key === 'high' && lpfOn === 1);
+
+    // Frequência: sempre reseta
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}F`, channel: ch, value: defaultF });
+    chState.eq[b.key].f = defaultF;
+
+    // Ganho: sempre vai para 0
+    socket.emit('control', { type: `${prefix}EQ/kEQ${label}G`, channel: ch, value: 0 });
+    chState.eq[b.key].g = 0;
+
+    // Q e modo: apenas se NÃO houver HPF/LPF ativo
+    if (!passFilterActive) {
+        if (isLowOrHigh) {
+            socket.emit('control', { type: `${prefix}EQ/kEQ${label}Q`, channel: ch, value: 20 });
+            const hpfType = `${prefix}EQ/kEQ${b.key === 'low' ? 'HPFOn' : 'LPFOn'}`;
+            socket.emit('control', { type: hpfType, channel: ch, value: 0 });
+            chState.eq[b.key].q = 20;
+            if (b.key === 'low')  chState.eq[b.key].hpfOn = 0;
+            if (b.key === 'high') chState.eq[b.key].lpfOn = 0;
+        } else {
+            // LowMid/HiMid: força Q default
+            socket.emit('control', { type: `${prefix}EQ/kEQ${label}Q`, channel: ch, value: 20 });
+            chState.eq[b.key].q = 20;
+        }
+    }
+
+    // Atualiza o filtro Biquad local para refletir o reset
+    if (passFilterActive) {
+        // HPF/LPF permanece: garante Q fixo e gain 0 no filtro local
+        b.filter.frequency.value = rawToFreq(defaultF);
+        b.filter.gain.value = 0;
+        b.filter.Q.value = 0.707;
+    } else {
+        b.filter.frequency.value = rawToFreq(defaultF);
+        b.filter.gain.value = 0;
+        b.filter.Q.value = rawToQ(20);
+        if (isLowOrHigh) {
+            b.filter.type = 'peaking';
+        }
+    }
+}
 
 window.flatEQ = function(ch) {
     const prefix = getChannelParamPrefix(ch);
