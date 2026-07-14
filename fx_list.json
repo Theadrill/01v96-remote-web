@@ -283,10 +283,10 @@
   ],
   "custom": [
     {
-      "id": 200,
+      "id": 64,
       "name": "Meu Reverb Custom",
       "read_only": false,
-      "comment": "Exemplo: adicione seus presets customizados a partir do id 200"
+      "comment": "Exemplo: adicione seus presets customizados a partir do id 64"
     }
   ]
 }
