@@ -4,6 +4,7 @@ members = [
     "remote_midi_server",
     "server_rust",
     "client_wasm",
+    "fx_type_query",
 ]
 resolver = "2"
 default-members = [

@@ -1011,6 +1011,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "fx_type_query"
+version = "0.1.0"
+dependencies = [
+ "midir",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "gdk"
 version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
