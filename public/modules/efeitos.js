@@ -4,59 +4,40 @@
 (function () {
     'use strict';
 
-    // ── Dados Mockados ──────────────────────────────────────────────────
-    const MOCK_SLOTS = [
-        {
-            id: 1,
-            effectName: 'REVERB HALL',
-            bypass: false,
-            panMode: 'L/R',
-            mixL: 78,
-            mixR: 78,
-            inPatchL: { label: '-', type: 'off' },
-            inPatchR: { label: '-', type: 'off' },
-            outPatchL: { label: '-', type: 'off' },
-            outPatchR: { label: '-', type: 'off' },
-        },
-        {
-            id: 2,
-            effectName: 'M.BAND DYNA.',
-            bypass: false,
-            panMode: 'L/R',
-            mixL: 64,
-            mixR: 64,
-            inPatchL: { label: 'INS BUS8', type: 'insert' },
-            inPatchR: { label: '-', type: 'off' },
-            outPatchL: { label: 'INS CH29', type: 'insert' },
-            outPatchR: { label: '-', type: 'off' },
-        },
-        {
-            id: 3,
-            effectName: 'REVERB STAGE',
-            bypass: false,
-            panMode: 'L/R',
-            mixL: 70,
-            mixR: 70,
-            inPatchL: { label: '-', type: 'off' },
-            inPatchR: { label: '-', type: 'off' },
-            outPatchL: { label: '-', type: 'off' },
-            outPatchR: { label: '-', type: 'off' },
-        },
-        {
-            id: 4,
-            effectName: 'REVERB PLATE',
-            bypass: false,
-            panMode: 'L/R',
-            mixL: 65,
-            mixR: 65,
-            inPatchL: { label: '-', type: 'off' },
-            inPatchR: { label: '-', type: 'off' },
-            outPatchL: { label: '-', type: 'off' },
-            outPatchR: { label: '-', type: 'off' },
-        },
+    // ── Estado dos 4 slots (preenchido pelo servidor) ──────────────────
+    const fxSlots = [
+        { id: 1, effectName: '...', bypass: false, mix: 100 },
+        { id: 2, effectName: '...', bypass: false, mix: 100 },
+        { id: 3, effectName: '...', bypass: false, mix: 100 },
+        { id: 4, effectName: '...', bypass: false, mix: 100 },
     ];
 
-    // ── Renderização ────────────────────────────────────────────────────
+    function applyFxTypes(data) {
+        console.log('[FX] fxTypesUpdate recebido:', JSON.stringify(data));
+        for (let i = 0; i < 4; i++) {
+            const d = data[i] || data[String(i)];
+            if (d) {
+                fxSlots[i].effectName = d.name || '...';
+                fxSlots[i].bypass = d.bypass || false;
+                fxSlots[i].mix = d.mix != null ? d.mix : 100;
+            }
+        }
+        rerenderIfOpen();
+    }
+
+    function rerenderIfOpen() {
+        const modal = document.getElementById('efeitosModal');
+        if (modal && modal.style.display === 'flex') {
+            renderEffectsScreen();
+        }
+    }
+
+    // ── Socket listeners ──────────────────────────────────────────────
+    if (typeof socket !== 'undefined') {
+        socket.on('fxTypesUpdate', applyFxTypes);
+    }
+
+    // ── Renderização ──────────────────────────────────────────────────
 
     function renderSlot(slot) {
         const bypassCls = slot.bypass ? 'fx-bypass-on' : '';
@@ -67,12 +48,12 @@
             <div class="fx-side-col fx-side-in">
                 <div class="fx-side-row">
                     <span class="fx-channel-label">L</span>
-                    <span class="fx-patch-label ${slot.inPatchL.type === 'off' ? 'fx-patch-off' : 'fx-patch-active'}">${slot.inPatchL.label}</span>
+                    <span class="fx-patch-label fx-patch-off">-</span>
                     <div class="fx-wire"></div>
                 </div>
                 <div class="fx-side-row">
                     <span class="fx-channel-label">R</span>
-                    <span class="fx-patch-label ${slot.inPatchR.type === 'off' ? 'fx-patch-off' : 'fx-patch-active'}">${slot.inPatchR.label}</span>
+                    <span class="fx-patch-label fx-patch-off">-</span>
                     <div class="fx-wire"></div>
                 </div>
             </div>
@@ -84,12 +65,12 @@
             <div class="fx-side-col fx-side-out">
                 <div class="fx-side-row">
                     <div class="fx-wire"></div>
-                    <span class="fx-patch-label ${slot.outPatchL.type === 'off' ? 'fx-patch-off' : 'fx-patch-active'}">${slot.outPatchL.label}</span>
+                    <span class="fx-patch-label fx-patch-off">-</span>
                     <span class="fx-channel-label">L</span>
                 </div>
                 <div class="fx-side-row">
                     <div class="fx-wire"></div>
-                    <span class="fx-patch-label ${slot.outPatchR.type === 'off' ? 'fx-patch-off' : 'fx-patch-active'}">${slot.outPatchR.label}</span>
+                    <span class="fx-patch-label fx-patch-off">-</span>
                     <span class="fx-channel-label">R</span>
                 </div>
             </div>
@@ -101,14 +82,14 @@
         if (!container) return;
 
         const columnsHTML = `
-        <div class="efeitos-title">MÁQUINAS DE EFEITOS (EM CONSTRUÇÃO)</div>
+        <div class="efeitos-title">MÁQUINAS DE EFEITOS</div>
         <div class="fx-header-row">
             <div class="fx-header-label">IN PATCH</div>
             <div class="fx-header-label fx-header-processor">PROCESSOR</div>
             <div class="fx-header-label">OUT PATCH</div>
         </div>
         <div class="fx-slots-container">
-            ${MOCK_SLOTS.map(renderSlot).join('')}
+            ${fxSlots.map(renderSlot).join('')}
         </div>`;
 
         container.innerHTML = columnsHTML;
@@ -120,6 +101,11 @@
         const modal = document.getElementById('efeitosModal');
         if (!modal) return;
         modal.style.display = 'flex';
+        // Query the mixer for current FX types in all 4 slots
+        if (typeof socket !== 'undefined') {
+            console.log('[FX] Enviando requestFxTypes...');
+            socket.emit('requestFxTypes');
+        }
         renderEffectsScreen();
     }
     window.openEffectsModal = openEffectsModal;

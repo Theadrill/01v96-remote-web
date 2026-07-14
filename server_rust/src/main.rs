@@ -269,6 +269,7 @@ async fn async_main(
         custom_scene_manager.clone(),
         app_config.meter_fps_desktop,
         app_config.remote_midi,
+        scheduler.clone(),
     );
 
     axum::serve(listener, app)

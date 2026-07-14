@@ -3,6 +3,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tokio::sync::mpsc;
 
+use crate::midi::MidiScheduler;
 use crate::midi::SyncCounter;
 use crate::midi::master_meter::MasterMeter;
 use crate::network::ConnectionManager;
@@ -18,6 +19,7 @@ pub fn start_rx_loop(
     csm: Arc<RwLock<crate::custom_scenes::CustomSceneManager>>,
     meter_fps: u32,
     is_remote_midi: bool,
+    scheduler: Arc<MidiScheduler>,
 ) {
     let io_clone = io.clone();
     let state_arc_in = global_state.clone();
@@ -29,6 +31,7 @@ pub fn start_rx_loop(
     let recv_count_log = recv_count.clone();
     let parsed_count_log = parsed_count.clone();
     let csm_clone = csm.clone();
+    let fx_requery_last = Arc::new(std::sync::Mutex::new(std::time::Instant::now() - std::time::Duration::from_secs(10)));
 
     // Meter buffer + FPS throttle (like Node.js)
     let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> =
@@ -85,7 +88,9 @@ pub fn start_rx_loop(
                 let mut meter_raw_emission: Option<Vec<u8>> = None;
                 let mut scenes_emission = None;
                 let mut current_scene_emission = None;
+                let mut fx_types_emission: Option<serde_json::Value> = None;
                 let mut should_broadcast_names = false;
+                let mut should_requery_fx = false;
 
                 {
                     let mut state = state_arc_in.write().await;
@@ -205,8 +210,30 @@ pub fn start_rx_loop(
                                         .and_then(|cs| serde_json::to_value(cs).ok());
                                 }
                             }
+                            crate::midi::protocol::ParsedMidi::FxTypeUpdate { slot, fx_type_id } => {
+                                tracing::info!(
+                                    "🎵 [FX] Slot {} → id={} name={}",
+                                    slot,
+                                    fx_type_id,
+                                    crate::midi::fx_list::resolve_fx_name(fx_type_id)
+                                );
+                                fx_types_emission = Some(
+                                    serde_json::to_value(&state.fx_types).unwrap_or_default(),
+                                );
+                            }
                             _ => {}
                         }
+                    } else if packet.len() >= 9
+                        && (packet[2] & 0xF0) == 0x10
+                        && packet[4] == 127
+                        && packet[5] == 0x50
+                    {
+                        // Mixer notification: section=127, group=0x50 — FX slot changed
+                        tracing::warn!(
+                            "🔔 [FX] Notification detected: pkt={}",
+                            packet.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ")
+                        );
+                        should_requery_fx = true;
                     }
                 } // state lock released here
 
@@ -215,6 +242,9 @@ pub fn start_rx_loop(
                 }
                 if let Some(v) = current_scene_emission {
                     let _ = io_clone.emit("currentScene", &v).await;
+                }
+                if let Some(v) = fx_types_emission {
+                    let _ = io_clone.emit("fxTypesUpdate", &v).await;
                 }
                 if should_broadcast_names {
                     crate::name_resolver::broadcast(&io_clone, &state_arc_in, &csm_clone).await;
@@ -233,6 +263,32 @@ pub fn start_rx_loop(
                 }
                 if let Some(raw_buf) = meter_raw_emission {
                     let _ = io_clone.emit("meterDataRaw", &raw_buf).await;
+                }
+
+                // Re-query FX types when mixer sends a notification
+                if should_requery_fx {
+                    let sched = scheduler.clone();
+                    let last_clone = fx_requery_last.clone();
+                    tokio::spawn(async move {
+                        {
+                            let mut last = last_clone.lock().unwrap();
+                            let now = std::time::Instant::now();
+                            if now.duration_since(*last).as_millis() < 1000 {
+                                return;
+                            }
+                            *last = now;
+                        }
+
+                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                        tracing::info!("🔄 [FX] Re-querying FX types after notification...");
+                        for i in 0..4u8 {
+                            if let Some(req) = crate::midi::protocol::build_fx_type_request(i) {
+                                tracing::info!("🔄 [FX] Sending FX type query for slot {}", i);
+                                sched.enqueue(req, 0).await;
+                                tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+                            }
+                        }
+                    });
                 }
             }
         }

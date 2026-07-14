@@ -139,6 +139,14 @@ pub struct MasterState {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FxTypeState {
+    pub id: u32,
+    pub name: String,
+    pub bypass: bool,
+    pub mix: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GlobalState {
     #[serde(skip)]
     pub scene_manager: crate::scene_manager::SceneManager,
@@ -162,6 +170,8 @@ pub struct GlobalState {
     pub out_patches_slot: HashMap<usize, f64>,
     #[serde(rename = "outPatches2tr")]
     pub out_patches_2tr: HashMap<usize, f64>,
+    #[serde(rename = "fxTypes")]
+    pub fx_types: HashMap<usize, FxTypeState>,
     #[serde(rename = "tailscaleUrl")]
     pub tailscale_url: Option<String>,
 }
@@ -384,6 +394,21 @@ impl GlobalState {
             out_patches_fx: HashMap::new(),
             out_patches_slot: HashMap::new(),
             out_patches_2tr: HashMap::new(),
+            fx_types: {
+                let mut fx = HashMap::new();
+                for i in 0..4 {
+                    fx.insert(
+                        i,
+                        FxTypeState {
+                            id: 0,
+                            name: "Reverb Hall".to_string(),
+                            bypass: false,
+                            mix: 100.0,
+                        },
+                    );
+                }
+                fx
+            },
             tailscale_url: None,
         }
     }
@@ -764,6 +789,19 @@ impl GlobalState {
             }
             crate::midi::protocol::ParsedMidi::PhysicalSceneStore(idx) => {
                 self.scene_manager.set_active_scene(*idx);
+            }
+            crate::midi::protocol::ParsedMidi::FxTypeUpdate { slot, fx_type_id } => {
+                if *slot < 4 {
+                    let name = crate::midi::fx_list::resolve_fx_name(*fx_type_id);
+                    let entry = self.fx_types.entry(*slot).or_insert_with(|| FxTypeState {
+                        id: 0,
+                        name: "Unknown".to_string(),
+                        bypass: false,
+                        mix: 100.0,
+                    });
+                    entry.id = *fx_type_id;
+                    entry.name = name;
+                }
             }
         }
     }

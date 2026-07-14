@@ -104,6 +104,14 @@ pub fn register_handlers(
                 };
                 socket_initial.emit("sync", &state_json).ok();
                 let _ = socket_initial.emit("scenesUpdated", &scenes_state);
+
+                // Emit FX types separately for the efeitos module
+                {
+                    let current_state = state_arc_connect.read().await;
+                    let fx_json =
+                        serde_json::to_value(&current_state.fx_types).unwrap_or_default();
+                    socket_initial.emit("fxTypesUpdate", &fx_json).ok();
+                }
             }
 
             let (inputs, outputs) = crate::midi::MidiEngine::get_available_ports();
@@ -2223,6 +2231,20 @@ pub fn register_handlers(
                     "skip_hpf_lpf": config.eq_flat_skip_hpf_lpf
                 }));
             }
+        );
+
+        // --- REQUEST FX TYPES ---
+        let sched_fx = scheduler_socket.clone();
+        socket.on(
+            "requestFxTypes",
+            move |_socket: SocketRef| async move {
+                for i in 0..4u8 {
+                    if let Some(req) = crate::midi::protocol::build_fx_type_request(i) {
+                        sched_fx.enqueue(req, 0).await;
+                        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+                    }
+                }
+            },
         );
     });
 }

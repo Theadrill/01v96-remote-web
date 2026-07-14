@@ -206,6 +206,24 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
+pub fn build_fx_type_request(slot: u8) -> Option<Vec<u8>> {
+    if slot > 3 {
+        return None;
+    }
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x30,                  // Parameter Request
+        MODEL_ID,              // 3E
+        127,                   // Section (kEffect = 0x7F)
+        1,                     // Group (0x01)
+        88,                    // Element (0x58)
+        49,                    // Parameter (kEffectType = 0x31)
+        slot,                  // Slot index (0-3)
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -251,6 +269,10 @@ pub enum ParsedMidi {
     },
     PhysicalSceneRecall(u8),
     PhysicalSceneStore(u8),
+    FxTypeUpdate {
+        slot: usize,
+        fx_type_id: u32,
+    },
 }
 
 pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
@@ -543,6 +565,14 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                     value: if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
                 });
             }
+        }
+
+        // --- FX TYPE (Section 127, Group 1, Element 88, Parameter 49) ---
+        // Special format: address has an extra slot-index byte after the 4-byte address
+        if section == 127 && group == 1 && element == 88 && parameter == 49 {
+            let slot = channel; // message[8] is actually the slot index (0-3)
+            let fx_type_id = bytes_to_fader(data_bytes) as u32;
+            return Some(ParsedMidi::FxTypeUpdate { slot, fx_type_id });
         }
 
         // --- SCENE (Section 127, Group 1) ---
