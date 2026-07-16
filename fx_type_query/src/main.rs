@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
-const LOG_PATH: &str = "log/fx_input_test_log.txt";
+const LOG_PATH: &str = "log/fx_output_test_log.txt";
 
 fn project_root() -> PathBuf {
     let mut p = std::env::current_exe()
@@ -24,9 +24,9 @@ const MODEL_ID: u8 = 0x3E;
 const PARAM_REQUEST: u8 = 0x30;
 const PARAM_CHANGE: u8 = 0x10;
 
-const FX_INPUT_SECTION: u8 = 0x0D;
-const FX_INPUT_GROUP: u8 = 0x02;
-const FX_INPUT_ELEMENT: u8 = 0x03;
+const FX_SECTION: u8 = 0x0D;
+const FX_GROUP: u8 = 0x02;
+const FX_ELEMENT_OUT: u8 = 0x03;
 
 struct MidiAssembler {
     buffer: Vec<u8>,
@@ -84,59 +84,33 @@ fn decode_value(data: &[u8]) -> u32 {
     val
 }
 
-fn fx_input_label(val: u32) -> String {
+fn fx_output_label(val: u32) -> String {
     match val {
-        0   => "OFF".into(),
-        // Aux Send 1-8 (1-8) — confirmado: id=1 = Aux 1
-        1..=8 => format!("AUX{}", val),
-        // Channel inserts (13-44) — confirmado: id=14 = Insert CH2
-        13..=44 => format!("INS CH{}", val - 12),
-        // Insert Bus 1-4 (109-112) — confirmado via mixer
-        109 => "INS BUS1".into(),
-        110 => "INS BUS2".into(),
-        111 => "INS BUS3".into(),
-        112 => "INS BUS4".into(),
-        // Insert Return L/R (113-116)
-        113 => "INS RET1 L".into(),
-        114 => "INS RET1 R".into(),
-        115 => "INS RET2 L".into(),
-        116 => "INS RET2 R".into(),
-        // Aux Send 1-8 (117-124) — confirmado: id=117 = Insert Aux 1
-        117 => "INS AUX1".into(),
-        118 => "INS AUX2".into(),
-        119 => "INS AUX3".into(),
-        120 => "INS AUX4".into(),
-        121 => "INS AUX5".into(),
-        122 => "INS AUX6".into(),
-        123 => "INS AUX7".into(),
-        124 => "INS AUX8".into(),
-        // Insert ST-L / ST-R — confirmado via mixer (master L/R)
-        137 => "INS ST-L".into(),
-        138 => "INS ST-R".into(),
-        _ => format!("??? (id={})", val),
+        0 => "OFF".into(),
+        _ => format!("id={}", val),
     }
 }
 
-fn build_fx_input_request(slot: u8, lr: u8) -> Vec<u8> {
+fn build_fx_output_request(port: u8) -> Vec<u8> {
     vec![
         HEADER[0], HEADER[1],
         PARAM_REQUEST, MODEL_ID,
-        FX_INPUT_SECTION, FX_INPUT_GROUP, FX_INPUT_ELEMENT,
-        lr,
-        slot,
+        FX_SECTION, FX_GROUP, FX_ELEMENT_OUT,
+        0,
+        port,
         0xF7,
     ]
 }
 
-fn is_fx_input_response(pkt: &[u8]) -> bool {
+fn is_fx_response(pkt: &[u8]) -> bool {
     pkt.len() >= 10
         && pkt[0] == 0xF0
         && pkt[1] == 0x43
         && (pkt[2] & 0xF0) == PARAM_CHANGE
         && pkt[3] == MODEL_ID
-        && pkt[4] == FX_INPUT_SECTION
-        && pkt[5] == FX_INPUT_GROUP
-        && pkt[6] == FX_INPUT_ELEMENT
+        && pkt[4] == FX_SECTION
+        && pkt[5] == FX_GROUP
+        && pkt[6] == FX_ELEMENT_OUT
 }
 
 fn pause_and_exit(msg: &str) -> ! {
@@ -148,8 +122,8 @@ fn pause_and_exit(msg: &str) -> ! {
 
 fn main() {
     println!("╔══════════════════════════════════════════════╗");
-    println!("║  01V96 — FX Input Query (apenas inputs)     ║");
-    println!("║  Consulta origem dos 4 FX (L/R cada)        ║");
+    println!("║  01V96 — FX Output Query (8 ports)          ║");
+    println!("║  Consulta destino dos 8 outputs FX           ║");
     println!("║  Enter = repetir  |  Esc = fechar           ║");
     println!("╚══════════════════════════════════════════════╝\n");
 
@@ -165,14 +139,14 @@ fn main() {
     };
 
     log_msg(&mut log, "═══════════════════════════════════════════");
-    log_msg(&mut log, "FX Input Query — início");
+    log_msg(&mut log, "FX Output Query — início");
     log_msg(&mut log, "═══════════════════════════════════════════");
 
-    let midi_in = match MidiInput::new("01V96 FX Input In") {
+    let midi_in = match MidiInput::new("01V96 FX Output In") {
         Ok(m) => m,
         Err(e) => pause_and_exit(&format!("Falha ao criar MidiInput: {}", e)),
     };
-    let midi_out = match MidiOutput::new("01V96 FX Input Out") {
+    let midi_out = match MidiOutput::new("01V96 FX Output Out") {
         Ok(m) => m,
         Err(e) => pause_and_exit(&format!("Falha ao criar MidiOutput: {}", e)),
     };
@@ -196,7 +170,6 @@ fn main() {
         return;
     }
 
-    // Auto-detect: prefer "yamaha" (directa na mesa), depois "loop"
     let find_port_in = |ports: &[midir::MidiInputPort]| -> Option<usize> {
         for (i, p) in ports.iter().enumerate() {
             let name = midi_in.port_name(p).unwrap_or_default().to_lowercase();
@@ -247,14 +220,14 @@ fn main() {
     let (tx, rx) = mpsc::channel::<Vec<u8>>();
 
     let mut out_conn: MidiOutputConnection = match midi_out
-        .connect(&out_ports[out_idx], "01V96 FX Input Out")
+        .connect(&out_ports[out_idx], "01V96 FX Output Out")
     {
         Ok(c) => c,
         Err(e) => pause_and_exit(&format!("Falha ao conectar OUT: {}", e)),
     };
 
     let _in_conn: MidiInputConnection<()> = match midi_in
-        .connect(&in_ports[in_idx], "01V96 FX Input In",
+        .connect(&in_ports[in_idx], "01V96 FX Output In",
             move |_stamp, msg, _| { let _ = tx.send(msg.to_vec()); },
             (),
         )
@@ -279,88 +252,67 @@ fn main() {
 
         log_msg(&mut log, &format!("── Rodada #{} ──", round));
 
-        // Enviar 1 query por vez, aguardar resposta antes da próxima
-        let mut responses: Vec<(u8, u8, u32, Vec<u8>)> = Vec::new();
+        let mut responses: Vec<(u8, u32, Vec<u8>)> = Vec::new();
         let mut total_received = 0u32;
 
-        for slot in 0u8..4 {
-            for lr in 0u8..2 {
-                let lr_label = if lr == 0 { "L" } else { "R" };
-                let req = build_fx_input_request(slot, lr);
-                log_msg(&mut log, &format!("→ FX{} {} REQ: {}", slot + 1, lr_label, hex_bytes(&req)));
-                if let Err(e) = out_conn.send(&req) {
-                    log_msg(&mut log, &format!("✗ Falha FX{} {}: {}", slot + 1, lr_label, e));
-                    continue;
-                }
+        // Query 8 output ports (0-7)
+        for port in 0u8..8 {
+            let req = build_fx_output_request(port);
+            log_msg(&mut log, &format!("→ Port {} REQ: {}", port, hex_bytes(&req)));
+            if let Err(e) = out_conn.send(&req) {
+                log_msg(&mut log, &format!("✗ Falha Port {}: {}", port, e));
+                continue;
+            }
 
-                // Aguardar até 2s por esta resposta específica
-                let deadline = Instant::now() + Duration::from_secs(2);
-                let mut found = false;
-                while Instant::now() < deadline && !found {
-                    if let Ok(raw) = rx.recv_timeout(Duration::from_millis(200)) {
-                        let packets = assembler.process_input(&raw);
-                        for pkt in packets {
-                            if !is_fx_input_response(&pkt) {
-                                continue;
-                            }
-                            total_received += 1;
-                            let r_slot = pkt[8];
-                            let r_lr = pkt[7];
-                            if r_slot == slot && r_lr == lr {
-                                let data = &pkt[9..pkt.len() - 1];
-                                let val = decode_value(data);
-                                let label = fx_input_label(val);
-                                log_msg(&mut log, &format!(
-                                    "← FX{} {} = {} (id={}) RAW: {}",
-                                    slot + 1, lr_label, label, val, hex_bytes(&pkt)
-                                ));
-                                println!("  FX{} Input {} = {} (id={})",
-                                    slot + 1, lr_label, label, val);
-                                responses.push((slot, lr, val, pkt.clone()));
-                                found = true;
-                            }
+            let deadline = Instant::now() + Duration::from_secs(2);
+            let mut found = false;
+            while Instant::now() < deadline && !found {
+                if let Ok(raw) = rx.recv_timeout(Duration::from_millis(200)) {
+                    let packets = assembler.process_input(&raw);
+                    for pkt in packets {
+                        if !is_fx_response(&pkt) { continue; }
+                        total_received += 1;
+                        let r_port = pkt[8];
+                        let r_param = pkt[7];
+                        if r_port == port && r_param == 0 {
+                            let data = &pkt[9..pkt.len() - 1];
+                            let val = decode_value(data);
+                            let label = fx_output_label(val);
+                            log_msg(&mut log, &format!(
+                                "← Port {} = {} (id={}) RAW: {}",
+                                port, label, val, hex_bytes(&pkt)
+                            ));
+                            println!("  Output Port {} = {} (id={})", port, label, val);
+                            responses.push((port, val, pkt.clone()));
+                            found = true;
                         }
                     }
                 }
-                if !found {
-                    log_msg(&mut log, &format!("  ✗ FX{} {} — sem resposta", slot + 1, lr_label));
-                    println!("  FX{} Input {} = ⚠ SEM RESPOSTA", slot + 1, lr_label);
-                }
+            }
+            if !found {
+                log_msg(&mut log, &format!("  ✗ Port {} — sem resposta", port));
+                println!("  Output Port {} = ⚠ SEM RESPOSTA", port);
             }
         }
 
-        // Resumo
         println!("\n╔══════════════════════════════════════════╗");
-        println!("║         RESUMO — FX INPUTS               ║");
+        println!("║         RESUMO — FX OUTPUTS              ║");
         println!("╠══════════════════════════════════════════╣");
 
-        let mut found = [[false; 2]; 4];
-        for (slot, lr, _val, _) in &responses {
-            let s = *slot as usize;
-            let l = *lr as usize;
-            if s < 4 && l < 2 {
-                found[s][l] = true;
-            }
-        }
-
-        for slot in 0..4u8 {
-            for lr in 0..2u8 {
-                let lr_label = if lr == 0 { "L" } else { "R" };
-                if let Some((_, _, val, _)) = responses.iter().find(|(s, l, _, _)| *s == slot && *l == lr) {
-                    println!("║  FX{} In {} = {:<26} ║", slot + 1, lr_label, fx_input_label(*val));
-                } else {
-                    println!("║  FX{} In {} = ⚠ SEM RESPOSTA                ║", slot + 1, lr_label);
-                }
+        for port in 0..8u8 {
+            if let Some((_, val, _)) = responses.iter().find(|(p, _, _)| *p == port) {
+                println!("║  Port {} = {:<28} ║", port, fx_output_label(*val));
+            } else {
+                println!("║  Port {} = ⚠ SEM RESPOSTA               ║", port);
             }
         }
 
         println!("╠══════════════════════════════════════════╣");
         println!("║  Respostas recebidas: {:<19}║", format!("{}/8", responses.len()));
-        println!("║  Total Sysex ignorados: {:<16}║", "???");
         println!("╚══════════════════════════════════════════╝");
 
         log_msg(&mut log, &format!(
-            "Resumo: {}/8 respostas, {} total packets filtrados",
+            "Resumo: {}/8 respostas, {} total packets",
             responses.len(), total_received
         ));
 
