@@ -224,6 +224,24 @@ pub fn build_fx_type_request(slot: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
+pub fn build_fx_input_request(slot: u8, lr: u8) -> Option<Vec<u8>> {
+    if slot > 3 || lr > 1 {
+        return None;
+    }
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x30,                  // Parameter Request
+        MODEL_ID,              // 3E
+        13,                    // Section
+        2,                     // Group
+        3,                     // Element
+        lr,                    // Parameter (0=L, 1=R)
+        slot,                  // Channel (FX slot 0-3)
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -774,8 +792,12 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                     return cc("kChannelInsertIn/kInsertIn", param_lsb, val);
                 }
             } else if element == 3 {
-                // kFx: MSB=0, LSB=0..7
-                if param_msb == 0 {
+                if param_msb <= 1 && param_lsb <= 3 {
+                    // kEffectInput: param_msb=LR(0=L,1=R), param_lsb=slot(0-3)
+                    let idx = param_lsb * 2 + param_msb;
+                    return cc("kEffectInput/kEffectIn", idx, val);
+                } else if param_msb == 0 {
+                    // kOutputPatch/kFx: param_msb=0, param_lsb=port(0-7)
                     return cc("kOutputPatch/kFx", param_lsb, val);
                 }
             } else if element == 5 {

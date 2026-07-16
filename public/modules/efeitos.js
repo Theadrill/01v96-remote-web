@@ -12,6 +12,38 @@
         { id: 4, effectName: '...', bypass: false, mix: 100 },
     ];
 
+    // FX inputs: [slot][lr] → source id
+    const fxInputs = [
+        [0, 0], // FX1 L/R
+        [0, 0], // FX2 L/R
+        [0, 0], // FX3 L/R
+        [0, 0], // FX4 L/R
+    ];
+
+    // ── Decoder FX Input Source → label ───────────────────────────────
+    function fxInputLabel(val) {
+        val = Math.round(val);
+        if (val === 0) return 'OFF';
+        if (val >= 1 && val <= 8) return 'AUX' + val;
+        if (val >= 13 && val <= 44) return 'INS CH' + (val - 12);
+        if (val === 109) return 'INS BUS1';
+        if (val === 110) return 'INS BUS2';
+        if (val === 111) return 'INS BUS3';
+        if (val === 112) return 'INS BUS4';
+        if (val === 113) return 'INS RET1 L';
+        if (val === 114) return 'INS RET1 R';
+        if (val === 115) return 'INS RET2 L';
+        if (val === 116) return 'INS RET2 R';
+        if (val >= 117 && val <= 124) return 'INS AUX' + (val - 116);
+        if (val === 137) return 'INS ST-L';
+        if (val === 138) return 'INS ST-R';
+        return '???(' + val + ')';
+    }
+
+    function fxInputPatchClass(val) {
+        return Math.round(val) === 0 ? 'fx-patch-off' : 'fx-patch-active';
+    }
+
     function applyFxTypes(data) {
         console.log('[FX] fxTypesUpdate recebido:', JSON.stringify(data));
         for (let i = 0; i < 4; i++) {
@@ -21,6 +53,17 @@
                 fxSlots[i].bypass = d.bypass || false;
                 fxSlots[i].mix = d.mix != null ? d.mix : 100;
             }
+        }
+        rerenderIfOpen();
+    }
+
+    function applyFxInputs(data) {
+        console.log('[FX] fxInputsUpdate recebido:', JSON.stringify(data));
+        for (let i = 0; i < 8; i++) {
+            const val = data[i] != null ? data[i] : 0;
+            const slot = Math.floor(i / 2);
+            const lr = i % 2;
+            fxInputs[slot][lr] = val;
         }
         rerenderIfOpen();
     }
@@ -35,25 +78,32 @@
     // ── Socket listeners ──────────────────────────────────────────────
     if (typeof socket !== 'undefined') {
         socket.on('fxTypesUpdate', applyFxTypes);
+        socket.on('fxInputsUpdate', applyFxInputs);
     }
 
     // ── Renderização ──────────────────────────────────────────────────
 
-    function renderSlot(slot) {
+    function renderSlot(slot, idx) {
         const bypassCls = slot.bypass ? 'fx-bypass-on' : '';
         const bypassIcon = slot.bypass ? '||' : '>';
+        const inL = fxInputs[idx][0];
+        const inR = fxInputs[idx][1];
+        const lblL = fxInputLabel(inL);
+        const lblR = fxInputLabel(inR);
+        const clsL = fxInputPatchClass(inL);
+        const clsR = fxInputPatchClass(inR);
 
         return `
         <div class="fx-slot">
             <div class="fx-side-col fx-side-in">
                 <div class="fx-side-row">
                     <span class="fx-channel-label">L</span>
-                    <span class="fx-patch-label fx-patch-off">-</span>
+                    <span class="fx-patch-label ${clsL}">${lblL}</span>
                     <div class="fx-wire"></div>
                 </div>
                 <div class="fx-side-row">
                     <span class="fx-channel-label">R</span>
-                    <span class="fx-patch-label fx-patch-off">-</span>
+                    <span class="fx-patch-label ${clsR}">${lblR}</span>
                     <div class="fx-wire"></div>
                 </div>
             </div>
@@ -89,7 +139,7 @@
             <div class="fx-header-label">OUT PATCH</div>
         </div>
         <div class="fx-slots-container">
-            ${fxSlots.map(renderSlot).join('')}
+            ${fxSlots.map((s, i) => renderSlot(s, i)).join('')}
         </div>`;
 
         container.innerHTML = columnsHTML;
@@ -101,10 +151,10 @@
         const modal = document.getElementById('efeitosModal');
         if (!modal) return;
         modal.style.display = 'flex';
-        // Query the mixer for current FX types in all 4 slots
         if (typeof socket !== 'undefined') {
-            console.log('[FX] Enviando requestFxTypes...');
+            console.log('[FX] Enviando requestFxTypes + requestFxInputs...');
             socket.emit('requestFxTypes');
+            socket.emit('requestFxInputs');
         }
         renderEffectsScreen();
     }

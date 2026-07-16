@@ -172,6 +172,8 @@ pub struct GlobalState {
     pub out_patches_2tr: HashMap<usize, f64>,
     #[serde(rename = "fxTypes")]
     pub fx_types: HashMap<usize, FxTypeState>,
+    #[serde(rename = "fxInputs")]
+    pub fx_inputs: HashMap<usize, f64>,
     #[serde(rename = "tailscaleUrl")]
     pub tailscale_url: Option<String>,
 }
@@ -409,6 +411,7 @@ impl GlobalState {
                 }
                 fx
             },
+            fx_inputs: HashMap::new(),
             tailscale_url: None,
         }
     }
@@ -573,6 +576,8 @@ impl GlobalState {
                     self.out_patches_slot.insert(*channel, v);
                 } else if mt == "kOutputPatch/k2tr" {
                     self.out_patches_2tr.insert(*channel, v);
+                } else if mt == "kEffectInput/kEffectIn" {
+                    self.fx_inputs.insert(*channel, v);
                 } else if mt == "kChannelInput/kChannelIn" {
                     if let Some(ch) = self.channels.get_mut(channel) {
                         ch.patch = v;

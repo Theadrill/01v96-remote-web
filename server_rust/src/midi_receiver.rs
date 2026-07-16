@@ -89,6 +89,7 @@ pub fn start_rx_loop(
                 let mut scenes_emission = None;
                 let mut current_scene_emission = None;
                 let mut fx_types_emission: Option<serde_json::Value> = None;
+                let mut fx_inputs_emission: Option<serde_json::Value> = None;
                 let mut should_broadcast_names = false;
                 let mut should_requery_fx = false;
 
@@ -174,6 +175,11 @@ pub fn start_rx_loop(
                                         "value": value
                                     }),
                                 ));
+                                if msg_type == "kEffectInput/kEffectIn" {
+                                    fx_inputs_emission = Some(
+                                        serde_json::to_value(&state.fx_inputs).unwrap_or_default(),
+                                    );
+                                }
                             }
                             crate::midi::protocol::ParsedMidi::PhysicalSceneRecall(idx) => {
                                 tracing::info!("🎹 [FÍSICO] Cena {} foi CARREGADA na mesa!", idx);
@@ -245,6 +251,9 @@ pub fn start_rx_loop(
                 }
                 if let Some(v) = fx_types_emission {
                     let _ = io_clone.emit("fxTypesUpdate", &v).await;
+                }
+                if let Some(v) = fx_inputs_emission {
+                    let _ = io_clone.emit("fxInputsUpdate", &v).await;
                 }
                 if should_broadcast_names {
                     crate::name_resolver::broadcast(&io_clone, &state_arc_in, &csm_clone).await;

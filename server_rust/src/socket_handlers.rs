@@ -112,6 +112,13 @@ pub fn register_handlers(
                         serde_json::to_value(&current_state.fx_types).unwrap_or_default();
                     socket_initial.emit("fxTypesUpdate", &fx_json).ok();
                 }
+                // Emit FX inputs for the efeitos module
+                {
+                    let current_state = state_arc_connect.read().await;
+                    let fx_in_json =
+                        serde_json::to_value(&current_state.fx_inputs).unwrap_or_default();
+                    socket_initial.emit("fxInputsUpdate", &fx_in_json).ok();
+                }
             }
 
             let (inputs, outputs) = crate::midi::MidiEngine::get_available_ports();
@@ -2242,6 +2249,22 @@ pub fn register_handlers(
                     if let Some(req) = crate::midi::protocol::build_fx_type_request(i) {
                         sched_fx.enqueue(req, 0).await;
                         tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+                    }
+                }
+            },
+        );
+
+        // --- REQUEST FX INPUTS ---
+        let sched_fx_in = scheduler_socket.clone();
+        socket.on(
+            "requestFxInputs",
+            move |_socket: SocketRef| async move {
+                for slot in 0u8..4 {
+                    for lr in 0u8..2 {
+                        if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
+                            sched_fx_in.enqueue(req, 0).await;
+                            tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+                        }
                     }
                 }
             },
