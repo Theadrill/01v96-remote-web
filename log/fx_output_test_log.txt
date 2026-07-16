@@ -1,0 +1,161 @@
+[100ns] ═══════════════════════════════════════════
+[100ns] FX Output Query — início
+[100ns] ═══════════════════════════════════════════
+[300ns] Conectado IN:[0] OUT:[1]
+[200ns] ── Rodada #1 ──
+[100ns] → Port 0 REQ: F0 43 30 3E 0D 02 03 00 00 F7
+[200ns] ← Port 0 = id=109 (id=109) RAW: F0 43 10 3E 0D 02 03 00 00 00 00 00 6D F7
+[100ns] → Port 1 REQ: F0 43 30 3E 0D 02 03 00 01 F7
+[100ns] ← Port 1 = id=109 (id=109) RAW: F0 43 10 3E 0D 02 03 00 01 00 00 00 6D F7
+[100ns] → Port 2 REQ: F0 43 30 3E 0D 02 03 00 02 F7
+[200ns] ← Port 2 = id=112 (id=112) RAW: F0 43 10 3E 0D 02 03 00 02 00 00 00 70 F7
+[100ns] → Port 3 REQ: F0 43 30 3E 0D 02 03 00 03 F7
+[100ns] ← Port 3 = id=137 (id=137) RAW: F0 43 10 3E 0D 02 03 00 03 00 00 01 09 F7
+[100ns] → Port 4 REQ: F0 43 30 3E 0D 02 03 00 04 F7
+[200ns]   ✗ Port 4 — sem resposta
+[100ns] → Port 5 REQ: F0 43 30 3E 0D 02 03 00 05 F7
+[100ns]   ✗ Port 5 — sem resposta
+[0ns] → Port 6 REQ: F0 43 30 3E 0D 02 03 00 06 F7
+[100ns]   ✗ Port 6 — sem resposta
+[0ns] → Port 7 REQ: F0 43 30 3E 0D 02 03 00 07 F7
+[100ns]   ✗ Port 7 — sem resposta
+[200ns] Resumo: 4/8 respostas, 4 total packets
+[100ns] ── Rodada #2 ──
+[100ns] → Port 0 REQ: F0 43 30 3E 0D 02 03 00 00 F7
+[100ns] ← Port 0 = id=109 (id=109) RAW: F0 43 10 3E 0D 02 03 00 00 00 00 00 6D F7
+[100ns] → Port 1 REQ: F0 43 30 3E 0D 02 03 00 01 F7
+[100ns] ← Port 1 = id=109 (id=109) RAW: F0 43 10 3E 0D 02 03 00 01 00 00 00 6D F7
+[0ns] → Port 2 REQ: F0 43 30 3E 0D 02 03 00 02 F7
+[0ns] ← Port 2 = id=112 (id=112) RAW: F0 43 10 3E 0D 02 03 00 02 00 00 00 70 F7
+[100ns] → Port 3 REQ: F0 43 30 3E 0D 02 03 00 03 F7
+[100ns] ← Port 3 = id=137 (id=137) RAW: F0 43 10 3E 0D 02 03 00 03 00 00 01 09 F7
+[100ns] → Port 4 REQ: F0 43 30 3E 0D 02 03 00 04 F7
+[100ns]   ✗ Port 4 — sem resposta
+[100ns] → Port 5 REQ: F0 43 30 3E 0D 02 03 00 05 F7
+[200ns]   ✗ Port 5 — sem resposta
+[100ns] → Port 6 REQ: F0 43 30 3E 0D 02 03 00 06 F7
+[100ns]   ✗ Port 6 — sem resposta
+[100ns] → Port 7 REQ: F0 43 30 3E 0D 02 03 00 07 F7
+[100ns]   ✗ Port 7 — sem resposta
+[100ns] Resumo: 4/8 respostas, 4 total packets
+[100ns] ═══════════════════════════════════════════
+[100ns] FX Output Patch Query — início
+[100ns] ═══════════════════════════════════════════
+[200ns] Conectado IN:[0] OUT:[1]
+[0ns] ── Rodada #1 ──
+[300ns] ← [CH6] = slot=6 RAW: F0 43 10 3E 0D 02 01 00 05 00 00 00 06 F7
+[200ns] ← [CH7] = slot=7 RAW: F0 43 10 3E 0D 02 01 00 06 00 00 00 07 F7
+[100ns] ← [CH9] = slot=10 RAW: F0 43 10 3E 0D 02 01 00 08 00 00 00 0A F7
+[100ns] ← [CH10] = slot=10 RAW: F0 43 10 3E 0D 02 01 00 09 00 00 00 0A F7
+[100ns] ← [CH11] = slot=11 RAW: F0 43 10 3E 0D 02 01 00 0A 00 00 00 0B F7
+[200ns] ← [CH12] = slot=47 RAW: F0 43 10 3E 0D 02 01 00 0B 00 00 00 2F F7
+[100ns] ← [CH13] = slot=44 RAW: F0 43 10 3E 0D 02 01 00 0C 00 00 00 2C F7
+[100ns] ← [CH14] = slot=45 RAW: F0 43 10 3E 0D 02 01 00 0D 00 00 00 2D F7
+[100ns] ← [CH15] = slot=46 RAW: F0 43 10 3E 0D 02 01 00 0E 00 00 00 2E F7
+[200ns] ← [CH18] = slot=41 RAW: F0 43 10 3E 0D 02 01 00 11 00 00 00 29 F7
+[100ns] ← [CH20] = slot=14 RAW: F0 43 10 3E 0D 02 01 00 13 00 00 00 0E F7
+[100ns] ← [CH21] = slot=5 RAW: F0 43 10 3E 0D 02 01 00 14 00 00 00 05 F7
+[200ns] ← [CH22] = slot=5 RAW: F0 43 10 3E 0D 02 01 00 15 00 00 00 05 F7
+[100ns] ← [CH23] = slot=48 RAW: F0 43 10 3E 0D 02 01 00 16 00 00 00 30 F7
+[100ns] ← [CH24] = slot=129 RAW: F0 43 10 3E 0D 02 01 00 17 00 00 01 01 F7
+[100ns] ← [CH25] = slot=1 RAW: F0 43 10 3E 0D 02 01 00 18 00 00 00 01 F7
+[100ns] ← [CH27] = slot=3 RAW: F0 43 10 3E 0D 02 01 00 1A 00 00 00 03 F7
+[100ns] ← [CH28] = slot=4 RAW: F0 43 10 3E 0D 02 01 00 1B 00 00 00 04 F7
+[100ns] ← [CH29] = slot=48 RAW: F0 43 10 3E 0D 02 01 00 1C 00 00 00 30 F7
+[300ns] ← [CH30] = slot=46 RAW: F0 43 10 3E 0D 02 01 00 1D 00 00 00 2E F7
+[100ns] ← [CH31] = slot=42 RAW: F0 43 10 3E 0D 02 01 00 1E 00 00 00 2A F7
+[100ns] ← [CH32] = slot=45 RAW: F0 43 10 3E 0D 02 01 00 1F 00 00 00 2D F7
+[100ns] ← [INSBUS1] = slot=121 RAW: F0 43 10 3E 0D 02 07 00 00 00 00 00 79 F7
+[100ns] ← [INSBUS2] = slot=122 RAW: F0 43 10 3E 0D 02 07 00 01 00 00 00 7A F7
+[100ns] ← [INSBUS3] = slot=137 RAW: F0 43 10 3E 0D 02 07 00 02 00 00 01 09 F7
+[100ns] ← [INSBUS4] = slot=138 RAW: F0 43 10 3E 0D 02 07 00 03 00 00 01 0A F7
+[200ns] Resumo: 79/79 respondidos, 26 com valor != 0
+[200ns] ═══════════════════════════════════════════
+[100ns] FX Output Patch Query — início
+[100ns] ═══════════════════════════════════════════
+[200ns] Conectado IN:[0] OUT:[1]
+[0ns] ── Rodada #1 ──
+[100ns] ← [CH6] = BUS6 RAW: F0 43 10 3E 0D 02 01 00 05 00 00 00 06 F7
+[100ns] ← [CH7] = BUS7 RAW: F0 43 10 3E 0D 02 01 00 06 00 00 00 07 F7
+[300ns] ← [CH9] = ST R RAW: F0 43 10 3E 0D 02 01 00 08 00 00 00 0A F7
+[200ns] ← [CH10] = ST R RAW: F0 43 10 3E 0D 02 01 00 09 00 00 00 0A F7
+[200ns] ← [CH11] = MATRIX1 RAW: F0 43 10 3E 0D 02 01 00 0A 00 00 00 0B F7
+[500ns] ← [CH12] = ?47 RAW: F0 43 10 3E 0D 02 01 00 0B 00 00 00 2F F7
+[200ns] ← [CH13] = ?44 RAW: F0 43 10 3E 0D 02 01 00 0C 00 00 00 2C F7
+[400ns] ← [CH14] = ?45 RAW: F0 43 10 3E 0D 02 01 00 0D 00 00 00 2D F7
+[200ns] ← [CH15] = ?46 RAW: F0 43 10 3E 0D 02 01 00 0E 00 00 00 2E F7
+[0ns] ← [CH18] = ?41 RAW: F0 43 10 3E 0D 02 01 00 11 00 00 00 29 F7
+[200ns] ← [CH20] = MATRIX4 RAW: F0 43 10 3E 0D 02 01 00 13 00 00 00 0E F7
+[100ns] ← [CH21] = BUS5 RAW: F0 43 10 3E 0D 02 01 00 14 00 00 00 05 F7
+[100ns] ← [CH22] = BUS5 RAW: F0 43 10 3E 0D 02 01 00 15 00 00 00 05 F7
+[100ns] ← [CH23] = ?48 RAW: F0 43 10 3E 0D 02 01 00 16 00 00 00 30 F7
+[200ns] ← [CH24] = FX2 Out1 RAW: F0 43 10 3E 0D 02 01 00 17 00 00 01 01 F7
+[100ns] ← [CH25] = BUS1 RAW: F0 43 10 3E 0D 02 01 00 18 00 00 00 01 F7
+[100ns] ← [CH27] = BUS3 RAW: F0 43 10 3E 0D 02 01 00 1A 00 00 00 03 F7
+[200ns] ← [CH28] = BUS4 RAW: F0 43 10 3E 0D 02 01 00 1B 00 00 00 04 F7
+[100ns] ← [CH29] = ?48 RAW: F0 43 10 3E 0D 02 01 00 1C 00 00 00 30 F7
+[100ns] ← [CH30] = ?46 RAW: F0 43 10 3E 0D 02 01 00 1D 00 00 00 2E F7
+[0ns] ← [CH31] = ?42 RAW: F0 43 10 3E 0D 02 01 00 1E 00 00 00 2A F7
+[100ns] ← [CH32] = ?45 RAW: F0 43 10 3E 0D 02 01 00 1F 00 00 00 2D F7
+[200ns] ← [INSBUS1] = FX1 Out1 RAW: F0 43 10 3E 0D 02 07 00 00 00 00 00 79 F7
+[100ns] ← [INSBUS2] = FX1 Out2 RAW: F0 43 10 3E 0D 02 07 00 01 00 00 00 7A F7
+[100ns] ← [INSBUS3] = FX3 Out1 RAW: F0 43 10 3E 0D 02 07 00 02 00 00 01 09 F7
+[100ns] ← [INSBUS4] = FX3 Out2 RAW: F0 43 10 3E 0D 02 07 00 03 00 00 01 0A F7
+[100ns] Resumo: 79/79 respondidos, 26 com valor != 0
+[200ns] ═══════════════════════════════════════════
+[100ns] FX Output Patch Query — início
+[200ns] ═══════════════════════════════════════════
+[100ns] Conectado IN:[0] OUT:[1]
+[0ns] ── Rodada #1 ──
+[200ns] ← [CH24] = FX2 Out1 RAW: F0 43 10 3E 0D 02 01 00 17 00 00 01 01 F7
+[300ns] ═══════════════════════════════════════════
+[100ns] FX Output Patch Query — início
+[100ns] ═══════════════════════════════════════════
+[200ns] Conectado IN:[0] OUT:[1]
+[100ns] ── Rodada #1 ──
+[100ns] ═══════════════════════════════════════════
+[100ns] FX Output Patch Query — início
+[100ns] ═══════════════════════════════════════════
+[100ns] Conectado IN:[0] OUT:[1]
+[100ns] ── Rodada #1 ──
+[100ns] ← [CH24] = FX2 Out1 RAW: F0 43 10 3E 0D 02 01 00 17 00 00 01 01 F7
+[100ns] ← [INSBUS1] = FX1 Out1 RAW: F0 43 10 3E 0D 02 07 00 00 00 00 00 79 F7
+[100ns] ← [INSBUS2] = FX1 Out2 RAW: F0 43 10 3E 0D 02 07 00 01 00 00 00 7A F7
+[100ns] ← [INSBUS3] = FX3 Out1 RAW: F0 43 10 3E 0D 02 07 00 02 00 00 01 09 F7
+[200ns] ← [INSBUS4] = FX3 Out2 RAW: F0 43 10 3E 0D 02 07 00 03 00 00 01 0A F7
+[100ns] Resumo: 79/79 respondidos, 5 com valor != 0
+[100ns] ═══════════════════════════════════════════
+[100ns] FX Output Patch Query — início
+[100ns] ═══════════════════════════════════════════
+[100ns] Conectado IN:[0] OUT:[1]
+[100ns] ── Rodada #1 ──
+[200ns] ← [CH24] = FX2 Out1 RAW: F0 43 10 3E 0D 02 01 00 17 00 00 01 01 F7
+[300ns] ← [INSBUS1] = FX1 Out1 RAW: F0 43 10 3E 0D 02 07 00 00 00 00 00 79 F7
+[200ns] ← [INSBUS2] = FX1 Out2 RAW: F0 43 10 3E 0D 02 07 00 01 00 00 00 7A F7
+[400ns] ← [INSBUS3] = FX3 Out1 RAW: F0 43 10 3E 0D 02 07 00 02 00 00 01 09 F7
+[200ns] ← [INSBUS4] = FX3 Out2 RAW: F0 43 10 3E 0D 02 07 00 03 00 00 01 0A F7
+[200ns] Resumo: 79/79 respondidos, 5 com valor != 0
+[100ns] ═══════════════════════════════════════════
+[0ns] FX Output Patch Query — início
+[100ns] ═══════════════════════════════════════════
+[300ns] Conectado IN:[0] OUT:[1]
+[200ns] ── Rodada #1 ──
+[200ns] ← [CH24] = FX2 Out1 RAW: F0 43 10 3E 0D 02 01 00 17 00 00 01 01 F7
+[200ns] ← [INSBUS1] = FX1 Out1 RAW: F0 43 10 3E 0D 02 07 00 00 00 00 00 79 F7
+[200ns] ← [INSBUS2] = FX1 Out2 RAW: F0 43 10 3E 0D 02 07 00 01 00 00 00 7A F7
+[200ns] ← [INSBUS3] = FX3 Out1 RAW: F0 43 10 3E 0D 02 07 00 02 00 00 01 09 F7
+[100ns] ← [INSBUS4] = FX3 Out2 RAW: F0 43 10 3E 0D 02 07 00 03 00 00 01 0A F7
+[100ns] Resumo: 79/79 respondidos, 5 com valor != 0
+[200ns] ═══════════════════════════════════════════
+[100ns] FX Output Patch Query — início
+[100ns] ═══════════════════════════════════════════
+[400ns] Conectado IN:[0] OUT:[1]
+[200ns] ── Rodada #1 ──
+[100ns] ← [CH24] = FX2 Out1 RAW: F0 43 10 3E 0D 02 01 00 17 00 00 01 01 F7
+[100ns] ← [INSBUS1] = FX1 Out1 RAW: F0 43 10 3E 0D 02 07 00 00 00 00 00 79 F7
+[200ns] ← [INSBUS2] = FX1 Out2 RAW: F0 43 10 3E 0D 02 07 00 01 00 00 00 7A F7
+[200ns] ← [INSBUS3] = FX3 Out1 RAW: F0 43 10 3E 0D 02 07 00 02 00 00 01 09 F7
+[200ns] ← [INSBUS4] = FX3 Out2 RAW: F0 43 10 3E 0D 02 07 00 03 00 00 01 0A F7
+[0ns] ← [MASTER L] = FX4 Out1 RAW: F0 43 10 3E 0D 02 0A 00 00 00 00 01 0B F7
+[300ns] ← [MASTER R] = FX4 Out2 RAW: F0 43 10 3E 0D 02 0A 00 01 00 00 01 0C F7
+[100ns] Resumo: 81/81 respondidos, 7 com valor != 0

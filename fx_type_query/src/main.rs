@@ -26,7 +26,6 @@ const PARAM_CHANGE: u8 = 0x10;
 
 const FX_SECTION: u8 = 0x0D;
 const FX_GROUP: u8 = 0x02;
-const FX_ELEMENT_OUT: u8 = 0x03;
 
 struct MidiAssembler {
     buffer: Vec<u8>,
@@ -84,25 +83,78 @@ fn decode_value(data: &[u8]) -> u32 {
     val
 }
 
-fn fx_output_label(val: u32) -> String {
+fn is_fx_slot(val: u32) -> bool {
+    matches!(val, 121..=140)
+}
+
+fn fx_output_slot_label(val: u32) -> String {
     match val {
         0 => "OFF".into(),
-        _ => format!("id={}", val),
+        1 => "BUS1".into(),
+        2 => "BUS2".into(),
+        3 => "BUS3".into(),
+        4 => "BUS4".into(),
+        5 => "BUS5".into(),
+        6 => "BUS6".into(),
+        7 => "BUS7".into(),
+        8 => "BUS8".into(),
+        9 => "ST L".into(),
+        10 => "ST R".into(),
+        11 => "MATRIX1".into(),
+        12 => "MATRIX2".into(),
+        13 => "MATRIX3".into(),
+        14 => "MATRIX4".into(),
+        15 => "MATRIX5".into(),
+        16 => "MATRIX6".into(),
+        17 => "MATRIX7".into(),
+        18 => "MATRIX8".into(),
+        121 => "FX1 Out1".into(),
+        122 => "FX1 Out2".into(),
+        129 => "FX2 Out1".into(),
+        130 => "FX2 Out2".into(),
+        137 => "FX3 Out1".into(),
+        138 => "FX3 Out2".into(),
+        139 => "FX4 Out1".into(),
+        140 => "FX4 Out2".into(),
+        _ => format!("?{}", val),
     }
 }
 
-fn build_fx_output_request(port: u8) -> Vec<u8> {
+fn dest_label(element: u8, channel: u8) -> String {
+    match element {
+        1 => {
+            if channel < 32 {
+                format!("CH{}", channel + 1)
+            } else if channel < 40 {
+                format!("STIN{}", channel - 31)
+            } else {
+                format!("EL1_{}", channel)
+            }
+        }
+        2 => format!("INSCH{}", channel + 1),
+        3 => format!("FX_IN_{}", channel),
+        7 => format!("INSBUS{}", channel + 1),
+        10 => {
+            if channel == 0 { "MASTER L".into() }
+            else if channel == 1 { "MASTER R".into() }
+            else { format!("EL10_{}", channel) }
+        }
+        _ => format!("EL{}_{}", element, channel),
+    }
+}
+
+fn build_output_patch_request(element: u8, param: u8, channel: u8) -> Vec<u8> {
     vec![
         HEADER[0], HEADER[1],
         PARAM_REQUEST, MODEL_ID,
-        FX_SECTION, FX_GROUP, FX_ELEMENT_OUT,
-        0,
-        port,
+        FX_SECTION, FX_GROUP, element,
+        param,
+        channel,
         0xF7,
     ]
 }
 
-fn is_fx_response(pkt: &[u8]) -> bool {
+fn is_response_for(pkt: &[u8], element: u8, param: u8, channel: u8) -> bool {
     pkt.len() >= 10
         && pkt[0] == 0xF0
         && pkt[1] == 0x43
@@ -110,7 +162,9 @@ fn is_fx_response(pkt: &[u8]) -> bool {
         && pkt[3] == MODEL_ID
         && pkt[4] == FX_SECTION
         && pkt[5] == FX_GROUP
-        && pkt[6] == FX_ELEMENT_OUT
+        && pkt[6] == element
+        && pkt[7] == param
+        && pkt[8] == channel
 }
 
 fn pause_and_exit(msg: &str) -> ! {
@@ -120,11 +174,19 @@ fn pause_and_exit(msg: &str) -> ! {
     std::process::exit(1);
 }
 
+struct QueryTarget {
+    element: u8,
+    param: u8,
+    channel: u8,
+}
+
 fn main() {
     println!("╔══════════════════════════════════════════════╗");
-    println!("║  01V96 — FX Output Query (8 ports)          ║");
-    println!("║  Consulta destino dos 8 outputs FX           ║");
-    println!("║  Enter = repetir  |  Esc = fechar           ║");
+    println!("║  01V96 — FX Output Patch Query               ║");
+    println!("║  Lê destinos do output patch (destination-    ║");
+    println!("║  indexed). Element 1=CH/STIN, 2=INSCH,       ║");
+    println!("║  3=FX_IN, 7=INSBUS                           ║");
+    println!("║  Enter = repetir  |  Esc = fechar            ║");
     println!("╚══════════════════════════════════════════════╝\n");
 
     let log_p = log_path();
@@ -139,14 +201,14 @@ fn main() {
     };
 
     log_msg(&mut log, "═══════════════════════════════════════════");
-    log_msg(&mut log, "FX Output Query — início");
+    log_msg(&mut log, "FX Output Patch Query — início");
     log_msg(&mut log, "═══════════════════════════════════════════");
 
-    let midi_in = match MidiInput::new("01V96 FX Output In") {
+    let midi_in = match MidiInput::new("01V96 FX OutPatch In") {
         Ok(m) => m,
         Err(e) => pause_and_exit(&format!("Falha ao criar MidiInput: {}", e)),
     };
-    let midi_out = match MidiOutput::new("01V96 FX Output Out") {
+    let midi_out = match MidiOutput::new("01V96 FX OutPatch Out") {
         Ok(m) => m,
         Err(e) => pause_and_exit(&format!("Falha ao criar MidiOutput: {}", e)),
     };
@@ -220,14 +282,14 @@ fn main() {
     let (tx, rx) = mpsc::channel::<Vec<u8>>();
 
     let mut out_conn: MidiOutputConnection = match midi_out
-        .connect(&out_ports[out_idx], "01V96 FX Output Out")
+        .connect(&out_ports[out_idx], "01V96 FX OutPatch Out")
     {
         Ok(c) => c,
         Err(e) => pause_and_exit(&format!("Falha ao conectar OUT: {}", e)),
     };
 
     let _in_conn: MidiInputConnection<()> = match midi_in
-        .connect(&in_ports[in_idx], "01V96 FX Output In",
+        .connect(&in_ports[in_idx], "01V96 FX OutPatch In",
             move |_stamp, msg, _| { let _ = tx.send(msg.to_vec()); },
             (),
         )
@@ -238,6 +300,18 @@ fn main() {
 
     log_msg(&mut log, &format!("Conectado IN:[{}] OUT:[{}]", in_idx, out_idx));
     println!("\n✔ Conectado!\n");
+
+    let targets: Vec<QueryTarget> = vec![
+        // Element 1: CH1-32 (channels 0-31) + STIN1-8 (channels 32-39)
+        (1..=39u8).map(|ch| QueryTarget { element: 1, param: 0, channel: ch }).collect::<Vec<_>>(),
+        // Element 2: INSCH1-32 (channels 0-31)
+        (0..=31u8).map(|ch| QueryTarget { element: 2, param: 0, channel: ch }).collect::<Vec<_>>(),
+        // Element 7: INSBUS1-8 (channels 0-7)
+        (0..=7u8).map(|ch| QueryTarget { element: 7, param: 0, channel: ch }).collect::<Vec<_>>(),
+        // Element 10: Master L/R (channels 0-1)
+        vec![QueryTarget { element: 10, param: 0, channel: 0 },
+             QueryTarget { element: 10, param: 0, channel: 1 }],
+    ].into_iter().flatten().collect();
 
     let mut assembler = MidiAssembler::new();
     let mut round = 0u32;
@@ -252,68 +326,66 @@ fn main() {
 
         log_msg(&mut log, &format!("── Rodada #{} ──", round));
 
-        let mut responses: Vec<(u8, u32, Vec<u8>)> = Vec::new();
-        let mut total_received = 0u32;
+        let mut results: Vec<(u8, u8, u8, u32, String)> = Vec::new();
+        let mut responded = 0u32;
 
-        // Query 8 output ports (0-7)
-        for port in 0u8..8 {
-            let req = build_fx_output_request(port);
-            log_msg(&mut log, &format!("→ Port {} REQ: {}", port, hex_bytes(&req)));
+        for t in &targets {
+            let req = build_output_patch_request(t.element, t.param, t.channel);
             if let Err(e) = out_conn.send(&req) {
-                log_msg(&mut log, &format!("✗ Falha Port {}: {}", port, e));
+                log_msg(&mut log, &format!("✗ EL{} P{} CH{}: {}", t.element, t.param, t.channel, e));
                 continue;
             }
 
-            let deadline = Instant::now() + Duration::from_secs(2);
+            let deadline = Instant::now() + Duration::from_millis(1500);
             let mut found = false;
             while Instant::now() < deadline && !found {
                 if let Ok(raw) = rx.recv_timeout(Duration::from_millis(200)) {
                     let packets = assembler.process_input(&raw);
                     for pkt in packets {
-                        if !is_fx_response(&pkt) { continue; }
-                        total_received += 1;
-                        let r_port = pkt[8];
-                        let r_param = pkt[7];
-                        if r_port == port && r_param == 0 {
-                            let data = &pkt[9..pkt.len() - 1];
-                            let val = decode_value(data);
-                            let label = fx_output_label(val);
+                        if !is_response_for(&pkt, t.element, t.param, t.channel) { continue; }
+                        let data = &pkt[9..pkt.len() - 1];
+                        let val = decode_value(data);
+                        let label = fx_output_slot_label(val);
+                        let dest = dest_label(t.element, t.channel);
+
+                        if val != 0 && is_fx_slot(val) {
                             log_msg(&mut log, &format!(
-                                "← Port {} = {} (id={}) RAW: {}",
-                                port, label, val, hex_bytes(&pkt)
+                                "← [{}] = {} RAW: {}",
+                                dest, label, hex_bytes(&pkt)
                             ));
-                            println!("  Output Port {} = {} (id={})", port, label, val);
-                            responses.push((port, val, pkt.clone()));
-                            found = true;
+                            println!("  {} = {}", dest, label);
+                            results.push((t.element, t.param, t.channel, val, dest.clone()));
                         }
+                        responded += 1;
+                        found = true;
                     }
                 }
             }
             if !found {
-                log_msg(&mut log, &format!("  ✗ Port {} — sem resposta", port));
-                println!("  Output Port {} = ⚠ SEM RESPOSTA", port);
+                log_msg(&mut log, &format!("  ✗ [{}] sem resposta",
+                    dest_label(t.element, t.channel)));
             }
         }
 
         println!("\n╔══════════════════════════════════════════╗");
-        println!("║         RESUMO — FX OUTPUTS              ║");
+        println!("║       FX OUTPUT PATCH — DESTINOS         ║");
         println!("╠══════════════════════════════════════════╣");
 
-        for port in 0..8u8 {
-            if let Some((_, val, _)) = responses.iter().find(|(p, _, _)| *p == port) {
-                println!("║  Port {} = {:<28} ║", port, fx_output_label(*val));
-            } else {
-                println!("║  Port {} = ⚠ SEM RESPOSTA               ║", port);
+        if results.is_empty() {
+            println!("║  Nenhum destino conectado (tudo OFF)     ║");
+        } else {
+            for (_el, _p, _ch, val, dest) in &results {
+                println!("║  {:<12} = {:<24} ║", dest, fx_output_slot_label(*val));
             }
         }
 
         println!("╠══════════════════════════════════════════╣");
-        println!("║  Respostas recebidas: {:<19}║", format!("{}/8", responses.len()));
+        println!("║  Respostas recebidas: {:<19}║", format!("{}/{}", responded, targets.len()));
         println!("╚══════════════════════════════════════════╝");
 
         log_msg(&mut log, &format!(
-            "Resumo: {}/8 respostas, {} total packets",
-            responses.len(), total_received
+            "Resumo: {}/{} respondidos, {} com valor != 0",
+            responded, targets.len(), results.len()
         ));
 
         println!("\n  [Enter] = repetir  |  [Esc] = fechar");

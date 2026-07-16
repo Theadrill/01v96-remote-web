@@ -281,3 +281,79 @@ Tabela de referência completa dos valores MIDI para os inputs dos efeitos (FX I
 
 ---
 
+## 8. Mapeamento de Patch Destination — FX Outputs
+
+Tabela de referência completa dos destinos do output patch (FX Output Patch Destination), validada via script de teste direto na porta MIDI da mesa.
+
+### 8.1. Conceito
+
+O output patch usa endereçamento **destination-indexed**: cada endereço representa um DESTINO, e o valor retornado indica qual OUTPUT SLOT do FX está conectado àquele destino. Diferente do input patch, onde o endereço representa o FX e o valor é a fonte.
+
+### 8.2. Formato SysEx
+
+**Query:** `F0 43 30 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] F7`
+**Resposta:** `F0 43 10 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] [VAL...] F7`
+
+### 8.3. Tabela de Destinos (Elements)
+
+| Element | Param | Canais | Destino |
+|---------|-------|--------|---------|
+| 1 | 0 | 0-31 | CH1-32 |
+| 1 | 0 | 32-39 | STIN1-8 |
+| 2 | 0 | 0-31 | INSCH1-32 |
+| 7 | 0 | 0-7 | INSBUS1-8 |
+| 10 | 0 | 0 | MASTER L |
+| 10 | 0 | 1 | MASTER R |
+
+### 8.4. Tabela de FX Output Slots (Valores)
+
+| Slot (dec) | Label | Status | Observação |
+|---|---|---|---|
+| 0 | OFF | ✅ Confirmado | Sem FX atribuído |
+| 1-8 | BUS1-8 | ✅ Confirmado | Saídas de bus (não são FX outputs) |
+| 9 | ST L | Assumido | Stereo Left |
+| 10 | ST R | ✅ Confirmado | Stereo Right |
+| 11-18 | MATRIX1-8 | Parcial | Matrix outputs (não são FX outputs) |
+| 41-48 | *(desconhecido)* | — | Não mapeado |
+| 121 | **FX1 Out1** | ✅ Confirmado | FX1 saída 1 |
+| 122 | **FX1 Out2** | ✅ Confirmado | FX1 saída 2 |
+| 129 | **FX2 Out1** | ✅ Confirmado | FX2 saída 1 |
+| 130 | **FX2 Out2** | ✅ Confirmado | FX2 saída 2 |
+| 137 | **FX3 Out1** | ✅ Confirmado | FX3 saída 1 |
+| 138 | **FX3 Out2** | ✅ Confirmado | FX3 saída 2 |
+| 139 | **FX4 Out1** | ✅ Confirmado | FX4 saída 1 |
+| 140 | **FX4 Out2** | Assumido | FX4 saída 2 (padrão +1) |
+
+### 8.5. Padrão de Encoding dos FX Output Slots
+
+```
+FX1 Out1 = 121    FX1 Out2 = 122
+FX2 Out1 = 129    FX2 Out2 = 130    (+8 por FX)
+FX3 Out1 = 137    FX3 Out2 = 138
+FX4 Out1 = 139    FX4 Out2 = 140
+```
+
+**Nota:** FX1-3 seguem padrão de +8. FX4 é +2 a partir de FX3 (137→139), não +8.
+
+### 8.6. Validação
+
+Resultados do script de teste vs configuração física da mesa:
+
+| Destino | Esperado | Resultado |
+|---------|----------|-----------|
+| INSBUS1 | FX1 Out1 | FX1 Out1 ✅ |
+| INSBUS2 | FX1 Out2 | FX1 Out2 ✅ |
+| CH24 | FX2 Out1 | FX2 Out1 ✅ |
+| INSBUS3 | FX3 Out1 | FX3 Out1 ✅ |
+| INSBUS4 | FX3 Out2 | FX3 Out2 ✅ |
+| MASTER L | FX4 Out1 | FX4 Out1 ✅ |
+| MASTER R | FX4 Out2 | FX4 Out2 ✅ |
+
+### 8.7. Notas Importantes
+
+- O insert do Master (element 10) é separado do output patch principal (elements 1, 2, 7).
+- FX4 só aparece quando routado para Master (element 10), não nos elementos 1/2/7.
+- O output patch NÃO modifica o estado da mesa — é somente leitura.
+- Slots 41-48 e gaps (9-12, 45-108) não foram mapeados e podem ser ignorados.
+
+
