@@ -2263,9 +2263,10 @@ pub fn register_handlers(
 
         // --- REQUEST FX INPUTS ---
         let sched_fx_in = scheduler_socket.clone();
+        let state_fx_in = global_state_socket.clone();
         socket.on(
             "requestFxInputs",
-            move |_socket: SocketRef| async move {
+            move |socket: SocketRef| async move {
                 for slot in 0u8..4 {
                     for lr in 0u8..2 {
                         if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
@@ -2274,6 +2275,12 @@ pub fn register_handlers(
                         }
                     }
                 }
+                // Wait for all 8 responses to arrive from the mixer
+                tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                // Re-emit the final state to guarantee completeness
+                let state = state_fx_in.read().await;
+                let fx_in_json = serde_json::to_value(&state.fx_inputs).unwrap_or_default();
+                socket.emit("fxInputsUpdate", &fx_in_json).ok();
             },
         );
 

@@ -174,8 +174,9 @@
 
     function applyFxInputs(data) {
         console.log('[FX] fxInputsUpdate recebido:', JSON.stringify(data));
-        for (let i = 0; i < 8; i++) {
-            const val = data[i] != null ? data[i] : 0;
+        for (const [key, val] of Object.entries(data)) {
+            const i = parseInt(key, 10);
+            if (isNaN(i) || i < 0 || i > 7) continue;
             const slot = Math.floor(i / 2);
             const lr = i % 2;
             fxInputs[slot][lr] = val;
