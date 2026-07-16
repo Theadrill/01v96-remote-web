@@ -300,6 +300,12 @@
             socket.emit('requestFxTypes');
             socket.emit('requestFxInputs');
             socket.emit('requestFxOutputs');
+            setTimeout(() => {
+                console.log('[FX] 2º resync...');
+                socket.emit('requestFxTypes');
+                socket.emit('requestFxInputs');
+                socket.emit('requestFxOutputs');
+            }, 4000);
         }
         renderEffectsScreen();
     }

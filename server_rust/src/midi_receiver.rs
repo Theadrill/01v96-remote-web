@@ -140,7 +140,7 @@ pub fn start_rx_loop(
                     && (packet[2] & 0xF0) == 0x10
                     && packet[4] == 13
                     && packet[5] == 2
-                    && [1u8, 2, 7, 10].contains(&packet[6])
+                    && [1u8, 2, 7, 8, 10].contains(&packet[6])
                     && packet[7] == 0
                     && conn_mgr_recv.is_fully_synced()
                     && !crate::midi::protocol::is_output_patch_active()
