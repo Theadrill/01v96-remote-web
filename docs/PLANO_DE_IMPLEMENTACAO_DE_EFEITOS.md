@@ -222,9 +222,38 @@ Esta tabela contém o mapeamento absoluto para o parâmetro DECAY, herdado da l�
 
 ---
 
-## 6. Progresso da Implementação (Frontend)
+## 6. Mapeamento de Patch Source — FX Inputs
 
-### 6.1. Tela de Máquinas de Efeitos — Etapa 1 (Mockada)
+Tabela de referência completa dos valores MIDI para os inputs dos efeitos (FX Input Patch Source), validada via script de teste direto na porta MIDI da mesa.
+
+**Endereço SysEx:** `F0 43 30 3E 0D 02 03 [LR] [SLOT] F7`
+- LR: `00`=L, `01`=R
+- SLOT: `00`=FX1, `01`=FX2, `02`=FX3, `03`=FX4
+
+**Resposta:** `F0 43 10 3E 0D 02 03 [LR] [SLOT] [VAL...] F7`
+
+| ID (dec) | Label | Status | Observação |
+|---|---|---|---|
+| 0 | OFF | ✅ Confirmado | Sem fonte atribuída |
+| 1-8 | AUX 1-8 | ✅ Confirmado | Aux Sends (id=1=AUX1) |
+| 9-12 | *(gap)* | — | Não mapeado / não usado como input |
+| 13-44 | INS CH1-CH32 | ✅ Confirmado | Insert do canal N (id=14=CH2) |
+| 45-108 | *(gap)* | — | Não mapeado / não usado como input |
+| 109-112 | INS BUS1-4 | ✅ Confirmado | Insert Bus 1-4 |
+| 113-116 | INS RET1-2 L/R | Assumido | Insert Return 1-4 L/R |
+| 117-124 | INS AUX1-8 | ✅ Confirmado | Insert Aux 1-8 (id=117=AUX1) |
+| 125-136 | *(gap)* | — | Não mapeado |
+| 137 | INS ST-L | ✅ Confirmado | Insert Stereo Left (master L) |
+| 138 | INS ST-R | ✅ Confirmado | Insert Stereo Right (master R) |
+| 139+ | *(desconhecido)* | — | Não testado |
+
+**Nota:** O encoding de FX Input é diferente do Channel Input. Valores como 137/138 significam INS ST-L/R para FX inputs, mas FX3 Out1/2 para channel inputs (routing.js fxMap).
+
+---
+
+## 7. Progresso da Implementação (Frontend)
+
+### 7.1. Tela de Máquinas de Efeitos — Etapa 1 (Mockada)
 
 **Status:** ✅ Concluída
 

@@ -1,103 +1,33 @@
 use midir::{MidiInput, MidiInputConnection, MidiOutput, MidiOutputConnection};
-use serde::Deserialize;
-use std::collections::HashMap;
 use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::PathBuf;
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
-const LOG_PATH: &str = "log/fx_test_log.txt";
-const FX_LIST_FILENAME: &str = "fx_list.json";
+const LOG_PATH: &str = "log/fx_input_test_log.txt";
 
-// Resolve caminhos relativos à RAIZ do projeto (2 pastas acima do exe em target/release/)
 fn project_root() -> PathBuf {
     let mut p = std::env::current_exe()
         .ok()
         .and_then(|p| p.parent().map(|p| p.to_path_buf()))
         .unwrap_or_else(|| PathBuf::from("."));
-    p.pop(); // sai de release/
-    p.pop(); // sai de target/
+    p.pop();
+    p.pop();
     p
 }
 
-fn fx_list_path() -> PathBuf { project_root().join(FX_LIST_FILENAME) }
 fn log_path() -> PathBuf { project_root().join(LOG_PATH) }
 
-// ─── Yamaha 01V96 SysEx Constants ───
 const HEADER: [u8; 2] = [0xF0, 0x43];
 const MODEL_ID: u8 = 0x3E;
 const PARAM_REQUEST: u8 = 0x30;
 const PARAM_CHANGE: u8 = 0x10;
 
-// Endereço do kEffect/kEffectType no dictionary.json
-const FX_SECTION: u8 = 0x7F;
-const FX_GROUP: u8 = 0x01;
-const FX_ELEMENT: u8 = 0x58;
-const FX_TYPE_PARAM: u8 = 0x31;
+const FX_INPUT_SECTION: u8 = 0x0D;
+const FX_INPUT_GROUP: u8 = 0x02;
+const FX_INPUT_ELEMENT: u8 = 0x03;
 
-// ─── JSON structures ───
-#[derive(Debug, Deserialize)]
-struct FxEntry {
-    id: u32,
-    name: String,
-    #[serde(default)]
-    read_only: bool,
-}
-
-#[derive(Debug, Deserialize)]
-struct FxList {
-    builtin: Vec<FxEntry>,
-    #[serde(default)]
-    custom: Vec<FxEntry>,
-}
-
-impl FxList {
-    fn load(path: &std::path::Path) -> Result<Self, String> {
-        let data = fs::read_to_string(path)
-            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
-        serde_json::from_str(&data)
-            .map_err(|e| format!("JSON inválido em {}: {}", path.display(), e))
-    }
-
-    /// Monta um mapa id→nome a partir de builtin + custom
-    fn to_map(&self) -> HashMap<u32, String> {
-        let mut m = HashMap::new();
-        for e in &self.builtin {
-            m.insert(e.id, e.name.clone());
-        }
-        for e in &self.custom {
-            m.insert(e.id, e.name.clone());
-        }
-        m
-    }
-
-    /// Monta um mapa id→read_only
-    fn read_only_map(&self) -> HashMap<u32, bool> {
-        let mut m = HashMap::new();
-        for e in &self.builtin {
-            m.insert(e.id, e.read_only);
-        }
-        for e in &self.custom {
-            m.insert(e.id, e.read_only);
-        }
-        m
-    }
-}
-
-// ─── SysEx Builder ───
-fn build_fx_type_request(slot: u8) -> Vec<u8> {
-    vec![
-        HEADER[0], HEADER[1],
-        PARAM_REQUEST,
-        MODEL_ID,
-        FX_SECTION, FX_GROUP, FX_ELEMENT, FX_TYPE_PARAM,
-        slot,
-        0xF7,
-    ]
-}
-
-// ─── Minimal MidiAssembler ───
 struct MidiAssembler {
     buffer: Vec<u8>,
     in_sysex: bool,
@@ -134,7 +64,6 @@ impl MidiAssembler {
     }
 }
 
-// ─── Logging ───
 fn log_msg(log: &mut fs::File, msg: &str) {
     let ts = format!("[{:?}] ", Instant::now().elapsed());
     let line = format!("{}{}\n", ts, msg);
@@ -155,10 +84,59 @@ fn decode_value(data: &[u8]) -> u32 {
     val
 }
 
-fn fx_type_name(id: u32, map: &HashMap<u32, String>) -> String {
-    map.get(&id)
-        .cloned()
-        .unwrap_or_else(|| format!("??? (id={})", id))
+fn fx_input_label(val: u32) -> String {
+    match val {
+        0   => "OFF".into(),
+        // Aux Send 1-8 (1-8) — confirmado: id=1 = Aux 1
+        1..=8 => format!("AUX{}", val),
+        // Channel inserts (13-44) — confirmado: id=14 = Insert CH2
+        13..=44 => format!("INS CH{}", val - 12),
+        // Insert Bus 1-4 (109-112) — confirmado via mixer
+        109 => "INS BUS1".into(),
+        110 => "INS BUS2".into(),
+        111 => "INS BUS3".into(),
+        112 => "INS BUS4".into(),
+        // Insert Return L/R (113-116)
+        113 => "INS RET1 L".into(),
+        114 => "INS RET1 R".into(),
+        115 => "INS RET2 L".into(),
+        116 => "INS RET2 R".into(),
+        // Aux Send 1-8 (117-124) — confirmado: id=117 = Insert Aux 1
+        117 => "INS AUX1".into(),
+        118 => "INS AUX2".into(),
+        119 => "INS AUX3".into(),
+        120 => "INS AUX4".into(),
+        121 => "INS AUX5".into(),
+        122 => "INS AUX6".into(),
+        123 => "INS AUX7".into(),
+        124 => "INS AUX8".into(),
+        // Insert ST-L / ST-R — confirmado via mixer (master L/R)
+        137 => "INS ST-L".into(),
+        138 => "INS ST-R".into(),
+        _ => format!("??? (id={})", val),
+    }
+}
+
+fn build_fx_input_request(slot: u8, lr: u8) -> Vec<u8> {
+    vec![
+        HEADER[0], HEADER[1],
+        PARAM_REQUEST, MODEL_ID,
+        FX_INPUT_SECTION, FX_INPUT_GROUP, FX_INPUT_ELEMENT,
+        lr,
+        slot,
+        0xF7,
+    ]
+}
+
+fn is_fx_input_response(pkt: &[u8]) -> bool {
+    pkt.len() >= 10
+        && pkt[0] == 0xF0
+        && pkt[1] == 0x43
+        && (pkt[2] & 0xF0) == PARAM_CHANGE
+        && pkt[3] == MODEL_ID
+        && pkt[4] == FX_INPUT_SECTION
+        && pkt[5] == FX_INPUT_GROUP
+        && pkt[6] == FX_INPUT_ELEMENT
 }
 
 fn pause_and_exit(msg: &str) -> ! {
@@ -168,134 +146,33 @@ fn pause_and_exit(msg: &str) -> ! {
     std::process::exit(1);
 }
 
-/// Envia requests para os 4 slots e coleta respostas.
-/// Retorna (responses, assembler_state)
-fn query_fx_slots(
-    out_conn: &mut MidiOutputConnection,
-    rx: &mpsc::Receiver<Vec<u8>>,
-    assembler: &mut MidiAssembler,
-    fx_map: &HashMap<u32, String>,
-    log: &mut fs::File,
-) -> Vec<(u8, Vec<u8>)> {
-    assembler.reset();
-
-    for slot in 0u8..4 {
-        let req = build_fx_type_request(slot);
-        log_msg(log, &format!("→ FX{} REQUEST: {}", slot + 1, hex_bytes(&req)));
-        if let Err(e) = out_conn.send(&req) {
-            log_msg(log, &format!("✗ Falha ao enviar FX{}: {}", slot + 1, e));
-        }
-        std::thread::sleep(Duration::from_millis(100));
-    }
-
-    println!("Aguardando respostas da mesa (5 segundos)...\n");
-    let deadline = Instant::now() + Duration::from_secs(5);
-    let mut responses: Vec<(u8, Vec<u8>)> = Vec::new();
-
-    while Instant::now() < deadline {
-        if let Ok(raw) = rx.recv_timeout(Duration::from_millis(200)) {
-            let packets = assembler.process_input(&raw);
-            for pkt in packets {
-                log_msg(log, &format!("← RAW: {}", hex_bytes(&pkt)));
-
-                if pkt.len() >= 10
-                    && pkt[0] == 0xF0
-                    && pkt[1] == 0x43
-                    && (pkt[2] & 0xF0) == PARAM_CHANGE
-                    && pkt[3] == MODEL_ID
-                    && pkt[4] == FX_SECTION
-                    && pkt[5] == FX_GROUP
-                    && pkt[6] == FX_ELEMENT
-                    && pkt[7] == FX_TYPE_PARAM
-                {
-                    let slot = pkt[8];
-                    let data = &pkt[9..pkt.len() - 1];
-                    let val = decode_value(data);
-                    let name = fx_type_name(val, fx_map);
-                    log_msg(log, &format!(
-                        "  ✔ FX{} Type: id={} ({}) | data[{}]: {} | pkt_len={}",
-                        slot + 1, val, name, data.len(), hex_bytes(data), pkt.len()
-                    ));
-                    println!("  [FX{} RAW] pkt_len={} data[{}]: {} → id={} ({})",
-                        slot + 1, pkt.len(), data.len(), hex_bytes(data), val, name);
-                    responses.push((slot, pkt.clone()));
-                }
-            }
-        }
-    }
-
-    responses
-}
-
-fn print_summary(responses: &[(u8, Vec<u8>)], fx_list: &FxList, fx_map: &HashMap<u32, String>) {
-    let ro_map = fx_list.read_only_map();
-
-    println!("\n╔══════════════════════════════════════════════════════╗");
-    println!("║                 RESUMO DOS SLOTS FX                  ║");
-    println!("╠══════════════════════════════════════════════════════╣");
-
-    let mut found = [false; 4];
-    for (slot, pkt) in responses {
-        if (*slot as usize) < 4 {
-            let data = &pkt[9..pkt.len() - 1];
-            let val = decode_value(data);
-            let name = fx_type_name(val, fx_map);
-            let tag = match ro_map.get(&val) {
-                Some(true)  => "[BUILTIN]",
-                Some(false) => "[CUSTOM]",
-                None        => "[UNKNOWN]",
-            };
-            println!("║  FX{} → id={:2} {:<25} {:<11} ║", slot + 1, val, name, tag);
-            found[*slot as usize] = true;
-        }
-    }
-
-    for i in 0..4 {
-        if !found[i] {
-            println!("║  FX{} → ⚠ SEM RESPOSTA                         ║", i + 1);
-        }
-    }
-
-    println!("╚══════════════════════════════════════════════════════╝");
-}
-
 fn main() {
-    println!("╔══════════════════════════════════════════╗");
-    println!("║  Yamaha 01V96 — FX Type Query Script     ║");
-    println!("║  Consulta o tipo do efeito em cada slot  ║");
-    println!("║  Enter = repetir  |  Esc = fechar        ║");
-    println!("╚══════════════════════════════════════════╝");
-    println!();
+    println!("╔══════════════════════════════════════════════╗");
+    println!("║  01V96 — FX Input Query (apenas inputs)     ║");
+    println!("║  Consulta origem dos 4 FX (L/R cada)        ║");
+    println!("║  Enter = repetir  |  Esc = fechar           ║");
+    println!("╚══════════════════════════════════════════════╝\n");
 
-    let fx_path = fx_list_path();
     let log_p = log_path();
-
-    // ─── Garantir pasta log/ ───
     if let Some(parent) = log_p.parent() {
         if let Err(e) = fs::create_dir_all(parent) {
             pause_and_exit(&format!("Falha ao criar {}: {}", parent.display(), e));
         }
     }
-
-    let mut log = match OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&log_p)
-    {
+    let mut log = match OpenOptions::new().create(true).append(true).open(&log_p) {
         Ok(f) => f,
         Err(e) => pause_and_exit(&format!("Falha ao abrir {}: {}", log_p.display(), e)),
     };
 
     log_msg(&mut log, "═══════════════════════════════════════════");
-    log_msg(&mut log, "Início da consulta FX Type");
+    log_msg(&mut log, "FX Input Query — início");
     log_msg(&mut log, "═══════════════════════════════════════════");
 
-    // ─── Listar portas MIDI ───
-    let midi_in = match MidiInput::new("01v96 FX Query In") {
+    let midi_in = match MidiInput::new("01V96 FX Input In") {
         Ok(m) => m,
         Err(e) => pause_and_exit(&format!("Falha ao criar MidiInput: {}", e)),
     };
-    let midi_out = match MidiOutput::new("01v96 FX Query Out") {
+    let midi_out = match MidiOutput::new("01V96 FX Input Out") {
         Ok(m) => m,
         Err(e) => pause_and_exit(&format!("Falha ao criar MidiOutput: {}", e)),
     };
@@ -308,7 +185,6 @@ fn main() {
         let name = midi_in.port_name(p).unwrap_or("?".into());
         println!("  [{}] {}", i, name);
     }
-
     println!("\n── Portas MIDI de Saída ──");
     for (i, p) in out_ports.iter().enumerate() {
         let name = midi_out.port_name(p).unwrap_or("?".into());
@@ -317,12 +193,11 @@ fn main() {
 
     if in_ports.is_empty() || out_ports.is_empty() {
         eprintln!("\n✗ Nenhuma porta MIDI encontrada!");
-        log_msg(&mut log, "ERRO: Nenhuma porta MIDI encontrada");
         return;
     }
 
-    // Auto-detect portas
-    let find_in = |ports: &[midir::MidiInputPort]| -> Option<usize> {
+    // Auto-detect: prefer "yamaha" (directa na mesa), depois "loop"
+    let find_port_in = |ports: &[midir::MidiInputPort]| -> Option<usize> {
         for (i, p) in ports.iter().enumerate() {
             let name = midi_in.port_name(p).unwrap_or_default().to_lowercase();
             if name.contains("yamaha") { return Some(i); }
@@ -334,7 +209,7 @@ fn main() {
         None
     };
 
-    let find_out = |ports: &[midir::MidiOutputPort]| -> Option<usize> {
+    let find_port_out = |ports: &[midir::MidiOutputPort]| -> Option<usize> {
         for (i, p) in ports.iter().enumerate() {
             let name = midi_out.port_name(p).unwrap_or_default().to_lowercase();
             if name.contains("yamaha") { return Some(i); }
@@ -346,7 +221,7 @@ fn main() {
         None
     };
 
-    let in_idx = find_in(&in_ports).unwrap_or_else(|| {
+    let in_idx = find_port_in(&in_ports).unwrap_or_else(|| {
         print!("\nDigite o índice da porta IN: ");
         std::io::Write::flush(&mut std::io::stdout()).ok();
         let mut buf = String::new();
@@ -354,7 +229,7 @@ fn main() {
         buf.trim().parse().expect("Índice inválido")
     });
 
-    let out_idx = find_out(&out_ports).unwrap_or_else(|| {
+    let out_idx = find_port_out(&out_ports).unwrap_or_else(|| {
         print!("Digite o índice da porta OUT: ");
         std::io::Write::flush(&mut std::io::stdout()).ok();
         let mut buf = String::new();
@@ -369,79 +244,128 @@ fn main() {
         println!("▶ Porta OUT: [{}] {}", out_idx, name_out);
     }
 
-    // ─── Conectar ───
     let (tx, rx) = mpsc::channel::<Vec<u8>>();
 
     let mut out_conn: MidiOutputConnection = match midi_out
-        .connect(&out_ports[out_idx], "01v96 FX Query Out")
+        .connect(&out_ports[out_idx], "01V96 FX Input Out")
     {
         Ok(c) => c,
-        Err(e) => pause_and_exit(&format!("Falha ao conectar porta OUT: {}", e)),
+        Err(e) => pause_and_exit(&format!("Falha ao conectar OUT: {}", e)),
     };
 
     let _in_conn: MidiInputConnection<()> = match midi_in
-        .connect(&in_ports[in_idx], "01v96 FX Query In",
+        .connect(&in_ports[in_idx], "01V96 FX Input In",
             move |_stamp, msg, _| { let _ = tx.send(msg.to_vec()); },
             (),
         )
     {
         Ok(c) => c,
-        Err(e) => pause_and_exit(&format!("Falha ao conectar porta IN: {}", e)),
+        Err(e) => pause_and_exit(&format!("Falha ao conectar IN: {}", e)),
     };
 
     log_msg(&mut log, &format!("Conectado IN:[{}] OUT:[{}]", in_idx, out_idx));
     println!("\n✔ Conectado!\n");
 
-    // ─── Loop: Enter = repetir, Esc = sair ───
     let mut assembler = MidiAssembler::new();
     let mut round = 0u32;
 
     loop {
         round += 1;
-
-        // ─── Recarregar JSON a cada rodada ───
-        let fx_list = match FxList::load(&fx_path) {
-            Ok(l) => l,
-            Err(e) => {
-                eprintln!("✗ {}", e);
-                log_msg(&mut log, &format!("ERRO ao carregar JSON: {}", e));
-                println!("\n  [Enter] = tentar novamente  |  [Esc] = fechar");
-                use std::io::Read;
-                let mut buf = [0u8; 1];
-                if let Ok(1) = std::io::stdin().lock().read(&mut buf) {
-                    if buf[0] == 0x1B { break; }
-                }
-                continue;
-            }
-        };
-        let fx_map = fx_list.to_map();
-        println!("Rodada #{} — {} efeitos ({} builtin + {} custom)\n",
-            round, fx_map.len(), fx_list.builtin.len(), fx_list.custom.len());
+        assembler.reset();
 
         println!("═══════════════════════════════════════════");
         println!("  Rodada #{}", round);
         println!("═══════════════════════════════════════════\n");
 
-        let responses = query_fx_slots(&mut out_conn, &rx, &mut assembler, &fx_map, &mut log);
-        print_summary(&responses, &fx_list, &fx_map);
+        log_msg(&mut log, &format!("── Rodada #{} ──", round));
 
-        log_msg(&mut log, &format!("═══ Resumo rodada #{}: {} respostas ═══", round, responses.len()));
-        for (slot, pkt) in &responses {
-            let data = &pkt[9..pkt.len() - 1];
-            let val = decode_value(data);
-            let name = fx_type_name(val, &fx_map);
-            log_msg(&mut log, &format!("FX{} → id={} ({})", slot + 1, val, name));
+        // Enviar 1 query por vez, aguardar resposta antes da próxima
+        let mut responses: Vec<(u8, u8, u32, Vec<u8>)> = Vec::new();
+        let mut total_received = 0u32;
+
+        for slot in 0u8..4 {
+            for lr in 0u8..2 {
+                let lr_label = if lr == 0 { "L" } else { "R" };
+                let req = build_fx_input_request(slot, lr);
+                log_msg(&mut log, &format!("→ FX{} {} REQ: {}", slot + 1, lr_label, hex_bytes(&req)));
+                if let Err(e) = out_conn.send(&req) {
+                    log_msg(&mut log, &format!("✗ Falha FX{} {}: {}", slot + 1, lr_label, e));
+                    continue;
+                }
+
+                // Aguardar até 2s por esta resposta específica
+                let deadline = Instant::now() + Duration::from_secs(2);
+                let mut found = false;
+                while Instant::now() < deadline && !found {
+                    if let Ok(raw) = rx.recv_timeout(Duration::from_millis(200)) {
+                        let packets = assembler.process_input(&raw);
+                        for pkt in packets {
+                            if !is_fx_input_response(&pkt) {
+                                continue;
+                            }
+                            total_received += 1;
+                            let r_slot = pkt[8];
+                            let r_lr = pkt[7];
+                            if r_slot == slot && r_lr == lr {
+                                let data = &pkt[9..pkt.len() - 1];
+                                let val = decode_value(data);
+                                let label = fx_input_label(val);
+                                log_msg(&mut log, &format!(
+                                    "← FX{} {} = {} (id={}) RAW: {}",
+                                    slot + 1, lr_label, label, val, hex_bytes(&pkt)
+                                ));
+                                println!("  FX{} Input {} = {} (id={})",
+                                    slot + 1, lr_label, label, val);
+                                responses.push((slot, lr, val, pkt.clone()));
+                                found = true;
+                            }
+                        }
+                    }
+                }
+                if !found {
+                    log_msg(&mut log, &format!("  ✗ FX{} {} — sem resposta", slot + 1, lr_label));
+                    println!("  FX{} Input {} = ⚠ SEM RESPOSTA", slot + 1, lr_label);
+                }
+            }
         }
 
-        let missing: Vec<u8> = (0..4).filter(|i| !responses.iter().any(|(s, _)| *s == *i)).collect();
-        if !missing.is_empty() {
-            log_msg(&mut log, &format!("Sem resposta para FX slots: {:?}", missing));
+        // Resumo
+        println!("\n╔══════════════════════════════════════════╗");
+        println!("║         RESUMO — FX INPUTS               ║");
+        println!("╠══════════════════════════════════════════╣");
+
+        let mut found = [[false; 2]; 4];
+        for (slot, lr, _val, _) in &responses {
+            let s = *slot as usize;
+            let l = *lr as usize;
+            if s < 4 && l < 2 {
+                found[s][l] = true;
+            }
         }
+
+        for slot in 0..4u8 {
+            for lr in 0..2u8 {
+                let lr_label = if lr == 0 { "L" } else { "R" };
+                if let Some((_, _, val, _)) = responses.iter().find(|(s, l, _, _)| *s == slot && *l == lr) {
+                    println!("║  FX{} In {} = {:<26} ║", slot + 1, lr_label, fx_input_label(*val));
+                } else {
+                    println!("║  FX{} In {} = ⚠ SEM RESPOSTA                ║", slot + 1, lr_label);
+                }
+            }
+        }
+
+        println!("╠══════════════════════════════════════════╣");
+        println!("║  Respostas recebidas: {:<19}║", format!("{}/8", responses.len()));
+        println!("║  Total Sysex ignorados: {:<16}║", "???");
+        println!("╚══════════════════════════════════════════╝");
+
+        log_msg(&mut log, &format!(
+            "Resumo: {}/8 respostas, {} total packets filtrados",
+            responses.len(), total_received
+        ));
 
         println!("\n  [Enter] = repetir  |  [Esc] = fechar");
 
-        // Lê tecla(s) sem precisar de Enter
-        // No Windows, Enter gera \r\n (2 bytes num único read)
         use std::io::Read;
         let stdin = std::io::stdin();
         let mut handle = stdin.lock();
@@ -451,6 +375,7 @@ fn main() {
                 for i in 0..n {
                     if buf[i] == 0x1B {
                         println!("\nEncerrando...");
+                        log_msg(&mut log, "Fim");
                         return;
                     }
                 }
@@ -458,9 +383,4 @@ fn main() {
             _ => return,
         }
     }
-
-    log_msg(&mut log, "═══════════════════════════════════════════\n");
-    println!("\nLog salvo em: {}", log_p.display());
-    println!("Pressione Enter para fechar...");
-    let _ = std::io::stdin().read_line(&mut String::new());
 }
