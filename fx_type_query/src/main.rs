@@ -126,7 +126,10 @@ fn dest_label(element: u8, channel: u8) -> String {
             if channel < 32 {
                 format!("CH{}", channel + 1)
             } else if channel < 40 {
-                format!("STIN{}", channel - 31)
+                let stereo_idx = channel - 32;
+                let stin_num = stereo_idx / 2 + 1;
+                let lr = if stereo_idx % 2 == 0 { "L" } else { "R" };
+                format!("STIN{}{}", stin_num, lr)
             } else {
                 format!("EL1_{}", channel)
             }
@@ -134,6 +137,7 @@ fn dest_label(element: u8, channel: u8) -> String {
         2 => format!("INSCH{}", channel + 1),
         3 => format!("FX_IN_{}", channel),
         7 => format!("INSBUS{}", channel + 1),
+        8 => format!("INSAUX{}", channel + 1),
         10 => {
             if channel == 0 { "MASTER L".into() }
             else if channel == 1 { "MASTER R".into() }

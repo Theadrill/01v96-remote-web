@@ -257,13 +257,14 @@ pub fn build_fx_input_request(slot: u8, lr: u8) -> Option<Vec<u8>> {
 }
 
 pub fn build_fx_output_request(element: u8, channel: u8) -> Option<Vec<u8>> {
-    if ![1, 2, 7, 10].contains(&element) {
+    if ![1, 2, 7, 8, 10].contains(&element) {
         return None;
     }
     let max_ch = match element {
         1 => 39,
         2 => 31,
         7 => 7,
+        8 => 7,
         10 => 1,
         _ => return None,
     };
@@ -879,7 +880,7 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 if param_msb == 0 {
                     return cc("kOutputPatch/k2tr", param_lsb, val);
                 }
-            } else if [1, 2, 7, 10].contains(&element) && param_msb == 0 {
+            } else if [1, 2, 7, 8, 10].contains(&element) && param_msb == 0 {
                 // FX output patch: each destination has a value telling which FX output slot connects
                 return Some(ParsedMidi::FxOutputUpdate {
                     element: element as usize,

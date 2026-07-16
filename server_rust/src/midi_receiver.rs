@@ -1,5 +1,6 @@
 use socketioxide::SocketIo;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::sync::RwLock;
 use tokio::sync::mpsc;
 
@@ -8,6 +9,12 @@ use crate::midi::SyncCounter;
 use crate::midi::master_meter::MasterMeter;
 use crate::network::ConnectionManager;
 use crate::state::GlobalState;
+
+/// Set to true while the FX output re-query task is alive (spawned and looping).
+static FX_OUTPUT_REQUERY_TASK_ACTIVE: AtomicBool = AtomicBool::new(false);
+/// Set to true when a notification arrives while a re-query cycle is already in progress.
+/// The task will check this after each cycle and chain another if needed.
+static FX_OUTPUT_REQUERY_PENDING: AtomicBool = AtomicBool::new(false);
 
 pub fn start_rx_loop(
     mut midi_in_rx: mpsc::Receiver<Vec<u8>>,
@@ -32,7 +39,6 @@ pub fn start_rx_loop(
     let parsed_count_log = parsed_count.clone();
     let csm_clone = csm.clone();
     let fx_requery_last = Arc::new(std::sync::Mutex::new(std::time::Instant::now() - std::time::Duration::from_secs(10)));
-    let fx_output_requery_last = Arc::new(std::sync::Mutex::new(std::time::Instant::now() - std::time::Duration::from_secs(10)));
 
     // Meter buffer + FPS throttle (like Node.js)
     let meter_buffer: Arc<std::sync::Mutex<Vec<f64>>> =
@@ -136,50 +142,109 @@ pub fn start_rx_loop(
                     && packet[5] == 2
                     && [1u8, 2, 7, 10].contains(&packet[6])
                     && packet[7] == 0
+                    && conn_mgr_recv.is_fully_synced()
                     && !crate::midi::protocol::is_output_patch_active()
                 {
-                    tracing::warn!(
-                        "🔔 [FX OUT] Notification detected: pkt={}",
-                        packet.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ")
-                    );
-                    let sched = scheduler.clone();
-                    let last_clone = fx_output_requery_last.clone();
-                    let state_clone = state_arc_in.clone();
-                    let io_clone_requery = io_clone.clone();
-                    tokio::spawn(async move {
-                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-                        {
-                            let mut last = last_clone.lock().unwrap();
-                            let now = std::time::Instant::now();
-                            if now.duration_since(*last).as_millis() < 8000 {
-                                return;
-                            }
-                            *last = now;
-                        }
-                        tracing::info!("🔄 [FX OUT] Re-querying FX outputs after notification...");
+                    if !FX_OUTPUT_REQUERY_TASK_ACTIVE.swap(true, Ordering::SeqCst) {
+                        // ── First notification → send immediate single request + spawn looping task ──
+                        // Set flag so the parser treats the response as FxOutputUpdate
                         crate::midi::protocol::set_output_patch_active(true);
-                        let destinations: &[(u8, u8)] = &[
-                            (1, 40),
-                            (2, 32),
-                            (7, 8),
-                            (10, 2),
-                        ];
-                        for &(element, count) in destinations {
-                            for ch in 0u8..count {
-                                if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
-                                    sched.enqueue(req, 0).await;
-                                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                        // Send just THIS element/channel so the UI updates almost instantly
+                        if let Some(req) = crate::midi::protocol::build_fx_output_request(packet[6], packet[8]) {
+                            scheduler.enqueue(req, 0).await;
+                        }
+                        let sched = scheduler.clone();
+                        let state_clone = state_arc_in.clone();
+                        let io_clone_requery = io_clone.clone();
+                        tokio::spawn(async move {
+                            // Debounce: wait for rapid changes to coalesce
+                            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
+                            if !FX_OUTPUT_REQUERY_PENDING.swap(false, Ordering::SeqCst) {
+                                // No other notifications during debounce → single request already handled it
+                                // Brief extra wait so the single response definitely arrives before clearing flag
+                                tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+                                crate::midi::protocol::set_output_patch_active(false);
+                                tracing::info!("🔄 [FX OUT] Single request sufficed, no pending notifications");
+                            } else {
+                                loop {
+                                    tracing::info!("🔄 [FX OUT] Re-querying FX outputs...");
+                                    crate::midi::protocol::set_output_patch_active(true);
+                                    let destinations: &[(u8, u8)] = &[
+                                        (1, 40),
+                                        (2, 32),
+                                        (7, 8),
+                                        (8, 8),
+                                        (10, 2),
+                                    ];
+                                    for &(element, count) in destinations {
+                                        for ch in 0u8..count {
+                                            if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
+                                                sched.enqueue(req, 0).await;
+                                                tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                                            }
+                                        }
+                                    }
+                                    tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+                                    crate::midi::protocol::set_output_patch_active(false);
+                                    let state = state_clone.read().await;
+                                    let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
+                                    drop(state);
+                                    let _ = io_clone_requery.emit("fxOutputsUpdate", &fx_out_json).await;
+
+                                    // DEBUG: log all FX output routes after re-query
+                                    let state2 = state_clone.read().await;
+                                    tracing::info!("🔍 [FX OUT DEBUG] === FX Output Mapping After Re-query ===");
+                                    tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", state2.fx_outputs.len());
+                                    for fx_val in [121u64, 122, 129, 130, 137, 138, 139, 140] {
+                                        let fx_name = match fx_val {
+                                            121 => "FX1 Out1",
+                                            122 => "FX1 Out2",
+                                            129 => "FX2 Out1",
+                                            130 => "FX2 Out2",
+                                            137 => "FX3 Out1",
+                                            138 => "FX3 Out2",
+                                            139 => "FX4 Out1",
+                                            140 => "FX4 Out2",
+                                            _ => "???",
+                                        };
+                                        let mut destinations: Vec<String> = Vec::new();
+                                        for (key, val) in state2.fx_outputs.iter() {
+                                            if val.round() as u64 == fx_val {
+                                                destinations.push(format!("{} (el={}, ch={})", key, key / 100, key % 100));
+                                            }
+                                        }
+                                        tracing::info!("🔍 [FX OUT DEBUG]   {} (val={}): {}",
+                                            fx_name,
+                                            fx_val,
+                                            if destinations.is_empty() {
+                                                "NOT ROUTED".to_string()
+                                            } else {
+                                                destinations.join(", ")
+                                            },
+                                        );
+                                    }
+                                    drop(state2);
+
+                                    // Check if notifications arrived during this cycle
+                                    if !FX_OUTPUT_REQUERY_PENDING.swap(false, Ordering::SeqCst) {
+                                        tracing::info!("🔄 [FX OUT] Re-query queue drained, no pending notifications");
+                                        break;
+                                    }
+                                    tracing::info!("🔄 [FX OUT] Pending notification found, chaining another re-query...");
+                                    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
                                 }
                             }
-                        }
-                        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                        crate::midi::protocol::set_output_patch_active(false);
-                        let state = state_clone.read().await;
-                        let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
-                        drop(state);
-                        let _ = io_clone_requery.emit("fxOutputsUpdate", &fx_out_json).await;
-                        tracing::info!("🔄 [FX OUT] Re-query complete, emitted fxOutputsUpdate");
-                    });
+                            FX_OUTPUT_REQUERY_TASK_ACTIVE.store(false, Ordering::SeqCst);
+                        });
+                    } else {
+                        // ── Task already running → queue notification ──
+                        FX_OUTPUT_REQUERY_PENDING.store(true, Ordering::SeqCst);
+                        tracing::warn!(
+                            "🔔 [FX OUT] Notification queued (re-query in progress): pkt={}",
+                            packet.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ")
+                        );
+                    }
                     continue;
                 }
 
@@ -324,9 +389,11 @@ pub fn start_rx_loop(
                                     channel,
                                     value
                                 );
-                                fx_outputs_emission = Some(
-                                    serde_json::to_value(&state.fx_outputs).unwrap_or_default(),
-                                );
+                                if conn_mgr_recv.is_fully_synced() {
+                                    fx_outputs_emission = Some(
+                                        serde_json::to_value(&state.fx_outputs).unwrap_or_default(),
+                                    );
+                                }
                             }
                             _ => {}
                         }

@@ -240,7 +240,7 @@ Tabela de referência completa dos valores MIDI para os inputs dos efeitos (FX I
 | 13-44 | INS CH1-CH32 | ✅ Confirmado | Insert do canal N (id=14=CH2) |
 | 45-108 | *(gap)* | — | Não mapeado / não usado como input |
 | 109-112 | INS BUS1-4 | ✅ Confirmado | Insert Bus 1-4 |
-| 113-116 | INS RET1-2 L/R | Assumido | Insert Return 1-4 L/R |
+| 113-116 | INS BUS5-8 | ✅ Confirmado | Insert Bus 5-8 |
 | 117-124 | INS AUX1-8 | ✅ Confirmado | Insert Aux 1-8 (id=117=AUX1) |
 | 125-136 | *(gap)* | — | Não mapeado |
 | 137 | INS ST-L | ✅ Confirmado | Insert Stereo Left (master L) |
@@ -299,9 +299,10 @@ O output patch usa endereçamento **destination-indexed**: cada endereço repres
 | Element | Param | Canais | Destino |
 |---------|-------|--------|---------|
 | 1 | 0 | 0-31 | CH1-32 |
-| 1 | 0 | 32-39 | STIN1-8 |
+| 1 | 0 | 32-39 | STIN1L, STIN1R, STIN2L, STIN2R, STIN3L, STIN3R, STIN4L, STIN4R |
 | 2 | 0 | 0-31 | INSCH1-32 |
-| 7 | 0 | 0-7 | INSBUS1-8 |
+| 7 | 0 | 0-3 | INSBUS1-4 |
+| 8 | 0 | 0-7 | INSAUX1-8 |
 | 10 | 0 | 0 | MASTER L |
 | 10 | 0 | 1 | MASTER R |
 
@@ -315,6 +316,9 @@ O output patch usa endereçamento **destination-indexed**: cada endereço repres
 | 10 | ST R | ✅ Confirmado | Stereo Right |
 | 11-18 | MATRIX1-8 | Parcial | Matrix outputs (não são FX outputs) |
 | 41-48 | *(desconhecido)* | — | Não mapeado |
+| 109-112 | INS BUS1-4 | ✅ Confirmado | Insert Bus 1-4 |
+| 113-116 | INS BUS5-8 | ✅ Confirmado | Insert Bus 5-8 |
+| 117-124 | INS AUX1-8 | ✅ Confirmado | Insert Aux 1-8 |
 | 121 | **FX1 Out1** | ✅ Confirmado | FX1 saída 1 |
 | 122 | **FX1 Out2** | ✅ Confirmado | FX1 saída 2 |
 | 129 | **FX2 Out1** | ✅ Confirmado | FX2 saída 1 |

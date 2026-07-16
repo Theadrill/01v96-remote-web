@@ -33,10 +33,10 @@
         if (val === 110) return 'INS BUS2';
         if (val === 111) return 'INS BUS3';
         if (val === 112) return 'INS BUS4';
-        if (val === 113) return 'INS RET1 L';
-        if (val === 114) return 'INS RET1 R';
-        if (val === 115) return 'INS RET2 L';
-        if (val === 116) return 'INS RET2 R';
+        if (val === 113) return 'INS BUS5';
+        if (val === 114) return 'INS BUS6';
+        if (val === 115) return 'INS BUS7';
+        if (val === 116) return 'INS BUS8';
         if (val >= 117 && val <= 124) return 'INS AUX' + (val - 116);
         if (val === 137) return 'INS ST-L';
         if (val === 138) return 'INS ST-R';
@@ -55,6 +55,7 @@
         if (slotVal === 9) return 'ST L';
         if (slotVal === 10) return 'ST R';
         if (slotVal >= 11 && slotVal <= 18) return 'MATRIX' + (slotVal - 10);
+        if (slotVal >= 117 && slotVal <= 124) return 'INS AUX' + (slotVal - 116);
         if (slotVal === 121) return 'FX1 Out1';
         if (slotVal === 122) return 'FX1 Out2';
         if (slotVal === 129) return 'FX2 Out1';
@@ -76,10 +77,14 @@
         const channel = destKey % 100;
         if (element === 1) {
             if (channel <= 31) return 'CH' + (channel + 1);
-            return 'STIN' + (channel - 31);
+            const stereoIdx = channel - 32;
+            const stinNum = Math.floor(stereoIdx / 2) + 1;
+            const lr = stereoIdx % 2 === 0 ? 'L' : 'R';
+            return 'STIN' + stinNum + lr;
         }
         if (element === 2) return 'INS CH' + (channel + 1);
         if (element === 7) return 'INS BUS' + (channel + 1);
+        if (element === 8) return 'INS AUX' + (channel + 1);
         if (element === 10) return channel === 0 ? 'MASTER L' : 'MASTER R';
         return '?el' + element + 'ch' + channel;
     }
@@ -90,12 +95,43 @@
         for (const [key, val] of Object.entries(fxOutputs)) {
             const v = Math.round(val);
             if (v === slotVal) {
-                console.log('[FX] findFxOutputDest(' + slotVal + '): found at key=' + key + ' val=' + v);
                 return parseInt(key);
             }
         }
-        console.log('[FX] findFxOutputDest(' + slotVal + '): NOT FOUND in', Object.keys(fxOutputs));
         return null;
+    }
+
+    // Find ALL destinations matching a given FX slot value (debug helper)
+    function findAllFxOutputDests(slotVal) {
+        slotVal = Math.round(slotVal);
+        const results = [];
+        for (const [key, val] of Object.entries(fxOutputs)) {
+            const v = Math.round(val);
+            if (v === slotVal) {
+                results.push(parseInt(key));
+            }
+        }
+        return results;
+    }
+
+    function logFxOutputMapping() {
+        const fxSlotInfo = [
+            { val: 121, name: 'FX1 Out1' },
+            { val: 122, name: 'FX1 Out2' },
+            { val: 129, name: 'FX2 Out1' },
+            { val: 130, name: 'FX2 Out2' },
+            { val: 137, name: 'FX3 Out1' },
+            { val: 138, name: 'FX3 Out2' },
+            { val: 139, name: 'FX4 Out1' },
+            { val: 140, name: 'FX4 Out2' },
+        ];
+        console.log('[FX] === FX Output Mapping ===');
+        for (const info of fxSlotInfo) {
+            const dests = findAllFxOutputDests(info.val);
+            const labels = dests.map(d => fxOutputDestLabel(d));
+            console.log('[FX]   ' + info.name + ' (val=' + info.val + '): ' +
+                (dests.length === 0 ? 'NOT ROUTED' : dests.map((d, i) => d + '=' + labels[i]).join(', ')));
+        }
     }
 
     function applyFxOutputs(data) {
@@ -119,6 +155,7 @@
         console.log('[FX] applyFxOutputs: changed=' + changed + '/' + newKeys.length + ' keys');
         if (changed > 0) console.log('[FX] diffs:', diffs.join(', '));
         fxOutputs = newData;
+        logFxOutputMapping();
         rerenderIfOpen();
     }
 
@@ -188,6 +225,8 @@
         const outDestR = findFxOutputDest(outSlotVals[1]);
         const lblOutL = outDestL != null ? fxOutputDestLabel(outDestL) : 'OFF';
         const lblOutR = outDestR != null ? fxOutputDestLabel(outDestR) : 'OFF';
+        console.log('[FX] renderSlot(' + idx + '): Out1 val=' + outSlotVals[0] + ' dest=' + outDestL + ' lbl=' + lblOutL +
+            ' | Out2 val=' + outSlotVals[1] + ' dest=' + outDestR + ' lbl=' + lblOutR);
         const clsOutL = outDestL != null ? 'fx-patch-active' : 'fx-patch-off';
         const clsOutR = outDestR != null ? 'fx-patch-active' : 'fx-patch-off';
 

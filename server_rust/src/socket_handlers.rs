@@ -2288,9 +2288,10 @@ pub fn register_handlers(
                 // input patch (kChannelInput) and output patch (FxOutputUpdate).
                 crate::midi::protocol::set_output_patch_active(true);
                 let destinations: &[(u8, u8)] = &[
-                    (1, 40),  // Element 1: CH1-32 + STIN1-8 (channels 0..=39)
+                    (1, 40),  // Element 1: CH1-32 + STIN1L-4R (channels 0..=39)
                     (2, 32),  // Element 2: INSCH1-32 (channels 0..=31)
                     (7, 8),   // Element 7: INSBUS1-8 (channels 0..=7)
+                    (8, 8),   // Element 8: INSAUX1-8 (channels 0..=7)
                     (10, 2),  // Element 10: MASTER L/R (channels 0..=1)
                 ];
                 for &(element, count) in destinations {
@@ -2311,6 +2312,38 @@ pub fn register_handlers(
                 let state = state_fx_out.read().await;
                 let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
                 socket.emit("fxOutputsUpdate", &fx_out_json).ok();
+
+                // DEBUG: log all FX output routes after requestFxOutputs
+                tracing::info!("🔍 [FX OUT DEBUG] === FX Output Mapping After requestFxOutputs ===");
+                tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", state.fx_outputs.len());
+                for fx_val in [121u64, 122, 129, 130, 137, 138, 139, 140] {
+                    let fx_name = match fx_val {
+                        121 => "FX1 Out1",
+                        122 => "FX1 Out2",
+                        129 => "FX2 Out1",
+                        130 => "FX2 Out2",
+                        137 => "FX3 Out1",
+                        138 => "FX3 Out2",
+                        139 => "FX4 Out1",
+                        140 => "FX4 Out2",
+                        _ => "???",
+                    };
+                    let mut destinations: Vec<String> = Vec::new();
+                    for (key, val) in state.fx_outputs.iter() {
+                        if val.round() as u64 == fx_val {
+                            destinations.push(format!("{} (el={}, ch={})", key, key / 100, key % 100));
+                        }
+                    }
+                    tracing::info!("🔍 [FX OUT DEBUG]   {} (val={}): {}",
+                        fx_name,
+                        fx_val,
+                        if destinations.is_empty() {
+                            "NOT ROUTED".to_string()
+                        } else {
+                            destinations.join(", ")
+                        },
+                    );
+                }
             },
         );
     });
