@@ -170,7 +170,8 @@ const forwardToYamaha = createSysExHandler(yamahaOut, 'S→Y');
 // FILTROS E LOG
 // ============================================================
 function toHex(msg) {
-    return Buffer.from(msg).toString('hex').toUpperCase().match(/.{1,2}/g).join(' ');
+    const hex = Buffer.from(msg).toString('hex').toUpperCase().match(/.{1,2}/g);
+    return hex ? hex.join(' ') : '(empty)';
 }
 
 function isMeterData(msg) {
