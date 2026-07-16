@@ -119,6 +119,13 @@ pub fn register_handlers(
                         serde_json::to_value(&current_state.fx_inputs).unwrap_or_default();
                     socket_initial.emit("fxInputsUpdate", &fx_in_json).ok();
                 }
+                // Emit FX outputs for the efeitos module
+                {
+                    let current_state = state_arc_connect.read().await;
+                    let fx_out_json =
+                        serde_json::to_value(&current_state.fx_outputs).unwrap_or_default();
+                    socket_initial.emit("fxOutputsUpdate", &fx_out_json).ok();
+                }
             }
 
             let (inputs, outputs) = crate::midi::MidiEngine::get_available_ports();
@@ -2267,6 +2274,43 @@ pub fn register_handlers(
                         }
                     }
                 }
+            },
+        );
+
+        // --- REQUEST FX OUTPUTS ---
+        let sched_fx_out = scheduler_socket.clone();
+        let state_fx_out = global_state_socket.clone();
+        socket.on(
+            "requestFxOutputs",
+            move |socket: SocketRef| async move {
+                // Signal the parser that upcoming responses are for the output patch.
+                // This is necessary because element 1 uses the same MIDI address for both
+                // input patch (kChannelInput) and output patch (FxOutputUpdate).
+                crate::midi::protocol::set_output_patch_active(true);
+                let destinations: &[(u8, u8)] = &[
+                    (1, 40),  // Element 1: CH1-32 + STIN1-8 (channels 0..=39)
+                    (2, 32),  // Element 2: INSCH1-32 (channels 0..=31)
+                    (7, 8),   // Element 7: INSBUS1-8 (channels 0..=7)
+                    (10, 2),  // Element 10: MASTER L/R (channels 0..=1)
+                ];
+                for &(element, count) in destinations {
+                    for ch in 0u8..count {
+                        if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
+                            sched_fx_out.enqueue(req, 0).await;
+                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                        }
+                    }
+                }
+                // Keep the flag active while responses arrive from the mixer.
+                //82 queries × 30ms = 2.5s queuing; responses take ~100-200ms each.
+                tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+                crate::midi::protocol::set_output_patch_active(false);
+
+                // Re-emit the final state to guarantee the client has the latest data,
+                // even if some individual FxOutputUpdate emissions were missed.
+                let state = state_fx_out.read().await;
+                let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
+                socket.emit("fxOutputsUpdate", &fx_out_json).ok();
             },
         );
     });

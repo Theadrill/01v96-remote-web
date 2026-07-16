@@ -1,5 +1,19 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+/// Set to true while FX output patch queries are in flight.
+/// Distinguishes element 1 responses between input patch (kChannelInput) and
+/// output patch (FxOutputUpdate) since both use the same MIDI address.
+static OUTPUT_PATCH_ACTIVE: AtomicBool = AtomicBool::new(false);
+
+pub fn set_output_patch_active(active: bool) {
+    OUTPUT_PATCH_ACTIVE.store(active, Ordering::SeqCst);
+}
+
+pub fn is_output_patch_active() -> bool {
+    OUTPUT_PATCH_ACTIVE.load(Ordering::SeqCst)
+}
 
 lazy_static! {
     pub static ref COMMAND_BYTES: HashMap<String, [u8; 4]> = {
@@ -242,6 +256,34 @@ pub fn build_fx_input_request(slot: u8, lr: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
+pub fn build_fx_output_request(element: u8, channel: u8) -> Option<Vec<u8>> {
+    if ![1, 2, 7, 10].contains(&element) {
+        return None;
+    }
+    let max_ch = match element {
+        1 => 39,
+        2 => 31,
+        7 => 7,
+        10 => 1,
+        _ => return None,
+    };
+    if channel > max_ch {
+        return None;
+    }
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x30,                  // Parameter Request
+        MODEL_ID,              // 3E
+        13,                    // Section
+        2,                     // Group
+        element,               // Element (1=CH/STIN, 2=INSCH, 7=INSBUS, 10=MASTER)
+        0,                     // Param (always 0)
+        channel,               // Channel (port within element)
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -290,6 +332,11 @@ pub enum ParsedMidi {
     FxTypeUpdate {
         slot: usize,
         fx_type_id: u32,
+    },
+    FxOutputUpdate {
+        element: usize,
+        channel: usize,
+        value: f64,
     },
 }
 
@@ -780,11 +827,25 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             if element == 1 {
                 // kChannelIn: MSB=0, LSB=chIdx
                 if param_msb == 0 {
+                    if is_output_patch_active() {
+                        return Some(ParsedMidi::FxOutputUpdate {
+                            element: element as usize,
+                            channel: param_lsb,
+                            value: val,
+                        });
+                    }
                     return cc("kChannelInput/kChannelIn", param_lsb, val);
                 }
             } else if element == 2 {
                 // kInsertIn: MSB=0, LSB=chIdx
                 if param_msb == 0 {
+                    if is_output_patch_active() {
+                        return Some(ParsedMidi::FxOutputUpdate {
+                            element: element as usize,
+                            channel: param_lsb,
+                            value: val,
+                        });
+                    }
                     println!(
                         "DEBUG kInsertIn: param_lsb={} val={} bytes={:?}",
                         param_lsb, val, data_bytes
@@ -818,6 +879,13 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 if param_msb == 0 {
                     return cc("kOutputPatch/k2tr", param_lsb, val);
                 }
+            } else if [1, 2, 7, 10].contains(&element) && param_msb == 0 {
+                // FX output patch: each destination has a value telling which FX output slot connects
+                return Some(ParsedMidi::FxOutputUpdate {
+                    element: element as usize,
+                    channel: param_lsb,
+                    value: val,
+                });
             }
         }
 

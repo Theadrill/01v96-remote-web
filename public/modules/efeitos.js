@@ -20,6 +20,9 @@
         [0, 0], // FX4 L/R
     ];
 
+    // FX outputs: maps destination key (element*100+channel) → FX slot value
+    let fxOutputs = {};
+
     // ── Decoder FX Input Source → label ───────────────────────────────
     function fxInputLabel(val) {
         val = Math.round(val);
@@ -42,6 +45,81 @@
 
     function fxInputPatchClass(val) {
         return Math.round(val) === 0 ? 'fx-patch-off' : 'fx-patch-active';
+    }
+
+    // ── Decoder FX Output Slot ID → label ───────────────────────────────
+    function fxOutputSlotLabel(slotVal) {
+        slotVal = Math.round(slotVal);
+        if (slotVal === 0) return 'OFF';
+        if (slotVal >= 1 && slotVal <= 8) return 'BUS' + slotVal;
+        if (slotVal === 9) return 'ST L';
+        if (slotVal === 10) return 'ST R';
+        if (slotVal >= 11 && slotVal <= 18) return 'MATRIX' + (slotVal - 10);
+        if (slotVal === 121) return 'FX1 Out1';
+        if (slotVal === 122) return 'FX1 Out2';
+        if (slotVal === 129) return 'FX2 Out1';
+        if (slotVal === 130) return 'FX2 Out2';
+        if (slotVal === 137) return 'FX3 Out1';
+        if (slotVal === 138) return 'FX3 Out2';
+        if (slotVal === 139) return 'FX4 Out1';
+        if (slotVal === 140) return 'FX4 Out2';
+        return '???(' + slotVal + ')';
+    }
+
+    function fxOutputSlotClass(slotVal) {
+        return Math.round(slotVal) === 0 ? 'fx-patch-off' : 'fx-patch-active';
+    }
+
+    // Decode a destination key (element*100+channel) into a human-readable label
+    function fxOutputDestLabel(destKey) {
+        const element = Math.floor(destKey / 100);
+        const channel = destKey % 100;
+        if (element === 1) {
+            if (channel <= 31) return 'CH' + (channel + 1);
+            return 'STIN' + (channel - 31);
+        }
+        if (element === 2) return 'INS CH' + (channel + 1);
+        if (element === 7) return 'INS BUS' + (channel + 1);
+        if (element === 10) return channel === 0 ? 'MASTER L' : 'MASTER R';
+        return '?el' + element + 'ch' + channel;
+    }
+
+    // Given an FX output slot value (121-140), find the destination key where it's routed
+    function findFxOutputDest(slotVal) {
+        slotVal = Math.round(slotVal);
+        for (const [key, val] of Object.entries(fxOutputs)) {
+            const v = Math.round(val);
+            if (v === slotVal) {
+                console.log('[FX] findFxOutputDest(' + slotVal + '): found at key=' + key + ' val=' + v);
+                return parseInt(key);
+            }
+        }
+        console.log('[FX] findFxOutputDest(' + slotVal + '): NOT FOUND in', Object.keys(fxOutputs));
+        return null;
+    }
+
+    function applyFxOutputs(data) {
+        const newData = data || {};
+        const oldKeys = Object.keys(fxOutputs);
+        const newKeys = Object.keys(newData);
+        let changed = 0;
+        const diffs = [];
+        for (const k of newKeys) {
+            if (fxOutputs[k] !== newData[k]) {
+                changed++;
+                diffs.push(k + ': ' + fxOutputs[k] + ' -> ' + newData[k]);
+            }
+        }
+        for (const k of oldKeys) {
+            if (!(k in newData)) {
+                changed++;
+                diffs.push(k + ': ' + fxOutputs[k] + ' -> (removed)');
+            }
+        }
+        console.log('[FX] applyFxOutputs: changed=' + changed + '/' + newKeys.length + ' keys');
+        if (changed > 0) console.log('[FX] diffs:', diffs.join(', '));
+        fxOutputs = newData;
+        rerenderIfOpen();
     }
 
     function applyFxTypes(data) {
@@ -70,7 +148,9 @@
 
     function rerenderIfOpen() {
         const modal = document.getElementById('efeitosModal');
-        if (modal && modal.style.display === 'flex') {
+        const isOpen = modal && modal.style.display === 'flex';
+        console.log('[FX] rerenderIfOpen: modal exists=' + !!modal + ', display=' + (modal ? modal.style.display : 'N/A') + ', isOpen=' + isOpen);
+        if (isOpen) {
             renderEffectsScreen();
         }
     }
@@ -79,6 +159,7 @@
     if (typeof socket !== 'undefined') {
         socket.on('fxTypesUpdate', applyFxTypes);
         socket.on('fxInputsUpdate', applyFxInputs);
+        socket.on('fxOutputsUpdate', applyFxOutputs);
     }
 
     // ── Renderização ──────────────────────────────────────────────────
@@ -92,6 +173,23 @@
         const lblR = fxInputLabel(inR);
         const clsL = fxInputPatchClass(inL);
         const clsR = fxInputPatchClass(inR);
+
+        // FX output: find destinations for this slot's Out1 and Out2
+        const outSlotVals = [
+            121 + idx * 8,  // Out1
+            122 + idx * 8,  // Out2
+        ];
+        // FX3→FX4 is +2 not +8, so adjust
+        if (idx === 3) {
+            outSlotVals[0] = 139;
+            outSlotVals[1] = 140;
+        }
+        const outDestL = findFxOutputDest(outSlotVals[0]);
+        const outDestR = findFxOutputDest(outSlotVals[1]);
+        const lblOutL = outDestL != null ? fxOutputDestLabel(outDestL) : 'OFF';
+        const lblOutR = outDestR != null ? fxOutputDestLabel(outDestR) : 'OFF';
+        const clsOutL = outDestL != null ? 'fx-patch-active' : 'fx-patch-off';
+        const clsOutR = outDestR != null ? 'fx-patch-active' : 'fx-patch-off';
 
         return `
         <div class="fx-slot">
@@ -115,12 +213,12 @@
             <div class="fx-side-col fx-side-out">
                 <div class="fx-side-row">
                     <div class="fx-wire"></div>
-                    <span class="fx-patch-label fx-patch-off">-</span>
+                    <span class="fx-patch-label ${clsOutL}">${lblOutL}</span>
                     <span class="fx-channel-label">L</span>
                 </div>
                 <div class="fx-side-row">
                     <div class="fx-wire"></div>
-                    <span class="fx-patch-label fx-patch-off">-</span>
+                    <span class="fx-patch-label ${clsOutR}">${lblOutR}</span>
                     <span class="fx-channel-label">R</span>
                 </div>
             </div>
@@ -129,7 +227,11 @@
 
     function renderEffectsScreen() {
         const container = document.getElementById('efeitosModalBody');
-        if (!container) return;
+        if (!container) {
+            console.log('[FX] renderEffectsScreen: container efeitosModalBody NOT FOUND');
+            return;
+        }
+        console.log('[FX] renderEffectsScreen: container found, fxOutputs keys=' + Object.keys(fxOutputs).length);
 
         const columnsHTML = `
         <div class="efeitos-title">MÁQUINAS DE EFEITOS</div>
@@ -142,7 +244,9 @@
             ${fxSlots.map((s, i) => renderSlot(s, i)).join('')}
         </div>`;
 
+        console.log('[FX] renderEffectsScreen: setting innerHTML (' + columnsHTML.length + ' chars)');
         container.innerHTML = columnsHTML;
+        console.log('[FX] renderEffectsScreen: DONE');
     }
 
     // ── Abertura / Fechamento do Modal ──────────────────────────────────
@@ -152,9 +256,10 @@
         if (!modal) return;
         modal.style.display = 'flex';
         if (typeof socket !== 'undefined') {
-            console.log('[FX] Enviando requestFxTypes + requestFxInputs...');
+            console.log('[FX] Enviando requestFxTypes + requestFxInputs + requestFxOutputs...');
             socket.emit('requestFxTypes');
             socket.emit('requestFxInputs');
+            socket.emit('requestFxOutputs');
         }
         renderEffectsScreen();
     }

@@ -174,6 +174,8 @@ pub struct GlobalState {
     pub fx_types: HashMap<usize, FxTypeState>,
     #[serde(rename = "fxInputs")]
     pub fx_inputs: HashMap<usize, f64>,
+    #[serde(rename = "fxOutputs")]
+    pub fx_outputs: HashMap<usize, f64>,
     #[serde(rename = "tailscaleUrl")]
     pub tailscale_url: Option<String>,
 }
@@ -412,6 +414,7 @@ impl GlobalState {
                 fx
             },
             fx_inputs: HashMap::new(),
+            fx_outputs: HashMap::new(),
             tailscale_url: None,
         }
     }
@@ -807,6 +810,14 @@ impl GlobalState {
                     entry.id = *fx_type_id;
                     entry.name = name;
                 }
+            }
+            crate::midi::protocol::ParsedMidi::FxOutputUpdate {
+                element,
+                channel,
+                value,
+            } => {
+                let key = element * 100 + channel;
+                self.fx_outputs.insert(key, *value);
             }
         }
     }
