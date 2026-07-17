@@ -236,12 +236,12 @@
             <div class="fx-side-col fx-side-in">
                 <div class="fx-side-row">
                     <span class="fx-channel-label">L</span>
-                    <span class="fx-patch-label ${clsL}">${lblL}</span>
+                    <span class="fx-patch-label ${clsL}" id="fx-patch-in-${idx}-0" onclick="openFxPatchSelector(${idx}, 0, 'in')">${lblL}</span>
                     <div class="fx-wire"></div>
                 </div>
                 <div class="fx-side-row">
                     <span class="fx-channel-label">R</span>
-                    <span class="fx-patch-label ${clsR}">${lblR}</span>
+                    <span class="fx-patch-label ${clsR}" id="fx-patch-in-${idx}-1" onclick="openFxPatchSelector(${idx}, 1, 'in')">${lblR}</span>
                     <div class="fx-wire"></div>
                 </div>
             </div>
@@ -253,12 +253,12 @@
             <div class="fx-side-col fx-side-out">
                 <div class="fx-side-row">
                     <div class="fx-wire"></div>
-                    <span class="fx-patch-label ${clsOutL}">${lblOutL}</span>
+                    <span class="fx-patch-label ${clsOutL}" id="fx-patch-out-${idx}-0" onclick="openFxPatchSelector(${idx}, 0, 'out')">${lblOutL}</span>
                     <span class="fx-channel-label">L</span>
                 </div>
                 <div class="fx-side-row">
                     <div class="fx-wire"></div>
-                    <span class="fx-patch-label ${clsOutR}">${lblOutR}</span>
+                    <span class="fx-patch-label ${clsOutR}" id="fx-patch-out-${idx}-1" onclick="openFxPatchSelector(${idx}, 1, 'out')">${lblOutR}</span>
                     <span class="fx-channel-label">R</span>
                 </div>
             </div>
@@ -296,16 +296,25 @@
         if (!modal) return;
         modal.style.display = 'flex';
         if (typeof socket !== 'undefined') {
-            console.log('[FX] Enviando requestFxTypes + requestFxInputs + requestFxOutputs...');
+            // IMPORTANTE: requestFxInputs e requestFxOutputs NÃO podem ser emitidos
+            // simultaneamente. O servidor usa a flag global OUTPUT_PATCH_ACTIVE para
+            // distinguir respostas de input-patch de output-patch (ambas usam o mesmo
+            // endereço MIDI). Emitir requestFxOutputs enquanto requestFxInputs ainda
+            // está recebendo respostas da mesa faz o servidor parsear respostas de
+            // kChannelInput como FxOutputUpdate, corrompendo o estado de fx_outputs.
+            //
+            // Solução: emitir types + inputs primeiro, aguardar o tempo suficiente para
+            // todas as 8 respostas de FX Input chegarem (8 × 50ms query + ~200ms resposta
+            // = ~600ms), e só então emitir requestFxOutputs.
+            console.log('[FX] Enviando requestFxTypes + requestFxInputs...');
             socket.emit('requestFxTypes');
             socket.emit('requestFxInputs');
-            socket.emit('requestFxOutputs');
+            // requestFxOutputs é disparado após 1200ms — tempo suficiente para todas as
+            // respostas de FX Input chegarem antes de OUTPUT_PATCH_ACTIVE ser setado.
             setTimeout(() => {
-                console.log('[FX] 2º resync...');
-                socket.emit('requestFxTypes');
-                socket.emit('requestFxInputs');
+                console.log('[FX] Enviando requestFxOutputs (após FX Inputs)...');
                 socket.emit('requestFxOutputs');
-            }, 4000);
+            }, 1200);
         }
         renderEffectsScreen();
     }

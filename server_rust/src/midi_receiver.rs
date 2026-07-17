@@ -315,21 +315,27 @@ pub fn start_rx_loop(
                                 let uc =
                                     UPDATE_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                                 if uc < 20 || uc.is_multiple_of(200) {
-                                    tracing::info!(
+                                    tracing::debug!(
                                         "📡 [UPDATE] #{uc}: type={}, ch={}, val={}",
                                         msg_type,
                                         channel,
                                         value
                                     );
                                 }
-                                emission = Some((
-                                    "update",
-                                    serde_json::json!({
-                                        "type": msg_type,
-                                        "channel": channel,
-                                        "value": value
-                                    }),
-                                ));
+                                // Só emite 'update' para os clientes após o sync completo.
+                                // Durante o sync inicial, ~700 respostas MIDI chegam da mesa —
+                                // emiti-las individualmente causaria flicker na UI e sobrecarga
+                                // desnecessária. O sync final envia um 'sync' completo de qualquer forma.
+                                if conn_mgr_recv.is_fully_synced() {
+                                    emission = Some((
+                                        "update",
+                                        serde_json::json!({
+                                            "type": msg_type,
+                                            "channel": channel,
+                                            "value": value
+                                        }),
+                                    ));
+                                }
                                 if msg_type == "kEffectInput/kEffectIn" {
                                     fx_inputs_emission = Some(
                                         serde_json::to_value(&state.fx_inputs).unwrap_or_default(),

@@ -3735,8 +3735,8 @@ input:checked+.slider:before {
 }
 
 .patch-opt-btn {
-    width: 52px;
-    min-width: 52px;
+    width: 57px;
+    min-width: 57px;
     /* Garante que não esmague */
     height: 34px;
     flex-shrink: 0;
@@ -3745,7 +3745,7 @@ input:checked+.slider:before {
     border: 1px solid #444;
     color: #fff;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 11px;
     cursor: pointer;
     text-align: center;
     white-space: nowrap;
@@ -3783,6 +3783,46 @@ input:checked+.slider:before {
         /* Mais alto para facilitar o toque */
         font-size: 16px;
         /* Letras maiores */
+    }
+}
+
+/* ── FX Patch Selector (modal categories) ────────────────────────── */
+.fx-patch-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 5px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.fx-patch-category {
+    flex: 1;
+    padding: 0 4px;
+    min-width: 180px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fx-patch-category-header {
+    padding: 10px 5px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #666;
+    text-transform: uppercase;
+    border-bottom: 1px solid #333;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .fx-patch-category {
+        min-width: 100%;
     }
 }
 

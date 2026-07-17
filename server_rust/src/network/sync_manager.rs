@@ -369,7 +369,6 @@ async fn queue_all_params_inner(
 
     requests.push(midi::master_meter::MasterMeter::build_stop_request());
     requests.extend(midi::pan::build_pan_sync_requests());
-    push_req(&mut requests, "kStereoFader/kFader", 0);
 
     for st in 0..4u8 {
         push_req(&mut requests, "kSTInFader/kFader", st);

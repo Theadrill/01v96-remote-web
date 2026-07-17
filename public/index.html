@@ -563,6 +563,17 @@
                 onclick="document.getElementById('patchSelectorModal').style.display='none'">CANCELAR</button>
         </div>
     </div>
+    <!-- Modal de Seleção de Patch FX (IN/OUT) -->
+    <div class="modal-overlay styled-sceneDetailsModal" id="fxPatchSelectorModal">
+        <div class="modal-content inline-style-47">
+            <p class="inline-style-48" id="fxPatchSelectorTitle">FX IN L</p>
+            <div class="fx-patch-grid" id="fxPatchGrid">
+                <!-- Botões gerados via JS -->
+            </div>
+            <button class="btn-close inline-style-49"
+                onclick="closeFxPatchSelector()">CANCELAR</button>
+        </div>
+    </div>
     <!-- Modal de Seleção de Cenas -->
     <div class="modal-overlay styled-sceneGridModal" id="sceneGridModal">
         <div class="modal-content inline-style-50">
@@ -1127,6 +1138,7 @@
     <script src="modules/socket.js?v=8"></script>
     <script src="modules/sidebar.js?v=12"></script>
     <script src="modules/efeitos.js?v=1"></script>
+    <script src="modules/fx_routing.js?v=1"></script>
     <script src="modules/routing.js?v=10"></script>
     <script src="modules/inserts.js?v=1"></script>
     <script src="modules/scroll.js"></script>
