@@ -193,11 +193,93 @@
         }
     }
 
+    // ── Estado de sincronização global ────────────────────────────────
+    // Rastreado via evento syncStatus vindo do servidor.
+    // true enquanto o SyncManager está rodando (sync inicial ou manual).
+    let isSyncing = false;
+
+    // true quando o modal foi aberto durante um sync ativo.
+    // Indica que a lógica de FX deve ser disparada assim que o sync terminar.
+    let pendingFxLoad = false;
+
+    // ── Overlay de bloqueio de sync ───────────────────────────────────
+    function showSyncOverlay() {
+        const overlay = document.getElementById('fxSyncOverlay');
+        if (overlay) overlay.classList.add('active');
+    }
+
+    function hideSyncOverlay() {
+        const overlay = document.getElementById('fxSyncOverlay');
+        if (overlay) overlay.classList.remove('active');
+    }
+
+    // ── Lógica de request dos dados FX da mesa ────────────────────────
+    // Separada em função para poder ser chamada tanto na abertura normal
+    // quanto quando o sync termina com o modal já aberto.
+    function dispatchFxRequests() {
+        if (typeof socket === 'undefined') return;
+
+        // IMPORTANTE: requestFxInputs e requestFxOutputs NÃO podem ser emitidos
+        // simultaneamente. O servidor usa a flag global OUTPUT_PATCH_ACTIVE para
+        // distinguir respostas de input-patch de output-patch (ambas usam o mesmo
+        // endereço MIDI). Emitir requestFxOutputs enquanto requestFxInputs ainda
+        // está recebendo respostas da mesa faz o servidor parsear respostas de
+        // kChannelInput como FxOutputUpdate, corrompendo o estado de fx_outputs.
+        //
+        // Solução: emitir types + inputs primeiro, aguardar o tempo suficiente para
+        // todas as 8 respostas de FX Input chegarem (8 × 50ms query + ~200ms resposta
+        // = ~600ms), e só então emitir requestFxOutputs.
+        console.log('[FX] Enviando requestFxTypes + requestFxInputs...');
+        socket.emit('requestFxTypes');
+        socket.emit('requestFxInputs');
+
+        // requestFxOutputs é disparado após 1200ms — tempo suficiente para todas as
+        // respostas de FX Input chegarem antes de OUTPUT_PATCH_ACTIVE ser setado.
+        setTimeout(() => {
+            console.log('[FX] Enviando requestFxOutputs (após FX Inputs)...');
+            socket.emit('requestFxOutputs');
+        }, 1200);
+    }
+
     // ── Socket listeners ──────────────────────────────────────────────
     if (typeof socket !== 'undefined') {
         socket.on('fxTypesUpdate', applyFxTypes);
         socket.on('fxInputsUpdate', applyFxInputs);
         socket.on('fxOutputsUpdate', applyFxOutputs);
+
+        // Monitora o estado de sincronização para controlar o overlay e
+        // para disparar a lógica de FX quando o sync terminar com o modal aberto.
+        socket.on('syncStatus', (data) => {
+            const wasActive = isSyncing;
+            isSyncing = (typeof data === 'object') ? !!data.active : !!data;
+
+            const modal = document.getElementById('efeitosModal');
+            const isOpen = modal && modal.style.display === 'flex';
+
+            if (isSyncing) {
+                // Sync ativo: se o modal estiver aberto, bloqueia com overlay
+                if (isOpen) {
+                    showSyncOverlay();
+                    pendingFxLoad = true;
+                    console.log('[FX] Sync ativo com modal aberto — exibindo overlay, aguardando sync...');
+                }
+            } else {
+                // Sync terminou
+                if (isOpen) {
+                    hideSyncOverlay();
+                    if (pendingFxLoad) {
+                        // Modal estava esperando o sync terminar — dispara agora
+                        pendingFxLoad = false;
+                        console.log('[FX] Sync concluído — disparando lógica de FX (pendingFxLoad)...');
+                        renderEffectsScreen();
+                        dispatchFxRequests();
+                    }
+                } else {
+                    // Modal fechado: limpa o estado pendente
+                    pendingFxLoad = false;
+                }
+            }
+        });
     }
 
     // ── Renderização ──────────────────────────────────────────────────
@@ -295,28 +377,22 @@
         const modal = document.getElementById('efeitosModal');
         if (!modal) return;
         modal.style.display = 'flex';
-        if (typeof socket !== 'undefined') {
-            // IMPORTANTE: requestFxInputs e requestFxOutputs NÃO podem ser emitidos
-            // simultaneamente. O servidor usa a flag global OUTPUT_PATCH_ACTIVE para
-            // distinguir respostas de input-patch de output-patch (ambas usam o mesmo
-            // endereço MIDI). Emitir requestFxOutputs enquanto requestFxInputs ainda
-            // está recebendo respostas da mesa faz o servidor parsear respostas de
-            // kChannelInput como FxOutputUpdate, corrompendo o estado de fx_outputs.
-            //
-            // Solução: emitir types + inputs primeiro, aguardar o tempo suficiente para
-            // todas as 8 respostas de FX Input chegarem (8 × 50ms query + ~200ms resposta
-            // = ~600ms), e só então emitir requestFxOutputs.
-            console.log('[FX] Enviando requestFxTypes + requestFxInputs...');
-            socket.emit('requestFxTypes');
-            socket.emit('requestFxInputs');
-            // requestFxOutputs é disparado após 1200ms — tempo suficiente para todas as
-            // respostas de FX Input chegarem antes de OUTPUT_PATCH_ACTIVE ser setado.
-            setTimeout(() => {
-                console.log('[FX] Enviando requestFxOutputs (após FX Inputs)...');
-                socket.emit('requestFxOutputs');
-            }, 1200);
+
+        if (isSyncing) {
+            // Mesa está sincronizando: bloqueia o modal inteiro com overlay
+            // e registra que a lógica de FX deve ser disparada após o sync.
+            showSyncOverlay();
+            pendingFxLoad = true;
+            console.log('[FX] Modal aberto durante sync — aguardando sincronização terminar...');
+            // Renderiza a tela vazia (esqueleto) para o modal não ficar em branco
+            renderEffectsScreen();
+        } else {
+            // Sync já concluído: dispara normalmente
+            hideSyncOverlay();
+            pendingFxLoad = false;
+            renderEffectsScreen();
+            dispatchFxRequests();
         }
-        renderEffectsScreen();
     }
     window.openEffectsModal = openEffectsModal;
 
@@ -324,7 +400,21 @@
         const modal = document.getElementById('efeitosModal');
         if (!modal) return;
         modal.style.display = 'none';
+        // Cancela qualquer pending load pendente — modal foi fechado antes do sync terminar
+        pendingFxLoad = false;
+        hideSyncOverlay();
     }
     window.closeEffectsModal = closeEffectsModal;
+
+    // ── rerenderIfOpen (usado pelos listeners de fxTypesUpdate etc.) ───
+    function rerenderIfOpen() {
+        const modal = document.getElementById('efeitosModal');
+        const isOpen = modal && modal.style.display === 'flex';
+        console.log('[FX] rerenderIfOpen: modal exists=' + !!modal + ', display=' + (modal ? modal.style.display : 'N/A') + ', isOpen=' + isOpen);
+        if (isOpen && !isSyncing) {
+            // Só re-renderiza se não estiver em sync (overlay não está ativo)
+            renderEffectsScreen();
+        }
+    }
 
 })();

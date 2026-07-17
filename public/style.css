@@ -2089,6 +2089,7 @@ body.layout-desktop .ch-modal-overlay {
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #4a90e2 #1a1a1a;
+    position: relative; /* necessário para o fx-sync-overlay absoluto */
 }
 
 .efeitos-modal-body {
@@ -2097,6 +2098,61 @@ body.layout-desktop .ch-modal-overlay {
     flex-direction: column;
     padding: 16px 20px;
     gap: 0;
+}
+
+/* ── Overlay de Bloqueio por Sync ─────────────────────────────────── */
+.fx-sync-overlay {
+    display: none; /* ativado pelo JS */
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    background: rgba(10, 10, 20, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    pointer-events: all; /* bloqueia todos os cliques */
+    border-radius: inherit;
+}
+
+.fx-sync-overlay.active {
+    display: flex;
+}
+
+.fx-sync-overlay-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+}
+
+.fx-sync-spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba(224, 176, 255, 0.15);
+    border-top-color: #e0b0ff;
+    border-radius: 50%;
+    animation: fx-spin 0.9s linear infinite;
+}
+
+@keyframes fx-spin {
+    to { transform: rotate(360deg); }
+}
+
+.fx-sync-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #e0b0ff;
+    text-align: center;
+    line-height: 1.6;
+    text-shadow: 0 0 16px rgba(224, 176, 255, 0.5);
+    animation: fx-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fx-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
 }
 
 .efeitos-title {
