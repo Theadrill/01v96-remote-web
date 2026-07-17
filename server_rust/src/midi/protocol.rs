@@ -285,6 +285,62 @@ pub fn build_fx_output_request(element: u8, channel: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
+/// Build a Parameter Change packet to set the FX input source.
+/// slot: 0-3 (FX1..FX4), lr: 0=L / 1=R, source_id: value from the FX_IN lookup table.
+/// Packet: F0 43 10 3E 0D 02 03 [lr] [slot] [d0 d1 d2 d3] F7
+pub fn build_fx_input_change(slot: u8, lr: u8, source_id: u32) -> Option<Vec<u8>> {
+    if slot > 3 || lr > 1 {
+        return None;
+    }
+    // source_id is a plain unsigned value — encode as 4×7bit SysEx bytes
+    let d0 = ((source_id >> 21) & 0x7F) as u8;
+    let d1 = ((source_id >> 14) & 0x7F) as u8;
+    let d2 = ((source_id >> 7) & 0x7F) as u8;
+    let d3 = (source_id & 0x7F) as u8;
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x10,                  // Parameter Change
+        MODEL_ID,              // 3E
+        13,                    // Section
+        2,                     // Group
+        3,                     // Element (FX input)
+        lr,                    // Param (0=L, 1=R)
+        slot,                  // Channel (FX slot 0-3)
+        d0, d1, d2, d3,
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
+/// Build a Parameter Change packet to set an FX output destination.
+/// element: 1=CH/STIN, 2=INSCH, 7=INSBUS, 8=INSAUX, 10=MASTER
+/// dest_channel: port index within the element
+/// fx_slot_val: the FX output slot value (121=FX1Out1, 122=FX1Out2, 129=FX2Out1, etc.)
+///              Use 0 to clear (route NONE).
+/// Packet: F0 43 10 3E 0D 02 [element] 00 [dest_channel] [d0 d1 d2 d3] F7
+pub fn build_fx_output_change(element: u8, dest_channel: u8, fx_slot_val: u32) -> Option<Vec<u8>> {
+    if ![1, 2, 7, 8, 10].contains(&element) {
+        return None;
+    }
+    let d0 = ((fx_slot_val >> 21) & 0x7F) as u8;
+    let d1 = ((fx_slot_val >> 14) & 0x7F) as u8;
+    let d2 = ((fx_slot_val >> 7) & 0x7F) as u8;
+    let d3 = (fx_slot_val & 0x7F) as u8;
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x10,                  // Parameter Change
+        MODEL_ID,              // 3E
+        13,                    // Section
+        2,                     // Group
+        element,               // Element (dest type)
+        0,                     // Param (always 0)
+        dest_channel,          // Channel (port within dest)
+        d0, d1, d2, d3,
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

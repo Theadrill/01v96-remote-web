@@ -44,6 +44,22 @@ function requestSetupStatus() {
         socket.emit('checkSetupStatus');
         const view = (typeof outsMode !== 'undefined' && outsMode) ? 'outs' : 'ins';
         socket.emit('set_active_view', { view: view });
+        // --- Sincronização Robusta de FX ---
+        // Para evitar perda de pacotes SysEx e conflito entre canais de entrada e saída,
+        // faremos a requisição espaçada e em DUAS passagens (2-pass sync).
+        socket.emit('requestFxTypes');
+        
+        // Passagem 1
+        setTimeout(() => { socket.emit('requestFxInputs'); }, 100);
+        setTimeout(() => { socket.emit('requestFxOutputs'); }, 1500);
+
+        // Passagem 2 (Garante precisão caso a mesa tenha ignorado algum pacote na Passagem 1)
+        setTimeout(() => { socket.emit('requestFxInputs'); }, 7000);
+        setTimeout(() => { 
+            window._ignoreFxSyncStatus = true;
+            socket.emit('requestFxOutputs'); 
+            setTimeout(() => { window._ignoreFxSyncStatus = false; }, 4500);
+        }, 8500);
     }
 }
 socket.on('connect', function () {
