@@ -224,30 +224,183 @@ Esta tabela contém o mapeamento absoluto para o parâmetro DECAY, herdado da l�
 
 ## 6. Mapeamento de Patch Source — FX Inputs
 
-Tabela de referência completa dos valores MIDI para os inputs dos efeitos (FX Input Patch Source), validada via script de teste direto na porta MIDI da mesa.
+Catálogo completo das fontes de **IN** dos processadores FX, alinhado ao seletor do Studio Manager / 01V96 (print 2026-07-17) e validado via query SysEx na mesa.
 
-**Endereço SysEx:** `F0 43 30 3E 0D 02 03 [LR] [SLOT] F7`
-- LR: `00`=L, `01`=R
-- SLOT: `00`=FX1, `01`=FX2, `02`=FX3, `03`=FX4
+### 6.1. Endereço do parâmetro (qual IN está sendo lido/escrito)
 
-**Resposta:** `F0 43 10 3E 0D 02 03 [LR] [SLOT] [VAL...] F7`
+Não existe um endereço SysEx diferente por botão da lista.  
+O endereço identifica **qual jack de input do FX** (FX1–4 × L/R). O botão escolhido vira apenas o **valor** (source ID).
 
-| ID (dec) | Label | Status | Observação |
-|---|---|---|---|
-| 0 | OFF | ✅ Confirmado | Sem fonte atribuída |
-| 1-8 | AUX 1-8 | ✅ Confirmado | Aux Sends (id=1=AUX1) |
-| 9-12 | *(gap)* | — | Não mapeado / não usado como input |
-| 13-44 | INS CH1-CH32 | ✅ Confirmado | Insert do canal N (id=14=CH2) |
-| 45-108 | *(gap)* | — | Não mapeado / não usado como input |
-| 109-112 | INS BUS1-4 | ✅ Confirmado | Insert Bus 1-4 |
-| 113-116 | INS BUS5-8 | ✅ Confirmado | Insert Bus 5-8 |
-| 117-124 | INS AUX1-8 | ✅ Confirmado | Insert Aux 1-8 (id=117=AUX1) |
-| 125-136 | *(gap)* | — | Não mapeado |
-| 137 | INS ST-L | ✅ Confirmado | Insert Stereo Left (master L) |
-| 138 | INS ST-R | ✅ Confirmado | Insert Stereo Right (master R) |
-| 139+ | *(desconhecido)* | — | Não testado |
+| Campo | Hex | Significado |
+|---|---|---|
+| Section | `0D` | Patch |
+| Group | `02` | Patch group |
+| Element | `03` | Effect Input |
+| Parameter (LR) | `00` / `01` | `00` = IN L · `01` = IN R |
+| Channel (SLOT) | `00`–`03` | FX1 / FX2 / FX3 / FX4 |
 
-**Nota:** O encoding de FX Input é diferente do Channel Input. Valores como 137/138 significam INS ST-L/R para FX inputs, mas FX3 Out1/2 para channel inputs (routing.js fxMap).
+**Query (Parameter Request `0x30`):**
+```text
+F0 43 30 3E 0D 02 03 [LR] [SLOT] F7
+```
+
+**Resposta (Parameter Change `0x10` vindo da mesa):**
+```text
+F0 43 10 3E 0D 02 03 [LR] [SLOT] [B0 B1 B2 B3] F7
+```
+- `[B0 B1 B2 B3]` = source ID em encoding fader Yamaha (28-bit / 7-bit chunks).  
+  Exemplos reais: `109` → `00 00 00 6D` · `137` → `00 00 01 09`.
+
+**Change (escrita — ✅ validado via capture SM 2026-07-17):**
+```text
+F0 43 10 3E 0D 02 03 [LR] [SLOT] [B0 B1 B2 B3] F7
+```
+Mesmo envelope da resposta; host → mesa.  
+Dicionário SM: `kEffectInput/kEffectIn1`…`kEffectIn8` = coords `[13, 2, 3, 0…7]` (índice flat 0–7 = slot×2+LR).
+
+**Captures reais (Studio Manager → mesa):**
+
+| Ação | SysEx (14 bytes) |
+|---|---|
+| FX1 L → AUX3 | `F0 43 10 3E 0D 02 03 00 00 00 00 00 03 F7` |
+| FX1 L → INSCH1 | `F0 43 10 3E 0D 02 03 00 00 00 00 00 0D F7` |
+
+Conclusão: write = Parameter Change `0x10` no endereço do jack + source ID em 4 bytes fader. Vale para todas as 59 opções (só muda `[B0..B3]`).
+
+| Jack | LR | SLOT | Query | Change (template) |
+|---|---|---|---|---|
+| FX1 L | `00` | `00` | `F0 43 30 3E 0D 02 03 00 00 F7` | `F0 43 10 3E 0D 02 03 00 00 [VAL] F7` |
+| FX1 R | `01` | `00` | `F0 43 30 3E 0D 02 03 01 00 F7` | `F0 43 10 3E 0D 02 03 01 00 [VAL] F7` |
+| FX2 L | `00` | `01` | `F0 43 30 3E 0D 02 03 00 01 F7` | `F0 43 10 3E 0D 02 03 00 01 [VAL] F7` |
+| FX2 R | `01` | `01` | `F0 43 30 3E 0D 02 03 01 01 F7` | `F0 43 10 3E 0D 02 03 01 01 [VAL] F7` |
+| FX3 L | `00` | `02` | `F0 43 30 3E 0D 02 03 00 02 F7` | `F0 43 10 3E 0D 02 03 00 02 [VAL] F7` |
+| FX3 R | `01` | `02` | `F0 43 30 3E 0D 02 03 01 02 F7` | `F0 43 10 3E 0D 02 03 01 02 [VAL] F7` |
+| FX4 L | `00` | `03` | `F0 43 30 3E 0D 02 03 00 03 F7` | `F0 43 10 3E 0D 02 03 00 03 [VAL] F7` |
+| FX4 R | `01` | `03` | `F0 43 30 3E 0D 02 03 01 03 F7` | `F0 43 10 3E 0D 02 03 01 03 [VAL] F7` |
+
+### 6.2. Catálogo UI → Source ID (todas as opções do seletor)
+
+Ordem idêntica ao grid do Studio Manager (8 colunas). **59 opções.**  
+Todos os **valores (source IDs)** abaixo já foram confirmados por **leitura** SysEx.  
+O **change** usa o mesmo ID; o que falta é só validar 1 write ponta a ponta (não re-mapear cada botão).
+
+#### Grid visual (labels do print)
+
+```text
+NONE    AUX1    AUX2    AUX3    AUX4    AUX5    AUX6    AUX7
+AUX8    INSCH1  INSCH2  INSCH3  INSCH4  INSCH5  INSCH6  INSCH7
+INSCH8  INSCH9  INSCH10 INSCH11 INSCH12 INSCH13 INSCH14 INSCH15
+INSCH16 INSCH17 INSCH18 INSCH19 INSCH20 INSCH21 INSCH22 INSCH23
+INSCH24 INSCH25 INSCH26 INSCH27 INSCH28 INSCH29 INSCH30 INSCH31
+INSCH32 INSBUS1 INSBUS2 INSBUS3 INSBUS4 INSBUS5 INSBUS6 INSBUS7
+INSBUS8 INSAUX1 INSAUX2 INSAUX3 INSAUX4 INSAUX5 INSAUX6 INSAUX7
+INSAUX8 INSSTL  INSSTR
+```
+
+#### Tabela completa: label UI → source ID → status
+
+| # | Label UI (print) | Source ID (dec) | ID hex (7-bit) | Valor 4 bytes típico | Status valor | Status change |
+|---|------------------|-----------------|----------------|----------------------|--------------|---------------|
+| 1 | NONE | 0 | `00` | `00 00 00 00` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 2 | AUX1 | 1 | `01` | `00 00 00 01` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 3 | AUX2 | 2 | `02` | `00 00 00 02` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 4 | AUX3 | 3 | `03` | `00 00 00 03` | ✅ Confirmado (read) | ✅ **Capture SM write** |
+| 5 | AUX4 | 4 | `04` | `00 00 00 04` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 6 | AUX5 | 5 | `05` | `00 00 00 05` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 7 | AUX6 | 6 | `06` | `00 00 00 06` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 8 | AUX7 | 7 | `07` | `00 00 00 07` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 9 | AUX8 | 8 | `08` | `00 00 00 08` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 10 | INSCH1 | 13 | `0D` | `00 00 00 0D` | ✅ Confirmado (read) | ✅ **Capture SM write** |
+| 11 | INSCH2 | 14 | `0E` | `00 00 00 0E` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 12 | INSCH3 | 15 | `0F` | `00 00 00 0F` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 13 | INSCH4 | 16 | `10` | `00 00 00 10` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 14 | INSCH5 | 17 | `11` | `00 00 00 11` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 15 | INSCH6 | 18 | `12` | `00 00 00 12` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 16 | INSCH7 | 19 | `13` | `00 00 00 13` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 17 | INSCH8 | 20 | `14` | `00 00 00 14` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 18 | INSCH9 | 21 | `15` | `00 00 00 15` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 19 | INSCH10 | 22 | `16` | `00 00 00 16` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 20 | INSCH11 | 23 | `17` | `00 00 00 17` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 21 | INSCH12 | 24 | `18` | `00 00 00 18` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 22 | INSCH13 | 25 | `19` | `00 00 00 19` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 23 | INSCH14 | 26 | `1A` | `00 00 00 1A` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 24 | INSCH15 | 27 | `1B` | `00 00 00 1B` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 25 | INSCH16 | 28 | `1C` | `00 00 00 1C` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 26 | INSCH17 | 29 | `1D` | `00 00 00 1D` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 27 | INSCH18 | 30 | `1E` | `00 00 00 1E` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 28 | INSCH19 | 31 | `1F` | `00 00 00 1F` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 29 | INSCH20 | 32 | `20` | `00 00 00 20` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 30 | INSCH21 | 33 | `21` | `00 00 00 21` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 31 | INSCH22 | 34 | `22` | `00 00 00 22` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 32 | INSCH23 | 35 | `23` | `00 00 00 23` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 33 | INSCH24 | 36 | `24` | `00 00 00 24` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 34 | INSCH25 | 37 | `25` | `00 00 00 25` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 35 | INSCH26 | 38 | `26` | `00 00 00 26` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 36 | INSCH27 | 39 | `27` | `00 00 00 27` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 37 | INSCH28 | 40 | `28` | `00 00 00 28` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 38 | INSCH29 | 41 | `29` | `00 00 00 29` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 39 | INSCH30 | 42 | `2A` | `00 00 00 2A` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 40 | INSCH31 | 43 | `2B` | `00 00 00 2B` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 41 | INSCH32 | 44 | `2C` | `00 00 00 2C` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 42 | INSBUS1 | 109 | `6D` | `00 00 00 6D` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 43 | INSBUS2 | 110 | `6E` | `00 00 00 6E` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 44 | INSBUS3 | 111 | `6F` | `00 00 00 6F` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 45 | INSBUS4 | 112 | `70` | `00 00 00 70` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 46 | INSBUS5 | 113 | `71` | `00 00 00 71` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 47 | INSBUS6 | 114 | `72` | `00 00 00 72` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 48 | INSBUS7 | 115 | `73` | `00 00 00 73` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 49 | INSBUS8 | 116 | `74` | `00 00 00 74` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 50 | INSAUX1 | 117 | `75` | `00 00 00 75` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 51 | INSAUX2 | 118 | `76` | `00 00 00 76` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 52 | INSAUX3 | 119 | `77` | `00 00 00 77` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 53 | INSAUX4 | 120 | `78` | `00 00 00 78` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 54 | INSAUX5 | 121 | `79` | `00 00 00 79` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 55 | INSAUX6 | 122 | `7A` | `00 00 00 7A` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 56 | INSAUX7 | 123 | `7B` | `00 00 00 7B` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 57 | INSAUX8 | 124 | `7C` | `00 00 00 7C` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 58 | INSSTL | 137 | `89` | `00 00 01 09` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+| 59 | INSSTR | 138 | `8A` | `00 00 01 0A` | ✅ Confirmado (read) | ✅ Formato write validado (mesmo envelope) |
+
+#### Resumo por faixa
+
+| Faixa ID | Labels | Fórmula |
+|---|---|---|
+| 0 | NONE | fixo |
+| 1–8 | AUX1–AUX8 | `id = n` |
+| 13–44 | INSCH1–INSCH32 | `id = 12 + n` |
+| 109–116 | INSBUS1–INSBUS8 | `id = 108 + n` |
+| 117–124 | INSAUX1–INSAUX8 | `id = 116 + n` |
+| 137 | INSSTL | fixo |
+| 138 | INSSTR | fixo |
+
+#### Gaps (não aparecem no seletor UI)
+
+| IDs | Motivo |
+|---|---|
+| 9–12 | gap — não usados como FX input |
+| 45–108 | gap — não usados como FX input |
+| 125–136 | gap — não usados como FX input |
+| 139+ | fora do catálogo do seletor |
+
+### 6.3. Notas de encoding
+
+- Labels do SM usam `NONE` / `INSCH` / `INSBUS` / `INSAUX` / `INSSTL` / `INSSTR` (sem espaços). O frontend atual usa aliases (`OFF`, `INS CH`, `INS ST-L`…) — unificar na UI de edição.
+- O encoding de **FX Input** é **diferente** do Channel Input / Insert In:  
+  ex. `137`/`138` = **INSSTL/INSSTR** no FX Input, mas **FX3 Out1/Out2** no patch de canal (`routing.js` / inserts).
+- **Não é necessário** capturar 59 changes no Studio Manager para descobrir IDs: os source IDs já estão 100% mapeados por read.
+- **Write validado (2026-07-17):** captures SM de FX1 L → AUX3 e FX1 L → INSCH1 confirmaram Parameter Change `0x10` puro (14 bytes), sem bulk/assign extra. Vale para **todas** as 59 opções.
+
+### 6.4. Status de implementação — FX Input change
+
+| Item | Status |
+|---|---|
+| Catálogo de 59 source IDs | ✅ Completo |
+| Query / read | ✅ Implementado (`requestFxInputs`) |
+| Formato write SysEx | ✅ Validado com SM |
+| Builder write no server (`build_fx_input_change` / control) | ❌ Ainda não |
+| UI seletor de IN na tela de efeitos | ❌ Ainda não |
+
+**FX Input está pronto para implementação de edição.** Não falta engenharia reversa.
 
 ---
 
@@ -287,61 +440,238 @@ Tabela de referência completa dos destinos do output patch (FX Output Patch Des
 
 ### 8.1. Conceito
 
-O output patch usa endereçamento **destination-indexed**: cada endereço representa um DESTINO, e o valor retornado indica qual OUTPUT SLOT do FX está conectado àquele destino. Diferente do input patch, onde o endereço representa o FX e o valor é a fonte.
+O “OUT do FX” **não tem endereço próprio no processador**.  
+É endereçamento **destination-indexed**: o SysEx aponta para o **DESTINO** (ex. CH1), e o **valor** diz qual fonte alimenta esse destino — inclusive um slot de saída de FX (`FX1 Out1` = 121, etc.).
+
+| Lado | Endereço | Valor |
+|---|---|---|
+| **FX Input (IN)** | jack do FX (FX1 L, …) | fonte (AUX3, INSCH1, …) |
+| **FX Output (OUT)** | destino (CH1, INSCH…, …) | slot FX (121 = FX1 Out1, …) |
+
+Por isso, ao “colocar OUT L do FX1 em CH1”, o que o SM manda é **mudança do patch de entrada do CH1** (`kChannelInput`), não um parâmetro “FX1 Out”.
 
 ### 8.2. Formato SysEx
 
-**Query:** `F0 43 30 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] F7`
-**Resposta:** `F0 43 10 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] [VAL...] F7`
+**Query:** `F0 43 30 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] F7`  
+**Resposta / Change:** `F0 43 10 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] [B0 B1 B2 B3] F7`
 
-### 8.3. Tabela de Destinos (Elements)
+Para **CH1–32** (element `01`, param `00`, channel = índice 0–31):
 
-| Element | Param | Canais | Destino |
-|---------|-------|--------|---------|
-| 1 | 0 | 0-31 | CH1-32 |
-| 1 | 0 | 32-39 | STIN1L, STIN1R, STIN2L, STIN2R, STIN3L, STIN3R, STIN4L, STIN4R |
-| 2 | 0 | 0-31 | INSCH1-32 |
-| 7 | 0 | 0-3 | INSBUS1-4 |
-| 8 | 0 | 0-7 | INSAUX1-8 |
-| 10 | 0 | 0 | MASTER L |
-| 10 | 0 | 1 | MASTER R |
+```text
+Change CH n → FX slot:  F0 43 10 3E 0D 02 01 00 [CH] [VAL 4 bytes] F7
+Query  CH n:            F0 43 30 3E 0D 02 01 00 [CH] F7
+```
 
-### 8.4. Tabela de FX Output Slots (Valores)
+Comando de app já existente: `kChannelInput/kChannelIn` (`dictionary` `[13, 2, 1, 0]`).
 
-| Slot (dec) | Label | Status | Observação |
+### 8.2.1. Capture SM — FX1 Out L → CH1 (2026-07-17)
+
+Ação no SM: OUT L do FX1 apontado para CH1 (CH1 já era destino de patch).
+
+| # | Dir | SysEx | Decode |
+|---|-----|-------|--------|
+| 1 | 💻→mesa | `F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7` | **Change** CH1 (ch=`00`) = valor `0x79` = **121** = **FX1 Out1** |
+| 2 | 💻→mesa | `F0 43 30 3E 0D 02 01 00 00 F7` | **Request** re-query do patch de CH1 |
+| 3 | 🎹→host | `F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7` | **Resposta** da mesa confirmando 121 |
+| 4 | 💻→mesa | `F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7` | SM **reenvia** o mesmo change (eco/sync) |
+
+Capture real informado:
+
+```text
+[18:07:37] 💻 SY (14b): F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7
+[18:07:37] 💻 SY (10b): F0 43 30 3E 0D 02 01 00 00 F7
+[18:07:37] 🎹 YS (14b): F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7
+[18:07:37] 💻 SY (14b): F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7
+```
+
+**Conclusão write OUT→CH:**
+
+- Element `01` = channel input patch (não element `03` de FX input)
+- Channel `00` = CH1
+- Valor `79` hex = **121** = FX1 Out1 (OUT L do FX1)
+- Padrão SM: **Change + Request + eco da mesa** (request/eco opcionais no nosso app; o essencial é o change `0x10`)
+- **Write validado** para destino CH via `kChannelInput`
+
+### 8.3. Catálogo UI de destinos (print SM 2026-07-17)
+
+Seletor ao clicar no **OUT** de um FX. Catálogo completo alinhado ao Studio Manager.
+Cada opção (exceto NONE) é um **destino** cujo patch recebe o **valor do slot FX** (ex. 121 = FX1 Out1).
+
+#### Grid visual (labels do print)
+
+```text
+NONE    CH1     CH2     CH3     CH4     CH5     CH6     CH7
+CH8     CH9     CH10    CH11    CH12    CH13    CH14    CH15
+CH16    CH17    CH18    CH19    CH20    CH21    CH22    CH23
+CH24    CH25    CH26    CH27    CH28    CH29    CH30    CH31
+CH32    STIN1L  STIN1R  STIN2L  STIN2R  STIN3L  STIN3R  STIN4L
+STIN4R  INSCH1  INSCH2  INSCH3  INSCH4  INSCH5  INSCH6  INSCH7
+INSCH8  INSCH9  INSCH10 INSCH11 INSCH12 INSCH13 INSCH14 INSCH15
+INSCH16 INSCH17 INSCH18 INSCH19 INSCH20 INSCH21 INSCH22 INSCH23
+INSCH24 INSCH25 INSCH26 INSCH27 INSCH28 INSCH29 INSCH30 INSCH31
+INSCH32 INSBUS1 INSBUS2 INSBUS3 INSBUS4 INSBUS5 INSBUS6 INSBUS7
+INSBUS8 INSAUX1 INSAUX2 INSAUX3 INSAUX4 INSAUX5 INSAUX6 INSAUX7
+INSAUX8 INSSTL  INSSTR
+```
+
+**Total:** 91 opções = NONE(1) + CH(32) + STIN(8) + INSCH(32) + INSBUS(8) + INSAUX(8) + INSST(2).
+
+**Observação:** o seletor de OUT **não lista MASTER L/R** com esse nome; o equivalente no SM é **INSSTL / INSSTR** (insert stereo, element 10). Em reads antigos o element 10 apareceu como "MASTER L/R" — mesmo endereço SysEx, labels diferentes.
+
+#### 8.3.1. Elementos SysEx por família de destino
+
+| Element | Param | Channel | Destinos UI | Comando dicionário | Status write |
+|---|---|---|---|---|---|
+| `01` | `00` | 0–31 | CH1–CH32 | `kChannelInput/kChannelIn` | ✅ Validado (CH1) |
+| `01` | `00` | 32–39 | STIN1L…STIN4R | `kChannelInput/kChannelIn` | ⏳ Mesmo comando (ch 32–39) |
+| `02` | `00` | 0–31 | INSCH1–INSCH32 | `kChannelInsertIn/kInsertIn` | ⏳ Esperado (insert já no app) |
+| `07` | `00` | 0–7 | INSBUS1–INSBUS8 | `kBusInsertInput/kBusInsertIn` | ⏳ Esperado (read ok) |
+| `08` | `00` | 0–7 | INSAUX1–INSAUX8 | `kAUXInsertInput/kAUXInsertIn` | ⏳ Esperado |
+| `10` | `00` | 0–1 | INSSTL, INSSTR | `kStereoInsertInput/kStereoInsertIn` | ⏳ Esperado (read ok) |
+
+**Change genérico:**
+
+```text
+F0 43 10 3E 0D 02 [ELEMENT] 00 [CHANNEL] [B0 B1 B2 B3] F7
+```
+
+onde `[B0..B3]` = slot FX (ex. FX1 Out1 = 121 → `00 00 00 79`).
+
+**NONE:** não é um destino com endereço próprio. Significa **desconectar** o OUT do FX (gravar OFF/`0` no destino que atualmente tem esse slot, ou restaurar fonte anterior — UX a definir).
+
+#### 8.3.2. Tabela completa destino UI → endereço de change
+
+Template: `F0 43 10 3E 0D 02 [EL] 00 [CH] [VAL_FX] F7`  
+Exemplo de VAL_FX para FX1 Out1: `00 00 00 79` (121).
+
+| # | Label UI | Element (hex) | Channel (dec) | Channel (hex) | Status |
+|---|---|---|---|---|---|
+| 0 | NONE | — | — | — | ⏳ UX (limpar destino anterior) |
+| 1 | CH1 | `01` | 0 | `00` | ✅ Write SM capturado |
+| 2 | CH2 | `01` | 1 | `01` | ✅ Mesmo modelo CH |
+| 3 | CH3 | `01` | 2 | `02` | ✅ Mesmo modelo CH |
+| 4 | CH4 | `01` | 3 | `03` | ✅ Mesmo modelo CH |
+| 5 | CH5 | `01` | 4 | `04` | ✅ Mesmo modelo CH |
+| 6 | CH6 | `01` | 5 | `05` | ✅ Mesmo modelo CH |
+| 7 | CH7 | `01` | 6 | `06` | ✅ Mesmo modelo CH |
+| 8 | CH8 | `01` | 7 | `07` | ✅ Mesmo modelo CH |
+| 9 | CH9 | `01` | 8 | `08` | ✅ Mesmo modelo CH |
+| 10 | CH10 | `01` | 9 | `09` | ✅ Mesmo modelo CH |
+| 11 | CH11 | `01` | 10 | `0A` | ✅ Mesmo modelo CH |
+| 12 | CH12 | `01` | 11 | `0B` | ✅ Mesmo modelo CH |
+| 13 | CH13 | `01` | 12 | `0C` | ✅ Mesmo modelo CH |
+| 14 | CH14 | `01` | 13 | `0D` | ✅ Mesmo modelo CH |
+| 15 | CH15 | `01` | 14 | `0E` | ✅ Mesmo modelo CH |
+| 16 | CH16 | `01` | 15 | `0F` | ✅ Mesmo modelo CH |
+| 17 | CH17 | `01` | 16 | `10` | ✅ Mesmo modelo CH |
+| 18 | CH18 | `01` | 17 | `11` | ✅ Mesmo modelo CH |
+| 19 | CH19 | `01` | 18 | `12` | ✅ Mesmo modelo CH |
+| 20 | CH20 | `01` | 19 | `13` | ✅ Mesmo modelo CH |
+| 21 | CH21 | `01` | 20 | `14` | ✅ Mesmo modelo CH |
+| 22 | CH22 | `01` | 21 | `15` | ✅ Mesmo modelo CH |
+| 23 | CH23 | `01` | 22 | `16` | ✅ Mesmo modelo CH |
+| 24 | CH24 | `01` | 23 | `17` | ✅ Mesmo modelo CH (read ok) |
+| 25 | CH25 | `01` | 24 | `18` | ✅ Mesmo modelo CH |
+| 26 | CH26 | `01` | 25 | `19` | ✅ Mesmo modelo CH |
+| 27 | CH27 | `01` | 26 | `1A` | ✅ Mesmo modelo CH |
+| 28 | CH28 | `01` | 27 | `1B` | ✅ Mesmo modelo CH |
+| 29 | CH29 | `01` | 28 | `1C` | ✅ Mesmo modelo CH |
+| 30 | CH30 | `01` | 29 | `1D` | ✅ Mesmo modelo CH |
+| 31 | CH31 | `01` | 30 | `1E` | ✅ Mesmo modelo CH |
+| 32 | CH32 | `01` | 31 | `1F` | ✅ Mesmo modelo CH |
+| 33 | STIN1L | `01` | 32 | `20` | ⏳ el.1 ch 32–39 |
+| 34 | STIN1R | `01` | 33 | `21` | ⏳ el.1 ch 32–39 |
+| 35 | STIN2L | `01` | 34 | `22` | ⏳ el.1 ch 32–39 |
+| 36 | STIN2R | `01` | 35 | `23` | ⏳ el.1 ch 32–39 |
+| 37 | STIN3L | `01` | 36 | `24` | ⏳ el.1 ch 32–39 |
+| 38 | STIN3R | `01` | 37 | `25` | ⏳ el.1 ch 32–39 |
+| 39 | STIN4L | `01` | 38 | `26` | ⏳ el.1 ch 32–39 |
+| 40 | STIN4R | `01` | 39 | `27` | ⏳ el.1 ch 32–39 |
+| 41 | INSCH1 | `02` | 0 | `00` | ⏳ insert path |
+| 42 | INSCH2 | `02` | 1 | `01` | ⏳ |
+| 43 | INSCH3 | `02` | 2 | `02` | ⏳ |
+| 44 | INSCH4 | `02` | 3 | `03` | ⏳ |
+| 45 | INSCH5 | `02` | 4 | `04` | ⏳ |
+| 46 | INSCH6 | `02` | 5 | `05` | ⏳ |
+| 47 | INSCH7 | `02` | 6 | `06` | ⏳ |
+| 48 | INSCH8 | `02` | 7 | `07` | ⏳ |
+| 49 | INSCH9 | `02` | 8 | `08` | ⏳ |
+| 50 | INSCH10 | `02` | 9 | `09` | ⏳ |
+| 51 | INSCH11 | `02` | 10 | `0A` | ⏳ |
+| 52 | INSCH12 | `02` | 11 | `0B` | ⏳ |
+| 53 | INSCH13 | `02` | 12 | `0C` | ⏳ |
+| 54 | INSCH14 | `02` | 13 | `0D` | ⏳ |
+| 55 | INSCH15 | `02` | 14 | `0E` | ⏳ |
+| 56 | INSCH16 | `02` | 15 | `0F` | ⏳ |
+| 57 | INSCH17 | `02` | 16 | `10` | ⏳ |
+| 58 | INSCH18 | `02` | 17 | `11` | ⏳ |
+| 59 | INSCH19 | `02` | 18 | `12` | ⏳ |
+| 60 | INSCH20 | `02` | 19 | `13` | ⏳ |
+| 61 | INSCH21 | `02` | 20 | `14` | ⏳ |
+| 62 | INSCH22 | `02` | 21 | `15` | ⏳ |
+| 63 | INSCH23 | `02` | 22 | `16` | ⏳ |
+| 64 | INSCH24 | `02` | 23 | `17` | ⏳ |
+| 65 | INSCH25 | `02` | 24 | `18` | ⏳ |
+| 66 | INSCH26 | `02` | 25 | `19` | ⏳ |
+| 67 | INSCH27 | `02` | 26 | `1A` | ⏳ |
+| 68 | INSCH28 | `02` | 27 | `1B` | ⏳ |
+| 69 | INSCH29 | `02` | 28 | `1C` | ⏳ |
+| 70 | INSCH30 | `02` | 29 | `1D` | ⏳ |
+| 71 | INSCH31 | `02` | 30 | `1E` | ⏳ |
+| 72 | INSCH32 | `02` | 31 | `1F` | ⏳ |
+| 73 | INSBUS1 | `07` | 0 | `00` | ⏳ (read ok) |
+| 74 | INSBUS2 | `07` | 1 | `01` | ⏳ (read ok) |
+| 75 | INSBUS3 | `07` | 2 | `02` | ⏳ (read ok) |
+| 76 | INSBUS4 | `07` | 3 | `03` | ⏳ (read ok) |
+| 77 | INSBUS5 | `07` | 4 | `04` | ⏳ |
+| 78 | INSBUS6 | `07` | 5 | `05` | ⏳ |
+| 79 | INSBUS7 | `07` | 6 | `06` | ⏳ |
+| 80 | INSBUS8 | `07` | 7 | `07` | ⏳ |
+| 81 | INSAUX1 | `08` | 0 | `00` | ⏳ |
+| 82 | INSAUX2 | `08` | 1 | `01` | ⏳ |
+| 83 | INSAUX3 | `08` | 2 | `02` | ⏳ |
+| 84 | INSAUX4 | `08` | 3 | `03` | ⏳ |
+| 85 | INSAUX5 | `08` | 4 | `04` | ⏳ |
+| 86 | INSAUX6 | `08` | 5 | `05` | ⏳ |
+| 87 | INSAUX7 | `08` | 6 | `06` | ⏳ |
+| 88 | INSAUX8 | `08` | 7 | `07` | ⏳ |
+| 89 | INSSTL | `0A` | 0 | `00` | ⏳ (read como MASTER L) |
+| 90 | INSSTR | `0A` | 1 | `01` | ⏳ (read como MASTER R) |
+
+#### 8.3.3. Exemplos de SysEx por família (FX1 Out1 = 121)
+
+| Destino | Change |
+|---|---|
+| CH1 | `F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7` ✅ capturado |
+| STIN1L | `F0 43 10 3E 0D 02 01 00 20 00 00 00 79 F7` |
+| INSCH1 | `F0 43 10 3E 0D 02 02 00 00 00 00 00 79 F7` |
+| INSBUS1 | `F0 43 10 3E 0D 02 07 00 00 00 00 00 79 F7` |
+| INSAUX1 | `F0 43 10 3E 0D 02 08 00 00 00 00 00 79 F7` |
+| INSSTL | `F0 43 10 3E 0D 02 0A 00 00 00 00 00 79 F7` |
+
+### 8.4. Valores gravados no destino (= slot de saída do FX)
+
+| Slot (dec) | Bytes (4) | Label OUT | Status |
 |---|---|---|---|
-| 0 | OFF | ✅ Confirmado | Sem FX atribuído |
-| 1-8 | BUS1-8 | ✅ Confirmado | Saídas de bus (não são FX outputs) |
-| 9 | ST L | Assumido | Stereo Left |
-| 10 | ST R | ✅ Confirmado | Stereo Right |
-| 11-18 | MATRIX1-8 | Parcial | Matrix outputs (não são FX outputs) |
-| 41-48 | *(desconhecido)* | — | Não mapeado |
-| 109-112 | INS BUS1-4 | ✅ Confirmado | Insert Bus 1-4 |
-| 113-116 | INS BUS5-8 | ✅ Confirmado | Insert Bus 5-8 |
-| 117-124 | INS AUX1-8 | ✅ Confirmado | Insert Aux 1-8 |
-| 121 | **FX1 Out1** | ✅ Confirmado | FX1 saída 1 |
-| 122 | **FX1 Out2** | ✅ Confirmado | FX1 saída 2 |
-| 129 | **FX2 Out1** | ✅ Confirmado | FX2 saída 1 |
-| 130 | **FX2 Out2** | ✅ Confirmado | FX2 saída 2 |
-| 137 | **FX3 Out1** | ✅ Confirmado | FX3 saída 1 |
-| 138 | **FX3 Out2** | ✅ Confirmado | FX3 saída 2 |
-| 139 | **FX4 Out1** | ✅ Confirmado | FX4 saída 1 |
-| 140 | **FX4 Out2** | Assumido | FX4 saída 2 (padrão +1) |
-
-### 8.5. Padrão de Encoding dos FX Output Slots
+| 121 | `00 00 00 79` | FX1 Out1 / OUT L | ✅ read + **write SM→CH1** |
+| 122 | `00 00 00 7A` | FX1 Out2 / OUT R | ✅ read |
+| 129 | `00 00 01 01` | FX2 Out1 | ✅ read |
+| 130 | `00 00 01 02` | FX2 Out2 | ✅ read |
+| 137 | `00 00 01 09` | FX3 Out1 | ✅ read |
+| 138 | `00 00 01 0A` | FX3 Out2 | ✅ read |
+| 139 | `00 00 01 0B` | FX4 Out1 | ✅ read |
+| 140 | `00 00 01 0C` | FX4 Out2 | ✅ read (padrão +1) |
 
 ```
 FX1 Out1 = 121    FX1 Out2 = 122
 FX2 Out1 = 129    FX2 Out2 = 130    (+8 por FX)
 FX3 Out1 = 137    FX3 Out2 = 138
-FX4 Out1 = 139    FX4 Out2 = 140
+FX4 Out1 = 139    FX4 Out2 = 140    (+2 a partir de FX3, não +8)
 ```
 
-**Nota:** FX1-3 seguem padrão de +8. FX4 é +2 a partir de FX3 (137→139), não +8.
+Outros valores podem existir no mesmo endereço de destino (OFF, BUS, MATRIX…) no patch geral da mesa. A UI de efeitos só precisa dos **8 slots FX + NONE**.
 
-### 8.6. Validação
-
-Resultados do script de teste vs configuração física da mesa:
+### 8.5. Validação read (script vs mesa)
 
 | Destino | Esperado | Resultado |
 |---------|----------|-----------|
@@ -350,14 +680,27 @@ Resultados do script de teste vs configuração física da mesa:
 | CH24 | FX2 Out1 | FX2 Out1 ✅ |
 | INSBUS3 | FX3 Out1 | FX3 Out1 ✅ |
 | INSBUS4 | FX3 Out2 | FX3 Out2 ✅ |
-| MASTER L | FX4 Out1 | FX4 Out1 ✅ |
-| MASTER R | FX4 Out2 | FX4 Out2 ✅ |
+| INSSTL (el.10 ch0) | FX4 Out1 | FX4 Out1 ✅ |
+| INSSTR (el.10 ch1) | FX4 Out2 | FX4 Out2 ✅ |
 
-### 8.7. Notas Importantes
+### 8.6. Notas importantes
 
-- O insert do Master (element 10) é separado do output patch principal (elements 1, 2, 7).
-- FX4 só aparece quando routado para Master (element 10), não nos elementos 1/2/7.
-- O output patch NÃO modifica o estado da mesa — é somente leitura.
-- Slots 41-48 e gaps (9-12, 45-108) não foram mapeados e podem ser ignorados.
+- **IN do FX** e **OUT do FX** usam modelos opostos: IN = endereço no FX + valor fonte; OUT = endereço no destino + valor slot FX.
+- Escolher CH n **substitui** a fonte atual daquele canal (AD → FX out, etc.).
+- Overview no app = reverse lookup (quem tem valor 121–140).
+- **Não é necessário** capturar 90 writes: o envelope é o mesmo; só mudam element/channel e o valor do slot.
+- Captures opcionais (1 por família): STIN1L, INSCH1, INSBUS1, INSAUX1, INSSTL — só se quiser carimbo SM extra. CH já está fechado.
 
+### 8.7. Status de implementação — FX Output change
 
+| Item | Status |
+|---|---|
+| Catálogo UI completo (print) | ✅ 91 opções documentadas |
+| Modelo destination-indexed | ✅ Confirmado |
+| Valores FX Out 121–140 | ✅ Confirmados |
+| Write CH1–32 | ✅ Validado SM (CH1); modelo para CH2–32 |
+| Write STIN / INSCH / INSBUS / INSAUX / INSST | ⏳ Endereços mapeados; write por família não capturado (baixa prioridade) |
+| UI seletor OUT | ❌ Ainda não |
+| Lógica NONE / mover OUT | ❌ Ainda não (UX) |
+
+**Catálogo de destinos de OUT está completo para implementação da UI.** Write de canal já validado; demais famílias seguem o mesmo SysEx com element diferente.
