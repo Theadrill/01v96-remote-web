@@ -62,8 +62,8 @@
         if (slotVal === 130) return 'FX2 Out2';
         if (slotVal === 137) return 'FX3 Out1';
         if (slotVal === 138) return 'FX3 Out2';
-        if (slotVal === 145) return 'FX4 Out1';
-        if (slotVal === 146) return 'FX4 Out2';
+        if (slotVal === 139) return 'FX4 Out1';
+        if (slotVal === 140) return 'FX4 Out2';
         return '???(' + slotVal + ')';
     }
 
@@ -122,8 +122,8 @@
             { val: 130, name: 'FX2 Out2' },
             { val: 137, name: 'FX3 Out1' },
             { val: 138, name: 'FX3 Out2' },
-            { val: 145, name: 'FX4 Out1' },
-            { val: 146, name: 'FX4 Out2' },
+            { val: 139, name: 'FX4 Out1' },
+            { val: 140, name: 'FX4 Out2' },
         ];
         console.log('[FX] === FX Output Mapping ===');
         for (const info of fxSlotInfo) {
@@ -245,9 +245,7 @@
         socket.on('fxInputsUpdate', applyFxInputs);
         socket.on('fxOutputsUpdate', applyFxOutputs);
 
-        // Ouve o status específico do sincronismo de FX
         socket.on('fxSyncStatus', (data) => {
-            if (window._ignoreFxSyncStatus) return;
             const active = (typeof data === 'object') ? !!data.active : !!data;
             isSyncingFxs = active;
             const modal = document.getElementById('efeitosModal');
@@ -310,11 +308,10 @@
 
         // FX output: find destinations for this slot's Out1 and Out2
         const outSlotVals = [
-            121 + idx * 8,  // Out1
-            122 + idx * 8,  // Out2
+            idx === 3 ? 139 : 121 + idx * 8,  // Out1 (FX4 uses 139/140 instead of +8 rule)
+            idx === 3 ? 140 : 122 + idx * 8,  // Out2
         ];
-        // O valor do FX4 é 145/146, que bate com a matemática acima (121 + 3 * 8 = 145).
-        // Não é mais necessário o ajuste para 139/140.
+        // O valor do FX4 é 139/140, não bate com a matemática acima, por isso o ternário
         const outDestL = findFxOutputDest(outSlotVals[0]);
         const outDestR = findFxOutputDest(outSlotVals[1]);
         const lblOutL = outDestL != null ? fxOutputDestLabel(outDestL) : 'OFF';
@@ -390,12 +387,15 @@
         modal.style.display = 'flex';
 
         if (isSyncing) {
-            // Mesa está sincronizando: bloqueia o modal inteiro com overlay
-            // e registra que a lógica de FX deve ser disparada após o sync.
+            // Mesa está sincronizando canais: bloqueia o modal
             showSyncOverlay("AGUARDANDO FINALIZAR SINCRONIZAÇÃO COM A MESA");
             pendingFxLoad = true;
-            console.log('[FX] Modal aberto durante sync — aguardando sincronização terminar...');
-            // Renderiza a tela vazia (esqueleto) para o modal não ficar em branco
+            console.log('[FX] Modal aberto durante sync principal...');
+            renderEffectsScreen();
+        } else if (isSyncingFxs) {
+            // Mesa está sincronizando especificamente os Efeitos (background task do Rust)
+            showSyncOverlay("CARREGANDO EFEITOS DA MESA...");
+            console.log('[FX] Modal aberto durante sync de FX...');
             renderEffectsScreen();
         } else {
             // Sync já concluído: dispara normalmente

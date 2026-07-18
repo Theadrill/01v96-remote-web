@@ -153,7 +153,7 @@
                 const currentSrcVal = outputs[destKey] ? Math.round(outputs[destKey]) : 0;
                 
                 const fxSlotVals = [
-                    [121, 122], [129, 130], [137, 138], [145, 146]
+                    [121, 122], [129, 130], [137, 138], [139, 140]
                 ];
                 const ourFxVal = fxSlotVals[slot][lr];
 
@@ -210,7 +210,7 @@
                     [121, 122], // FX1 L/R
                     [129, 130], // FX2 L/R
                     [137, 138], // FX3 L/R
-                    [145, 146], // FX4 L/R
+                    [139, 140], // FX4 L/R
                 ];
                 const targetVal = fxSlotVals[slot][lr];
                 // Procura em outputs qual destKey tem esse valor
@@ -281,7 +281,9 @@
         if (val === 50) return `STEREO R`;
         if (val === 51) return `C-R L`;
         if (val === 52) return `C-R R`;
-        if (val >= 121 && val <= 146) {
+        if (val === 139) return 'FX4 L';
+        if (val === 140) return 'FX4 R';
+        if (val >= 121 && val <= 138) {
             const fxNum = Math.floor((val - 121) / 8) + 1;
             const isR = (val - 121) % 8 === 1;
             return `FX${fxNum} ${isR ? 'R' : 'L'}`;

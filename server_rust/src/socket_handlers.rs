@@ -2248,36 +2248,21 @@ pub fn register_handlers(
         );
 
         // --- REQUEST FX TYPES ---
-        let sched_fx = scheduler_socket.clone();
+        let state_fx_types = global_state_socket.clone();
         socket.on(
             "requestFxTypes",
-            move |_socket: SocketRef| async move {
-                for i in 0..4u8 {
-                    if let Some(req) = crate::midi::protocol::build_fx_type_request(i) {
-                        sched_fx.enqueue(req, 0).await;
-                        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
-                    }
-                }
+            move |socket: SocketRef| async move {
+                let state = state_fx_types.read().await;
+                let fx_types_json = serde_json::to_value(&state.fx_types).unwrap_or_default();
+                socket.emit("fxTypesUpdate", &fx_types_json).ok();
             },
         );
 
         // --- REQUEST FX INPUTS ---
-        let sched_fx_in = scheduler_socket.clone();
         let state_fx_in = global_state_socket.clone();
         socket.on(
             "requestFxInputs",
             move |socket: SocketRef| async move {
-                for slot in 0u8..4 {
-                    for lr in 0u8..2 {
-                        if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
-                            sched_fx_in.enqueue(req, 0).await;
-                            tokio::time::sleep(std::time::Duration::from_millis(50)).await;
-                        }
-                    }
-                }
-                // Wait for all 8 responses to arrive from the mixer
-                tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-                // Re-emit the final state to guarantee completeness
                 let state = state_fx_in.read().await;
                 let fx_in_json = serde_json::to_value(&state.fx_inputs).unwrap_or_default();
                 socket.emit("fxInputsUpdate", &fx_in_json).ok();
@@ -2285,74 +2270,13 @@ pub fn register_handlers(
         );
 
         // --- REQUEST FX OUTPUTS ---
-        let sched_fx_out = scheduler_socket.clone();
         let state_fx_out = global_state_socket.clone();
         socket.on(
             "requestFxOutputs",
             move |socket: SocketRef| async move {
-                // Signal the parser that upcoming responses are for the output patch.
-                // This is necessary because element 1 uses the same MIDI address for both
-                // input patch (kChannelInput) and output patch (FxOutputUpdate).
-                socket.emit("fxSyncStatus", &serde_json::json!({ "active": true })).ok();
-                crate::midi::protocol::set_output_patch_active(true);
-                let destinations: &[(u8, u8)] = &[
-                    (1, 40),  // Element 1: CH1-32 + STIN1L-4R (channels 0..=39)
-                    (2, 32),  // Element 2: INSCH1-32 (channels 0..=31)
-                    (7, 8),   // Element 7: INSBUS1-8 (channels 0..=7)
-                    (8, 8),   // Element 8: INSAUX1-8 (channels 0..=7)
-                    (10, 2),  // Element 10: MASTER L/R (channels 0..=1)
-                ];
-                for &(element, count) in destinations {
-                    for ch in 0u8..count {
-                        if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
-                            sched_fx_out.enqueue(req, 0).await;
-                            tokio::time::sleep(std::time::Duration::from_millis(30)).await;
-                        }
-                    }
-                }
-                // Keep the flag active while responses arrive from the mixer.
-                //82 queries × 30ms = 2.5s queuing; responses take ~100-200ms each.
-                tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                crate::midi::protocol::set_output_patch_active(false);
-
-                // Re-emit the final state to guarantee the client has the latest data,
-                // even if some individual FxOutputUpdate emissions were missed.
                 let state = state_fx_out.read().await;
                 let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
                 socket.emit("fxOutputsUpdate", &fx_out_json).ok();
-                socket.emit("fxSyncStatus", &serde_json::json!({ "active": false })).ok();
-
-                // DEBUG: log all FX output routes after requestFxOutputs
-                tracing::info!("🔍 [FX OUT DEBUG] === FX Output Mapping After requestFxOutputs ===");
-                tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", state.fx_outputs.len());
-                for fx_val in [121u64, 122, 129, 130, 137, 138, 145, 146] {
-                    let fx_name = match fx_val {
-                        121 => "FX1 Out1",
-                        122 => "FX1 Out2",
-                        129 => "FX2 Out1",
-                        130 => "FX2 Out2",
-                        137 => "FX3 Out1",
-                        138 => "FX3 Out2",
-                        145 => "FX4 Out1",
-                        146 => "FX4 Out2",
-                        _ => "???",
-                    };
-                    let mut destinations: Vec<String> = Vec::new();
-                    for (key, val) in state.fx_outputs.iter() {
-                        if val.round() as u64 == fx_val {
-                            destinations.push(format!("{} (el={}, ch={})", key, key / 100, key % 100));
-                        }
-                    }
-                    tracing::info!("🔍 [FX OUT DEBUG]   {} (val={}): {}",
-                        fx_name,
-                        fx_val,
-                        if destinations.is_empty() {
-                            "NOT ROUTED".to_string()
-                        } else {
-                            destinations.join(", ")
-                        },
-                    );
-                }
             },
         );
 
@@ -2360,9 +2284,10 @@ pub fn register_handlers(
         // Payload: { slot: 0-3, lr: 0|1, source_id: u32 }
         let sched_set_fx_in = scheduler_socket.clone();
         let state_set_fx_in = global_state_socket.clone();
+        let io_fx_in = io.clone();
         socket.on(
             "setFxInput",
-            move |socket: SocketRef, Data::<serde_json::Value>(data)| async move {
+            move |_socket: SocketRef, Data::<serde_json::Value>(data)| async move {
                 let slot = data["slot"].as_u64().unwrap_or(99) as u8;
                 let lr = data["lr"].as_u64().unwrap_or(99) as u8;
                 let source_id = data["source_id"].as_u64().unwrap_or(0) as u32;
@@ -2388,7 +2313,7 @@ pub fn register_handlers(
                 // Re-emit updated state immediately to all clients to update the UI
                 let state = state_set_fx_in.read().await;
                 let fx_in_json = serde_json::to_value(&state.fx_inputs).unwrap_or_default();
-                let _ = socket.emit("fxInputsUpdate", &fx_in_json);
+                let _ = io_fx_in.emit("fxInputsUpdate", &fx_in_json).await;
             },
         );
 
@@ -2397,9 +2322,10 @@ pub fn register_handlers(
         // element+dest_channel = null means NONE (clear the route)
         let sched_set_fx_out = scheduler_socket.clone();
         let state_set_fx_out = global_state_socket.clone();
+        let io_fx_out = io.clone();
         socket.on(
             "setFxOutput",
-            move |socket: SocketRef, Data::<serde_json::Value>(data)| async move {
+            move |_socket: SocketRef, Data::<serde_json::Value>(data)| async move {
                 let slot = data["slot"].as_u64().unwrap_or(99) as u8;
                 let lr = data["lr"].as_u64().unwrap_or(99) as u8;
                 let element = data["element"].as_u64().map(|v| v as u8);
@@ -2419,18 +2345,29 @@ pub fn register_handlers(
                     (1, 1) => 130,
                     (2, 0) => 137,
                     (2, 1) => 138,
-                    (3, 0) => 145,
-                    (3, 1) => 146,
+                    (3, 0) => 139,
+                    (3, 1) => 140,
                     _ => return,
                 };
 
                 tracing::info!("🎛️ [setFxOutput] FX{} {} (val={}) → el={:?} ch={:?}",
-                    slot + 1, if lr == 0 { "L" } else { "R" }, fx_slot_val, element, dest_channel);
+                        slot + 1, if lr == 0 { "L" } else { "R" }, fx_slot_val, element, dest_channel);
 
                 // Step 1: Clear current routes for this FX output locally and collect clear packets
                 let mut clear_packets = Vec::new();
                 {
                     let mut state = state_set_fx_out.write().await;
+                    
+                    // DEBUG: log all FX output routes
+                    tracing::info!("🔍 [FX OUT DEBUG] === FX Output Mapping State ===");
+                    tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", state.fx_outputs.len());
+                    for (key, val) in state.fx_outputs.iter() {
+                        let v = val.round() as u32;
+                        if v > 0 { // Print any active route
+                            tracing::info!("🔍 [FX OUT DEBUG] Dest el={} ch={} has source ID = {}", key / 100, key % 100, v);
+                        }
+                    }
+
                     let mut keys_to_remove = Vec::new();
                     for (&key, &val) in state.fx_outputs.iter() {
                         if val.round() as u32 == fx_slot_val {
@@ -2459,17 +2396,23 @@ pub fn register_handlers(
                     tokio::time::sleep(std::time::Duration::from_millis(30)).await;
                 }
 
+
                 // Send new route packet
                 if let (Some(el), Some(ch)) = (element, dest_channel) {
                     if let Some(pkt) = crate::midi::protocol::build_fx_output_change(el, ch, fx_slot_val) {
+                        tracing::info!("🚀 [setFxOutput] ENQUEUING: {:02X?}", pkt);
                         sched_set_fx_out.enqueue(pkt, 0).await;
+                    } else {
+                        tracing::error!("❌ [setFxOutput] build_fx_output_change returned None for el={} ch={} val={}", el, ch, fx_slot_val);
                     }
+                } else {
+                    tracing::warn!("⚠️ [setFxOutput] Missing element or dest_channel: el={:?} ch={:?}", element, dest_channel);
                 }
 
                 // Re-emit updated state immediately to all clients to update the UI
                 let state = state_set_fx_out.read().await;
                 let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
-                let _ = socket.emit("fxOutputsUpdate", &fx_out_json);
+                let _ = io_fx_out.emit("fxOutputsUpdate", &fx_out_json).await;
             },
         );
     });

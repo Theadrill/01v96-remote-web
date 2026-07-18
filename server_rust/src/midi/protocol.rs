@@ -238,23 +238,7 @@ pub fn build_fx_type_request(slot: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
-pub fn build_fx_input_request(slot: u8, lr: u8) -> Option<Vec<u8>> {
-    if slot > 3 || lr > 1 {
-        return None;
-    }
-    let mut packet = vec![
-        HEADER[0], HEADER[1], // F0 43
-        0x30,                  // Parameter Request
-        MODEL_ID,              // 3E
-        13,                    // Section
-        2,                     // Group
-        3,                     // Element
-        lr,                    // Parameter (0=L, 1=R)
-        slot,                  // Channel (FX slot 0-3)
-    ];
-    packet.extend_from_slice(FOOTER);
-    Some(packet)
-}
+
 
 pub fn build_fx_output_request(element: u8, channel: u8) -> Option<Vec<u8>> {
     if ![1, 2, 7, 8, 10].contains(&element) {
@@ -318,10 +302,30 @@ pub fn build_fx_input_change(slot: u8, lr: u8, source_id: u32) -> Option<Vec<u8>
 /// fx_slot_val: the FX output slot value (121=FX1Out1, 122=FX1Out2, 129=FX2Out1, etc.)
 ///              Use 0 to clear (route NONE).
 /// Packet: F0 43 10 3E 0D 02 [element] 00 [dest_channel] [d0 d1 d2 d3] F7
-pub fn build_fx_output_change(element: u8, dest_channel: u8, fx_slot_val: u32) -> Option<Vec<u8>> {
-    if ![1, 2, 7, 8, 10].contains(&element) {
+pub fn build_fx_output_change(mut element: u8, dest_channel: u8, fx_slot_val: u32) -> Option<Vec<u8>> {
+    // We map UI elements to console elements:
+    // element=15 -> ADAT (element 5, MSB=ch, LSB=1)
+    // element=5  -> SLOT (element 5, MSB=ch, LSB=0)
+    // element=6  -> OMNI (element 6, MSB=0, LSB=ch)
+    // element=12 -> 2TR (element 12, MSB=0, LSB=ch)
+    
+    let mut param = 0; // MSB
+    let mut ch = dest_channel; // LSB
+    
+    if element == 15 {
+        element = 5;
+        param = dest_channel;
+        ch = 1;
+    } else if element == 5 {
+        param = dest_channel;
+        ch = 0;
+    } else if element == 6 || element == 12 {
+        param = 0;
+        ch = dest_channel;
+    } else if ![1, 2, 7, 8, 10].contains(&element) {
         return None;
     }
+
     let d0 = ((fx_slot_val >> 21) & 0x7F) as u8;
     let d1 = ((fx_slot_val >> 14) & 0x7F) as u8;
     let d2 = ((fx_slot_val >> 7) & 0x7F) as u8;
@@ -333,8 +337,8 @@ pub fn build_fx_output_change(element: u8, dest_channel: u8, fx_slot_val: u32) -
         13,                    // Section
         2,                     // Group
         element,               // Element (dest type)
-        0,                     // Param (always 0)
-        dest_channel,          // Channel (port within dest)
+        param,                 // Param (MSB)
+        ch,                    // Channel (LSB)
         d0, d1, d2, d3,
     ];
     packet.extend_from_slice(FOOTER);
