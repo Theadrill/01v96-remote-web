@@ -723,6 +723,7 @@ Durante a fase de sincronização completa da mesa (sync de nomes, faders, etc.)
 
 ### 9.2. Ajuste Fino de Latência de Hardware
 - Descobrimos que a mesa 01V96 possui um processamento de MIDI que pode atrasar respostas sob estresse (como no sync inicial).
-- Para evitar packet loss e timeouts persistentes, o código centraliza o tempo de espera na constante `FX_SYNC_THROTTLE_MS` no topo de `sync_manager.rs`.
-- Valor inicial padrão calibrado pelo usuário: **150ms** (garante sincronização estável).
+- Para evitar packet loss e timeouts, a latência de envio foi parametrizada dinamicamente através do arquivo `config.json` no campo `time_between_out_fxs_requests`.
+- O valor é lido na inicialização do servidor e propagado com segurança para o `SyncManager`.
+- Valor padrão calibrado pelo usuário: **150** (150ms), garantindo sincronização estável em lote para Inputs e Outputs.
 

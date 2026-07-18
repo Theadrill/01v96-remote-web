@@ -7,8 +7,6 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::sync::RwLock;
 use tracing::info;
 
-pub const FX_SYNC_THROTTLE_MS: u64 = 150;
-
 pub struct SyncManager {
     scheduler: Arc<MidiScheduler>,
     io: SocketIo,
@@ -18,10 +16,18 @@ pub struct SyncManager {
     csm: Arc<RwLock<CustomSceneManager>>,
     chunk_size: u32,
     chunk_delay_ms: u64,
+    pub time_between_out_fxs_requests: u64,
 }
 
 impl SyncManager {
-    pub fn new(scheduler: Arc<MidiScheduler>, io: SocketIo, csm: Arc<RwLock<CustomSceneManager>>, chunk_size: u32, chunk_delay_ms: u64) -> Self {
+    pub fn new(
+        scheduler: Arc<MidiScheduler>,
+        io: SocketIo,
+        csm: Arc<RwLock<CustomSceneManager>>,
+        chunk_size: u32,
+        chunk_delay_ms: u64,
+        time_between_out_fxs_requests: u64,
+    ) -> Self {
         Self {
             scheduler,
             io,
@@ -31,6 +37,7 @@ impl SyncManager {
             csm,
             chunk_size,
             chunk_delay_ms,
+            time_between_out_fxs_requests,
         }
     }
 
@@ -62,6 +69,7 @@ impl SyncManager {
         let csm = self.csm.clone();
         let chunk_size = self.chunk_size;
         let chunk_delay_ms = self.chunk_delay_ms;
+        let time_between_out_fxs_requests = self.time_between_out_fxs_requests;
 
         tokio::spawn(async move {
             tracing::info!("🔄 [SyncManager] Task de sync iniciada");
@@ -167,6 +175,7 @@ impl SyncManager {
                 csm,
                 chunk_size,
                 chunk_delay_ms,
+                time_between_out_fxs_requests,
             )
             .await;
         });
@@ -232,6 +241,7 @@ impl SyncManager {
         let csm = self.csm.clone();
         let chunk_size = self.chunk_size;
         let chunk_delay_ms = self.chunk_delay_ms;
+        let time_between_out_fxs_requests = self.time_between_out_fxs_requests;
 
         tokio::spawn(async move {
             queue_all_params_inner(
@@ -245,6 +255,7 @@ impl SyncManager {
                 csm,
                 chunk_size,
                 chunk_delay_ms,
+                time_between_out_fxs_requests,
             )
             .await;
         });
@@ -364,6 +375,7 @@ async fn queue_all_params_inner(
     csm: Arc<RwLock<CustomSceneManager>>,
     chunk_size: u32,
     chunk_delay_ms: u64,
+    time_between_out_fxs_requests: u64,
 ) {
     let mut pending_corrections: Vec<Vec<u8>> = Vec::new();
 
@@ -792,6 +804,7 @@ async fn queue_all_params_inner(
         let sched_fx = sched.clone();
         let io_fx    = io.clone();
         let state_fx = state.clone();
+        let throttle_ms = time_between_out_fxs_requests;
         tokio::spawn(async move {
             use crate::midi::protocol::FxSyncAck;
             use tokio::time::{timeout, Duration, sleep};
@@ -809,23 +822,23 @@ async fn queue_all_params_inner(
             sleep(Duration::from_millis(1500)).await;
 
             // ── FASE 1: FX Inputs (modo batch) ──────────────────────────────────
-            tracing::info!("🔄 [FX SYNC] FASE 1: FX Inputs (modo batch, {}ms throttle)", FX_SYNC_THROTTLE_MS);
+            tracing::info!("🔄 [FX SYNC] FASE 1: FX Inputs (modo batch, {}ms throttle)", throttle_ms);
             for slot in 0..4u8 {
                 for lr in 0..2u8 {
                     if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
                         sched_fx.enqueue(req, 0).await;
-                        sleep(Duration::from_millis(FX_SYNC_THROTTLE_MS)).await;
+                        sleep(Duration::from_millis(throttle_ms)).await;
                     }
                 }
             }
             tracing::info!("✅ [FX SYNC] FASE 1 concluída. Inputs mapeados.");
 
             // ── FASE 2: FX Outputs (modo batch) ──────────────────────────────────
-            // Envia todos os requests com 10ms de throttle entre cada um.
+            // Envia todos os requests com throttle entre cada um.
             // Depois drena todos os acks de uma vez com timeout global.
             // OUTPUT_PATCH_ACTIVE=true apenas dentro desta fase — inputs já terminaram,
             // zero sobreposição possível.
-            tracing::info!("🔄 [FX SYNC] FASE 2: FX Outputs (modo batch, {}ms throttle)", FX_SYNC_THROTTLE_MS);
+            tracing::info!("🔄 [FX SYNC] FASE 2: FX Outputs (modo batch, {}ms throttle)", throttle_ms);
             crate::midi::protocol::set_output_patch_active(true);
             let destinations: &[(u8, u8)] = &[
                 (1, 40), (2, 32), (7, 8), (8, 8), (10, 2),
@@ -836,7 +849,7 @@ async fn queue_all_params_inner(
                     if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
                         sched_fx.enqueue(req, 0).await;
                         expected_acks += 1;
-                        sleep(Duration::from_millis(FX_SYNC_THROTTLE_MS)).await;
+                        sleep(Duration::from_millis(throttle_ms)).await;
                     }
                 }
             }
@@ -844,8 +857,8 @@ async fn queue_all_params_inner(
 
             // Drena os acks de output: aguarda receber `expected_acks` acks de Output,
             // descartando quaisquer acks de Input que cheguem (ex: notificações físicas).
-            // Timeout global = (expected_acks × 150ms) para cobrir a pior latência por request.
-            let global_timeout_ms = (expected_acks as u64) * 150;
+            // Timeout global = (expected_acks × throttle_ms) para cobrir a pior latência por request.
+            let global_timeout_ms = (expected_acks as u64) * throttle_ms;
             let r = timeout(Duration::from_millis(global_timeout_ms), async {
                 let mut received = 0usize;
                 while received < expected_acks {

@@ -85,6 +85,10 @@ pub struct AppConfig {
     #[serde(default = "default_monitoring_format")]
     pub monitoring_format: String,
 
+    #[serde(default = "default_time_between_out_fxs_requests")]
+    pub time_between_out_fxs_requests: u64,
+
+
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub steps: serde_json::Value,
@@ -105,6 +109,11 @@ fn default_sync_chunk_delay_ms() -> u64 {
 fn default_wasm_throttle_ms() -> u64 {
     16
 }
+
+fn default_time_between_out_fxs_requests() -> u64 {
+    150
+}
+
 
 fn default_meter_opacity() -> f64 {
     1.0
@@ -248,6 +257,24 @@ impl AppConfig {
             }
         }
 
+        // Migração: adicionar time_between_out_fxs_requests se ausente
+        if let Ok(contents) = fs::read_to_string(&config_path)
+            && let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&contents)
+            && !json.get("time_between_out_fxs_requests").is_some()
+        {
+            if let Some(obj) = json.as_object_mut() {
+                obj.insert("time_between_out_fxs_requests".to_string(), serde_json::Value::Number(150.into()));
+            }
+            if let Ok(pretty) = serde_json::to_string_pretty(&json) {
+                if let Err(e) = fs::write(&config_path, pretty) {
+                    error!("[CONFIG] Falha ao adicionar time_between_out_fxs_requests ao config.json: {}", e);
+                } else {
+                    info!("[CONFIG] time_between_out_fxs_requests adicionado ao config.json");
+                }
+            }
+        }
+
+
         let mut config = match fs::read_to_string(&config_path) {
             Ok(contents) => match serde_json::from_str::<AppConfig>(&contents) {
                 Ok(c) => c,
@@ -333,8 +360,10 @@ impl AppConfig {
             eq_flat_skip_hpf_lpf: false,
             monitoring_buffer_size: default_monitoring_buffer_size(),
             monitoring_format: default_monitoring_format(),
+            time_between_out_fxs_requests: default_time_between_out_fxs_requests(),
             steps: serde_json::Value::Null,
         }
+
     }
 }
 

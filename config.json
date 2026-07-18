@@ -44,5 +44,6 @@
   "use_canvas": false,
   "wasm_throttle_ms": 16,
   "watchdog_normal_ms": 5000,
-  "watchdog_sync_ms": 15000
+  "watchdog_sync_ms": 15000,
+  "time_between_out_fxs_requests": 150
 }
