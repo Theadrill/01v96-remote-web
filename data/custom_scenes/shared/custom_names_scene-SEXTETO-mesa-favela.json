@@ -1,0 +1,170 @@
+{
+  "scene_name": "SEXTETO",
+  "scene_id": 34,
+  "channels": {
+    "17": {
+      "name": "",
+      "short": "    "
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "18": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "10": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "37": {
+      "name": "STI3",
+      "short": "STI3"
+    },
+    "6": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "27": {
+      "name": "MIC PANDEI",
+      "short": "MICP"
+    },
+    "33": {
+      "name": "REVERB FX",
+      "short": "REVE"
+    },
+    "29": {
+      "name": "",
+      "short": "    "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "16": {
+      "name": "OUTRO",
+      "short": "OUTR"
+    },
+    "35": {
+      "name": "STI2",
+      "short": "STI2"
+    },
+    "5": {
+      "name": "BAIXO",
+      "short": "BAIX"
+    },
+    "13": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "25": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "31": {
+      "name": "VOCALISTA",
+      "short": "VOCA"
+    },
+    "15": {
+      "name": "PANDEIRO",
+      "short": "PAND"
+    },
+    "11": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "19": {
+      "name": "",
+      "short": "    "
+    },
+    "23": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "3": {
+      "name": "",
+      "short": "    "
+    },
+    "28": {
+      "name": "MIC VIOLAO",
+      "short": "MICV"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "14": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "20": {
+      "name": "CELULAR",
+      "short": "CELU"
+    },
+    "2": {
+      "name": "",
+      "short": "    "
+    },
+    "39": {
+      "name": "STI4",
+      "short": "STI4"
+    },
+    "26": {
+      "name": "MIC TANTAN",
+      "short": "MICT"
+    },
+    "32": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "1": {
+      "name": "",
+      "short": "    "
+    },
+    "4": {
+      "name": "",
+      "short": "    "
+    },
+    "9": {
+      "name": "BUMB AGUDO",
+      "short": "BUMB"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "7": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "21": {
+      "name": "TECLADO",
+      "short": "TECL"
+    },
+    "24": {
+      "name": "",
+      "short": "    "
+    },
+    "12": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "master": {
+      "name": "ST",
+      "short": "ST  "
+    },
+    "22": {
+      "name": "R-CL",
+      "short": "RCL "
+    }
+  }
+}
