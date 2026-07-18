@@ -74,6 +74,7 @@ pub fn register_handlers(
         let conn_mgr_connect = conn_mgr_handler.clone();
         let csm_connect = csm_socket.clone();
         let rta_handler = rta_socket_main.clone();
+        let sync_manager_connect = sync_manager_socket.clone();
         tokio::spawn(async move {
             let config_arc = crate::config::AppConfig::load();
             let is_syncing = conn_mgr_connect.is_syncing();
@@ -166,6 +167,13 @@ pub fn register_handlers(
                 .emit(
                     "syncStatus",
                     &serde_json::json!({ "active": conn_mgr_connect.is_syncing() }),
+                )
+                .ok();
+
+            socket_initial
+                .emit(
+                    "fxSyncStatus",
+                    &serde_json::json!({ "active": sync_manager_connect.is_syncing_fx() }),
                 )
                 .ok();
 

@@ -12,12 +12,14 @@ pub struct SyncManager {
     io: SocketIo,
     is_syncing: Arc<AtomicBool>,
     is_fully_synced: Arc<AtomicBool>,
+    is_syncing_fx: Arc<AtomicBool>,
     has_synced_names: AtomicBool,
     csm: Arc<RwLock<CustomSceneManager>>,
     chunk_size: u32,
     chunk_delay_ms: u64,
     pub time_between_out_fxs_requests: u64,
 }
+
 
 impl SyncManager {
     pub fn new(
@@ -33,6 +35,7 @@ impl SyncManager {
             io,
             is_syncing: Arc::new(AtomicBool::new(false)),
             is_fully_synced: Arc::new(AtomicBool::new(false)),
+            is_syncing_fx: Arc::new(AtomicBool::new(false)),
             has_synced_names: AtomicBool::new(false),
             csm,
             chunk_size,
@@ -41,9 +44,15 @@ impl SyncManager {
         }
     }
 
+
     pub fn is_busy(&self) -> bool {
         self.is_syncing.load(Ordering::SeqCst)
     }
+
+    pub fn is_syncing_fx(&self) -> bool {
+        self.is_syncing_fx.load(Ordering::SeqCst)
+    }
+
 
     pub fn is_ready(&self) -> bool {
         self.is_fully_synced.load(Ordering::SeqCst)
@@ -70,6 +79,7 @@ impl SyncManager {
         let chunk_size = self.chunk_size;
         let chunk_delay_ms = self.chunk_delay_ms;
         let time_between_out_fxs_requests = self.time_between_out_fxs_requests;
+        let is_syncing_fx = self.is_syncing_fx.clone();
 
         tokio::spawn(async move {
             tracing::info!("🔄 [SyncManager] Task de sync iniciada");
@@ -176,6 +186,7 @@ impl SyncManager {
                 chunk_size,
                 chunk_delay_ms,
                 time_between_out_fxs_requests,
+                is_syncing_fx,
             )
             .await;
         });
@@ -242,6 +253,7 @@ impl SyncManager {
         let chunk_size = self.chunk_size;
         let chunk_delay_ms = self.chunk_delay_ms;
         let time_between_out_fxs_requests = self.time_between_out_fxs_requests;
+        let is_syncing_fx = self.is_syncing_fx.clone();
 
         tokio::spawn(async move {
             queue_all_params_inner(
@@ -256,6 +268,7 @@ impl SyncManager {
                 chunk_size,
                 chunk_delay_ms,
                 time_between_out_fxs_requests,
+                is_syncing_fx,
             )
             .await;
         });
@@ -376,6 +389,7 @@ async fn queue_all_params_inner(
     chunk_size: u32,
     chunk_delay_ms: u64,
     time_between_out_fxs_requests: u64,
+    is_syncing_fx: Arc<AtomicBool>,
 ) {
     let mut pending_corrections: Vec<Vec<u8>> = Vec::new();
 
@@ -805,9 +819,12 @@ async fn queue_all_params_inner(
         let io_fx    = io.clone();
         let state_fx = state.clone();
         let throttle_ms = time_between_out_fxs_requests;
+        let is_syncing_fx_clone = is_syncing_fx.clone();
         tokio::spawn(async move {
+            is_syncing_fx_clone.store(true, Ordering::SeqCst);
             use crate::midi::protocol::FxSyncAck;
             use tokio::time::{timeout, Duration, sleep};
+
 
             let _ = io_fx.emit("fxSyncStatus", &serde_json::json!({ "active": true })).await;
 
@@ -888,6 +905,7 @@ async fn queue_all_params_inner(
                 let mut st = state_fx.write().await;
                 st.fx_sync_ack_tx = None;
             }
+            is_syncing_fx_clone.store(false, Ordering::SeqCst);
             let _ = io_fx.emit("fxSyncStatus", &serde_json::json!({ "active": false })).await;
         });
     }
