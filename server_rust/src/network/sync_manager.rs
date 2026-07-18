@@ -562,9 +562,6 @@ async fn queue_all_params_inner(
     for i in 0..8u8 {
         push_req(&mut requests, "kOutputPatch/kFx", i);
     }
-    for i in 0..8u8 {
-        push_req(&mut requests, "kEffectInput/kEffectIn", i);
-    }
     for i in 0..2u8 {
         push_req(&mut requests, "kOutputPatch/k2tr", i);
     }
@@ -779,6 +776,45 @@ async fn queue_all_params_inner(
     is_syncing.store(false, Ordering::SeqCst);
     is_fully_synced.store(true, Ordering::SeqCst);
     info!("✅ [SyncManager] Sincronizacao concluida!");
+
+    // --- Sync Autônomo de FX Inputs (Two-Pass) ---
+    // Garante que os 8 FX Inputs (kEffectInput/kEffectIn) estejam corretos,
+    // repetindo a consulta duas vezes para compensar pacotes dropados pela mesa.
+    {
+        let sched_fx_in = sched.clone();
+        let io_fx_in = io.clone();
+        tokio::spawn(async move {
+            let _ = io_fx_in.emit("fxSyncStatus", &serde_json::json!({ "active": true })).await;
+            tracing::info!("🔄 [SyncManager] Iniciando sync autônomo de FX Inputs (Passagem 1)...");
+            tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+
+            for slot in 0..4u8 {
+                for lr in 0..2u8 {
+                    if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
+                        sched_fx_in.enqueue(req, 0).await;
+                        tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                    }
+                }
+            }
+            tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+            tracing::info!("✅ [SyncManager] Passagem 1 de FX Inputs concluída.");
+
+            // Passagem 2 (Garante consistência caso a mesa drope pacotes na 1ª passagem)
+            tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
+            tracing::info!("🔄 [SyncManager] Iniciando sync autônomo de FX Inputs (Passagem 2)...");
+            for slot in 0..4u8 {
+                for lr in 0..2u8 {
+                    if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
+                        sched_fx_in.enqueue(req, 0).await;
+                        tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                    }
+                }
+            }
+            tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+            tracing::info!("✅ [SyncManager] Sync de FX Inputs concluído.");
+            let _ = io_fx_in.emit("fxSyncStatus", &serde_json::json!({ "active": false })).await;
+        });
+    }
 
     // --- Iniciar Sync Autônomo de FX Outputs ---
     // Fazemos isso apenas APÓS o is_fully_synced = true, para que as respotas

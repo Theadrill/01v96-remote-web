@@ -269,6 +269,24 @@ pub fn build_fx_output_request(element: u8, channel: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
+pub fn build_fx_input_request(slot: u8, lr: u8) -> Option<Vec<u8>> {
+    if slot > 3 || lr > 1 {
+        return None;
+    }
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x30,                  // Parameter Request
+        MODEL_ID,              // 3E
+        13,                    // Section
+        2,                     // Group
+        3,                     // Element (FX Input)
+        lr,                    // Param MSB (0=L, 1=R)
+        slot,                  // Param LSB (slot 0-3)
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
 /// Build a Parameter Change packet to set the FX input source.
 /// slot: 0-3 (FX1..FX4), lr: 0=L / 1=R, source_id: value from the FX_IN lookup table.
 /// Packet: F0 43 10 3E 0D 02 03 [lr] [slot] [d0 d1 d2 d3] F7
