@@ -104,6 +104,7 @@ pub fn start_rx_loop(
                 // The parser misclassifies FX output patch notifications (section=13, group=2,
                 // element=1) as kChannelInput because it shares the same MIDI address as input
                 // patch. Detecting at raw packet level and continuing skips the parser entirely.
+
                 if packet.len() >= 9
                     && (packet[2] & 0xF0) == 0x10
                     && packet[4] == 127
@@ -245,6 +246,39 @@ pub fn start_rx_loop(
                             packet.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ")
                         );
                     }
+                    continue;
+                } else if packet.len() >= 9
+                    && (packet[2] & 0xF0) == 0x10
+                    && packet[4] == 127
+                    && packet[5] == 0x50
+                {
+                    // Mixer notification: section=127, group=0x50 — FX slot changed
+                    tracing::warn!(
+                        "🔔 [FX] Notification detected: pkt={}",
+                        packet.iter().map(|b| format!("{:02X}", b)).collect::<Vec<_>>().join(" ")
+                    );
+                    let sched = scheduler.clone();
+                    let last_clone = fx_requery_last.clone();
+                    tokio::spawn(async move {
+                        {
+                            let mut last = last_clone.lock().unwrap();
+                            let now = std::time::Instant::now();
+                            if now.duration_since(*last).as_millis() < 1000 {
+                                return;
+                            }
+                            *last = now;
+                        }
+
+                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                        tracing::info!("🔄 [FX] Re-querying FX types after notification...");
+                        for i in 0..4u8 {
+                            if let Some(req) = crate::midi::protocol::build_fx_type_request(i) {
+                                tracing::info!("🔄 [FX] Sending FX type query for slot {}", i);
+                                sched.enqueue(req, 0).await;
+                                tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+                            }
+                        }
+                    });
                     continue;
                 }
 
