@@ -78,6 +78,12 @@
       "physical_scene": "MARCELO V 360",
       "physical_id": 39,
       "file": "custom_names_scene-MARCELO V 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "DANIEL VIEIR 3",
+      "physical_scene": "DANIEL VIEIR 3",
+      "physical_id": 29,
+      "file": "custom_names_scene-DANIEL VIEIR 3-mesa-maria.json"
     }
   ]
 }

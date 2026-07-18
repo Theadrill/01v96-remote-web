@@ -1,0 +1,170 @@
+{
+  "scene_name": "DANIEL VIEIR 3",
+  "scene_id": 29,
+  "channels": {
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "20": {
+      "name": "MIC VOCALI",
+      "short": "MICV"
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "7": {
+      "name": "CAIXA",
+      "short": "CAIX"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "19": {
+      "name": "MIC DAVI",
+      "short": "MICD"
+    },
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
+    },
+    "3": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "17": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "12": {
+      "name": "MIC MATH",
+      "short": "MICM"
+    },
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "14": {
+      "name": "",
+      "short": "    "
+    },
+    "29": {
+      "name": "VOZES",
+      "short": "VOZE"
+    },
+    "11": {
+      "name": "MIC HAMILT",
+      "short": "MICH"
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
+    }
+  }
+}
