@@ -16,34 +16,22 @@ Habilitar a aba **ROUTING / ETC** para os Buses (44-51) na tela de configuracao 
 |--------------------------|---------------|------------|
 | Input Patch (kChannelInput/kChannelIn) | **NAO** | Buses nao tem patch de entrada |
 | Bus Assignment (kInputBus/kBusN) | **NAO** | Buses IS the bus |
-| Stereo Master (kInputBus/kStereo) | **SIM** | Atribui bus ao master L/R |
+| Stereo Master (kBusToStereo/kBusToStereoOn) | **SIM** | Atribui bus ao master L/R |
 | Insert On/Position | **SIM** | `kBusInsert/kInsertOn`, `kBusInsert/kInsertLocInsert` |
 | Insert Input Patch | **SIM** | `kBusInsertInput/kBusInsertIn` (element 7) |
 | Pair (estereo) | **SIM** | Ja implementado em `kBusPair/kPair` |
 
 ---
 
-## 2. Enderecos SysEx (Ja definidos no dictionary.json)
+## 2. Enderecos SysEx (Tabela de Mapeamento)
 
-### 2.1. Insert On/Off — `kBusInsert/kInsertOn`
-- **Endereco**: `[127, 1, 40, 0]` (element 40, param 0)
-- **Canal**: `00` a `07` (Bus 1-8)
-- **Valores**: `0` = OFF, `1` = ON
-
-### 2.2. Posicao do Insert — `kBusInsert/kInsertLocInsert`
-- **Endereco**: `[127, 1, 40, 2]` (element 40, param 2)
-- **Canal**: `00` a `07`
-- **Valores**: `0` = Pre EQ, `1` = Pre Fader, `2` = Post Fader
-
-### 2.3. Insert First (auxiliar) — `kBusInsert/kInsertLocInsertFirst`
-- **Endereco**: `[127, 1, 40, 1]` (element 40, param 1)
-- Parece ser um offset/auxiliar. Pode ser necessario para setar a posicao correta.
-
-### 2.4. Insert Input Patch — `kBusInsertInput/kBusInsertIn`
-- **Endereco**: `[13, 2, 7, 0]` (section 13, group 2, element 7)
-- **Param MSB**: `0` ( parametro fixo )
-- **Param LSB**: `0` a `7` (bus index)
-- **Valores**: Mesma tabela de patches do input (1=AD1..16=AD16, 25-40=Slot, 41-48=ADAT, etc.)
+| Comando | Endereço (Dec) | Endereço (Hex) | Canal | Valores | Status |
+|---------|----------------|----------------|-------|---------|--------|
+| `kBusInsert/kInsertOn` | `[127, 1, 40, 0]` | `7F 01 28 00` | `00-07` | `0` = OFF, `1` = ON | ✅ **Confirmado por monitoramento** |
+| `kBusInsert/kInsertLocInsert` | `[127, 1, 40, 2]` | `7F 01 28 02` | `00-07` | `0` = Pre EQ, `1` = Pre Fader, `2` = Post Fader | ✅ **Confirmado por monitoramento** |
+| `kBusInsert/kInsertLocInsertFirst` | `[127, 1, 40, 1]` | `7F 01 28 01` | `00-07` | Geralmente `0` ou `1` | ⏳ *Pendente de confirmação* |
+| `kBusInsertInput/kBusInsertIn` | `[13, 2, 7, 0]` | `0D 02 07 00` | `00-07` | Mapeamento de fontes (AD, Slot, ADAT, FX) | ✅ **Confirmado por monitoramento** |
+| `kBusToStereo/kBusToStereoOn` | `[127, 1, 50, 0]` | `7F 01 32 00` | `00-07` | `0` = OFF, `1` = ON | ✅ **Confirmado por monitoramento** |
 
 ---
 
@@ -72,7 +60,7 @@ Alternativamente, se for necessario distinguir, criar flag `BUS_INSERT_ACTIVE` (
 
 ### 4.1. Rust — `state.rs`
 
-**Adicionar campo `insert` ao `MixBusState`** (linha ~110):
+**Adicionar campos `insert` e `stereo` ao `MixBusState`** (linha ~110):
 ```rust
 pub struct MixBusState {
     pub value: f64,
@@ -86,15 +74,17 @@ pub struct MixBusState {
     pub paired_with: Option<usize>,
     pub pair_source: Option<usize>,
     pub insert: InsertState,  // <-- NOVO
+    pub stereo: bool,         // <-- NOVO (para Buses, default false para Mixes)
 }
 ```
 
-**Inicializar** no construtor de `MixBusState` (linha ~278):
+**Inicializar** no construtor de `MixBusState` (linha ~287):
 ```rust
 insert: InsertState { on: false, position: 0.0, patch_in: 0.0 },
+stereo: false,
 ```
 
-**Adicionar handlers** na funcao `apply_midi` (proximo a linha 560, apos os handlers de input insert):
+**Adicionar handlers** na funcao `apply_midi` (proximo a linha 600-690):
 ```rust
 } else if mt == "kBusInsert/kInsertOn" {
     if let Some(bus) = self.buses.get_mut(channel) {
@@ -102,7 +92,11 @@ insert: InsertState { on: false, position: 0.0, patch_in: 0.0 },
     }
 } else if mt == "kBusInsert/kInsertLocInsert" {
     if let Some(bus) = self.buses.get_mut(channel) {
-        bus.insert.position = v;
+        bus.insert.position = cv;
+    }
+} else if mt == "kBusToStereo/kBusToStereoOn" {
+    if let Some(bus) = self.buses.get_mut(channel) {
+        bus.stereo = cv;
     }
 ```
 
@@ -196,7 +190,7 @@ Para `kBusInsertInput/kBusInsertIn`: Mapear a partir de `FxOutputUpdate` com `el
 
 **Modificar `setInsertPosition()`**: Enviar o tipo correto baseado no canal.
 
-**Para o Insert Input Patch**: O `setInsertIn()` atual envia `kChannelInsertIn/kInsertIn`. Para buses, enviar `kBusInsertInput/kBusInsertIn` — MAS ver secao 3 sobre a colisao com element 7.
+**Para the Insert Input Patch**: O `setInsertIn()` atual envia `kChannelInsertIn/kInsertIn`. Para buses, enviar `kBusInsertInput/kBusInsertIn` — MAS ver secao 3 sobre a colisao com element 7.
 
 ### 4.8. JavaScript — `routing.js`
 
@@ -266,14 +260,14 @@ if (chIdx >= 44 && chIdx <= 51) {
 
 ## 6. Pontos de Atencao
 
-1. **Element 7 colisao**: `kBusInsertInput/kBusInsertIn` e `FxOutputUpdate` element 7 usam o mesmo endereco MIDI. Decidir se:
-   - (A) Reaproveitar o two-pass de FX Outputs que ja consulta element 7
-   - (B) Criar flag `BUS_INSERT_ACTIVE` para desambiguar (complexo)
+1. **Element 7 colisao**: `kBusInsertInput/kBusInsertIn` e `FxOutputUpdate` element 7 usam o mesmo endereco MIDI. Fica decidido pela **Opcao A**: Reaproveitar o two-pass de FX Outputs que ja consulta element 7. Tanto em `state.rs` quanto em `efeitos.js` (applyFxOutputs), mapear as atualizacoes do element 7 para atualizar `insert.patch_in` do respectivo barramento.
 
-2. **`toggleStereoAssignment()`** (`routing.js`): Atualmente usa `channelStates[chIdx]`. Para buses, precisa ler de `busesState[chIdx - 44]` e emitir o MIDI correto. Verificar se o command name `kInputBus/kStereo` funciona para buses (canal 0-7) ou se existe um `kBus*` equivalente.
+2. **Mapeamento de Stereo**: Confirmado que `kInputBus/kStereo` e exclusivo de inputs. Para buses, usar **`kBusToStereo/kBusToStereoOn`** (`[127, 1, 50, 0]`). A funcao `toggleStereoAssignment()` em `routing.js` deve tratar buses separadamente, manipulando `busesState[chIdx - 44].stereo` e emitindo `kBusToStereo/kBusToStereoOn`.
 
-3. **`kBusInsert/kInsertLocInsertFirst`** (element 40, param 1): Pode ser necessario para setar a posicao corretamente. Testar na mesa fisica.
+3. **Mapeamento Generalizado de Canais em `protocol.rs`**: O build de SysEx (`build_change` e `build_request`) precisa de alteracao para que qualquer comando com prefixo `"kBus"` aplique o offset de canal (`channel - 44`) e `"kAUX"` aplique (`channel - 36`) de forma automatica, garantindo que comandos como `kBusInsert` e `kBusToStereo` cheguem na mesa com o canal físico correto (0-7).
 
-3. **Copy/Paste** (`copy_paste.js`): Extender para copiar/colar insert de buses usando command names corretos.
-
-4. **Nao tocar no two-pass de FX Outputs**: O two-pass existente ja consulta element 7 (INSBUS, 8 canais). Esses dados podem ser reaproveitados para o bus insert input.
+4. **Fórmulas de Patch de Saída em `inserts.js`**: As funções `setInsertOut`, `openInsertModal` e `clearPreviousInsertOut` precisam ser atualizadas para usar as seguintes fórmulas de Source ID para barramentos (Buses):
+   - Saída Física: `(chIdx - 44) + 1` (IDs 1 a 8)
+   - Entrada de FX: `(chIdx - 44) + 109` (IDs 109 a 116)
+   - ✅ **Confirmado por monitoramento**: Ao mapear o Insert Out do Bus 1 para o FX4 R (destino `[13, 2, 3, 1, 3]`), a mesa enviou o valor `0x6D` (`109`), validando exatamente a fórmula `busIdx + 109`.
+   - **Nota de Sincronização**: Como o sync inicial do app já varre todos os destinos de saída e lê suas fontes ativas, a inicialização lerá automaticamente esses patches. Não há necessidade de adicionar novos comandos de sincronização de saída.
