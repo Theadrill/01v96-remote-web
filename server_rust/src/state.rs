@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use tokio::sync::mpsc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EqBand {
@@ -178,6 +179,11 @@ pub struct GlobalState {
     pub fx_outputs: HashMap<usize, f64>,
     #[serde(rename = "tailscaleUrl")]
     pub tailscale_url: Option<String>,
+    /// Sender half of the FX sync pipeline ack channel (UnboundedSender — never drops signals).
+    /// Installed by SyncManager before starting the FX sync task; set to None when done.
+    /// midi_receiver calls send() here after processing each FX Input/Output MIDI response.
+    #[serde(skip)]
+    pub fx_sync_ack_tx: Option<mpsc::UnboundedSender<crate::midi::protocol::FxSyncAck>>,
 }
 
 impl GlobalState {
@@ -416,6 +422,7 @@ impl GlobalState {
             fx_inputs: HashMap::new(),
             fx_outputs: HashMap::new(),
             tailscale_url: None,
+            fx_sync_ack_tx: None,
         }
     }
     pub fn handle_raw_midi(&mut self, message: &[u8]) -> bool {

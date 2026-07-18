@@ -374,6 +374,16 @@ pub fn start_rx_loop(
                                     fx_inputs_emission = Some(
                                         serde_json::to_value(&state.fx_inputs).unwrap_or_default(),
                                     );
+                                    // Signal the FX sync pipeline: this input slot response arrived.
+                                    // channel = idx = slot*2 + lr (as encoded by the parser)
+                                    let ack_slot = (channel / 2) as u8;
+                                    let ack_lr   = (channel % 2) as u8;
+                                    if let Some(tx) = &state.fx_sync_ack_tx {
+                                        let _ = tx.send(crate::midi::protocol::FxSyncAck::Input {
+                                            slot: ack_slot,
+                                            lr:   ack_lr,
+                                        });
+                                    }
                                 }
                             }
                             crate::midi::protocol::ParsedMidi::PhysicalSceneRecall(idx) => {
@@ -433,6 +443,13 @@ pub fn start_rx_loop(
                                     fx_outputs_emission = Some(
                                         serde_json::to_value(&state.fx_outputs).unwrap_or_default(),
                                     );
+                                }
+                                // Signal the FX sync pipeline: this output slot response arrived.
+                                if let Some(tx) = &state.fx_sync_ack_tx {
+                                    let _ = tx.send(crate::midi::protocol::FxSyncAck::Output {
+                                        element: element as u8,
+                                        channel: channel as u8,
+                                    });
                                 }
                             }
                             _ => {}

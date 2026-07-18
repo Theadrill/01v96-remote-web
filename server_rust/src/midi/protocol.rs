@@ -15,6 +15,17 @@ pub fn is_output_patch_active() -> bool {
     OUTPUT_PATCH_ACTIVE.load(Ordering::SeqCst)
 }
 
+/// Signal sent by midi_receiver to the FX sync pipeline after each MIDI response
+/// is processed and stored in state. Allows the pipeline to advance one request
+/// at a time (flag-based coordination instead of fixed sleep timers).
+#[derive(Debug)]
+pub enum FxSyncAck {
+    /// A kEffectInput/kEffectIn response was received for the given slot and lr.
+    Input { slot: u8, lr: u8 },
+    /// A FxOutputUpdate response was received for the given element and channel.
+    Output { element: u8, channel: u8 },
+}
+
 lazy_static! {
     pub static ref COMMAND_BYTES: HashMap<String, [u8; 4]> = {
         let json_str = include_str!("dictionary.json");

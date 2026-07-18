@@ -7,6 +7,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::sync::RwLock;
 use tracing::info;
 
+pub const FX_SYNC_THROTTLE_MS: u64 = 150;
+
 pub struct SyncManager {
     scheduler: Arc<MidiScheduler>,
     io: SocketIo,
@@ -777,89 +779,103 @@ async fn queue_all_params_inner(
     is_fully_synced.store(true, Ordering::SeqCst);
     info!("✅ [SyncManager] Sincronizacao concluida!");
 
-    // --- Sync Autônomo de FX Inputs (Two-Pass) ---
-    // Garante que os 8 FX Inputs (kEffectInput/kEffectIn) estejam corretos,
-    // repetindo a consulta duas vezes para compensar pacotes dropados pela mesa.
+    // --- Pipeline Sequencial de FX (Inputs → Outputs, passagem única) ---
+    // Uma task só, fases serializadas, sem overlap entre inputs e outputs.
+    //
+    // Inputs  (8 requests):  ack por request — garante que cada um chegou antes do próximo.
+    // Outputs (90 requests): modo batch — envia tudo com 10ms de throttle, depois drena
+    //                        todos os acks de uma vez. Muito mais rápido que ack por request
+    //                        (90 round-trips × ~100ms = inaceitável).
+    //
+    // OUTPUT_PATCH_ACTIVE=true APENAS durante a fase de Outputs.
     {
-        let sched_fx_in = sched.clone();
-        let io_fx_in = io.clone();
+        let sched_fx = sched.clone();
+        let io_fx    = io.clone();
+        let state_fx = state.clone();
         tokio::spawn(async move {
-            let _ = io_fx_in.emit("fxSyncStatus", &serde_json::json!({ "active": true })).await;
-            tracing::info!("🔄 [SyncManager] Iniciando sync autônomo de FX Inputs (Passagem 1)...");
-            tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+            use crate::midi::protocol::FxSyncAck;
+            use tokio::time::{timeout, Duration, sleep};
 
+            let _ = io_fx.emit("fxSyncStatus", &serde_json::json!({ "active": true })).await;
+
+            // Cria o canal e instala o sender no GlobalState
+            let (ack_tx, mut ack_rx) = tokio::sync::mpsc::unbounded_channel::<FxSyncAck>();
+            {
+                let mut st = state_fx.write().await;
+                st.fx_sync_ack_tx = Some(ack_tx);
+            }
+
+            // Pequeno respiro após o sync principal liberar a fila
+            sleep(Duration::from_millis(1500)).await;
+
+            // ── FASE 1: FX Inputs (modo batch) ──────────────────────────────────
+            tracing::info!("🔄 [FX SYNC] FASE 1: FX Inputs (modo batch, {}ms throttle)", FX_SYNC_THROTTLE_MS);
             for slot in 0..4u8 {
                 for lr in 0..2u8 {
                     if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
-                        sched_fx_in.enqueue(req, 0).await;
-                        tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+                        sched_fx.enqueue(req, 0).await;
+                        sleep(Duration::from_millis(FX_SYNC_THROTTLE_MS)).await;
                     }
                 }
             }
-            tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-            tracing::info!("✅ [SyncManager] Passagem 1 de FX Inputs concluída.");
+            tracing::info!("✅ [FX SYNC] FASE 1 concluída. Inputs mapeados.");
 
-            // Passagem 2 (Garante consistência caso a mesa drope pacotes na 1ª passagem)
-            tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
-            tracing::info!("🔄 [SyncManager] Iniciando sync autônomo de FX Inputs (Passagem 2)...");
-            for slot in 0..4u8 {
-                for lr in 0..2u8 {
-                    if let Some(req) = crate::midi::protocol::build_fx_input_request(slot, lr) {
-                        sched_fx_in.enqueue(req, 0).await;
-                        tokio::time::sleep(std::time::Duration::from_millis(30)).await;
+            // ── FASE 2: FX Outputs (modo batch) ──────────────────────────────────
+            // Envia todos os requests com 10ms de throttle entre cada um.
+            // Depois drena todos os acks de uma vez com timeout global.
+            // OUTPUT_PATCH_ACTIVE=true apenas dentro desta fase — inputs já terminaram,
+            // zero sobreposição possível.
+            tracing::info!("🔄 [FX SYNC] FASE 2: FX Outputs (modo batch, {}ms throttle)", FX_SYNC_THROTTLE_MS);
+            crate::midi::protocol::set_output_patch_active(true);
+            let destinations: &[(u8, u8)] = &[
+                (1, 40), (2, 32), (7, 8), (8, 8), (10, 2),
+            ];
+            let mut expected_acks: usize = 0;
+            for &(element, count) in destinations {
+                for ch in 0u8..count {
+                    if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
+                        sched_fx.enqueue(req, 0).await;
+                        expected_acks += 1;
+                        sleep(Duration::from_millis(FX_SYNC_THROTTLE_MS)).await;
                     }
                 }
             }
-            tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-            tracing::info!("✅ [SyncManager] Sync de FX Inputs concluído.");
-            let _ = io_fx_in.emit("fxSyncStatus", &serde_json::json!({ "active": false })).await;
+            tracing::info!("🔄 [FX SYNC] {} requests enviados, aguardando acks...", expected_acks);
+
+            // Drena os acks de output: aguarda receber `expected_acks` acks de Output,
+            // descartando quaisquer acks de Input que cheguem (ex: notificações físicas).
+            // Timeout global = (expected_acks × 150ms) para cobrir a pior latência por request.
+            let global_timeout_ms = (expected_acks as u64) * 150;
+            let r = timeout(Duration::from_millis(global_timeout_ms), async {
+                let mut received = 0usize;
+                while received < expected_acks {
+                    match ack_rx.recv().await {
+                        Some(FxSyncAck::Output { .. }) => {
+                            received += 1;
+                        }
+                        Some(FxSyncAck::Input { .. }) => {
+                            // Ack de input chegou fora de hora (ex: mudança física na mesa) — ignora
+                        }
+                        None => break, // canal fechado
+                    }
+                }
+            }).await;
+            if r.is_err() {
+                tracing::warn!(
+                    "⚠️ [FX SYNC] Timeout global aguardando acks de Output (esperado={} acks em {}ms)",
+                    expected_acks, global_timeout_ms
+                );
+            }
+
+            crate::midi::protocol::set_output_patch_active(false);
+            tracing::info!("✅ [FX SYNC] FASE 2 concluída. Pipeline FX completo.");
+
+            // Remove o sender do state (encerra o canal) e notifica o frontend
+            {
+                let mut st = state_fx.write().await;
+                st.fx_sync_ack_tx = None;
+            }
+            let _ = io_fx.emit("fxSyncStatus", &serde_json::json!({ "active": false })).await;
         });
     }
-
-    // --- Iniciar Sync Autônomo de FX Outputs ---
-    // Fazemos isso apenas APÓS o is_fully_synced = true, para que as respotas
-    // do kChannelInput não entrem em colisão com FxOutputUpdate, já que
-    // ambas usam element 1, diferenciadas por OUTPUT_PATCH_ACTIVE.
-    let sched_fx = sched.clone();
-    let io_fx = io.clone();
-    tokio::spawn(async move {
-        let _ = io_fx.emit("fxSyncStatus", &serde_json::json!({ "active": true })).await;
-        tracing::info!("🔄 [SyncManager] Iniciando sync autônomo de FX Outputs (Passagem 1)...");
-        // Dá um respiro pequeno após a liberação da fila principal
-        tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
-        
-        crate::midi::protocol::set_output_patch_active(true);
-        let destinations: &[(u8, u8)] = &[
-            (1, 40), (2, 32), (7, 8), (8, 8), (10, 2),
-        ];
-        for &(element, count) in destinations {
-            for ch in 0u8..count {
-                if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
-                    sched_fx.enqueue(req, 0).await;
-                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
-                }
-            }
-        }
-        // Tempo para as respostas chegarem antes de desativar a flag global
-        tokio::time::sleep(std::time::Duration::from_millis(3000)).await;
-        crate::midi::protocol::set_output_patch_active(false);
-        tracing::info!("✅ [SyncManager] Passagem 1 de FX Outputs concluída.");
-
-        // Passagem 2 (Garante consistência caso a mesa drope pacotes na 1ª passagem)
-        tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
-        tracing::info!("🔄 [SyncManager] Iniciando sync autônomo de FX Outputs (Passagem 2)...");
-        crate::midi::protocol::set_output_patch_active(true);
-        for &(element, count) in destinations {
-            for ch in 0u8..count {
-                if let Some(req) = crate::midi::protocol::build_fx_output_request(element, ch) {
-                    sched_fx.enqueue(req, 0).await;
-                    tokio::time::sleep(std::time::Duration::from_millis(30)).await;
-                }
-            }
-        }
-        tokio::time::sleep(std::time::Duration::from_millis(3000)).await;
-        crate::midi::protocol::set_output_patch_active(false);
-        tracing::info!("✅ [SyncManager] Passagem 2 de FX Outputs concluída. Sync completo.");
-        let _ = io_fx.emit("fxSyncStatus", &serde_json::json!({ "active": false })).await;
-    });
 }

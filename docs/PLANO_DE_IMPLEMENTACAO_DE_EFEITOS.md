@@ -704,3 +704,25 @@ Outros valores podem existir no mesmo endereço de destino (OFF, BUS, MATRIX…)
 | Lógica NONE / mover OUT | ❌ Ainda não (UX) |
 
 **Catálogo de destinos de OUT está completo para implementação da UI.** Write de canal já validado; demais famílias seguem o mesmo SysEx com element diferente.
+
+---
+
+## 9. Sincronização de Efeitos (Filtros de Latência e Pipeline)
+
+Durante a fase de sincronização completa da mesa (sync de nomes, faders, etc.), implementamos uma pipeline dedicada para atualizar o estado dos Processadores de Efeitos (FX Inputs e FX Outputs) respeitando os tempos de resposta físicos da Yamaha 01V96.
+
+### 9.1. Arquitetura da Sincronização Sequencial
+- **Fase 1: FX Inputs (Modo Batch):**
+  - Solicita o patch de entrada dos efeitos (`kEffectInput/kEffectIn`) para todos os 4 slots (L/R, total de 8 requisições).
+  - Executado em lote com throttle de hardware configurável.
+- **Fase 2: FX Outputs (Modo Batch):**
+  - Envia requisições de patch de saída (`build_fx_output_request`) para todos os destinos mapeados (canais, insert inputs, etc.).
+  - Executado em lote com throttle de hardware configurável.
+  - Ativa temporariamente `is_output_patch_active = true` para que o parser possa discriminar respostas de output patch versus inputs comuns.
+  - Coleta as confirmações (acks) em background por até 5.0 segundos antes de restaurar o estado normal.
+
+### 9.2. Ajuste Fino de Latência de Hardware
+- Descobrimos que a mesa 01V96 possui um processamento de MIDI que pode atrasar respostas sob estresse (como no sync inicial).
+- Para evitar packet loss e timeouts persistentes, o código centraliza o tempo de espera na constante `FX_SYNC_THROTTLE_MS` no topo de `sync_manager.rs`.
+- Valor inicial padrão calibrado pelo usuário: **150ms** (garante sincronização estável).
+
