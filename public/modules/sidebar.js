@@ -29,7 +29,15 @@ function forceSync() {
 }
 
 function toggleOuts() {
-    outsMode = !outsMode;
+    const efeitosModal = document.getElementById('efeitosModal');
+    if (efeitosModal && efeitosModal.style.display === 'flex') {
+        if (typeof closeEffectsModal === 'function') {
+            closeEffectsModal();
+        }
+        outsMode = true;
+    } else {
+        outsMode = !outsMode;
+    }
     technicianMixMode = false;
     const btn = document.getElementById('dockBtnOuts');
     if (btn) {
