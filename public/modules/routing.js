@@ -2,13 +2,44 @@ window.renderRouting = function(chIdx) {
     const container = document.querySelector('.ch-modal-body');
     const chData = getChannelStateById(chIdx) || {};
     
-    // Master (52), Buses (44-51), Mixes (36-43) não têm essa tela de routing na 01V96
-    if ((chIdx >= 36 && chIdx <= 52) && !(chIdx >= 60 && chIdx <= 67)) {
+    // Master (52) e Mixes (36-43) não têm essa tela de routing na 01V96
+    if (((chIdx >= 36 && chIdx <= 43) || chIdx === 52) && !(chIdx >= 60 && chIdx <= 67)) {
         container.innerHTML = `
             <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#666; padding:20px; text-align:center;">
                 <div style="font-size:48px; margin-bottom:15px; opacity:0.3;"><i class="fas fa-route"></i></div>
                 <div style="font-size:14px; font-weight:bold; text-transform:uppercase;">Routing Não Disponível</div>
             </div>`;
+        return;
+    }
+
+    if (chIdx >= 44 && chIdx <= 51) {
+        const busIdx = chIdx - 44;
+        const busState = busesState[busIdx] || {};
+        const stereoActive = !!busState.stereo;
+        
+        container.innerHTML = `
+            <div class="routing-container" style="display:flex; flex-direction:column; gap:25px; padding:15px; height:100%; overflow-y:auto;">
+                <!-- Stereo Master -->
+                <div class="routing-section" style="padding-bottom:20px;">
+                    <p style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">Saída Master</p>
+                    <button class="route-btn ${stereoActive ? 'active' : ''}" onclick="toggleStereoAssignment(${chIdx})"
+                        style="width:100%; height:55px; background:${stereoActive ? '#34c759' : '#1a1f2e'}; border:1px solid ${stereoActive ? '#34c759' : '#333'}; color:${stereoActive ? '#fff' : '#aaa'}; border-radius:10px; font-size:14px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        👑 STEREO L/R
+                    </button>
+                </div>
+                
+                <!-- Insert -->
+                <div class="routing-section" style="border-top:1px solid #333; padding-top:20px; padding-bottom:20px;">
+                    <p style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">Configuração do Insert</p>
+                    <button onclick="window.openInsertModal(${chIdx})"
+                        style="width:100%; height:55px; background:#1a1f2e; border:1px solid #5cacee; color:#5cacee; border-radius:10px; font-size:14px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        🔌 CONFIGURAR INSERT
+                    </button>
+                </div>
+            </div>
+        `;
+        const routeContainer = container.querySelector('.routing-container');
+        if (routeContainer) routeContainer.innerHTML += renderPairSection(chIdx);
         return;
     }
 
@@ -189,18 +220,29 @@ window.renderRouting = function(chIdx) {
 
 window.toggleStereoAssignment = function(chIdx) {
     if (!appReady) return;
-    const currentState = !!channelStates[chIdx].stereo;
+    
+    const isBus = chIdx >= 44 && chIdx <= 51;
+    const state = isBus ? busesState[chIdx - 44] : channelStates[chIdx];
+    const currentState = !!state.stereo;
     const newState = !currentState;
     
-    console.log(`[STEREO] Canal ${chIdx+1} -> MASTER = ${newState}`);
-    
-    socket.emit('control', {
-        type: `kInputBus/kStereo`,
-        channel: chIdx,
-        value: newState ? 1 : 0
-    });
+    if (isBus) {
+        console.log(`[STEREO] BUS ${chIdx - 43} -> MASTER = ${newState}`);
+        socket.emit('control', {
+            type: `kBusToStereo/kBusToStereoOn`,
+            channel: chIdx,
+            value: newState ? 1 : 0
+        });
+    } else {
+        console.log(`[STEREO] Canal ${chIdx+1} -> MASTER = ${newState}`);
+        socket.emit('control', {
+            type: `kInputBus/kStereo`,
+            channel: chIdx,
+            value: newState ? 1 : 0
+        });
+    }
 
-    channelStates[chIdx].stereo = newState;
+    state.stereo = newState;
     renderRouting(chIdx);
 };
 
@@ -353,6 +395,25 @@ function selectPatch(logicChIdx, patchId, uiChIdx) {
  * Renderiza o botão de PAIR ou o status de PAREADO
  */
 function renderPairSection(chIdx) {
+    if (chIdx >= 44 && chIdx <= 51) {
+        const busIdx = chIdx - 44;
+        const state = busesState[busIdx];
+        const isPaired = state && state.paired;
+        if (isPaired) {
+            return `
+            <div class="routing-section" style="border-top:1px solid #333; padding-top:20px;">
+                <p style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">Pair de Canal</p>
+                <div style="background:#0a1f10; border:1px solid #34c759; border-radius:10px; padding:16px; display:flex; align-items:center; justify-content:space-between;">
+                    <div>
+                        <span style="color:#34c759; font-size:13px; font-weight:bold;">🔗 PAREADO</span><br>
+                        <span style="color:#aaa; font-size:11px; margin-top:4px; display:block;">BUS ${busIdx+1} + BUS ${state.pairedWith+1}</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+        return '';
+    }
+
     const partnerIdx = chIdx % 2 === 0 ? chIdx + 1 : chIdx - 1;
     const state = channelStates[chIdx];
     const isPaired = state && state.paired;

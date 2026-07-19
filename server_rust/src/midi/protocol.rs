@@ -118,8 +118,13 @@ pub fn build_change(
         packet.push(coords[2]);
         packet.push(channel); // MSB (port index)
         packet.push(1); // LSB (Adat=1)
+    } else if command_name == "kOutputPatch/kFx" {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(channel / 4); // MSB (0=L, 1=R)
+        packet.push(channel % 4); // LSB (0..3 for FX1..4)
     } else if command_name == "kOutputPatch/kOmni"
-        || command_name == "kOutputPatch/kFx"
         || command_name == "kOutputPatch/k2tr"
     {
         packet.push(coords[0]);
@@ -144,10 +149,7 @@ pub fn build_change(
             } else if (60..=67).contains(&channel) {
                 final_channel = 32 + (channel - 60);
             }
-        } else if command_name.contains("EQ/")
-            || command_name.contains("Comp/")
-            || command_name.contains("Attenuator/kAtt")
-        {
+        } else {
             if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
                 final_channel = channel - 36;
             } else if command_name.starts_with("kBus") && (44..=51).contains(&channel) {
@@ -157,8 +159,6 @@ pub fn build_change(
             } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
                 final_channel = 32 + (channel - 60);
             }
-        } else if command_name.starts_with("kInput") && (60..=67).contains(&channel) {
-            final_channel = 32 + (channel - 60);
         }
 
         packet.push(element);
@@ -192,6 +192,11 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
         packet.push(coords[2]);
         packet.push(channel); // MSB is port index
         let _ = coords[3]; // unused LSB definition from dictionary
+    } else if command_name == "kOutputPatch/kFx" {
+        packet.push(coords[0]);
+        packet.push(coords[1]);
+        packet.push(coords[2]);
+        packet.push(channel / 4); // MSB (0=L, 1=R)
     } else {
         packet.push(coords[0]);
         packet.push(coords[1]);
@@ -204,26 +209,21 @@ pub fn build_request(command_name: &str, channel: u8) -> Option<Vec<u8>> {
         final_channel = 0;
     } else if command_name == "kOutputPatch/kAdat" {
         final_channel = 1;
+    } else if command_name == "kOutputPatch/kFx" {
+        final_channel = channel % 4;
     }
 
-    // Map ST IN channels for any Input command
+    // Map channels universally
     if (command_name.starts_with("kInput") || command_name == "kSetupSoloChOn/kSoloChOn")
         && (60..=67).contains(&channel)
     {
         final_channel = 32 + (channel - 60);
-    }
-
-    if command_name.contains("EQ/")
-        || command_name.contains("Comp/")
-        || command_name.contains("Attenuator/kAtt")
-    {
-        if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
-            final_channel = channel - 36;
-        } else if command_name.starts_with("kBus") && (44..=51).contains(&channel) {
-            final_channel = channel - 44;
-        } else if command_name.starts_with("kStereo") && channel == 52 {
-            final_channel = 0;
-        }
+    } else if command_name.starts_with("kAUX") && (36..=43).contains(&channel) {
+        final_channel = channel - 36;
+    } else if command_name.starts_with("kBus") && (44..=51).contains(&channel) {
+        final_channel = channel - 44;
+    } else if command_name.starts_with("kStereo") && channel == 52 {
+        final_channel = 0;
     }
     packet.push(final_channel);
 
@@ -1003,6 +1003,24 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 return cc("kInputInsert/kInsertOn", channel, val);
             } else if parameter == 2 {
                 return cc("kInputInsert/kInsertLocInsert", channel, val);
+            }
+        }
+
+        // --- BUS INSERT ON / LOCATION (element 40) ---
+        if element == 40 {
+            let val = *data_bytes.last().unwrap_or(&0) as f64;
+            if parameter == 0 {
+                return cc("kBusInsert/kInsertOn", channel, val);
+            } else if parameter == 2 {
+                return cc("kBusInsert/kInsertLocInsert", channel, val);
+            }
+        }
+
+        // --- BUS TO STEREO (element 50) ---
+        if element == 50 {
+            let val = *data_bytes.last().unwrap_or(&0) as f64;
+            if parameter == 0 {
+                return cc("kBusToStereo/kBusToStereoOn", channel, val);
             }
         }
     }

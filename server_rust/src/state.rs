@@ -123,6 +123,8 @@ pub struct MixBusState {
     pub paired_with: Option<usize>,
     #[serde(rename = "pairSource")]
     pub pair_source: Option<usize>,
+    pub insert: InsertState,
+    pub stereo: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -334,6 +336,8 @@ impl GlobalState {
                 paired: false,
                 paired_with: None,
                 pair_source: None,
+                insert: InsertState { on: false, position: 0.0, patch_in: 0.0 },
+                stereo: false,
             };
             mixes.insert(i, mix_bus_state.clone());
             let mut bus_state = mix_bus_state.clone();
@@ -575,6 +579,26 @@ impl GlobalState {
                 } else if mt == "kChannelInsertIn/kInsertIn" {
                     if let Some(ch) = self.channels.get_mut(channel) {
                         ch.insert.patch_in = v;
+                    }
+                } else if mt == "kBusInsert/kInsertOn" {
+                    let local = if (44..=51).contains(channel) { *channel - 44 } else { *channel };
+                    if let Some(bus) = self.buses.get_mut(&local) {
+                        bus.insert.on = cv;
+                    }
+                } else if mt == "kBusInsert/kInsertLocInsert" {
+                    let local = if (44..=51).contains(channel) { *channel - 44 } else { *channel };
+                    if let Some(bus) = self.buses.get_mut(&local) {
+                        bus.insert.position = v;
+                    }
+                } else if mt == "kBusToStereo/kBusToStereoOn" {
+                    let local = if (44..=51).contains(channel) { *channel - 44 } else { *channel };
+                    if let Some(bus) = self.buses.get_mut(&local) {
+                        bus.stereo = cv;
+                    }
+                } else if mt == "kBusInsertInput/kBusInsertIn" {
+                    let local = if (44..=51).contains(channel) { *channel - 44 } else { *channel };
+                    if let Some(bus) = self.buses.get_mut(&local) {
+                        bus.insert.patch_in = v;
                     }
                 } else if mt == "kOutputPatch/kOmni" {
                     self.out_patches_omni.insert(*channel, v);
@@ -825,6 +849,11 @@ impl GlobalState {
             } => {
                 let key = element * 100 + channel;
                 self.fx_outputs.insert(key, *value);
+                if *element == 7 {
+                    if let Some(bus) = self.buses.get_mut(channel) {
+                        bus.insert.patch_in = *value;
+                    }
+                }
             }
         }
     }

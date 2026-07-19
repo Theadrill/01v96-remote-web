@@ -246,6 +246,35 @@ socket.on('update', (d) => {
             }
         }
 
+        // Suporte a Bus Insert / Stereo (ETC)
+        if (d.type === 'kBusInsert/kInsertOn') {
+            const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
+            const globalCh = 44 + busIdx;
+            const state = busesState[busIdx];
+            if (state) state.insert.on = !!d.value;
+            if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
+                renderRouting(globalCh);
+            }
+        }
+        if (d.type === 'kBusInsert/kInsertLocInsert') {
+            const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
+            const globalCh = 44 + busIdx;
+            const state = busesState[busIdx];
+            if (state) state.insert.position = d.value;
+            if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
+                renderRouting(globalCh);
+            }
+        }
+        if (d.type === 'kBusToStereo/kBusToStereoOn') {
+            const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
+            const globalCh = 44 + busIdx;
+            const state = busesState[busIdx];
+            if (state) state.stereo = !!d.value;
+            if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
+                renderRouting(globalCh);
+            }
+        }
+
         // Suporte a BUS / STEREO (ETC)
         if (d.type && d.type.startsWith('kInputBus/k')) {
             const state = getChannelStateById(d.channel);

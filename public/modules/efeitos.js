@@ -154,6 +154,27 @@
         }
         console.log('[FX] applyFxOutputs: changed=' + changed + '/' + newKeys.length + ' keys');
         if (changed > 0) console.log('[FX] diffs:', diffs.join(', '));
+        
+        // Sync local insert input patch values
+        for (const [keyStr, val] of Object.entries(newData)) {
+            const key = parseInt(keyStr, 10);
+            const element = Math.floor(key / 100);
+            const channel = key % 100;
+            if (element === 2) {
+                if (window.channelStates && window.channelStates[channel] && window.channelStates[channel].insert) {
+                    window.channelStates[channel].insert.patch_in = val;
+                }
+            } else if (element === 7) {
+                if (window.busesState && window.busesState[channel] && window.busesState[channel].insert) {
+                    window.busesState[channel].insert.patch_in = val;
+                }
+            } else if (element === 8) {
+                if (window.mixesState && window.mixesState[channel] && window.mixesState[channel].insert) {
+                    window.mixesState[channel].insert.patch_in = val;
+                }
+            }
+        }
+
         fxOutputs = newData;
         logFxOutputMapping();
         rerenderIfOpen();

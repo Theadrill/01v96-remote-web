@@ -554,6 +554,10 @@ async fn queue_all_params_inner(
         if i % 2 == 0 {
             push_req(&mut requests, "kBusPair/kPair", i);
         }
+        push_req(&mut requests, "kBusInsert/kInsertOn", i);
+        push_req(&mut requests, "kBusInsert/kInsertLocInsert", i);
+        push_req(&mut requests, "kBusToStereo/kBusToStereoOn", i);
+        push_req(&mut requests, "kBusInsertInput/kBusInsertIn", i);
     }
 
     push_req(&mut requests, "kStereoFader/kFader", 0);

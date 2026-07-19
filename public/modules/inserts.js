@@ -8,8 +8,18 @@ window.openInsertModal = function(chIdx) {
     // Obter patch_out se existir, buscando em globalOutPatches
     let currentOut = 0; // 0 = None
     if (window.globalOutPatches) {
-        const targetSrcNormal = chIdx + 31;
-        const targetSrcFx = chIdx + 13;
+        let targetSrcNormal = 0;
+        let targetSrcFx = 0;
+        if (chIdx >= 0 && chIdx <= 31) {
+            targetSrcNormal = chIdx + 31;
+            targetSrcFx = chIdx + 13;
+        } else if (chIdx >= 44 && chIdx <= 51) {
+            targetSrcNormal = (chIdx - 44) + 127;
+            targetSrcFx = (chIdx - 44) + 109;
+        } else if (chIdx >= 36 && chIdx <= 43) {
+            targetSrcNormal = (chIdx - 36) + 9;
+            targetSrcFx = (chIdx - 36) + 117;
+        }
         
         for (let p = 0; p < 4; p++) {
             if (window.globalOutPatches.omni && window.globalOutPatches.omni[p] === targetSrcNormal) { currentOut = p + 60; break; }
@@ -65,9 +75,13 @@ window.openInsertModal = function(chIdx) {
         if (chData.insert.patch_in === 150) inName = '2TD R';
     }
 
+    let titleName = `CH ${chIdx + 1}`;
+    if (chIdx >= 44 && chIdx <= 51) titleName = `BUS ${chIdx - 43}`;
+    else if (chIdx >= 36 && chIdx <= 43) titleName = `AUX ${chIdx - 35}`;
+
     const html = `
         <div style="padding: 20px;">
-            <h3 style="margin-top:0; color:#5cacee; margin-bottom:20px;"><i class="fas fa-random"></i> CONFIGURAR INSERT - CH ${chIdx + 1}</h3>
+            <h3 style="margin-top:0; color:#5cacee; margin-bottom:20px;"><i class="fas fa-random"></i> CONFIGURAR INSERT - ${titleName}</h3>
             
             <div style="display:flex; flex-direction:column; gap:15px;">
                 <!-- INSERT ON/OFF -->
@@ -112,8 +126,9 @@ window.toggleInsertOn = function(chIdx) {
     const chData = getChannelStateById(chIdx);
     const newState = !(chData.insert && chData.insert.on);
     
+    const commandType = (chIdx >= 44 && chIdx <= 51) ? 'kBusInsert/kInsertOn' : 'kInputInsert/kInsertOn';
     socket.emit('control', {
-        type: 'kInputInsert/kInsertOn',
+        type: commandType,
         channel: chIdx,
         value: newState ? 1 : 0
     });
@@ -165,8 +180,9 @@ window.openInsertPositionSelector = function(chIdx) {
 };
 
 window.setInsertPosition = function(chIdx, posVal) {
+    const commandType = (chIdx >= 44 && chIdx <= 51) ? 'kBusInsert/kInsertLocInsert' : 'kInputInsert/kInsertLocInsert';
     socket.emit('control', {
-        type: 'kInputInsert/kInsertLocInsert',
+        type: commandType,
         channel: chIdx,
         value: posVal
     });
@@ -239,9 +255,13 @@ window.openInsertOutSelector = function(chIdx, currentOut) {
     optionsHtml += `<button onclick="setInsertOut(${chIdx}, '2tr', 1)" style="height:45px; background:#222; border:1px solid #444; color:#fff; border-radius:8px;">2TD R</button>`;
     optionsHtml += '</div>';
 
+    let titleName = `CH ${chIdx + 1}`;
+    if (chIdx >= 44 && chIdx <= 51) titleName = `BUS ${chIdx - 43}`;
+    else if (chIdx >= 36 && chIdx <= 43) titleName = `AUX ${chIdx - 35}`;
+
     const html = `
         <div style="padding: 20px;">
-            <h3 style="margin-top:0; color:#ff9800; margin-bottom:15px;">INSERT OUT CH ${chIdx + 1}</h3>
+            <h3 style="margin-top:0; color:#ff9800; margin-bottom:15px;">INSERT OUT ${titleName}</h3>
             <div style="max-height: 60vh; overflow-y: auto; padding-right:5px;">
                 ${optionsHtml}
             </div>
@@ -253,7 +273,18 @@ window.openInsertOutSelector = function(chIdx, currentOut) {
 };
 
 window.setInsertOut = function(chIdx, type, portIdx) {
-    const srcValue = (type === null) ? 0 : (type === 'fx' ? chIdx + 13 : chIdx + 31);
+    let srcValue = 0;
+    if (type !== null) {
+        if (chIdx >= 0 && chIdx <= 31) {
+            srcValue = (type === 'fx') ? chIdx + 13 : chIdx + 31;
+        } else if (chIdx >= 44 && chIdx <= 51) {
+            const busIdx = chIdx - 44;
+            srcValue = (type === 'fx') ? busIdx + 109 : busIdx + 127;
+        } else if (chIdx >= 36 && chIdx <= 43) {
+            const auxIdx = chIdx - 36;
+            srcValue = (type === 'fx') ? auxIdx + 117 : auxIdx + 9;
+        }
+    }
     
     if (type !== null) {
         let currentAssignedSrc = 0;
@@ -318,8 +349,18 @@ window.executeSetInsertOut = function(chIdx, type, portIdx, srcValue) {
 };
 
 window.clearPreviousInsertOut = function(chIdx) {
-    const srcToClearFx = chIdx + 13;
-    const srcToClearNormal = chIdx + 31;
+    let srcToClearNormal = 0;
+    let srcToClearFx = 0;
+    if (chIdx >= 0 && chIdx <= 31) {
+        srcToClearNormal = chIdx + 31;
+        srcToClearFx = chIdx + 13;
+    } else if (chIdx >= 44 && chIdx <= 51) {
+        srcToClearNormal = (chIdx - 44) + 127;
+        srcToClearFx = (chIdx - 44) + 109;
+    } else if (chIdx >= 36 && chIdx <= 43) {
+        srcToClearNormal = (chIdx - 36) + 9;
+        srcToClearFx = (chIdx - 36) + 117;
+    }
     
     if (window.globalOutPatches) {
         for (let t of ['omni', 'adat', 'fx', 'slot', '2tr']) {
@@ -492,9 +533,13 @@ window.openInsertInSelector = function(chIdx, currentIn) {
     optionsHtml += `<button onclick="setInsertIn(${chIdx}, 150)" style="height:45px; background:#222; border:1px solid #444; color:#fff; border-radius:8px; font-size:12px;">2TD R</button>`;
     optionsHtml += '</div>';
 
+    let titleName = `CH ${chIdx + 1}`;
+    if (chIdx >= 44 && chIdx <= 51) titleName = `BUS ${chIdx - 43}`;
+    else if (chIdx >= 36 && chIdx <= 43) titleName = `AUX ${chIdx - 35}`;
+
     const html = `
         <div style="padding: 20px;">
-            <h3 style="margin-top:0; color:#4caf50; margin-bottom:15px;">INSERT IN CH ${chIdx + 1}</h3>
+            <h3 style="margin-top:0; color:#4caf50; margin-bottom:15px;">INSERT IN ${titleName}</h3>
             <div style="max-height: 60vh; overflow-y: auto; padding-right:5px;">
                 ${optionsHtml}
             </div>
@@ -508,8 +553,10 @@ window.openInsertInSelector = function(chIdx, currentIn) {
 window.setInsertIn = function(chIdx, srcValue) {
     // Envia um evento de controle em vez de SysEx bruto.
     // Assim, o servidor atualiza o GlobalState imediatamente.
+    const isBus = chIdx >= 44 && chIdx <= 51;
+    const commandType = isBus ? 'kBusInsertInput/kBusInsertIn' : 'kChannelInsertIn/kInsertIn';
     socket.emit('control', {
-        type: 'kChannelInsertIn/kInsertIn',
+        type: commandType,
         channel: chIdx,
         value: srcValue
     });
