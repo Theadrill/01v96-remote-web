@@ -26,12 +26,6 @@
       "file": "custom_names_scene-REGIS 360-mesa-maria.json"
     },
     {
-      "custom_name": "SENSIBLDADE 36",
-      "physical_scene": "SENSIBLDADE 36",
-      "physical_id": 20,
-      "file": "custom_names_scene-SENSIBLDADE 36-mesa-maria.json"
-    },
-    {
       "custom_name": "KALAWE 360",
       "physical_scene": "KALAWE 360",
       "physical_id": 24,
@@ -84,6 +78,12 @@
       "physical_scene": "DAN VIEIRA 360",
       "physical_id": 29,
       "file": "custom_names_scene-DAN VIEIRA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "ID DO SAMBA 360",
+      "physical_scene": "ID DO SAMBA 360",
+      "physical_id": 20,
+      "file": "custom_names_scene-ID DO SAMBA 360-mesa-maria.json"
     }
   ]
 }
