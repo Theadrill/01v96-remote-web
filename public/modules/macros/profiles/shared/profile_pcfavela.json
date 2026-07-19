@@ -73,6 +73,26 @@
     "name": "luz e strobo",
     "scriptId": "lumikit"
   },
+  "7": {
+    "config": {
+      "extras": [],
+      "scenes": [
+        "0:14"
+      ]
+    },
+    "name": "MACRO 8",
+    "scriptId": "lumikit"
+  },
+  "8": {
+    "config": {
+      "extras": [],
+      "scenes": [
+        "0:3"
+      ]
+    },
+    "name": "MACRO 9",
+    "scriptId": "lumikit"
+  },
   "globalConfig": {
     "lumikit": {
       "ip": "pcfavela",
