@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "public/modules/sidebar.js": {
-    "mtime": 1784771527.4259067,
-    "ast_hash": "6aa6a90b502e85091f37103c659e836f",
+    "mtime": 1784427964.9600086,
+    "ast_hash": "26e889d86d5bfc398defa8aeaf7eeca3",
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1784771582.0901804,
-    "ast_hash": "c9bfa5e0a067d4d3b77c58a7b67c996c",
+    "mtime": 1784771407.580974,
+    "ast_hash": "51be73259df583036cf375c9ac802837",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -3170,8 +3170,8 @@
     "semantic_hash": ""
   },
   "public/modules/FXS/reverb.js": {
-    "mtime": 1784771488.0875688,
-    "ast_hash": "a37c5917aa4bada1295421361b8e65a0",
+    "mtime": 1784771382.9456537,
+    "ast_hash": "37176d38b177cb48defc7908da7d4bb4",
     "semantic_hash": ""
   },
   "public/modules/fx_routing.js": {

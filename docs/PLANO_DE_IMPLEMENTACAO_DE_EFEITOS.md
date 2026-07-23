@@ -727,3 +727,63 @@ Durante a fase de sincronização completa da mesa (sync de nomes, faders, etc.)
 - O valor é lido na inicialização do servidor e propagado com segurança para o `SyncManager`.
 - Valor padrão calibrado pelo usuário: **150** (150ms), garantindo sincronização estável em lote para Inputs e Outputs.
 
+---
+
+## 10. IMPLEMENTAÇÃO DE TELAS DE EFEITOS
+
+Nesta seção documentamos o plano de arquitetura, sincronização sob demanda (Lazy-Sync por Slot) e catálogo de parâmetros para as telas individuais de cada processador de efeito (FX1–FX4).
+
+### 10.1. Estratégia de Sincronização Sob Demanda (Lazy-Sync por Slot)
+Para evitar o consumo excessivo da largura de banda MIDI (31.25 kbps) e garantir inicialização ultra-rápida do aplicativo:
+- **Boot Inicial do App:** Sincroniza apenas os canais principais (faders, mutes, EQs, auxs, panning e visão geral dos slots FX). NÃO sincroniza os parâmetros internos detalhados das máquinas de efeitos.
+- **On-Demand (Ao Abrir o Efeito):** Ao clicar em um slot FX (`openFxEditor(slotIdx)`):
+  - Verifica se o slot já foi sincronizado nesta sessão (`syncedSlots[slotIdx] === false`).
+  - Se não sincronizado, dispara a requisição dos parâmetros específicos daquele algoritmo para a mesa, marcando o slot como `syncedSlots[slotIdx] = true`.
+  - Se já sincronizado, lê instantaneamente do cache local em memória RAM.
+- **Escuta em Tempo Real (Event-Driven):** Uma vez sincronizado o slot, o aplicativo escuta mensagens SysEx de Parameter Change da mesa e emite alterações instantâneas quando o operador interage com a UI web (Knobs, Steppers ou Faders).
+
+---
+
+### 10.2. TELAS DE EFEITOS DE REVERB (REVERB HALL, REVERB ROOM, REVERB STAGE, REVERB PLATE)
+
+Os 4 Reverbs Padrão da Yamaha 01V96 compartilham a mesma estrutura de 14 parâmetros + Mix Balance + Bypass:
+
+#### Mapeamento de Endereços Hex por Slot (0x00 a 0x03) e Parâmetros (0x10 a 0x34)
+- **INI.DLY (`0x10`):** Initial Delay (0 a 500.0ms)
+- **REV TIME (`0x11`):** Tempo de Reverb (0.3s a 99.0s)
+- **HI.RATIO (`0x12`):** Amortecimento de Agudos (0.1 a 1.0)
+- **LO.RATIO (`0x13`):** Amortecimento de Graves (0.1 a 2.0)
+- **DIFF (`0x14`):** Difusão (0 a 10)
+- **DENSITY (`0x15`):** Densidade (0% a 100%)
+- **HPF (`0x16`):** Filtro Passa-Altas (Thru / 20Hz a 8.00kHz)
+- **LPF (`0x17`):** Filtro Passa-Baixas (1.00kHz a 20.0kHz / Thru)
+- **E/R DLY (`0x18`):** Early Reflection Delay (0.0ms a 100.0ms)
+- **E/R BAL (`0x19`):** Early Reflection Balance (0% a 100%)
+- **GATE LVL (`0x1A`):** Threshold do Gate (OFF / -60dB a 0dB)
+- **ATTACK (`0x1B`):** Tempo de Ataque do Gate (0ms a 120ms)
+- **HOLD (`0x1C`):** Tempo de Sustentação (0ms a 500ms)
+- **DECAY (`0x1D`):** Tempo de Decaimento do Gate (0ms a 500ms)
+- **MIX BALANCE (`0x30`):** Proporção Wet/Dry (0% a 100%)
+- **BYPASS (`0x34`):** Estado de Bypass (0 = ON, 1 = BYPASS)
+
+#### Organização das Telas (Desktop vs Mobile)
+- **Layout Desktop (Grid Responsivo de Seções Verticais):**
+  - Aproveitamento total de telas largas (1366px, Full HD, 4K) em até 4 colunas verticais lado a lado:
+    - *Cartão 1 (SAÍDA & FILTROS):* MIX BALANCE, HPF, LPF
+    - *Cartão 2 (TEMPO & ESPECTRO):* REV TIME, INI. DLY, HI.RATIO, LO.RATIO
+    - *Cartão 3 (REFLEXÕES & DIFUSÃO):* DIFF., DENSITY, E/R DLY, E/R BAL.
+    - *Cartão 4 (ENVELOPE DO GATE):* GATE LVL, ATTACK, HOLD, DECAY
+- **Layout Mobile (Abas Touch com Stepper Cards):**
+  - Navegação rápida por abas categorizadas (*TEMPO*, *REFLEXÕES*, *FILTROS*, *GATE*) com suporte a botões de toque contínuo (auto-repeat).
+
+---
+
+### 10.3. PRÓXIMOS ALGORITMOS DE EFEITO (A MAPEAR)
+- **REV-X (REV-X Hall, REV-X Room):** Algoritmo avançado da Yamaha com janela customizada e parâmetros estendidos.
+- **DELAYS (Mono Delay, Stereo Delay, Delay L,C,R, Echo):** Sincronização por Tempo (ms) e BPM/Subdivisão rítmica.
+- **MODULAÇÃO (Chorus, Flanger, Phaser, Symphonic, Tremolo):** Taxa de modulação (Speed/Hz), profundidade (Depth) e realimentação (Feedback).
+- **DINÂMICOS MULTIBANDA (M.Band Dyna, Multi-Filter):** Compressores/Expansores multibanda.
+- **EFEITOS COMBINADOS (Delay+Rev, Chorus+Rev, etc.):** Interfaces divididas em duas seções de controle duplo.
+- **TELA DE EFEITO EM CONSTRUÇÃO:** Para efeitos ainda não calibrados, o sistema exibe a mensagem amigável de desenvolvimento mantendo o cabeçalho e slot identificados.
+
+
