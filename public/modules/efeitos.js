@@ -6,10 +6,10 @@
 
     // ── Estado dos 4 slots (preenchido pelo servidor) ──────────────────
     const fxSlots = [
-        { id: 1, effectName: '...', bypass: false, mix: 100 },
-        { id: 2, effectName: '...', bypass: false, mix: 100 },
-        { id: 3, effectName: '...', bypass: false, mix: 100 },
-        { id: 4, effectName: '...', bypass: false, mix: 100 },
+        { id: 1, effectName: 'Reverb Hall', bypass: false, mix: 100 },
+        { id: 2, effectName: 'Reverb Room', bypass: false, mix: 100 },
+        { id: 3, effectName: 'Reverb Stage', bypass: false, mix: 100 },
+        { id: 4, effectName: 'Reverb Plate', bypass: false, mix: 100 },
     ];
 
     // FX inputs: [slot][lr] → source id
@@ -356,7 +356,7 @@
                     <div class="fx-wire"></div>
                 </div>
             </div>
-            <div class="fx-processor ${bypassCls}">
+            <div class="fx-processor ${bypassCls}" onclick="if(!event.target.closest('.fx-bypass-btn')) openFxEditor(${idx})">
                 <span class="fx-proc-id">${slot.id}</span>
                 <span class="fx-proc-name">${slot.effectName}</span>
                 <button class="fx-bypass-btn" title="Bypass">${bypassIcon}</button>
@@ -437,6 +437,30 @@
         hideSyncOverlay();
     }
     window.closeEffectsModal = closeEffectsModal;
+
+    function isStandardReverbName(name) {
+        if (!name) return false;
+        const s = String(name).toUpperCase();
+        if (s.includes('REV-X') || s.includes('REV X') || s.includes('+')) return false;
+        return s.includes('HALL') || s.includes('ROOM') || s.includes('STAGE') || s.includes('PLATE') || s.includes('REVERB');
+    }
+
+    function openFxEditor(idx) {
+        const slot = fxSlots[idx];
+        const effectName = slot ? slot.effectName : '';
+        console.log('[FX] Abrindo slot FX' + (idx + 1) + ' (Tipo: ' + effectName + ')');
+
+        if (isStandardReverbName(effectName)) {
+            if (window.ReverbEditor && typeof window.ReverbEditor.open === 'function') {
+                window.ReverbEditor.open(idx, effectName);
+            }
+        } else {
+            if (window.ReverbEditor && typeof window.ReverbEditor.openUnderConstruction === 'function') {
+                window.ReverbEditor.openUnderConstruction(idx, effectName);
+            }
+        }
+    }
+    window.openFxEditor = openFxEditor;
 
     // ── rerenderIfOpen (usado pelos listeners de fxTypesUpdate etc.) ───
     function rerenderIfOpen() {

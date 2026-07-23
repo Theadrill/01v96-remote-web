@@ -769,7 +769,7 @@ function renderDock(mode) {
                 buttons.push({ label: '1-16', action: 'setLayer(0)', cls: 'dock-layer' + (activeLayerStart === 0 ? ' active-tab' : '') });
                 buttons.push({ label: '17-32', action: 'setLayer(16)', cls: 'dock-layer' + (activeLayerStart === 16 ? ' active-tab' : '') });
             }
-            buttons.push({ label: 'SAIR', action: "var em=document.getElementById('efeitosModal');if(em&&em.style.display==='flex'){closeEffectsModal()}else{document.getElementById('logoutConfirmModal').style.display='flex'}", cls: 'dock-exit' });
+            buttons.push({ label: 'SAIR', action: "triggerExitActiveMode()", cls: 'dock-exit' });
             const isStandalone = window.navigator.standalone === true;
             if (!isStandalone) {
                 const fsSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`;
@@ -829,11 +829,26 @@ function renderDock(mode) {
     }
 }
 
+function isModalOpen(el) {
+    if (!el) return false;
+    if (el.style.display === 'flex' || el.style.display === 'block') return true;
+    return window.getComputedStyle(el).display !== 'none';
+}
+
 function triggerExitActiveMode() {
+    const fxEditorModal = document.getElementById('fxEditorModal');
+    if (isModalOpen(fxEditorModal)) {
+        if (window.ReverbEditor && typeof window.ReverbEditor.close === 'function') {
+            window.ReverbEditor.close();
+            return;
+        }
+    }
     const efeitosModal = document.getElementById('efeitosModal');
-    if (efeitosModal && efeitosModal.style.display === 'flex') {
-        if (typeof closeEffectsModal === 'function') closeEffectsModal();
-        return;
+    if (isModalOpen(efeitosModal)) {
+        if (typeof closeEffectsModal === 'function') {
+            closeEffectsModal();
+            return;
+        }
     }
     const mode = window.currentDockMode;
     if (mode === 'main' || mode === 'musician') {
@@ -1048,49 +1063,8 @@ function handleMobileSairAction() {
         return;
     }
 
-    // PRIORIDADE 1.5: Se o modal de efeitos estiver aberto, fecha ele
-    const efeitosModal = document.getElementById('efeitosModal');
-    if (efeitosModal && efeitosModal.style.display === 'flex') {
-        if (typeof closeEffectsModal === 'function') closeEffectsModal();
-        return;
-    }
-
-    // PRIORIDADE 2: Executa o fechamento/desconexão contextual com base no estado atual da aplicação
-    const currentMode = window.currentDockMode || 'main';
-
-    switch (currentMode) {
-        case 'main':
-            // Abre o modal padrão de confirmação de logout/desconexão
-            if (document.getElementById('logoutConfirmModal')) {
-                document.getElementById('logoutConfirmModal').style.display = 'flex';
-            }
-            break;
-            
-        case 'channelConfig':
-            // Executa a função nativa para fechar a tela individual do canal
-            if (typeof closeChannelConfig === 'function') {
-                closeChannelConfig();
-            }
-            break;
-            
-        case 'outs':
-            // Executa a função nativa para fechar a tela de mix/bus masters
-            if (typeof toggleOuts === 'function') {
-                toggleOuts();
-            }
-            break;
-            
-        case 'techMix':
-            // Executa a função nativa para fechar o modo técnico/Sends on Faders
-            if (typeof exitTechnicianMixMode === 'function') {
-                exitTechnicianMixMode();
-            }
-            break;
-
-        default:
-            console.log("Ação de Sair executada para o modo: " + currentMode);
-            break;
-    }
+    // Unificado com a ação geral de saída do aplicativo
+    triggerExitActiveMode();
 }
 
 function toggleMobileMenu() {
