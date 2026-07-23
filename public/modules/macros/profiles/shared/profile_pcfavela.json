@@ -31,11 +31,15 @@
     "scriptId": "channel_toggler"
   },
   "3": {
-    "config": [
-      22
-    ],
-    "name": "VDJ",
-    "scriptId": "channel_toggler"
+    "color": "#327671",
+    "config": {
+      "extras": [],
+      "scenes": [
+        "0:10"
+      ]
+    },
+    "name": "DJ E PARLED",
+    "scriptId": "lumikit"
   },
   "4": {
     "color": "#ff2929",
