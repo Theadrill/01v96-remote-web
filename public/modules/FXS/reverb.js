@@ -96,34 +96,9 @@
         const container = document.getElementById('fxEditorModalContent');
         if (!container) return;
 
-        const html = `
-        <div class="fx-ed-container theme-stage concept-construction">
-            <div class="fx-ed-header theme-stage">
-                <div class="fx-ed-header-top">
-                    <div class="fx-ed-title-block">
-                        <span class="fx-ed-slot-tag">FX${slotNum}</span>
-                        <h2 class="fx-ed-name">${displayName}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="fx-ed-scroll-body">
-                <div class="fx-under-construction">
-                    <div class="fx-uc-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="fx-uc-title">TELA DE EFEITO EM CONSTRUÇÃO</h3>
-                    <div class="fx-uc-name-badge">${displayName}</div>
-                    <p class="fx-uc-desc">
-                        A tela de configuração individual para este efeito está em desenvolvimento.<br><br>
-                        Os 4 Reverbs Padrão (<strong>REVERB HALL</strong>, <strong>REVERB ROOM</strong>, <strong>REVERB STAGE</strong> e <strong>REVERB PLATE</strong>) já estão 100% calibrados e disponíveis para teste no simulador.
-                    </p>
-                </div>
-            </div>
-        </div>`;
-
-        container.innerHTML = html;
+        if (window.FXComponents) {
+            container.innerHTML = FXComponents.renderUnderConstruction({ slotNum, displayName });
+        }
 
         const overviewModal = document.getElementById('efeitosModal');
         if (overviewModal) overviewModal.style.display = 'none';
@@ -165,32 +140,14 @@
         const params = REVERB_PARAMS_DEFAULT;
         const effectName = currentEffectTitle || preset.type;
 
-        const headerHTML = `
-            <div class="fx-ed-header ${preset.colorTheme}">
-                <div class="fx-ed-header-top">
-                    <div class="fx-ed-title-block">
-                        <span class="fx-ed-slot-tag">FX${preset.slot}</span>
-                        <h2 class="fx-ed-name">${effectName}</h2>
-                    </div>
-                    <div class="fx-ed-bypass-wrapper">
-                        <button class="fx-ed-bypass-btn ${params.bypass ? 'active' : ''}" onclick="this.classList.toggle('active')">
-                            BYPASS
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Seletor de Layout (MOBILE | DESKTOP com localStorage) -->
-                <div class="fx-ed-layout-picker">
-                    <span class="fx-ed-picker-label">LAYOUT:</span>
-                    <button class="fx-ed-layout-btn ${currentLayoutMode === 'mobile' ? 'active' : ''}" onclick="ReverbEditor.setLayoutMode('mobile')">
-                        MOBILE
-                    </button>
-                    <button class="fx-ed-layout-btn ${currentLayoutMode === 'desktop' ? 'active' : ''}" onclick="ReverbEditor.setLayoutMode('desktop')">
-                        DESKTOP
-                    </button>
-                </div>
-            </div>
-        `;
+        const headerHTML = window.FXComponents ? FXComponents.renderHeader({
+            slot: preset.slot,
+            effectName: effectName,
+            colorTheme: preset.colorTheme,
+            bypass: params.bypass,
+            currentMode: currentLayoutMode,
+            showBypass: true
+        }) : '';
 
         let bodyHTML = '';
         if (currentConcept === 1) {
@@ -213,69 +170,61 @@
     // CONCEITO 1: Knobs Rotativos em Grid (Manipuláveis por Arrasto)
     // ─────────────────────────────────────────────────────────────────
     function renderConcept1Knobs(p, preset) {
+        if (!window.FXComponents) return '';
+
         return `
         <div class="concept-view concept-knobs">
             <!-- Grupo 1: Mix Balance & Filtros -->
-            <div class="fx-card-group">
-                <div class="fx-card-header">SAÍDA & FILTROS</div>
-                <div class="knobs-grid">
-                    ${renderKnobItem(p.mix.name, p.mix.val, p.mix.pct, 'purple')}
-                    ${renderKnobItem(p.hpf.name, p.hpf.val, p.hpf.pct, 'rose')}
-                    ${renderKnobItem(p.lpf.name, p.lpf.val, p.lpf.pct, 'rose')}
-                </div>
-            </div>
+            ${FXComponents.renderCardGroup({
+                title: 'SAÍDA & FILTROS',
+                content: `
+                    ${FXComponents.renderKnob({ label: p.mix.name, value: p.mix.val, percent: p.mix.pct, colorClass: 'purple' })}
+                    ${FXComponents.renderKnob({ label: p.hpf.name, value: p.hpf.val, percent: p.hpf.pct, colorClass: 'rose' })}
+                    ${FXComponents.renderKnob({ label: p.lpf.name, value: p.lpf.val, percent: p.lpf.pct, colorClass: 'rose' })}
+                `
+            })}
 
             <!-- Grupo 2: Tempos & Ratios -->
-            <div class="fx-card-group">
-                <div class="fx-card-header">TEMPO & ESPECTRO</div>
-                <div class="knobs-grid">
-                    ${renderKnobItem(p.revTime.name, p.revTime.val, p.revTime.pct, 'purple')}
-                    ${renderKnobItem(p.iniDly.name, p.iniDly.val, p.iniDly.pct, 'cyan')}
-                    ${renderKnobItem(p.hiRatio.name, p.hiRatio.val, p.hiRatio.pct, 'amber')}
-                    ${renderKnobItem(p.loRatio.name, p.loRatio.val, p.loRatio.pct, 'amber')}
-                </div>
-            </div>
+            ${FXComponents.renderCardGroup({
+                title: 'TEMPO & ESPECTRO',
+                content: `
+                    ${FXComponents.renderKnob({ label: p.revTime.name, value: p.revTime.val, percent: p.revTime.pct, colorClass: 'purple' })}
+                    ${FXComponents.renderKnob({ label: p.iniDly.name, value: p.iniDly.val, percent: p.iniDly.pct, colorClass: 'cyan' })}
+                    ${FXComponents.renderKnob({ label: p.hiRatio.name, value: p.hiRatio.val, percent: p.hiRatio.pct, colorClass: 'amber' })}
+                    ${FXComponents.renderKnob({ label: p.loRatio.name, value: p.loRatio.val, percent: p.loRatio.pct, colorClass: 'amber' })}
+                `
+            })}
 
             <!-- Grupo 3: Reflexões Primárias & Difusão -->
-            <div class="fx-card-group">
-                <div class="fx-card-header">REFLEXÕES & DIFUSÃO</div>
-                <div class="knobs-grid">
-                    ${renderKnobItem(p.diff.name, p.diff.val, p.diff.pct, 'blue')}
-                    ${renderKnobItem(p.density.name, p.density.val, p.density.pct, 'blue')}
-                    ${renderKnobItem(p.erDly.name, p.erDly.val, p.erDly.pct, 'cyan')}
-                    ${renderKnobItem(p.erBal.name, p.erBal.val, p.erBal.pct, 'green')}
-                </div>
-            </div>
+            ${FXComponents.renderCardGroup({
+                title: 'REFLEXÕES & DIFUSÃO',
+                content: `
+                    ${FXComponents.renderKnob({ label: p.diff.name, value: p.diff.val, percent: p.diff.pct, colorClass: 'blue' })}
+                    ${FXComponents.renderKnob({ label: p.density.name, value: p.density.val, percent: p.density.pct, colorClass: 'blue' })}
+                    ${FXComponents.renderKnob({ label: p.erDly.name, value: p.erDly.val, percent: p.erDly.pct, colorClass: 'cyan' })}
+                    ${FXComponents.renderKnob({ label: p.erBal.name, value: p.erBal.val, percent: p.erBal.pct, colorClass: 'green' })}
+                `
+            })}
 
             <!-- Grupo 4: Envelope do Gate -->
-            <div class="fx-card-group">
-                <div class="fx-card-header">ENVELOPE DO GATE</div>
-                <div class="knobs-grid">
-                    ${renderKnobItem(p.gateLvl.name, p.gateLvl.val, p.gateLvl.pct, 'emerald')}
-                    ${renderKnobItem(p.attack.name, p.attack.val, p.attack.pct, 'emerald')}
-                    ${renderKnobItem(p.hold.name, p.hold.val, p.hold.pct, 'emerald')}
-                    ${renderKnobItem(p.decay.name, p.decay.val, p.decay.pct, 'emerald')}
-                </div>
-            </div>
+            ${FXComponents.renderCardGroup({
+                title: 'ENVELOPE DO GATE',
+                content: `
+                    ${FXComponents.renderKnob({ label: p.gateLvl.name, value: p.gateLvl.val, percent: p.gateLvl.pct, colorClass: 'emerald' })}
+                    ${FXComponents.renderKnob({ label: p.attack.name, value: p.attack.val, percent: p.attack.pct, colorClass: 'emerald' })}
+                    ${FXComponents.renderKnob({ label: p.hold.name, value: p.hold.val, percent: p.hold.pct, colorClass: 'emerald' })}
+                    ${FXComponents.renderKnob({ label: p.decay.name, value: p.decay.val, percent: p.decay.pct, colorClass: 'emerald' })}
+                `
+            })}
         </div>`;
     }
 
     function degFromPct(pct) {
-        return Math.round(-135 + (pct / 100) * 270);
+        return window.FXComponents ? FXComponents.degFromPct(pct) : Math.round(-135 + (pct / 100) * 270);
     }
 
     function renderKnobItem(label, value, percent, colorClass = 'purple') {
-        const deg = degFromPct(percent);
-        return `
-        <div class="knob-box ${colorClass}" onmousedown="ReverbEditor.startKnobDrag(event, this)" ontouchstart="ReverbEditor.startKnobDrag(event, this)">
-            <span class="knob-label">${label}</span>
-            <div class="knob-outer">
-                <div class="knob-ring" style="--percent: ${percent}%;"></div>
-                <div class="knob-pointer" style="transform: rotate(${deg}deg);"></div>
-                <div class="knob-center-dot"></div>
-            </div>
-            <span class="knob-val-badge">${value}</span>
-        </div>`;
+        return window.FXComponents ? FXComponents.renderKnob({ label, value, percent, colorClass }) : '';
     }
 
     // ─────────────────────────────────────────────────────────────────
