@@ -1,0 +1,170 @@
+{
+  "scene_name": "SAID DE EMRG 3",
+  "scene_id": 36,
+  "channels": {
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "19": {
+      "name": "MIC DAVI",
+      "short": "MICD"
+    },
+    "31": {
+      "name": "TANT AGUDO",
+      "short": "TANT"
+    },
+    "3": {
+      "name": "SURDAO",
+      "short": "SURD"
+    },
+    "15": {
+      "name": "REGENCIA",
+      "short": "REGE"
+    },
+    "9": {
+      "name": "CAVACO",
+      "short": "CAVA"
+    },
+    "11": {
+      "name": "MIC HAMILT",
+      "short": "MICH"
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "2": {
+      "name": "CHIMBAL",
+      "short": "CHIM"
+    },
+    "29": {
+      "name": "VOZES",
+      "short": "VOZE"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "32": {
+      "name": "KICK AGUDO",
+      "short": "KICK"
+    },
+    "12": {
+      "name": "MIC MATH",
+      "short": "MICM"
+    },
+    "23": {
+      "name": "SURDO BAT",
+      "short": "SURD"
+    },
+    "8": {
+      "name": "",
+      "short": "    "
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "7": {
+      "name": "CAIXA",
+      "short": "CAIX"
+    },
+    "5": {
+      "name": "TANTAN",
+      "short": "TANT"
+    },
+    "13": {
+      "name": "",
+      "short": "    "
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "30": {
+      "name": "PAND AGUDO",
+      "short": "PAND"
+    },
+    "10": {
+      "name": "VIOLAO",
+      "short": "VIOL"
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "MIC VOCALI",
+      "short": "MICV"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "4": {
+      "name": "PANDEIRO",
+      "short": "PAND"
+    },
+    "17": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "14": {
+      "name": "MIC AKG",
+      "short": "MICA"
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    }
+  }
+}
