@@ -1,16 +1,16 @@
-# Graph Report - 01v96-remote-web  (2026-07-25)
+# Graph Report - 01v96-remote-web  (2026-07-22)
 
 ## Corpus Check
-- 631 files · ~12,920,068 words
+- 630 files · ~12,780,944 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 13685 nodes · 15828 edges · 2146 communities (2079 shown, 67 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 665 edges (avg confidence: 0.8)
+- 13663 nodes · 15797 edges · 2137 communities (2068 shown, 69 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 666 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `80e391f5`
+- Built from commit: `fb0d14d2`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1955,7 +1955,6 @@
 - [[_COMMUNITY_Community 1969|Community 1969]]
 - [[_COMMUNITY_Community 1970|Community 1970]]
 - [[_COMMUNITY_Community 1971|Community 1971]]
-- [[_COMMUNITY_Community 1972|Community 1972]]
 - [[_COMMUNITY_Community 1973|Community 1973]]
 - [[_COMMUNITY_Community 1974|Community 1974]]
 - [[_COMMUNITY_Community 1975|Community 1975]]
@@ -2010,7 +2009,6 @@
 - [[_COMMUNITY_Community 2024|Community 2024]]
 - [[_COMMUNITY_Community 2025|Community 2025]]
 - [[_COMMUNITY_Community 2026|Community 2026]]
-- [[_COMMUNITY_Community 2027|Community 2027]]
 - [[_COMMUNITY_Community 2028|Community 2028]]
 - [[_COMMUNITY_Community 2029|Community 2029]]
 - [[_COMMUNITY_Community 2030|Community 2030]]
@@ -2035,9 +2033,7 @@
 - [[_COMMUNITY_Community 2049|Community 2049]]
 - [[_COMMUNITY_Community 2050|Community 2050]]
 - [[_COMMUNITY_Community 2051|Community 2051]]
-- [[_COMMUNITY_Community 2052|Community 2052]]
 - [[_COMMUNITY_Community 2053|Community 2053]]
-- [[_COMMUNITY_Community 2054|Community 2054]]
 - [[_COMMUNITY_Community 2055|Community 2055]]
 - [[_COMMUNITY_Community 2056|Community 2056]]
 - [[_COMMUNITY_Community 2057|Community 2057]]
@@ -2047,7 +2043,6 @@
 - [[_COMMUNITY_Community 2061|Community 2061]]
 - [[_COMMUNITY_Community 2062|Community 2062]]
 - [[_COMMUNITY_Community 2063|Community 2063]]
-- [[_COMMUNITY_Community 2064|Community 2064]]
 - [[_COMMUNITY_Community 2065|Community 2065]]
 - [[_COMMUNITY_Community 2066|Community 2066]]
 - [[_COMMUNITY_Community 2067|Community 2067]]
@@ -2080,11 +2075,8 @@
 - [[_COMMUNITY_Community 2094|Community 2094]]
 - [[_COMMUNITY_Community 2095|Community 2095]]
 - [[_COMMUNITY_Community 2096|Community 2096]]
-- [[_COMMUNITY_Community 2097|Community 2097]]
-- [[_COMMUNITY_Community 2098|Community 2098]]
 - [[_COMMUNITY_Community 2099|Community 2099]]
 - [[_COMMUNITY_Community 2100|Community 2100]]
-- [[_COMMUNITY_Community 2101|Community 2101]]
 - [[_COMMUNITY_Community 2102|Community 2102]]
 - [[_COMMUNITY_Community 2103|Community 2103]]
 - [[_COMMUNITY_Community 2104|Community 2104]]
@@ -2125,7 +2117,6 @@
 - [[_COMMUNITY_Community 2139|Community 2139]]
 - [[_COMMUNITY_Community 2140|Community 2140]]
 - [[_COMMUNITY_Community 2141|Community 2141]]
-- [[_COMMUNITY_Community 2142|Community 2142]]
 - [[_COMMUNITY_Community 2143|Community 2143]]
 - [[_COMMUNITY_Community 2144|Community 2144]]
 - [[_COMMUNITY_Community 2145|Community 2145]]
@@ -2189,11 +2180,11 @@
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 - **14-bit Master Meter via native 0x21 with steps.json calibration (dB = (raw - 4493) / 63.66)** —  [INFERRED 0.90]
 
-## Communities (2146 total, 67 thin omitted)
+## Communities (2137 total, 69 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
-Cohesion: 0.10
-Nodes (27): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, startDynNudge/stopDynNudge Dynamics Nudge Controls, toggleState(), appReady Global Guard Flag, channelStates (+19 more)
+Cohesion: 0.11
+Nodes (26): clearAllSolos Master Solo Clear, createOutputStrip / createDesktopOutputStrip, initUI Full UI Renderer, updateUI Fader/On/Solo UI Sync, startDynNudge/stopDynNudge Dynamics Nudge Controls, appReady Global Guard Flag, channelStates, mapDynDbToPercent Dynamics Meter Mapper (+18 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
@@ -2228,12 +2219,12 @@ Cohesion: 0.00
 Nodes (500): kAUXAttenuator/kAtt, kAUXAttenuator/kAttBitShift, kAUXBalance/kBalance, kAUXChannelOn/kChannelOn, kAUXComp/kCompAttack, kAUXComp/kCompGain, kAUXComp/kCompKnee, kAUXComp/kCompLink (+492 more)
 
 ### Community 9 - "Macros Engine & Host Profiles"
-Cohesion: 0.28
-Nodes (9): 2, color, config, name, scriptId, config, config, extras (+1 more)
+Cohesion: 0.40
+Nodes (5): 2, color, config, name, scriptId
 
 ### Community 10 - "Node.js Legacy MIDI Functions"
 Cohesion: 0.05
-Nodes (47): 0, config, name, scriptId, 1, config, name, scriptId (+39 more)
+Nodes (46): 0, config, name, scriptId, 1, config, name, scriptId (+38 more)
 
 ### Community 11 - "Rust Migration Governance Rules"
 Cohesion: 0.20
@@ -2297,7 +2288,7 @@ Nodes (20): cachedTextDecoder, cachedTextEncoder, decodeText(), getArrayF32FromW
 
 ### Community 33 - "Community 33"
 Cohesion: 0.11
-Nodes (26): auxWheelInput(), updateAuxFromSocket Aux Sync Handler, updatePanIndicator Desktop Pan Visual, renderCompressor(), updateCompFromSocket(), renderDynamics(), updateEQParam Socket-to-UI EQ Sync, handleWheelPan/resetPan/startPanLongPress Pan Controls (+18 more)
+Nodes (25): auxWheelInput(), updateAuxFromSocket Aux Sync Handler, updatePanIndicator Desktop Pan Visual, renderCompressor(), updateCompFromSocket(), renderDynamics(), updateEQParam Socket-to-UI EQ Sync, handleWheelPan/resetPan/startPanLongPress Pan Controls (+17 more)
 
 ### Community 34 - "UI/UX Pro Max BM25 Search"
 Cohesion: 0.07
@@ -2320,8 +2311,8 @@ Cohesion: 0.07
 Nodes (31): str, BM25, detect_domain(), _load_csv(), BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query (+23 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.07
-Nodes (36): pasteEQLogic(), pasteFullChannelLogic(), DEFAULT_EQ_FREQ, drawRtaData(), EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer (+28 more)
+Cohesion: 0.05
+Nodes (55): pasteEQLogic(), pasteFullChannelLogic(), DEFAULT_EQ_FREQ, drawRtaData(), EQ ATT Attenuator Control, eqBands, EQ Canvas Graph Renderer (60fps Animation), EQ Copy/Paste Clipboard Buffer (+47 more)
 
 ### Community 46 - "Community 46"
 Cohesion: 0.07
@@ -2385,7 +2376,7 @@ Nodes (82): Any, int, _ensure_gh_authenticated(), fetch_all(), get_current_pr_re
 
 ### Community 69 - "Community 69"
 Cohesion: 0.05
-Nodes (47): 0, config, name, scriptId, 1, config, name, scriptId (+39 more)
+Nodes (46): 0, config, name, scriptId, 1, config, name, scriptId (+38 more)
 
 ### Community 70 - "Community 70"
 Cohesion: 0.06
@@ -2472,8 +2463,8 @@ Cohesion: 0.14
 Nodes (13): Benchmarking Profile, Custom Profiles, Default Profile, Dev Dependencies Optimization, LTO Options, Optimization Levels, Optimized Profile, perf-release-profile (+5 more)
 
 ### Community 91 - "Community 91"
-Cohesion: 0.06
-Nodes (42): closeEffectsModal(), initUI(), isValidChannelForLayer(), closeChannelConfig(), autoScaleElement(), changeTechnicianMix(), closeMobileMenu(), closeTopmostModal() (+34 more)
+Cohesion: 0.07
+Nodes (34): closeEffectsModal(), closeChannelConfig(), autoScaleElement(), closeMobileMenu(), closeTopmostModal(), exitTechnicianMixMode(), fallbackCopyTextToClipboard(), handleMobileSairAction() (+26 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.09
@@ -2500,8 +2491,8 @@ Cohesion: 0.13
 Nodes (25): updatePanIndicator(), commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), handleWheelPan(), isMobileEvents, jumpPanToPosition() (+17 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.15
-Nodes (15): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, stopEQAnimation(), changeConfigChannel(), Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), updateConfigUIForChannel(), Layout Mode (mobile/desktop) (+7 more)
+Cohesion: 0.16
+Nodes (13): renderAuxs Aux Sends UI Renderer, createDesktopStrip / createMobileStrip Universal Fader Components, stopEQAnimation(), Desktop Grab-to-Scroll (Faders Area Drag), openChannelConfig(), Layout Mode (mobile/desktop), enableDragScroll(), toggleFullScreen / iOS PWA Install (+5 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.21
@@ -2552,8 +2543,8 @@ Cohesion: 0.15
 Nodes (12): Complete Cargo.toml, Configuration, Dependency Issues, Feature Issues, lint-cargo-metadata, Missing Metadata, Multiple Crate Versions, Notable Lints (+4 more)
 
 ### Community 111 - "Community 111"
-Cohesion: 0.17
-Nodes (11): 2.1. Conversão de Frequências (Padrão Yamaha), 2. Estrutura e Arquitetura Proposta, 4. Tabela de Referência: HOLD (0x1C), 5. Tabela de Referência: DECAY (0x1D), 6.1. Tela de Máquinas de Efeitos — Etapa 1 (Mockada), 6. Progresso da Implementação (Frontend), 7.1. Tela de Máquinas de Efeitos — Etapa 1 (Mockada), 7. Progresso da Implementação (Frontend) (+3 more)
+Cohesion: 0.05
+Nodes (43): 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles Comuns (Presentes em todos os efeitos), 1. Documentação Técnica, 2.1. Conversão de Frequências (Padrão Yamaha), 2. Estrutura e Arquitetura Proposta, 3.1. Reverb Standard (IDs 0, 1, 2, 3), 3. Mapeamento de Algoritmos, 4. Tabela de Referência: HOLD (0x1C) (+35 more)
 
 ### Community 112 - "Community 112"
 Cohesion: 0.14
@@ -2572,8 +2563,8 @@ Cohesion: 0.19
 Nodes (6): MasterMeter, HashMap, Option, Self, Value, Vec
 
 ### Community 116 - "Community 116"
-Cohesion: 0.21
-Nodes (21): updateAuxFromSocket(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+13 more)
+Cohesion: 0.14
+Nodes (32): renderAuxs(), checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip() (+24 more)
 
 ### Community 117 - "Community 117"
 Cohesion: 0.15
@@ -2884,8 +2875,8 @@ Cohesion: 0.40
 Nodes (5): 3, color, config, name, scriptId
 
 ### Community 196 - "Community 196"
-Cohesion: 0.40
-Nodes (5): 4, color, config, name, scriptId
+Cohesion: 0.28
+Nodes (9): 4, color, config, name, scriptId, config, config, extras (+1 more)
 
 ### Community 197 - "Community 197"
 Cohesion: 0.40
@@ -4309,7 +4300,7 @@ Nodes (11): 1. Análise do Cenário Atual (Meters), 2. A Nova Arquitetura com WA
 
 ### Community 573 - "Community 573"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 574 - "Community 574"
 Cohesion: 0.25
@@ -4317,11 +4308,11 @@ Nodes (7): files, main, name, sideEffects, type, types, version
 
 ### Community 575 - "Community 575"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 576 - "Community 576"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 36, 7
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 577 - "Community 577"
 Cohesion: 0.29
@@ -4341,11 +4332,11 @@ Nodes (8): name, short, name, short, channels, 8, 9, mesa_nome
 
 ### Community 581 - "Community 581"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 1, 12
+Nodes (7): name, short, name, short, channels, 11, 12
 
 ### Community 582 - "Community 582"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 583 - "Community 583"
 Cohesion: 0.29
@@ -4353,11 +4344,11 @@ Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 584 - "Community 584"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 585 - "Community 585"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 3, 36
 
 ### Community 587 - "Community 587"
 Cohesion: 0.25
@@ -4369,7 +4360,7 @@ Nodes (7): name, short, name, short, channels, 1, 12
 
 ### Community 589 - "Community 589"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 590 - "Community 590"
 Cohesion: 0.29
@@ -4381,15 +4372,15 @@ Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 592 - "Community 592"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 36, 5
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 593 - "Community 593"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 3, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 594 - "Community 594"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 595 - "Community 595"
 Cohesion: 0.67
@@ -4397,15 +4388,15 @@ Nodes (3): name, short, 18
 
 ### Community 596 - "Community 596"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 36, 5
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 597 - "Community 597"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 598 - "Community 598"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 36, 7
 
 ### Community 599 - "Community 599"
 Cohesion: 0.29
@@ -4935,10 +4926,6 @@ Nodes (3): name, short, 40
 Cohesion: 0.67
 Nodes (3): name, short, 4
 
-### Community 741 - "Community 741"
-Cohesion: 0.11
-Nodes (21): nudgeATT(), nudgeFreq(), nudgeGain(), eqBands, freqToRaw(), gainToRaw(), initEQEngine(), nudgeQ() (+13 more)
-
 ### Community 742 - "Community 742"
 Cohesion: 0.67
 Nodes (3): name, short, 6
@@ -5100,8 +5087,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 6
 
 ### Community 783 - "Community 783"
-Cohesion: 0.17
-Nodes (18): applyFxInputs(), applyFxOutputs(), applyFxTypes(), dispatchFxRequests(), findAllFxOutputDests(), findFxOutputDest(), fxInputLabel(), fxInputPatchClass() (+10 more)
+Cohesion: 0.67
+Nodes (3): name, short, 7
 
 ### Community 784 - "Community 784"
 Cohesion: 0.67
@@ -6732,8 +6719,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 39
 
 ### Community 1200 - "Community 1200"
-Cohesion: 0.35
-Nodes (11): Channel Toggler Macro Mod (ON/OFF Multi-Channel), MixerAPI (mixer/network/utils) Modder Contract, Macro Engine (Multi-Preset, Slots, Plugin Registry), Host-to-Preset Mapping Configuration, Lumikit Macro Mod (Lighting Scene+Extra Control), macroDatabase, registerMacro Plugin Registration Function, Macro Profile: pcfavela (Channel Toggler + Lumikit) (+3 more)
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1201 - "Community 1201"
 Cohesion: 0.67
@@ -6900,8 +6887,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 4
 
 ### Community 1243 - "Community 1243"
-Cohesion: 0.22
-Nodes (9): 6.1. Endereço do parâmetro (qual IN está sendo lido/escrito), 6.2. Catálogo UI → Source ID (todas as opções do seletor), 6.3. Notas de encoding, 6.4. Status de implementação — FX Input change, 6. Mapeamento de Patch Source — FX Inputs, Gaps (não aparecem no seletor UI), Grid visual (labels do print), Resumo por faixa (+1 more)
+Cohesion: 0.67
+Nodes (3): name, short, 5
 
 ### Community 1244 - "Community 1244"
 Cohesion: 0.67
@@ -7044,8 +7031,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 39
 
 ### Community 1280 - "Community 1280"
-Cohesion: 0.25
-Nodes (8): 8.1. Conceito, 8.2.1. Capture SM — FX1 Out L → CH1 (2026-07-17), 8.2. Formato SysEx, 8.4. Valores gravados no destino (= slot de saída do FX), 8.5. Validação read (script vs mesa), 8.6. Notas importantes, 8.7. Status de implementação — FX Output change, 8. Mapeamento de Patch Destination — FX Outputs
+Cohesion: 0.67
+Nodes (3): name, short, 3
 
 ### Community 1281 - "Community 1281"
 Cohesion: 0.67
@@ -7136,8 +7123,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 23
 
 ### Community 1304 - "Community 1304"
-Cohesion: 0.32
-Nodes (4): degFromPct(), renderHeader(), renderKnob(), renderLayoutPicker()
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 1305 - "Community 1305"
 Cohesion: 0.67
@@ -7164,8 +7151,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 21
 
 ### Community 1311 - "Community 1311"
-Cohesion: 0.32
-Nodes (4): findFxOutId(), getCurrentActiveId(), handleFxPatchSelect(), updateGridUi()
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 1312 - "Community 1312"
 Cohesion: 0.67
@@ -7259,17 +7246,13 @@ Nodes (3): name, short, 9
 Cohesion: 0.67
 Nodes (3): master, name, short
 
-### Community 1335 - "Community 1335"
-Cohesion: 0.33
-Nodes (6): 10.1. Estratégia de Sincronização Sob Demanda (Lazy-Sync por Slot), 10.2. TELAS DE EFEITOS DE REVERB (REVERB HALL, REVERB ROOM, REVERB STAGE, REVERB PLATE), 10.3. PRÓXIMOS ALGORITMOS DE EFEITO (A MAPEAR), 10. IMPLEMENTAÇÃO DE TELAS DE EFEITOS, Mapeamento de Endereços Hex por Slot (0x00 a 0x03) e Parâmetros (0x10 a 0x34), Organização das Telas (Desktop vs Mobile)
-
 ### Community 1336 - "Community 1336"
 Cohesion: 0.67
 Nodes (3): name, short, 10
 
 ### Community 1337 - "Community 1337"
 Cohesion: 0.29
-Nodes (6): channels, master, name, short, scene_id, scene_name
+Nodes (7): name, short, channels, 11, master, name, short
 
 ### Community 1338 - "Community 1338"
 Cohesion: 0.67
@@ -7432,8 +7415,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 3
 
 ### Community 1380 - "Community 1380"
-Cohesion: 0.11
-Nodes (24): degFromPct(), detectDefaultLayoutMode(), formatMockValue(), formatMockValueByLabel(), handleFaderInput(), handleStepper(), onKnobDrag(), onWheelDrag() (+16 more)
+Cohesion: 0.12
+Nodes (22): degFromPct(), formatMockValue(), formatMockValueByLabel(), handleFaderInput(), handleStepper(), onKnobDrag(), onWheelDrag(), open() (+14 more)
 
 ### Community 1381 - "Community 1381"
 Cohesion: 0.12
@@ -7572,8 +7555,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 4
 
 ### Community 1415 - "Community 1415"
-Cohesion: 0.40
-Nodes (5): 8.3.1. Elementos SysEx por família de destino, 8.3.2. Tabela completa destino UI → endereço de change, 8.3.3. Exemplos de SysEx por família (FX1 Out1 = 121), 8.3. Catálogo UI de destinos (print SM 2026-07-17), Grid visual (labels do print)
+Cohesion: 0.67
+Nodes (3): name, short, 5
 
 ### Community 1416 - "Community 1416"
 Cohesion: 0.67
@@ -7640,8 +7623,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 20
 
 ### Community 1433 - "Community 1433"
-Cohesion: 0.14
-Nodes (21): assignedMacros, availableScripts, completeMacroMove(), detectCurrentPreset(), executeMacro(), fetchProtectedPresets(), handleTouchEnd(), initMacros() (+13 more)
+Cohesion: 0.10
+Nodes (32): assignedMacros, availableScripts, Channel Toggler Macro Mod (ON/OFF Multi-Channel), completeMacroMove(), MixerAPI (mixer/network/utils) Modder Contract, detectCurrentPreset(), Macro Engine (Multi-Preset, Slots, Plugin Registry), executeMacro() (+24 more)
 
 ### Community 1434 - "Community 1434"
 Cohesion: 0.67
@@ -8140,8 +8123,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 23
 
 ### Community 1564 - "Community 1564"
-Cohesion: 0.50
-Nodes (4): 3.1. Reverb Standard (IDs 0, 1, 2, 3), 3. Mapeamento de Algoritmos, Detalhes do HOLD (0x1C):, Detalhes do Rev Time (0x11):
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 1565 - "Community 1565"
 Cohesion: 0.67
@@ -8264,8 +8247,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 24
 
 ### Community 1596 - "Community 1596"
-Cohesion: 0.67
-Nodes (3): 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles Comuns (Presentes em todos os efeitos), 1. Documentação Técnica
+Cohesion: 0.32
+Nodes (4): findFxOutId(), getCurrentActiveId(), handleFxPatchSelect(), updateGridUi()
 
 ### Community 1598 - "Community 1598"
 Cohesion: 0.67
@@ -8276,8 +8259,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 24
 
 ### Community 1601 - "Community 1601"
-Cohesion: 0.13
-Nodes (24): auxLevelInput(), nudgeAuxLevel(), renderAuxs(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxManual(), auxVG_deltaToDB() (+16 more)
+Cohesion: 0.12
+Nodes (24): auxLevelInput(), nudgeAuxLevel(), startAuxNudge(), stopAuxNudge(), toggleAuxOn(), updateAuxFromSocket(), updateAuxManual(), auxVG_deltaToDB() (+16 more)
 
 ### Community 1602 - "Community 1602"
 Cohesion: 0.67
@@ -8325,7 +8308,7 @@ Nodes (5): MdctLookup, Self, CeltMode, default_mode(), PulseCache
 
 ### Community 1613 - "Community 1613"
 Cohesion: 0.29
-Nodes (6): name, short, channels, 36, scene_id, scene_name
+Nodes (7): name, short, name, short, channels, 23, 36
 
 ### Community 1614 - "Community 1614"
 Cohesion: 0.29
@@ -8333,11 +8316,11 @@ Nodes (6): name, short, channels, 13, scene_id, scene_name
 
 ### Community 1615 - "Community 1615"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 3, 36
+Nodes (7): name, short, name, short, channels, 36, 5
 
 ### Community 1616 - "Community 1616"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 23, 36
 
 ### Community 1617 - "Community 1617"
 Cohesion: 0.29
@@ -8345,7 +8328,7 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 1618 - "Community 1618"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 24, 36
 
 ### Community 1619 - "Community 1619"
 Cohesion: 0.29
@@ -8353,15 +8336,15 @@ Nodes (6): name, short, channels, 13, scene_id, scene_name
 
 ### Community 1620 - "Community 1620"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (6): name, short, channels, 36, scene_id, scene_name
 
 ### Community 1622 - "Community 1622"
 Cohesion: 0.80
 Nodes (4): RangeCoder, combine_pulses(), encode_split(), silk_shell_encoder()
 
 ### Community 1623 - "Community 1623"
-Cohesion: 0.67
-Nodes (3): 9.1. Arquitetura da Sincronização Sequencial, 9.2. Ajuste Fino de Latência de Hardware, 9. Sincronização de Efeitos (Filtros de Latência e Pipeline)
+Cohesion: 0.17
+Nodes (16): applyFxInputs(), applyFxOutputs(), applyFxTypes(), dispatchFxRequests(), findAllFxOutputDests(), findFxOutputDest(), fxInputLabel(), fxInputPatchClass() (+8 more)
 
 ### Community 1624 - "Community 1624"
 Cohesion: 0.29
@@ -8386,10 +8369,6 @@ Nodes (3): name, short, 18
 ### Community 1629 - "Community 1629"
 Cohesion: 0.67
 Nodes (3): name, short, 24
-
-### Community 1631 - "Community 1631"
-Cohesion: 0.67
-Nodes (3): name, short, 18
 
 ### Community 1632 - "Community 1632"
 Cohesion: 0.67
@@ -8557,7 +8536,7 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 1673 - "Community 1673"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 21
 
 ### Community 1674 - "Community 1674"
 Cohesion: 0.67
@@ -8717,7 +8696,7 @@ Nodes (3): master, name, short
 
 ### Community 1713 - "Community 1713"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 1
 
 ### Community 1714 - "Community 1714"
 Cohesion: 0.29
@@ -8845,7 +8824,7 @@ Nodes (3): name, short, 39
 
 ### Community 1746 - "Community 1746"
 Cohesion: 0.67
-Nodes (3): name, short, 11
+Nodes (3): name, short, 3
 
 ### Community 1747 - "Community 1747"
 Cohesion: 0.67
@@ -8881,7 +8860,7 @@ Nodes (3): master, name, short
 
 ### Community 1755 - "Community 1755"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 18
 
 ### Community 1757 - "Community 1757"
 Cohesion: 0.67
@@ -9049,7 +9028,7 @@ Nodes (4): 10, config, name, scriptId
 
 ### Community 1799 - "Community 1799"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 18
 
 ### Community 1801 - "Community 1801"
 Cohesion: 0.67
@@ -9561,7 +9540,7 @@ Nodes (3): name, short, 20
 
 ### Community 1931 - "Community 1931"
 Cohesion: 0.67
-Nodes (3): name, short, 18
+Nodes (3): name, short, 21
 
 ### Community 1932 - "Community 1932"
 Cohesion: 0.67
@@ -9673,7 +9652,7 @@ Nodes (3): master, name, short
 
 ### Community 1960 - "Community 1960"
 Cohesion: 0.67
-Nodes (3): name, short, 11
+Nodes (3): name, short, 21
 
 ### Community 1966 - "Community 1966"
 Cohesion: 0.67
@@ -9694,10 +9673,6 @@ Nodes (3): name, short, 36
 ### Community 1970 - "Community 1970"
 Cohesion: 0.67
 Nodes (3): name, short, bus5
-
-### Community 1972 - "Community 1972"
-Cohesion: 0.67
-Nodes (3): name, short, 21
 
 ### Community 1973 - "Community 1973"
 Cohesion: 0.67
@@ -9911,10 +9886,6 @@ Nodes (3): name, short, 22
 Cohesion: 0.67
 Nodes (3): name, short, 23
 
-### Community 2027 - "Community 2027"
-Cohesion: 0.67
-Nodes (3): name, short, 5
-
 ### Community 2028 - "Community 2028"
 Cohesion: 0.67
 Nodes (3): name, short, 25
@@ -10011,17 +9982,9 @@ Nodes (3): name, short, 9
 Cohesion: 0.67
 Nodes (3): master, name, short
 
-### Community 2052 - "Community 2052"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
 ### Community 2053 - "Community 2053"
 Cohesion: 0.67
 Nodes (3): name, short, 26
-
-### Community 2054 - "Community 2054"
-Cohesion: 0.67
-Nodes (3): name, short, 23
 
 ### Community 2056 - "Community 2056"
 Cohesion: 0.67
@@ -10054,10 +10017,6 @@ Nodes (3): name, short, 16
 ### Community 2063 - "Community 2063"
 Cohesion: 0.67
 Nodes (3): name, short, 17
-
-### Community 2064 - "Community 2064"
-Cohesion: 0.67
-Nodes (3): name, short, 18
 
 ### Community 2065 - "Community 2065"
 Cohesion: 0.67
@@ -10185,11 +10144,7 @@ Nodes (3): name, short, 24
 
 ### Community 2096 - "Community 2096"
 Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 2097 - "Community 2097"
-Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 18
 
 ### Community 2099 - "Community 2099"
 Cohesion: 0.67
@@ -10198,10 +10153,6 @@ Nodes (3): name, short, 5
 ### Community 2100 - "Community 2100"
 Cohesion: 0.67
 Nodes (3): name, short, 21
-
-### Community 2101 - "Community 2101"
-Cohesion: 0.67
-Nodes (3): name, short, 3
 
 ### Community 2102 - "Community 2102"
 Cohesion: 0.67
@@ -10363,10 +10314,6 @@ Nodes (3): name, short, 9
 Cohesion: 0.67
 Nodes (3): name, short, bus5
 
-### Community 2142 - "Community 2142"
-Cohesion: 0.67
-Nodes (3): name, short, 7
-
 ### Community 2143 - "Community 2143"
 Cohesion: 0.67
 Nodes (3): name, short, 21
@@ -10380,9 +10327,9 @@ Cohesion: 0.67
 Nodes (3): master, name, short
 
 ## Knowledge Gaps
-- **8742 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+8737 more)
+- **8738 isolated node(s):** `contentHash`, `downloadedAt`, `contentHash`, `downloadedAt`, `contentHash` (+8733 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **67 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **69 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -10398,6 +10345,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 43 inferred relationships involving `silk_smlawb()` (e.g. with `silk_ana_filt_bank_1()` and `silk_biquad_alt_stride1()`) actually correct?**
   _`silk_smlawb()` has 43 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `contentHash`, `downloadedAt`, `contentHash` to the rest of the system?**
-  _8773 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _8769 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)` be split into smaller, more focused modules?**
-  _Cohesion score 0.10344827586206896 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10591133004926108 - nodes in this community are weakly interconnected._

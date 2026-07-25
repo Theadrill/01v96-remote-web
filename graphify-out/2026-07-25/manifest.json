@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "config.json": {
-    "mtime": 1784783811.3835957,
-    "ast_hash": "ab8841dc072ee4d919ef22afdebf6062",
+    "mtime": 1784766495.6169603,
+    "ast_hash": "2873a8996f0b53d27c0002f4c8983166",
     "semantic_hash": ""
   },
   "eslint.config.mjs": {
@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/shared/profile_pcfavela.json": {
-    "mtime": 1784781098.0480354,
-    "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
+    "mtime": 1784443030.072715,
+    "ast_hash": "d356e92ed6dfeb009481854e252c6121",
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/shared/profile_pcmaria.json": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "public/modules/sidebar.js": {
-    "mtime": 1784959684.9249325,
-    "ast_hash": "924296d01ab459d9dc5d2c018f85cb3d",
+    "mtime": 1784771527.4259067,
+    "ast_hash": "6aa6a90b502e85091f37103c659e836f",
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "docs/PLANO_DE_IMPLEMENTACAO_DE_EFEITOS.md": {
-    "mtime": 1784774758.0101151,
-    "ast_hash": "8dd4b189cf6eff80cb40653a6a8a4c7a",
+    "mtime": 1784358563.368658,
+    "ast_hash": "77a143a4a603432bec658f0a2203f42f",
     "semantic_hash": ""
   },
   "docs/PLANO_MIGRACAO_RUST.md": {
@@ -525,8 +525,8 @@
     "semantic_hash": ""
   },
   "public/index.html": {
-    "mtime": 1784959674.4602487,
-    "ast_hash": "fe5e9c7d65ee5d62696452a7a74f75f5",
+    "mtime": 1784770541.421574,
+    "ast_hash": "2dda362c9b31f9785b3e1458fca72725",
     "semantic_hash": ""
   },
   "reverse_dll_project/BIBLIA_TECNICA_01V96.md": {
@@ -2435,8 +2435,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-PGD ONLINE 360-mesa-maria.json": {
-    "mtime": 1784946243.7809072,
-    "ast_hash": "268f266333b4b20cf3f19e5822085ff9",
+    "mtime": 1783823422.734789,
+    "ast_hash": "44fdd29449bec5602cc819627e51851e",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SARU-mesa-favela.json": {
@@ -2445,13 +2445,13 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-favela.json": {
-    "mtime": 1784782909.4104347,
-    "ast_hash": "dad01e837433923794561420e32241c1",
+    "mtime": 1784345659.98014,
+    "ast_hash": "8bea61048bdd3cbcb8974b56c86f145d",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-maria.json": {
-    "mtime": 1784946243.7819567,
-    "ast_hash": "8ac738927d024051f1ff3ba5830a480d",
+    "mtime": 1784766499.2441216,
+    "ast_hash": "94491c5d5ba327c7002e58e2ff5e90ae",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-teste.json": {
@@ -2465,8 +2465,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-REGIS-mesa-favela.json": {
-    "mtime": 1784782181.8680809,
-    "ast_hash": "bf46cc9efffa3a07485106ab836e6184",
+    "mtime": 1783560804.1597743,
+    "ast_hash": "cfd82a5a9381f71515dfff3a52d2fc69",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CENA TESTE 222-mesa-teste.json": {
@@ -2485,8 +2485,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-PISEIRO-mesa-favela.json": {
-    "mtime": 1784782909.4061103,
-    "ast_hash": "273bd0eea88d3cdae627c13ed40b58e6",
+    "mtime": 1784168317.2862544,
+    "ast_hash": "92cf64ee0ff64213873b5a34def348d5",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-PISEIRO2-mesa-favela.json": {
@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1784961040.3826118,
-    "ast_hash": "061a037c50a2cc42818c4b5152009cdf",
+    "mtime": 1784771582.0901804,
+    "ast_hash": "c9bfa5e0a067d4d3b77c58a7b67c996c",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -2670,8 +2670,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-PISEIRO-mesa-favela.json": {
-    "mtime": 1784782909.4056082,
-    "ast_hash": "273bd0eea88d3cdae627c13ed40b58e6",
+    "mtime": 1784168317.283899,
+    "ast_hash": "92cf64ee0ff64213873b5a34def348d5",
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-PISEIRO2-mesa-favela.json": {
@@ -2680,8 +2680,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-REGIS-mesa-favela.json": {
-    "mtime": 1784782181.8670785,
-    "ast_hash": "bf46cc9efffa3a07485106ab836e6184",
+    "mtime": 1783560804.1574733,
+    "ast_hash": "cfd82a5a9381f71515dfff3a52d2fc69",
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-SARU-mesa-favela.json": {
@@ -2695,8 +2695,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scenes-mesa-favela.json": {
-    "mtime": 1784782909.4089227,
-    "ast_hash": "dad01e837433923794561420e32241c1",
+    "mtime": 1784345659.9791381,
+    "ast_hash": "8bea61048bdd3cbcb8974b56c86f145d",
     "semantic_hash": ""
   },
   "data/custom_scenes/local/global-names-mesa-favela.json": {
@@ -2705,8 +2705,8 @@
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/local/profile_pcfavela.json": {
-    "mtime": 1784781098.0480354,
-    "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
+    "mtime": 1784443030.071715,
+    "ast_hash": "d356e92ed6dfeb009481854e252c6121",
     "semantic_hash": ""
   },
   "public/modules/rta.js": {
@@ -2767,6 +2767,11 @@
   "package.json": {
     "mtime": 1783910294.1326642,
     "ast_hash": "18a66b0862f11ecb8973f362219f604c",
+    "semantic_hash": ""
+  },
+  "public/modules/efeitos.js": {
+    "mtime": 1784770561.2899058,
+    "ast_hash": "5e4ad6e8fed2c1f31592e19a4fe3ce9e",
     "semantic_hash": ""
   },
   "public/modules/fps_meter.js": {
@@ -3165,8 +3170,13 @@
     "semantic_hash": ""
   },
   "public/modules/FXS/reverb.js": {
-    "mtime": 1784959275.0578141,
-    "ast_hash": "177db041dce2385af9ae3cbeb2251284",
+    "mtime": 1784771488.0875688,
+    "ast_hash": "a37c5917aa4bada1295421361b8e65a0",
+    "semantic_hash": ""
+  },
+  "public/modules/fx_routing.js": {
+    "mtime": 1784341686.0019104,
+    "ast_hash": "4cf53d6b90b592b5b0f7325960fe8950",
     "semantic_hash": ""
   },
   "server_rust/src/midi/fx_list.rs": {
@@ -3192,21 +3202,6 @@
   "log/fx_output_test_log.txt": {
     "mtime": 1784177035.552711,
     "ast_hash": "12adfa4745664908ec9c3ba075f78b72",
-    "semantic_hash": ""
-  },
-  "public/modules/FXS/efeitos.js": {
-    "mtime": 1784772004.1681607,
-    "ast_hash": "c34932b43294f98313b3759bf6afe4c4",
-    "semantic_hash": ""
-  },
-  "public/modules/FXS/fx_components.js": {
-    "mtime": 1784774002.7862697,
-    "ast_hash": "6e7a1c25a467ab8d362b09febf970ede",
-    "semantic_hash": ""
-  },
-  "public/modules/FXS/fx_routing.js": {
-    "mtime": 1784341686.0019104,
-    "ast_hash": "4cf53d6b90b592b5b0f7325960fe8950",
     "semantic_hash": ""
   }
 }
