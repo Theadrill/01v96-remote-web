@@ -24,7 +24,7 @@ body.layout-horizontal {
     flex-direction: column;
 }
 
-/* ÃƒÂ rea dos faders com rolagem lateral fluida */
+/* Área dos faders com rolagem lateral fluida */
 .faders-area {
     flex: 1;
     display: flex;
@@ -51,7 +51,7 @@ body.layout-horizontal .faders-area {
     overflow-x: hidden;
 }
 
-.faders-area::-webkit-scrollbar {
+body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
     display: none;
 }
 
@@ -1268,9 +1268,8 @@ html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
 body.layout-desktop .faders-area {
     display: flex;
     flex-direction: row;
-    overflow-x: scroll;
-    /* ForÃƒÂ§a scrollbar visÃƒÂ­vel no Desktop */
-    overflow-y: hidden;
+    overflow-x: scroll !important;
+    overflow-y: hidden !important;
     padding: 0;
     gap: 0;
     justify-content: flex-start;
@@ -1279,36 +1278,52 @@ body.layout-desktop .faders-area {
     order: 1;
     cursor: grab;
     user-select: none;
-    scrollbar-width: thin;
-    scrollbar-color: #4a90e2 #1a1a1a;
+    scrollbar-width: auto !important;
+    scrollbar-color: #3b82f6 #0f141c !important;
     flex: 1 1 0%;
     min-width: 0;
+    position: relative;
+    z-index: 10;
+}
+
+body.layout-desktop.hide-desktop-scrollbar .faders-area {
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    overflow-x: auto !important;
 }
 
 body.layout-desktop .faders-area.is-grabbing {
     cursor: grabbing;
 }
 
-/* Barra de Scroll Customizada Inferior */
+/* Barra de Scroll Customizada Inferior (Desktop) */
 body.layout-desktop .faders-area::-webkit-scrollbar {
     display: block !important;
-    height: 14px;
+    height: 22px !important;
+    background-color: #0f141c !important;
+}
+
+body.layout-desktop.hide-desktop-scrollbar .faders-area::-webkit-scrollbar {
+    display: none !important;
+    height: 0 !important;
 }
 
 body.layout-desktop .faders-area::-webkit-scrollbar-track {
-    background: #111;
-    border-top: 1px solid #333;
+    background-color: #0f141c !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 body.layout-desktop .faders-area::-webkit-scrollbar-thumb {
-    background: #4a90e2;
-    /* Azul elegante */
-    border-radius: 10px;
-    border: 3px solid #111;
+    background: #3b82f6 !important;
+    background-color: #3b82f6 !important;
+    border-radius: 6px !important;
+    border: 2px solid #0f141c !important;
+    min-width: 50px !important;
 }
 
 body.layout-desktop .faders-area::-webkit-scrollbar-thumb:hover {
-    background: #357abd;
+    background: #60a5fa !important;
+    background-color: #60a5fa !important;
 }
 
 body.layout-desktop .sidebar {
@@ -1400,6 +1415,7 @@ body.layout-desktop .sidebar-macros {
     background: #222;
     border-right: 1px solid #111;
     height: 100%;
+    max-height: 100%;
     box-sizing: border-box;
     transition: none !important;
     contain: layout style paint;
@@ -4928,11 +4944,11 @@ body.layout-desktop .btn-macros {
 
 
 /* Extracted <style> block */
-::-webkit-scrollbar {
+body:not(.layout-desktop) ::-webkit-scrollbar {
     display: none !important;
 }
 
-* {
+body:not(.layout-desktop) * {
     scrollbar-width: none !important;
 }
 

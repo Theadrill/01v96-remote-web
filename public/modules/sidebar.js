@@ -735,15 +735,42 @@ function updateMacrosState() {
     console.log("🛠️ Class hide-macros ativa no body:", document.body.classList.contains('hide-macros'));
 }
 
+window.toggleDesktopScrollbar = function (enabled) {
+    localStorage.setItem('01v96_desktop_scrollbar', enabled ? 'true' : 'false');
+    if (enabled) {
+        document.body.classList.remove('hide-desktop-scrollbar');
+    } else {
+        document.body.classList.add('hide-desktop-scrollbar');
+    }
+};
+
+function updateDesktopScrollbarState() {
+    const showScrollbar = localStorage.getItem('01v96_desktop_scrollbar') !== 'false';
+    const toggleChk = document.getElementById('toggleDesktopScrollbar');
+    if (toggleChk) {
+        toggleChk.checked = showScrollbar;
+    }
+    if (showScrollbar) {
+        document.body.classList.remove('hide-desktop-scrollbar');
+    } else {
+        document.body.classList.add('hide-desktop-scrollbar');
+    }
+}
+
+// Inicializa estado da barra de rolagem imediatamente
+updateDesktopScrollbarState();
+
 // Atualiza o display do nome do servidor sempre que o configModal abrir
 document.addEventListener('DOMContentLoaded', () => {
     updateMacrosState();
+    updateDesktopScrollbarState();
     const configModal = document.getElementById('configModal');
     if (!configModal) return;
     const observer = new MutationObserver(() => {
         if (configModal.style.display === 'flex') {
             refreshServerNameDisplay();
             updateMacrosState();
+            updateDesktopScrollbarState();
             const toggleChk = document.getElementById('toggleLayerNav');
             if (toggleChk) toggleChk.checked = !!layerNavEnabled;
         }
