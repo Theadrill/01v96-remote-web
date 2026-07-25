@@ -56,12 +56,6 @@
       "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
     },
     {
-      "custom_name": "PGD ONLINE 360",
-      "physical_scene": "PGD ONLINE 360",
-      "physical_id": 5,
-      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
-    },
-    {
       "custom_name": "ANAKA 360",
       "physical_scene": "ANAKA 360",
       "physical_id": 40,
@@ -84,6 +78,12 @@
       "physical_scene": "ID DO SAMBA 360",
       "physical_id": 20,
       "file": "custom_names_scene-ID DO SAMBA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE 360",
+      "physical_scene": "PGD ONLINE 360",
+      "physical_id": 5,
+      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     }
   ]
 }
