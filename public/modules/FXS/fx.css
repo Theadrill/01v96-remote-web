@@ -49,6 +49,44 @@
     --bg-header: linear-gradient(135deg, #4c0519 0%, #0f172a 100%);
 }
 
+/* Watermark Overlay Transversal DEMONSTRAÇÃO */
+.fx-demo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.fx-demo-overlay-text {
+    font-size: 5.5vw;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.12);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    transform: rotate(-28deg);
+    white-space: nowrap;
+    user-select: none;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    border: 3px dashed rgba(255, 255, 255, 0.12);
+    padding: 10px 40px;
+    border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+    .fx-demo-overlay-text {
+        font-size: 8.5vw;
+        border-width: 2px;
+        padding: 6px 24px;
+    }
+}
+
 /* Header Comum */
 .fx-ed-header {
     background: var(--bg-header);

@@ -157,7 +157,10 @@
         }
 
         container.innerHTML = `
-            <div class="fx-ed-container ${preset.colorTheme} concept-${currentConcept}">
+            <div class="fx-ed-container ${preset.colorTheme} concept-${currentConcept}" style="position: relative;">
+                <div class="fx-demo-overlay">
+                    <div class="fx-demo-overlay-text">DEMONSTRAÇÃO</div>
+                </div>
                 ${headerHTML}
                 <div class="fx-ed-scroll-body">
                     ${bodyHTML}
