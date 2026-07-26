@@ -1,11 +1,11 @@
 # Graph Report - 01v96-remote-web  (2026-07-26)
 
 ## Corpus Check
-- 617 files · ~12,503,758 words
+- 617 files · ~12,503,763 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 14108 nodes · 9959 edges · 7836 communities (967 shown, 6869 thin omitted)
+- 14052 nodes · 9959 edges · 7785 communities (972 shown, 6813 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 579 edges (avg confidence: 0.78)
 - Token cost: 0 input · 0 output
 
@@ -214,7 +214,6 @@
 - Community 596
 - Community 597
 - Community 598
-- Community 599
 - Community 600
 - Community 601
 - Community 602
@@ -247,6 +246,8 @@
 - Community 635
 - Community 636
 - Community 637
+- Community 638
+- Community 639
 - Community 640
 - Community 641
 - Community 642
@@ -310,7 +311,6 @@
 - Community 701
 - Community 702
 - Community 703
-- Community 704
 - Community 705
 - Community 706
 - Community 708
@@ -416,6 +416,7 @@
 - Community 811
 - Community 812
 - Community 813
+- Community 814
 - Community 815
 - Community 816
 - Community 817
@@ -486,7 +487,6 @@
 - Community 886
 - GitSyncState
 - Community 888
-- Community 889
 - Community 890
 - err-expect-bugs-only
 - name-as-free
@@ -507,6 +507,7 @@
 - shell_coder.rs
 - Community 908
 - Community 909
+- anti-panic-expected
 - Community 911
 - Community 912
 - Community 913
@@ -520,6 +521,7 @@
 - Community 921
 - Community 922
 - Community 923
+- err-from-impl
 - Community 925
 - Community 926
 - Community 927
@@ -530,7 +532,6 @@
 - Community 951
 - Community 953
 - Community 954
-- Community 955
 - Community 971
 - Community 973
 - Community 974
@@ -554,7 +555,6 @@
 - Community 997
 - Community 998
 - Community 999
-- Community 1000
 - Community 1022
 - Community 1025
 - Community 1026
@@ -572,7 +572,6 @@
 - Community 1038
 - Community 1039
 - Community 1040
-- Community 1041
 - Community 1055
 - Community 1058
 - Community 1063
@@ -593,7 +592,6 @@
 - Community 1078
 - Community 1079
 - Community 1080
-- Community 1081
 - Community 1099
 - Community 1103
 - Community 1104
@@ -613,7 +611,6 @@
 - Community 1120
 - Community 1121
 - Community 1122
-- Community 1123
 - Community 1137
 - Community 1143
 - Community 1145
@@ -667,7 +664,6 @@
 - Community 1210
 - Community 1213
 - Community 1216
-- Community 1217
 - Community 1218
 - Community 1221
 - Community 1223
@@ -699,7 +695,6 @@
 - Community 1263
 - Community 1264
 - Community 1266
-- Community 1267
 - Community 1268
 - Community 1270
 - Community 1271
@@ -715,7 +710,6 @@
 - Community 1285
 - Community 1286
 - Community 1288
-- Community 1289
 - Community 1293
 - Community 1294
 - Community 1298
@@ -728,14 +722,12 @@
 - Community 1311
 - Community 1312
 - Community 1313
-- Community 1318
 - Community 1322
 - Community 1326
 - Community 1332
 - Community 1333
 - Community 1335
 - Community 1336
-- Community 1340
 - Community 1341
 - Community 1347
 - Community 1348
@@ -765,7 +757,6 @@
 - Community 1395
 - Community 1396
 - Community 1397
-- Community 1398
 - Community 1415
 - Community 1420
 - Community 1422
@@ -784,7 +775,6 @@
 - Community 1435
 - Community 1436
 - Community 1437
-- Community 1438
 - Community 1457
 - Community 1460
 - Community 1462
@@ -808,7 +798,6 @@
 - Community 1483
 - Community 1484
 - Community 1485
-- Community 1486
 - Community 1508
 - Community 1510
 - Community 1511
@@ -828,7 +817,6 @@
 - Community 1525
 - Community 1526
 - Community 1527
-- Community 1528
 - Community 1552
 - Community 1553
 - Community 1554
@@ -843,7 +831,6 @@
 - Community 1563
 - Community 1564
 - Community 1565
-- Community 1566
 - Community 1588
 - Community 1589
 - Community 1590
@@ -892,7 +879,6 @@
 - Community 1645
 - Community 1646
 - Community 1647
-- Community 1648
 - Community 1670
 - Community 1671
 - Community 1672
@@ -911,7 +897,6 @@
 - Community 1686
 - Community 1687
 - Community 1688
-- Community 1689
 - Community 1712
 - Community 1714
 - Community 1716
@@ -930,7 +915,6 @@
 - Community 1729
 - Community 1730
 - Community 1731
-- Community 1732
 - Community 1754
 - Community 1755
 - Community 1757
@@ -948,7 +932,6 @@
 - Community 1769
 - Community 1770
 - Community 1772
-- Community 1773
 - Community 1795
 - Community 1798
 - Community 1799
@@ -968,7 +951,6 @@
 - Community 1814
 - Community 1815
 - Community 1816
-- Community 1817
 - Community 1839
 - Community 1841
 - Community 1842
@@ -986,7 +968,6 @@
 - Community 1854
 - Community 1855
 - Community 1856
-- Community 1857
 - Community 1879
 - Community 1880
 - Community 1881
@@ -1003,7 +984,6 @@
 - Community 1892
 - Community 1893
 - Community 1894
-- Community 1895
 - Community 1918
 - Community 1920
 - Community 1921
@@ -1021,7 +1001,6 @@
 - Community 1933
 - Community 1934
 - Community 1935
-- Community 1936
 - Community 1950
 - Community 1958
 - Community 1960
@@ -1049,7 +1028,6 @@
 - Community 1986
 - Community 1987
 - Community 1988
-- Community 1989
 - Community 2011
 - Community 2013
 - Community 2014
@@ -1066,7 +1044,6 @@
 - Community 2025
 - Community 2026
 - Community 2028
-- Community 2029
 - Community 2051
 - Community 2052
 - Community 2053
@@ -1087,7 +1064,6 @@
 - Community 2069
 - Community 2070
 - Community 2071
-- Community 2072
 - Community 2094
 - Community 2095
 - Community 2096
@@ -1110,7 +1086,6 @@
 - Community 2116
 - Community 2117
 - Community 2118
-- Community 2119
 - Community 2143
 - Community 2144
 - Community 2145
@@ -4691,7 +4666,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -4735,7 +4709,6 @@
 - 9
 - scene_id
 - scene_name
-- short
 - short
 - short
 - short
@@ -4896,7 +4869,6 @@
 - short
 - short
 - short
-- short
 - scene_name
 - name
 - short
@@ -4917,7 +4889,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -4961,7 +4932,6 @@
 - 9
 - scene_id
 - scene_name
-- short
 - short
 - short
 - short
@@ -5039,7 +5009,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -5082,68 +5051,6 @@
 - 9
 - scene_id
 - scene_name
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- channels
-- 1
-- 10
-- 11
-- 12
-- 13
-- 14
-- 15
-- 16
-- 17
-- 18
-- 19
-- 2
-- 20
-- 21
-- 22
-- 23
-- 24
-- 25
-- 26
-- 27
-- 28
-- 29
-- 3
-- 30
-- 31
-- 32
-- 33
-- 34
-- 35
-- 36
-- 37
-- 38
-- 39
-- 4
-- 40
-- 5
-- 6
-- 7
-- 8
-- 9
-- scene_id
-- scene_name
-- short
 - short
 - short
 - short
@@ -5205,6 +5112,65 @@
 - scene_id
 - scene_name
 - short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- channels
+- 1
+- 10
+- 11
+- 12
+- 13
+- 14
+- 15
+- 16
+- 17
+- 18
+- 19
+- 2
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 26
+- 27
+- 28
+- 29
+- 3
+- 30
+- 31
+- 32
+- 33
+- 34
+- 35
+- 36
+- 37
+- 38
+- 39
+- 4
+- 40
+- 5
+- 6
+- 7
+- 8
+- 9
+- scene_id
+- scene_name
 - short
 - short
 - short
@@ -5276,7 +5242,6 @@
 - short
 - short
 - name
-- short
 - short
 - short
 - short
@@ -5352,7 +5317,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -5396,68 +5360,6 @@
 - 9
 - scene_id
 - scene_name
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- channels
-- 1
-- 10
-- 11
-- 12
-- 13
-- 14
-- 15
-- 16
-- 17
-- 18
-- 19
-- 2
-- 20
-- 21
-- 22
-- 23
-- 24
-- 25
-- 26
-- 27
-- 28
-- 29
-- 3
-- 30
-- 31
-- 32
-- 33
-- 34
-- 35
-- 36
-- 37
-- 38
-- 39
-- 4
-- 40
-- 5
-- 6
-- 7
-- 8
-- 9
-- scene_id
-- scene_name
-- short
 - short
 - short
 - short
@@ -5535,7 +5437,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -5579,68 +5480,6 @@
 - 9
 - scene_id
 - scene_name
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- channels
-- 1
-- 10
-- 11
-- 12
-- 13
-- 14
-- 15
-- 16
-- 17
-- 18
-- 19
-- 2
-- 20
-- 21
-- 22
-- 23
-- 24
-- 25
-- 26
-- 27
-- 28
-- 29
-- 3
-- 30
-- 31
-- 32
-- 33
-- 34
-- 35
-- 36
-- 37
-- 38
-- 39
-- 4
-- 40
-- 5
-- 6
-- 7
-- 8
-- 9
-- scene_id
-- scene_name
-- short
 - short
 - short
 - short
@@ -5718,7 +5557,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -5762,68 +5600,6 @@
 - 9
 - scene_id
 - scene_name
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- channels
-- 1
-- 10
-- 11
-- 12
-- 13
-- 14
-- 15
-- 16
-- 17
-- 18
-- 19
-- 2
-- 20
-- 21
-- 22
-- 23
-- 24
-- 25
-- 26
-- 27
-- 28
-- 29
-- 3
-- 30
-- 31
-- 32
-- 33
-- 34
-- 35
-- 36
-- 37
-- 38
-- 39
-- 4
-- 40
-- 5
-- 6
-- 7
-- 8
-- 9
-- scene_id
-- scene_name
-- short
 - short
 - short
 - short
@@ -5901,6 +5677,65 @@
 - short
 - short
 - short
+- channels
+- 1
+- 10
+- 11
+- 12
+- 13
+- 14
+- 15
+- 16
+- 17
+- 18
+- 19
+- 2
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 26
+- 27
+- 28
+- 29
+- 3
+- 30
+- 31
+- 32
+- 33
+- 34
+- 35
+- 36
+- 37
+- 38
+- 39
+- 4
+- 40
+- 5
+- 6
+- 7
+- 8
+- 9
+- scene_id
+- scene_name
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
 - short
 - channels
 - 1
@@ -5962,6 +5797,65 @@
 - short
 - short
 - short
+- channels
+- 1
+- 10
+- 11
+- 12
+- 13
+- 14
+- 15
+- 16
+- 17
+- 18
+- 19
+- 2
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 26
+- 27
+- 28
+- 29
+- 3
+- 30
+- 31
+- 32
+- 33
+- 34
+- 35
+- 36
+- 37
+- 38
+- 39
+- 4
+- 40
+- 5
+- 6
+- 7
+- 8
+- 9
+- scene_id
+- scene_name
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
 - short
 - channels
 - 1
@@ -6023,7 +5917,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -6068,6 +5961,65 @@
 - scene_id
 - scene_name
 - short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- channels
+- 1
+- 10
+- 11
+- 12
+- 13
+- 14
+- 15
+- 16
+- 17
+- 18
+- 19
+- 2
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 26
+- 27
+- 28
+- 29
+- 3
+- 30
+- 31
+- 32
+- 33
+- 34
+- 35
+- 36
+- 37
+- 38
+- 39
+- 4
+- 40
+- 5
+- 6
+- 7
+- 8
+- 9
+- scene_id
+- scene_name
 - short
 - short
 - short
@@ -6148,7 +6100,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -6191,68 +6142,6 @@
 - 9
 - scene_id
 - scene_name
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- short
-- channels
-- 1
-- 10
-- 11
-- 12
-- 13
-- 14
-- 15
-- 16
-- 17
-- 18
-- 19
-- 2
-- 20
-- 21
-- 22
-- 23
-- 24
-- 25
-- 26
-- 27
-- 28
-- 29
-- 3
-- 30
-- 31
-- 32
-- 33
-- 34
-- 35
-- 36
-- 37
-- 38
-- 39
-- 4
-- 40
-- 5
-- 6
-- 7
-- 8
-- 9
-- scene_id
-- scene_name
-- short
 - short
 - short
 - short
@@ -6330,7 +6219,6 @@
 - short
 - short
 - short
-- short
 - channels
 - 1
 - 10
@@ -6375,6 +6263,65 @@
 - scene_id
 - scene_name
 - short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- short
+- channels
+- 1
+- 10
+- 11
+- 12
+- 13
+- 14
+- 15
+- 16
+- 17
+- 18
+- 19
+- 2
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 26
+- 27
+- 28
+- 29
+- 3
+- 30
+- 31
+- 32
+- 33
+- 34
+- 35
+- 36
+- 37
+- 38
+- 39
+- 4
+- 40
+- 5
+- 6
+- 7
+- 8
+- 9
+- scene_id
+- scene_name
 - short
 - short
 - short
@@ -7385,7 +7332,7 @@
 - **Yamaha 01V96 FX parameters (HOLD/DECAY/Rev Time) via SysEx F0 43 10 3E 7F 01 58** — docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_sysex_structure, docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_hold_table, docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_decay_table, docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_reverb_standard, log_fx_test_log_fx1_decay [INFERRED 0.85]
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 
-## Communities (7836 total, 6869 thin omitted)
+## Communities (7785 total, 6813 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
 Cohesion: 0.53
@@ -7404,8 +7351,8 @@ Cohesion: 0.17
 Nodes (19): MidiInput, async_main(), establish_midi(), get_project_root(), main(), MidiConnectionState, MiniConfig, Box (+11 more)
 
 ### Community 10 - "Node.js Legacy MIDI Functions"
-Cohesion: 0.10
-Nodes (19): async-clone-before-await, Bad, Good, Minimizing Clones, MutexGuard Across Await, Scope-Based Approach, See Also, Spawn Pattern (+11 more)
+Cohesion: 0.20
+Nodes (10): async-clone-before-await, Bad, Good, Minimizing Clones, MutexGuard Across Await, Scope-Based Approach, See Also, Spawn Pattern (+2 more)
 
 ### Community 16 - "UI/UX Pro Max Design System Skills"
 Cohesion: 0.17
@@ -7544,8 +7491,8 @@ Cohesion: 0.08
 Nodes (24): Cena default: `custom_names_scene-default-{nome_da_mesa}.json`, Cena individual: `custom_names_scene-{nome}-{nome_da_mesa}.json`, Estrutura de dados, Feature 1: Cenas de Nomes Customizados, Feature 2: Atribuição de Nome ao Servidor/Mesa, O que foi feito recentemente, Onde paramos e Problema Atual, Passo 1: Backend — Detecção e validação do `.env` (+16 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.09
-Nodes (24): Channel Config Modal (EQ/DYN/AUX/ETC + Mini Fader), changeConfigChannel(), commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), isMobileEvents, jumpPanToPosition() (+16 more)
+Cohesion: 0.13
+Nodes (16): Channel Config Modal (EQ/DYN/AUX/ETC + Mini Fader), changeConfigChannel(), commitFaderChange(), faderInput(), handlePanPointerMove(), handleWheelFader(), isMobileEvents, jumpPanToPosition() (+8 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.21
@@ -7616,8 +7563,8 @@ Cohesion: 0.27
 Nodes (7): Option, Self, String, Vec, SceneData, SceneManager, SceneManagerState
 
 ### Community 125 - "Community 125"
-Cohesion: 0.12
-Nodes (9): Bad, Combining with Context, err-question-mark, Error Type Conversion, Good, How ? Works, See Also, Why It Matters (+1 more)
+Cohesion: 0.08
+Nodes (17): Bad, Blanket From Implementations, err-from-impl, From with Context, Good, See Also, Use thiserror for Automatic From, Why It Matters (+9 more)
 
 ### Community 126 - "Community 126"
 Cohesion: 0.07
@@ -7632,8 +7579,8 @@ Cohesion: 0.09
 Nodes (15): AtomicUsize, MasterMeter, HashMap, Option, Self, Value, Vec, Arc (+7 more)
 
 ### Community 129 - "Community 129"
-Cohesion: 0.11
-Nodes (14): api-typestate, Bad, Builder Typestate, Good, See Also, Transaction Example, Why It Matters, Bad (+6 more)
+Cohesion: 0.12
+Nodes (15): anti-stringly-typed, Bad, Error Messages, Good, Parsing Strings to Types, See Also, Why It Matters, With Serde (+7 more)
 
 ### Community 130 - "Community 130"
 Cohesion: 0.18
@@ -7696,8 +7643,8 @@ Cohesion: 0.15
 Nodes (8): Autovectorization (Stable), Choosing an Approach, opt-simd-portable, Platform-Specific (When Needed), Portable SIMD (Nightly), See Also, Why It Matters, wide Crate (Stable)
 
 ### Community 157 - "Community 157"
-Cohesion: 0.09
-Nodes (15): Bad, doc-all-public, Enforcement, Good, See Also, What to Document, Why It Matters, Bad (+7 more)
+Cohesion: 0.25
+Nodes (8): Bad, Crate Root Example, doc-module-inner, Good, Key Sections for Module Docs, See Also, Where to Use Inner Docs, Why It Matters
 
 ### Community 158 - "Community 158"
 Cohesion: 0.09
@@ -7904,8 +7851,8 @@ Cohesion: 0.09
 Nodes (22): anti-premature-optimize, Bad, Common Premature Optimizations, Document Optimizations, Good, Optimization Principles, Profile Tools, Profiling Workflow (+14 more)
 
 ### Community 576 - "Community 576"
-Cohesion: 0.04
-Nodes (42): Bad, Benefits, Good, Hybrid Approach, Module Structure, proj-mod-by-feature, See Also, Shared Code (+34 more)
+Cohesion: 0.17
+Nodes (12): Bad, Comparison: Module Structure vs Public API, Glob Re-exports, Good, Pattern: Feature-Gated Re-exports, Pattern: Prelude Module, Pattern: Rename on Re-export, Pattern: Selective Re-export (+4 more)
 
 ### Community 587 - "Community 587"
 Cohesion: 0.20
@@ -7939,10 +7886,6 @@ Nodes (12): Configuration, Example Catches, lint-warn-suspicious, Notable Lints 
 Cohesion: 0.22
 Nodes (9): Bad, Combining with Result, Good, See Also, test-should-panic, Testing Invariants, When NOT to Use should_panic, Why It Matters (+1 more)
 
-### Community 599 - "Community 599"
-Cohesion: 0.13
-Nodes (8): Bad, Good, own-slice-over-vec, Path Types Too, See Also, The Deref Coercion Chain, When to Accept Owned Types, Why It Matters
-
 ### Community 600 - "Community 600"
 Cohesion: 0.14
 Nodes (14): main(), MidiDispatcher, PendingEvent, ping(), Arc, HashMap, Result, Self (+6 more)
@@ -7962,6 +7905,10 @@ Nodes (9): 1. Contexto do Problema, 2.1. Configurações Globais Centralizadas, 
 ### Community 615 - "Community 615"
 Cohesion: 0.17
 Nodes (12): Bad, Cargo Configuration, Checking Enabled Features, Common Target CPUs, Feature Detection at Runtime, Good, Multi-Architecture Builds, opt-target-cpu (+4 more)
+
+### Community 630 - "Community 630"
+Cohesion: 0.16
+Nodes (7): Bad, Good, name-variants-camel, See Also, Variant Naming Tips, Variants with Data, Why It Matters
 
 ### Community 632 - "Community 632"
 Cohesion: 0.26
@@ -7987,6 +7934,14 @@ Nodes (12): Bad, Documenting the Prelude, Example: Database Library Prelude, Exa
 Cohesion: 0.17
 Nodes (12): Bad, Build Time Trade-offs, Full Release Profile, Good, How It Works, Measuring Impact, opt-codegen-units, Per-Profile Configuration (+4 more)
 
+### Community 638 - "Community 638"
+Cohesion: 0.25
+Nodes (8): clearMacroSelection(), macroFader, openMacroConfig(), renderMacroGrid(), tempMacroLockedChannels, tempMacroSelectedChannels, toggleMacroChannel(), updateMacroModalLayout()
+
+### Community 639 - "Community 639"
+Cohesion: 0.20
+Nodes (10): Bad, Benefits, Good, Hybrid Approach, Module Structure, proj-mod-by-feature, See Also, Shared Code (+2 more)
+
 ### Community 640 - "Community 640"
 Cohesion: 0.18
 Nodes (11): anti-vec-for-slice, Bad, Clippy Detection, Deref Coercion, Good, Mutable Slices, Pattern: Accepting Multiple Types, See Also (+3 more)
@@ -7996,7 +7951,7 @@ Cohesion: 0.22
 Nodes (9): anti-lock-across-await, Bad, Detection, Good, Pattern: Clone Before Await, Pattern: Restructure to Avoid Lock, See Also, What Can Cross Await (+1 more)
 
 ### Community 643 - "Community 643"
-Cohesion: 0.19
+Cohesion: 0.27
 Nodes (15): checkMasterSoloIndicator(), clearAllSolos(), createChannelStrip(), createDesktopChannelStrip(), createDesktopOutputStrip(), createDesktopStrip(), createMobileStrip(), createOutputStrip() (+7 more)
 
 ### Community 644 - "Community 644"
@@ -8004,8 +7959,8 @@ Cohesion: 0.20
 Nodes (10): Bad, Coercion to Any Type, Current Limitations (Nightly), Diverging Closures, Good, In Match Expressions, See Also, Standard Library Examples (+2 more)
 
 ### Community 645 - "Community 645"
-Cohesion: 0.09
-Nodes (17): anti-over-abstraction, Bad, Good, Prefer Concrete Types in Private Code, Rule of Three, See Also, Signs of Over-Abstraction, When to Generalize (+9 more)
+Cohesion: 0.08
+Nodes (17): Bad, Common Lifetime Conventions, Elision Preferred, Good, name-lifetime-short, See Also, Serde Convention, Why It Matters (+9 more)
 
 ### Community 646 - "Community 646"
 Cohesion: 0.18
@@ -8052,8 +8007,8 @@ Cohesion: 0.17
 Nodes (12): Bad, Benefits, Commands, Good, Member Crate Cargo.toml, Pattern: Crate Interdependencies, Pattern: Virtual Workspace, proj-workspace-large (+4 more)
 
 ### Community 657 - "Community 657"
-Cohesion: 0.10
-Nodes (31): alloc_trim_analysis(), AnalysisInfo, CeltEncoder, comb_filter(), comb_filter_const(), comb_filter_const_avx(), comb_filter_const_neon(), comb_filter_const_neon_impl() (+23 more)
+Cohesion: 0.09
+Nodes (33): log2amp(), spreading_decision(), alloc_trim_analysis(), AnalysisInfo, CeltEncoder, comb_filter(), comb_filter_const(), comb_filter_const_avx() (+25 more)
 
 ### Community 658 - "Community 658"
 Cohesion: 0.18
@@ -8072,8 +8027,8 @@ Cohesion: 0.17
 Nodes (12): Complete Cargo.toml, Configuration, Dependency Issues, Feature Issues, lint-cargo-metadata, Missing Metadata, Multiple Crate Versions, Notable Lints (+4 more)
 
 ### Community 662 - "Community 662"
-Cohesion: 0.09
-Nodes (21): Bad, doc-hidden-setup, Good, Pattern: Hiding Multi-Line Setup, Pattern: `ignore` and `no_run`, Pattern: Showing Setup When Relevant, See Also, What to Hide (+13 more)
+Cohesion: 0.17
+Nodes (12): Allow for Specific Items, Combining with doc Attributes, Configuration, Good, Gradual Adoption, lint-missing-docs, Private Items, See Also (+4 more)
 
 ### Community 663 - "Community 663"
 Cohesion: 0.22
@@ -8094,6 +8049,10 @@ Nodes (12): Bad, Cargo Configuration, Checking Enabled Features, Common Target C
 ### Community 680 - "Community 680"
 Cohesion: 0.22
 Nodes (9): api-extension-trait, Bad, Convention: Ext Suffix, Ecosystem Examples, Generic Extensions with Bounds, Good, Scoped Extensions, See Also (+1 more)
+
+### Community 685 - "Community 685"
+Cohesion: 0.20
+Nodes (10): Bad, Benefits, Good, Pattern: Feature Module Internals, Pattern: Internal Module, Pattern: Test Visibility, proj-pub-crate-internal, See Also (+2 more)
 
 ### Community 686 - "Community 686"
 Cohesion: 0.20
@@ -8148,8 +8107,8 @@ Cohesion: 0.20
 Nodes (10): Bad, Check Enum Sizes, Clippy Lint, Good, mem-box-large-variant, Pattern Matching with Boxed Variants, Recursive Types Require Boxing, See Also (+2 more)
 
 ### Community 699 - "Community 699"
-Cohesion: 0.12
-Nodes (15): anti-panic-expected, Anti-pattern: panic! for Control Flow, Bad, Decision Guide, Good, See Also, When to Panic, Why It Matters (+7 more)
+Cohesion: 0.07
+Nodes (24): anti-panic-expected, Anti-pattern: panic! for Control Flow, Bad, Decision Guide, Good, See Also, When to Panic, Why It Matters (+16 more)
 
 ### Community 700 - "Community 700"
 Cohesion: 0.22
@@ -8167,13 +8126,9 @@ Nodes (8): Bad, Custom Iterator Methods, Implementation, name-iter-type-match, N
 Cohesion: 0.20
 Nodes (10): Bad, Common Uses, Expressing Borrowing, Expressing Ownership, Good, See Also, Type-Level State Machine, type-phantom-marker (+2 more)
 
-### Community 704 - "Community 704"
-Cohesion: 0.05
-Nodes (31): anti-expect-lazy, Bad, Decision Guide, Good, See Also, When expect() Is Appropriate, Why It Matters, anti-panic-expected (+23 more)
-
 ### Community 705 - "Community 705"
-Cohesion: 0.22
-Nodes (9): Bad, Common Panic Conditions, doc-panics-section, Good, Pattern: Debug-Only Panics, Pattern: Panic vs Return Error, Provide Non-Panicking Alternatives, See Also (+1 more)
+Cohesion: 0.20
+Nodes (10): Bad, Comparison, Good, Pattern: Layered Visibility, Pattern: Test Helpers, proj-pub-super-parent, See Also, Visibility Hierarchy (+2 more)
 
 ### Community 716 - "Community 716"
 Cohesion: 0.20
@@ -8186,6 +8141,10 @@ Nodes (10): Avoid Pointer Chasing, Bad, Good, Hot/Cold Splitting, Measuring Cach
 ### Community 761 - "Community 761"
 Cohesion: 0.18
 Nodes (11): anti-premature-optimize, Bad, Common Premature Optimizations, Document Optimizations, Good, Optimization Principles, Profile Tools, Profiling Workflow (+3 more)
+
+### Community 764 - "Community 764"
+Cohesion: 0.22
+Nodes (9): anti-over-abstraction, Bad, Good, Prefer Concrete Types in Private Code, Rule of Three, See Also, Signs of Over-Abstraction, When to Generalize (+1 more)
 
 ### Community 765 - "Community 765"
 Cohesion: 0.22
@@ -8208,8 +8167,8 @@ Cohesion: 0.22
 Nodes (9): Bad, Clippy Lint, err-doc-errors, Error Section Format Options, Good, Linking to Error Variants, Panic vs Error Documentation, See Also (+1 more)
 
 ### Community 770 - "Community 770"
-Cohesion: 0.09
-Nodes (20): Bad, Binary Naming, Explicit Configuration, Good, Pattern: Binary with Multiple Files, Pattern: Default Binary, Pattern: Shared Library Code, proj-bin-dir (+12 more)
+Cohesion: 0.18
+Nodes (11): Bad, Binary Naming, Explicit Configuration, Good, Pattern: Binary with Multiple Files, Pattern: Default Binary, Pattern: Shared Library Code, proj-bin-dir (+3 more)
 
 ### Community 771 - "Community 771"
 Cohesion: 0.20
@@ -8257,7 +8216,7 @@ Nodes (9): async-bounded-channel, Bad, Channel Types, Choosing Buffer Size, Good
 
 ### Community 782 - "async-join-parallel"
 Cohesion: 0.22
-Nodes (9): async-join-parallel, Bad, futures::join_all for Dynamic Collections, Good, join! vs try_join!, Limiting Concurrency, See Also, When NOT to Use join! (+1 more)
+Nodes (8): anti-unwrap-abuse, Bad, Clippy Lint, expect() Is Slightly Better, Good, See Also, When unwrap() Is Acceptable, Why It Matters
 
 ### Community 783 - "Community 783"
 Cohesion: 0.17
@@ -8278,6 +8237,10 @@ Nodes (11): async-select-racing, Bad, Biased Selection, Cancellation Behavior, C
 ### Community 801 - "Community 801"
 Cohesion: 0.18
 Nodes (11): Alternative: Explicit Opt-in, Bad, Full Configuration, Good, lint-pedantic-selective, Module-Level Overrides, Often Disabled, Recommended Pedantic Lints (+3 more)
+
+### Community 804 - "Community 804"
+Cohesion: 0.22
+Nodes (9): async-no-lock-await, Bad, Good, Patterns for Extraction, See Also, std::sync::Mutex vs tokio::sync::Mutex, The Problem Visualized, Using RwLock (+1 more)
 
 ### Community 805 - "Community 805"
 Cohesion: 0.22
@@ -8315,6 +8278,10 @@ Nodes (7): Bad, Decision Guide, Evidence, Good, own-rc-single-thread, See Also, 
 Cohesion: 0.29
 Nodes (7): Bad, Common Pattern: Rc<RefCell<T>>, Good, own-refcell-interior, Runtime Panics, See Also, Why It Matters
 
+### Community 814 - "Community 814"
+Cohesion: 0.08
+Nodes (18): Bad, doc-hidden-setup, Good, Pattern: Hiding Multi-Line Setup, Pattern: `ignore` and `no_run`, Pattern: Showing Setup When Relevant, See Also, What to Hide (+10 more)
+
 ### Community 815 - "Community 815"
 Cohesion: 0.25
 Nodes (8): Bad, Common Validated Types, Compile-Time Validation, Good, See Also, type-newtype-validated, Why It Matters, With Serde
@@ -8336,7 +8303,7 @@ Cohesion: 0.22
 Nodes (9): Bad, Good, In snake_case, Mixed Cases, name-acronym-word, See Also, Standard Library Examples, Two-Letter Acronyms (+1 more)
 
 ### Community 820 - "Community 820"
-Cohesion: 0.11
+Cohesion: 0.09
 Nodes (15): Bad, Good, name-variants-camel, See Also, Variant Naming Tips, Variants with Data, Why It Matters, Bad (+7 more)
 
 ### Community 821 - "Community 821"
@@ -8345,7 +8312,7 @@ Nodes (9): Arc vs Rc Decision Tree, Arc with Mutex for Mutable Shared State, Bad
 
 ### Community 822 - "err-expect-bugs-only"
 Cohesion: 0.22
-Nodes (9): Bad, Boolean Fields, Common Prefixes, Good, name-is-has-bool, Negation, See Also, Standard Library Examples (+1 more)
+Nodes (9): Bad, Good, Multiple Binaries, proj-lib-main-split, Project Structure, See Also, Testing Benefits, Why It Matters (+1 more)
 
 ### Community 824 - "Community 824"
 Cohesion: 0.25
@@ -8424,8 +8391,8 @@ Cohesion: 0.20
 Nodes (10): api-impl-asref, AsRef vs Into vs Borrow, Bad, Common AsRef Implementations, Good, Implement AsRef for Custom Types, Pattern: Optional AsRef Bound, See Also (+2 more)
 
 ### Community 847 - "Community 847"
-Cohesion: 0.05
-Nodes (40): async-broadcast-pubsub, Bad, Broadcast Semantics, Broadcast vs Watch, Clone Requirement, Event Bus Pattern, Good, Handling Lagging Receivers (+32 more)
+Cohesion: 0.04
+Nodes (49): async-broadcast-pubsub, Bad, Broadcast Semantics, Broadcast vs Watch, Clone Requirement, Event Bus Pattern, Good, Handling Lagging Receivers (+41 more)
 
 ### Community 848 - "Community 848"
 Cohesion: 0.22
@@ -8457,7 +8424,7 @@ Nodes (10): Bad, Bumpalo Collections, Evidence from ROC Compiler, Good, mem-aren
 
 ### Community 855 - "Community 855"
 Cohesion: 0.10
-Nodes (48): amp2log2(), anti_collapse(), BandCtx, bitexact_cos(), bitexact_log2tan(), celt_atan2p_norm(), celt_lcg_rand(), celt_sudiv() (+40 more)
+Nodes (47): amp2log2(), anti_collapse(), BandCtx, bitexact_cos(), bitexact_log2tan(), celt_atan2p_norm(), celt_lcg_rand(), celt_sudiv() (+39 more)
 
 ### Community 856 - "Community 856"
 Cohesion: 0.07
@@ -8473,7 +8440,7 @@ Nodes (9): Bad, Edge Cases, Error Cases, Good, Module Organization, Naming Patte
 
 ### Community 871 - "restart_server"
 Cohesion: 0.25
-Nodes (8): Bad, Blanket From Implementations, err-from-impl, From with Context, Good, See Also, Use thiserror for Automatic From, Why It Matters
+Nodes (7): anti-expect-lazy, Bad, Decision Guide, Good, See Also, When expect() Is Appropriate, Why It Matters
 
 ### Community 881 - "name-type-param-single"
 Cohesion: 0.22
@@ -8559,9 +8526,21 @@ Nodes (3): combine_pulses(), encode_split(), silk_shell_encoder()
 Cohesion: 0.22
 Nodes (9): Bad, Good, In snake_case, Mixed Cases, name-acronym-word, See Also, Standard Library Examples, Two-Letter Acronyms (+1 more)
 
+### Community 910 - "anti-panic-expected"
+Cohesion: 0.25
+Nodes (8): anti-panic-expected, Anti-pattern: panic! for Control Flow, Bad, Decision Guide, Good, See Also, When to Panic, Why It Matters
+
 ### Community 912 - "Community 912"
 Cohesion: 0.18
 Nodes (11): Adjacent File Benefits, Consistency Rule, Example: Complex Module, mod.rs Benefits, proj-mod-rs-dir, See Also, Style 1: mod.rs (Recommended for larger modules), Style 2: Adjacent file (Recommended for smaller modules) (+3 more)
+
+### Community 924 - "err-from-impl"
+Cohesion: 0.25
+Nodes (8): Bad, Blanket From Implementations, err-from-impl, From with Context, Good, See Also, Use thiserror for Automatic From, Why It Matters
+
+### Community 929 - "Community 929"
+Cohesion: 0.29
+Nodes (7): Bad, doc-all-public, Enforcement, Good, See Also, What to Document, Why It Matters
 
 ### Community 946 - "Community 946"
 Cohesion: 0.15
@@ -8628,8 +8607,8 @@ Cohesion: 0.20
 Nodes (10): async-broadcast-pubsub, Bad, Broadcast Semantics, Broadcast vs Watch, Clone Requirement, Event Bus Pattern, Good, Handling Lagging Receivers (+2 more)
 
 ### Community 1099 - "Community 1099"
-Cohesion: 0.13
-Nodes (7): Bad, Evidence, Good, own-borrow-over-clone, See Also, When Clone Is Acceptable, Why It Matters
+Cohesion: 0.06
+Nodes (25): Bad, Evidence, Good, own-borrow-over-clone, See Also, When Clone Is Acceptable, Why It Matters, Bad (+17 more)
 
 ### Community 1105 - "Community 1105"
 Cohesion: 0.06
@@ -8816,8 +8795,8 @@ Cohesion: 0.20
 Nodes (10): Bad, Broken Link Detection, Common Patterns, doc-link-types, Good, Link Syntax, Linking to Trait Items, Module-Level Documentation (+2 more)
 
 ### Community 1205 - "Community 1205"
-Cohesion: 0.20
-Nodes (10): Bad, Box<str> for Immutable Strings, Conversion Patterns, Good, mem-boxed-slice, Memory Layout, Real-World Example, See Also (+2 more)
+Cohesion: 0.10
+Nodes (19): Bad, Box<str> for Immutable Strings, Conversion Patterns, Good, mem-boxed-slice, Memory Layout, Real-World Example, See Also (+11 more)
 
 ### Community 1206 - "Community 1206"
 Cohesion: 0.20
@@ -8832,8 +8811,8 @@ Cohesion: 0.22
 Nodes (9): Bad, CompactString for Small Strings, Good, mem-avoid-format, Pre-allocate for Multiple Appends, See Also, Use write!() for Output, When format!() Is Fine (+1 more)
 
 ### Community 1210 - "Community 1210"
-Cohesion: 0.20
-Nodes (10): Bad, Decision Guide, Good, name-no-get-prefix, Pattern: Builder Methods, Pattern: Getter/Setter Pairs, See Also, Standard Library Examples (+2 more)
+Cohesion: 0.10
+Nodes (19): Bad, Boolean Fields, Common Prefixes, Good, name-is-has-bool, Negation, See Also, Standard Library Examples (+11 more)
 
 ### Community 1213 - "Community 1213"
 Cohesion: 0.20
@@ -8842,10 +8821,6 @@ Nodes (10): Bad, #[cold] for Unlikely Branches, Error Construction Functions, Go
 ### Community 1216 - "Community 1216"
 Cohesion: 0.20
 Nodes (10): Alternative: References, Bad, Good, own-move-large, Pattern: Builder Returns Boxed, Profile First, See Also, Stack vs Heap Tradeoffs (+2 more)
-
-### Community 1217 - "Community 1217"
-Cohesion: 0.20
-Nodes (10): Bad, Drain Methods, drain vs clear vs take, Good, Pattern: Batch Processing, Pattern: HashMap Drain, Pattern: Transfer Between Collections, perf-drain-reuse (+2 more)
 
 ### Community 1218 - "Community 1218"
 Cohesion: 0.20
@@ -8967,10 +8942,6 @@ Nodes (9): Bad, Conversion Method Prefixes, Custom Types, Good, name-to-expensiv
 Cohesion: 0.22
 Nodes (9): Arc vs Rc Decision Tree, Arc with Mutex for Mutable Shared State, Bad, Common Patterns, Good, own-arc-shared, Performance Considerations, See Also (+1 more)
 
-### Community 1267 - "Community 1267"
-Cohesion: 0.22
-Nodes (9): Bad, clone_from Optimization, Custom Clone Implementation, Derive vs Manual Clone, Good, own-clone-explicit, See Also, When to Avoid Clone (+1 more)
-
 ### Community 1268 - "Community 1268"
 Cohesion: 0.22
 Nodes (9): Bad, Clone-on-Write Pattern, Cow with Collections, Good, own-cow-conditional, Real-World Example from ripgrep, See Also, When to Use Cow (+1 more)
@@ -9031,10 +9002,6 @@ Nodes (9): anti-over-abstraction, Bad, Good, Prefer Concrete Types in Private Co
 Cohesion: 0.22
 Nodes (8): anti-unwrap-abuse, Bad, Clippy Lint, expect() Is Slightly Better, Good, See Also, When unwrap() Is Acceptable, Why It Matters
 
-### Community 1289 - "Community 1289"
-Cohesion: 0.22
-Nodes (9): api-builder-must-use, Apply to Entire Type, Bad, Clippy Lint, Good, Message Guidelines, See Also, Standard Library Examples (+1 more)
-
 ### Community 1293 - "Community 1293"
 Cohesion: 0.22
 Nodes (9): api-non-exhaustive, Bad, Good, How It Works, Non-Exhaustive Variants, See Also, Struct Usage, When to Use (+1 more)
@@ -9075,10 +9042,6 @@ Nodes (5): findFxOutId(), getCurrentActiveId(), handleFxPatchSelect(), renderCat
 Cohesion: 0.13
 Nodes (32): autocorr(), celt_fir(), celt_fir_neon(), celt_iir(), celt_iir_neon(), lpc(), Option, celt_fir5() (+24 more)
 
-### Community 1318 - "Community 1318"
-Cohesion: 0.22
-Nodes (9): Bad, Collection Capacity Methods, Estimating Capacity, Evidence from Production Code, Good, mem-with-capacity, See Also, When to Skip (+1 more)
-
 ### Community 1322 - "Community 1322"
 Cohesion: 0.22
 Nodes (9): Additional Iterator Methods, Bad, Implementation, name-iter-convention, See Also, Standard Library Examples, The Three Iterator Methods, Usage (+1 more)
@@ -9103,12 +9066,8 @@ Nodes (12): 10.1.1. Natureza das Requisições SysEx (Parâmetro por Parâmetro)
 Cohesion: 0.22
 Nodes (9): Bad, Bound Placement, Conditional Trait Implementation, Good, Implied Bounds, See Also, type-generic-bounds, Where Clause Benefits (+1 more)
 
-### Community 1340 - "Community 1340"
-Cohesion: 0.25
-Nodes (8): anti-stringly-typed, Bad, Error Messages, Good, Parsing Strings to Types, See Also, Why It Matters, With Serde
-
 ### Community 1341 - "Community 1341"
-Cohesion: 0.11
+Cohesion: 0.25
 Nodes (8): api-builder-pattern, Bad, Builder Variations, Evidence from reqwest, Good, Key Attributes, See Also, Why It Matters
 
 ### Community 1347 - "Community 1347"
@@ -9197,7 +9156,7 @@ Nodes (15): auxVG_deltaToDB(), auxVG_resetDbDisplay(), auxVG_updateDbDisplay(), 
 
 ### Community 1604 - "Community 1604"
 Cohesion: 0.12
-Nodes (25): denormalise_bands(), log2amp(), normalise_bands(), scale_slice_avx2(), scale_slice_neon(), CeltDecoder, comb_filter_inplace(), tf_decode() (+17 more)
+Nodes (24): denormalise_bands(), normalise_bands(), scale_slice_avx2(), scale_slice_neon(), CeltDecoder, comb_filter_inplace(), tf_decode(), CeltMode (+16 more)
 
 ### Community 1605 - "Community 1605"
 Cohesion: 0.15
@@ -9256,9 +9215,9 @@ Cohesion: 0.67
 Nodes (3): junie_master_meter_report.txt (AirFader 14-bit master), AirFader master offsets 01V96V2: Left=56, Right=57; MixEngine.cs linhas 3369-3777 (processamento), 14524-14527 (geração de comandos), 1034-1038 (offsets), AirFader master meter SysEx request: F0 43 3n 3E 0D 21 04 PP CC 00 01 F7; stop: F0 43 3n 3E 0D 21 7F 00 00 00 00 F7; 14-bit raw = (high<<7)|low; db = (raw - 4493) / 63.66; 25 FPS (40ms)
 
 ## Knowledge Gaps
-- **10725 isolated node(s):** `@opencode-ai/plugin`, `@opencode-ai/plugin`, `QueryTarget`, `midi`, `fs` (+10720 more)
+- **10669 isolated node(s):** `@opencode-ai/plugin`, `@opencode-ai/plugin`, `QueryTarget`, `midi`, `fs` (+10664 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **6869 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **6813 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -9268,12 +9227,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `RangeCoder` connect `Community 1221` to `Community 1604`, `Community 1381`, `shell_coder.rs`, `Community 657`, `Community 115`, `Community 855`, `Karpathy Coding Guidelines Skill`, `Community 1181`, `Community 1119`?**
   _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Why does `Inner` connect `Community 1457` to `Karpathy Coding Guidelines Skill`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Are the 43 inferred relationships involving `silk_smlawb()` (e.g. with `.encode()` and `silk_ana_filt_bank_1()`) actually correct?**
   _`silk_smlawb()` has 43 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Resolve the PR for the current branch (whatever gh considers associated).     Wo`, `Call `gh api graphql` using -F variables, avoiding JSON blobs with nulls.     Qu`, `BM25 ranking algorithm for text search` to the rest of the system?**
-  _10757 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _10701 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.12043010752688173 - nodes in this community are weakly interconnected._
-- **Should `Node.js Legacy MIDI Functions` be split into smaller, more focused modules?**
-  _Cohesion score 0.09941520467836257 - nodes in this community are weakly interconnected._
+- **Should `Karpathy Coding Guidelines Skill` be split into smaller, more focused modules?**
+  _Cohesion score 0.13063063063063063 - nodes in this community are weakly interconnected._
