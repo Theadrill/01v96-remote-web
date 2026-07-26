@@ -847,8 +847,13 @@ impl GlobalState {
                         bypass: false,
                         mix: 100.0,
                     });
-                    entry.id = *fx_type_id;
-                    entry.name = name;
+                    if entry.id != *fx_type_id {
+                        entry.id = *fx_type_id;
+                        entry.name = name;
+                        if let Some(params_map) = self.fx_params.get_mut(slot) {
+                            params_map.clear();
+                        }
+                    }
                 }
             }
             crate::midi::protocol::ParsedMidi::FxParamUpdate { slot, param, value } => {

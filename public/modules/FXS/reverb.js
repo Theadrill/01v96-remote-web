@@ -222,6 +222,21 @@
     }
 
     if (typeof socket !== 'undefined') {
+        socket.on('fxTypesUpdate', function(data) {
+            if (!data) return;
+            for (let i = 0; i < 4; i++) {
+                const d = data[i] || data[String(i)];
+                if (d && d.id !== undefined) {
+                    if (lastFxTypeId[i] !== -1 && lastFxTypeId[i] !== d.id) {
+                        // O algoritmo do efeito mudou na mesa: invalida o cache deste slot
+                        syncedSlots[i] = false;
+                        fxParamsState[i] = {};
+                    }
+                    lastFxTypeId[i] = d.id;
+                }
+            }
+        });
+
         socket.on('fxSlotParamsUpdate', function(data) {
             if (data && typeof data.slot === 'number' && data.params) {
                 const slot = data.slot;
@@ -232,7 +247,7 @@
                     hideEditorSyncOverlay();
                 }
                 const modal = document.getElementById('fxEditorModal');
-                if (modal && modal.style.display === 'flex' && currentSlotIdx === slot) {
+                if (modal && modal.style.display === 'flex' && currentSlotIdx === slot && !activeKnobDrag) {
                     renderModal();
                 }
             }
@@ -243,8 +258,14 @@
                 const slot = data.slot;
                 if (!fxParamsState[slot]) fxParamsState[slot] = {};
                 fxParamsState[slot][data.param] = data.value;
+
+                // Modificar um parâmetro NÃO des-sincroniza o slot! Se já temos >= 14 params, mantemos syncedSlots = true
+                if (Object.keys(fxParamsState[slot]).length >= 14) {
+                    syncedSlots[slot] = true;
+                }
+
                 const modal = document.getElementById('fxEditorModal');
-                if (modal && modal.style.display === 'flex' && currentSlotIdx === slot) {
+                if (modal && modal.style.display === 'flex' && currentSlotIdx === slot && !activeKnobDrag) {
                     renderModal();
                 }
             }
@@ -269,7 +290,12 @@
         const modal = document.getElementById('fxEditorModal');
         if (modal) modal.style.display = 'flex';
 
-        // Lazy sync: dispara requisição se ainda não tiver sincronizado os parâmetros deste slot
+        // Se o estado local tem >= 14 parâmetros acumulados, a slot já está sincronizada
+        if (fxParamsState[currentSlotIdx] && Object.keys(fxParamsState[currentSlotIdx]).length >= 14) {
+            syncedSlots[currentSlotIdx] = true;
+        }
+
+        // Lazy sync: dispara requisição apenas se ainda NÃO tiver sincronizado este slot
         if (!syncedSlots[currentSlotIdx]) {
             if (typeof socket !== 'undefined' && socket.emit) {
                 console.log('[FX] Disparando Lazy-Sync para FX' + (currentSlotIdx + 1));
@@ -331,6 +357,10 @@
         const container = document.getElementById('fxEditorModalContent');
         if (!container) return;
 
+        // Salva a posição atual do scroll da lista antes de atualizar o HTML
+        const scrollEl = container.querySelector('.fx-ed-scroll-body');
+        const savedScrollTop = scrollEl ? scrollEl.scrollTop : 0;
+
         const preset = REVERB_PRESETS[currentSlotIdx];
         const params = decodeReverbParams(currentSlotIdx);
         const effectName = currentEffectTitle || preset.type;
@@ -359,6 +389,12 @@
                 </div>
             </div>
         `;
+
+        // Restaura a posição exata da barra de rolagem
+        const newScrollEl = container.querySelector('.fx-ed-scroll-body');
+        if (newScrollEl) {
+            newScrollEl.scrollTop = savedScrollTop;
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -708,32 +744,67 @@
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // HANDLERS INTERATIVOS (SEM LÓGICA DE SERVIDORES / APENAS MOCK UI)
+    // ENVIO DE ALTERAÇÃO DE PARÂMETROS (APP -> MESA 01V96)
     // ─────────────────────────────────────────────────────────────────
+    const PARAM_MAP_BY_TITLE = {
+        'REV. TIME': { param: 17, min: 0, max: 99 },
+        'REV TIME': { param: 17, min: 0, max: 99 },
+        'INI. DLY': { param: 16, min: 0, max: 5000 },
+        'HI.RATIO': { param: 18, min: 0, max: 9 },
+        'LO.RATIO': { param: 19, min: 0, max: 23 },
+        'DIFF.': { param: 20, min: 0, max: 10 },
+        'DIFF': { param: 20, min: 0, max: 10 },
+        'DENSITY': { param: 21, min: 0, max: 100 },
+        'HPF': { param: 22, min: 0, max: 104 },
+        'LPF': { param: 23, min: 0, max: 105 },
+        'E/R DLY': { param: 24, min: 0, max: 1000 },
+        'E/R BAL.': { param: 25, min: 0, max: 100 },
+        'E/R BAL': { param: 25, min: 0, max: 100 },
+        'GATE': { param: 26, min: 0, max: 61 },
+        'GATE LVL': { param: 26, min: 0, max: 61 },
+        'ATTACK': { param: 27, min: 0, max: 120 },
+        'HOLD': { param: 28, min: 0, max: 215 },
+        'DECAY': { param: 29, min: 0, max: 159 },
+        'MIX BALANCE': { param: 48, min: 0, max: 100 },
+        'MIX': { param: 48, min: 0, max: 100 }
+    };
 
-    // 1. Handlers de Fader/Slider
-    function handleFaderInput(inputEl, type) {
-        const val = parseInt(inputEl.value, 10);
-        const container = inputEl.closest('.fader-track-container') || inputEl.closest('.c2-mix-bar');
-        if (!container) return;
+    function sendParamChange(param, value) {
+        if (typeof currentSlotIdx !== 'number' || currentSlotIdx < 0 || currentSlotIdx > 3) return;
+        if (!fxParamsState[currentSlotIdx]) fxParamsState[currentSlotIdx] = {};
+        
+        // Atualização Otimista local
+        fxParamsState[currentSlotIdx][param] = value;
 
-        const fill = container.querySelector('.fader-fill');
-        if (fill) fill.style.width = val + '%';
-
-        const row = inputEl.closest('.fader-row');
-        if (row) {
-            const badge = row.querySelector('.fader-badge');
-            if (badge) badge.innerText = formatMockValue(val, type);
-        }
-
-        const mixBar = inputEl.closest('.c2-mix-bar');
-        if (mixBar) {
-            const mixVal = mixBar.querySelector('.c2-mix-val');
-            if (mixVal) mixVal.innerText = val + '%';
+        if (typeof socket !== 'undefined' && socket.emit) {
+            socket.emit('changeFxParam', {
+                slot: currentSlotIdx,
+                param: param,
+                value: value
+            });
         }
     }
 
-    // 2. Handlers de Knobs (Drag em Y)
+    function toggleBypass() {
+        const currentVal = fxParamsState[currentSlotIdx] ? (fxParamsState[currentSlotIdx][52] || 0) : 0;
+        const newBypassVal = currentVal > 0 ? 0 : 1;
+        sendParamChange(52, newBypassVal);
+        renderModal();
+    }
+
+    // 1. Handlers de Fader/Slider
+    let lastFaderSentTime = 0;
+    function handleFaderInput(inputEl, type) {
+        const val = parseInt(inputEl.value, 10);
+        const now = Date.now();
+        if (type === 'mix' && (now - lastFaderSentTime >= 40)) {
+            sendParamChange(48, val);
+            lastFaderSentTime = now;
+        }
+        renderModal();
+    }
+
+    // 2. Handlers de Knobs (Drag em Y com Transmissão em Tempo Real Cadenciada)
     let activeKnobDrag = null;
 
     function startKnobDrag(e, knobBox) {
@@ -753,6 +824,9 @@
         activeKnobDrag = {
             startY: clientY,
             startPct: currentPct,
+            lastPct: currentPct,
+            lastSentTime: 0,
+            lastSentStep: -1,
             ring: ring,
             pointer: pointer,
             badge: badge,
@@ -765,6 +839,37 @@
         window.addEventListener('touchend', stopKnobDrag);
     }
 
+    function formatRevTimeStep(step) {
+        step = Math.round(step);
+        let secs = 0.3;
+        if (step <= 47) secs = step * 0.1 + 0.3;
+        else if (step <= 57) secs = (step - 47) * 0.5 + 5.0;
+        else if (step <= 67) secs = (step - 57) * 1.0 + 10.0;
+        else if (step <= 82) secs = (step - 67) * 5.0 + 20.0;
+        else secs = 99.0;
+        return secs.toFixed(1) + 's';
+    }
+
+    function formatRealValueByParam(param, step) {
+        step = Math.round(step);
+        if (param === 16) return (step / 10).toFixed(1) + 'ms';
+        if (param === 17) return formatRevTimeStep(step);
+        if (param === 18) return ((step + 1) / 10).toFixed(1);
+        if (param === 19) return ((step + 1) / 10).toFixed(1);
+        if (param === 20) return String(step);
+        if (param === 21) return step + '%';
+        if (param === 22) return formatHpfStep(step);
+        if (param === 23) return formatLpfStep(step);
+        if (param === 24) return (step / 10).toFixed(1) + 'ms';
+        if (param === 25) return step + '%';
+        if (param === 26) return step === 0 ? 'OFF' : (step - 61) + 'dB';
+        if (param === 27) return step + 'ms';
+        if (param === 28) return formatHoldStep(step);
+        if (param === 29) return formatDecayStep(step);
+        if (param === 48) return step + '%';
+        return String(step);
+    }
+
     function onKnobDrag(e) {
         if (!activeKnobDrag) return;
         if (e.cancelable) e.preventDefault();
@@ -772,22 +877,49 @@
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const deltaY = activeKnobDrag.startY - clientY;
         let newPct = Math.min(100, Math.max(0, activeKnobDrag.startPct + deltaY * 0.75));
+        activeKnobDrag.lastPct = newPct;
 
         const deg = degFromPct(newPct);
         if (activeKnobDrag.ring) activeKnobDrag.ring.style.setProperty('--percent', newPct + '%');
         if (activeKnobDrag.pointer) activeKnobDrag.pointer.style.transform = `rotate(${deg}deg)`;
 
-        if (activeKnobDrag.badge) {
-            activeKnobDrag.badge.innerText = formatMockValueByLabel(newPct, activeKnobDrag.label);
+        const labelKey = activeKnobDrag.label.trim().toUpperCase();
+        const info = PARAM_MAP_BY_TITLE[labelKey];
+
+        if (info) {
+            const step = Math.min(info.max, Math.max(info.min, Math.round((newPct / 100) * info.max)));
+            if (activeKnobDrag.badge) {
+                activeKnobDrag.badge.innerText = formatRealValueByParam(info.param, step);
+            }
+            // Transmissão cadastrada em tempo real (Throttle ~40ms para audio feeling sem flood)
+            const now = Date.now();
+            if (step !== activeKnobDrag.lastSentStep && (now - activeKnobDrag.lastSentTime >= 40)) {
+                sendParamChange(info.param, step);
+                activeKnobDrag.lastSentTime = now;
+                activeKnobDrag.lastSentStep = step;
+            }
+        } else if (activeKnobDrag.badge) {
+            activeKnobDrag.badge.innerText = Math.round(newPct) + '%';
         }
     }
 
     function stopKnobDrag() {
+        if (activeKnobDrag) {
+            const labelKey = activeKnobDrag.label.trim().toUpperCase();
+            const info = PARAM_MAP_BY_TITLE[labelKey];
+            if (info && typeof activeKnobDrag.lastPct === 'number') {
+                const step = Math.min(info.max, Math.max(info.min, Math.round((activeKnobDrag.lastPct / 100) * info.max)));
+                if (step !== activeKnobDrag.lastSentStep) {
+                    sendParamChange(info.param, step);
+                }
+            }
+        }
         activeKnobDrag = null;
         window.removeEventListener('mousemove', onKnobDrag);
         window.removeEventListener('mouseup', stopKnobDrag);
         window.removeEventListener('touchmove', onKnobDrag);
         window.removeEventListener('touchend', stopKnobDrag);
+        renderModal();
     }
 
     // 3. Handlers de Steppers (Conceito 3 com Press & Hold)
@@ -819,37 +951,22 @@
     }
 
     function handleStepper(btnEl, delta) {
-        const controls = btnEl.closest('.c3-stepper-controls');
-        if (!controls) return;
-        const display = controls.querySelector('.c3-val-display');
-        if (!display) return;
+        const card = btnEl.closest('.c3-stepper-card');
+        if (!card) return;
+        const titleEl = card.querySelector('.c3-stepper-title');
+        if (!titleEl) return;
 
-        let txt = display.innerText;
-        let match = txt.match(/^([-\d.]+)/);
-        if (match) {
-            let num = parseFloat(match[1]);
-            let isFloat = txt.includes('.');
-            num = isFloat ? parseFloat((num + delta * 0.1).toFixed(1)) : (num + delta);
+        const titleKey = titleEl.innerText.trim().toUpperCase();
+        const info = PARAM_MAP_BY_TITLE[titleKey];
+        if (!info) return;
 
-            let unit = txt.replace(/^scroll/i, '').replace(/^[-\d.]+/, '');
-            
-            // Tratamento especial para limites mock
-            if (unit === 'dB') {
-                if (num < -60) txt = 'OFF';
-                else txt = (num > 0 ? 0 : num) + 'dB';
-            } else if (unit === '%') {
-                num = Math.min(100, Math.max(0, num));
-                txt = num + '%';
-            } else {
-                if (num < 0) num = 0;
-                txt = num + unit;
-            }
-            display.innerText = txt;
-        } else if (txt === 'OFF' && delta > 0) {
-            display.innerText = '-60dB';
-        } else if (txt === 'Thru' && delta > 0) {
-            display.innerText = '85.0Hz';
-        }
+        const currentSlotParams = fxParamsState[currentSlotIdx] || {};
+        let currentRaw = currentSlotParams[info.param];
+        if (currentRaw === undefined) currentRaw = 0;
+
+        let newRaw = Math.min(info.max, Math.max(info.min, Math.round(currentRaw) + delta));
+        sendParamChange(info.param, newRaw);
+        renderModal();
     }
 
     // 4. Handlers de Wheel Drag (Conceito 4)
@@ -882,7 +999,7 @@
         let newPct = Math.min(100, Math.max(0, activeWheelDrag.currentPct + deltaY * 0.5));
 
         if (activeWheelDrag.valEl) {
-            activeWheelDrag.valEl.innerText = formatMockValue(newPct, activeWheelDrag.type);
+            activeWheelDrag.valEl.innerText = Math.round(newPct) + '%';
         }
     }
 
@@ -892,34 +1009,6 @@
         window.removeEventListener('mouseup', stopWheelDrag);
         window.removeEventListener('touchmove', onWheelDrag);
         window.removeEventListener('touchend', stopWheelDrag);
-    }
-
-    // Helpers de Formatação Mock
-    function formatMockValue(pct, type) {
-        pct = Math.round(pct);
-        if (type === 'revTime') return (0.3 + (pct / 100) * 8.0).toFixed(1) + 's';
-        if (type === 'iniDly') return (pct * 2.5).toFixed(1) + 'ms';
-        if (type === 'ratio') return (0.1 + (pct / 100) * 2.0).toFixed(1);
-        if (type === 'diff') return Math.round(pct / 10);
-        if (type === 'erDly') return (pct * 0.8).toFixed(1) + 'ms';
-        if (type === 'hpf') return pct === 0 ? 'Thru' : Math.round(20 + pct * 5) + 'Hz';
-        if (type === 'lpf') return pct === 100 ? 'Thru' : (1.0 + (pct / 100) * 15.0).toFixed(2) + 'kHz';
-        if (type === 'gate') return pct === 0 ? 'OFF' : (pct - 61) + 'dB';
-        if (type === 'ms') return Math.round(pct * 1.5) + 'ms';
-        return pct + '%';
-    }
-
-    function formatMockValueByLabel(pct, label) {
-        label = label.toUpperCase();
-        if (label.includes('TIME')) return (0.3 + (pct / 100) * 8.0).toFixed(1) + 's';
-        if (label.includes('INI. DLY') || label.includes('E/R DLY')) return (pct * 2.5).toFixed(1) + 'ms';
-        if (label.includes('RATIO')) return (0.1 + (pct / 100) * 2.0).toFixed(1);
-        if (label.includes('DIFF')) return Math.round(pct / 10);
-        if (label.includes('HPF')) return pct === 0 ? 'Thru' : Math.round(20 + pct * 5) + 'Hz';
-        if (label.includes('LPF')) return pct === 100 ? 'Thru' : (1.0 + (pct / 100) * 15.0).toFixed(2) + 'kHz';
-        if (label.includes('GATE')) return pct === 0 ? 'OFF' : (pct - 61) + 'dB';
-        if (label.includes('ATTACK') || label.includes('HOLD') || label.includes('DECAY')) return Math.round(pct * 1.5) + 'ms';
-        return Math.round(pct) + '%';
     }
 
     // Expor Globalmente
@@ -934,7 +1023,8 @@
         handleStepper: handleStepper,
         startStepperHold: startStepperHold,
         stopStepperHold: stopStepperHold,
-        startWheelDrag: startWheelDrag
+        startWheelDrag: startWheelDrag,
+        toggleBypass: toggleBypass
     };
 
 })();

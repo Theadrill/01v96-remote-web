@@ -89,7 +89,7 @@
                 </div>
                 ${showBypass ? `
                 <div class="fx-ed-bypass-wrapper">
-                    <button class="fx-ed-bypass-btn ${bypass ? 'active' : ''}" onclick="this.classList.toggle('active')">
+                    <button class="fx-ed-bypass-btn ${bypass ? 'active' : ''}" onclick="if (window.ReverbEditor && window.ReverbEditor.toggleBypass) window.ReverbEditor.toggleBypass(); else this.classList.toggle('active');">
                         BYPASS
                     </button>
                 </div>` : ''}
