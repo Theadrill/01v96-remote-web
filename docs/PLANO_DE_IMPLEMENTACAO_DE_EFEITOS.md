@@ -404,33 +404,30 @@ INSAUX8 INSSTL  INSSTR
 
 ---
 
-## 7. Progresso da Implementação (Frontend)
+### 7.1. Tela de Máquinas de Efeitos — Etapa 1 e Refatoração Modular (Concluídas)
 
-### 7.1. Tela de Máquinas de Efeitos — Etapa 1 (Mockada)
+**Status:** ✅ Concluída (Visão Geral + Arquitetura Schema-Driven em `public/modules/FXS/`)
 
-**Status:** ✅ Concluída
+**Estrutura de Arquivos Criada (`public/modules/FXS/`):**
+- `public/modules/FXS/efeitos.js` — Módulo de visão geral dos 4 slots FX (FX1–FX4), com renderização do diagrama de fluxo de sinal (IN Patch → Processador → OUT Patch), decodificação de roteamento e abertura do modal de edição.
+- `public/modules/FXS/fx_core.js` — Motor genérico de efeitos. Gerencia o estado local (`fxParamsState`, `syncedSlots`), controle de Lazy-Sync, manipulação de drag/wheel/stepper, troca de layout Desktop/Mobile e escuta de eventos WebSocket em tempo real.
+- `public/modules/FXS/fx_registry.js` — Catálogo declarativo (Schema-Driven) de algoritmos. Mapeia IDs de efeitos Yamaha para suas categorias, parâmetros SysEx, limites e funções de formatação.
+- `public/modules/FXS/fx_components.js` — Biblioteca de componentes visuais reaproveitáveis (Knobs rotativos, Stepper Cards -/+, Switch Cards ON/OFF, Headers, Card Groups e Tab Bars).
+- `public/modules/FXS/fx_routing.js` — Utilitários de roteamento e decodificação de patch (IN e OUT).
+- `public/modules/FXS/fx_utils.js` — Funções utilitárias de formatação de valores (ms, s, Hz, kHz, %, dB, ratios).
+- `public/modules/FXS/fx.css` — Estilos dedicados para o editor de efeitos, suportando temas visuais por tipo de algoritmo e responsividade mobile.
 
-**Arquivos criados:**
-- `public/modules/efeitos.js` — Módulo com dados mockados dos 4 slots FX (FX1–FX4), renderização do layout e funções `openEffectsModal()` / `closeEffectsModal()`.
+**Arquivos Modificados na Integração:**
+- `public/index.html` — Modal `<div id="efeitosModal">`, modal `<div id="fxEditorModal">` com overlay de sync, e tags `<script>` para todos os módulos de `FXS/`.
+- `public/modules/sidebar.js` — Integração dos botões "EFEITOS" (dock e mobile bottom bar) com handlers de fechamento.
+- `public/style.css` — Estilos globais e compatibilidade visual.
 
-**Arquivos modificados:**
-- `public/index.html` — Modal `<div id="efeitosModal">` e `<script>` tag para `efeitos.js`.
-- `public/modules/sidebar.js` — Botão "EFEITOS" no dock (modo main), no menu mobile (bottom bar), e handlers de fechamento (backdrop click + Escape).
-- `public/style.css` — ~200 linhas de CSS dedicado ao layout de efeitos, incluindo media query mobile.
-
-**Funcionalidades implementadas:**
-- Botão "EFEITOS" na sidebar dock (roxo, classe `dock-efeitos`).
-- Botão "EFEITOS" no menu mobile/bottom bar (roxo, `menu-btn-solid-purple`).
-- Modal fullscreen com o mesmo padrão do `chConfigModal`.
-- Layout de 3 blocos: IN (L/R + patches + wires) → Processador único → OUT (wires + patches + L/R).
-- Header com labels IN PATCH / PROCESSOR / OUT PATCH alinhados ao layout.
-- Título "MÁQUINAS DE EFEITOS (EM CONSTRUÇÃO)".
-- Botão "FECHAR" no rodapé (vermelho, padrão SAIR).
-- Patches com `min-width: 75px`, visual diferenciado (off = cinza, active = azul).
-- Processador e patches com `cursor: pointer` e feedback visual no toque.
-- Media query mobile: fios ocultos, processador com `min-width: auto` e `padding: 10px` + `margin: 0 10px`.
-
-**Próxima etapa:** Conectar com dados reais do servidor (socket) e implementar a tela de detalhes de cada máquina de efeitos ao clicar no processador.
+**Funcionalidades Implementadas:**
+- **Overview dos 4 Slots (FX1-FX4):** Modal fullscreen com layout de 3 blocos (IN Patch → Processor → OUT Patch) e fios visuais.
+- **Arquitetura Reutilizável (Schema-Driven):** Separação total entre catálogo de parâmetros, componentes de interface e motor de estado.
+- **Lazy-Sync por Slot:** Solicitação em lote sob demanda ao abrir o editor de um slot e cache em memória.
+- **Interface Dual (Desktop / Mobile):** Grid de cartões por categoria em telas grandes e navegação por abas com botões Stepper touch em dispositivos móveis.
+- **Atualização Direta do DOM:** Atualizações de parâmetros alteram pontualmente os seletores do DOM sem causar perda de foco, saltos de scroll ou travamentos.
 
 ---
 
@@ -851,6 +848,55 @@ Quando o operador executa um **Recall de Biblioteca de Efeitos (FX Library)** di
   1. O listener de `fxTypesUpdate` invalida o cache local (`syncedSlots[slot] = false` e limpa `fxParamsState[slot]`).
   2. Se o slot modificado for o slot **atualmente visível na tela**, o frontend dispara imediatamente `socket.emit('requestFxSlotParams', { slot: currentSlotIdx })` e exibe o overlay de sincronização (`showEditorSyncOverlay()`).
   3. Ao receber `fxSlotParamsUpdate`, os novos parâmetros da biblioteca selecionada são aplicados e a interface é re-renderizada automaticamente sem exigir que o usuário feche e reabra o modal.
+
+---
+
+### 10.6. Arquitetura Modular e Generalizada (Schema-Driven Frontend — `public/modules/FXS/`)
+
+Para evitar a duplicação de código HTML/JS a cada novo efeito mapeado (ex: Delays, Compressores Multibanda, Modulações, Dinâmicos), o frontend de efeitos foi completamente refatorado para uma **Arquitetura Orientada a Esquemas (Schema-Driven)**.
+
+#### 10.6.1. Divisão de Responsabilidades dos Módulos
+
+```text
+public/modules/FXS/
+├── fx_registry.js    -> Catálogo declarativo de esquemas por Algorithm ID
+├── fx_components.js  -> Biblioteca pura de componentes visuais reutilizáveis
+├── fx_core.js        -> Motor genérico de estado, eventos, Lazy-Sync e renderização
+├── fx_routing.js     -> Utilitários de patch e conversores de seletores IN/OUT
+├── fx_utils.js       -> Formatadores visuais de valores (ms, Hz, dB, ratios, tables)
+└── efeitos.js        -> Visão geral dos 4 slots (IN Patch -> Processador -> OUT Patch)
+```
+
+#### 10.6.2. Catálogo Declarativo de Efeitos (`FXRegistry`)
+- Cada efeito da Yamaha 01V96 possui um ID de Algoritmo único (ex: Reverbs IDs `0..3`, Multiband Compressor ID `25`, Delays IDs `10..15`).
+- Para adicionar o suporte a um novo algoritmo, **não é necessário criar nenhuma nova página HTML nem escrever manipuladores de socket ou drag**:
+- Basta registrar a estrutura declarativa no `FXRegistry` com:
+  1. **Propriedades Gerais:** `id`, `name`, `colorTheme`, `supported: true`.
+  2. **Categorias de Agrupamento (`categories`):** Define a ordem das caixas visuais (Desktop) e das abas de navegação (Mobile). Exemplo para Compressor Multibanda: `Crossover & Saída`, `Banda Grave`, `Banda Média`, `Banda Aguda`.
+  3. **Mapeamento de Parâmetros (`params`):**
+     - `key`: Identificador único (ex: `'thresh_low'`, `'decay'`).
+     - `name`: Rótulo exibido na UI (ex: `'THRESHOLD'`, `'REV TIME'`).
+     - `sysEx`: Offset numérico SysEx (ex: `0x10`..`0x1D`, `0x30`, `0x34`).
+     - `category`: ID da categoria a que pertence.
+     - `min`, `max`, `defaultVal`.
+     - `formatFn`: Função ou chave utilitária em `FXUtils` para formatar a unidade exibida (`formatTime`, `formatFreq`, `formatGain`, `formatDecayPoints`).
+
+#### 10.6.3. Componentes Genéricos de Interface (`FXComponents`)
+Componentes visuais agnósticos criados para atender a qualquer tipo de parâmetro:
+- **Knob Rotativo (`renderKnob`):** Anel proporcional SVG + badge de valor + ponteiro rotativo para Desktop.
+- **Card Touch com Stepper (`renderStepperCard`):** Controles `-` e `+` responsivos com suporte a toque contínuo (hold) para telas Mobile.
+- **Card de Alternância (`renderSwitchCard`):** Botão pill estilo chave ON/OFF para parâmetros booleanos (Bypass, Gate ON/OFF, Phase, etc.).
+- **Card Group (`renderCardGroup`):** Contêiner visual para grupos de controles agrupados por categoria.
+- **Barra de Abas Mobile (`renderMobileTabs`):** Menu de abas responsivo.
+- **Tela "Em Construção" (`renderUnderConstruction`):** Exibição amigável para efeitos ainda não calibrados sem disparar tráfego MIDI.
+
+#### 10.6.4. Motor Central de Estado e Interatividade (`FXCore`)
+- **Estado Local Inteligente:** Mantém o cache `fxParamsState` e os flags de sincronização `syncedSlots[4]`.
+- **Detecção de Dispositivo:** Detecta automaticamente mobile/desktop e ajusta o layout (salvando preferência no `localStorage`).
+- **Atualizações de Desempenho Cirúrgicas (`updateSingleParamDom`):**
+  - Ao alterar um parâmetro (via drag no mouse, wheel, stepper hold ou atualização vinda do socket da mesa), o `FXCore` atualiza diretamente o nó específico do DOM (`data-sysex="XYZ"`).
+  - Isso elimina perdas de foco, interrupções no movimento do mouse e saltos indesejados de scroll.
+- **Gestão de Sincronização em Tempo Real:** Trata reconexões de socket, recalls de preset na mesa física com cooldown de segurança contra loops, e Lazy-Sync dinâmico ao abrir o editor.
 
 
 
