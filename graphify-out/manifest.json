@@ -365,7 +365,7 @@
     "semantic_hash": ""
   },
   "server_rust/src/state.rs": {
-    "mtime": 1785041569.8716385,
+    "mtime": 1785049437.757123,
     "ast_hash": "e74f914166492cb4fb9504b4ab94a32d",
     "semantic_hash": ""
   },
@@ -525,8 +525,8 @@
     "semantic_hash": ""
   },
   "public/index.html": {
-    "mtime": 1785038106.6719716,
-    "ast_hash": "448456a13f1e11c387666e30d899837a",
+    "mtime": 1785045209.7206855,
+    "ast_hash": "80eb0fc6a69e50d5259d8f8162f11cfc",
     "semantic_hash": ""
   },
   "reverse_dll_project/BIBLIA_TECNICA_01V96.md": {
@@ -2520,13 +2520,13 @@
     "semantic_hash": ""
   },
   "log/monitor_log.txt": {
-    "mtime": 1785044192.8060923,
-    "ast_hash": "06333abe480b5b4f268923a68c5aaf75",
+    "mtime": 1785049399.705208,
+    "ast_hash": "45fc485bbefa4078f90d57d1a810d30b",
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785044031.741263,
-    "ast_hash": "94f9569523198908835a852011aebc8e",
+    "mtime": 1785049752.4484057,
+    "ast_hash": "4df53d4e9bef664faf596d9f1da3b208",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -3080,8 +3080,8 @@
     "semantic_hash": ""
   },
   "public/modules/FXS/reverb.js": {
-    "mtime": 1785043785.875382,
-    "ast_hash": "45ac4f938378adcdf3a04929b09329ce",
+    "mtime": 1785045203.0526023,
+    "ast_hash": "08f7d0a53a840650558348943e5b92c4",
     "semantic_hash": ""
   },
   "server_rust/src/midi/fx_list.rs": {
@@ -3110,13 +3110,13 @@
     "semantic_hash": ""
   },
   "public/modules/FXS/efeitos.js": {
-    "mtime": 1784772004.1681607,
-    "ast_hash": "c34932b43294f98313b3759bf6afe4c4",
+    "mtime": 1785045453.0028348,
+    "ast_hash": "474dce6b4d87a2b94f676a80dffcd255",
     "semantic_hash": ""
   },
   "public/modules/FXS/fx_components.js": {
-    "mtime": 1785038493.0036027,
-    "ast_hash": "a447cd67dd24150a989abc82a38f9de9",
+    "mtime": 1785046264.8896313,
+    "ast_hash": "e80e5fefe5c6ca5baf1c358187f5844a",
     "semantic_hash": ""
   },
   "public/modules/FXS/fx_routing.js": {
@@ -3195,8 +3195,8 @@
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/local/profile_pcfavela.json": {
-    "mtime": 1784781098.0480354,
-    "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
+    "mtime": 1785046138.7731476,
+    "ast_hash": "4068afd4fa14ab68e6b3f87d70abe2a2",
     "semantic_hash": ""
   },
   "public/wasm/client_wasm.d.ts": {
@@ -3212,6 +3212,21 @@
   "tmp/fix_eq.ps1": {
     "mtime": 1781508665.1342523,
     "ast_hash": "72c19baa0cba2144f52ddbfbaf63ba84",
+    "semantic_hash": ""
+  },
+  "public/modules/FXS/fx_core.js": {
+    "mtime": 1785049684.3831103,
+    "ast_hash": "b93f003b7d8b73d8a49b850ef57d96d0",
+    "semantic_hash": ""
+  },
+  "public/modules/FXS/fx_registry.js": {
+    "mtime": 1785045179.6092508,
+    "ast_hash": "b438cdd539ec3c469f17dca1daaa4f5f",
+    "semantic_hash": ""
+  },
+  "public/modules/FXS/fx_utils.js": {
+    "mtime": 1785045173.66198,
+    "ast_hash": "f1112c0e3b6c21abf4af980a42432cda",
     "semantic_hash": ""
   }
 }

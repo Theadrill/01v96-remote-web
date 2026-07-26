@@ -450,14 +450,10 @@
         const effectName = slot ? slot.effectName : '';
         console.log('[FX] Abrindo slot FX' + (idx + 1) + ' (Tipo: ' + effectName + ')');
 
-        if (isStandardReverbName(effectName)) {
-            if (window.ReverbEditor && typeof window.ReverbEditor.open === 'function') {
-                window.ReverbEditor.open(idx, effectName);
-            }
-        } else {
-            if (window.ReverbEditor && typeof window.ReverbEditor.openUnderConstruction === 'function') {
-                window.ReverbEditor.openUnderConstruction(idx, effectName);
-            }
+        if (window.FXCore && typeof window.FXCore.openFxEditor === 'function') {
+            window.FXCore.openFxEditor(idx);
+        } else if (window.ReverbEditor && typeof window.ReverbEditor.open === 'function') {
+            window.ReverbEditor.open(idx, effectName);
         }
     }
     window.openFxEditor = openFxEditor;

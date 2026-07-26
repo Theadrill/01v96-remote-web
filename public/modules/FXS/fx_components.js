@@ -6,17 +6,24 @@
         return Math.round(-135 + (pct / 100) * 270);
     }
 
+    function controllerRef() {
+        return (window.FXCore) ? 'FXCore' : 'ReverbEditor';
+    }
+
     // ── Componente: Rotary Knob ──────────────────────────────────────
-    function renderKnob({ label, value, percent, colorClass = 'purple', isLarge = false, onDrag, onWheel }) {
+    function renderKnob({ label, value, percent, colorClass = 'purple', isLarge = false, onDrag, onWheel, sysEx, paramKey }) {
         const deg = degFromPct(percent);
         const sizeCls = isLarge ? 'large-knob' : '';
-        const dragAttr = onDrag || "ReverbEditor.startKnobDrag(event, this)";
-        const wheelAttr = onWheel || "ReverbEditor.handleWheelKnob(event, this)";
+        const ctrl = controllerRef();
+        const dragAttr = onDrag || `${ctrl}.startKnobDrag(event, this)`;
+        const wheelAttr = onWheel || `${ctrl}.handleWheelKnob(event, this)`;
+        const dataSysEx = (sysEx !== undefined) ? `data-sysex="${sysEx}"` : '';
+        const dataKey = (paramKey) ? `data-param-key="${paramKey}"` : '';
 
         return `
-        <div class="knob-box ${colorClass} ${sizeCls}" onmousedown="${dragAttr}" ontouchstart="${dragAttr}" onwheel="${wheelAttr}">
+        <div class="knob-box ${colorClass} ${sizeCls}" ${dataSysEx} ${dataKey} onmousedown="${dragAttr}" ontouchstart="${dragAttr}">
             ${label ? `<span class="knob-label">${label}</span>` : ''}
-            <div class="knob-outer">
+            <div class="knob-outer" onwheel="${wheelAttr}">
                 <div class="knob-ring" style="--percent: ${percent}%;"></div>
                 <div class="knob-pointer" style="transform: rotate(${deg}deg);"></div>
                 <div class="knob-center-dot"></div>
@@ -26,29 +33,33 @@
     }
 
     // ── Componente: Stepper Card (Touch + Auto-repeat) ───────────────
-    function renderStepperCard({ title, value, desc }) {
+    function renderStepperCard({ title, value, desc, sysEx, paramKey }) {
+        const ctrl = controllerRef();
+        const dataSysEx = (sysEx !== undefined) ? `data-sysex="${sysEx}"` : '';
+        const dataKey = (paramKey) ? `data-param-key="${paramKey}"` : '';
+
         return `
-        <div class="c3-stepper-card">
+        <div class="c3-stepper-card" ${dataSysEx} ${dataKey}>
             <div class="c3-stepper-info">
                 <span class="c3-stepper-title">${title}</span>
                 <span class="c3-stepper-desc">${desc || ''}</span>
             </div>
             <div class="c3-stepper-controls">
                 <button class="c3-btn-step" 
-                        onmousedown="ReverbEditor.startStepperHold(this, -1, event)"
-                        onmouseup="ReverbEditor.stopStepperHold()"
-                        onmouseleave="ReverbEditor.stopStepperHold()"
-                        ontouchstart="ReverbEditor.startStepperHold(this, -1, event)"
-                        ontouchend="ReverbEditor.stopStepperHold()"
-                        ontouchcancel="ReverbEditor.stopStepperHold()">-</button>
+                        onmousedown="${ctrl}.startStepperHold(this, -1, event)"
+                        onmouseup="${ctrl}.stopStepperHold()"
+                        onmouseleave="${ctrl}.stopStepperHold()"
+                        ontouchstart="${ctrl}.startStepperHold(this, -1, event)"
+                        ontouchend="${ctrl}.stopStepperHold()"
+                        ontouchcancel="${ctrl}.stopStepperHold()">-</button>
                 <span class="c3-val-display">${value}</span>
                 <button class="c3-btn-step" 
-                        onmousedown="ReverbEditor.startStepperHold(this, 1, event)"
-                        onmouseup="ReverbEditor.stopStepperHold()"
-                        onmouseleave="ReverbEditor.stopStepperHold()"
-                        ontouchstart="ReverbEditor.startStepperHold(this, 1, event)"
-                        ontouchend="ReverbEditor.stopStepperHold()"
-                        ontouchcancel="ReverbEditor.stopStepperHold()">+</button>
+                        onmousedown="${ctrl}.startStepperHold(this, 1, event)"
+                        onmouseup="${ctrl}.stopStepperHold()"
+                        onmouseleave="${ctrl}.stopStepperHold()"
+                        ontouchstart="${ctrl}.startStepperHold(this, 1, event)"
+                        ontouchend="${ctrl}.stopStepperHold()"
+                        ontouchcancel="${ctrl}.stopStepperHold()">+</button>
             </div>
         </div>`;
     }
@@ -66,7 +77,8 @@
 
     // ── Componente: Seletor de Layout (MOBILE | DESKTOP) ─────────────
     function renderLayoutPicker({ currentMode, onSetMode }) {
-        const fn = onSetMode || 'ReverbEditor.setLayoutMode';
+        const ctrl = controllerRef();
+        const fn = onSetMode || `${ctrl}.setLayoutMode`;
         return `
         <div class="fx-ed-layout-picker">
             <span class="fx-ed-picker-label">LAYOUT:</span>
@@ -81,6 +93,7 @@
 
     // ── Componente: Cabeçalho Padrão do Efeito ────────────────────────
     function renderHeader({ slot, effectName, colorTheme, bypass, currentMode, showBypass = true }) {
+        const ctrl = controllerRef();
         return `
         <div class="fx-ed-header ${colorTheme}">
             <div class="fx-ed-header-top">
@@ -90,13 +103,50 @@
                 </div>
                 ${showBypass ? `
                 <div class="fx-ed-bypass-wrapper">
-                    <button class="fx-ed-bypass-btn ${bypass ? 'active' : ''}" onclick="if (window.ReverbEditor && window.ReverbEditor.toggleBypass) window.ReverbEditor.toggleBypass(); else this.classList.toggle('active');">
+                    <button class="fx-ed-bypass-btn ${bypass ? 'active' : ''}" onclick="if (window.${ctrl} && window.${ctrl}.toggleBypass) window.${ctrl}.toggleBypass(); else if (window.ReverbEditor && window.ReverbEditor.toggleBypass) window.ReverbEditor.toggleBypass(); else this.classList.toggle('active');">
                         BYPASS
                     </button>
                 </div>` : ''}
             </div>
 
             ${renderLayoutPicker({ currentMode })}
+        </div>`;
+    }
+
+    // ── Componente: Switch / Toggle (ON/OFF) ──────────────────────────
+    function renderSwitchCard({ label, active, onToggle, sysEx, paramKey }) {
+        const ctrl = controllerRef();
+        const fn = onToggle || `${ctrl}.toggleSwitch(this)`;
+        const dataSysEx = (sysEx !== undefined) ? `data-sysex="${sysEx}"` : '';
+        const dataKey = (paramKey) ? `data-param-key="${paramKey}"` : '';
+
+        return `
+        <div class="fx-switch-card ${active ? 'active' : ''}" ${dataSysEx} ${dataKey} onclick="${fn}">
+            <span class="fx-switch-label">${label}</span>
+            <div class="fx-switch-pill ${active ? 'on' : 'off'}">
+                <span class="fx-switch-text">${active ? 'ON' : 'OFF'}</span>
+            </div>
+        </div>`;
+    }
+
+    // ── Componente: Seletor / Dropdown / Pills ────────────────────────
+    function renderSelectorCard({ label, options = [], selectedVal, onSelect, sysEx, paramKey }) {
+        const ctrl = controllerRef();
+        const dataSysEx = (sysEx !== undefined) ? `data-sysex="${sysEx}"` : '';
+        const dataKey = (paramKey) ? `data-param-key="${paramKey}"` : '';
+
+        const buttons = options.map(opt => {
+            const isSel = (opt.val === selectedVal);
+            const fn = onSelect || `${ctrl}.selectOption(this, ${opt.val})`;
+            return `<button class="fx-opt-btn ${isSel ? 'active' : ''}" onclick="${fn}">${opt.label}</button>`;
+        }).join('');
+
+        return `
+        <div class="fx-selector-card" ${dataSysEx} ${dataKey}>
+            ${label ? `<span class="fx-selector-label">${label}</span>` : ''}
+            <div class="fx-selector-options">
+                ${buttons}
+            </div>
         </div>`;
     }
 
@@ -137,6 +187,8 @@
         renderCardGroup: renderCardGroup,
         renderLayoutPicker: renderLayoutPicker,
         renderHeader: renderHeader,
+        renderSwitchCard: renderSwitchCard,
+        renderSelectorCard: renderSelectorCard,
         renderUnderConstruction: renderUnderConstruction,
         degFromPct: degFromPct
     };
