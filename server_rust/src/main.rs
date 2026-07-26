@@ -161,7 +161,7 @@ async fn async_main(
         custom_scene_manager.clone(),
         app_config.sync_chunk_size,
         app_config.sync_chunk_delay_ms,
-        app_config.time_between_out_fxs_requests,
+        app_config.time_between_fxs_requests,
     ));
     let sync_manager_socket = sync_manager.clone();
 

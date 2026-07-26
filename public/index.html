@@ -401,10 +401,19 @@
             <div class="efeitos-modal-body" id="efeitosModalBody"></div>
         </div>
     </div>
-    <!-- Modal do Editor Individual de Efeito (FX Editor Mock) -->
+    <!-- Modal do Editor Individual de Efeito (FX Editor) -->
     <div class="ch-modal-overlay" id="fxEditorModal">
-        <div class="fx-editor-modal-inner" id="fxEditorModalContent">
-            <!-- Renderizado via JS (reverb.js) -->
+        <div class="fx-editor-modal-inner" style="position: relative;">
+            <!-- Overlay de bloqueio durante sincronização de parâmetros do efeito -->
+            <div class="fx-sync-overlay" id="fxEditorSyncOverlay">
+                <div class="fx-sync-overlay-inner">
+                    <div class="fx-sync-spinner"></div>
+                    <div class="fx-sync-text">CARREGANDO PARÂMETROS DA MESA...</div>
+                </div>
+            </div>
+            <div id="fxEditorModalContent" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+                <!-- Renderizado via JS (reverb.js) -->
+            </div>
         </div>
     </div>
     <!-- Modal de Opções de Cópia -->

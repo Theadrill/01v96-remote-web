@@ -1,572 +1,572 @@
 {
   ".agent/skills/coding-guidelines/.skill-meta.json": {
-    "mtime": 1780576123.3603227,
-    "ast_hash": "ac084f212e08dc795051176a91616484",
+    "mtime": 1780423214.2803712,
+    "ast_hash": "bce7e428fee2d74f00097e45b4b0066e",
     "semantic_hash": ""
   },
   ".agent/skills/docs-writer/.skill-meta.json": {
-    "mtime": 1780576123.3615537,
-    "ast_hash": "6a018764ad11ca50a32c3353a97408b6",
+    "mtime": 1780423214.3875012,
+    "ast_hash": "f961c252b334569ed7a6083d79d948f2",
     "semantic_hash": ""
   },
   ".agent/skills/gh-address-comments/.skill-meta.json": {
-    "mtime": 1780576123.363686,
-    "ast_hash": "7d08c482740187c96d21a3011aed7caa",
+    "mtime": 1780423214.497997,
+    "ast_hash": "4a61b973faf4e526ebd3d66892b9ca1c",
     "semantic_hash": ""
   },
   ".agent/skills/gh-address-comments/scripts/fetch_comments.py": {
-    "mtime": 1780576123.3657038,
-    "ast_hash": "5226b39c39f7a22fbe9913d4b3e51b69",
+    "mtime": 1780423214.4974709,
+    "ast_hash": "a86abd5451a6aa00cfd42c790fdbfa21",
     "semantic_hash": ""
   },
   ".agent/skills/ui-ux-pro-max/scripts/core.py": {
-    "mtime": 1780576123.3878012,
+    "mtime": 1777017802.8015587,
     "ast_hash": "f2438d23c79e31780fcb6742d68601a1",
     "semantic_hash": ""
   },
   ".agent/skills/ui-ux-pro-max/scripts/design_system.py": {
-    "mtime": 1780576123.3888035,
+    "mtime": 1777017802.8015587,
     "ast_hash": "d39fb252f4adf5fed6359483dbe7d590",
     "semantic_hash": ""
   },
   ".agent/skills/ui-ux-pro-max/scripts/search.py": {
-    "mtime": 1780576123.3888035,
+    "mtime": 1777017802.802562,
     "ast_hash": "800e6cb41a93e4c8e918dcd1847252f8",
     "semantic_hash": ""
   },
   ".agents/.skill-lock.json": {
-    "mtime": 1780576123.391245,
-    "ast_hash": "ff3be57c28ae7d4e157632e8e8535155",
+    "mtime": 1780423214.7056258,
+    "ast_hash": "7bfb32972e022c102e30ccdfae5744cc",
     "semantic_hash": ""
   },
   "ArtNetToDMX_FTDI/ArtNetToDMX.runtimeconfig.json": {
-    "mtime": 1780576123.4548464,
+    "mtime": 1777329792.9000974,
     "ast_hash": "d94cf983fba9ab1bb8a6cb3ad4a48f50",
     "semantic_hash": ""
   },
   "config.json": {
-    "mtime": 1784783811.3835957,
-    "ast_hash": "ab8841dc072ee4d919ef22afdebf6062",
+    "mtime": 1785016812.7865224,
+    "ast_hash": "49d0fbc81d32ed11a2663d86e5a99471",
     "semantic_hash": ""
   },
   "eslint.config.mjs": {
-    "mtime": 1780800157.0061114,
+    "mtime": 1780925484.7341294,
     "ast_hash": "8e1c48e1f42805d5dd3f91f8ba162875",
     "semantic_hash": ""
   },
   "midi_common/src/assembler.rs": {
-    "mtime": 1780576123.5398197,
+    "mtime": 1780411835.5391872,
     "ast_hash": "b306c5245a084d7be017ec0211a9be21",
     "semantic_hash": ""
   },
   "midi_common/src/framing.rs": {
-    "mtime": 1780576123.5408196,
-    "ast_hash": "5e0be7f846d6f3866277b12b04a0b500",
+    "mtime": 1780413645.6511943,
+    "ast_hash": "51fb1db737437892a975d6a78355b436",
     "semantic_hash": ""
   },
   "midi_common/src/lib.rs": {
-    "mtime": 1781318053.194409,
+    "mtime": 1781519201.0338576,
     "ast_hash": "fd9e9f38e5212a8b5b5324c50774ea3c",
     "semantic_hash": ""
   },
   "monitor.js": {
-    "mtime": 1784172389.9217234,
+    "mtime": 1784197164.305914,
     "ast_hash": "ea4dd181bff44c2ee7297d8655e5b376",
     "semantic_hash": ""
   },
   "public/app.js": {
-    "mtime": 1781922246.5090835,
-    "ast_hash": "747ecdbab30ff03b86e42a527470535f",
+    "mtime": 1781878661.3997567,
+    "ast_hash": "1e7c6ad51fa5fb931c4a63f785ff3cbe",
     "semantic_hash": ""
   },
   "public/modules/auxs_sends.js": {
-    "mtime": 1783748149.327386,
-    "ast_hash": "63bf6e74286b7d0280f85cadb64624fd",
+    "mtime": 1784007762.9953575,
+    "ast_hash": "79b1d8005b2a78b8a38e17bf0a0e719b",
     "semantic_hash": ""
   },
   "public/modules/channel_strip.js": {
-    "mtime": 1783745728.8471022,
+    "mtime": 1783702703.586797,
     "ast_hash": "d8ef80d8ef5d79aa38c9d342568d5ef4",
     "semantic_hash": ""
   },
   "public/modules/compressor.js": {
-    "mtime": 1780576123.5581362,
+    "mtime": 1777020161.8156943,
     "ast_hash": "908041cc909b795f5d7d3fbf4209a14e",
     "semantic_hash": ""
   },
   "public/modules/dynamics.js": {
-    "mtime": 1780576123.5581362,
+    "mtime": 1777020161.8156943,
     "ast_hash": "083d7ccffa37d6b98c74ebc6d3a27654",
     "semantic_hash": ""
   },
   "public/modules/eq.js": {
-    "mtime": 1784162435.4754775,
+    "mtime": 1784009945.1810224,
     "ast_hash": "3b3dedd5b31273719e2a135ac0ded7d6",
     "semantic_hash": ""
   },
   "public/modules/events.js": {
-    "mtime": 1783746778.62563,
+    "mtime": 1784007762.9953575,
     "ast_hash": "937021e23aa2255eb4b794a9aef27d2a",
     "semantic_hash": ""
   },
   "public/modules/gate.js": {
-    "mtime": 1780576123.5616424,
+    "mtime": 1777020161.8172276,
     "ast_hash": "45046ffccb510e01c9a9f5a0fdc0e116",
     "semantic_hash": ""
   },
   "public/modules/globals.js": {
-    "mtime": 1784427964.956661,
+    "mtime": 1785015065.1499877,
     "ast_hash": "4d97e8d53d0b3319a09ef918141a2382",
     "semantic_hash": ""
   },
   "public/modules/macro_fader.js": {
-    "mtime": 1783745681.9323225,
-    "ast_hash": "e89312067409a5c79288387269b98240",
+    "mtime": 1784007762.9963584,
+    "ast_hash": "7196c8bee7108408c2efde1c21799a8c",
     "semantic_hash": ""
   },
   "public/modules/macros.js": {
-    "mtime": 1782960631.1060314,
+    "mtime": 1783400375.7914565,
     "ast_hash": "1cefba1095a6ad7f5b9fe15acfe59292",
     "semantic_hash": ""
   },
   "public/modules/macros/channel_toggler.js": {
-    "mtime": 1782711966.4751945,
+    "mtime": 1783400375.7914565,
     "ast_hash": "33b78481c5c3ecc6255499538d2b519b",
     "semantic_hash": ""
   },
   "public/modules/macros/core.js": {
-    "mtime": 1780576123.5637262,
+    "mtime": 1780411835.5411906,
     "ast_hash": "d466be5c1fcb043b39b098408fed9769",
     "semantic_hash": ""
   },
   "public/modules/macros/hosts.json": {
-    "mtime": 1780576123.5647447,
+    "mtime": 1776142598.9603834,
     "ast_hash": "74627c6e61813c2c5c7f135c66317eb1",
     "semantic_hash": ""
   },
   "public/modules/macros/lumikit.js": {
-    "mtime": 1781744136.8958504,
+    "mtime": 1781862182.4525425,
     "ast_hash": "01090ca4f5d2c105306c40332940d989",
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/shared/profile_pcfavela.json": {
-    "mtime": 1784781098.0480354,
-    "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
+    "mtime": 1785015065.1509888,
+    "ast_hash": "3118def81e674320cb1105b074be3473",
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/shared/profile_pcmaria.json": {
-    "mtime": 1781489964.514717,
+    "mtime": 1781519201.0368571,
     "ast_hash": "f1c26936a095d7fe47ae08d29331ea9f",
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/shared/profile_teste.json": {
-    "mtime": 1780576123.577039,
-    "ast_hash": "ee4006ebd06c9e9a9227495d8c6cb058",
+    "mtime": 1776383098.592949,
+    "ast_hash": "b6d0a9fae9495c034d008e7e68bac1ef",
     "semantic_hash": ""
   },
   "public/modules/routing.js": {
-    "mtime": 1784427964.9589703,
+    "mtime": 1785015065.1509888,
     "ast_hash": "fc41feb310b2bb1b9d37ca8b1537f875",
     "semantic_hash": ""
   },
   "public/modules/scene_grid.js": {
-    "mtime": 1783225246.378862,
+    "mtime": 1783400375.7926009,
     "ast_hash": "d99d422bd92077b70f3637046c6cd692",
     "semantic_hash": ""
   },
   "public/modules/scroll.js": {
-    "mtime": 1780576123.5790532,
+    "mtime": 1778654314.9292562,
     "ast_hash": "3cf944d3152cfbb8afb47e94eea3d70f",
     "semantic_hash": ""
   },
   "public/modules/search.js": {
-    "mtime": 1783218931.8968213,
+    "mtime": 1783400375.793605,
     "ast_hash": "70017e82b5844da72598a30bace7b597",
     "semantic_hash": ""
   },
   "public/modules/sidebar.js": {
-    "mtime": 1784959684.9249325,
+    "mtime": 1785015065.1519852,
     "ast_hash": "924296d01ab459d9dc5d2c018f85cb3d",
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
-    "mtime": 1784427964.962387,
+    "mtime": 1785015065.1519852,
     "ast_hash": "ddacfbc861e305f2d624dc7fa246a736",
     "semantic_hash": ""
   },
   "public/modules/splash_screen.js": {
-    "mtime": 1782716616.820007,
+    "mtime": 1783400375.7946038,
     "ast_hash": "3923545931d9d77c04e5280fe44cd114",
     "semantic_hash": ""
   },
   "public/modules/steps.js": {
-    "mtime": 1780576123.5841553,
-    "ast_hash": "b8e8f309b8f73a5d6ec95356412eea97",
+    "mtime": 1776219862.1689062,
+    "ast_hash": "1b1cf539f27203f72ebe54e9d862ca6a",
     "semantic_hash": ""
   },
   "public/steps.json": {
-    "mtime": 1780576123.5873373,
+    "mtime": 1776365887.6021323,
     "ast_hash": "e431c351c75499e7dfe2d71335ea7be1",
     "semantic_hash": ""
   },
   "public/vendor/socket.io.min.js": {
-    "mtime": 1780576123.5904288,
-    "ast_hash": "a5b52e1cbc9923135c420c3995a56b32",
+    "mtime": 1779875973.8939772,
+    "ast_hash": "2b5a5f6f7e742b8f73fa48494ea78e09",
     "semantic_hash": ""
   },
   "remote_midi_server/src/main.rs": {
-    "mtime": 1780576123.5924368,
+    "mtime": 1780417917.8348339,
     "ast_hash": "9f46e514ce9e94965a14c4ebfb679865",
     "semantic_hash": ""
   },
   "remote_midi_server/src/tray.rs": {
-    "mtime": 1780576123.5935645,
+    "mtime": 1780411835.5451896,
     "ast_hash": "ac2f3ab6d3244ed8b2a24ea60f90bf20",
     "semantic_hash": ""
   },
   "reverse_dll_project/01v96_property_map.json": {
-    "mtime": 1780576123.595584,
-    "ast_hash": "46e9405a812c264719c7e849b3916d87",
+    "mtime": 1776122564.6098602,
+    "ast_hash": "92f998272b7a1f1714674549d4693973",
     "semantic_hash": ""
   },
   "reverse_dll_project/categorized_properties.json": {
-    "mtime": 1780576123.601769,
-    "ast_hash": "931ddb2bdb58c39a505bc54c7d62ec64",
+    "mtime": 1776123011.2208037,
+    "ast_hash": "482af2c32e1185e20691251b8a58e2af",
     "semantic_hash": ""
   },
   "reverse_dll_project/detailed_prop_map.json": {
-    "mtime": 1780576123.6047702,
-    "ast_hash": "445be04fb5a0bd336b6ed06bd8451187",
+    "mtime": 1776123484.0167248,
+    "ast_hash": "2ed127de681dacc2dfb5a7f47046d250",
     "semantic_hash": ""
   },
   "reverse_dll_project/sync_properties.json": {
-    "mtime": 1780576123.6057694,
-    "ast_hash": "528921336728ea280104c508830cd4d1",
+    "mtime": 1776123226.075585,
+    "ast_hash": "dc4beaa149e393ff0aa2aec7a62351e3",
     "semantic_hash": ""
   },
   "server_rust/src/api/macros.rs": {
-    "mtime": 1783305662.3686073,
+    "mtime": 1783400375.79681,
     "ast_hash": "75a8ef0ee6b043760bb75a91bfe23d19",
     "semantic_hash": ""
   },
   "server_rust/src/api/mod.rs": {
-    "mtime": 1780576123.7072513,
+    "mtime": 1779877546.6779766,
     "ast_hash": "149549efba1f8677b9af2cdf6d0837ec",
     "semantic_hash": ""
   },
   "server_rust/src/boot.rs": {
-    "mtime": 1780576123.7083073,
-    "ast_hash": "87b99ad4af5b00279cd6c28a0f9d376c",
+    "mtime": 1780415489.8022609,
+    "ast_hash": "80bd3a5e6b8093567d3482bfd7663831",
     "semantic_hash": ""
   },
   "server_rust/src/config.rs": {
-    "mtime": 1784358503.546003,
-    "ast_hash": "f921b4a2580b79067f4b4ef7d1fff762",
+    "mtime": 1785016852.8199322,
+    "ast_hash": "4a2e65cd006308e4b628ce2a27948619",
     "semantic_hash": ""
   },
   "server_rust/src/dmx.rs": {
-    "mtime": 1780800157.0113277,
+    "mtime": 1780925484.8035026,
     "ast_hash": "f5775dee84b6e46b1626f1e0809bf097",
     "semantic_hash": ""
   },
   "server_rust/src/main.rs": {
-    "mtime": 1784358542.5782342,
-    "ast_hash": "bdf2fdb901e903c81b6c6d60bb417ca2",
+    "mtime": 1785016864.251891,
+    "ast_hash": "d8dc0a5e0b5e753c29df0282b5819dbd",
     "semantic_hash": ""
   },
   "server_rust/src/midi/assembler.rs": {
-    "mtime": 1780576123.7113576,
+    "mtime": 1780623235.5933914,
     "ast_hash": "26ec37c043efac54c339e913a5e7fa2e",
     "semantic_hash": ""
   },
   "server_rust/src/midi/dictionary.json": {
-    "mtime": 1781317321.1994627,
+    "mtime": 1781519201.0428574,
     "ast_hash": "e129ff9ddaaeb689051bacffdc061a50",
     "semantic_hash": ""
   },
   "server_rust/src/midi/engine.rs": {
-    "mtime": 1780800157.0135374,
+    "mtime": 1780925484.8061955,
     "ast_hash": "72d01ed79995e25656ea7f2add8e0429",
     "semantic_hash": ""
   },
   "server_rust/src/midi/master_meter.rs": {
-    "mtime": 1780576123.714511,
-    "ast_hash": "fa034dfc7644477ea846d1416df25402",
+    "mtime": 1779883399.2296367,
+    "ast_hash": "09422ed8b5a59b70bbe1cd730d61b772",
     "semantic_hash": ""
   },
   "server_rust/src/midi/meter_dummy.rs": {
-    "mtime": 1783557958.3751535,
-    "ast_hash": "835cfb049ca257ff09cf627bb1755d5b",
+    "mtime": 1783449720.9386003,
+    "ast_hash": "dd9395d669d526c8310ef79c22eda1a9",
     "semantic_hash": ""
   },
   "server_rust/src/midi/mod.rs": {
-    "mtime": 1784162435.4788368,
-    "ast_hash": "83ca445a9e7bd85679de0e1f519db62b",
+    "mtime": 1784016182.9454758,
+    "ast_hash": "254dc41585b6a2d60d65de98bbb2ab1b",
     "semantic_hash": ""
   },
   "server_rust/src/midi/pair.rs": {
-    "mtime": 1780576123.7155137,
-    "ast_hash": "b5ae200d774d7023093fedc55046fa5f",
+    "mtime": 1780413645.6829114,
+    "ast_hash": "5ad46930a5f854c64237fd68738e9a98",
     "semantic_hash": ""
   },
   "server_rust/src/midi/pan.rs": {
-    "mtime": 1780712992.9472437,
+    "mtime": 1780925484.8072011,
     "ast_hash": "45c835717436ec91ab49e4f7e7f37737",
     "semantic_hash": ""
   },
   "server_rust/src/midi/protocol.rs": {
-    "mtime": 1784427964.9647963,
-    "ast_hash": "3e4258ac36b83d7a36fb6f4cf1e756e5",
+    "mtime": 1785016253.9296825,
+    "ast_hash": "74b83c5c804cdff01ce627b7d7b23d22",
     "semantic_hash": ""
   },
   "server_rust/src/midi/remote_client.rs": {
-    "mtime": 1780576123.7165163,
+    "mtime": 1780623235.594443,
     "ast_hash": "fc531b7e220973832005a69164841c99",
     "semantic_hash": ""
   },
   "server_rust/src/midi/scheduler.rs": {
-    "mtime": 1780800157.0145519,
+    "mtime": 1780925484.8082013,
     "ast_hash": "283f076f0f524cb9935e036f2426cc49",
     "semantic_hash": ""
   },
   "server_rust/src/midi/sync_counter.rs": {
-    "mtime": 1780576123.7175186,
+    "mtime": 1779962789.9058638,
     "ast_hash": "b42ae7de653e3250eeab8f3b0cd372c8",
     "semantic_hash": ""
   },
   "server_rust/src/midi_receiver.rs": {
-    "mtime": 1784355286.4827073,
-    "ast_hash": "68e7bf259b0559a1086e96b8a009a901",
+    "mtime": 1785016319.955827,
+    "ast_hash": "8d684d65694f539d34dc5813025055ad",
     "semantic_hash": ""
   },
   "server_rust/src/network/connection.rs": {
-    "mtime": 1781744136.9092531,
+    "mtime": 1781611724.831529,
     "ast_hash": "5329c89a8fdbcc7a62db76bda2bcca4c",
     "semantic_hash": ""
   },
   "server_rust/src/network/mod.rs": {
-    "mtime": 1780576123.7195225,
+    "mtime": 1779962789.9058638,
     "ast_hash": "d20aaba1c7af5befb34480aa559406c3",
     "semantic_hash": ""
   },
   "server_rust/src/network/sync_manager.rs": {
-    "mtime": 1784427964.9657958,
-    "ast_hash": "c7736ce13a3d28c7aeb426d37d5e2589",
+    "mtime": 1785016950.871219,
+    "ast_hash": "5962f90efbf8cc389509f7b64e8e1b1d",
     "semantic_hash": ""
   },
   "server_rust/src/scene_manager.rs": {
-    "mtime": 1781317321.2016358,
+    "mtime": 1781205538.1432288,
     "ast_hash": "d8fba35c255f6ad7efd8ed55961a7c70",
     "semantic_hash": ""
   },
   "server_rust/src/socket_handlers.rs": {
-    "mtime": 1784358859.7485676,
-    "ast_hash": "08a62780434008a7921b1be63f25225f",
+    "mtime": 1785018702.5642798,
+    "ast_hash": "91ddf8940b2ba898b771edc0c9c5529f",
     "semantic_hash": ""
   },
   "server_rust/src/state.rs": {
-    "mtime": 1784427964.9668658,
-    "ast_hash": "a89ca482e9508a16bc227f02fe7bb172",
+    "mtime": 1785016279.005678,
+    "ast_hash": "e9b9fdaa8ccfd9f6a5adad876b32e312",
     "semantic_hash": ""
   },
   "server_rust/src/tray.rs": {
-    "mtime": 1783305535.2507052,
+    "mtime": 1783400375.8006535,
     "ast_hash": "90c9c49b4e56627a51d53eb402038f76",
     "semantic_hash": ""
   },
   "server_rust/update_main.py": {
-    "mtime": 1780576123.7226229,
-    "ast_hash": "1344ea0d393b54e65230c3e4f13eefa5",
+    "mtime": 1779878414.5792565,
+    "ast_hash": "4fb7d27b24eb8a4202ca0128487032f0",
     "semantic_hash": ""
   },
   "server_rust/update_state.py": {
-    "mtime": 1780576123.7236593,
-    "ast_hash": "1649acb30644d8c91ac4a430449a43d5",
+    "mtime": 1779878501.1421375,
+    "ast_hash": "0ba16cee244d95f05a8c5360640b645e",
     "semantic_hash": ""
   },
   ".agent/skills/coding-guidelines/SKILL.md": {
-    "mtime": 1780576123.3603227,
-    "ast_hash": "e8e9c6823844bf46eadcbfdec5c319aa",
+    "mtime": 1780423214.2803712,
+    "ast_hash": "fb6c5ac443b02d129d21c04e2b2139ff",
     "semantic_hash": ""
   },
   ".agent/skills/docs-writer/SKILL.md": {
-    "mtime": 1780576123.3625596,
-    "ast_hash": "bc54963deffaafaf04953922bd1fd912",
+    "mtime": 1780423214.352724,
+    "ast_hash": "b308c48ecaaff4d1e483dea39f212762",
     "semantic_hash": ""
   },
   ".agent/skills/docs-writer/references/style-guide.md": {
-    "mtime": 1780576123.363686,
-    "ast_hash": "8f5b3e59744f3e51d09f5f59d9c369c9",
+    "mtime": 1780423214.3875012,
+    "ast_hash": "d526a4bac0e17e20936f972ab1aa4659",
     "semantic_hash": ""
   },
   ".agent/skills/gh-address-comments/LICENSE.txt": {
-    "mtime": 1780576123.3647003,
-    "ast_hash": "0ba5044c64ef53cb0189c9546081e228",
+    "mtime": 1780423214.4520063,
+    "ast_hash": "175792518e4ac015ab6696d16c4f607e",
     "semantic_hash": ""
   },
   ".agent/skills/gh-address-comments/SKILL.md": {
-    "mtime": 1780576123.3647003,
-    "ast_hash": "97cc375f9f2930826da939e84df6d5b6",
+    "mtime": 1780423214.4540076,
+    "ast_hash": "671c184ca81d34b9e99287ddb8e2dc1b",
     "semantic_hash": ""
   },
   ".agent/skills/javascript-mastery/SKILL.md": {
-    "mtime": 1780576123.366707,
+    "mtime": 1777017801.2151544,
     "ast_hash": "7fd6a49373903c56651142f81fbe2aa4",
     "semantic_hash": ""
   },
   ".agent/skills/javascript-pro/SKILL.md": {
-    "mtime": 1780576123.3677104,
+    "mtime": 1777017801.2156901,
     "ast_hash": "499d211239268f6dc2bc63f62a266085",
     "semantic_hash": ""
   },
   ".agent/skills/javascript-testing-patterns/SKILL.md": {
-    "mtime": 1780576123.3677104,
+    "mtime": 1777017801.2156901,
     "ast_hash": "7d8c3f6fb09afac12e67d9906bc7f67d",
     "semantic_hash": ""
   },
   ".agent/skills/javascript-testing-patterns/resources/implementation-playbook.md": {
-    "mtime": 1780576123.369159,
+    "mtime": 1777017801.2166924,
     "ast_hash": "39f68ba1d8a40003ecb1440377aa7481",
     "semantic_hash": ""
   },
   ".agent/skills/nodejs-backend-patterns/SKILL.md": {
-    "mtime": 1780576123.369159,
+    "mtime": 1777017802.0079193,
     "ast_hash": "8e515a2c4a6c1a8ffbaebb16ae14f36a",
     "semantic_hash": ""
   },
   ".agent/skills/nodejs-backend-patterns/resources/implementation-playbook.md": {
-    "mtime": 1780576123.370163,
+    "mtime": 1777017802.0089211,
     "ast_hash": "3c41788829340d9db99a4e26f306ab76",
     "semantic_hash": ""
   },
   ".agent/skills/nodejs-best-practices/SKILL.md": {
-    "mtime": 1780576123.3711734,
+    "mtime": 1777017802.0094235,
     "ast_hash": "b50198711140d67e282660261d61ff10",
     "semantic_hash": ""
   },
   ".agent/skills/ui-ux-pro-max/SKILL.md": {
-    "mtime": 1780576123.3721764,
+    "mtime": 1777017802.7898388,
     "ast_hash": "d62f9e321660a5669a2bf3312b25f982",
     "semantic_hash": ""
   },
   ".agent/skills/ui-visual-validator/SKILL.md": {
-    "mtime": 1780576123.389803,
+    "mtime": 1777017802.8030782,
     "ast_hash": "1a331ec2537f29b260eb3586464d199d",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
-    "mtime": 1780576123.3932498,
+    "mtime": 1780475314.781442,
     "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
     "semantic_hash": ""
   },
   ".agents/workflows/graphify.md": {
-    "mtime": 1780576123.3942654,
+    "mtime": 1780475314.7824428,
     "ast_hash": "637776aa6f7496d069afe7520c845c8a",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1783909442.4106321,
+    "mtime": 1784007762.9380443,
     "ast_hash": "b1c0a4eae601126315e7c05d1ca2fb62",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE_REFACTOR_PLAN.md": {
-    "mtime": 1780576123.4708488,
-    "ast_hash": "0d964886bedbaec8fa5e8fd7bf2abfc2",
+    "mtime": 1776370778.9080284,
+    "ast_hash": "78f37bc9df27fcf8996abdef12ed6679",
     "semantic_hash": ""
   },
   "docs/MIGRATION_AUDIT.md": {
-    "mtime": 1780576123.471848,
-    "ast_hash": "69afbb38c431c6c0491b0dd0c8f66adc",
+    "mtime": 1779881576.918317,
+    "ast_hash": "720591a11fb140715d85eef842abd9ee",
     "semantic_hash": ""
   },
   "docs/PLANO_DE_IMPLEMENTACAO_DE_EFEITOS.md": {
-    "mtime": 1784774758.0101151,
-    "ast_hash": "8dd4b189cf6eff80cb40653a6a8a4c7a",
+    "mtime": 1785016936.729509,
+    "ast_hash": "3bddae4e16f1eef1c674e19c704d88a2",
     "semantic_hash": ""
   },
   "docs/PLANO_MIGRACAO_RUST.md": {
-    "mtime": 1782951779.7186499,
+    "mtime": 1783400375.7853415,
     "ast_hash": "ca9af80b3a00e73a6c45225625f3d2cb",
     "semantic_hash": ""
   },
   "docs/channel_pair_implementation_plan.md": {
-    "mtime": 1780576123.4988306,
+    "mtime": 1778056913.4728882,
     "ast_hash": "b4b88e74474d711928bba8cf94268fa0",
     "semantic_hash": ""
   },
   "docs/dmx_auto_recovery_plan.md": {
-    "mtime": 1780576123.4998298,
+    "mtime": 1777329792.901596,
     "ast_hash": "c47d5d479c038dd050f1a46603598f7c",
     "semantic_hash": ""
   },
   "docs/github_sync_implementation_plan.md": {
-    "mtime": 1780576123.4998298,
+    "mtime": 1776078517.3648984,
     "ast_hash": "f9b7c9e393e548de13b3a82d706784a1",
     "semantic_hash": ""
   },
   "docs/plano_de_features.md": {
-    "mtime": 1780712992.8729842,
+    "mtime": 1780682890.9645858,
     "ast_hash": "3c36e85b28fdb329c3ade0c8288a3183",
     "semantic_hash": ""
   },
   "docs/plano_de_otimizacao.md": {
-    "mtime": 1780576123.5028286,
+    "mtime": 1778654314.926256,
     "ast_hash": "c1562418bec906af7905d0b15bb8fd6a",
     "semantic_hash": ""
   },
   "docs/plano_implementacao_remote_midi.md": {
-    "mtime": 1780576123.5038273,
+    "mtime": 1780411835.538182,
     "ast_hash": "10643c9474430fdadbb550ab057b1de6",
     "semantic_hash": ""
   },
   "log/fx_test_log.txt": {
-    "mtime": 1784168460.5401478,
-    "ast_hash": "6540d23b2a0045b07b6da2c5aba7be97",
+    "mtime": 1784197164.3045068,
+    "ast_hash": "32c12d86d2ce98d314c88892e52a4588",
     "semantic_hash": ""
   },
   "public/index.html": {
-    "mtime": 1784959674.4602487,
-    "ast_hash": "fe5e9c7d65ee5d62696452a7a74f75f5",
+    "mtime": 1785019243.6614609,
+    "ast_hash": "89e640bf8eb861b60d545ec5e2e133c4",
     "semantic_hash": ""
   },
   "reverse_dll_project/BIBLIA_TECNICA_01V96.md": {
-    "mtime": 1780576123.5976572,
-    "ast_hash": "e9df61ba1d4ea79cc8ee97d0adaeb6a6",
+    "mtime": 1776221175.005927,
+    "ast_hash": "b6bff3699c1f85334c3148bdabde3851",
     "semantic_hash": ""
   },
   "reverse_dll_project/DECOMPILED_README.md": {
-    "mtime": 1780576123.5997562,
-    "ast_hash": "e6d4e52c4923b1bc68fc818a4c9d6ce2",
+    "mtime": 1776208353.4513068,
+    "ast_hash": "7c98e849a69f5acbb768eef7c1783528",
     "semantic_hash": ""
   },
   "reverse_dll_project/junie_master_meter_report.txt": {
-    "mtime": 1780576123.6057694,
-    "ast_hash": "848a11c81af77da0207a1ca7024cdaf9",
+    "mtime": 1776221097.1549232,
+    "ast_hash": "134d3206636fcc76aaba83f05c8cde11",
     "semantic_hash": ""
   },
   "log/monitor_log(sincroniza\u00e7\u00e3o inicial).txt": {
-    "mtime": 1780576123.5378158,
-    "ast_hash": "3c3fa4284d33b7382180df4640c46038",
+    "mtime": 1778791567.8233535,
+    "ast_hash": "9205e7a1dd4ccb3ef5c0ac7cf02c5ae2",
     "semantic_hash": ""
   },
   "public/modules/setup.js": {
-    "mtime": 1780712992.935238,
+    "mtime": 1780925484.7982543,
     "ast_hash": "4ceb7e1759794994d44fc14474d82561",
     "semantic_hash": ""
   },
   "server_rust/src/env_config.rs": {
-    "mtime": 1780712992.9440606,
+    "mtime": 1780925484.804508,
     "ast_hash": "02b68d351052209dbbea4f72d74e6c41",
     "semantic_hash": ""
   },
   ".agent/rules/graphify.md": {
-    "mtime": 1780576123.3932498,
+    "mtime": 1780620153.4867747,
     "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
     "semantic_hash": ""
   },
   "filter.json": {
-    "mtime": 1780712992.8729842,
-    "ast_hash": "f244f04560d19061cab53108ae1f8eaa",
+    "mtime": 1780660786.7284398,
+    "ast_hash": "d470f5ef78dff24b5a3c3cafcae02f51",
     "semantic_hash": ""
   },
   "names.json": {
@@ -575,1947 +575,1947 @@
     "semantic_hash": ""
   },
   "public/modules/custom_scenes.js": {
-    "mtime": 1783131897.7025876,
+    "mtime": 1783400375.7874508,
     "ast_hash": "afd4f9279af411837dcad5cfaba549c2",
     "semantic_hash": ""
   },
   "public/modules/overlay_info.js": {
-    "mtime": 1780712992.9331403,
-    "ast_hash": "3fa12a386bd1a82d5ba64b28a7c98dd4",
+    "mtime": 1780663705.8418717,
+    "ast_hash": "84f335283c273072e094b61007b3f5bb",
     "semantic_hash": ""
   },
   "server_rust/src/custom_scenes.rs": {
-    "mtime": 1783131897.709923,
+    "mtime": 1783400375.797622,
     "ast_hash": "7449cdb54567dc388e0b697106b23b1f",
     "semantic_hash": ""
   },
   "skills-lock.json": {
-    "mtime": 1780590813.5006475,
-    "ast_hash": "9c1b7ac93264d18887414c502bf86942",
+    "mtime": 1780620153.656055,
+    "ast_hash": "3c69df08f573ad67e3c2de7c6747651a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/AGENTS.md": {
-    "mtime": 1780590715.9822543,
+    "mtime": 1780620153.4867747,
     "ast_hash": "77427c33fabab0e470f53b2098bf2780",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/CLAUDE.md": {
-    "mtime": 1780590715.9832826,
+    "mtime": 1780620153.4877758,
     "ast_hash": "77427c33fabab0e470f53b2098bf2780",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/README.md": {
-    "mtime": 1780590715.984311,
+    "mtime": 1780620153.4877758,
     "ast_hash": "29b280bbc265033cdd080f70069af8e2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/SKILL.md": {
-    "mtime": 1780590715.984311,
+    "mtime": 1780620153.4887757,
     "ast_hash": "67e3783f19d7d90087a7e694229f003a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-clone-excessive.md": {
-    "mtime": 1780590715.9858153,
+    "mtime": 1780620153.4897768,
     "ast_hash": "018dc5461ddde2f3687d43fe9f54a760",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-collect-intermediate.md": {
-    "mtime": 1780590715.9869459,
+    "mtime": 1780620153.4897768,
     "ast_hash": "c3a0465aab6a6cef9a6445b56248f20a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-empty-catch.md": {
-    "mtime": 1780590715.9869459,
+    "mtime": 1780620153.4907744,
     "ast_hash": "ae0ad39c6e27b2e4cff6524f9171f992",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-expect-lazy.md": {
-    "mtime": 1780590715.9879706,
+    "mtime": 1780620153.4918077,
     "ast_hash": "833290152050e27e2b8ae178104703aa",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-format-hot-path.md": {
-    "mtime": 1780590715.9879706,
+    "mtime": 1780620153.4918077,
     "ast_hash": "538039e8ee835f99c15bd2869dd3d8d2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-index-over-iter.md": {
-    "mtime": 1780590715.9890063,
+    "mtime": 1780620153.4918077,
     "ast_hash": "f8fb910aa5295bb3096b1828128356da",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-lock-across-await.md": {
-    "mtime": 1780590715.9890063,
+    "mtime": 1780620153.4928155,
     "ast_hash": "ecfe28df3d5a21822fafaa9e74ac2bdc",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-over-abstraction.md": {
-    "mtime": 1780590715.9900124,
+    "mtime": 1780620153.4928155,
     "ast_hash": "1440d698fb5b16664f0ee6a66d134894",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-panic-expected.md": {
-    "mtime": 1780590715.990564,
+    "mtime": 1780620153.4928155,
     "ast_hash": "e8af22989ecc00b2d9ce8a30b4d81fe8",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-premature-optimize.md": {
-    "mtime": 1780590715.991575,
+    "mtime": 1780620153.4928155,
     "ast_hash": "e031f685f7da0ef8689b49c6acbfaefc",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-string-for-str.md": {
-    "mtime": 1780590715.991575,
+    "mtime": 1780620153.493816,
     "ast_hash": "0484ae7f9bd57c0001de28abd775cab3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-stringly-typed.md": {
-    "mtime": 1780590715.991575,
+    "mtime": 1780620153.493816,
     "ast_hash": "f843faac1df816730b321b13cb6f7725",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-type-erasure.md": {
-    "mtime": 1780590715.9925902,
+    "mtime": 1780620153.493816,
     "ast_hash": "fb0950b95a12f5838623cfcebc120642",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-unwrap-abuse.md": {
-    "mtime": 1780590715.9925902,
+    "mtime": 1780620153.4948125,
     "ast_hash": "1d59ba24c13580d17e5ee1245aee1c61",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/anti-vec-for-slice.md": {
-    "mtime": 1780590715.9936612,
+    "mtime": 1780620153.4948125,
     "ast_hash": "e24ba1dc09317a4cdc20f81a26c3f555",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-builder-must-use.md": {
-    "mtime": 1780590715.9936612,
+    "mtime": 1780620153.4948125,
     "ast_hash": "d3167b8afb7c4a5261a40bf462c571f7",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-builder-pattern.md": {
-    "mtime": 1780590715.9946773,
+    "mtime": 1780620153.4948125,
     "ast_hash": "a40759193ef612a3074fbe282be23bb2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-common-traits.md": {
-    "mtime": 1780590715.9956923,
+    "mtime": 1780620153.495814,
     "ast_hash": "7f325f736a336c64c6460f354236e4e2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-default-impl.md": {
-    "mtime": 1780590715.9956923,
+    "mtime": 1780620153.496813,
     "ast_hash": "3d0e473cab11e7ff69b9ac243dab2219",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-extension-trait.md": {
-    "mtime": 1780590715.9956923,
+    "mtime": 1780620153.496813,
     "ast_hash": "be519ae6848ce9bc0267af217c8e30b8",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-from-not-into.md": {
-    "mtime": 1780590715.997492,
+    "mtime": 1780620153.4978137,
     "ast_hash": "5d8738ea281ac8a7304d46a5b3de6708",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-impl-asref.md": {
-    "mtime": 1780590715.997492,
+    "mtime": 1780620153.4978137,
     "ast_hash": "4a2c741a6b69e531f564e18114bb46e8",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-impl-into.md": {
-    "mtime": 1780590715.9985707,
+    "mtime": 1780620153.4978137,
     "ast_hash": "b9f4d9b7ce11f0d39ab0211b101891d9",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-must-use.md": {
-    "mtime": 1780590715.9985707,
+    "mtime": 1780620153.4978137,
     "ast_hash": "b947f685a390a8bc11b8c46ba7c381c2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-newtype-safety.md": {
-    "mtime": 1780590715.9985707,
+    "mtime": 1780620153.4988136,
     "ast_hash": "4ac0cb749d16df8825b27e16525cc18c",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-non-exhaustive.md": {
-    "mtime": 1780590715.9995778,
+    "mtime": 1780620153.4988136,
     "ast_hash": "298c1e587104ade666cb7d2a20792ffd",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-parse-dont-validate.md": {
-    "mtime": 1780590715.9995778,
+    "mtime": 1780620153.4998133,
     "ast_hash": "a54b4631ce687c0e1ae178339947c2c1",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-sealed-trait.md": {
-    "mtime": 1780590716.0010848,
+    "mtime": 1780620153.4998133,
     "ast_hash": "0dc9fdad1074dd8a23252e1760c754d5",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-serde-optional.md": {
-    "mtime": 1780590716.0010848,
+    "mtime": 1780620153.5008154,
     "ast_hash": "b4526c329758d12452aade411bb96949",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/api-typestate.md": {
-    "mtime": 1780590716.0022204,
+    "mtime": 1780620153.5008154,
     "ast_hash": "3691b5fe6b840215cbc2aa20650e2bb1",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-bounded-channel.md": {
-    "mtime": 1780590716.0032682,
+    "mtime": 1780620153.5013218,
     "ast_hash": "19acfd2a44e078ee1c1e9a71c04cec5a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-broadcast-pubsub.md": {
-    "mtime": 1780590716.0032682,
+    "mtime": 1780620153.5018263,
     "ast_hash": "97ca4038c34289441c0418b7cea352ef",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-clone-before-await.md": {
-    "mtime": 1780590716.0042913,
+    "mtime": 1780620153.5018263,
     "ast_hash": "f2e42fad002f5eb80e1a5d357de183f0",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-join-parallel.md": {
-    "mtime": 1780590716.0053184,
+    "mtime": 1780620153.5018263,
     "ast_hash": "5d8857c082501341c6c1d1aaf996bb36",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-joinset-structured.md": {
-    "mtime": 1780590716.0058713,
+    "mtime": 1780620153.5028312,
     "ast_hash": "c77adc5080be8c1a87747db9f903dd9b",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-mpsc-queue.md": {
-    "mtime": 1780590716.0058713,
+    "mtime": 1780620153.5028312,
     "ast_hash": "03a3ac535dd72239e50c713376383d9a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-no-lock-await.md": {
-    "mtime": 1780590716.0068865,
+    "mtime": 1780620153.5028312,
     "ast_hash": "30fb27535d30f132afef02f384e05d77",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-oneshot-response.md": {
-    "mtime": 1780590716.0068865,
+    "mtime": 1780620153.5038314,
     "ast_hash": "41bbd449dab1441044a5093c973ff8be",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-select-racing.md": {
-    "mtime": 1780590716.0079167,
+    "mtime": 1780620153.5038314,
     "ast_hash": "8456cf482410e7c7e371e93ec4d5eeee",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-spawn-blocking.md": {
-    "mtime": 1780590716.0089345,
+    "mtime": 1780620153.5043352,
     "ast_hash": "336edd747218fc770c51e04f35ffa15f",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-tokio-fs.md": {
-    "mtime": 1780590716.0089345,
+    "mtime": 1780620153.5043352,
     "ast_hash": "752de7ad63502fc377f7922e41e80010",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-tokio-runtime.md": {
-    "mtime": 1780590716.0089345,
+    "mtime": 1780620153.5043352,
     "ast_hash": "a08a71b4b197309fdb34829aa1cceb08",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-try-join.md": {
-    "mtime": 1780590716.0101233,
+    "mtime": 1780620153.5063396,
     "ast_hash": "90eb6c281a81c2ce5f028a2493617086",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/async-watch-latest.md": {
-    "mtime": 1780590716.0111349,
+    "mtime": 1780620153.5063396,
     "ast_hash": "94aad11afd665e8c1466db9a53f2bf0a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-all-public.md": {
-    "mtime": 1780590716.0111349,
+    "mtime": 1780620153.5063396,
     "ast_hash": "c0f6c5ac2f49ca601eea0c818074578e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-cargo-metadata.md": {
-    "mtime": 1780590716.0111349,
+    "mtime": 1780620153.5063396,
     "ast_hash": "e26f5ae5d6eb3926906abed46affcee3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-errors-section.md": {
-    "mtime": 1780590716.0126402,
+    "mtime": 1780620153.507343,
     "ast_hash": "0945f8ae5930a53a7bdb7860c638e62c",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-examples-section.md": {
-    "mtime": 1780590716.0126402,
+    "mtime": 1780620153.507343,
     "ast_hash": "4269de7c1f47fda7ce6610d398e3ef54",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-hidden-setup.md": {
-    "mtime": 1780590716.0136495,
+    "mtime": 1780620153.507343,
     "ast_hash": "04490108009aaca8ab44254b9035deea",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-intra-links.md": {
-    "mtime": 1780590716.0136495,
+    "mtime": 1780620153.5083423,
     "ast_hash": "0e78d4b56e95b875cbd4a6c2f36dc8b0",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-link-types.md": {
-    "mtime": 1780590716.0146568,
+    "mtime": 1780620153.5083423,
     "ast_hash": "4e630e85bb04dcc68679cff1eac5eb3b",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-module-inner.md": {
-    "mtime": 1780590716.0146568,
+    "mtime": 1780620153.5083423,
     "ast_hash": "d4c61321c8957ebd236cf752487467b2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-panics-section.md": {
-    "mtime": 1780590716.0156884,
+    "mtime": 1780620153.5093408,
     "ast_hash": "45e077583bd097a4846d6e2130a128a6",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-question-mark.md": {
-    "mtime": 1780590716.0156884,
+    "mtime": 1780620153.5093408,
     "ast_hash": "52ecb24cc18207be9fe19860b42be8fe",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/doc-safety-section.md": {
-    "mtime": 1780590716.0166967,
+    "mtime": 1780620153.5093408,
     "ast_hash": "21546d91989e6fe59ba762f42d0c3347",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-anyhow-app.md": {
-    "mtime": 1780590716.0166967,
+    "mtime": 1780620153.5108454,
     "ast_hash": "9511a7c81edf0cea8cbc005fa314ca8f",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-context-chain.md": {
-    "mtime": 1780590716.0177205,
+    "mtime": 1780620153.5108454,
     "ast_hash": "bc96746a758e47d6c33df0766366981c",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-custom-type.md": {
-    "mtime": 1780590716.0187466,
+    "mtime": 1780620153.5108454,
     "ast_hash": "6f120808e60c5fcd22df01721cbddfa1",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-doc-errors.md": {
-    "mtime": 1780590716.0187466,
+    "mtime": 1780620153.511853,
     "ast_hash": "540b12fdd83d8b5c556ffd9e464b39c0",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-expect-bugs-only.md": {
-    "mtime": 1780590716.0187466,
+    "mtime": 1780620153.511853,
     "ast_hash": "9eb1c2a64958c7098b44e997c965dec3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-from-impl.md": {
-    "mtime": 1780590716.019778,
+    "mtime": 1780620153.5123613,
     "ast_hash": "8f165200503e932eff90fa603b5f8b86",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-lowercase-msg.md": {
-    "mtime": 1780590716.019778,
+    "mtime": 1780620153.5123613,
     "ast_hash": "d8cf5eda61391dc82165c6162a11ce03",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-no-unwrap-prod.md": {
-    "mtime": 1780590716.0213528,
+    "mtime": 1780620153.5133626,
     "ast_hash": "fb8e33859dc9844b994c4278c4af65e9",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-question-mark.md": {
-    "mtime": 1780590716.0213528,
+    "mtime": 1780620153.5141473,
     "ast_hash": "e9209705aed2e3a887df6ead335a9a19",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-result-over-panic.md": {
-    "mtime": 1780590716.022363,
+    "mtime": 1780620153.5141473,
     "ast_hash": "18a1621092605bad8bed4439ab61c5af",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-source-chain.md": {
-    "mtime": 1780590716.022363,
+    "mtime": 1780620153.5141473,
     "ast_hash": "847a4092dcfbedaef3d0786fb2b40053",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/err-thiserror-lib.md": {
-    "mtime": 1780590716.0233696,
+    "mtime": 1780620153.5141473,
     "ast_hash": "d1cf2b6c79cc3977a27b8f11e1e9f3a5",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-cargo-metadata.md": {
-    "mtime": 1780590716.0233696,
+    "mtime": 1780620153.5151544,
     "ast_hash": "a2766314e4a8b4be5c722056c4e43541",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-deny-correctness.md": {
-    "mtime": 1780590716.0244062,
+    "mtime": 1780620153.5151544,
     "ast_hash": "6e076777a78a19eb0efe05566b04340e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-missing-docs.md": {
-    "mtime": 1780590716.0244062,
+    "mtime": 1780620153.5151544,
     "ast_hash": "e8912941f5adad344d22ff7ce4f45e3e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-pedantic-selective.md": {
-    "mtime": 1780590716.0254369,
+    "mtime": 1780620153.5161552,
     "ast_hash": "1de2450cb891b8714b9b51fd81272e79",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-rustfmt-check.md": {
-    "mtime": 1780590716.0254369,
+    "mtime": 1780620153.5161552,
     "ast_hash": "a79bcc050e70bad3bb0bcb575055ca64",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-unsafe-doc.md": {
-    "mtime": 1780590716.0264435,
+    "mtime": 1780620153.5171523,
     "ast_hash": "719ac388a6d6697759a982d5195c2a01",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-warn-complexity.md": {
-    "mtime": 1780590716.0264435,
+    "mtime": 1780620153.5171523,
     "ast_hash": "3e0c67acdf6f333af5f1302b21b58708",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-warn-perf.md": {
-    "mtime": 1780590716.02745,
+    "mtime": 1780620153.5171523,
     "ast_hash": "b2f4afbcf8b2c97dc6894fffe8f5fc44",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-warn-style.md": {
-    "mtime": 1780590716.02745,
+    "mtime": 1780620153.518152,
     "ast_hash": "abd37d04352136a171bb85fa921fa577",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-warn-suspicious.md": {
-    "mtime": 1780590716.0284698,
+    "mtime": 1780620153.518152,
     "ast_hash": "84df44351113c7cf54a6ae5db02fbee1",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/lint-workspace-lints.md": {
-    "mtime": 1780590716.0284698,
+    "mtime": 1780620153.518152,
     "ast_hash": "ea59bafa58cf85a95b896a05b85f81ca",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-arena-allocator.md": {
-    "mtime": 1780590716.0284698,
+    "mtime": 1780620153.518152,
     "ast_hash": "27d72d3d7b1e2a13c5968e99c3cd33f3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-arrayvec.md": {
-    "mtime": 1780590716.029477,
+    "mtime": 1780620153.5191557,
     "ast_hash": "cf4c345d7f35e533f67753f65e025c5e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-assert-type-size.md": {
-    "mtime": 1780590716.029477,
+    "mtime": 1780620153.5191557,
     "ast_hash": "e8de53b4616332aeab3b3cb410fb04c2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-avoid-format.md": {
-    "mtime": 1780590716.030981,
+    "mtime": 1780620153.5191557,
     "ast_hash": "9cdef79e9d43c63279a7a7e80ef206fe",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-box-large-variant.md": {
-    "mtime": 1780590716.030981,
+    "mtime": 1780620153.5191557,
     "ast_hash": "f7497e7a700d6ef142c3af5cdcf62beb",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-boxed-slice.md": {
-    "mtime": 1780590716.031991,
+    "mtime": 1780620153.5191557,
     "ast_hash": "ca46d3f65fb0f59d2649dad482cba95e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-clone-from.md": {
-    "mtime": 1780590716.031991,
+    "mtime": 1780620153.5206623,
     "ast_hash": "70f576c4efe4dd06032cad1a6cb0668d",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-compact-string.md": {
-    "mtime": 1780590716.033012,
+    "mtime": 1780620153.5206623,
     "ast_hash": "a525f4e3eebf09d19a46247939153a7a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-reuse-collections.md": {
-    "mtime": 1780590716.033012,
+    "mtime": 1780620153.5206623,
     "ast_hash": "92ee621c565c5f9fd668abd9db0b8a61",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-smaller-integers.md": {
-    "mtime": 1780590716.034019,
+    "mtime": 1780620153.5206623,
     "ast_hash": "16cf30e9522fc6336f40fe41680e4ad9",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-smallvec.md": {
-    "mtime": 1780590716.034019,
+    "mtime": 1780620153.5216699,
     "ast_hash": "a616bf9f0044cf60f984ba09825e6f41",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-thinvec.md": {
-    "mtime": 1780590716.0350351,
+    "mtime": 1780620153.5231798,
     "ast_hash": "ca0c9ac826454cfa5404e8f487c79073",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-with-capacity.md": {
-    "mtime": 1780590716.0350351,
+    "mtime": 1780620153.5231798,
     "ast_hash": "be94e346054e81b36c1592b4e6f69c7d",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-write-over-format.md": {
-    "mtime": 1780590716.036043,
+    "mtime": 1780620153.5231798,
     "ast_hash": "fa04927a9753af081b3a671d4b346a50",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/mem-zero-copy.md": {
-    "mtime": 1780590716.0365763,
+    "mtime": 1780620153.5241818,
     "ast_hash": "015d7350d2bb1ddc5ad3045a48287fdf",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-acronym-word.md": {
-    "mtime": 1780590716.03759,
+    "mtime": 1780620153.5241818,
     "ast_hash": "f69f4b0e9d2777c3b9426e94473a6670",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-as-free.md": {
-    "mtime": 1780590716.03759,
+    "mtime": 1780620153.5241818,
     "ast_hash": "f2382669c4eff6137eb202eaedde092a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-consts-screaming.md": {
-    "mtime": 1780590716.03759,
+    "mtime": 1780620153.5241818,
     "ast_hash": "692e3b662ac49eb17cd3247a384692f4",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-crate-no-rs.md": {
-    "mtime": 1780590716.0385966,
+    "mtime": 1780620153.5251818,
     "ast_hash": "4a3db780a2e984b1d1b841b776a0cabe",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-funcs-snake.md": {
-    "mtime": 1780590716.0396032,
+    "mtime": 1780620153.5251818,
     "ast_hash": "0114285b9b8cfd1f1c02ae2af491b151",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-into-ownership.md": {
-    "mtime": 1780590716.0396032,
+    "mtime": 1780620153.5251818,
     "ast_hash": "f7a9761da90bcb28b2f58f60f28785a8",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-is-has-bool.md": {
-    "mtime": 1780590716.040629,
+    "mtime": 1780620153.526183,
     "ast_hash": "789aca8dfc7bf6adabdc5c840a6b0614",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-iter-convention.md": {
-    "mtime": 1780590716.040629,
+    "mtime": 1780620153.526183,
     "ast_hash": "53222cd72a94dc8551288646e65920b7",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-iter-method.md": {
-    "mtime": 1780590716.0416453,
+    "mtime": 1780620153.526183,
     "ast_hash": "3192ec1e9a9f1f54aa9eebf1d0268eb2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-iter-type-match.md": {
-    "mtime": 1780590716.0416453,
+    "mtime": 1780620153.5271807,
     "ast_hash": "a517315112fb79d54b2d62df550f3842",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-lifetime-short.md": {
-    "mtime": 1780590716.042652,
+    "mtime": 1780620153.5271807,
     "ast_hash": "139892ca5f1bc528ebfea32680b89a15",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-no-get-prefix.md": {
-    "mtime": 1780590716.042652,
+    "mtime": 1780620153.5271807,
     "ast_hash": "bf125aa6e702abbad4f8934eec06cdb6",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-to-expensive.md": {
-    "mtime": 1780590716.0436585,
+    "mtime": 1780620153.5271807,
     "ast_hash": "8b612f391755e458c28474cfa3094b89",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-type-param-single.md": {
-    "mtime": 1780590716.0436585,
+    "mtime": 1780620153.5281801,
     "ast_hash": "96e8a25b0bc863345ad950c77e6b8eb3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-types-camel.md": {
-    "mtime": 1780590716.044677,
+    "mtime": 1780620153.5281801,
     "ast_hash": "194e114bffb62bab089e3afec87363b3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/name-variants-camel.md": {
-    "mtime": 1780590716.044677,
+    "mtime": 1780620153.5291803,
     "ast_hash": "ab48427560a4cec74daf06f76f0f47dc",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-bounds-check.md": {
-    "mtime": 1780590716.045684,
+    "mtime": 1780620153.5291803,
     "ast_hash": "a30b24e67cb1ecd0481e3c877eb95e44",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-cache-friendly.md": {
-    "mtime": 1780590716.045684,
+    "mtime": 1780620153.5291803,
     "ast_hash": "176afcaaa666a69a6dd80045b768253c",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-codegen-units.md": {
-    "mtime": 1780590716.045684,
+    "mtime": 1780620153.5291803,
     "ast_hash": "8026623ae6f378a40d10ec3e4a917f98",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-cold-unlikely.md": {
-    "mtime": 1780590716.0471883,
+    "mtime": 1780620153.5291803,
     "ast_hash": "bcd803facf76d6e566d85bdf0c67139c",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-inline-always-rare.md": {
-    "mtime": 1780590716.0471883,
+    "mtime": 1780620153.5306864,
     "ast_hash": "219f9f68a11e7d20ecf907cb06bb4fad",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-inline-never-cold.md": {
-    "mtime": 1780590716.0482807,
+    "mtime": 1780620153.5306864,
     "ast_hash": "022cdb27c90bde50488df717231dfc1d",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-inline-small.md": {
-    "mtime": 1780590716.0482807,
+    "mtime": 1780620153.5306864,
     "ast_hash": "17b7f924151e057d47281cf58dce1c01",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-likely-hint.md": {
-    "mtime": 1780590716.0492878,
+    "mtime": 1780620153.5316923,
     "ast_hash": "7378dd57076435d77a5f7f7975b0cb8f",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-lto-release.md": {
-    "mtime": 1780590716.0492878,
+    "mtime": 1780620153.5316923,
     "ast_hash": "a6e2b107546b3cc349567f05c292abb0",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-pgo-profile.md": {
-    "mtime": 1780590716.0503178,
+    "mtime": 1780620153.5316923,
     "ast_hash": "c5b2bf61a51501dbf1961f537eae3551",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-simd-portable.md": {
-    "mtime": 1780590716.0503178,
+    "mtime": 1780620153.5316923,
     "ast_hash": "f378fa8307fa799a8543067f8b58ea3b",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/opt-target-cpu.md": {
-    "mtime": 1780590716.0513175,
+    "mtime": 1780620153.5327852,
     "ast_hash": "250e0d40684cc7abf82ce9eaea1e0acf",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-arc-shared.md": {
-    "mtime": 1780590716.0518224,
+    "mtime": 1780620153.5327852,
     "ast_hash": "fe617b0d1108802f88e4d1497ec9e8c3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-borrow-over-clone.md": {
-    "mtime": 1780590716.0526717,
+    "mtime": 1780620153.5327852,
     "ast_hash": "fb0b18cb294404c40d56da957db38f18",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-clone-explicit.md": {
-    "mtime": 1780590716.0531769,
+    "mtime": 1780620153.5336692,
     "ast_hash": "9a0cdd9ec0422f5f99c653f843483a7e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-copy-small.md": {
-    "mtime": 1780590716.054209,
+    "mtime": 1780620153.5336692,
     "ast_hash": "bbd6cf2887a2c6b486043b808bb9cd20",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-cow-conditional.md": {
-    "mtime": 1780590716.054209,
+    "mtime": 1780620153.5336692,
     "ast_hash": "59c311d93a2475e147fa7d4e6fbb6df3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-lifetime-elision.md": {
-    "mtime": 1780590716.0552301,
+    "mtime": 1780620153.5336692,
     "ast_hash": "091f75b039566f06d45930e19b721ed9",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-move-large.md": {
-    "mtime": 1780590716.0552301,
+    "mtime": 1780620153.534785,
     "ast_hash": "f121595eb1c8bdac9d9581b153b3e105",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-mutex-interior.md": {
-    "mtime": 1780590716.0562527,
+    "mtime": 1780620153.534785,
     "ast_hash": "3792755dbb1a2537cb02efb8e61fdb28",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-rc-single-thread.md": {
-    "mtime": 1780590716.0562527,
+    "mtime": 1780620153.534785,
     "ast_hash": "293330aa63a316620b545997b325ece3",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-refcell-interior.md": {
-    "mtime": 1780590716.0573046,
+    "mtime": 1780620153.5357869,
     "ast_hash": "bc5d2bf5f2bce27067df8f4fd464a306",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-rwlock-readers.md": {
-    "mtime": 1780590716.0573046,
+    "mtime": 1780620153.5357869,
     "ast_hash": "79e6201fb3fe6b097e5686b3f4d73bd9",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/own-slice-over-vec.md": {
-    "mtime": 1780590716.0583124,
+    "mtime": 1780620153.5357869,
     "ast_hash": "931ba79d91b871f78bed203b36f1a3a4",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-black-box-bench.md": {
-    "mtime": 1780590716.0583124,
+    "mtime": 1780620153.5357869,
     "ast_hash": "bcd3c51800a7c4694128228dde308fb1",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-chain-avoid.md": {
-    "mtime": 1780590716.0593188,
+    "mtime": 1780620153.5367866,
     "ast_hash": "aea0930fc5b8d9e09ee7478a132b567a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-collect-into.md": {
-    "mtime": 1780590716.0593188,
+    "mtime": 1780620153.5367866,
     "ast_hash": "07e4f76ae2a073dca51f9761dd2d7bb8",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-collect-once.md": {
-    "mtime": 1780590716.0603254,
+    "mtime": 1780620153.5367866,
     "ast_hash": "6f00b455905837bb45255de541b194c1",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-drain-reuse.md": {
-    "mtime": 1780590716.0603254,
+    "mtime": 1780620153.5377846,
     "ast_hash": "a0c7c9ac922040e537bbef41eb30892b",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-entry-api.md": {
-    "mtime": 1780590716.0613537,
+    "mtime": 1780620153.5377846,
     "ast_hash": "fa83ad781e74be37c254646e91a0a131",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-extend-batch.md": {
-    "mtime": 1780590716.0613537,
+    "mtime": 1780620153.5377846,
     "ast_hash": "07d553d53b282ac9a76db500a86629f4",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-iter-lazy.md": {
-    "mtime": 1780590716.0613537,
+    "mtime": 1780620153.5377846,
     "ast_hash": "6ad54c377781f2964af7e707c1d7e711",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-iter-over-index.md": {
-    "mtime": 1780590716.0628583,
+    "mtime": 1780620153.5387864,
     "ast_hash": "1af721e0c3bb76946934c633f4508e5b",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-profile-first.md": {
-    "mtime": 1780590716.0628583,
+    "mtime": 1780620153.5387864,
     "ast_hash": "78f9e4b4e026f42729f29d70ca97d932",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/perf-release-profile.md": {
-    "mtime": 1780590716.0639398,
+    "mtime": 1780620153.5387864,
     "ast_hash": "a7358b2a7f6d7fe5051b5b80d7755a2a",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-bin-dir.md": {
-    "mtime": 1780590716.0639398,
+    "mtime": 1780620153.539786,
     "ast_hash": "c65569f5e0f3fa5d8632a6647f358f91",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-flat-small.md": {
-    "mtime": 1780590716.0649471,
+    "mtime": 1780620153.539786,
     "ast_hash": "37651511700da2e5bf17d78d1d194f3b",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-lib-main-split.md": {
-    "mtime": 1780590716.0649471,
+    "mtime": 1780620153.539786,
     "ast_hash": "0fe42694503dc43c9f722cd5430c70a6",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-mod-by-feature.md": {
-    "mtime": 1780590716.0659733,
+    "mtime": 1780620153.540788,
     "ast_hash": "6a65a3341687adf61f53d6631b97d634",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-mod-rs-dir.md": {
-    "mtime": 1780590716.0659733,
+    "mtime": 1780620153.540788,
     "ast_hash": "558e6ff1656e234f762cfd2ed08a5d79",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-prelude-module.md": {
-    "mtime": 1780590716.0675218,
+    "mtime": 1780620153.5412943,
     "ast_hash": "d5b67cb588f10f23648fbb65539a7c94",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-pub-crate-internal.md": {
-    "mtime": 1780590716.0675218,
+    "mtime": 1780620153.5418015,
     "ast_hash": "24cc7f1c3c9563d4471ae683e6a8818c",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-pub-super-parent.md": {
-    "mtime": 1780590716.0685341,
+    "mtime": 1780620153.5418015,
     "ast_hash": "bf4f66d75a9257c7a9c1c2672239894c",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-pub-use-reexport.md": {
-    "mtime": 1780590716.0685341,
+    "mtime": 1780620153.5418015,
     "ast_hash": "8a42af03b5be30a6b4dd8477f695cfb5",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-workspace-deps.md": {
-    "mtime": 1780590716.0695417,
+    "mtime": 1780620153.5418015,
     "ast_hash": "e297ee26840bbfcf918758b57ad70d2e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/proj-workspace-large.md": {
-    "mtime": 1780590716.0695417,
+    "mtime": 1780620153.54281,
     "ast_hash": "e6ab25d3a50d325c94477ddd25c92a82",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-arrange-act-assert.md": {
-    "mtime": 1780590716.0705469,
+    "mtime": 1780620153.54281,
     "ast_hash": "847e40f978e3452a1261a3dfb37afb16",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-cfg-test-module.md": {
-    "mtime": 1780590716.0705469,
+    "mtime": 1780620153.54281,
     "ast_hash": "2b0842b2f2518120e636426d33eda7af",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-criterion-bench.md": {
-    "mtime": 1780590716.0715625,
+    "mtime": 1780620153.54281,
     "ast_hash": "c3eb8c4885c9cedfcaea5772c1d856bb",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-descriptive-names.md": {
-    "mtime": 1780590716.0715625,
+    "mtime": 1780620153.5438094,
     "ast_hash": "226113f9904842174b74165118b705d9",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-doctest-examples.md": {
-    "mtime": 1780590716.0725691,
+    "mtime": 1780620153.5438094,
     "ast_hash": "cbe84152a4073dd0c775efccdc8e0a07",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-fixture-raii.md": {
-    "mtime": 1780590716.0725691,
+    "mtime": 1780620153.5448098,
     "ast_hash": "c61cc60f95bd959f4f7163200a4d65d2",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-integration-dir.md": {
-    "mtime": 1780590716.0736494,
+    "mtime": 1780620153.5448098,
     "ast_hash": "5176f0c0103ee8e01b33a705d7127772",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-mock-traits.md": {
-    "mtime": 1780590716.0736494,
+    "mtime": 1780620153.5448098,
     "ast_hash": "45406e6ba17bb39ddae66f505a359e2e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-mockall-mocking.md": {
-    "mtime": 1780590716.0746677,
+    "mtime": 1780620153.5448098,
     "ast_hash": "b1ae49034876e61a3888960f7e746721",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-proptest-properties.md": {
-    "mtime": 1780590716.0746677,
+    "mtime": 1780620153.5458097,
     "ast_hash": "0ea429716854a071ce904eff79987c82",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-should-panic.md": {
-    "mtime": 1780590716.0756717,
+    "mtime": 1780620153.5458097,
     "ast_hash": "316bad70aa719d0f9aea410ac23b16a7",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-tokio-async.md": {
-    "mtime": 1780590716.0756717,
+    "mtime": 1780620153.5458097,
     "ast_hash": "9bff0ab233c2ca568a6221acc51c13cf",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/test-use-super.md": {
-    "mtime": 1780590716.0767026,
+    "mtime": 1780620153.5468094,
     "ast_hash": "9249ea840d4aca334c5f7e96328cbaa7",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-enum-states.md": {
-    "mtime": 1780590716.0767026,
+    "mtime": 1780620153.5468094,
     "ast_hash": "7c60e9d26f2ac21047d08bed5d5958ce",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-generic-bounds.md": {
-    "mtime": 1780590716.0777247,
+    "mtime": 1780620153.5468094,
     "ast_hash": "126f439008942f164b9a172e975f6884",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-never-diverge.md": {
-    "mtime": 1780590716.0777247,
+    "mtime": 1780620153.5478075,
     "ast_hash": "afe33f37ac8c40249c977d8ebc8b5435",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-newtype-ids.md": {
-    "mtime": 1780590716.0787492,
+    "mtime": 1780620153.5478075,
     "ast_hash": "5e26216d7d9e02a2f6523d2af59c77c9",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-newtype-validated.md": {
-    "mtime": 1780590716.0787492,
+    "mtime": 1780620153.5478075,
     "ast_hash": "e1182215403e5812ae6b754150265475",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-no-stringly.md": {
-    "mtime": 1780590716.0797527,
+    "mtime": 1780620153.548807,
     "ast_hash": "e23a1a6d6a3e7d2bc289b7aef59cb32e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-option-nullable.md": {
-    "mtime": 1780590716.0797527,
+    "mtime": 1780620153.548807,
     "ast_hash": "421de472a5d64aa7604bfcaa92039ebc",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-phantom-marker.md": {
-    "mtime": 1780590716.0797527,
+    "mtime": 1780620153.548807,
     "ast_hash": "a6a7e22c34a6b6e06c715cfe4a06903b",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-repr-transparent.md": {
-    "mtime": 1780590716.0812564,
+    "mtime": 1780620153.5498085,
     "ast_hash": "f8f36448dd24a02a4acd6358f167b00e",
     "semantic_hash": ""
   },
   ".agent/skills/rust-skills/rules/type-result-fallible.md": {
-    "mtime": 1780590716.0812564,
+    "mtime": 1780620153.5498085,
     "ast_hash": "c9762214fd30ddb320c95bdf57cc9073",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/AGENTS.md": {
-    "mtime": 1780590715.9822543,
+    "mtime": 1780620153.5498085,
     "ast_hash": "77427c33fabab0e470f53b2098bf2780",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/CLAUDE.md": {
-    "mtime": 1780590715.9832826,
+    "mtime": 1780620153.5508096,
     "ast_hash": "77427c33fabab0e470f53b2098bf2780",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/README.md": {
-    "mtime": 1780590715.984311,
+    "mtime": 1780620153.5513184,
     "ast_hash": "29b280bbc265033cdd080f70069af8e2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/SKILL.md": {
-    "mtime": 1780590715.984311,
+    "mtime": 1780620153.5518222,
     "ast_hash": "67e3783f19d7d90087a7e694229f003a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-clone-excessive.md": {
-    "mtime": 1780590715.9858153,
+    "mtime": 1780620153.5518222,
     "ast_hash": "018dc5461ddde2f3687d43fe9f54a760",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-collect-intermediate.md": {
-    "mtime": 1780590715.9869459,
+    "mtime": 1780620153.5528264,
     "ast_hash": "c3a0465aab6a6cef9a6445b56248f20a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-empty-catch.md": {
-    "mtime": 1780590715.9869459,
+    "mtime": 1780620153.5528264,
     "ast_hash": "ae0ad39c6e27b2e4cff6524f9171f992",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-expect-lazy.md": {
-    "mtime": 1780590715.9879706,
+    "mtime": 1780620153.5528264,
     "ast_hash": "833290152050e27e2b8ae178104703aa",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-format-hot-path.md": {
-    "mtime": 1780590715.9879706,
+    "mtime": 1780620153.553651,
     "ast_hash": "538039e8ee835f99c15bd2869dd3d8d2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-index-over-iter.md": {
-    "mtime": 1780590715.9890063,
+    "mtime": 1780620153.553651,
     "ast_hash": "f8fb910aa5295bb3096b1828128356da",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-lock-across-await.md": {
-    "mtime": 1780590715.9890063,
+    "mtime": 1780620153.553651,
     "ast_hash": "ecfe28df3d5a21822fafaa9e74ac2bdc",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-over-abstraction.md": {
-    "mtime": 1780590715.9900124,
+    "mtime": 1780620153.553651,
     "ast_hash": "1440d698fb5b16664f0ee6a66d134894",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-panic-expected.md": {
-    "mtime": 1780590715.990564,
+    "mtime": 1780620153.554829,
     "ast_hash": "e8af22989ecc00b2d9ce8a30b4d81fe8",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-premature-optimize.md": {
-    "mtime": 1780590715.991575,
+    "mtime": 1780620153.554829,
     "ast_hash": "e031f685f7da0ef8689b49c6acbfaefc",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-string-for-str.md": {
-    "mtime": 1780590715.991575,
+    "mtime": 1780620153.554829,
     "ast_hash": "0484ae7f9bd57c0001de28abd775cab3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-stringly-typed.md": {
-    "mtime": 1780590715.991575,
+    "mtime": 1780620153.5558276,
     "ast_hash": "f843faac1df816730b321b13cb6f7725",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-type-erasure.md": {
-    "mtime": 1780590715.9925902,
+    "mtime": 1780620153.5558276,
     "ast_hash": "fb0950b95a12f5838623cfcebc120642",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-unwrap-abuse.md": {
-    "mtime": 1780590715.9925902,
+    "mtime": 1780620153.5558276,
     "ast_hash": "1d59ba24c13580d17e5ee1245aee1c61",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/anti-vec-for-slice.md": {
-    "mtime": 1780590715.9936612,
+    "mtime": 1780620153.5558276,
     "ast_hash": "e24ba1dc09317a4cdc20f81a26c3f555",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-builder-must-use.md": {
-    "mtime": 1780590715.9936612,
+    "mtime": 1780620153.556827,
     "ast_hash": "d3167b8afb7c4a5261a40bf462c571f7",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-builder-pattern.md": {
-    "mtime": 1780590715.9946773,
+    "mtime": 1780620153.556827,
     "ast_hash": "a40759193ef612a3074fbe282be23bb2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-common-traits.md": {
-    "mtime": 1780590715.9956923,
+    "mtime": 1780620153.556827,
     "ast_hash": "7f325f736a336c64c6460f354236e4e2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-default-impl.md": {
-    "mtime": 1780590715.9956923,
+    "mtime": 1780620153.5578275,
     "ast_hash": "3d0e473cab11e7ff69b9ac243dab2219",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-extension-trait.md": {
-    "mtime": 1780590715.9956923,
+    "mtime": 1780620153.5578275,
     "ast_hash": "be519ae6848ce9bc0267af217c8e30b8",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-from-not-into.md": {
-    "mtime": 1780590715.997492,
+    "mtime": 1780620153.5578275,
     "ast_hash": "5d8738ea281ac8a7304d46a5b3de6708",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-impl-asref.md": {
-    "mtime": 1780590715.997492,
+    "mtime": 1780620153.5578275,
     "ast_hash": "4a2c741a6b69e531f564e18114bb46e8",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-impl-into.md": {
-    "mtime": 1780590715.9985707,
+    "mtime": 1780620153.5588272,
     "ast_hash": "b9f4d9b7ce11f0d39ab0211b101891d9",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-must-use.md": {
-    "mtime": 1780590715.9985707,
+    "mtime": 1780620153.5588272,
     "ast_hash": "b947f685a390a8bc11b8c46ba7c381c2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-newtype-safety.md": {
-    "mtime": 1780590715.9985707,
+    "mtime": 1780620153.5598273,
     "ast_hash": "4ac0cb749d16df8825b27e16525cc18c",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-non-exhaustive.md": {
-    "mtime": 1780590715.9995778,
+    "mtime": 1780620153.5598273,
     "ast_hash": "298c1e587104ade666cb7d2a20792ffd",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-parse-dont-validate.md": {
-    "mtime": 1780590715.9995778,
+    "mtime": 1780620153.560827,
     "ast_hash": "a54b4631ce687c0e1ae178339947c2c1",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-sealed-trait.md": {
-    "mtime": 1780590716.0010848,
+    "mtime": 1780620153.560827,
     "ast_hash": "0dc9fdad1074dd8a23252e1760c754d5",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-serde-optional.md": {
-    "mtime": 1780590716.0010848,
+    "mtime": 1780620153.5613308,
     "ast_hash": "b4526c329758d12452aade411bb96949",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/api-typestate.md": {
-    "mtime": 1780590716.0022204,
+    "mtime": 1780620153.5613308,
     "ast_hash": "3691b5fe6b840215cbc2aa20650e2bb1",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-bounded-channel.md": {
-    "mtime": 1780590716.0032682,
+    "mtime": 1780620153.5618339,
     "ast_hash": "19acfd2a44e078ee1c1e9a71c04cec5a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-broadcast-pubsub.md": {
-    "mtime": 1780590716.0032682,
+    "mtime": 1780620153.5618339,
     "ast_hash": "97ca4038c34289441c0418b7cea352ef",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-clone-before-await.md": {
-    "mtime": 1780590716.0042913,
+    "mtime": 1780620153.5628386,
     "ast_hash": "f2e42fad002f5eb80e1a5d357de183f0",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-join-parallel.md": {
-    "mtime": 1780590716.0053184,
+    "mtime": 1780620153.5638416,
     "ast_hash": "5d8857c082501341c6c1d1aaf996bb36",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-joinset-structured.md": {
-    "mtime": 1780590716.0058713,
+    "mtime": 1780620153.5638416,
     "ast_hash": "c77adc5080be8c1a87747db9f903dd9b",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-mpsc-queue.md": {
-    "mtime": 1780590716.0058713,
+    "mtime": 1780620153.5638416,
     "ast_hash": "03a3ac535dd72239e50c713376383d9a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-no-lock-await.md": {
-    "mtime": 1780590716.0068865,
+    "mtime": 1780620153.5648422,
     "ast_hash": "30fb27535d30f132afef02f384e05d77",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-oneshot-response.md": {
-    "mtime": 1780590716.0068865,
+    "mtime": 1780620153.5648422,
     "ast_hash": "41bbd449dab1441044a5093c973ff8be",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-select-racing.md": {
-    "mtime": 1780590716.0079167,
+    "mtime": 1780620153.5648422,
     "ast_hash": "8456cf482410e7c7e371e93ec4d5eeee",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-spawn-blocking.md": {
-    "mtime": 1780590716.0089345,
+    "mtime": 1780620153.5658429,
     "ast_hash": "336edd747218fc770c51e04f35ffa15f",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-tokio-fs.md": {
-    "mtime": 1780590716.0089345,
+    "mtime": 1780620153.5658429,
     "ast_hash": "752de7ad63502fc377f7922e41e80010",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-tokio-runtime.md": {
-    "mtime": 1780590716.0089345,
+    "mtime": 1780620153.5658429,
     "ast_hash": "a08a71b4b197309fdb34829aa1cceb08",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-try-join.md": {
-    "mtime": 1780590716.0101233,
+    "mtime": 1780620153.5688412,
     "ast_hash": "90eb6c281a81c2ce5f028a2493617086",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/async-watch-latest.md": {
-    "mtime": 1780590716.0111349,
+    "mtime": 1780620153.5688412,
     "ast_hash": "94aad11afd665e8c1466db9a53f2bf0a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-all-public.md": {
-    "mtime": 1780590716.0111349,
+    "mtime": 1780620153.5688412,
     "ast_hash": "c0f6c5ac2f49ca601eea0c818074578e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-cargo-metadata.md": {
-    "mtime": 1780590716.0111349,
+    "mtime": 1780620153.569842,
     "ast_hash": "e26f5ae5d6eb3926906abed46affcee3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-errors-section.md": {
-    "mtime": 1780590716.0126402,
+    "mtime": 1780620153.569842,
     "ast_hash": "0945f8ae5930a53a7bdb7860c638e62c",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-examples-section.md": {
-    "mtime": 1780590716.0126402,
+    "mtime": 1780620153.569842,
     "ast_hash": "4269de7c1f47fda7ce6610d398e3ef54",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-hidden-setup.md": {
-    "mtime": 1780590716.0136495,
+    "mtime": 1780620153.569842,
     "ast_hash": "04490108009aaca8ab44254b9035deea",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-intra-links.md": {
-    "mtime": 1780590716.0136495,
+    "mtime": 1780620153.5708418,
     "ast_hash": "0e78d4b56e95b875cbd4a6c2f36dc8b0",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-link-types.md": {
-    "mtime": 1780590716.0146568,
+    "mtime": 1780620153.5713449,
     "ast_hash": "4e630e85bb04dcc68679cff1eac5eb3b",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-module-inner.md": {
-    "mtime": 1780590716.0146568,
+    "mtime": 1780620153.5713449,
     "ast_hash": "d4c61321c8957ebd236cf752487467b2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-panics-section.md": {
-    "mtime": 1780590716.0156884,
+    "mtime": 1780620153.5718474,
     "ast_hash": "45e077583bd097a4846d6e2130a128a6",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-question-mark.md": {
-    "mtime": 1780590716.0156884,
+    "mtime": 1780620153.5728538,
     "ast_hash": "52ecb24cc18207be9fe19860b42be8fe",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/doc-safety-section.md": {
-    "mtime": 1780590716.0166967,
+    "mtime": 1780620153.5728538,
     "ast_hash": "21546d91989e6fe59ba762f42d0c3347",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-anyhow-app.md": {
-    "mtime": 1780590716.0166967,
+    "mtime": 1780620153.573854,
     "ast_hash": "9511a7c81edf0cea8cbc005fa314ca8f",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-context-chain.md": {
-    "mtime": 1780590716.0177205,
+    "mtime": 1780620153.5742366,
     "ast_hash": "bc96746a758e47d6c33df0766366981c",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-custom-type.md": {
-    "mtime": 1780590716.0187466,
+    "mtime": 1780620153.5742366,
     "ast_hash": "6f120808e60c5fcd22df01721cbddfa1",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-doc-errors.md": {
-    "mtime": 1780590716.0187466,
+    "mtime": 1780620153.5748541,
     "ast_hash": "540b12fdd83d8b5c556ffd9e464b39c0",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-expect-bugs-only.md": {
-    "mtime": 1780590716.0187466,
+    "mtime": 1780620153.5748541,
     "ast_hash": "9eb1c2a64958c7098b44e997c965dec3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-from-impl.md": {
-    "mtime": 1780590716.019778,
+    "mtime": 1780620153.5758524,
     "ast_hash": "8f165200503e932eff90fa603b5f8b86",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-lowercase-msg.md": {
-    "mtime": 1780590716.019778,
+    "mtime": 1780620153.5758524,
     "ast_hash": "d8cf5eda61391dc82165c6162a11ce03",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-no-unwrap-prod.md": {
-    "mtime": 1780590716.0213528,
+    "mtime": 1780620153.5768533,
     "ast_hash": "fb8e33859dc9844b994c4278c4af65e9",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-question-mark.md": {
-    "mtime": 1780590716.0213528,
+    "mtime": 1780620153.5768533,
     "ast_hash": "e9209705aed2e3a887df6ead335a9a19",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-result-over-panic.md": {
-    "mtime": 1780590716.022363,
+    "mtime": 1780620153.5778522,
     "ast_hash": "18a1621092605bad8bed4439ab61c5af",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-source-chain.md": {
-    "mtime": 1780590716.022363,
+    "mtime": 1780620153.5778522,
     "ast_hash": "847a4092dcfbedaef3d0786fb2b40053",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/err-thiserror-lib.md": {
-    "mtime": 1780590716.0233696,
+    "mtime": 1780620153.5778522,
     "ast_hash": "d1cf2b6c79cc3977a27b8f11e1e9f3a5",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-cargo-metadata.md": {
-    "mtime": 1780590716.0233696,
+    "mtime": 1780620153.578852,
     "ast_hash": "a2766314e4a8b4be5c722056c4e43541",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-deny-correctness.md": {
-    "mtime": 1780590716.0244062,
+    "mtime": 1780620153.578852,
     "ast_hash": "6e076777a78a19eb0efe05566b04340e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-missing-docs.md": {
-    "mtime": 1780590716.0244062,
+    "mtime": 1780620153.5798516,
     "ast_hash": "e8912941f5adad344d22ff7ce4f45e3e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-pedantic-selective.md": {
-    "mtime": 1780590716.0254369,
+    "mtime": 1780620153.5808516,
     "ast_hash": "1de2450cb891b8714b9b51fd81272e79",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-rustfmt-check.md": {
-    "mtime": 1780590716.0254369,
+    "mtime": 1780620153.5808516,
     "ast_hash": "a79bcc050e70bad3bb0bcb575055ca64",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-unsafe-doc.md": {
-    "mtime": 1780590716.0264435,
+    "mtime": 1780620153.5813556,
     "ast_hash": "719ac388a6d6697759a982d5195c2a01",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-warn-complexity.md": {
-    "mtime": 1780590716.0264435,
+    "mtime": 1780620153.5818586,
     "ast_hash": "3e0c67acdf6f333af5f1302b21b58708",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-warn-perf.md": {
-    "mtime": 1780590716.02745,
+    "mtime": 1780620153.5818586,
     "ast_hash": "b2f4afbcf8b2c97dc6894fffe8f5fc44",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-warn-style.md": {
-    "mtime": 1780590716.02745,
+    "mtime": 1780620153.5818586,
     "ast_hash": "abd37d04352136a171bb85fa921fa577",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-warn-suspicious.md": {
-    "mtime": 1780590716.0284698,
+    "mtime": 1780620153.582863,
     "ast_hash": "84df44351113c7cf54a6ae5db02fbee1",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/lint-workspace-lints.md": {
-    "mtime": 1780590716.0284698,
+    "mtime": 1780620153.582863,
     "ast_hash": "ea59bafa58cf85a95b896a05b85f81ca",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-arena-allocator.md": {
-    "mtime": 1780590716.0284698,
+    "mtime": 1780620153.582863,
     "ast_hash": "27d72d3d7b1e2a13c5968e99c3cd33f3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-arrayvec.md": {
-    "mtime": 1780590716.029477,
+    "mtime": 1780620153.5838668,
     "ast_hash": "cf4c345d7f35e533f67753f65e025c5e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-assert-type-size.md": {
-    "mtime": 1780590716.029477,
+    "mtime": 1780620153.5838668,
     "ast_hash": "e8de53b4616332aeab3b3cb410fb04c2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-avoid-format.md": {
-    "mtime": 1780590716.030981,
+    "mtime": 1780620153.5838668,
     "ast_hash": "9cdef79e9d43c63279a7a7e80ef206fe",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-box-large-variant.md": {
-    "mtime": 1780590716.030981,
+    "mtime": 1780620153.5848665,
     "ast_hash": "f7497e7a700d6ef142c3af5cdcf62beb",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-boxed-slice.md": {
-    "mtime": 1780590716.031991,
+    "mtime": 1780620153.5848665,
     "ast_hash": "ca46d3f65fb0f59d2649dad482cba95e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-clone-from.md": {
-    "mtime": 1780590716.031991,
+    "mtime": 1780620153.5848665,
     "ast_hash": "70f576c4efe4dd06032cad1a6cb0668d",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-compact-string.md": {
-    "mtime": 1780590716.033012,
+    "mtime": 1780620153.585867,
     "ast_hash": "a525f4e3eebf09d19a46247939153a7a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-reuse-collections.md": {
-    "mtime": 1780590716.033012,
+    "mtime": 1780620153.585867,
     "ast_hash": "92ee621c565c5f9fd668abd9db0b8a61",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-smaller-integers.md": {
-    "mtime": 1780590716.034019,
+    "mtime": 1780620153.585867,
     "ast_hash": "16cf30e9522fc6336f40fe41680e4ad9",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-smallvec.md": {
-    "mtime": 1780590716.034019,
+    "mtime": 1780620153.5868688,
     "ast_hash": "a616bf9f0044cf60f984ba09825e6f41",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-thinvec.md": {
-    "mtime": 1780590716.0350351,
+    "mtime": 1780620153.5878663,
     "ast_hash": "ca0c9ac826454cfa5404e8f487c79073",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-with-capacity.md": {
-    "mtime": 1780590716.0350351,
+    "mtime": 1780620153.5878663,
     "ast_hash": "be94e346054e81b36c1592b4e6f69c7d",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-write-over-format.md": {
-    "mtime": 1780590716.036043,
+    "mtime": 1780620153.5878663,
     "ast_hash": "fa04927a9753af081b3a671d4b346a50",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/mem-zero-copy.md": {
-    "mtime": 1780590716.0365763,
+    "mtime": 1780620153.5888677,
     "ast_hash": "015d7350d2bb1ddc5ad3045a48287fdf",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-acronym-word.md": {
-    "mtime": 1780590716.03759,
+    "mtime": 1780620153.5888677,
     "ast_hash": "f69f4b0e9d2777c3b9426e94473a6670",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-as-free.md": {
-    "mtime": 1780590716.03759,
+    "mtime": 1780620153.5898676,
     "ast_hash": "f2382669c4eff6137eb202eaedde092a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-consts-screaming.md": {
-    "mtime": 1780590716.03759,
+    "mtime": 1780620153.5898676,
     "ast_hash": "692e3b662ac49eb17cd3247a384692f4",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-crate-no-rs.md": {
-    "mtime": 1780590716.0385966,
+    "mtime": 1780620153.5898676,
     "ast_hash": "4a3db780a2e984b1d1b841b776a0cabe",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-funcs-snake.md": {
-    "mtime": 1780590716.0396032,
+    "mtime": 1780620153.5908682,
     "ast_hash": "0114285b9b8cfd1f1c02ae2af491b151",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-into-ownership.md": {
-    "mtime": 1780590716.0396032,
+    "mtime": 1780620153.5908682,
     "ast_hash": "f7a9761da90bcb28b2f58f60f28785a8",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-is-has-bool.md": {
-    "mtime": 1780590716.040629,
+    "mtime": 1780620153.5908682,
     "ast_hash": "789aca8dfc7bf6adabdc5c840a6b0614",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-iter-convention.md": {
-    "mtime": 1780590716.040629,
+    "mtime": 1780620153.5908682,
     "ast_hash": "53222cd72a94dc8551288646e65920b7",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-iter-method.md": {
-    "mtime": 1780590716.0416453,
+    "mtime": 1780620153.5922673,
     "ast_hash": "3192ec1e9a9f1f54aa9eebf1d0268eb2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-iter-type-match.md": {
-    "mtime": 1780590716.0416453,
+    "mtime": 1780620153.5922673,
     "ast_hash": "a517315112fb79d54b2d62df550f3842",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-lifetime-short.md": {
-    "mtime": 1780590716.042652,
+    "mtime": 1780620153.5932734,
     "ast_hash": "139892ca5f1bc528ebfea32680b89a15",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-no-get-prefix.md": {
-    "mtime": 1780590716.042652,
+    "mtime": 1780620153.5932734,
     "ast_hash": "bf125aa6e702abbad4f8934eec06cdb6",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-to-expensive.md": {
-    "mtime": 1780590716.0436585,
+    "mtime": 1780620153.5932734,
     "ast_hash": "8b612f391755e458c28474cfa3094b89",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-type-param-single.md": {
-    "mtime": 1780590716.0436585,
+    "mtime": 1780620153.594233,
     "ast_hash": "96e8a25b0bc863345ad950c77e6b8eb3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-types-camel.md": {
-    "mtime": 1780590716.044677,
+    "mtime": 1780620153.594233,
     "ast_hash": "194e114bffb62bab089e3afec87363b3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/name-variants-camel.md": {
-    "mtime": 1780590716.044677,
+    "mtime": 1780620153.594233,
     "ast_hash": "ab48427560a4cec74daf06f76f0f47dc",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-bounds-check.md": {
-    "mtime": 1780590716.045684,
+    "mtime": 1780620153.5952713,
     "ast_hash": "a30b24e67cb1ecd0481e3c877eb95e44",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-cache-friendly.md": {
-    "mtime": 1780590716.045684,
+    "mtime": 1780620153.5952713,
     "ast_hash": "176afcaaa666a69a6dd80045b768253c",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-codegen-units.md": {
-    "mtime": 1780590716.045684,
+    "mtime": 1780620153.595775,
     "ast_hash": "8026623ae6f378a40d10ec3e4a917f98",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-cold-unlikely.md": {
-    "mtime": 1780590716.0471883,
+    "mtime": 1780620153.595775,
     "ast_hash": "bcd803facf76d6e566d85bdf0c67139c",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-inline-always-rare.md": {
-    "mtime": 1780590716.0471883,
+    "mtime": 1780620153.595775,
     "ast_hash": "219f9f68a11e7d20ecf907cb06bb4fad",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-inline-never-cold.md": {
-    "mtime": 1780590716.0482807,
+    "mtime": 1780620153.5967786,
     "ast_hash": "022cdb27c90bde50488df717231dfc1d",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-inline-small.md": {
-    "mtime": 1780590716.0482807,
+    "mtime": 1780620153.5967786,
     "ast_hash": "17b7f924151e057d47281cf58dce1c01",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-likely-hint.md": {
-    "mtime": 1780590716.0492878,
+    "mtime": 1780620153.5967786,
     "ast_hash": "7378dd57076435d77a5f7f7975b0cb8f",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-lto-release.md": {
-    "mtime": 1780590716.0492878,
+    "mtime": 1780620153.5967786,
     "ast_hash": "a6e2b107546b3cc349567f05c292abb0",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-pgo-profile.md": {
-    "mtime": 1780590716.0503178,
+    "mtime": 1780620153.5977798,
     "ast_hash": "c5b2bf61a51501dbf1961f537eae3551",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-simd-portable.md": {
-    "mtime": 1780590716.0503178,
+    "mtime": 1780620153.5977798,
     "ast_hash": "f378fa8307fa799a8543067f8b58ea3b",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/opt-target-cpu.md": {
-    "mtime": 1780590716.0513175,
+    "mtime": 1780620153.5977798,
     "ast_hash": "250e0d40684cc7abf82ce9eaea1e0acf",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-arc-shared.md": {
-    "mtime": 1780590716.0518224,
+    "mtime": 1780620153.598779,
     "ast_hash": "fe617b0d1108802f88e4d1497ec9e8c3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-borrow-over-clone.md": {
-    "mtime": 1780590716.0526717,
+    "mtime": 1780620153.598779,
     "ast_hash": "fb0b18cb294404c40d56da957db38f18",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-clone-explicit.md": {
-    "mtime": 1780590716.0531769,
+    "mtime": 1780620153.598779,
     "ast_hash": "9a0cdd9ec0422f5f99c653f843483a7e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-copy-small.md": {
-    "mtime": 1780590716.054209,
+    "mtime": 1780620153.598779,
     "ast_hash": "bbd6cf2887a2c6b486043b808bb9cd20",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-cow-conditional.md": {
-    "mtime": 1780590716.054209,
+    "mtime": 1780620153.5997787,
     "ast_hash": "59c311d93a2475e147fa7d4e6fbb6df3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-lifetime-elision.md": {
-    "mtime": 1780590716.0552301,
+    "mtime": 1780620153.5997787,
     "ast_hash": "091f75b039566f06d45930e19b721ed9",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-move-large.md": {
-    "mtime": 1780590716.0552301,
+    "mtime": 1780620153.5997787,
     "ast_hash": "f121595eb1c8bdac9d9581b153b3e105",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-mutex-interior.md": {
-    "mtime": 1780590716.0562527,
+    "mtime": 1780620153.6007788,
     "ast_hash": "3792755dbb1a2537cb02efb8e61fdb28",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-rc-single-thread.md": {
-    "mtime": 1780590716.0562527,
+    "mtime": 1780620153.6007788,
     "ast_hash": "293330aa63a316620b545997b325ece3",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-refcell-interior.md": {
-    "mtime": 1780590716.0573046,
+    "mtime": 1780620153.6012826,
     "ast_hash": "bc5d2bf5f2bce27067df8f4fd464a306",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-rwlock-readers.md": {
-    "mtime": 1780590716.0573046,
+    "mtime": 1780620153.6012826,
     "ast_hash": "79e6201fb3fe6b097e5686b3f4d73bd9",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/own-slice-over-vec.md": {
-    "mtime": 1780590716.0583124,
+    "mtime": 1780620153.6017866,
     "ast_hash": "931ba79d91b871f78bed203b36f1a3a4",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-black-box-bench.md": {
-    "mtime": 1780590716.0583124,
+    "mtime": 1780620153.6017866,
     "ast_hash": "bcd3c51800a7c4694128228dde308fb1",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-chain-avoid.md": {
-    "mtime": 1780590716.0593188,
+    "mtime": 1780620153.6017866,
     "ast_hash": "aea0930fc5b8d9e09ee7478a132b567a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-collect-into.md": {
-    "mtime": 1780590716.0593188,
+    "mtime": 1780620153.6027918,
     "ast_hash": "07e4f76ae2a073dca51f9761dd2d7bb8",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-collect-once.md": {
-    "mtime": 1780590716.0603254,
+    "mtime": 1780620153.6027918,
     "ast_hash": "6f00b455905837bb45255de541b194c1",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-drain-reuse.md": {
-    "mtime": 1780590716.0603254,
+    "mtime": 1780620153.6027918,
     "ast_hash": "a0c7c9ac922040e537bbef41eb30892b",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-entry-api.md": {
-    "mtime": 1780590716.0613537,
+    "mtime": 1780620153.6027918,
     "ast_hash": "fa83ad781e74be37c254646e91a0a131",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-extend-batch.md": {
-    "mtime": 1780590716.0613537,
+    "mtime": 1780620153.6037924,
     "ast_hash": "07d553d53b282ac9a76db500a86629f4",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-iter-lazy.md": {
-    "mtime": 1780590716.0613537,
+    "mtime": 1780620153.604297,
     "ast_hash": "6ad54c377781f2964af7e707c1d7e711",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-iter-over-index.md": {
-    "mtime": 1780590716.0628583,
+    "mtime": 1780620153.604297,
     "ast_hash": "1af721e0c3bb76946934c633f4508e5b",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-profile-first.md": {
-    "mtime": 1780590716.0628583,
+    "mtime": 1780620153.604297,
     "ast_hash": "78f9e4b4e026f42729f29d70ca97d932",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/perf-release-profile.md": {
-    "mtime": 1780590716.0639398,
+    "mtime": 1780620153.6053014,
     "ast_hash": "a7358b2a7f6d7fe5051b5b80d7755a2a",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-bin-dir.md": {
-    "mtime": 1780590716.0639398,
+    "mtime": 1780620153.6053014,
     "ast_hash": "c65569f5e0f3fa5d8632a6647f358f91",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-flat-small.md": {
-    "mtime": 1780590716.0649471,
+    "mtime": 1780620153.6053014,
     "ast_hash": "37651511700da2e5bf17d78d1d194f3b",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-lib-main-split.md": {
-    "mtime": 1780590716.0649471,
+    "mtime": 1780620153.6063023,
     "ast_hash": "0fe42694503dc43c9f722cd5430c70a6",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-mod-by-feature.md": {
-    "mtime": 1780590716.0659733,
+    "mtime": 1780620153.6063023,
     "ast_hash": "6a65a3341687adf61f53d6631b97d634",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-mod-rs-dir.md": {
-    "mtime": 1780590716.0659733,
+    "mtime": 1780620153.6063023,
     "ast_hash": "558e6ff1656e234f762cfd2ed08a5d79",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-prelude-module.md": {
-    "mtime": 1780590716.0675218,
+    "mtime": 1780620153.6063023,
     "ast_hash": "d5b67cb588f10f23648fbb65539a7c94",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-pub-crate-internal.md": {
-    "mtime": 1780590716.0675218,
+    "mtime": 1780620153.6073017,
     "ast_hash": "24cc7f1c3c9563d4471ae683e6a8818c",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-pub-super-parent.md": {
-    "mtime": 1780590716.0685341,
+    "mtime": 1780620153.6073017,
     "ast_hash": "bf4f66d75a9257c7a9c1c2672239894c",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-pub-use-reexport.md": {
-    "mtime": 1780590716.0685341,
+    "mtime": 1780620153.6073017,
     "ast_hash": "8a42af03b5be30a6b4dd8477f695cfb5",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-workspace-deps.md": {
-    "mtime": 1780590716.0695417,
+    "mtime": 1780620153.608302,
     "ast_hash": "e297ee26840bbfcf918758b57ad70d2e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/proj-workspace-large.md": {
-    "mtime": 1780590716.0695417,
+    "mtime": 1780620153.608302,
     "ast_hash": "e6ab25d3a50d325c94477ddd25c92a82",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-arrange-act-assert.md": {
-    "mtime": 1780590716.0705469,
+    "mtime": 1780620153.608302,
     "ast_hash": "847e40f978e3452a1261a3dfb37afb16",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-cfg-test-module.md": {
-    "mtime": 1780590716.0705469,
+    "mtime": 1780620153.6093018,
     "ast_hash": "2b0842b2f2518120e636426d33eda7af",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-criterion-bench.md": {
-    "mtime": 1780590716.0715625,
+    "mtime": 1780620153.6093018,
     "ast_hash": "c3eb8c4885c9cedfcaea5772c1d856bb",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-descriptive-names.md": {
-    "mtime": 1780590716.0715625,
+    "mtime": 1780620153.6093018,
     "ast_hash": "226113f9904842174b74165118b705d9",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-doctest-examples.md": {
-    "mtime": 1780590716.0725691,
+    "mtime": 1780620153.6093018,
     "ast_hash": "cbe84152a4073dd0c775efccdc8e0a07",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-fixture-raii.md": {
-    "mtime": 1780590716.0725691,
+    "mtime": 1780620153.6093018,
     "ast_hash": "c61cc60f95bd959f4f7163200a4d65d2",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-integration-dir.md": {
-    "mtime": 1780590716.0736494,
+    "mtime": 1780620153.6093018,
     "ast_hash": "5176f0c0103ee8e01b33a705d7127772",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-mock-traits.md": {
-    "mtime": 1780590716.0736494,
+    "mtime": 1780620153.6108062,
     "ast_hash": "45406e6ba17bb39ddae66f505a359e2e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-mockall-mocking.md": {
-    "mtime": 1780590716.0746677,
+    "mtime": 1780620153.6108062,
     "ast_hash": "b1ae49034876e61a3888960f7e746721",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-proptest-properties.md": {
-    "mtime": 1780590716.0746677,
+    "mtime": 1780620153.6108062,
     "ast_hash": "0ea429716854a071ce904eff79987c82",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-should-panic.md": {
-    "mtime": 1780590716.0756717,
+    "mtime": 1780620153.6118104,
     "ast_hash": "316bad70aa719d0f9aea410ac23b16a7",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-tokio-async.md": {
-    "mtime": 1780590716.0756717,
+    "mtime": 1780620153.6118104,
     "ast_hash": "9bff0ab233c2ca568a6221acc51c13cf",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/test-use-super.md": {
-    "mtime": 1780590716.0767026,
+    "mtime": 1780620153.6118104,
     "ast_hash": "9249ea840d4aca334c5f7e96328cbaa7",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-enum-states.md": {
-    "mtime": 1780590716.0767026,
+    "mtime": 1780620153.6118104,
     "ast_hash": "7c60e9d26f2ac21047d08bed5d5958ce",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-generic-bounds.md": {
-    "mtime": 1780590716.0777247,
+    "mtime": 1780620153.612861,
     "ast_hash": "126f439008942f164b9a172e975f6884",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-never-diverge.md": {
-    "mtime": 1780590716.0777247,
+    "mtime": 1780620153.612861,
     "ast_hash": "afe33f37ac8c40249c977d8ebc8b5435",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-newtype-ids.md": {
-    "mtime": 1780590716.0787492,
+    "mtime": 1780620153.6136606,
     "ast_hash": "5e26216d7d9e02a2f6523d2af59c77c9",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-newtype-validated.md": {
-    "mtime": 1780590716.0787492,
+    "mtime": 1780620153.6136606,
     "ast_hash": "e1182215403e5812ae6b754150265475",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-no-stringly.md": {
-    "mtime": 1780590716.0797527,
+    "mtime": 1780620153.6136606,
     "ast_hash": "e23a1a6d6a3e7d2bc289b7aef59cb32e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-option-nullable.md": {
-    "mtime": 1780590716.0797527,
+    "mtime": 1780620153.6136606,
     "ast_hash": "421de472a5d64aa7604bfcaa92039ebc",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-phantom-marker.md": {
-    "mtime": 1780590716.0797527,
+    "mtime": 1780620153.6148596,
     "ast_hash": "a6a7e22c34a6b6e06c715cfe4a06903b",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-repr-transparent.md": {
-    "mtime": 1780590716.0812564,
+    "mtime": 1780620153.6148596,
     "ast_hash": "f8f36448dd24a02a4acd6358f167b00e",
     "semantic_hash": ""
   },
   ".agents/skills/rust-skills/rules/type-result-fallible.md": {
-    "mtime": 1780590716.0812564,
+    "mtime": 1780620153.6148596,
     "ast_hash": "c9762214fd30ddb320c95bdf57cc9073",
     "semantic_hash": ""
   },
   "docs/auditoria_memoria_rust.md": {
-    "mtime": 1780591794.918401,
-    "ast_hash": "0488be5476c634406f5290d73d16c491",
+    "mtime": 1780620153.6218715,
+    "ast_hash": "e47e6019a8b5ee8b17a73f326c221be9",
     "semantic_hash": ""
   },
   "docs/auditoria_plano_de_features.md": {
-    "mtime": 1780592524.9171946,
-    "ast_hash": "89e2d80ebdb0b9d1cc453c46c5218070",
+    "mtime": 1780620153.6228771,
+    "ast_hash": "07a6a99a78c8fe247ac6e76bfce80bee",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CAI NA GANDAIA-mesa-maria.json": {
-    "mtime": 1780800157.0039797,
+    "mtime": 1780925484.7315142,
     "ast_hash": "224e5ff2e306e1158762ca888887972c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CENA_TESTE_222-mesa-teste.json": {
-    "mtime": 1780712992.8691752,
+    "mtime": 1780925484.732028,
     "ast_hash": "e22df4aab51e35420e0361058e87e4f8",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-PGD ONLINE 360-mesa-maria.json": {
-    "mtime": 1784946243.7809072,
+    "mtime": 1785015065.0726492,
     "ast_hash": "268f266333b4b20cf3f19e5822085ff9",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SARU-mesa-favela.json": {
-    "mtime": 1783835829.7521362,
-    "ast_hash": "c9ab50ce0fa757b578d4a5879b7b6969",
+    "mtime": 1784007762.9401367,
+    "ast_hash": "864141d834faf9ea820e0942b70db6dd",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-favela.json": {
-    "mtime": 1784782909.4104347,
-    "ast_hash": "dad01e837433923794561420e32241c1",
+    "mtime": 1785015065.0742066,
+    "ast_hash": "dc36e5d8664194a77b21195bdfb7c72d",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-maria.json": {
-    "mtime": 1784946243.7819567,
-    "ast_hash": "8ac738927d024051f1ff3ba5830a480d",
+    "mtime": 1785015065.0742066,
+    "ast_hash": "666dd104ded21668086bbc3c48bbdb0c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-teste.json": {
-    "mtime": 1781317321.101776,
-    "ast_hash": "2a595991719b4feb18a343915e54097f",
+    "mtime": 1781237326.140743,
+    "ast_hash": "0655b2798fa459acb765909737abbb20",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-LIVRE P SONHAR-mesa-maria.json": {
-    "mtime": 1780884815.7269082,
+    "mtime": 1780925484.732028,
     "ast_hash": "dad108f52cde2b6e256e1730d4047712",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-REGIS-mesa-favela.json": {
-    "mtime": 1784782181.8680809,
-    "ast_hash": "bf46cc9efffa3a07485106ab836e6184",
+    "mtime": 1785015065.0731702,
+    "ast_hash": "eafe87b1a93bd0e14a4aceb7d6c194b8",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CENA TESTE 222-mesa-teste.json": {
-    "mtime": 1781317321.0993083,
+    "mtime": 1781205538.0911229,
     "ast_hash": "fcc29b32a8f4a817069dc3c3d650b316",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-FORRO ENGATILH-mesa-favela.json": {
-    "mtime": 1781159759.4476197,
-    "ast_hash": "6be0fb4b22e026042fe46f341c29637f",
+    "mtime": 1781181400.5032387,
+    "ast_hash": "d70230b0f80b75c65e516a0447b6f853",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-FORRO ENGATILHA-mesa-favela.json": {
-    "mtime": 1781148157.8424604,
-    "ast_hash": "20774da7e869fc11b3c174b0ccb2ccb7",
+    "mtime": 1781181400.5037687,
+    "ast_hash": "261e3690239d92149a1444dc67f5653c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-PISEIRO-mesa-favela.json": {
-    "mtime": 1784782909.4061103,
-    "ast_hash": "273bd0eea88d3cdae627c13ed40b58e6",
+    "mtime": 1785015065.0731702,
+    "ast_hash": "afd7c324ab4884dbfafc4f47c091f8d6",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-PISEIRO2-mesa-favela.json": {
-    "mtime": 1781163080.9872735,
-    "ast_hash": "c2f0a3cb7fb0afafddfcfe4d39504638",
+    "mtime": 1781181400.504829,
+    "ast_hash": "27e90d3db1363f4969dd302a213efc14",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SOMALIA-mesa-maria.json": {
-    "mtime": 1782951779.7164004,
+    "mtime": 1783400375.7842462,
     "ast_hash": "9a39d9d2271bb25d4599b1330303400e",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/global-names-mesa-favela.json": {
-    "mtime": 1784433048.1501513,
-    "ast_hash": "13c9175b45af5c8d45915f93410a2d71",
+    "mtime": 1785015065.0742066,
+    "ast_hash": "eac1a9de6af222955cd69a183ab42ebb",
     "semantic_hash": ""
   },
   "docs/mapeamento_de_comandos.md": {
-    "mtime": 1781317321.1029868,
-    "ast_hash": "534b4f16c92b1bd70d772120c4118ad9",
+    "mtime": 1781248862.323786,
+    "ast_hash": "f552ded66ab85f6ac1aa0b18aef90777",
     "semantic_hash": ""
   },
   "docs/plano_feature_global_names.md": {
-    "mtime": 1781157688.8222804,
-    "ast_hash": "ea1e74d858c64f50459f5757759fe417",
+    "mtime": 1781181400.5073755,
+    "ast_hash": "f9e11abe947f1d4e53bd1e6d97635686",
     "semantic_hash": ""
   },
   "log/monitor_METERS_log.txt": {
-    "mtime": 1781147577.8016086,
+    "mtime": 1781181400.5073755,
     "ast_hash": "a2ff4b389c5b786d5021d192f6cd234e",
     "semantic_hash": ""
   },
@@ -2530,683 +2530,618 @@
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
-    "mtime": 1781506384.2439227,
+    "mtime": 1781519200.9648125,
     "ast_hash": "dbad8b0e8751bf7dcdc954328376ab3b",
     "semantic_hash": ""
   },
   "client_wasm/src/meters.rs": {
-    "mtime": 1781922246.505964,
+    "mtime": 1781875390.0024338,
     "ast_hash": "bda6940155b8b4050b432d9f967c1a57",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CENA TESTE 22-mesa-teste.json": {
-    "mtime": 1781317321.0979643,
+    "mtime": 1781205538.0905876,
     "ast_hash": "eb62756df80cb171a16002983646317f",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CENA TESTE 3-mesa-teste.json": {
-    "mtime": 1781317321.0993083,
-    "ast_hash": "71f0c2532c7dc610800fee5d84dd12b4",
+    "mtime": 1781237266.780205,
+    "ast_hash": "d34bea3e781eb860557ee4e9332eb1f4",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-TESTE 1-mesa-teste.json": {
-    "mtime": 1781317321.100458,
-    "ast_hash": "f99d2c6a9ac3e7356bc923b3b61ff409",
+    "mtime": 1781237326.1392303,
+    "ast_hash": "ab57d2ab557edb065bd8ef99e2b523e2",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-TESTE 2-mesa-teste.json": {
-    "mtime": 1781317321.100458,
-    "ast_hash": "fa9c2acc784397d2e5f8b82498c6f602",
+    "mtime": 1781237385.579576,
+    "ast_hash": "69fc62612e29f244820b69d41ca6bba9",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/global-names-mesa-teste.json": {
-    "mtime": 1781317321.101776,
+    "mtime": 1781205538.0932677,
     "ast_hash": "f15e64047e4c29e5b2ce4998aa80d5c3",
     "semantic_hash": ""
   },
   "public/modules/copy_paste.js": {
-    "mtime": 1782108257.0871274,
+    "mtime": 1782161452.8479156,
     "ast_hash": "a156acb343e25580cad5cd38e6a51028",
     "semantic_hash": ""
   },
   "public/modules/inserts.js": {
-    "mtime": 1784427964.9578297,
+    "mtime": 1785015065.1499877,
     "ast_hash": "4bcc71dfdcc2302179e5790984fc733e",
     "semantic_hash": ""
   },
-  "public/wasm/client_wasm.d.ts": {
-    "mtime": 1781506406.5251741,
-    "ast_hash": "909c3a33c4da1b7b31bc26762cf1a511",
-    "semantic_hash": ""
-  },
   "public/wasm/client_wasm.js": {
-    "mtime": 1781922246.5174644,
-    "ast_hash": "05e5a8664dae170946293f12079612bc",
-    "semantic_hash": ""
-  },
-  "public/wasm/client_wasm_bg.wasm.d.ts": {
-    "mtime": 1781506406.526306,
-    "ast_hash": "c2f8357e9a7d13753ef93870984ee2b8",
+    "mtime": 1781876359.986109,
+    "ast_hash": "7c51568d2b88625bfc93aa7b1b94408e",
     "semantic_hash": ""
   },
   "public/wasm/package.json": {
-    "mtime": 1781744136.9055564,
-    "ast_hash": "b0ed64002d8ba56b9da9887bad29e445",
+    "mtime": 1781876360.7924728,
+    "ast_hash": "f6955dc4306c1e2cba81e6ef0851ea0c",
     "semantic_hash": ""
   },
   "server_rust/src/name_resolver.rs": {
-    "mtime": 1783131897.7109225,
+    "mtime": 1783400375.7996528,
     "ast_hash": "0b66909a43d34a1107046d8aab8e2bc6",
     "semantic_hash": ""
   },
   "docs/plano_de_implementacao_WASM.md": {
-    "mtime": 1781325288.8791738,
+    "mtime": 1781519200.9678154,
     "ast_hash": "4c7ccd13663b307c9e8b44435261eb30",
     "semantic_hash": ""
   },
   "docs/plano_de_implementacao_de_custom_layer.md": {
-    "mtime": 1781338386.8754172,
-    "ast_hash": "109e83fe8a8f5cefdb6f9540a1819567",
+    "mtime": 1781519200.9678154,
+    "ast_hash": "0e664fdc3991a5fb7aaf20c2aac4ca5f",
     "semantic_hash": ""
   },
   "docs/plano_implementacao_inserts.md": {
-    "mtime": 1781317321.1039858,
-    "ast_hash": "3af141ff2819f383e4516dc7b4ad88c7",
+    "mtime": 1781245667.834271,
+    "ast_hash": "ddccbda1784a7f315d20a902b241d66a",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-FILOSOFIA 360-mesa-maria.json": {
-    "mtime": 1781489964.5061102,
+    "mtime": 1781519200.9658172,
     "ast_hash": "a00d44f5be973642dc0fc8563fbf4bd7",
     "semantic_hash": ""
   },
   "docs/plano_de_implementacao_mudan\u00e7a_bottombar.md": {
-    "mtime": 1781489964.508156,
+    "mtime": 1781519200.9688156,
     "ast_hash": "6ca663d66550e10098fbefbc1b1ed6d2",
     "semantic_hash": ""
   },
   "docs/plano_de_implementa\u00e7\u00e3o_fluxo_de_dados.md": {
-    "mtime": 1781489964.5101776,
+    "mtime": 1781519200.9688156,
     "ast_hash": "34e3a8836b2b314a17dab3335281e52b",
     "semantic_hash": ""
   },
   "server_rust/src/rta_manager.rs": {
-    "mtime": 1782951779.7292213,
+    "mtime": 1783400375.7996528,
     "ast_hash": "d6c2da7b2601cc19406c4107bf40afe5",
     "semantic_hash": ""
   },
   "docs/plano_de_implementacao_RTA.md": {
-    "mtime": 1781504094.376961,
-    "ast_hash": "4e6c1c5f12d1449381597142fa6ca36c",
-    "semantic_hash": ""
-  },
-  "client_wasm/pkg/client_wasm.d.ts": {
-    "mtime": 1781490208.9829051,
-    "ast_hash": "73eb866a043d05461186c78dc64cd357",
-    "semantic_hash": ""
-  },
-  "client_wasm/pkg/client_wasm.js": {
-    "mtime": 1781490208.9819014,
-    "ast_hash": "18534b3927ea3cea470cada606a9b5d9",
-    "semantic_hash": ""
-  },
-  "client_wasm/pkg/client_wasm_bg.wasm.d.ts": {
-    "mtime": 1781490208.9829051,
-    "ast_hash": "76d9d758e276cb91673ffd345cf73a05",
-    "semantic_hash": ""
-  },
-  "client_wasm/pkg/package.json": {
-    "mtime": 1781490210.1122618,
-    "ast_hash": "9348063a05b968be30963f6172ebb426",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scene-FORRO ENGATILH-mesa-favela.json": {
-    "mtime": 1781159759.446606,
-    "ast_hash": "6be0fb4b22e026042fe46f341c29637f",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scene-FORRO ENGATILHA-mesa-favela.json": {
-    "mtime": 1781148162.3996966,
-    "ast_hash": "20774da7e869fc11b3c174b0ccb2ccb7",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scene-PISEIRO-mesa-favela.json": {
-    "mtime": 1784782909.4056082,
-    "ast_hash": "273bd0eea88d3cdae627c13ed40b58e6",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scene-PISEIRO2-mesa-favela.json": {
-    "mtime": 1781163080.9862738,
-    "ast_hash": "c2f0a3cb7fb0afafddfcfe4d39504638",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scene-REGIS-mesa-favela.json": {
-    "mtime": 1784782181.8670785,
-    "ast_hash": "bf46cc9efffa3a07485106ab836e6184",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scene-SARU-mesa-favela.json": {
-    "mtime": 1783835829.7516298,
-    "ast_hash": "c9ab50ce0fa757b578d4a5879b7b6969",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scene-SEXTETO-mesa-favela.json": {
-    "mtime": 1784345659.976388,
-    "ast_hash": "8a33ea3599e17e0a9a722882249e726b",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/custom_names_scenes-mesa-favela.json": {
-    "mtime": 1784782909.4089227,
-    "ast_hash": "dad01e837433923794561420e32241c1",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/local/global-names-mesa-favela.json": {
-    "mtime": 1784433048.1496463,
-    "ast_hash": "13c9175b45af5c8d45915f93410a2d71",
-    "semantic_hash": ""
-  },
-  "public/modules/macros/profiles/local/profile_pcfavela.json": {
-    "mtime": 1784781098.0480354,
-    "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
+    "mtime": 1781519200.9668157,
+    "ast_hash": "419a2c79e07493cf88186003eb14445f",
     "semantic_hash": ""
   },
   "public/modules/rta.js": {
-    "mtime": 1782099268.8675864,
+    "mtime": 1782161452.8500285,
     "ast_hash": "6e97132307b111ff48dc2d1a558f6be7",
     "semantic_hash": ""
   },
   "server_rust/src/tailscale_http.rs": {
-    "mtime": 1781744136.913392,
-    "ast_hash": "77e6a5fe6e6443032d2223cfaf823c5a",
-    "semantic_hash": ""
-  },
-  "tmp/fix_eq.ps1": {
-    "mtime": 1781508665.1342523,
-    "ast_hash": "72c19baa0cba2144f52ddbfbaf63ba84",
+    "mtime": 1781605847.5588536,
+    "ast_hash": "9132fcf7d5bc5fa63ce2495bdd64e6e7",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-ANAKA 360-mesa-maria.json": {
-    "mtime": 1783823422.7337792,
+    "mtime": 1784007762.9390988,
     "ast_hash": "99be20c44996ccab9351c4bf05e0056c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CHOCO 360-mesa-maria.json": {
-    "mtime": 1782094068.9663644,
+    "mtime": 1782161452.844212,
     "ast_hash": "c74714aff02f8b0fa1dff2b1ac9fba8c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-KALAWE 360-mesa-maria.json": {
-    "mtime": 1782699989.902565,
+    "mtime": 1783400375.7821453,
     "ast_hash": "4ce8e2f94b50d035d28ecc140c2e30d5",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-MARCELO V 360-mesa-maria.json": {
-    "mtime": 1783909442.4116485,
+    "mtime": 1784007762.9390988,
     "ast_hash": "fae2675801748d6a306423c4334b9aa3",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SBLM MAGIA 360-mesa-maria.json": {
-    "mtime": 1782951779.714877,
+    "mtime": 1783400375.7831914,
     "ast_hash": "d5f3a4fda79f6a50eec4902b239e5720",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SENSIBLDADE 36-mesa-maria.json": {
-    "mtime": 1782621663.1118813,
+    "mtime": 1783400375.7837164,
     "ast_hash": "5868155d5355d85003c7705ca330924c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SKEMA BOM-mesa-maria.json": {
-    "mtime": 1782008991.3838356,
+    "mtime": 1782036761.9685614,
     "ast_hash": "61acb0bf473c453a834de7447bce71a8",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SOMALIA 360-mesa-maria.json": {
-    "mtime": 1782951779.7153976,
+    "mtime": 1783400375.7837164,
     "ast_hash": "5681821c1f6d682c35e75be429b70744",
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1783910294.1326642,
-    "ast_hash": "18a66b0862f11ecb8973f362219f604c",
+    "mtime": 1784007762.9933586,
+    "ast_hash": "f040ca26cedd269c1a1ac45792dc12bd",
     "semantic_hash": ""
   },
   "public/modules/fps_meter.js": {
-    "mtime": 1781922246.511338,
-    "ast_hash": "f90ba4dc91e36758c48dddb1416891f5",
+    "mtime": 1781878859.0408769,
+    "ast_hash": "6cc65da34b48b7a4621b439a6d7f43ff",
     "semantic_hash": ""
   },
   "public/modules/monitoring.js": {
-    "mtime": 1782957230.605322,
+    "mtime": 1783400375.7914565,
     "ast_hash": "ca1cb19315901d537552e9e6d8ddd31e",
     "semantic_hash": ""
   },
   "public/modules/volume_geral.js": {
-    "mtime": 1783746250.1080837,
-    "ast_hash": "97747c5c25d2d06814d7c94563b567ea",
+    "mtime": 1784007762.997358,
+    "ast_hash": "f8978366f0c0da583838bf1066ad7321",
     "semantic_hash": ""
   },
   "server_rust/src/monitoring.rs": {
-    "mtime": 1782957778.9771857,
+    "mtime": 1783400375.7986524,
     "ast_hash": "ee945eb08ddba54a739222d6fce17197",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/bands.rs": {
-    "mtime": 1782951779.7349703,
+    "mtime": 1783400375.8016527,
     "ast_hash": "fe8b7ba72d938db80dcbea4258214a05",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/celt.rs": {
-    "mtime": 1782951779.7369833,
+    "mtime": 1783400375.8026543,
     "ast_hash": "7dd6b299841c4ef5636eeb52ab7924b0",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/celt_lpc.rs": {
-    "mtime": 1782951779.7369833,
+    "mtime": 1783400375.8026543,
     "ast_hash": "1eeb6d2d78c397ed95c51b82c7dc93ee",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/hp_cutoff.rs": {
-    "mtime": 1782951779.738218,
+    "mtime": 1783400375.8026543,
     "ast_hash": "249c87ded830a15f613d99ec622983d5",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/kiss_fft.rs": {
-    "mtime": 1782951779.7392206,
+    "mtime": 1783400375.8036532,
     "ast_hash": "13b35f746850a2c1ade060d5f2295831",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/lib.rs": {
-    "mtime": 1782951779.7392206,
+    "mtime": 1783400375.8036532,
     "ast_hash": "3839b6e9f385c76bdc93130ab8ade27d",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/mdct.rs": {
-    "mtime": 1782951779.7414339,
+    "mtime": 1783400375.8036532,
     "ast_hash": "ab1ac14dff319ce084ff98c50080e42e",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/modes.rs": {
-    "mtime": 1782951779.7428765,
+    "mtime": 1783400375.8046534,
     "ast_hash": "c94e6128b2e892f2a486c775088972eb",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/pitch.rs": {
-    "mtime": 1782951779.7443159,
+    "mtime": 1783400375.805836,
     "ast_hash": "5a5a8651c7952a3d8c31f1c2a0cda602",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/pvq.rs": {
-    "mtime": 1782951779.7453363,
+    "mtime": 1783400375.8068452,
     "ast_hash": "390a0a698906088a27bb724b341a8dc3",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/quant_bands.rs": {
-    "mtime": 1782951779.7463703,
+    "mtime": 1783400375.8068452,
     "ast_hash": "fa93df80a034d0246652d772b6d51f5e",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/range_coder.rs": {
-    "mtime": 1782951779.7474172,
+    "mtime": 1783400375.8068452,
     "ast_hash": "47b7850bf6a7703ea5058ff3cf485cd6",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/rate.rs": {
-    "mtime": 1782951779.7474172,
+    "mtime": 1783400375.807844,
     "ast_hash": "792d645b04c467fdfb56451be059f02b",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/ana_filt_bank_1.rs": {
-    "mtime": 1782951779.7495584,
+    "mtime": 1783400375.807844,
     "ast_hash": "6c4c03a380ef2c983919e37abd1aab0e",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/biquad_alt.rs": {
-    "mtime": 1782951779.7495584,
+    "mtime": 1783400375.807844,
     "ast_hash": "cd844dc1aa5a1a23be1ed9f9ac9403d2",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/control_codec.rs": {
-    "mtime": 1782951779.7513547,
+    "mtime": 1783400375.8088424,
     "ast_hash": "c31e9cbf0be947adaaaa7ed3b7377af3",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/control_fixed.rs": {
-    "mtime": 1782951779.7513547,
+    "mtime": 1783400375.8088424,
     "ast_hash": "fef9410bebd2abc07fe25f4920968cca",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/control_snr.rs": {
-    "mtime": 1782951779.752373,
+    "mtime": 1783400375.8088424,
     "ast_hash": "2ec58a15b354c0979ef161192590c06c",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/dec_api.rs": {
-    "mtime": 1782951779.7533722,
+    "mtime": 1783400375.8088424,
     "ast_hash": "01afb517b7e5a7ac7613b4a29d704ae6",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/decode_core.rs": {
-    "mtime": 1782951779.7543714,
+    "mtime": 1783400375.8098433,
     "ast_hash": "82decb4855fba3eaed7f67beac6a1429",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/decode_frame.rs": {
-    "mtime": 1782951779.7543714,
+    "mtime": 1783400375.8098433,
     "ast_hash": "3af45694b1036f22c6ad2930da8a738e",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/decode_indices.rs": {
-    "mtime": 1782951779.755371,
+    "mtime": 1783400375.8098433,
     "ast_hash": "12f634456dea32d36a56f92c2333eebd",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/decode_parameters.rs": {
-    "mtime": 1782951779.75637,
+    "mtime": 1783400375.8098433,
     "ast_hash": "330314b2cd8dd15211af25cdad78f3fc",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/decode_pulses.rs": {
-    "mtime": 1782951779.75637,
+    "mtime": 1783400375.8108425,
     "ast_hash": "e9be078101a8a2e7ce62982d3762077c",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/decoder_structs.rs": {
-    "mtime": 1782951779.7576072,
+    "mtime": 1783400375.8108425,
     "ast_hash": "ece32773194096adb9976456f29bde15",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/define.rs": {
-    "mtime": 1782951779.7590866,
+    "mtime": 1783400375.8108425,
     "ast_hash": "bae647a935a6d59f31eae182144831e3",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/enc_api.rs": {
-    "mtime": 1782951779.7600906,
+    "mtime": 1783400375.8108425,
     "ast_hash": "7b01e9991920cccfaf010a38c1f86df1",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/encode_indices.rs": {
-    "mtime": 1782951779.7600906,
+    "mtime": 1783400375.8108425,
     "ast_hash": "0cfa98d90ba088df2677768b46057424",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/encode_pulses.rs": {
-    "mtime": 1782951779.7615962,
+    "mtime": 1783400375.811842,
     "ast_hash": "8cfdda5f4453ea44f21128251f64d5bc",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/gain_quant.rs": {
-    "mtime": 1782951779.762609,
+    "mtime": 1783400375.811842,
     "ast_hash": "3119364ab072126af51424907f4e9a71",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/hp_variable_cutoff.rs": {
-    "mtime": 1782951779.762609,
+    "mtime": 1783400375.811842,
     "ast_hash": "4e7f4d1f3613654b6a835a875dcf665a",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/init_decoder.rs": {
-    "mtime": 1782951779.7639031,
+    "mtime": 1783400375.811842,
     "ast_hash": "caeb3c27672a63dc4fa6fe4d09071d8e",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/init_encoder.rs": {
-    "mtime": 1782951779.7639031,
+    "mtime": 1783400375.811842,
     "ast_hash": "5be1f381abe309deacb545d95ab6fa3b",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/interpolate.rs": {
-    "mtime": 1782951779.7651424,
+    "mtime": 1783400375.811842,
     "ast_hash": "34d2aec371565a17919e7b20ce5ca58d",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/lin2log.rs": {
-    "mtime": 1782951779.7651424,
+    "mtime": 1783400375.8128426,
     "ast_hash": "63d35ca9829daebf7d85e0126563171b",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/log2lin.rs": {
-    "mtime": 1782951779.766412,
+    "mtime": 1783400375.8128426,
     "ast_hash": "5de6015c27c3eaf6f4e2fb9bb6b7ace9",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/lp_variable_cutoff.rs": {
-    "mtime": 1782951779.766412,
+    "mtime": 1783400375.8128426,
     "ast_hash": "b69e628babeed08bcee483918cf0d0d0",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/lpc_analysis.rs": {
-    "mtime": 1782951779.7675004,
+    "mtime": 1783400375.8128426,
     "ast_hash": "d727a4b6ee161dea5c95949aa34f5799",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/lpc_fit.rs": {
-    "mtime": 1782951779.7675004,
+    "mtime": 1783400375.8128426,
     "ast_hash": "1bb461ba061ea1f6f632bec2d250587b",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/ltp_analysis.rs": {
-    "mtime": 1782951779.7687418,
+    "mtime": 1783400375.8128426,
     "ast_hash": "66fce3e58db086acc0684e1e5c66e14b",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/macros.rs": {
-    "mtime": 1782951779.7687418,
+    "mtime": 1783400375.8128426,
     "ast_hash": "a754e6f2b1726d4a66acc4052cf37bb3",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/mod.rs": {
-    "mtime": 1782951779.7699637,
+    "mtime": 1783400375.8128426,
     "ast_hash": "d7c81a27df428c78539f4e5e1cf31210",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/nlsf.rs": {
-    "mtime": 1782951779.7699637,
+    "mtime": 1783400375.8143463,
     "ast_hash": "93d57ec33aaf42f57a88e0ae9bb0f198",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/nlsf_decode.rs": {
-    "mtime": 1782951779.7713456,
+    "mtime": 1783400375.8143463,
     "ast_hash": "891dd7ea32126022399c3b3d867f0eea",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/nlsf_del_dec_quant.rs": {
-    "mtime": 1782951779.7713456,
+    "mtime": 1783400375.8143463,
     "ast_hash": "74e242edaa96b642805f7733a7d95d80",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/nlsf_encode.rs": {
-    "mtime": 1782951779.772374,
+    "mtime": 1783400375.8143463,
     "ast_hash": "1f56b4e294e99d9bc9aa463f67f3fbed",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/nlsf_unpack.rs": {
-    "mtime": 1782951779.772374,
+    "mtime": 1783400375.8143463,
     "ast_hash": "4dc639150f5624922ff09958d8cfcab8",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/noise_shape_analysis.rs": {
-    "mtime": 1782951779.7736168,
+    "mtime": 1783400375.8153508,
     "ast_hash": "d51fbea047049e8b203085102f20ed45",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/nsq.rs": {
-    "mtime": 1782951779.7746327,
+    "mtime": 1783400375.8153508,
     "ast_hash": "e0a0356df67f4959943303688ec59916",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/nsq_del_dec.rs": {
-    "mtime": 1782951779.777122,
+    "mtime": 1783400375.8153508,
     "ast_hash": "ced48110b237876c911b32f84bed1e5b",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/pitch_analysis.rs": {
-    "mtime": 1782951779.7781255,
+    "mtime": 1783400375.8153508,
     "ast_hash": "74208536801b183971783a5f37071690",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/resampler.rs": {
-    "mtime": 1782951779.7781255,
+    "mtime": 1783400375.8164558,
     "ast_hash": "c496b4bc4237aa320a1f6df7a7ae722a",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/shell_coder.rs": {
-    "mtime": 1782951779.7795875,
+    "mtime": 1783400375.8164558,
     "ast_hash": "89c4b26b40fe7dc66db62075b8b09f6b",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/sigm.rs": {
-    "mtime": 1782951779.7795875,
+    "mtime": 1783400375.8164558,
     "ast_hash": "c76f54f43075a606bf58ba332fc669ec",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/sigproc_fix.rs": {
-    "mtime": 1782951779.7808843,
+    "mtime": 1783400375.8172505,
     "ast_hash": "78656a7840d4b5f7da6c78b8ce431ed2",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/sort.rs": {
-    "mtime": 1782951779.7813885,
+    "mtime": 1783400375.8172505,
     "ast_hash": "a64df2c0918883e069a9b136799a0e09",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/structs.rs": {
-    "mtime": 1782951779.7824,
+    "mtime": 1783400375.8172505,
     "ast_hash": "c8237116bb6141a929dee5bf60bb1090",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/tables.rs": {
-    "mtime": 1782951779.7824,
+    "mtime": 1783400375.8172505,
     "ast_hash": "11607f4c35dfbd7bddd2a93ed1acb78f",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/tables_nlsf.rs": {
-    "mtime": 1782951779.7837281,
+    "mtime": 1783400375.8183248,
     "ast_hash": "5e6c12b5de68c63c8ac89dcd497603b0",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/tuning_parameters.rs": {
-    "mtime": 1782951779.7837281,
+    "mtime": 1783400375.8183248,
     "ast_hash": "2122f1f3804ccd85caa0e5e0367e1b9f",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/vad.rs": {
-    "mtime": 1782951779.7849877,
+    "mtime": 1783400375.8183248,
     "ast_hash": "3ac1d56a6a0819268c0c85664326b2c2",
     "semantic_hash": ""
   },
   "server_rust/vendor/opus-rs/src/silk/vq_wmat_ec.rs": {
-    "mtime": 1782951779.7849877,
+    "mtime": 1783400375.8183248,
     "ast_hash": "cecdb73b7e29909e218385bce9bad411",
     "semantic_hash": ""
   },
   "docs/plano_De_implementacao_volume_geral.md": {
-    "mtime": 1783743823.9986703,
-    "ast_hash": "4808dbdcadfc1b2a3b8b386af77d69d0",
+    "mtime": 1784007762.9412022,
+    "ast_hash": "3da16eeff8e08821dda3f66267510f3a",
     "semantic_hash": ""
   },
   "docs/plano_de_implementacao_monitoramento_de_audio.md": {
-    "mtime": 1782951779.7196658,
+    "mtime": 1783400375.7858727,
     "ast_hash": "1a9fe722544b62effcb1292076f5675f",
     "semantic_hash": ""
   },
   "docs/plano_de_implementa\u00e7\u00e3o_CANVAS.md": {
-    "mtime": 1781922246.508061,
-    "ast_hash": "c703a26d958dfb87168ae2d619be973a",
+    "mtime": 1781863483.3520193,
+    "ast_hash": "84a76d4f01422464936fc99540810b55",
     "semantic_hash": ""
   },
   "docs/plano_de_implementa\u00e7\u00e3o_FPS_FIX.md": {
-    "mtime": 1781922246.5085766,
-    "ast_hash": "e1c719b8ff47be64902f189373ee93f4",
+    "mtime": 1781875893.0847642,
+    "ast_hash": "847a0db058dd67fefa30a8263b38cb07",
     "semantic_hash": ""
   },
   "docs/plano_de_implementa\u00e7\u00e3o_navega\u00e7\u00e3o_por_layers.md": {
-    "mtime": 1783562690.4959223,
-    "ast_hash": "022e7a5c0d530eedc9694abbeee71a83",
+    "mtime": 1783702703.5857372,
+    "ast_hash": "079381dbaf5911a9c8e723493f19b7bd",
     "semantic_hash": ""
   },
   "docs/plano_de_implementa\u00e7\u00e3o_pagina_de_status.md": {
-    "mtime": 1783305304.1531336,
+    "mtime": 1783400375.7858727,
     "ast_hash": "f52112ef92b14a89ce2d9a26e0c4fb16",
     "semantic_hash": ""
   },
   "public/status.html": {
-    "mtime": 1783310110.092672,
-    "ast_hash": "e639c1b2a54bacc55860869df0416535",
+    "mtime": 1783400375.7946038,
+    "ast_hash": "8192324126a1137b2e3d6e19b79062e7",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-DAN VIEIRA 360-mesa-maria.json": {
-    "mtime": 1784427964.9500768,
+    "mtime": 1785015065.0715914,
     "ast_hash": "f1afa20efc08704187be2e70d992091c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-DANIEL VIEIR 3-mesa-maria.json": {
-    "mtime": 1784427964.9511185,
+    "mtime": 1785015065.072124,
     "ast_hash": "ee9a0460db18fa2863f60987357ace5e",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-ID DO SAMBA 360-mesa-maria.json": {
-    "mtime": 1784766499.242707,
+    "mtime": 1785015065.072124,
     "ast_hash": "c491ca3f9a5b4fcba025cdccc06aa31c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SEXTETO-mesa-favela.json": {
-    "mtime": 1784345659.9779596,
-    "ast_hash": "8a33ea3599e17e0a9a722882249e726b",
+    "mtime": 1785015065.0736856,
+    "ast_hash": "9a4507bb9002066f2939dc3945933281",
     "semantic_hash": ""
   },
   "fx_list.json": {
-    "mtime": 1784162435.3296185,
-    "ast_hash": "61509e597303d6449000f8f0adadc3c9",
+    "mtime": 1784016004.6770692,
+    "ast_hash": "0e7349d05351c8214d1e1d2100eb5a6f",
     "semantic_hash": ""
   },
   "fx_type_query/src/main.rs": {
-    "mtime": 1784341685.9986744,
+    "mtime": 1784202034.586611,
     "ast_hash": "f97916397eb139bf25a5affdcab4e5b4",
     "semantic_hash": ""
   },
   "public/modules/FXS/reverb.js": {
-    "mtime": 1784959275.0578141,
-    "ast_hash": "177db041dce2385af9ae3cbeb2251284",
+    "mtime": 1785024385.017158,
+    "ast_hash": "08d3a708b4d5b036e645cafb178d921c",
     "semantic_hash": ""
   },
   "server_rust/src/midi/fx_list.rs": {
-    "mtime": 1784162435.4778376,
-    "ast_hash": "04c4a06489fd30767d3dc15f001f0ee4",
+    "mtime": 1784016771.436284,
+    "ast_hash": "511162ca6316aa7af6d1e4c2b357a60e",
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1784168375.012929,
-    "ast_hash": "4214a352cdfce3a50aa525100356bf97",
+    "mtime": 1784197164.2183745,
+    "ast_hash": "192e7f2e6ac40284b43fbd2236f01757",
     "semantic_hash": ""
   },
   "docs/plano_de_implementacao_bus_routing.md": {
-    "mtime": 1784427964.9532013,
+    "mtime": 1785015065.075778,
     "ast_hash": "b1f90c94bc79cf4c2074b15a85fb8a89",
     "semantic_hash": ""
   },
   "log/fx_input_test_log.txt": {
-    "mtime": 1784171011.752663,
-    "ast_hash": "061ebb08df78ee18864bef63f18fce7a",
+    "mtime": 1784197164.2209563,
+    "ast_hash": "3b0e74f16c57ff331284cb3aed3198de",
     "semantic_hash": ""
   },
   "log/fx_output_test_log.txt": {
-    "mtime": 1784177035.552711,
-    "ast_hash": "12adfa4745664908ec9c3ba075f78b72",
+    "mtime": 1784197164.22147,
+    "ast_hash": "ef6dd3ab64814bfa9b180351052a24b4",
     "semantic_hash": ""
   },
   "public/modules/FXS/efeitos.js": {
-    "mtime": 1784772004.1681607,
+    "mtime": 1785015065.1479855,
     "ast_hash": "c34932b43294f98313b3759bf6afe4c4",
     "semantic_hash": ""
   },
   "public/modules/FXS/fx_components.js": {
-    "mtime": 1784774002.7862697,
-    "ast_hash": "6e7a1c25a467ab8d362b09febf970ede",
+    "mtime": 1785015065.1489854,
+    "ast_hash": "ecfc37ae5440de1371f437a75e08759b",
     "semantic_hash": ""
   },
   "public/modules/FXS/fx_routing.js": {
-    "mtime": 1784341686.0019104,
+    "mtime": 1785015065.1489854,
     "ast_hash": "4cf53d6b90b592b5b0f7325960fe8950",
+    "semantic_hash": ""
+  },
+  ".openclaude/settings.local.json": {
+    "mtime": 1777447896.8358233,
+    "ast_hash": "2d2fc245f83a69e34d6e60cb6065226a",
+    "semantic_hash": ""
+  },
+  ".opencode/package.json": {
+    "mtime": 1780426664.7354198,
+    "ast_hash": "9da2b87294a22da9e79bad08ba9aa53e",
+    "semantic_hash": ""
+  },
+  ".vscode/.opencode/package.json": {
+    "mtime": 1780475484.5258825,
+    "ast_hash": "d3ab821609ec487b22aa5b0027f5f400",
+    "semantic_hash": ""
+  },
+  "data/custom_scenes/shared/custom_names_scene-SAID DE EMRG 3-mesa-maria.json": {
+    "mtime": 1785015065.0736856,
+    "ast_hash": "d183e5a97f6a55a1968f04bb5ab0b175",
     "semantic_hash": ""
   }
 }

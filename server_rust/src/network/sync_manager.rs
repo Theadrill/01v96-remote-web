@@ -17,7 +17,7 @@ pub struct SyncManager {
     csm: Arc<RwLock<CustomSceneManager>>,
     chunk_size: u32,
     chunk_delay_ms: u64,
-    pub time_between_out_fxs_requests: u64,
+    pub time_between_fxs_requests: u64,
 }
 
 
@@ -28,7 +28,7 @@ impl SyncManager {
         csm: Arc<RwLock<CustomSceneManager>>,
         chunk_size: u32,
         chunk_delay_ms: u64,
-        time_between_out_fxs_requests: u64,
+        time_between_fxs_requests: u64,
     ) -> Self {
         Self {
             scheduler,
@@ -40,7 +40,7 @@ impl SyncManager {
             csm,
             chunk_size,
             chunk_delay_ms,
-            time_between_out_fxs_requests,
+            time_between_fxs_requests,
         }
     }
 
@@ -78,7 +78,7 @@ impl SyncManager {
         let csm = self.csm.clone();
         let chunk_size = self.chunk_size;
         let chunk_delay_ms = self.chunk_delay_ms;
-        let time_between_out_fxs_requests = self.time_between_out_fxs_requests;
+        let time_between_fxs_requests = self.time_between_fxs_requests;
         let is_syncing_fx = self.is_syncing_fx.clone();
 
         tokio::spawn(async move {
@@ -185,7 +185,7 @@ impl SyncManager {
                 csm,
                 chunk_size,
                 chunk_delay_ms,
-                time_between_out_fxs_requests,
+                time_between_fxs_requests,
                 is_syncing_fx,
             )
             .await;
@@ -252,7 +252,7 @@ impl SyncManager {
         let csm = self.csm.clone();
         let chunk_size = self.chunk_size;
         let chunk_delay_ms = self.chunk_delay_ms;
-        let time_between_out_fxs_requests = self.time_between_out_fxs_requests;
+        let time_between_fxs_requests = self.time_between_fxs_requests;
         let is_syncing_fx = self.is_syncing_fx.clone();
 
         tokio::spawn(async move {
@@ -267,7 +267,7 @@ impl SyncManager {
                 csm,
                 chunk_size,
                 chunk_delay_ms,
-                time_between_out_fxs_requests,
+                time_between_fxs_requests,
                 is_syncing_fx,
             )
             .await;
@@ -388,7 +388,7 @@ async fn queue_all_params_inner(
     csm: Arc<RwLock<CustomSceneManager>>,
     chunk_size: u32,
     chunk_delay_ms: u64,
-    time_between_out_fxs_requests: u64,
+    time_between_fxs_requests: u64,
     is_syncing_fx: Arc<AtomicBool>,
 ) {
     let mut pending_corrections: Vec<Vec<u8>> = Vec::new();
@@ -822,7 +822,7 @@ async fn queue_all_params_inner(
         let sched_fx = sched.clone();
         let io_fx    = io.clone();
         let state_fx = state.clone();
-        let throttle_ms = time_between_out_fxs_requests;
+        let throttle_ms = time_between_fxs_requests;
         let is_syncing_fx_clone = is_syncing_fx.clone();
         tokio::spawn(async move {
             is_syncing_fx_clone.store(true, Ordering::SeqCst);

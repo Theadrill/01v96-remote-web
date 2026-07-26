@@ -2288,6 +2288,97 @@ pub fn register_handlers(
             },
         );
 
+        // --- REQUEST FX SLOT PARAMS ---
+        let sched_fx_slot = scheduler_socket.clone();
+        let state_fx_slot = global_state_socket.clone();
+        socket.on(
+            "requestFxSlotParams",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if let Some(slot) = data.get("slot").and_then(|v| v.as_u64()).map(|v| v as u8) {
+                    if slot < 4 {
+                        let force = data.get("force").and_then(|v| v.as_bool()).unwrap_or(false);
+                        let state = state_fx_slot.read().await;
+                        let already_synced = state
+                            .fx_params
+                            .get(&(slot as usize))
+                            .map_or(false, |m| m.len() >= 14);
+
+                        if already_synced && !force {
+                            if let Some(params_map) = state.fx_params.get(&(slot as usize)) {
+                                let _ = socket.emit("fxSlotParamsUpdate", &serde_json::json!({
+                                    "slot": slot,
+                                    "params": params_map
+                                }));
+                            }
+                        } else {
+                            let sched = sched_fx_slot.clone();
+                            let state_inner = state_fx_slot.clone();
+                            let socket_inner = socket.clone();
+                            tokio::spawn(async move {
+                                let config = crate::config::AppConfig::load();
+                                let throttle_ms = config.time_between_fxs_requests;
+                                let params = [
+                                    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+                                    0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 48, 52
+                                ];
+                                for &p in &params {
+                                    if let Some(req) = crate::midi::protocol::build_fx_param_request(slot, p) {
+                                        sched.enqueue(req, 0).await;
+                                    }
+                                    tokio::time::sleep(std::time::Duration::from_millis(throttle_ms)).await;
+                                }
+                                tokio::time::sleep(std::time::Duration::from_millis(throttle_ms)).await;
+                                let state = state_inner.read().await;
+                                if let Some(params_map) = state.fx_params.get(&(slot as usize)) {
+                                    let _ = socket_inner.emit("fxSlotParamsUpdate", &serde_json::json!({
+                                        "slot": slot,
+                                        "params": params_map
+                                    }));
+                                }
+                            });
+                        }
+                    }
+                }
+            },
+        );
+
+        // --- CHANGE FX PARAM ---
+        let sched_change_fx_param = scheduler_socket.clone();
+        let state_change_fx_param = global_state_socket.clone();
+        socket.on(
+            "changeFxParam",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                let slot = data.get("slot").and_then(|v| v.as_u64()).map(|v| v as u8);
+                let param = data.get("param").and_then(|v| v.as_u64()).map(|v| v as u8);
+                let value = data.get("value").and_then(|v| v.as_f64());
+
+                if let (Some(slot), Some(param), Some(value)) = (slot, param, value) {
+                    if slot < 4 {
+                        if let Some(req) = crate::midi::protocol::build_fx_param_change(slot, param, value) {
+                            sched_change_fx_param.enqueue(req, 0).await;
+                        }
+                        let mut state = state_change_fx_param.write().await;
+                        let entry = state.fx_params.entry(slot as usize).or_default();
+                        entry.insert(param as usize, value);
+                        if param == 48 {
+                            if let Some(fx) = state.fx_types.get_mut(&(slot as usize)) {
+                                fx.mix = value;
+                            }
+                        } else if param == 52 {
+                            if let Some(fx) = state.fx_types.get_mut(&(slot as usize)) {
+                                fx.bypass = value > 0.0;
+                            }
+                        }
+                        let _ = socket.broadcast().emit("fxParamUpdate", &serde_json::json!({
+                            "slot": slot,
+                            "param": param,
+                            "value": value
+                        })).await;
+                    }
+                }
+            },
+        );
+
         // --- SET FX INPUT PATCH ---
         // Payload: { slot: 0-3, lr: 0|1, source_id: u32 }
         let sched_set_fx_in = scheduler_socket.clone();

@@ -1,7 +1,7 @@
 {
   "inIdx": 2,
   "outIdx": 3,
-  "loopmidi-monitor": false,
+  "loopmidi-monitor": true,
   "open_browser_startup": false,
   "use_canvas": false,
   "demo_mode": false,
@@ -45,5 +45,5 @@
   "eq_flat_skip_hpf_lpf": true,
   "monitoring_buffer_size": 960,
   "monitoring_format": "pcm",
-  "time_between_out_fxs_requests": 150
+  "time_between_fxs_requests": 150
 }

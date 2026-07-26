@@ -723,7 +723,7 @@ Durante a fase de sincronização completa da mesa (sync de nomes, faders, etc.)
 
 ### 9.2. Ajuste Fino de Latência de Hardware
 - Descobrimos que a mesa 01V96 possui um processamento de MIDI que pode atrasar respostas sob estresse (como no sync inicial).
-- Para evitar packet loss e timeouts, a latência de envio foi parametrizada dinamicamente através do arquivo `config.json` no campo `time_between_out_fxs_requests`.
+- Para evitar packet loss e timeouts, a latência de envio foi parametrizada dinamicamente através do arquivo `config.json` no campo `time_between_fxs_requests`.
 - O valor é lido na inicialização do servidor e propagado com segurança para o `SyncManager`.
 - Valor padrão calibrado pelo usuário: **150** (150ms), garantindo sincronização estável em lote para Inputs e Outputs.
 
@@ -731,59 +731,113 @@ Durante a fase de sincronização completa da mesa (sync de nomes, faders, etc.)
 
 ## 10. IMPLEMENTAÇÃO DE TELAS DE EFEITOS
 
-Nesta seção documentamos o plano de arquitetura, sincronização sob demanda (Lazy-Sync por Slot) e catálogo de parâmetros para as telas individuais de cada processador de efeito (FX1–FX4).
-
-### 10.1. Estratégia de Sincronização Sob Demanda (Lazy-Sync por Slot)
-Para evitar o consumo excessivo da largura de banda MIDI (31.25 kbps) e garantir inicialização ultra-rápida do aplicativo:
-- **Boot Inicial do App:** Sincroniza apenas os canais principais (faders, mutes, EQs, auxs, panning e visão geral dos slots FX). NÃO sincroniza os parâmetros internos detalhados das máquinas de efeitos.
-- **On-Demand (Ao Abrir o Efeito):** Ao clicar em um slot FX (`openFxEditor(slotIdx)`):
-  - Verifica se o slot já foi sincronizado nesta sessão (`syncedSlots[slotIdx] === false`).
-  - Se não sincronizado, dispara a requisição dos parâmetros específicos daquele algoritmo para a mesa, marcando o slot como `syncedSlots[slotIdx] = true`.
-  - Se já sincronizado, lê instantaneamente do cache local em memória RAM.
-- **Escuta em Tempo Real (Event-Driven):** Uma vez sincronizado o slot, o aplicativo escuta mensagens SysEx de Parameter Change da mesa e emite alterações instantâneas quando o operador interage com a UI web (Knobs, Steppers ou Faders).
+Nesta seção documentamos a arquitetura de comunicação MIDI SysEx, sincronização sob demanda (Lazy-Sync por Slot), filtragem por tipo de algoritmo e o plano passo a passo de implementação técnica para o editor de efeitos.
 
 ---
 
-### 10.2. TELAS DE EFEITOS DE REVERB (REVERB HALL, REVERB ROOM, REVERB STAGE, REVERB PLATE)
+### 10.1. Comportamento do Protocolo MIDI SysEx e Estratégia Lazy-Sync
 
-Os 4 Reverbs Padrão da Yamaha 01V96 compartilham a mesma estrutura de 14 parâmetros + Mix Balance + Bypass:
+#### 10.1.1. Natureza das Requisições SysEx (Parâmetro por Parâmetro)
+- Na Yamaha 01V96, as requisições diretas de controle de efeito (`Parameter Request` — opcode `0x30`) operam estritamente no modelo **1 para 1** (um parâmetro por mensagem):
+  ```text
+  Requisição (Host -> Mesa): F0 43 30 3E 7F 01 58 [PARAM] [SLOT] F7
+  Resposta   (Mesa -> Host): F0 43 10 3E 7F 01 58 [PARAM] [SLOT] 00 00 00 [VAL] F7
+  ```
+- **Não existe** um comando `0x30` que retorne todos os 14 parâmetros internos de uma máquina de efeitos de uma só vez.
+- O **Bulk Dump** (`0x20` / `0x00`) executado durante a inicialização traz o mapa da cena geral (canais, EQs, auxs, panning, Patch In/Out e o ID do `Effect Type`), mas não popula decodificadamente todos os 14 parâmetros detalhados dos 4 processadores FX.
 
-#### Mapeamento de Endereços Hex por Slot (0x00 a 0x03) e Parâmetros (0x10 a 0x34)
-- **INI.DLY (`0x10`):** Initial Delay (0 a 500.0ms)
-- **REV TIME (`0x11`):** Tempo de Reverb (0.3s a 99.0s)
-- **HI.RATIO (`0x12`):** Amortecimento de Agudos (0.1 a 1.0)
-- **LO.RATIO (`0x13`):** Amortecimento de Graves (0.1 a 2.0)
-- **DIFF (`0x14`):** Difusão (0 a 10)
-- **DENSITY (`0x15`):** Densidade (0% a 100%)
-- **HPF (`0x16`):** Filtro Passa-Altas (Thru / 20Hz a 8.00kHz)
-- **LPF (`0x17`):** Filtro Passa-Baixas (1.00kHz a 20.0kHz / Thru)
-- **E/R DLY (`0x18`):** Early Reflection Delay (0.0ms a 100.0ms)
-- **E/R BAL (`0x19`):** Early Reflection Balance (0% a 100%)
-- **GATE LVL (`0x1A`):** Threshold do Gate (OFF / -60dB a 0dB)
-- **ATTACK (`0x1B`):** Tempo de Ataque do Gate (0ms a 120ms)
-- **HOLD (`0x1C`):** Tempo de Sustentação (0ms a 500ms)
-- **DECAY (`0x1D`):** Tempo de Decaimento do Gate (0ms a 500ms)
-- **MIX BALANCE (`0x30`):** Proporção Wet/Dry (0% a 100%)
-- **BYPASS (`0x34`):** Estado de Bypass (0 = ON, 1 = BYPASS)
-
-#### Organização das Telas (Desktop vs Mobile)
-- **Layout Desktop (Grid Responsivo de Seções Verticais):**
-  - Aproveitamento total de telas largas (1366px, Full HD, 4K) em até 4 colunas verticais lado a lado:
-    - *Cartão 1 (SAÍDA & FILTROS):* MIX BALANCE, HPF, LPF
-    - *Cartão 2 (TEMPO & ESPECTRO):* REV TIME, INI. DLY, HI.RATIO, LO.RATIO
-    - *Cartão 3 (REFLEXÕES & DIFUSÃO):* DIFF., DENSITY, E/R DLY, E/R BAL.
-    - *Cartão 4 (ENVELOPE DO GATE):* GATE LVL, ATTACK, HOLD, DECAY
-- **Layout Mobile (Abas Touch com Stepper Cards):**
-  - Navegação rápida por abas categorizadas (*TEMPO*, *REFLEXÕES*, *FILTROS*, *GATE*) com suporte a botões de toque contínuo (auto-repeat).
+#### 10.1.2. Fluxo da Sincronização Sob Demanda (Lazy-Sync por Slot)
+Para economizar tráfego MIDI (31.25 kbps) e acelerar a inicialização:
+1. **Boot Inicial do App:** Sincroniza faders, mutes, EQs, auxs, panning, o ID do `Effect Type` (`0x31`) e os Patch Inputs/Outputs dos 4 slots FX.
+2. **Ao Abrir o Editor de Efeito (`openFxEditor(slotIdx)`):**
+   - Obtém o `Effect Type` (ID do algoritmo) já salvo no cache do slot.
+   - **Verificação de Suporte:**
+     - **Se o algoritmo for SUPORTADO (IDs 0, 1, 2, 3 - Reverbs):**
+       - Verifica se o slot já foi sincronizado (`syncedSlots[slotIdx] === true`).
+       - Se `false`: Envia em lote (*batch request* com throttling) os 16 `Parameter Requests` (`0x30`) referentes aos parâmetros `0x10`..`0x1D`, Mix Balance `0x30` e Bypass `0x34`.
+       - Marca `syncedSlots[slotIdx] = true` e armazena os valores na RAM.
+       - Se `true`: Lê instantaneamente do cache na RAM.
+     - **Se o algoritmo NÃO for suportado (REV-X, Delays, Modulações, etc.):**
+       - **Ignora** o disparo de requisições de parâmetros internos para evitar tráfego MIDI desnecessário.
+       - Abre a tela em modo **"EFEITO EM CONSTRUÇÃO"** (exibe slot, nome e tipo de efeito com mensagem amigável de desenvolvimento).
+3. **Atualização em Tempo Real (Event-Driven):**
+   - Após sincronizado, o app escuta `Parameter Change` (`0x10`) do `Element 0x58` para atualizar a UI em tempo real quando o operador físico mexer na mesa.
 
 ---
 
-### 10.3. PRÓXIMOS ALGORITMOS DE EFEITO (A MAPEAR)
-- **REV-X (REV-X Hall, REV-X Room):** Algoritmo avançado da Yamaha com janela customizada e parâmetros estendidos.
-- **DELAYS (Mono Delay, Stereo Delay, Delay L,C,R, Echo):** Sincronização por Tempo (ms) e BPM/Subdivisão rítmica.
-- **MODULAÇÃO (Chorus, Flanger, Phaser, Symphonic, Tremolo):** Taxa de modulação (Speed/Hz), profundidade (Depth) e realimentação (Feedback).
-- **DINÂMICOS MULTIBANDA (M.Band Dyna, Multi-Filter):** Compressores/Expansores multibanda.
-- **EFEITOS COMBINADOS (Delay+Rev, Chorus+Rev, etc.):** Interfaces divididas em duas seções de controle duplo.
-- **TELA DE EFEITO EM CONSTRUÇÃO:** Para efeitos ainda não calibrados, o sistema exibe a mensagem amigável de desenvolvimento mantendo o cabeçalho e slot identificados.
+### 10.2. Algoritmo Suportado: Reverb Standard (IDs 0, 1, 2, 3)
+
+Os 4 Reverbs Padrão (*Reverb Hall*, *Reverb Room*, *Reverb Stage*, *Reverb Plate*) compartilham a mesma estrutura de 14 parâmetros internos + Mix Balance + Bypass:
+
+#### Endereço de Parâmetros (`Element 0x58`, Slot `0x00` a `0x03`):
+- `0x10`: **INI.DLY** (Initial Delay: 0.0ms a 500.0ms)
+- `0x11`: **REV TIME** (Reverb Time: 0.3s a 99.0s)
+- `0x12`: **HI.RATIO** (High Damping: 0.1 a 1.0)
+- `0x13`: **LO.RATIO** (Low Damping: 0.1 a 2.0)
+- `0x14`: **DIFF** (Diffusion: 0 a 10)
+- `0x15`: **DENSITY** (Density: 0% a 100%)
+- `0x16`: **HPF** (High Pass Filter: Thru / 20Hz a 8.00kHz)
+- `0x17`: **LPF** (Low Pass Filter: 1.00kHz a 20.0kHz / Thru)
+- `0x18`: **E/R DLY** (Early Reflection Delay: 0.0ms a 100.0ms)
+- `0x19`: **E/R BAL** (Early Reflection Balance: 0% a 100%)
+- `0x1A`: **GATE LVL** (Gate Threshold: OFF / -60dB a 0dB)
+- `0x1B`: **ATTACK** (Gate Attack Time: 0ms a 120ms)
+- `0x1C`: **HOLD** (Gate Hold Time: 0.02ms a 1.96s - Tabela `holdPoints` 216 passos)
+- `0x1D`: **DECAY** (Gate Decay Time: 5ms a 42.3s - Tabela `decayPoints` 160 passos)
+- `0x30`: **MIX BALANCE** (Wet/Dry Ratio: 0% a 100%)
+- `0x34`: **BYPASS** (State: 0 = ON, 1 = BYPASS)
+
+#### Organização da Interface (Desktop vs Mobile)
+- **Layout Desktop:** Grid de 4 cartões lado a lado (*Saída & Filtros*, *Tempo & Espectro*, *Reflexões & Difusão*, *Envelope do Gate*).
+- **Layout Mobile:** Abas com botões touch e stepper cards (*TEMPO*, *REFLEXÕES*, *FILTROS*, *GATE*).
+
+---
+
+### 10.3. Status de Suporte de Algoritmos
+
+| ID Hex / Dec | Nome do Algoritmo | Status | Ação no Editor |
+|---|---|---|---|
+| 0 | REVERB HALL | ✅ Suportado | Lazy-Sync + Editor Completo |
+| 1 | REVERB ROOM | ✅ Suportado | Lazy-Sync + Editor Completo |
+| 2 | REVERB STAGE | ✅ Suportado | Lazy-Sync + Editor Completo |
+| 3 | REVERB PLATE | ✅ Suportado | Lazy-Sync + Editor Completo |
+| 4+ | REV-X, Delays, Modulações, Dinâmicos, etc. | ⏳ A Mapear | Exibe "Efeito em Construção" (Ignora Sync) |
+
+---
+
+### 10.4. Plano Técnico de Implementação (Passo a Passo)
+
+#### Passo 1: Servidor Rust (`server_rust/src/midi/protocol.rs`)
+- Implementar construtor de requisição individual de parâmetro de efeito:
+  ```rust
+  pub fn build_fx_param_request(slot: u8, param: u8) -> Option<Vec<u8>>
+  ```
+  Monta o pacote SysEx `F0 43 30 3E 7F 01 58 [PARAM] [SLOT] F7`.
+
+#### Passo 2: Servidor Rust (Parser & State)
+- No parser de mensagens de entrada (`Element 0x58` / `Section 0x7F`):
+  - Mapear `param` (0x10..0x1D, 0x30, 0x34) e `slot` (0..3).
+  - Atualizar o estado global em memória (`GlobalState`).
+  - Emitir evento WebSocket `fxParamUpdate` via Socket.IO:
+    `{ "slot": slot, "param": param, "value": value }`.
+
+#### Passo 3: Frontend (`public/modules/efeitos.js`)
+- Criar controle de sincronização local:
+  ```javascript
+  const syncedSlots = [false, false, false, false];
+  const fxParams = [{}, {}, {}, {}];
+  ```
+- Na função `openFxEditor(slotIdx)`:
+  1. Verificar o `effectType` do slot.
+  2. Se `[0, 1, 2, 3].includes(effectType)`:
+     - Se `syncedSlots[slotIdx] === false`: emitir evento de WebSocket para o servidor solicitar os parâmetros do slot `slotIdx` à mesa, e marcar `syncedSlots[slotIdx] = true`.
+     - Renderizar os cartões e controles do Reverb.
+  3. Se não for Reverb:
+     - Renderizar o container com aviso de "EFEITO EM CONSTRUÇÃO" para aquele algoritmo.
+- Adicionar escuta do evento `fxParamUpdate`:
+  - Atualizar `fxParams[slotIdx][param]` e ajustar a posição dos knobs/steppers na tela em tempo real.
+- Adicionar manipuladores de envio de alteração (Knobs/Steppers):
+  - Enviar evento Socket.IO `changeFxParam` para o servidor gravar a mudança no hardware.
+
 
 

@@ -432,6 +432,28 @@ pub fn start_rx_loop(
                                     serde_json::to_value(&state.fx_types).unwrap_or_default(),
                                 );
                             }
+                            crate::midi::protocol::ParsedMidi::FxParamUpdate { slot, param, value } => {
+                                tracing::info!(
+                                    "🎵 [FX PARAM] Slot {} param={:#04X} ({}) val={}",
+                                    slot,
+                                    param,
+                                    param,
+                                    value
+                                );
+                                let _ = io_clone.emit(
+                                    "fxParamUpdate",
+                                    &serde_json::json!({
+                                        "slot": slot,
+                                        "param": param,
+                                        "value": value
+                                    }),
+                                ).await;
+                                if param == 48 || param == 52 {
+                                    fx_types_emission = Some(
+                                        serde_json::to_value(&state.fx_types).unwrap_or_default(),
+                                    );
+                                }
+                            }
                             crate::midi::protocol::ParsedMidi::FxOutputUpdate { element, channel, value } => {
                                 tracing::info!(
                                     "🎵 [FX OUT] element={} ch={} val={}",

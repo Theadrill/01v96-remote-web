@@ -249,6 +249,45 @@ pub fn build_fx_type_request(slot: u8) -> Option<Vec<u8>> {
     Some(packet)
 }
 
+pub fn build_fx_param_request(slot: u8, param: u8) -> Option<Vec<u8>> {
+    if slot > 3 {
+        return None;
+    }
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x30,                  // Parameter Request
+        MODEL_ID,              // 3E
+        127,                   // Section (kEffect = 0x7F)
+        1,                     // Group (0x01)
+        88,                    // Element (0x58)
+        param,                 // Parameter index
+        slot,                  // Slot index (0-3)
+    ];
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
+pub fn build_fx_param_change(slot: u8, param: u8, value: f64) -> Option<Vec<u8>> {
+    if slot > 3 {
+        return None;
+    }
+    let mut packet = vec![
+        HEADER[0], HEADER[1], // F0 43
+        0x10,                  // Parameter Change
+        MODEL_ID,              // 3E
+        127,                   // Section (kEffect = 0x7F)
+        1,                     // Group (0x01)
+        88,                    // Element (0x58)
+        param,                 // Parameter index
+        slot,                  // Slot index (0-3)
+    ];
+    let val_bytes = convert_to_bytes(value, &Converter::Fader);
+    packet.extend_from_slice(&val_bytes);
+    packet.extend_from_slice(FOOTER);
+    Some(packet)
+}
+
+
 
 
 pub fn build_fx_output_request(element: u8, channel: u8) -> Option<Vec<u8>> {
@@ -422,6 +461,11 @@ pub enum ParsedMidi {
     FxTypeUpdate {
         slot: usize,
         fx_type_id: u32,
+    },
+    FxParamUpdate {
+        slot: usize,
+        param: usize,
+        value: f64,
     },
     FxOutputUpdate {
         element: usize,
@@ -722,12 +766,21 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             }
         }
 
-        // --- FX TYPE (Section 127, Group 1, Element 88, Parameter 49) ---
+        // --- FX TYPE & PARAMS (Section 127, Group 1, Element 88) ---
         // Special format: address has an extra slot-index byte after the 4-byte address
-        if section == 127 && group == 1 && element == 88 && parameter == 49 {
+        if section == 127 && group == 1 && element == 88 {
             let slot = channel; // message[8] is actually the slot index (0-3)
-            let fx_type_id = bytes_to_fader(data_bytes) as u32;
-            return Some(ParsedMidi::FxTypeUpdate { slot, fx_type_id });
+            if parameter == 49 {
+                let fx_type_id = bytes_to_fader(data_bytes) as u32;
+                return Some(ParsedMidi::FxTypeUpdate { slot, fx_type_id });
+            } else {
+                let val = bytes_to_fader(data_bytes) as f64;
+                return Some(ParsedMidi::FxParamUpdate {
+                    slot,
+                    param: parameter as usize,
+                    value: val,
+                });
+            }
         }
 
         // --- SCENE (Section 127, Group 1) ---

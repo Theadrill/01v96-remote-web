@@ -2,6 +2,43 @@
     box-sizing: border-box;
 }
 
+/* ── Sistema Global de Scrollbars Estilizadas ──────────────────────── */
+:root {
+    --scrollbar-track-bg: #0f141c;
+    --scrollbar-thumb-bg: #3b82f6;
+    --scrollbar-thumb-hover-bg: #60a5fa;
+    --scrollbar-border-color: #0f141c;
+}
+
+/* Suporte Global Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb, var(--scrollbar-thumb-bg)) var(--scrollbar-track-bg);
+}
+
+/* Tamanho Padrão Webkit (quando não sobrescrito pelo container) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track-bg);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb, var(--scrollbar-thumb-bg));
+    background-color: var(--scrollbar-thumb, var(--scrollbar-thumb-bg));
+    border-radius: 6px;
+    border: 2px solid var(--scrollbar-border-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-bg));
+    background-color: var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-bg));
+}
+
 html,
 body {
     margin: 0;

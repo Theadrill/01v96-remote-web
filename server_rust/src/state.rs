@@ -175,6 +175,8 @@ pub struct GlobalState {
     pub out_patches_2tr: HashMap<usize, f64>,
     #[serde(rename = "fxTypes")]
     pub fx_types: HashMap<usize, FxTypeState>,
+    #[serde(rename = "fxParams")]
+    pub fx_params: HashMap<usize, HashMap<usize, f64>>,
     #[serde(rename = "fxInputs")]
     pub fx_inputs: HashMap<usize, f64>,
     #[serde(rename = "fxOutputs")]
@@ -425,6 +427,13 @@ impl GlobalState {
             },
             fx_inputs: HashMap::new(),
             fx_outputs: HashMap::new(),
+            fx_params: {
+                let mut map = HashMap::new();
+                for i in 0..4 {
+                    map.insert(i, HashMap::new());
+                }
+                map
+            },
             tailscale_url: None,
             fx_sync_ack_tx: None,
         }
@@ -840,6 +849,21 @@ impl GlobalState {
                     });
                     entry.id = *fx_type_id;
                     entry.name = name;
+                }
+            }
+            crate::midi::protocol::ParsedMidi::FxParamUpdate { slot, param, value } => {
+                if *slot < 4 {
+                    let entry = self.fx_params.entry(*slot).or_default();
+                    entry.insert(*param, *value);
+                    if *param == 48 {
+                        if let Some(fx) = self.fx_types.get_mut(slot) {
+                            fx.mix = *value;
+                        }
+                    } else if *param == 52 {
+                        if let Some(fx) = self.fx_types.get_mut(slot) {
+                            fx.bypass = *value > 0.0;
+                        }
+                    }
                 }
             }
             crate::midi::protocol::ParsedMidi::FxOutputUpdate {
