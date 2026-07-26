@@ -1,0 +1,8 @@
+{
+  "globalConfig": {
+    "lumikit": {
+      "ip": "pcfavela",
+      "port": 5000
+    }
+  }
+}
