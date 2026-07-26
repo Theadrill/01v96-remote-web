@@ -1414,7 +1414,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "midi_common_src_framing",
-      "community": 180,
+      "community": 808,
       "norm_label": "framing.rs"
     },
     {
@@ -1424,7 +1424,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "midi_common_src_framing_is_heartbeat",
-      "community": 180,
+      "community": 808,
       "norm_label": "is_heartbeat()"
     },
     {
@@ -1434,7 +1434,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "midi_common_src_framing_write_frame",
-      "community": 180,
+      "community": 808,
       "norm_label": "write_frame()"
     },
     {
@@ -1444,7 +1444,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "w",
-      "community": 180,
+      "community": 808,
       "norm_label": "w"
     },
     {
@@ -1454,7 +1454,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "midi_common_src_framing_rs_result",
-      "community": 180,
+      "community": 808,
       "norm_label": "result"
     },
     {
@@ -1464,7 +1464,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "midi_common_src_framing_read_frame",
-      "community": 180,
+      "community": 808,
       "norm_label": "read_frame()"
     },
     {
@@ -1474,7 +1474,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "r",
-      "community": 180,
+      "community": 808,
       "norm_label": "r"
     },
     {
@@ -1484,7 +1484,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "midi_common_src_framing_rs_vec",
-      "community": 180,
+      "community": 808,
       "norm_label": "vec"
     },
     {
@@ -2351,7 +2351,7 @@
       "label": "open()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L255",
+      "source_location": "L276",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_open",
       "community": 1380,
@@ -2361,7 +2361,7 @@
       "label": "openUnderConstruction()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L285",
+      "source_location": "L311",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_openunderconstruction",
       "community": 1380,
@@ -2371,7 +2371,7 @@
       "label": "close()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L304",
+      "source_location": "L330",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_close",
       "community": 1380,
@@ -2381,7 +2381,7 @@
       "label": "setLayoutMode()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L314",
+      "source_location": "L340",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_setlayoutmode",
       "community": 1380,
@@ -2391,7 +2391,7 @@
       "label": "setConcept3Tab()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L324",
+      "source_location": "L350",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_setconcept3tab",
       "community": 1380,
@@ -2401,7 +2401,7 @@
       "label": "renderModal()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L330",
+      "source_location": "L356",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_rendermodal",
       "community": 1380,
@@ -2411,7 +2411,7 @@
       "label": "renderConcept1Knobs()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L377",
+      "source_location": "L403",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderconcept1knobs",
       "community": 1380,
@@ -2421,7 +2421,7 @@
       "label": "degFromPct()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L427",
+      "source_location": "L453",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_degfrompct",
       "community": 1380,
@@ -2431,7 +2431,7 @@
       "label": "renderKnobItem()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L431",
+      "source_location": "L457",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderknobitem",
       "community": 1380,
@@ -2441,7 +2441,7 @@
       "label": "renderConcept2Faders()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L438",
+      "source_location": "L464",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderconcept2faders",
       "community": 1380,
@@ -2451,7 +2451,7 @@
       "label": "renderFaderRow()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L496",
+      "source_location": "L522",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderfaderrow",
       "community": 1380,
@@ -2461,7 +2461,7 @@
       "label": "renderConcept3Tabs()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L513",
+      "source_location": "L539",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderconcept3tabs",
       "community": 1380,
@@ -2471,7 +2471,7 @@
       "label": "renderConcept3ActiveTabContent()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L550",
+      "source_location": "L576",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderconcept3activetabcontent",
       "community": 1380,
@@ -2481,7 +2481,7 @@
       "label": "renderStepperCard()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L592",
+      "source_location": "L618",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_rendersteppercard",
       "community": 1380,
@@ -2491,7 +2491,7 @@
       "label": "renderConcept4ProGraph()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L622",
+      "source_location": "L648",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderconcept4prograph",
       "community": 1380,
@@ -2501,7 +2501,7 @@
       "label": "renderDawCompactItem()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L710",
+      "source_location": "L736",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_renderdawcompactitem",
       "community": 1380,
@@ -2511,7 +2511,7 @@
       "label": "sendParamChange()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L746",
+      "source_location": "L772",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_sendparamchange",
       "community": 1380,
@@ -2521,7 +2521,7 @@
       "label": "toggleBypass()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L762",
+      "source_location": "L788",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_togglebypass",
       "community": 1380,
@@ -2531,7 +2531,7 @@
       "label": "handleFaderInput()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L771",
+      "source_location": "L797",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_handlefaderinput",
       "community": 1380,
@@ -2541,7 +2541,7 @@
       "label": "startKnobDrag()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L784",
+      "source_location": "L810",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_startknobdrag",
       "community": 1380,
@@ -2551,7 +2551,7 @@
       "label": "formatRevTimeStep()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L816",
+      "source_location": "L842",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_formatrevtimestep",
       "community": 1380,
@@ -2561,7 +2561,7 @@
       "label": "formatRealValueByParam()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L827",
+      "source_location": "L853",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_formatrealvaluebyparam",
       "community": 1380,
@@ -2571,7 +2571,7 @@
       "label": "onKnobDrag()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L847",
+      "source_location": "L873",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_onknobdrag",
       "community": 1380,
@@ -2581,7 +2581,7 @@
       "label": "stopKnobDrag()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L880",
+      "source_location": "L906",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_stopknobdrag",
       "community": 1380,
@@ -2591,7 +2591,7 @@
       "label": "startStepperHold()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L903",
+      "source_location": "L929",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_startstepperhold",
       "community": 1380,
@@ -2601,7 +2601,7 @@
       "label": "stopStepperHold()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L916",
+      "source_location": "L942",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_stopstepperhold",
       "community": 1380,
@@ -2611,7 +2611,7 @@
       "label": "handleStepper()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L927",
+      "source_location": "L953",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_handlestepper",
       "community": 1380,
@@ -2621,7 +2621,7 @@
       "label": "startWheelDrag()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L949",
+      "source_location": "L975",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_startwheeldrag",
       "community": 1380,
@@ -2631,7 +2631,7 @@
       "label": "onWheelDrag()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L967",
+      "source_location": "L993",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_onwheeldrag",
       "community": 1380,
@@ -2641,7 +2641,7 @@
       "label": "stopWheelDrag()",
       "file_type": "code",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L980",
+      "source_location": "L1006",
       "_origin": "ast",
       "id": "public_modules_fxs_reverb_stopwheeldrag",
       "community": 1380,
@@ -3004,7 +3004,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "public_modules_dynamics",
-      "community": 905,
+      "community": 643,
       "norm_label": "dynamics.js"
     },
     {
@@ -3014,7 +3014,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "public_modules_dynamics_renderdynamics",
-      "community": 905,
+      "community": 643,
       "norm_label": "renderdynamics()"
     },
     {
@@ -3844,7 +3844,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "public_modules_macro_fader",
-      "community": 782,
+      "community": 97,
       "norm_label": "macro_fader.js"
     },
     {
@@ -3854,7 +3854,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_modules_macro_fader_tempmacroselectedchannels",
-      "community": 782,
+      "community": 97,
       "norm_label": "tempmacroselectedchannels"
     },
     {
@@ -3864,7 +3864,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "public_modules_macro_fader_tempmacrolockedchannels",
-      "community": 782,
+      "community": 97,
       "norm_label": "tempmacrolockedchannels"
     },
     {
@@ -3874,7 +3874,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "public_modules_macro_fader_savemacrochannels",
-      "community": 782,
+      "community": 97,
       "norm_label": "savemacrochannels()"
     },
     {
@@ -3894,7 +3894,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "public_modules_macro_fader_macrofader",
-      "community": 782,
+      "community": 97,
       "norm_label": "macrofader"
     },
     {
@@ -3904,7 +3904,7 @@
       "source_location": "L219",
       "_origin": "ast",
       "id": "public_modules_macro_fader_openmacroconfig",
-      "community": 782,
+      "community": 97,
       "norm_label": "openmacroconfig()"
     },
     {
@@ -3914,7 +3914,7 @@
       "source_location": "L243",
       "_origin": "ast",
       "id": "public_modules_macro_fader_updatemacromodallayout",
-      "community": 782,
+      "community": 97,
       "norm_label": "updatemacromodallayout()"
     },
     {
@@ -3924,7 +3924,7 @@
       "source_location": "L255",
       "_origin": "ast",
       "id": "public_modules_macro_fader_rendermacrogrid",
-      "community": 782,
+      "community": 97,
       "norm_label": "rendermacrogrid()"
     },
     {
@@ -3934,7 +3934,7 @@
       "source_location": "L308",
       "_origin": "ast",
       "id": "public_modules_macro_fader_clearmacroselection",
-      "community": 782,
+      "community": 97,
       "norm_label": "clearmacroselection()"
     },
     {
@@ -3944,7 +3944,7 @@
       "source_location": "L317",
       "_origin": "ast",
       "id": "public_modules_macro_fader_togglemacrochannel",
-      "community": 782,
+      "community": 97,
       "norm_label": "togglemacrochannel()"
     },
     {
@@ -3954,7 +3954,7 @@
       "source_location": "L332",
       "_origin": "ast",
       "id": "public_modules_macro_fader_rendermacrofader",
-      "community": 782,
+      "community": 97,
       "norm_label": "rendermacrofader()"
     },
     {
@@ -4904,7 +4904,7 @@
       "source_location": "L167",
       "_origin": "ast",
       "id": "public_modules_sidebar_setlayoutmode",
-      "community": 91,
+      "community": 894,
       "norm_label": "setlayoutmode()"
     },
     {
@@ -4914,7 +4914,7 @@
       "source_location": "L175",
       "_origin": "ast",
       "id": "public_modules_sidebar_updatelayoutbuttons",
-      "community": 91,
+      "community": 894,
       "norm_label": "updatelayoutbuttons()"
     },
     {
@@ -4944,7 +4944,7 @@
       "source_location": "L201",
       "_origin": "ast",
       "id": "public_modules_sidebar_switchtab",
-      "community": 91,
+      "community": 896,
       "norm_label": "switchtab()"
     },
     {
@@ -5014,7 +5014,7 @@
       "source_location": "L569",
       "_origin": "ast",
       "id": "public_modules_sidebar_resetdmx",
-      "community": 91,
+      "community": 894,
       "norm_label": "resetdmx()"
     },
     {
@@ -7394,7 +7394,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_config_rs_string",
-      "community": 103,
+      "community": 649,
       "norm_label": "string"
     },
     {
@@ -10414,7 +10414,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_rust_src_midi_sync_counter",
-      "community": 100,
+      "community": 128,
       "norm_label": "sync_counter.rs"
     },
     {
@@ -10424,7 +10424,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_rust_src_midi_sync_counter_synccounter",
-      "community": 100,
+      "community": 128,
       "norm_label": "synccounter"
     },
     {
@@ -10434,7 +10434,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "atomicusize",
-      "community": 100,
+      "community": 128,
       "norm_label": "atomicusize"
     },
     {
@@ -10444,7 +10444,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_rust_src_midi_sync_counter_synccounter_new",
-      "community": 100,
+      "community": 128,
       "norm_label": ".new()"
     },
     {
@@ -10454,7 +10454,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_midi_sync_counter_rs_self",
-      "community": 100,
+      "community": 128,
       "norm_label": "self"
     },
     {
@@ -10464,7 +10464,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "server_rust_src_midi_sync_counter_synccounter_begin_sync",
-      "community": 100,
+      "community": 128,
       "norm_label": ".begin_sync()"
     },
     {
@@ -10474,7 +10474,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "server_rust_src_midi_sync_counter_synccounter_should_ignore",
-      "community": 100,
+      "community": 128,
       "norm_label": ".should_ignore()"
     },
     {
@@ -10484,7 +10484,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "server_rust_src_midi_sync_counter_synccounter_reset",
-      "community": 100,
+      "community": 128,
       "norm_label": ".reset()"
     },
     {
@@ -10494,7 +10494,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_rust_src_midi_receiver",
-      "community": 100,
+      "community": 128,
       "norm_label": "midi_receiver.rs"
     },
     {
@@ -10504,7 +10504,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "server_rust_src_midi_receiver_start_rx_loop",
-      "community": 100,
+      "community": 128,
       "norm_label": "start_rx_loop()"
     },
     {
@@ -10514,7 +10514,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_midi_receiver_rs_receiver",
-      "community": 100,
+      "community": 128,
       "norm_label": "receiver"
     },
     {
@@ -10524,7 +10524,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_midi_receiver_rs_vec",
-      "community": 100,
+      "community": 128,
       "norm_label": "vec"
     },
     {
@@ -10534,7 +10534,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_midi_receiver_rs_socketio",
-      "community": 100,
+      "community": 128,
       "norm_label": "socketio"
     },
     {
@@ -10544,7 +10544,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_midi_receiver_rs_arc",
-      "community": 100,
+      "community": 128,
       "norm_label": "arc"
     },
     {
@@ -10554,7 +10554,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_midi_receiver_rs_rwlock",
-      "community": 100,
+      "community": 128,
       "norm_label": "rwlock"
     },
     {
@@ -10824,7 +10824,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver",
-      "community": 34,
+      "community": 1,
       "norm_label": "name_resolver.rs"
     },
     {
@@ -10834,7 +10834,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_namesource",
-      "community": 34,
+      "community": 1,
       "norm_label": "namesource"
     },
     {
@@ -10844,7 +10844,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_resolvedname",
-      "community": 34,
+      "community": 1,
       "norm_label": "resolvedname"
     },
     {
@@ -10854,7 +10854,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_string",
-      "community": 34,
+      "community": 1,
       "norm_label": "string"
     },
     {
@@ -10864,7 +10864,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_resolve_all",
-      "community": 34,
+      "community": 1,
       "norm_label": "resolve_all()"
     },
     {
@@ -10874,7 +10874,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_arc",
-      "community": 34,
+      "community": 1,
       "norm_label": "arc"
     },
     {
@@ -10884,7 +10884,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_rwlock",
-      "community": 34,
+      "community": 1,
       "norm_label": "rwlock"
     },
     {
@@ -10894,7 +10894,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_vec",
-      "community": 34,
+      "community": 1,
       "norm_label": "vec"
     },
     {
@@ -10904,7 +10904,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_physicalsnapshot",
-      "community": 34,
+      "community": 1,
       "norm_label": "physicalsnapshot"
     },
     {
@@ -10914,7 +10914,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_physicalsnapshot_from_state",
-      "community": 34,
+      "community": 1,
       "norm_label": ".from_state()"
     },
     {
@@ -10924,7 +10924,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_self",
-      "community": 34,
+      "community": 1,
       "norm_label": "self"
     },
     {
@@ -10934,7 +10934,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_build_resolved",
-      "community": 34,
+      "community": 1,
       "norm_label": "build_resolved()"
     },
     {
@@ -10944,7 +10944,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_hashmap",
-      "community": 34,
+      "community": 1,
       "norm_label": "hashmap"
     },
     {
@@ -10954,7 +10954,7 @@
       "source_location": "L200",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_resolve_one",
-      "community": 34,
+      "community": 1,
       "norm_label": "resolve_one()"
     },
     {
@@ -10964,7 +10964,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_option",
-      "community": 34,
+      "community": 1,
       "norm_label": "option"
     },
     {
@@ -10974,7 +10974,7 @@
       "source_location": "L243",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_broadcast",
-      "community": 34,
+      "community": 1,
       "norm_label": "broadcast()"
     },
     {
@@ -10984,7 +10984,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "server_rust_src_name_resolver_rs_socketio",
-      "community": 34,
+      "community": 1,
       "norm_label": "socketio"
     },
     {
@@ -12191,7 +12191,7 @@
       "label": ".get_target_for_mt()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L885",
+      "source_location": "L890",
       "_origin": "ast",
       "id": "server_rust_src_state_globalstate_get_target_for_mt",
       "community": 62,
@@ -12201,7 +12201,7 @@
       "label": ".apply_name_char()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L925",
+      "source_location": "L930",
       "_origin": "ast",
       "id": "server_rust_src_state_globalstate_apply_name_char",
       "community": 62,
@@ -12211,7 +12211,7 @@
       "label": ".apply_eq()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L966",
+      "source_location": "L971",
       "_origin": "ast",
       "id": "server_rust_src_state_globalstate_apply_eq",
       "community": 62,
@@ -12221,7 +12221,7 @@
       "label": "ChannelLike",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1017",
+      "source_location": "L1022",
       "_origin": "ast",
       "id": "server_rust_src_state_channellike",
       "community": 62,
@@ -12231,7 +12231,7 @@
       "label": ".set_att()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1028",
+      "source_location": "L1033",
       "_origin": "ast",
       "id": "server_rust_src_state_channelstate_set_att",
       "community": 62,
@@ -12241,7 +12241,7 @@
       "label": ".set_pan()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1031",
+      "source_location": "L1036",
       "_origin": "ast",
       "id": "server_rust_src_state_channelstate_set_pan",
       "community": 62,
@@ -12251,7 +12251,7 @@
       "label": ".apply_comp()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1034",
+      "source_location": "L1039",
       "_origin": "ast",
       "id": "server_rust_src_state_channelstate_apply_comp",
       "community": 62,
@@ -12261,7 +12261,7 @@
       "label": ".eq_mut()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1037",
+      "source_location": "L1042",
       "_origin": "ast",
       "id": "server_rust_src_state_channelstate_eq_mut",
       "community": 62,
@@ -12271,7 +12271,7 @@
       "label": ".gate_mut()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1040",
+      "source_location": "L1045",
       "_origin": "ast",
       "id": "server_rust_src_state_channelstate_gate_mut",
       "community": 62,
@@ -12281,7 +12281,7 @@
       "label": ".set_att()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1046",
+      "source_location": "L1051",
       "_origin": "ast",
       "id": "server_rust_src_state_mixbusstate_set_att",
       "community": 62,
@@ -12291,7 +12291,7 @@
       "label": ".set_pan()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1047",
+      "source_location": "L1052",
       "_origin": "ast",
       "id": "server_rust_src_state_mixbusstate_set_pan",
       "community": 62,
@@ -12301,7 +12301,7 @@
       "label": ".apply_comp()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1048",
+      "source_location": "L1053",
       "_origin": "ast",
       "id": "server_rust_src_state_mixbusstate_apply_comp",
       "community": 62,
@@ -12311,7 +12311,7 @@
       "label": ".eq_mut()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1051",
+      "source_location": "L1056",
       "_origin": "ast",
       "id": "server_rust_src_state_mixbusstate_eq_mut",
       "community": 62,
@@ -12321,7 +12321,7 @@
       "label": ".set_att()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1057",
+      "source_location": "L1062",
       "_origin": "ast",
       "id": "server_rust_src_state_masterstate_set_att",
       "community": 62,
@@ -12331,7 +12331,7 @@
       "label": ".set_pan()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1060",
+      "source_location": "L1065",
       "_origin": "ast",
       "id": "server_rust_src_state_masterstate_set_pan",
       "community": 62,
@@ -12341,7 +12341,7 @@
       "label": ".apply_comp()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1063",
+      "source_location": "L1068",
       "_origin": "ast",
       "id": "server_rust_src_state_masterstate_apply_comp",
       "community": 62,
@@ -12351,7 +12351,7 @@
       "label": ".eq_mut()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1066",
+      "source_location": "L1071",
       "_origin": "ast",
       "id": "server_rust_src_state_masterstate_eq_mut",
       "community": 62,
@@ -12361,7 +12361,7 @@
       "label": "apply_comp_fields()",
       "file_type": "code",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1071",
+      "source_location": "L1076",
       "_origin": "ast",
       "id": "server_rust_src_state_apply_comp_fields",
       "community": 62,
@@ -21354,7 +21354,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_skill",
-      "community": 588,
+      "community": 108,
       "norm_label": "skill.md"
     },
     {
@@ -21584,7 +21584,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_clone_excessive",
-      "community": 896,
+      "community": 172,
       "norm_label": "anti-clone-excessive.md"
     },
     {
@@ -21684,7 +21684,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_collect_intermediate",
-      "community": 172,
+      "community": 108,
       "norm_label": "anti-collect-intermediate.md"
     },
     {
@@ -22094,7 +22094,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_index_over_iter",
-      "community": 172,
+      "community": 108,
       "norm_label": "anti-index-over-iter.md"
     },
     {
@@ -22294,7 +22294,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction",
-      "community": 896,
+      "community": 1279,
       "norm_label": "anti-over-abstraction.md"
     },
     {
@@ -22304,7 +22304,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_anti_over_abstraction",
-      "community": 695,
+      "community": 645,
       "norm_label": "anti-over-abstraction"
     },
     {
@@ -22314,7 +22314,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_why_it_matters",
-      "community": 695,
+      "community": 645,
       "norm_label": "why it matters"
     },
     {
@@ -22324,7 +22324,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_bad",
-      "community": 695,
+      "community": 645,
       "norm_label": "bad"
     },
     {
@@ -22334,7 +22334,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_good",
-      "community": 695,
+      "community": 645,
       "norm_label": "good"
     },
     {
@@ -22344,7 +22344,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_signs_of_over_abstraction",
-      "community": 695,
+      "community": 645,
       "norm_label": "signs of over-abstraction"
     },
     {
@@ -22354,7 +22354,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_when_to_generalize",
-      "community": 695,
+      "community": 645,
       "norm_label": "when to generalize"
     },
     {
@@ -22364,7 +22364,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_rule_of_three",
-      "community": 695,
+      "community": 645,
       "norm_label": "rule of three"
     },
     {
@@ -22374,7 +22374,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_prefer_concrete_types_in_private_code",
-      "community": 695,
+      "community": 645,
       "norm_label": "prefer concrete types in private code"
     },
     {
@@ -22384,7 +22384,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_over_abstraction_see_also",
-      "community": 695,
+      "community": 645,
       "norm_label": "see also"
     },
     {
@@ -22604,7 +22604,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_string_for_str",
-      "community": 896,
+      "community": 1279,
       "norm_label": "anti-string-for-str.md"
     },
     {
@@ -22804,7 +22804,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_type_erasure",
-      "community": 896,
+      "community": 1279,
       "norm_label": "anti-type-erasure.md"
     },
     {
@@ -23004,7 +23004,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_anti_vec_for_slice",
-      "community": 896,
+      "community": 1279,
       "norm_label": "anti-vec-for-slice.md"
     },
     {
@@ -23124,7 +23124,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use",
-      "community": 588,
+      "community": 704,
       "norm_label": "api-builder-must-use.md"
     },
     {
@@ -23134,7 +23134,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_api_builder_must_use",
-      "community": 689,
+      "community": 645,
       "norm_label": "api-builder-must-use"
     },
     {
@@ -23144,7 +23144,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_why_it_matters",
-      "community": 689,
+      "community": 645,
       "norm_label": "why it matters"
     },
     {
@@ -23154,7 +23154,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_bad",
-      "community": 689,
+      "community": 645,
       "norm_label": "bad"
     },
     {
@@ -23164,7 +23164,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_good",
-      "community": 689,
+      "community": 645,
       "norm_label": "good"
     },
     {
@@ -23174,7 +23174,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_apply_to_entire_type",
-      "community": 689,
+      "community": 645,
       "norm_label": "apply to entire type"
     },
     {
@@ -23184,7 +23184,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_message_guidelines",
-      "community": 689,
+      "community": 645,
       "norm_label": "message guidelines"
     },
     {
@@ -23194,7 +23194,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_clippy_lint",
-      "community": 689,
+      "community": 645,
       "norm_label": "clippy lint"
     },
     {
@@ -23204,7 +23204,7 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_standard_library_examples",
-      "community": 689,
+      "community": 645,
       "norm_label": "standard library examples"
     },
     {
@@ -23214,7 +23214,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_builder_must_use_see_also",
-      "community": 689,
+      "community": 645,
       "norm_label": "see also"
     },
     {
@@ -23314,7 +23314,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_common_traits",
-      "community": 690,
+      "community": 129,
       "norm_label": "api-common-traits.md"
     },
     {
@@ -23524,7 +23524,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_extension_trait",
-      "community": 690,
+      "community": 129,
       "norm_label": "api-extension-trait.md"
     },
     {
@@ -23734,7 +23734,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_impl_asref",
-      "community": 896,
+      "community": 1279,
       "norm_label": "api-impl-asref.md"
     },
     {
@@ -23954,7 +23954,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_must_use",
-      "community": 588,
+      "community": 704,
       "norm_label": "api-must-use.md"
     },
     {
@@ -24164,7 +24164,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_non_exhaustive",
-      "community": 128,
+      "community": 129,
       "norm_label": "api-non-exhaustive.md"
     },
     {
@@ -24364,7 +24364,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_sealed_trait",
-      "community": 690,
+      "community": 129,
       "norm_label": "api-sealed-trait.md"
     },
     {
@@ -24584,7 +24584,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_typestate_api_typestate",
-      "community": 129,
+      "community": 809,
       "norm_label": "api-typestate"
     },
     {
@@ -24594,7 +24594,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_typestate_why_it_matters",
-      "community": 129,
+      "community": 809,
       "norm_label": "why it matters"
     },
     {
@@ -24604,7 +24604,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_typestate_bad",
-      "community": 129,
+      "community": 809,
       "norm_label": "bad"
     },
     {
@@ -24614,7 +24614,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_typestate_good",
-      "community": 129,
+      "community": 809,
       "norm_label": "good"
     },
     {
@@ -24624,7 +24624,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_typestate_builder_typestate",
-      "community": 129,
+      "community": 809,
       "norm_label": "builder typestate"
     },
     {
@@ -24634,7 +24634,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_typestate_transaction_example",
-      "community": 129,
+      "community": 809,
       "norm_label": "transaction example"
     },
     {
@@ -24644,7 +24644,7 @@
       "source_location": "L195",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_api_typestate_see_also",
-      "community": 129,
+      "community": 809,
       "norm_label": "see also"
     },
     {
@@ -24654,7 +24654,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_bounded_channel",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-bounded-channel.md"
     },
     {
@@ -24754,7 +24754,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_broadcast_pubsub",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-broadcast-pubsub.md"
     },
     {
@@ -24974,7 +24974,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_join_parallel",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-join-parallel.md"
     },
     {
@@ -25074,7 +25074,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_joinset_structured",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-joinset-structured.md"
     },
     {
@@ -25194,7 +25194,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_mpsc_queue",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-mpsc-queue.md"
     },
     {
@@ -25404,7 +25404,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_oneshot_response",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-oneshot-response.md"
     },
     {
@@ -25514,7 +25514,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_select_racing",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-select-racing.md"
     },
     {
@@ -25934,7 +25934,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_try_join",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-try-join.md"
     },
     {
@@ -26034,7 +26034,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_async_watch_latest",
-      "community": 588,
+      "community": 108,
       "norm_label": "async-watch-latest.md"
     },
     {
@@ -27114,7 +27114,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_doc_question_mark",
-      "community": 157,
+      "community": 645,
       "norm_label": "doc-question-mark"
     },
     {
@@ -27124,7 +27124,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_why_it_matters",
-      "community": 157,
+      "community": 645,
       "norm_label": "why it matters"
     },
     {
@@ -27134,7 +27134,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_bad",
-      "community": 157,
+      "community": 645,
       "norm_label": "bad"
     },
     {
@@ -27144,7 +27144,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_good",
-      "community": 157,
+      "community": 645,
       "norm_label": "good"
     },
     {
@@ -27154,7 +27154,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_doctest_wrapper_pattern",
-      "community": 157,
+      "community": 645,
       "norm_label": "doctest wrapper pattern"
     },
     {
@@ -27164,7 +27164,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_when_to_use_unwrap",
-      "community": 157,
+      "community": 645,
       "norm_label": "when to use `.unwrap()`"
     },
     {
@@ -27174,7 +27174,7 @@
       "source_location": "L124",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_comparison",
-      "community": 157,
+      "community": 645,
       "norm_label": "comparison"
     },
     {
@@ -27184,7 +27184,7 @@
       "source_location": "L132",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_doc_question_mark_see_also",
-      "community": 157,
+      "community": 645,
       "norm_label": "see also"
     },
     {
@@ -27704,7 +27704,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_err_expect_bugs_only",
-      "community": 149,
+      "community": 695,
       "norm_label": "err-expect-bugs-only"
     },
     {
@@ -27714,7 +27714,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_why_it_matters",
-      "community": 149,
+      "community": 695,
       "norm_label": "why it matters"
     },
     {
@@ -27724,7 +27724,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_bad",
-      "community": 149,
+      "community": 695,
       "norm_label": "bad"
     },
     {
@@ -27734,7 +27734,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_good",
-      "community": 149,
+      "community": 695,
       "norm_label": "good"
     },
     {
@@ -27744,7 +27744,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_expect_message_guidelines",
-      "community": 149,
+      "community": 695,
       "norm_label": "expect() message guidelines"
     },
     {
@@ -27754,7 +27754,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_pattern_validate_once_expect_after",
-      "community": 149,
+      "community": 695,
       "norm_label": "pattern: validate once, expect() after"
     },
     {
@@ -27764,7 +27764,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_alternatives_when_expect_is_wrong",
-      "community": 149,
+      "community": 695,
       "norm_label": "alternatives when expect() is wrong"
     },
     {
@@ -27774,7 +27774,7 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_err_expect_bugs_only_see_also",
-      "community": 149,
+      "community": 695,
       "norm_label": "see also"
     },
     {
@@ -28604,7 +28604,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_lint_deny_correctness",
-      "community": 781,
+      "community": 645,
       "norm_label": "lint-deny-correctness"
     },
     {
@@ -28614,7 +28614,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_why_it_matters",
-      "community": 781,
+      "community": 645,
       "norm_label": "why it matters"
     },
     {
@@ -28624,7 +28624,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_setup",
-      "community": 781,
+      "community": 645,
       "norm_label": "setup"
     },
     {
@@ -28634,7 +28634,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_what_it_catches",
-      "community": 781,
+      "community": 645,
       "norm_label": "what it catches"
     },
     {
@@ -28644,7 +28644,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_important_correctness_lints",
-      "community": 781,
+      "community": 645,
       "norm_label": "important correctness lints"
     },
     {
@@ -28654,7 +28654,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_full_recommended_lints",
-      "community": 781,
+      "community": 645,
       "norm_label": "full recommended lints"
     },
     {
@@ -28664,7 +28664,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_running_clippy",
-      "community": 781,
+      "community": 645,
       "norm_label": "running clippy"
     },
     {
@@ -28674,7 +28674,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_lint_deny_correctness_see_also",
-      "community": 781,
+      "community": 645,
       "norm_label": "see also"
     },
     {
@@ -30484,7 +30484,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_mem_clone_from",
-      "community": 896,
+      "community": 172,
       "norm_label": "mem-clone-from.md"
     },
     {
@@ -31384,7 +31384,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_mem_zero_copy",
-      "community": 896,
+      "community": 172,
       "norm_label": "mem-zero-copy.md"
     },
     {
@@ -31504,7 +31504,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_acronym_word",
-      "community": 588,
+      "community": 27,
       "norm_label": "name-acronym-word.md"
     },
     {
@@ -31694,7 +31694,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_consts_screaming",
-      "community": 588,
+      "community": 27,
       "norm_label": "name-consts-screaming.md"
     },
     {
@@ -31794,7 +31794,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_name_crate_no_rs",
-      "community": 808,
+      "community": 588,
       "norm_label": "name-crate-no-rs"
     },
     {
@@ -31804,7 +31804,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_why_it_matters",
-      "community": 808,
+      "community": 588,
       "norm_label": "why it matters"
     },
     {
@@ -31814,7 +31814,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_bad",
-      "community": 808,
+      "community": 588,
       "norm_label": "bad"
     },
     {
@@ -31824,7 +31824,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_good",
-      "community": 808,
+      "community": 588,
       "norm_label": "good"
     },
     {
@@ -31834,7 +31834,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_when_context_is_needed",
-      "community": 808,
+      "community": 588,
       "norm_label": "when context is needed"
     },
     {
@@ -31844,7 +31844,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_repository_naming",
-      "community": 808,
+      "community": 588,
       "norm_label": "repository naming"
     },
     {
@@ -31854,7 +31854,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_exceptions",
-      "community": 808,
+      "community": 588,
       "norm_label": "exceptions"
     },
     {
@@ -31864,7 +31864,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_crate_no_rs_see_also",
-      "community": 808,
+      "community": 588,
       "norm_label": "see also"
     },
     {
@@ -31874,7 +31874,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_funcs_snake",
-      "community": 588,
+      "community": 27,
       "norm_label": "name-funcs-snake.md"
     },
     {
@@ -31964,7 +31964,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_name_into_ownership",
-      "community": 778,
+      "community": 690,
       "norm_label": "name-into-ownership"
     },
     {
@@ -31974,7 +31974,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_why_it_matters",
-      "community": 778,
+      "community": 690,
       "norm_label": "why it matters"
     },
     {
@@ -31984,7 +31984,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_bad",
-      "community": 778,
+      "community": 690,
       "norm_label": "bad"
     },
     {
@@ -31994,7 +31994,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_good",
-      "community": 778,
+      "community": 690,
       "norm_label": "good"
     },
     {
@@ -32004,7 +32004,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_standard_library_examples",
-      "community": 778,
+      "community": 690,
       "norm_label": "standard library examples"
     },
     {
@@ -32014,7 +32014,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_into_iter_pattern",
-      "community": 778,
+      "community": 690,
       "norm_label": "into_iter() pattern"
     },
     {
@@ -32024,7 +32024,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_intoiterator_trait",
-      "community": 778,
+      "community": 690,
       "norm_label": "intoiterator trait"
     },
     {
@@ -32034,7 +32034,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_conversion_prefix_summary",
-      "community": 778,
+      "community": 690,
       "norm_label": "conversion prefix summary"
     },
     {
@@ -32044,7 +32044,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_into_ownership_see_also",
-      "community": 778,
+      "community": 690,
       "norm_label": "see also"
     },
     {
@@ -32054,7 +32054,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_is_has_bool",
-      "community": 588,
+      "community": 27,
       "norm_label": "name-is-has-bool.md"
     },
     {
@@ -32154,7 +32154,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_convention",
-      "community": 690,
+      "community": 129,
       "norm_label": "name-iter-convention.md"
     },
     {
@@ -32254,7 +32254,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_method",
-      "community": 690,
+      "community": 129,
       "norm_label": "name-iter-method.md"
     },
     {
@@ -32344,7 +32344,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match",
-      "community": 690,
+      "community": 129,
       "norm_label": "name-iter-type-match.md"
     },
     {
@@ -32354,7 +32354,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_name_iter_type_match",
-      "community": 690,
+      "community": 702,
       "norm_label": "name-iter-type-match"
     },
     {
@@ -32364,7 +32364,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_why_it_matters",
-      "community": 690,
+      "community": 702,
       "norm_label": "why it matters"
     },
     {
@@ -32374,7 +32374,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_standard_library_pattern",
-      "community": 690,
+      "community": 702,
       "norm_label": "standard library pattern"
     },
     {
@@ -32384,7 +32384,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_implementation",
-      "community": 690,
+      "community": 702,
       "norm_label": "implementation"
     },
     {
@@ -32394,7 +32394,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_naming_convention",
-      "community": 690,
+      "community": 702,
       "norm_label": "naming convention"
     },
     {
@@ -32404,7 +32404,7 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_custom_iterator_methods",
-      "community": 690,
+      "community": 702,
       "norm_label": "custom iterator methods"
     },
     {
@@ -32414,7 +32414,7 @@
       "source_location": "L124",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_bad",
-      "community": 690,
+      "community": 702,
       "norm_label": "bad"
     },
     {
@@ -32424,7 +32424,7 @@
       "source_location": "L138",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_iter_type_match_see_also",
-      "community": 690,
+      "community": 702,
       "norm_label": "see also"
     },
     {
@@ -32434,7 +32434,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_lifetime_short",
-      "community": 896,
+      "community": 27,
       "norm_label": "name-lifetime-short.md"
     },
     {
@@ -32524,7 +32524,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_no_get_prefix",
-      "community": 588,
+      "community": 27,
       "norm_label": "name-no-get-prefix.md"
     },
     {
@@ -32734,7 +32734,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single",
-      "community": 896,
+      "community": 27,
       "norm_label": "name-type-param-single.md"
     },
     {
@@ -32744,7 +32744,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_name_type_param_single",
-      "community": 809,
+      "community": 27,
       "norm_label": "name-type-param-single"
     },
     {
@@ -32754,7 +32754,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_why_it_matters",
-      "community": 809,
+      "community": 27,
       "norm_label": "why it matters"
     },
     {
@@ -32764,7 +32764,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_bad",
-      "community": 809,
+      "community": 27,
       "norm_label": "bad"
     },
     {
@@ -32774,7 +32774,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_good",
-      "community": 809,
+      "community": 27,
       "norm_label": "good"
     },
     {
@@ -32784,7 +32784,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_standard_type_parameter_names",
-      "community": 809,
+      "community": 27,
       "norm_label": "standard type parameter names"
     },
     {
@@ -32794,7 +32794,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_multiple_type_parameters",
-      "community": 809,
+      "community": 27,
       "norm_label": "multiple type parameters"
     },
     {
@@ -32804,7 +32804,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_trait_bounds",
-      "community": 809,
+      "community": 27,
       "norm_label": "trait bounds"
     },
     {
@@ -32814,7 +32814,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_type_param_single_see_also",
-      "community": 809,
+      "community": 27,
       "norm_label": "see also"
     },
     {
@@ -32824,7 +32824,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_types_camel",
-      "community": 588,
+      "community": 27,
       "norm_label": "name-types-camel.md"
     },
     {
@@ -32904,7 +32904,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel",
-      "community": 128,
+      "community": 129,
       "norm_label": "name-variants-camel.md"
     },
     {
@@ -32914,7 +32914,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel_name_variants_camel",
-      "community": 128,
+      "community": 129,
       "norm_label": "name-variants-camel"
     },
     {
@@ -32924,7 +32924,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel_why_it_matters",
-      "community": 128,
+      "community": 129,
       "norm_label": "why it matters"
     },
     {
@@ -32934,7 +32934,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel_bad",
-      "community": 128,
+      "community": 129,
       "norm_label": "bad"
     },
     {
@@ -32944,7 +32944,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel_good",
-      "community": 128,
+      "community": 129,
       "norm_label": "good"
     },
     {
@@ -32954,7 +32954,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel_variants_with_data",
-      "community": 128,
+      "community": 129,
       "norm_label": "variants with data"
     },
     {
@@ -32964,7 +32964,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel_variant_naming_tips",
-      "community": 128,
+      "community": 129,
       "norm_label": "variant naming tips"
     },
     {
@@ -32974,7 +32974,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_name_variants_camel_see_also",
-      "community": 128,
+      "community": 129,
       "norm_label": "see also"
     },
     {
@@ -32984,7 +32984,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_opt_bounds_check",
-      "community": 172,
+      "community": 108,
       "norm_label": "opt-bounds-check.md"
     },
     {
@@ -34134,7 +34134,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_opt_simd_portable",
-      "community": 172,
+      "community": 108,
       "norm_label": "opt-simd-portable.md"
     },
     {
@@ -34454,7 +34454,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone",
-      "community": 896,
+      "community": 172,
       "norm_label": "own-borrow-over-clone.md"
     },
     {
@@ -34464,7 +34464,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone_own_borrow_over_clone",
-      "community": 896,
+      "community": 172,
       "norm_label": "own-borrow-over-clone"
     },
     {
@@ -34474,7 +34474,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone_why_it_matters",
-      "community": 896,
+      "community": 172,
       "norm_label": "why it matters"
     },
     {
@@ -34484,7 +34484,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone_bad",
-      "community": 896,
+      "community": 172,
       "norm_label": "bad"
     },
     {
@@ -34494,7 +34494,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone_good",
-      "community": 896,
+      "community": 172,
       "norm_label": "good"
     },
     {
@@ -34504,7 +34504,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone_when_clone_is_acceptable",
-      "community": 896,
+      "community": 172,
       "norm_label": "when clone is acceptable"
     },
     {
@@ -34514,7 +34514,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone_evidence",
-      "community": 896,
+      "community": 172,
       "norm_label": "evidence"
     },
     {
@@ -34524,7 +34524,7 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_borrow_over_clone_see_also",
-      "community": 896,
+      "community": 172,
       "norm_label": "see also"
     },
     {
@@ -34534,7 +34534,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_clone_explicit",
-      "community": 896,
+      "community": 172,
       "norm_label": "own-clone-explicit.md"
     },
     {
@@ -34724,7 +34724,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_cow_conditional",
-      "community": 896,
+      "community": 172,
       "norm_label": "own-cow-conditional.md"
     },
     {
@@ -34824,7 +34824,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_lifetime_elision",
-      "community": 896,
+      "community": 27,
       "norm_label": "own-lifetime-elision.md"
     },
     {
@@ -35134,7 +35134,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_rc_single_thread_own_rc_single_thread",
-      "community": 772,
+      "community": 887,
       "norm_label": "own-rc-single-thread"
     },
     {
@@ -35144,7 +35144,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_rc_single_thread_why_it_matters",
-      "community": 772,
+      "community": 887,
       "norm_label": "why it matters"
     },
     {
@@ -35154,7 +35154,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_rc_single_thread_bad",
-      "community": 772,
+      "community": 887,
       "norm_label": "bad"
     },
     {
@@ -35164,7 +35164,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_rc_single_thread_good",
-      "community": 772,
+      "community": 887,
       "norm_label": "good"
     },
     {
@@ -35174,7 +35174,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_rc_single_thread_decision_guide",
-      "community": 772,
+      "community": 887,
       "norm_label": "decision guide"
     },
     {
@@ -35184,7 +35184,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_rc_single_thread_evidence",
-      "community": 772,
+      "community": 887,
       "norm_label": "evidence"
     },
     {
@@ -35194,7 +35194,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_rc_single_thread_see_also",
-      "community": 772,
+      "community": 887,
       "norm_label": "see also"
     },
     {
@@ -35384,7 +35384,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_own_slice_over_vec",
-      "community": 896,
+      "community": 1279,
       "norm_label": "own-slice-over-vec.md"
     },
     {
@@ -35594,7 +35594,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_perf_chain_avoid",
-      "community": 172,
+      "community": 108,
       "norm_label": "perf-chain-avoid.md"
     },
     {
@@ -35814,7 +35814,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_perf_collect_once",
-      "community": 172,
+      "community": 108,
       "norm_label": "perf-collect-once.md"
     },
     {
@@ -36244,7 +36244,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_perf_iter_lazy",
-      "community": 172,
+      "community": 108,
       "norm_label": "perf-iter-lazy.md"
     },
     {
@@ -36344,7 +36344,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_perf_iter_over_index",
-      "community": 172,
+      "community": 108,
       "norm_label": "perf-iter-over-index.md"
     },
     {
@@ -36734,7 +36734,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_bin_dir",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-bin-dir.md"
     },
     {
@@ -36854,7 +36854,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_flat_small",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-flat-small.md"
     },
     {
@@ -36994,7 +36994,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_lib_main_split",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-lib-main-split.md"
     },
     {
@@ -37094,7 +37094,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_mod_by_feature",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-mod-by-feature.md"
     },
     {
@@ -37204,7 +37204,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_mod_rs_dir",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-mod-rs-dir.md"
     },
     {
@@ -37454,7 +37454,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_pub_crate_internal",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-pub-crate-internal.md"
     },
     {
@@ -37564,7 +37564,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_pub_super_parent",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-pub-super-parent.md"
     },
     {
@@ -37674,7 +37674,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_pub_use_reexport",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-pub-use-reexport.md"
     },
     {
@@ -37914,7 +37914,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_proj_workspace_large",
-      "community": 128,
+      "community": 1964,
       "norm_label": "proj-workspace-large.md"
     },
     {
@@ -38154,7 +38154,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_test_cfg_test_module",
-      "community": 1964,
+      "community": 767,
       "norm_label": "test-cfg-test-module"
     },
     {
@@ -38164,7 +38164,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_why_it_matters",
-      "community": 1964,
+      "community": 767,
       "norm_label": "why it matters"
     },
     {
@@ -38174,7 +38174,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_bad",
-      "community": 1964,
+      "community": 767,
       "norm_label": "bad"
     },
     {
@@ -38184,7 +38184,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_good",
-      "community": 1964,
+      "community": 767,
       "norm_label": "good"
     },
     {
@@ -38194,7 +38194,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_module_structure",
-      "community": 1964,
+      "community": 767,
       "norm_label": "module structure"
     },
     {
@@ -38204,7 +38204,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_test_helpers",
-      "community": 1964,
+      "community": 767,
       "norm_label": "test helpers"
     },
     {
@@ -38214,7 +38214,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_multiple_test_modules",
-      "community": 1964,
+      "community": 767,
       "norm_label": "multiple test modules"
     },
     {
@@ -38224,7 +38224,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_cfg_test_module_see_also",
-      "community": 1964,
+      "community": 767,
       "norm_label": "see also"
     },
     {
@@ -38364,7 +38364,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_test_descriptive_names",
-      "community": 768,
+      "community": 1964,
       "norm_label": "test-descriptive-names"
     },
     {
@@ -38374,7 +38374,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_why_it_matters",
-      "community": 768,
+      "community": 1964,
       "norm_label": "why it matters"
     },
     {
@@ -38384,7 +38384,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_bad",
-      "community": 768,
+      "community": 1964,
       "norm_label": "bad"
     },
     {
@@ -38394,7 +38394,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_good",
-      "community": 768,
+      "community": 1964,
       "norm_label": "good"
     },
     {
@@ -38404,7 +38404,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_naming_patterns",
-      "community": 768,
+      "community": 1964,
       "norm_label": "naming patterns"
     },
     {
@@ -38414,7 +38414,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_edge_cases",
-      "community": 768,
+      "community": 1964,
       "norm_label": "edge cases"
     },
     {
@@ -38424,7 +38424,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_error_cases",
-      "community": 768,
+      "community": 1964,
       "norm_label": "error cases"
     },
     {
@@ -38434,7 +38434,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_module_organization",
-      "community": 768,
+      "community": 1964,
       "norm_label": "module organization"
     },
     {
@@ -38444,7 +38444,7 @@
       "source_location": "L138",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_descriptive_names_see_also",
-      "community": 768,
+      "community": 1964,
       "norm_label": "see also"
     },
     {
@@ -38864,7 +38864,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_test_mockall_mocking",
-      "community": 658,
+      "community": 633,
       "norm_label": "test-mockall-mocking"
     },
     {
@@ -38874,7 +38874,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_why_it_matters",
-      "community": 658,
+      "community": 633,
       "norm_label": "why it matters"
     },
     {
@@ -38884,7 +38884,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_setup",
-      "community": 658,
+      "community": 633,
       "norm_label": "setup"
     },
     {
@@ -38894,7 +38894,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_basic_usage",
-      "community": 658,
+      "community": 633,
       "norm_label": "basic usage"
     },
     {
@@ -38904,7 +38904,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_expectations",
-      "community": 658,
+      "community": 633,
       "norm_label": "expectations"
     },
     {
@@ -38914,7 +38914,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_predicates",
-      "community": 658,
+      "community": 633,
       "norm_label": "predicates"
     },
     {
@@ -38924,7 +38924,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_sequences",
-      "community": 658,
+      "community": 633,
       "norm_label": "sequences"
     },
     {
@@ -38934,7 +38934,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_return_values",
-      "community": 658,
+      "community": 633,
       "norm_label": "return values"
     },
     {
@@ -38944,7 +38944,7 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_mocking_external_traits",
-      "community": 658,
+      "community": 633,
       "norm_label": "mocking external traits"
     },
     {
@@ -38954,7 +38954,7 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_async_mocking",
-      "community": 658,
+      "community": 633,
       "norm_label": "async mocking"
     },
     {
@@ -38964,7 +38964,7 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_design_for_testability",
-      "community": 658,
+      "community": 633,
       "norm_label": "design for testability"
     },
     {
@@ -38974,7 +38974,7 @@
       "source_location": "L222",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_test_mockall_mocking_see_also",
-      "community": 658,
+      "community": 633,
       "norm_label": "see also"
     },
     {
@@ -39394,7 +39394,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_enum_states",
-      "community": 128,
+      "community": 129,
       "norm_label": "type-enum-states.md"
     },
     {
@@ -39494,7 +39494,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_generic_bounds",
-      "community": 896,
+      "community": 1279,
       "norm_label": "type-generic-bounds.md"
     },
     {
@@ -40324,7 +40324,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_type_result_fallible",
-      "community": 704,
+      "community": 768,
       "norm_label": "type-result-fallible"
     },
     {
@@ -40334,7 +40334,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_why_it_matters",
-      "community": 704,
+      "community": 768,
       "norm_label": "why it matters"
     },
     {
@@ -40344,7 +40344,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_bad",
-      "community": 704,
+      "community": 768,
       "norm_label": "bad"
     },
     {
@@ -40354,7 +40354,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_good",
-      "community": 704,
+      "community": 768,
       "norm_label": "good"
     },
     {
@@ -40364,7 +40364,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_the_operator",
-      "community": 704,
+      "community": 768,
       "norm_label": "the ? operator"
     },
     {
@@ -40374,7 +40374,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_result_combinators",
-      "community": 704,
+      "community": 768,
       "norm_label": "result combinators"
     },
     {
@@ -40384,7 +40384,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_defining_error_types",
-      "community": 704,
+      "community": 768,
       "norm_label": "defining error types"
     },
     {
@@ -40394,7 +40394,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "agent_skills_rust_skills_rules_type_result_fallible_see_also",
-      "community": 704,
+      "community": 768,
       "norm_label": "see also"
     },
     {
@@ -42144,7 +42144,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_anti_over_abstraction",
-      "community": 1286,
+      "community": 817,
       "norm_label": "anti-over-abstraction.md"
     },
     {
@@ -42654,7 +42654,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_anti_type_erasure",
-      "community": 1286,
+      "community": 817,
       "norm_label": "anti-type-erasure.md"
     },
     {
@@ -42974,7 +42974,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_builder_must_use",
-      "community": 125,
+      "community": 814,
       "norm_label": "api-builder-must-use.md"
     },
     {
@@ -43074,7 +43074,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_builder_pattern",
-      "community": 125,
+      "community": 814,
       "norm_label": "api-builder-pattern.md"
     },
     {
@@ -43164,7 +43164,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_common_traits",
-      "community": 903,
+      "community": 814,
       "norm_label": "api-common-traits.md"
     },
     {
@@ -43274,7 +43274,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_default_impl",
-      "community": 125,
+      "community": 814,
       "norm_label": "api-default-impl.md"
     },
     {
@@ -43474,7 +43474,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_from_not_into",
-      "community": 125,
+      "community": 814,
       "norm_label": "api-from-not-into.md"
     },
     {
@@ -43694,7 +43694,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_impl_into",
-      "community": 125,
+      "community": 814,
       "norm_label": "api-impl-into.md"
     },
     {
@@ -43804,7 +43804,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_must_use",
-      "community": 125,
+      "community": 814,
       "norm_label": "api-must-use.md"
     },
     {
@@ -44014,7 +44014,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_api_non_exhaustive",
-      "community": 814,
+      "community": 34,
       "norm_label": "api-non-exhaustive.md"
     },
     {
@@ -44514,7 +44514,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_async_bounded_channel",
-      "community": 638,
+      "community": 689,
       "norm_label": "async-bounded-channel"
     },
     {
@@ -44524,7 +44524,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_why_it_matters",
-      "community": 638,
+      "community": 689,
       "norm_label": "why it matters"
     },
     {
@@ -44534,7 +44534,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_bad",
-      "community": 638,
+      "community": 689,
       "norm_label": "bad"
     },
     {
@@ -44544,7 +44544,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_good",
-      "community": 638,
+      "community": 689,
       "norm_label": "good"
     },
     {
@@ -44554,7 +44554,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_choosing_buffer_size",
-      "community": 638,
+      "community": 689,
       "norm_label": "choosing buffer size"
     },
     {
@@ -44564,7 +44564,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_handling_full_channel",
-      "community": 638,
+      "community": 689,
       "norm_label": "handling full channel"
     },
     {
@@ -44574,7 +44574,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_channel_types",
-      "community": 638,
+      "community": 689,
       "norm_label": "channel types"
     },
     {
@@ -44584,7 +44584,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_worker_pool_pattern",
-      "community": 638,
+      "community": 689,
       "norm_label": "worker pool pattern"
     },
     {
@@ -44594,7 +44594,7 @@
       "source_location": "L171",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_async_bounded_channel_see_also",
-      "community": 638,
+      "community": 689,
       "norm_label": "see also"
     },
     {
@@ -47634,7 +47634,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_err_from_impl",
-      "community": 125,
+      "community": 814,
       "norm_label": "err-from-impl.md"
     },
     {
@@ -47724,7 +47724,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_err_lowercase_msg",
-      "community": 814,
+      "community": 125,
       "norm_label": "err-lowercase-msg.md"
     },
     {
@@ -49784,7 +49784,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec",
-      "community": 1099,
+      "community": 1216,
       "norm_label": "mem-arrayvec.md"
     },
     {
@@ -49794,7 +49794,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_mem_arrayvec",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "mem-arrayvec"
     },
     {
@@ -49804,7 +49804,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_why_it_matters",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "why it matters"
     },
     {
@@ -49814,7 +49814,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_bad",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "bad"
     },
     {
@@ -49824,7 +49824,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_good",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "good"
     },
     {
@@ -49834,7 +49834,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_arrayvec_vs_smallvec_vs_vec",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "arrayvec vs smallvec vs vec"
     },
     {
@@ -49844,7 +49844,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_api_patterns",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "api patterns"
     },
     {
@@ -49854,7 +49854,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_arraystring_for_stack_strings",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "arraystring for stack strings"
     },
     {
@@ -49864,7 +49864,7 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_when_not_to_use_arrayvec",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "when not to use arrayvec"
     },
     {
@@ -49874,7 +49874,7 @@
       "source_location": "L131",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_cargo_toml",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "cargo.toml"
     },
     {
@@ -49884,7 +49884,7 @@
       "source_location": "L138",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_arrayvec_see_also",
-      "community": 1203,
+      "community": 1216,
       "norm_label": "see also"
     },
     {
@@ -50334,7 +50334,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_clone_from",
-      "community": 817,
+      "community": 1099,
       "norm_label": "mem-clone-from.md"
     },
     {
@@ -50694,7 +50694,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_mem_smaller_integers",
-      "community": 702,
+      "community": 32,
       "norm_label": "mem-smaller-integers"
     },
     {
@@ -50704,7 +50704,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_why_it_matters",
-      "community": 702,
+      "community": 32,
       "norm_label": "why it matters"
     },
     {
@@ -50714,7 +50714,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_bad",
-      "community": 702,
+      "community": 32,
       "norm_label": "bad"
     },
     {
@@ -50724,7 +50724,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_good",
-      "community": 702,
+      "community": 32,
       "norm_label": "good"
     },
     {
@@ -50734,7 +50734,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_integer_size_reference",
-      "community": 702,
+      "community": 32,
       "norm_label": "integer size reference"
     },
     {
@@ -50744,7 +50744,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_struct_packing",
-      "community": 702,
+      "community": 32,
       "norm_label": "struct packing"
     },
     {
@@ -50754,7 +50754,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_conversion_safety",
-      "community": 702,
+      "community": 32,
       "norm_label": "conversion safety"
     },
     {
@@ -50764,7 +50764,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_bitflags_for_boolean_sets",
-      "community": 702,
+      "community": 32,
       "norm_label": "bitflags for boolean sets"
     },
     {
@@ -50774,7 +50774,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_nonzero_types_for_option_optimization",
-      "community": 702,
+      "community": 32,
       "norm_label": "nonzero types for option optimization"
     },
     {
@@ -50784,7 +50784,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_mem_smaller_integers_see_also",
-      "community": 702,
+      "community": 32,
       "norm_label": "see also"
     },
     {
@@ -51354,7 +51354,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_acronym_word",
-      "community": 1326,
+      "community": 814,
       "norm_label": "name-acronym-word.md"
     },
     {
@@ -51454,7 +51454,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free",
-      "community": 137,
+      "community": 814,
       "norm_label": "name-as-free.md"
     },
     {
@@ -51464,7 +51464,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_name_as_free",
-      "community": 137,
+      "community": 778,
       "norm_label": "name-as-free"
     },
     {
@@ -51474,7 +51474,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_why_it_matters",
-      "community": 137,
+      "community": 778,
       "norm_label": "why it matters"
     },
     {
@@ -51484,7 +51484,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_the_convention",
-      "community": 137,
+      "community": 778,
       "norm_label": "the convention"
     },
     {
@@ -51494,7 +51494,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_examples",
-      "community": 137,
+      "community": 778,
       "norm_label": "examples"
     },
     {
@@ -51504,7 +51504,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_standard_library_examples",
-      "community": 137,
+      "community": 778,
       "norm_label": "standard library examples"
     },
     {
@@ -51514,7 +51514,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_bad",
-      "community": 137,
+      "community": 778,
       "norm_label": "bad"
     },
     {
@@ -51524,7 +51524,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_good",
-      "community": 137,
+      "community": 778,
       "norm_label": "good"
     },
     {
@@ -51534,7 +51534,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_as_free_see_also",
-      "community": 137,
+      "community": 778,
       "norm_label": "see also"
     },
     {
@@ -51544,7 +51544,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_consts_screaming",
-      "community": 1326,
+      "community": 814,
       "norm_label": "name-consts-screaming.md"
     },
     {
@@ -51724,7 +51724,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_funcs_snake",
-      "community": 1326,
+      "community": 814,
       "norm_label": "name-funcs-snake.md"
     },
     {
@@ -51804,7 +51804,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_into_ownership",
-      "community": 137,
+      "community": 814,
       "norm_label": "name-into-ownership.md"
     },
     {
@@ -51904,7 +51904,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_is_has_bool",
-      "community": 125,
+      "community": 814,
       "norm_label": "name-is-has-bool.md"
     },
     {
@@ -52004,7 +52004,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_convention",
-      "community": 903,
+      "community": 814,
       "norm_label": "name-iter-convention.md"
     },
     {
@@ -52104,7 +52104,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method",
-      "community": 903,
+      "community": 814,
       "norm_label": "name-iter-method.md"
     },
     {
@@ -52114,7 +52114,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_name_iter_method",
-      "community": 1322,
+      "community": 781,
       "norm_label": "name-iter-method"
     },
     {
@@ -52124,7 +52124,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_why_it_matters",
-      "community": 1322,
+      "community": 781,
       "norm_label": "why it matters"
     },
     {
@@ -52134,7 +52134,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_bad",
-      "community": 1322,
+      "community": 781,
       "norm_label": "bad"
     },
     {
@@ -52144,7 +52144,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_good",
-      "community": 1322,
+      "community": 781,
       "norm_label": "good"
     },
     {
@@ -52154,7 +52154,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_iterator_convention_summary",
-      "community": 1322,
+      "community": 781,
       "norm_label": "iterator convention summary"
     },
     {
@@ -52164,7 +52164,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_for_loop_integration",
-      "community": 1322,
+      "community": 781,
       "norm_label": "for loop integration"
     },
     {
@@ -52174,7 +52174,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_additional_iterator_methods",
-      "community": 1322,
+      "community": 781,
       "norm_label": "additional iterator methods"
     },
     {
@@ -52184,7 +52184,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_method_see_also",
-      "community": 1322,
+      "community": 781,
       "norm_label": "see also"
     },
     {
@@ -52194,7 +52194,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_iter_type_match",
-      "community": 903,
+      "community": 814,
       "norm_label": "name-iter-type-match.md"
     },
     {
@@ -52284,7 +52284,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short",
-      "community": 1326,
+      "community": 817,
       "norm_label": "name-lifetime-short.md"
     },
     {
@@ -52294,7 +52294,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_name_lifetime_short",
-      "community": 1326,
+      "community": 782,
       "norm_label": "name-lifetime-short"
     },
     {
@@ -52304,7 +52304,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_why_it_matters",
-      "community": 1326,
+      "community": 782,
       "norm_label": "why it matters"
     },
     {
@@ -52314,7 +52314,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_bad",
-      "community": 1326,
+      "community": 782,
       "norm_label": "bad"
     },
     {
@@ -52324,7 +52324,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_good",
-      "community": 1326,
+      "community": 782,
       "norm_label": "good"
     },
     {
@@ -52334,7 +52334,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_common_lifetime_conventions",
-      "community": 1326,
+      "community": 782,
       "norm_label": "common lifetime conventions"
     },
     {
@@ -52344,7 +52344,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_elision_preferred",
-      "community": 1326,
+      "community": 782,
       "norm_label": "elision preferred"
     },
     {
@@ -52354,7 +52354,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_serde_convention",
-      "community": 1326,
+      "community": 782,
       "norm_label": "serde convention"
     },
     {
@@ -52364,7 +52364,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_lifetime_short_see_also",
-      "community": 1326,
+      "community": 782,
       "norm_label": "see also"
     },
     {
@@ -52374,7 +52374,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_no_get_prefix",
-      "community": 125,
+      "community": 814,
       "norm_label": "name-no-get-prefix.md"
     },
     {
@@ -52484,7 +52484,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_to_expensive",
-      "community": 137,
+      "community": 814,
       "norm_label": "name-to-expensive.md"
     },
     {
@@ -52584,7 +52584,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single",
-      "community": 1326,
+      "community": 817,
       "norm_label": "name-type-param-single.md"
     },
     {
@@ -52594,7 +52594,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_name_type_param_single",
-      "community": 1326,
+      "community": 817,
       "norm_label": "name-type-param-single"
     },
     {
@@ -52604,7 +52604,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_why_it_matters",
-      "community": 1326,
+      "community": 817,
       "norm_label": "why it matters"
     },
     {
@@ -52614,7 +52614,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_bad",
-      "community": 1326,
+      "community": 817,
       "norm_label": "bad"
     },
     {
@@ -52624,7 +52624,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_good",
-      "community": 1326,
+      "community": 817,
       "norm_label": "good"
     },
     {
@@ -52634,7 +52634,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_standard_type_parameter_names",
-      "community": 1326,
+      "community": 817,
       "norm_label": "standard type parameter names"
     },
     {
@@ -52644,7 +52644,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_multiple_type_parameters",
-      "community": 1326,
+      "community": 817,
       "norm_label": "multiple type parameters"
     },
     {
@@ -52654,7 +52654,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_trait_bounds",
-      "community": 1326,
+      "community": 817,
       "norm_label": "trait bounds"
     },
     {
@@ -52664,7 +52664,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_type_param_single_see_also",
-      "community": 1326,
+      "community": 817,
       "norm_label": "see also"
     },
     {
@@ -52674,7 +52674,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_types_camel",
-      "community": 1326,
+      "community": 814,
       "norm_label": "name-types-camel.md"
     },
     {
@@ -52754,7 +52754,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_name_variants_camel",
-      "community": 814,
+      "community": 34,
       "norm_label": "name-variants-camel.md"
     },
     {
@@ -53754,7 +53754,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_opt_lto_release",
-      "community": 666,
+      "community": 156,
       "norm_label": "opt-lto-release"
     },
     {
@@ -53764,7 +53764,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_why_it_matters",
-      "community": 666,
+      "community": 156,
       "norm_label": "why it matters"
     },
     {
@@ -53774,7 +53774,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_bad",
-      "community": 666,
+      "community": 156,
       "norm_label": "bad"
     },
     {
@@ -53784,7 +53784,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_good",
-      "community": 666,
+      "community": 156,
       "norm_label": "good"
     },
     {
@@ -53794,7 +53794,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_lto_options_explained",
-      "community": 666,
+      "community": 156,
       "norm_label": "lto options explained"
     },
     {
@@ -53804,7 +53804,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_trade_offs",
-      "community": 666,
+      "community": 156,
       "norm_label": "trade-offs"
     },
     {
@@ -53814,7 +53814,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_evidence_from_production",
-      "community": 666,
+      "community": 156,
       "norm_label": "evidence from production"
     },
     {
@@ -53824,7 +53824,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_complete_optimized_profile",
-      "community": 666,
+      "community": 156,
       "norm_label": "complete optimized profile"
     },
     {
@@ -53834,7 +53834,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_when_to_use_each",
-      "community": 666,
+      "community": 156,
       "norm_label": "when to use each"
     },
     {
@@ -53844,7 +53844,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_measuring_impact",
-      "community": 666,
+      "community": 156,
       "norm_label": "measuring impact"
     },
     {
@@ -53854,7 +53854,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_opt_lto_release_see_also",
-      "community": 666,
+      "community": 156,
       "norm_label": "see also"
     },
     {
@@ -54314,7 +54314,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_borrow_over_clone_own_borrow_over_clone",
-      "community": 817,
+      "community": 892,
       "norm_label": "own-borrow-over-clone"
     },
     {
@@ -54324,7 +54324,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_borrow_over_clone_why_it_matters",
-      "community": 817,
+      "community": 892,
       "norm_label": "why it matters"
     },
     {
@@ -54334,7 +54334,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_borrow_over_clone_bad",
-      "community": 817,
+      "community": 892,
       "norm_label": "bad"
     },
     {
@@ -54344,7 +54344,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_borrow_over_clone_good",
-      "community": 817,
+      "community": 892,
       "norm_label": "good"
     },
     {
@@ -54354,7 +54354,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_borrow_over_clone_when_clone_is_acceptable",
-      "community": 817,
+      "community": 892,
       "norm_label": "when clone is acceptable"
     },
     {
@@ -54364,7 +54364,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_borrow_over_clone_evidence",
-      "community": 817,
+      "community": 892,
       "norm_label": "evidence"
     },
     {
@@ -54374,7 +54374,7 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_borrow_over_clone_see_also",
-      "community": 817,
+      "community": 892,
       "norm_label": "see also"
     },
     {
@@ -54674,7 +54674,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_own_lifetime_elision",
-      "community": 1326,
+      "community": 817,
       "norm_label": "own-lifetime-elision.md"
     },
     {
@@ -56584,7 +56584,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_bin_dir",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-bin-dir.md"
     },
     {
@@ -56704,7 +56704,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_flat_small",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-flat-small.md"
     },
     {
@@ -56844,7 +56844,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_lib_main_split",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-lib-main-split.md"
     },
     {
@@ -56944,7 +56944,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_mod_by_feature",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-mod-by-feature.md"
     },
     {
@@ -57054,7 +57054,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_mod_rs_dir",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-mod-rs-dir.md"
     },
     {
@@ -57304,7 +57304,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_pub_crate_internal",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-pub-crate-internal.md"
     },
     {
@@ -57414,7 +57414,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_pub_super_parent",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-pub-super-parent.md"
     },
     {
@@ -57524,7 +57524,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_pub_use_reexport",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-pub-use-reexport.md"
     },
     {
@@ -57764,7 +57764,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_proj_workspace_large",
-      "community": 814,
+      "community": 34,
       "norm_label": "proj-workspace-large.md"
     },
     {
@@ -57894,7 +57894,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_arrange_act_assert",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-arrange-act-assert.md"
     },
     {
@@ -57994,7 +57994,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_cfg_test_module",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-cfg-test-module.md"
     },
     {
@@ -58204,7 +58204,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_descriptive_names",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-descriptive-names.md"
     },
     {
@@ -58414,7 +58414,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_fixture_raii",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-fixture-raii.md"
     },
     {
@@ -58494,7 +58494,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_integration_dir",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-integration-dir.md"
     },
     {
@@ -58604,7 +58604,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_mock_traits",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-mock-traits.md"
     },
     {
@@ -58704,7 +58704,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_mockall_mocking",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-mockall-mocking.md"
     },
     {
@@ -58834,7 +58834,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_proptest_properties",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-proptest-properties.md"
     },
     {
@@ -59054,7 +59054,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_tokio_async",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-tokio-async.md"
     },
     {
@@ -59154,7 +59154,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_test_use_super",
-      "community": 814,
+      "community": 34,
       "norm_label": "test-use-super.md"
     },
     {
@@ -59244,7 +59244,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_enum_states",
-      "community": 814,
+      "community": 34,
       "norm_label": "type-enum-states.md"
     },
     {
@@ -59344,7 +59344,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_generic_bounds",
-      "community": 1286,
+      "community": 817,
       "norm_label": "type-generic-bounds.md"
     },
     {
@@ -59564,7 +59564,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_type_newtype_ids",
-      "community": 132,
+      "community": 820,
       "norm_label": "type-newtype-ids"
     },
     {
@@ -59574,7 +59574,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_why_it_matters",
-      "community": 132,
+      "community": 820,
       "norm_label": "why it matters"
     },
     {
@@ -59584,7 +59584,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_bad",
-      "community": 132,
+      "community": 820,
       "norm_label": "bad"
     },
     {
@@ -59594,7 +59594,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_good",
-      "community": 132,
+      "community": 820,
       "norm_label": "good"
     },
     {
@@ -59604,7 +59604,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_derive_common_traits",
-      "community": 132,
+      "community": 820,
       "norm_label": "derive common traits"
     },
     {
@@ -59614,7 +59614,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_add_useful_methods",
-      "community": 132,
+      "community": 820,
       "norm_label": "add useful methods"
     },
     {
@@ -59624,7 +59624,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_with_serde",
-      "community": 132,
+      "community": 820,
       "norm_label": "with serde"
     },
     {
@@ -59634,7 +59634,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_string_ids_uuids_etc",
-      "community": 132,
+      "community": 820,
       "norm_label": "string ids (uuids, etc.)"
     },
     {
@@ -59644,7 +59644,7 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_multiple_related_ids",
-      "community": 132,
+      "community": 820,
       "norm_label": "multiple related ids"
     },
     {
@@ -59654,7 +59654,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_ids_see_also",
-      "community": 132,
+      "community": 820,
       "norm_label": "see also"
     },
     {
@@ -59674,7 +59674,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_type_newtype_validated",
-      "community": 132,
+      "community": 820,
       "norm_label": "type-newtype-validated"
     },
     {
@@ -59684,7 +59684,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_why_it_matters",
-      "community": 132,
+      "community": 820,
       "norm_label": "why it matters"
     },
     {
@@ -59694,7 +59694,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_bad",
-      "community": 132,
+      "community": 820,
       "norm_label": "bad"
     },
     {
@@ -59704,7 +59704,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_good",
-      "community": 132,
+      "community": 820,
       "norm_label": "good"
     },
     {
@@ -59714,7 +59714,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_common_validated_types",
-      "community": 132,
+      "community": 820,
       "norm_label": "common validated types"
     },
     {
@@ -59724,7 +59724,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_with_serde",
-      "community": 132,
+      "community": 820,
       "norm_label": "with serde"
     },
     {
@@ -59734,7 +59734,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_compile_time_validation",
-      "community": 132,
+      "community": 820,
       "norm_label": "compile-time validation"
     },
     {
@@ -59744,7 +59744,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_newtype_validated_see_also",
-      "community": 132,
+      "community": 820,
       "norm_label": "see also"
     },
     {
@@ -59764,7 +59764,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_type_no_stringly",
-      "community": 820,
+      "community": 807,
       "norm_label": "type-no-stringly"
     },
     {
@@ -59774,7 +59774,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_why_it_matters",
-      "community": 820,
+      "community": 807,
       "norm_label": "why it matters"
     },
     {
@@ -59784,7 +59784,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_bad",
-      "community": 820,
+      "community": 807,
       "norm_label": "bad"
     },
     {
@@ -59794,7 +59794,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_good",
-      "community": 820,
+      "community": 807,
       "norm_label": "good"
     },
     {
@@ -59804,7 +59804,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_parsing_at_boundaries",
-      "community": 820,
+      "community": 807,
       "norm_label": "parsing at boundaries"
     },
     {
@@ -59814,7 +59814,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_validated_newtypes",
-      "community": 820,
+      "community": 807,
       "norm_label": "validated newtypes"
     },
     {
@@ -59824,7 +59824,7 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_with_serde",
-      "community": 820,
+      "community": 807,
       "norm_label": "with serde"
     },
     {
@@ -59834,7 +59834,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_no_stringly_see_also",
-      "community": 820,
+      "community": 807,
       "norm_label": "see also"
     },
     {
@@ -59844,7 +59844,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_option_nullable",
-      "community": 814,
+      "community": 125,
       "norm_label": "type-option-nullable.md"
     },
     {
@@ -60064,7 +60064,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_type_repr_transparent",
-      "community": 132,
+      "community": 688,
       "norm_label": "type-repr-transparent"
     },
     {
@@ -60074,7 +60074,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_why_it_matters",
-      "community": 132,
+      "community": 688,
       "norm_label": "why it matters"
     },
     {
@@ -60084,7 +60084,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_bad",
-      "community": 132,
+      "community": 688,
       "norm_label": "bad"
     },
     {
@@ -60094,7 +60094,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_good",
-      "community": 132,
+      "community": 688,
       "norm_label": "good"
     },
     {
@@ -60104,7 +60104,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_what_repr_transparent_guarantees",
-      "community": 132,
+      "community": 688,
       "norm_label": "what repr(transparent) guarantees"
     },
     {
@@ -60114,7 +60114,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_with_phantomdata",
-      "community": 132,
+      "community": 688,
       "norm_label": "with phantomdata"
     },
     {
@@ -60124,7 +60124,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_nonzero_wrappers",
-      "community": 132,
+      "community": 688,
       "norm_label": "nonzero wrappers"
     },
     {
@@ -60134,7 +60134,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_ffi_pattern",
-      "community": 132,
+      "community": 688,
       "norm_label": "ffi pattern"
     },
     {
@@ -60144,7 +60144,7 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_when_to_use",
-      "community": 132,
+      "community": 688,
       "norm_label": "when to use"
     },
     {
@@ -60154,7 +60154,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "agents_skills_rust_skills_rules_type_repr_transparent_see_also",
-      "community": 132,
+      "community": 688,
       "norm_label": "see also"
     },
     {
@@ -68899,24 +68899,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_anaka_360_mesa_maria_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-ANAKA 360-mesa-maria.json",
-      "source_location": "L150",
-      "community": 1651,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_anaka_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-ANAKA 360-mesa-maria.json",
-      "source_location": "L151",
-      "community": 5756,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_anaka_360_mesa_maria_29_short"
-    },
-    {
       "label": "26",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-ANAKA 360-mesa-maria.json",
@@ -69032,24 +69014,6 @@
       "community": 5883,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_cai_na_gandaia_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CAI NA GANDAIA-mesa-maria.json",
-      "source_location": "L6",
-      "community": 688,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_cai_na_gandaia_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CAI NA GANDAIA-mesa-maria.json",
-      "source_location": "L7",
-      "community": 5840,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_cai_na_gandaia_mesa_maria_29_short"
     },
     {
       "label": "36",
@@ -70195,24 +70159,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_22_mesa_teste_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CENA TESTE 22-mesa-teste.json",
-      "source_location": "L94",
-      "community": 1401,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_22_mesa_teste_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CENA TESTE 22-mesa-teste.json",
-      "source_location": "L95",
-      "community": 6051,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_22_mesa_teste_29_short"
-    },
-    {
       "label": "27",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-CENA TESTE 22-mesa-teste.json",
@@ -70864,24 +70810,6 @@
       "label": "name",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-CENA_TESTE_222-mesa-teste.json",
-      "source_location": "L94",
-      "community": 633,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_222_mesa_teste_json_shared_custom_names_scene_cena_teste_222_mesa_teste_2_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CENA_TESTE_222-mesa-teste.json",
-      "source_location": "L95",
-      "community": 6007,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_222_mesa_teste_json_shared_custom_names_scene_cena_teste_222_mesa_teste_2_short"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CENA_TESTE_222-mesa-teste.json",
       "source_location": "L42",
       "community": 606,
       "norm_label": "name",
@@ -71291,24 +71219,6 @@
       "community": 6178,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_3_mesa_teste_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CENA TESTE 3-mesa-teste.json",
-      "source_location": "L62",
-      "community": 1441,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_3_mesa_teste_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CENA TESTE 3-mesa-teste.json",
-      "source_location": "L63",
-      "community": 6135,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_cena_teste_3_mesa_teste_29_short"
     },
     {
       "label": "8",
@@ -72490,24 +72400,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_choco_360_mesa_maria_channels_28"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CHOCO 360-mesa-maria.json",
-      "source_location": "L158",
-      "community": 1692,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_choco_360_mesa_maria_28_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-CHOCO 360-mesa-maria.json",
-      "source_location": "L159",
-      "community": 6219,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_choco_360_mesa_maria_28_short"
-    },
-    {
       "label": "14",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-CHOCO 360-mesa-maria.json",
@@ -73037,24 +72929,6 @@
       "community": 6344,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_dan_vieira_360_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-DAN VIEIRA 360-mesa-maria.json",
-      "source_location": "L114",
-      "community": 1992,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_dan_vieira_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-DAN VIEIRA 360-mesa-maria.json",
-      "source_location": "L115",
-      "community": 6301,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_dan_vieira_360_mesa_maria_29_short"
     },
     {
       "label": "16",
@@ -73820,24 +73694,6 @@
       "community": 6428,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_daniel_vieir_3_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-DANIEL VIEIR 3-mesa-maria.json",
-      "source_location": "L106",
-      "community": 2032,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_daniel_vieir_3_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-DANIEL VIEIR 3-mesa-maria.json",
-      "source_location": "L107",
-      "community": 6385,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_daniel_vieir_3_mesa_maria_29_short"
     },
     {
       "label": "40",
@@ -74740,24 +74596,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_filosofia_360_mesa_maria_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-FILOSOFIA 360-mesa-maria.json",
-      "source_location": "L134",
-      "community": 1569,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_filosofia_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-FILOSOFIA 360-mesa-maria.json",
-      "source_location": "L135",
-      "community": 6469,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_filosofia_360_mesa_maria_29_short"
-    },
-    {
       "label": "1",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-FILOSOFIA 360-mesa-maria.json",
@@ -75514,24 +75352,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_forro_engatilh_mesa_favela_channels_32"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-FORRO ENGATILH-mesa-favela.json",
-      "source_location": "L138",
-      "community": 958,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_forro_engatilh_mesa_favela_32_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-FORRO ENGATILH-mesa-favela.json",
-      "source_location": "L139",
-      "community": 6558,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_forro_engatilh_mesa_favela_32_short"
-    },
-    {
       "label": "5",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-FORRO ENGATILH-mesa-favela.json",
@@ -75899,24 +75719,6 @@
       "community": 6688,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_forro_engatilha_mesa_favela_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-FORRO ENGATILHA-mesa-favela.json",
-      "source_location": "L18",
-      "community": 1003,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_forro_engatilha_mesa_favela_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-FORRO ENGATILHA-mesa-favela.json",
-      "source_location": "L19",
-      "community": 6645,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_forro_engatilha_mesa_favela_29_short"
     },
     {
       "label": "4",
@@ -76781,24 +76583,6 @@
       "community": 6772,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_id_do_samba_360_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-ID DO SAMBA 360-mesa-maria.json",
-      "source_location": "L54",
-      "community": 2075,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_id_do_samba_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-ID DO SAMBA 360-mesa-maria.json",
-      "source_location": "L55",
-      "community": 6729,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_id_do_samba_360_mesa_maria_29_short"
     },
     {
       "label": "30",
@@ -78043,24 +77827,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_kalawe_360_mesa_maria_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-KALAWE 360-mesa-maria.json",
-      "source_location": "L154",
-      "community": 1735,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_kalawe_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-KALAWE 360-mesa-maria.json",
-      "source_location": "L155",
-      "community": 6813,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_kalawe_360_mesa_maria_29_short"
-    },
-    {
       "label": "21",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-KALAWE 360-mesa-maria.json",
@@ -78644,24 +78410,6 @@
       "community": 6940,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_livre_p_sonhar_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-LIVRE P SONHAR-mesa-maria.json",
-      "source_location": "L106",
-      "community": 892,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_livre_p_sonhar_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-LIVRE P SONHAR-mesa-maria.json",
-      "source_location": "L107",
-      "community": 6897,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_livre_p_sonhar_mesa_maria_29_short"
     },
     {
       "label": "16",
@@ -79420,24 +79168,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_marcelo_v_360_mesa_maria_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-MARCELO V 360-mesa-maria.json",
-      "source_location": "L110",
-      "community": 1776,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_marcelo_v_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-MARCELO V 360-mesa-maria.json",
-      "source_location": "L111",
-      "community": 6981,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_marcelo_v_360_mesa_maria_29_short"
-    },
-    {
       "label": "20",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-MARCELO V 360-mesa-maria.json",
@@ -79796,24 +79526,6 @@
       "community": 7108,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_pgd_online_360_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-PGD ONLINE 360-mesa-maria.json",
-      "source_location": "L18",
-      "community": 767,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_pgd_online_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-PGD ONLINE 360-mesa-maria.json",
-      "source_location": "L19",
-      "community": 7065,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_pgd_online_360_mesa_maria_29_short"
     },
     {
       "label": "37",
@@ -81112,24 +80824,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_piseiro_mesa_favela_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-PISEIRO-mesa-favela.json",
-      "source_location": "L142",
-      "community": 1084,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_piseiro_mesa_favela_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-PISEIRO-mesa-favela.json",
-      "source_location": "L143",
-      "community": 7233,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_piseiro_mesa_favela_29_short"
-    },
-    {
       "label": "38",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-PISEIRO-mesa-favela.json",
@@ -81677,24 +81371,6 @@
       "community": 7192,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_piseiro2_mesa_favela_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-PISEIRO2-mesa-favela.json",
-      "source_location": "L86",
-      "community": 1044,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_piseiro2_mesa_favela_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-PISEIRO2-mesa-favela.json",
-      "source_location": "L87",
-      "community": 7149,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_piseiro2_mesa_favela_29_short"
     },
     {
       "label": "8",
@@ -82523,24 +82199,6 @@
       "community": 7360,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_regis_mesa_favela_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-REGIS-mesa-favela.json",
-      "source_location": "L98",
-      "community": 932,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_regis_mesa_favela_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-REGIS-mesa-favela.json",
-      "source_location": "L99",
-      "community": 7317,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_regis_mesa_favela_29_short"
     },
     {
       "label": "8",
@@ -83443,24 +83101,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_saru_mesa_favela_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SARU-mesa-favela.json",
-      "source_location": "L134",
-      "community": 807,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_saru_mesa_favela_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SARU-mesa-favela.json",
-      "source_location": "L135",
-      "community": 7401,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_saru_mesa_favela_29_short"
-    },
-    {
       "label": "master",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-SARU-mesa-favela.json",
@@ -83729,24 +83369,6 @@
       "community": 7528,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_sblm_magia_360_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SBLM MAGIA 360-mesa-maria.json",
-      "source_location": "L18",
-      "community": 1820,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_sblm_magia_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SBLM MAGIA 360-mesa-maria.json",
-      "source_location": "L19",
-      "community": 7485,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_sblm_magia_360_mesa_maria_29_short"
     },
     {
       "label": "25",
@@ -85126,24 +84748,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_sensibldade_36_mesa_maria_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SENSIBLDADE 36-mesa-maria.json",
-      "source_location": "L154",
-      "community": 1860,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_sensibldade_36_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SENSIBLDADE 36-mesa-maria.json",
-      "source_location": "L155",
-      "community": 7569,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_sensibldade_36_mesa_maria_29_short"
-    },
-    {
       "label": "6",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-SENSIBLDADE 36-mesa-maria.json",
@@ -85619,24 +85223,6 @@
       "community": 7686,
       "norm_label": "2",
       "id": "data_custom_scenes_shared_custom_names_scene_sexteto_mesa_favela_channels_2"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SEXTETO-mesa-favela.json",
-      "source_location": "L90",
-      "community": 2122,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_sexteto_mesa_favela_2_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SEXTETO-mesa-favela.json",
-      "source_location": "L91",
-      "community": 7654,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_sexteto_mesa_favela_2_short"
     },
     {
       "label": "36",
@@ -86332,24 +85918,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_skema_bom_mesa_maria_channels_28"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SKEMA BOM-mesa-maria.json",
-      "source_location": "L70",
-      "community": 1898,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_skema_bom_mesa_maria_28_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SKEMA BOM-mesa-maria.json",
-      "source_location": "L71",
-      "community": 7739,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_skema_bom_mesa_maria_28_short"
-    },
-    {
       "label": "27",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-SKEMA BOM-mesa-maria.json",
@@ -86978,24 +86546,6 @@
       "community": 7864,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_somalia_360_mesa_maria_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SOMALIA 360-mesa-maria.json",
-      "source_location": "L54",
-      "community": 1939,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_somalia_360_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SOMALIA 360-mesa-maria.json",
-      "source_location": "L55",
-      "community": 7821,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_somalia_360_mesa_maria_29_short"
     },
     {
       "label": "master",
@@ -88033,24 +87583,6 @@
       "id": "data_custom_scenes_shared_custom_names_scene_somalia_mesa_maria_channels_29"
     },
     {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SOMALIA-mesa-maria.json",
-      "source_location": "L110",
-      "community": 1126,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_somalia_mesa_maria_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-SOMALIA-mesa-maria.json",
-      "source_location": "L111",
-      "community": 7905,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_somalia_mesa_maria_29_short"
-    },
-    {
       "label": "6",
       "file_type": "code",
       "source_file": "data/custom_scenes/shared/custom_names_scene-SOMALIA-mesa-maria.json",
@@ -88535,24 +88067,6 @@
       "community": 8032,
       "norm_label": "29",
       "id": "data_custom_scenes_shared_custom_names_scene_teste_1_mesa_teste_channels_29"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-TESTE 1-mesa-teste.json",
-      "source_location": "L50",
-      "community": 1489,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_teste_1_mesa_teste_29_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-TESTE 1-mesa-teste.json",
-      "source_location": "L51",
-      "community": 7989,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_teste_1_mesa_teste_29_short"
     },
     {
       "label": "10",
@@ -89687,24 +89201,6 @@
       "community": 8105,
       "norm_label": "2",
       "id": "data_custom_scenes_shared_custom_names_scene_teste_2_mesa_teste_channels_2"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-TESTE 2-mesa-teste.json",
-      "source_location": "L126",
-      "community": 1531,
-      "norm_label": "name",
-      "id": "data_custom_scenes_shared_custom_names_scene_teste_2_mesa_teste_2_name"
-    },
-    {
-      "label": "short",
-      "file_type": "code",
-      "source_file": "data/custom_scenes/shared/custom_names_scene-TESTE 2-mesa-teste.json",
-      "source_location": "L127",
-      "community": 8074,
-      "norm_label": "short",
-      "id": "data_custom_scenes_shared_custom_names_scene_teste_2_mesa_teste_2_short"
     },
     {
       "label": "33",
@@ -109729,7 +109225,7 @@
       "source_location": "L1",
       "community": 618,
       "norm_label": "agents.md",
-      "id": "agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_md_rust_skills_agents"
+      "id": "agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_skills_rust_skills_agents_md_rust_skills_agents"
     },
     {
       "label": "CLAUDE.md",
@@ -133857,7 +133353,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 91,
+      "community": 894,
       "norm_label": "showscenegrid scene save/load grid modal",
       "id": "modules_scenegrid_showscenegrid"
     },
@@ -133870,7 +133366,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 91,
+      "community": 896,
       "norm_label": "togglefullscreen / ios pwa install",
       "id": "public_modules_sidebar_fullscreen"
     },
@@ -135911,7 +135407,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 91,
+      "community": 894,
       "norm_label": "config modal (midi ports, scenes, dmx, layout)",
       "id": "public_index_html_configmodal"
     },
@@ -135937,7 +135433,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 91,
+      "community": 894,
       "norm_label": "scene grid modal (99 save/load slots with fuzzy search)",
       "id": "public_index_html_scenegridmodal"
     },
@@ -135963,7 +135459,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 91,
+      "community": 896,
       "norm_label": "sidebar (mainnav, chnav, channel/outs/techmix context)",
       "id": "public_index_html_sidebar"
     },
@@ -139534,7 +139030,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L304",
+      "source_location": "L330",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_close",
@@ -139554,7 +139050,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L427",
+      "source_location": "L453",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_degfrompct",
@@ -139614,7 +139110,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L827",
+      "source_location": "L853",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_formatrealvaluebyparam",
@@ -139624,7 +139120,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L816",
+      "source_location": "L842",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_formatrevtimestep",
@@ -139634,7 +139130,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L771",
+      "source_location": "L797",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_handlefaderinput",
@@ -139644,7 +139140,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L927",
+      "source_location": "L953",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_handlestepper",
@@ -139664,7 +139160,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L847",
+      "source_location": "L873",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_onknobdrag",
@@ -139674,7 +139170,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L967",
+      "source_location": "L993",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_onwheeldrag",
@@ -139684,7 +139180,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L255",
+      "source_location": "L276",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_open",
@@ -139694,7 +139190,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L285",
+      "source_location": "L311",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_openunderconstruction",
@@ -139704,7 +139200,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L377",
+      "source_location": "L403",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderconcept1knobs",
@@ -139714,7 +139210,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L438",
+      "source_location": "L464",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderconcept2faders",
@@ -139724,7 +139220,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L550",
+      "source_location": "L576",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderconcept3activetabcontent",
@@ -139734,7 +139230,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L513",
+      "source_location": "L539",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderconcept3tabs",
@@ -139744,7 +139240,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L622",
+      "source_location": "L648",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderconcept4prograph",
@@ -139754,7 +139250,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L710",
+      "source_location": "L736",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderdawcompactitem",
@@ -139764,7 +139260,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L496",
+      "source_location": "L522",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderfaderrow",
@@ -139774,7 +139270,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L431",
+      "source_location": "L457",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_renderknobitem",
@@ -139784,7 +139280,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L330",
+      "source_location": "L356",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -139794,7 +139290,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L592",
+      "source_location": "L618",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_rendersteppercard",
@@ -139804,7 +139300,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L746",
+      "source_location": "L772",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_sendparamchange",
@@ -139814,7 +139310,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L324",
+      "source_location": "L350",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_setconcept3tab",
@@ -139824,7 +139320,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L314",
+      "source_location": "L340",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_setlayoutmode",
@@ -139844,7 +139340,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L784",
+      "source_location": "L810",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_startknobdrag",
@@ -139854,7 +139350,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L903",
+      "source_location": "L929",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_startstepperhold",
@@ -139864,7 +139360,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L949",
+      "source_location": "L975",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_startwheeldrag",
@@ -139874,7 +139370,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L880",
+      "source_location": "L906",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_stopknobdrag",
@@ -139884,7 +139380,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L916",
+      "source_location": "L942",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_stopstepperhold",
@@ -139894,7 +139390,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L980",
+      "source_location": "L1006",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_stopwheeldrag",
@@ -139904,7 +139400,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L762",
+      "source_location": "L788",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb",
       "target": "public_modules_fxs_reverb_togglebypass",
@@ -139915,7 +139411,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L259",
+      "source_location": "L280",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_open",
       "target": "public_modules_fxs_reverb_detectdefaultlayoutmode",
@@ -139937,7 +139433,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L835",
+      "source_location": "L861",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_formatrealvaluebyparam",
       "target": "public_modules_fxs_reverb_formathpfstep",
@@ -139959,7 +139455,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L836",
+      "source_location": "L862",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_formatrealvaluebyparam",
       "target": "public_modules_fxs_reverb_formatlpfstep",
@@ -139981,7 +139477,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L841",
+      "source_location": "L867",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_formatrealvaluebyparam",
       "target": "public_modules_fxs_reverb_formatholdstep",
@@ -140003,7 +139499,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L842",
+      "source_location": "L868",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_formatrealvaluebyparam",
       "target": "public_modules_fxs_reverb_formatdecaystep",
@@ -140014,7 +139510,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L339",
+      "source_location": "L365",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_rendermodal",
       "target": "public_modules_fxs_reverb_decodereverbparams",
@@ -140025,7 +139521,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L277",
+      "source_location": "L303",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_open",
       "target": "public_modules_fxs_reverb_showeditorsyncoverlay",
@@ -140036,7 +139532,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L305",
+      "source_location": "L331",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_close",
       "target": "public_modules_fxs_reverb_hideeditorsyncoverlay",
@@ -140047,7 +139543,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L281",
+      "source_location": "L307",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_open",
       "target": "public_modules_fxs_reverb_hideeditorsyncoverlay",
@@ -140058,7 +139554,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L262",
+      "source_location": "L283",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_open",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -140069,7 +139565,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L321",
+      "source_location": "L347",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_setlayoutmode",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -140080,7 +139576,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L326",
+      "source_location": "L352",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_setconcept3tab",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -140091,7 +139587,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L778",
+      "source_location": "L804",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_handlefaderinput",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -140102,7 +139598,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L943",
+      "source_location": "L969",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_handlestepper",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -140113,7 +139609,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L353",
+      "source_location": "L379",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_rendermodal",
       "target": "public_modules_fxs_reverb_renderconcept1knobs",
@@ -140124,7 +139620,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L355",
+      "source_location": "L381",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_rendermodal",
       "target": "public_modules_fxs_reverb_renderconcept3tabs",
@@ -140135,7 +139631,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L896",
+      "source_location": "L922",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_stopknobdrag",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -140146,7 +139642,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L766",
+      "source_location": "L792",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_togglebypass",
       "target": "public_modules_fxs_reverb_rendermodal",
@@ -140157,7 +139653,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L856",
+      "source_location": "L882",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_onknobdrag",
       "target": "public_modules_fxs_reverb_degfrompct",
@@ -140168,7 +139664,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L456",
+      "source_location": "L482",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_renderconcept2faders",
       "target": "public_modules_fxs_reverb_renderfaderrow",
@@ -140179,7 +139675,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L545",
+      "source_location": "L571",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_renderconcept3tabs",
       "target": "public_modules_fxs_reverb_renderconcept3activetabcontent",
@@ -140190,7 +139686,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L555",
+      "source_location": "L581",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_renderconcept3activetabcontent",
       "target": "public_modules_fxs_reverb_rendersteppercard",
@@ -140201,7 +139697,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L683",
+      "source_location": "L709",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_renderconcept4prograph",
       "target": "public_modules_fxs_reverb_renderdawcompactitem",
@@ -140212,7 +139708,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L775",
+      "source_location": "L801",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_handlefaderinput",
       "target": "public_modules_fxs_reverb_sendparamchange",
@@ -140223,7 +139719,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L942",
+      "source_location": "L968",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_handlestepper",
       "target": "public_modules_fxs_reverb_sendparamchange",
@@ -140234,7 +139730,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L871",
+      "source_location": "L897",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_onknobdrag",
       "target": "public_modules_fxs_reverb_sendparamchange",
@@ -140245,7 +139741,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L887",
+      "source_location": "L913",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_stopknobdrag",
       "target": "public_modules_fxs_reverb_sendparamchange",
@@ -140256,7 +139752,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L765",
+      "source_location": "L791",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_togglebypass",
       "target": "public_modules_fxs_reverb_sendparamchange",
@@ -140267,7 +139763,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L810",
+      "source_location": "L836",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_startknobdrag",
       "target": "public_modules_fxs_reverb_onknobdrag",
@@ -140278,7 +139774,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L811",
+      "source_location": "L837",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_startknobdrag",
       "target": "public_modules_fxs_reverb_stopknobdrag",
@@ -140289,7 +139785,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L830",
+      "source_location": "L856",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_formatrealvaluebyparam",
       "target": "public_modules_fxs_reverb_formatrevtimestep",
@@ -140300,7 +139796,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L866",
+      "source_location": "L892",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_onknobdrag",
       "target": "public_modules_fxs_reverb_formatrealvaluebyparam",
@@ -140311,7 +139807,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L892",
+      "source_location": "L918",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_stopknobdrag",
       "target": "public_modules_fxs_reverb_onknobdrag",
@@ -140322,7 +139818,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L907",
+      "source_location": "L933",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_startstepperhold",
       "target": "public_modules_fxs_reverb_handlestepper",
@@ -140333,7 +139829,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L905",
+      "source_location": "L931",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_startstepperhold",
       "target": "public_modules_fxs_reverb_stopstepperhold",
@@ -140344,7 +139840,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L961",
+      "source_location": "L987",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_startwheeldrag",
       "target": "public_modules_fxs_reverb_onwheeldrag",
@@ -140355,7 +139851,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L962",
+      "source_location": "L988",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_startwheeldrag",
       "target": "public_modules_fxs_reverb_stopwheeldrag",
@@ -140366,7 +139862,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "public/modules/FXS/reverb.js",
-      "source_location": "L982",
+      "source_location": "L1008",
       "weight": 1.0,
       "source": "public_modules_fxs_reverb_stopwheeldrag",
       "target": "public_modules_fxs_reverb_onwheeldrag",
@@ -159173,7 +158669,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1071",
+      "source_location": "L1076",
       "weight": 1.0,
       "source": "server_rust_src_state",
       "target": "server_rust_src_state_apply_comp_fields",
@@ -159183,7 +158679,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1017",
+      "source_location": "L1022",
       "weight": 1.0,
       "source": "server_rust_src_state",
       "target": "server_rust_src_state_channellike",
@@ -159337,7 +158833,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1040",
+      "source_location": "L1045",
       "weight": 1.0,
       "context": "return_type",
       "source": "server_rust_src_state_channelstate_gate_mut",
@@ -159359,7 +158855,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L885",
+      "source_location": "L890",
       "weight": 1.0,
       "context": "return_type",
       "source": "server_rust_src_state_globalstate_get_target_for_mt",
@@ -159392,7 +158888,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1037",
+      "source_location": "L1042",
       "weight": 1.0,
       "context": "return_type",
       "source": "server_rust_src_state_channelstate_eq_mut",
@@ -159414,7 +158910,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1066",
+      "source_location": "L1071",
       "weight": 1.0,
       "context": "return_type",
       "source": "server_rust_src_state_masterstate_eq_mut",
@@ -159436,7 +158932,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1051",
+      "source_location": "L1056",
       "weight": 1.0,
       "context": "return_type",
       "source": "server_rust_src_state_mixbusstate_eq_mut",
@@ -159447,7 +158943,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1071",
+      "source_location": "L1076",
       "weight": 1.0,
       "context": "parameter_type",
       "source": "server_rust_src_state_apply_comp_fields",
@@ -159502,7 +158998,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1040",
+      "source_location": "L1045",
       "weight": 1.0,
       "context": "generic_arg",
       "source": "server_rust_src_state_channelstate_gate_mut",
@@ -159535,7 +159031,7 @@
       "relation": "implements",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1027",
+      "source_location": "L1032",
       "weight": 1.0,
       "source": "server_rust_src_state_channelstate",
       "target": "server_rust_src_state_channellike",
@@ -159545,7 +159041,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1034",
+      "source_location": "L1039",
       "weight": 1.0,
       "source": "server_rust_src_state_channelstate",
       "target": "server_rust_src_state_channelstate_apply_comp",
@@ -159555,7 +159051,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1037",
+      "source_location": "L1042",
       "weight": 1.0,
       "source": "server_rust_src_state_channelstate",
       "target": "server_rust_src_state_channelstate_eq_mut",
@@ -159565,7 +159061,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1040",
+      "source_location": "L1045",
       "weight": 1.0,
       "source": "server_rust_src_state_channelstate",
       "target": "server_rust_src_state_channelstate_gate_mut",
@@ -159575,7 +159071,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1028",
+      "source_location": "L1033",
       "weight": 1.0,
       "source": "server_rust_src_state_channelstate",
       "target": "server_rust_src_state_channelstate_set_att",
@@ -159585,7 +159081,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1031",
+      "source_location": "L1036",
       "weight": 1.0,
       "source": "server_rust_src_state_channelstate",
       "target": "server_rust_src_state_channelstate_set_pan",
@@ -159727,7 +159223,7 @@
       "relation": "implements",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1045",
+      "source_location": "L1050",
       "weight": 1.0,
       "source": "server_rust_src_state_mixbusstate",
       "target": "server_rust_src_state_channellike",
@@ -159737,7 +159233,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1048",
+      "source_location": "L1053",
       "weight": 1.0,
       "source": "server_rust_src_state_mixbusstate",
       "target": "server_rust_src_state_mixbusstate_apply_comp",
@@ -159747,7 +159243,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1051",
+      "source_location": "L1056",
       "weight": 1.0,
       "source": "server_rust_src_state_mixbusstate",
       "target": "server_rust_src_state_mixbusstate_eq_mut",
@@ -159757,7 +159253,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1046",
+      "source_location": "L1051",
       "weight": 1.0,
       "source": "server_rust_src_state_mixbusstate",
       "target": "server_rust_src_state_mixbusstate_set_att",
@@ -159767,7 +159263,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1047",
+      "source_location": "L1052",
       "weight": 1.0,
       "source": "server_rust_src_state_mixbusstate",
       "target": "server_rust_src_state_mixbusstate_set_pan",
@@ -159788,7 +159284,7 @@
       "relation": "implements",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1056",
+      "source_location": "L1061",
       "weight": 1.0,
       "source": "server_rust_src_state_masterstate",
       "target": "server_rust_src_state_channellike",
@@ -159798,7 +159294,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1063",
+      "source_location": "L1068",
       "weight": 1.0,
       "source": "server_rust_src_state_masterstate",
       "target": "server_rust_src_state_masterstate_apply_comp",
@@ -159808,7 +159304,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1066",
+      "source_location": "L1071",
       "weight": 1.0,
       "source": "server_rust_src_state_masterstate",
       "target": "server_rust_src_state_masterstate_eq_mut",
@@ -159818,7 +159314,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1057",
+      "source_location": "L1062",
       "weight": 1.0,
       "source": "server_rust_src_state_masterstate",
       "target": "server_rust_src_state_masterstate_set_att",
@@ -159828,7 +159324,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1060",
+      "source_location": "L1065",
       "weight": 1.0,
       "source": "server_rust_src_state_masterstate",
       "target": "server_rust_src_state_masterstate_set_pan",
@@ -159849,7 +159345,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L966",
+      "source_location": "L971",
       "weight": 1.0,
       "source": "server_rust_src_state_globalstate",
       "target": "server_rust_src_state_globalstate_apply_eq",
@@ -159869,7 +159365,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L925",
+      "source_location": "L930",
       "weight": 1.0,
       "source": "server_rust_src_state_globalstate",
       "target": "server_rust_src_state_globalstate_apply_name_char",
@@ -159879,7 +159375,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L885",
+      "source_location": "L890",
       "weight": 1.0,
       "source": "server_rust_src_state_globalstate",
       "target": "server_rust_src_state_globalstate_get_target_for_mt",
@@ -160063,7 +159559,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L990",
+      "source_location": "L995",
       "weight": 1.0,
       "source": "server_rust_src_state_globalstate_apply_eq",
       "target": "server_rust_src_state_globalstate_get_target_for_mt",
@@ -160073,7 +159569,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L885",
+      "source_location": "L890",
       "weight": 1.0,
       "context": "generic_arg",
       "source": "server_rust_src_state_globalstate_get_target_for_mt",
@@ -160085,7 +159581,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L992",
+      "source_location": "L997",
       "weight": 1.0,
       "source": "server_rust_src_state_globalstate_apply_eq",
       "target": "server_rust_src_state_masterstate_eq_mut",
@@ -160096,7 +159592,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1035",
+      "source_location": "L1040",
       "weight": 1.0,
       "source": "server_rust_src_state_channelstate_apply_comp",
       "target": "server_rust_src_state_apply_comp_fields",
@@ -160107,7 +159603,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1049",
+      "source_location": "L1054",
       "weight": 1.0,
       "source": "server_rust_src_state_mixbusstate_apply_comp",
       "target": "server_rust_src_state_apply_comp_fields",
@@ -160118,7 +159614,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server_rust/src/state.rs",
-      "source_location": "L1064",
+      "source_location": "L1069",
       "weight": 1.0,
       "source": "server_rust_src_state_masterstate_apply_comp",
       "target": "server_rust_src_state_apply_comp_fields",
