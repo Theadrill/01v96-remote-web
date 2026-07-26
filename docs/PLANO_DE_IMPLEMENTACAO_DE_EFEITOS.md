@@ -839,5 +839,18 @@ Os 4 Reverbs Padrão (*Reverb Hall*, *Reverb Room*, *Reverb Stage*, *Reverb Plat
 - Adicionar manipuladores de envio de alteração (Knobs/Steppers):
   - Enviar evento Socket.IO `changeFxParam` para o servidor gravar a mudança no hardware.
 
+---
+
+### 10.5. Atualização em Tempo Real via FX Library Recall (Mesa → Frontend)
+
+#### Cenário:
+Quando o operador executa um **Recall de Biblioteca de Efeitos (FX Library)** diretamente na mesa Yamaha 01V96, a mesa envia comandos SysEx (`0D 04 09...` / `7F 10...`).
+
+#### Requisito de Sincronização Dinâmica:
+- Se o modal do editor (`fxEditorModal`) estiver **aberto no navegador**:
+  1. O listener de `fxTypesUpdate` invalida o cache local (`syncedSlots[slot] = false` e limpa `fxParamsState[slot]`).
+  2. Se o slot modificado for o slot **atualmente visível na tela**, o frontend dispara imediatamente `socket.emit('requestFxSlotParams', { slot: currentSlotIdx })` e exibe o overlay de sincronização (`showEditorSyncOverlay()`).
+  3. Ao receber `fxSlotParamsUpdate`, os novos parâmetros da biblioteca selecionada são aplicados e a interface é re-renderizada automaticamente sem exigir que o usuário feche e reabra o modal.
+
 
 

@@ -884,6 +884,7 @@ impl GlobalState {
                     }
                 }
             }
+            crate::midi::protocol::ParsedMidi::FxRecallDetected => {}
         }
     }
 

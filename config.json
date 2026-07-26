@@ -1,7 +1,7 @@
 {
   "inIdx": 2,
   "outIdx": 3,
-  "loopmidi-monitor": true,
+  "loopmidi-monitor": false,
   "open_browser_startup": false,
   "use_canvas": false,
   "demo_mode": false,

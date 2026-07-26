@@ -7,13 +7,14 @@
     }
 
     // ── Componente: Rotary Knob ──────────────────────────────────────
-    function renderKnob({ label, value, percent, colorClass = 'purple', isLarge = false, onDrag }) {
+    function renderKnob({ label, value, percent, colorClass = 'purple', isLarge = false, onDrag, onWheel }) {
         const deg = degFromPct(percent);
         const sizeCls = isLarge ? 'large-knob' : '';
         const dragAttr = onDrag || "ReverbEditor.startKnobDrag(event, this)";
+        const wheelAttr = onWheel || "ReverbEditor.handleWheelKnob(event, this)";
 
         return `
-        <div class="knob-box ${colorClass} ${sizeCls}" onmousedown="${dragAttr}" ontouchstart="${dragAttr}">
+        <div class="knob-box ${colorClass} ${sizeCls}" onmousedown="${dragAttr}" ontouchstart="${dragAttr}" onwheel="${wheelAttr}">
             ${label ? `<span class="knob-label">${label}</span>` : ''}
             <div class="knob-outer">
                 <div class="knob-ring" style="--percent: ${percent}%;"></div>

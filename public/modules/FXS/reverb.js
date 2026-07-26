@@ -65,6 +65,7 @@
 
     const syncedSlots = [false, false, false, false];
     const isSyncingSlot = [false, false, false, false];
+    const lastFxTypeId = [-1, -1, -1, -1];
     const fxParamsState = [{}, {}, {}, {}];
 
     const holdPoints = [0.02, 0.04, 0.06, 0.08, 0.10, 0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25, 0.27, 0.29, 0.31, 0.33, 0.35, 0.38, 0.40, 0.42, 0.44, 0.46, 0.48, 0.50, 0.52, 0.54, 0.56, 0.58, 0.60, 0.63, 0.65, 0.67, 0.69, 0.73, 0.77, 0.81, 0.85, 0.90, 0.94, 0.98, 1.02, 1.06, 1.10, 1.15, 1.19, 1.23, 1.27, 1.31, 1.35, 1.44, 1.52, 1.60, 1.68, 1.76, 1.84, 1.93, 2.01, 2.10, 2.18, 2.27, 2.35, 2.44, 2.52, 2.60, 2.69, 2.85, 3.02, 3.19, 3.35, 3.52, 3.69, 3.85, 4.02, 4.19, 4.35, 4.52, 4.69, 4.85, 5.02, 5.19, 5.35, 5.69, 6.02, 6.35, 6.69, 7.02, 7.35, 7.69, 8.02, 8.35, 8.69, 9.02, 9.35, 9.69, 10.0, 10.3, 10.6, 11.3, 12.0, 12.6, 13.3, 14.0, 14.6, 15.3, 16.0, 16.6, 17.3, 18.0, 18.6, 19.3, 20.0, 20.6, 21.3, 22.6, 24.0, 25.3, 26.6, 28.0, 29.3, 30.6, 32.0, 33.3, 34.6, 36.0, 37.3, 38.6, 40.0, 41.3, 42.6, 45.3, 48.0, 50.6, 53.3, 56.0, 58.6, 61.3, 64.0, 66.6, 69.3, 72.0, 74.6, 77.3, 80.0, 82.6, 85.3, 90.6, 96.0, 101, 106, 112, 117, 122, 128, 133, 138, 144, 149, 154, 160, 165, 170, 181, 192, 202, 213, 224, 234, 245, 256, 266, 277, 288, 298, 309, 320, 330, 341, 362, 384, 405, 426, 448, 469, 490, 512, 533, 554, 576, 597, 618, 640, 661, 682, 725, 768, 810, 853, 896, 938, 981, 1020, 1060, 1100, 1150, 1190, 1230, 1280, 1320, 1360, 1450, 1530, 1620, 1700, 1790, 1870, 1960];
@@ -220,26 +221,121 @@
         const overlay = document.getElementById('fxEditorSyncOverlay');
         if (overlay) overlay.classList.remove('active');
     }
-
     if (typeof socket !== 'undefined') {
+        socket.on('connect', function() {
+            // Em reconexão do socket (Alt+Tab, queda de rede, etc.), reseta o estado travado de sync
+            for (let i = 0; i < 4; i++) {
+                isSyncingSlot[i] = false;
+            }
+            hideEditorSyncOverlay();
+
+            // Bloqueia a execução do CASO 2 (Recall do mesmo preset) no fxTypesUpdate que o servidor envia ao reconectar
+            lastSameTypeRecallSyncTime = Date.now();
+
+            // Se o editor estiver aberto no momento da reconexão e o slot já tiver parâmetros salvos no front, apenas renderiza sem resync
+            const modal = document.getElementById('fxEditorModal');
+            if (modal && modal.style.display !== 'none' && window.getComputedStyle(modal).display !== 'none') {
+                if (syncedSlots[currentSlotIdx]) {
+                    renderModal();
+                } else {
+                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx });
+                }
+            }
+        });
+
+        let lastSameTypeRecallSyncTime = 0;
+
         socket.on('fxTypesUpdate', function(data) {
             if (!data) return;
+            const modal = document.getElementById('fxEditorModal');
+            const isModalOpen = modal && modal.style.display !== 'none' && window.getComputedStyle(modal).display !== 'none';
+
+            let isInitial = true;
+            let hasDifferentType = false;
+
             for (let i = 0; i < 4; i++) {
+                if (lastFxTypeId[i] !== -1) isInitial = false;
                 const d = data[i] || data[String(i)];
-                if (d && d.id !== undefined) {
-                    if (lastFxTypeId[i] !== -1 && lastFxTypeId[i] !== d.id) {
-                        // O algoritmo do efeito mudou na mesa: invalida o cache deste slot
+                if (d && d.id !== undefined && lastFxTypeId[i] !== -1 && lastFxTypeId[i] !== d.id) {
+                    hasDifferentType = true;
+                }
+            }
+
+            // CARGA INICIAL (ou após reset explícito): Apenas salva os IDs
+            if (isInitial) {
+                for (let i = 0; i < 4; i++) {
+                    const d = data[i] || data[String(i)];
+                    if (d && d.id !== undefined) lastFxTypeId[i] = d.id;
+                }
+                return;
+            }
+
+            // CASO 1: Algoritmo mudou (ex: Hall -> Room)
+            if (hasDifferentType) {
+                console.log('[FX] 🔀 Mudança de Tipo/Algoritmo detectada!');
+                for (let i = 0; i < 4; i++) {
+                    const d = data[i] || data[String(i)];
+                    if (d && d.id !== undefined && lastFxTypeId[i] !== d.id) {
                         syncedSlots[i] = false;
                         fxParamsState[i] = {};
+                        lastFxTypeId[i] = d.id;
                     }
-                    lastFxTypeId[i] = d.id;
                 }
+                if (isModalOpen) {
+                    isSyncingSlot[currentSlotIdx] = true;
+                    showEditorSyncOverlay();
+                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+                }
+                return;
+            }
+
+            // CASO 2: Todos os 4 IDs vieram idênticos (Recall do MESMO Preset na mesa!)
+            // Proteção com Cooldown de 3 segundos para que o re-sync execute UMA VEZ e NUNCA entre em loop!
+            const now = Date.now();
+            if (now - lastSameTypeRecallSyncTime > 3000) {
+                lastSameTypeRecallSyncTime = now;
+                console.log('[FX] 🔄 Recall do MESMO Preset detectado na mesa! Sincronizando...');
+                for (let i = 0; i < 4; i++) {
+                    syncedSlots[i] = false;
+                    fxParamsState[i] = {};
+                }
+
+                if (isModalOpen) {
+                    isSyncingSlot[currentSlotIdx] = true;
+                    showEditorSyncOverlay();
+                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+                }
+            }
+        });
+
+        // Evento específico disparado quando a mesa faz Recall de Preset (inclusive do mesmo algoritmo)
+        socket.on('fxLibraryRecall', function() {
+            const modal = document.getElementById('fxEditorModal');
+            const isModalOpen = modal && modal.style.display !== 'none' && window.getComputedStyle(modal).display !== 'none';
+
+            console.log('[FX DEBUG] 🔄 fxLibraryRecall recebido! | isModalOpen:', isModalOpen, '| currentSlotIdx:', currentSlotIdx, '| syncedSlots antes:', JSON.stringify(syncedSlots));
+
+            for (let i = 0; i < 4; i++) {
+                syncedSlots[i] = false;
+                fxParamsState[i] = {};
+            }
+
+            isSyncingSlot[currentSlotIdx] = false;
+
+            if (isModalOpen) {
+                console.log('[FX DEBUG] Modal aberto! Re-solicitando parâmetros do slot ' + (currentSlotIdx + 1) + '...');
+                isSyncingSlot[currentSlotIdx] = true;
+                showEditorSyncOverlay();
+                socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+            } else {
+                console.log('[FX DEBUG] Modal fechado. Cache invalidado (syncedSlots=false). Re-sincronizará ao abrir o editor.');
             }
         });
 
         socket.on('fxSlotParamsUpdate', function(data) {
             if (data && typeof data.slot === 'number' && data.params) {
                 const slot = data.slot;
+                console.log(`[FX DEBUG] 📥 fxSlotParamsUpdate recebido para Slot ${slot + 1} (${Object.keys(data.params).length} params).`);
                 fxParamsState[slot] = Object.assign({}, fxParamsState[slot], data.params);
                 syncedSlots[slot] = true;
                 isSyncingSlot[slot] = false;
@@ -262,6 +358,10 @@
                 // Modificar um parâmetro NÃO des-sincroniza o slot! Se já temos >= 14 params, mantemos syncedSlots = true
                 if (Object.keys(fxParamsState[slot]).length >= 14) {
                     syncedSlots[slot] = true;
+                    isSyncingSlot[slot] = false;
+                    if (currentSlotIdx === slot) {
+                        hideEditorSyncOverlay();
+                    }
                 }
 
                 const modal = document.getElementById('fxEditorModal');
@@ -290,7 +390,9 @@
         const modal = document.getElementById('fxEditorModal');
         if (modal) modal.style.display = 'flex';
 
-        // Se o estado local tem >= 14 parâmetros acumulados, a slot já está sincronizada
+        console.log(`[FX DEBUG] 🚪 Editor aberto para Slot ${currentSlotIdx + 1}. syncedSlots[${currentSlotIdx}] = ${syncedSlots[currentSlotIdx]}, params acumulados = ${fxParamsState[currentSlotIdx] ? Object.keys(fxParamsState[currentSlotIdx]).length : 0}`);
+
+        // Se o estado local tem >= 14 parâmetros acumulados, o slot já está sincronizado
         if (fxParamsState[currentSlotIdx] && Object.keys(fxParamsState[currentSlotIdx]).length >= 14) {
             syncedSlots[currentSlotIdx] = true;
         }
@@ -298,9 +400,10 @@
         // Lazy sync: dispara requisição apenas se ainda NÃO tiver sincronizado este slot
         if (!syncedSlots[currentSlotIdx]) {
             if (typeof socket !== 'undefined' && socket.emit) {
-                console.log('[FX] Disparando Lazy-Sync para FX' + (currentSlotIdx + 1));
+                console.log('[FX DEBUG] 🚀 Disparando Lazy-Sync (cache server) para FX' + (currentSlotIdx + 1));
                 isSyncingSlot[currentSlotIdx] = true;
                 showEditorSyncOverlay();
+                // SEM force: true -> O servidor retorna do seu próprio cache de estado se já tiver os parâmetros!
                 socket.emit('requestFxSlotParams', { slot: currentSlotIdx });
             }
         } else {
@@ -682,19 +785,19 @@
 
             <!-- Controles Macro Destaque (Rodas / Wheels Grandes) -->
             <div class="daw-main-wheels">
-                <div class="daw-wheel-item" onmousedown="ReverbEditor.startWheelDrag(event, this, 'revTime')" ontouchstart="ReverbEditor.startWheelDrag(event, this, 'revTime')">
+                <div class="daw-wheel-item" onmousedown="ReverbEditor.startWheelDrag(event, this, 'revTime')" ontouchstart="ReverbEditor.startWheelDrag(event, this, 'revTime')" onwheel="ReverbEditor.handleWheelKnob(event, this)">
                     <span class="daw-wheel-lbl">REV TIME</span>
                     <div class="daw-wheel-body">
                         <span class="daw-wheel-val">${p.revTime.val}</span>
                     </div>
                 </div>
-                <div class="daw-wheel-item" onmousedown="ReverbEditor.startWheelDrag(event, this, 'iniDly')" ontouchstart="ReverbEditor.startWheelDrag(event, this, 'iniDly')">
+                <div class="daw-wheel-item" onmousedown="ReverbEditor.startWheelDrag(event, this, 'iniDly')" ontouchstart="ReverbEditor.startWheelDrag(event, this, 'iniDly')" onwheel="ReverbEditor.handleWheelKnob(event, this)">
                     <span class="daw-wheel-lbl">INI. DLY</span>
                     <div class="daw-wheel-body">
                         <span class="daw-wheel-val">${p.iniDly.val}</span>
                     </div>
                 </div>
-                <div class="daw-wheel-item" onmousedown="ReverbEditor.startWheelDrag(event, this, 'mix')" ontouchstart="ReverbEditor.startWheelDrag(event, this, 'mix')">
+                <div class="daw-wheel-item" onmousedown="ReverbEditor.startWheelDrag(event, this, 'mix')" ontouchstart="ReverbEditor.startWheelDrag(event, this, 'mix')" onwheel="ReverbEditor.handleWheelKnob(event, this)">
                     <span class="daw-wheel-lbl">MIX</span>
                     <div class="daw-wheel-body highlight">
                         <span class="daw-wheel-val">${p.mix.val}</span>
@@ -735,7 +838,7 @@
 
     function renderDawCompactItem(name, val, type = 'pct') {
         return `
-        <div class="daw-compact-item" onmousedown="ReverbEditor.startWheelDrag(event, this, '${type}')" ontouchstart="ReverbEditor.startWheelDrag(event, this, '${type}')">
+        <div class="daw-compact-item" onmousedown="ReverbEditor.startWheelDrag(event, this, '${type}')" ontouchstart="ReverbEditor.startWheelDrag(event, this, '${type}')" onwheel="ReverbEditor.handleWheelKnob(event, this)">
             <span class="daw-ci-name">${name}</span>
             <div class="daw-ci-val-box">
                 <span>${val}</span>
@@ -922,6 +1025,27 @@
         renderModal();
     }
 
+    function handleWheelKnob(e, knobBox) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const labelEl = knobBox.querySelector('.knob-label') || knobBox.querySelector('.daw-wheel-lbl') || knobBox.querySelector('.daw-ci-name');
+        if (!labelEl) return;
+
+        const labelKey = labelEl.innerText.trim().toUpperCase();
+        const info = PARAM_MAP_BY_TITLE[labelKey];
+        if (!info) return;
+
+        const delta = e.deltaY < 0 ? 1 : -1;
+        const currentSlotParams = fxParamsState[currentSlotIdx] || {};
+        let currentRaw = currentSlotParams[info.param];
+        if (currentRaw === undefined) currentRaw = 0;
+
+        let newRaw = Math.min(info.max, Math.max(info.min, Math.round(currentRaw) + delta));
+        sendParamChange(info.param, newRaw);
+        renderModal();
+    }
+
     // 3. Handlers de Steppers (Conceito 3 com Press & Hold)
     let stepperHoldTimer = null;
     let stepperHoldInterval = null;
@@ -1020,6 +1144,7 @@
         setConcept3Tab: setConcept3Tab,
         handleFaderInput: handleFaderInput,
         startKnobDrag: startKnobDrag,
+        handleWheelKnob: handleWheelKnob,
         handleStepper: handleStepper,
         startStepperHold: startStepperHold,
         stopStepperHold: stopStepperHold,

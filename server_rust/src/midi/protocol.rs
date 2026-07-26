@@ -472,6 +472,8 @@ pub enum ParsedMidi {
         channel: usize,
         value: f64,
     },
+    /// FX Recall de preset detectado na mesa (section 127, group 80 / 0x50)
+    FxRecallDetected,
 }
 
 pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
@@ -492,6 +494,11 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         } else if action == 0x20 {
             return Some(ParsedMidi::PhysicalSceneStore(scene_idx));
         }
+    }
+
+    // --- FX RECALL COMMIT (Section 127, Group 80 / 0x50) ---
+    if message.len() >= 12 && message[3] == 0x3E && message[4] == 0x7F && message[5] == 0x50 {
+        return Some(ParsedMidi::FxRecallDetected);
     }
 
     // --- PRIORITY 0: PAN ---
