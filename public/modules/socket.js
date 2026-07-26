@@ -783,11 +783,15 @@ socket.on('connectionState', (state) => {
     const scn = document.getElementById('scn');
     const baseName = window.serverName || '01V96';
     if (state.connected) {
-        scn.innerText = baseName;
-        scn.style.color = '#0f0';
+        window.currentScnNameText = baseName;
+        if (scn) scn.style.color = '#0f0';
     } else {
-        scn.innerText = state.demo_mode ? `${baseName} (demo)` : `${baseName} (offline)`;
-        scn.style.color = state.demo_mode ? '#ffc107' : '#dc3545';
+        window.currentScnNameText = state.demo_mode ? `${baseName} (demo)` : `${baseName} (offline)`;
+        if (scn) scn.style.color = state.demo_mode ? '#ffc107' : '#dc3545';
+    }
+    if ((!window.sidebarScnDisplayMode || window.sidebarScnDisplayMode === 'name') && scn) {
+        scn.innerText = window.currentScnNameText;
+        if (typeof autoScaleElement === 'function') autoScaleElement(scn);
     }
     const overlay = document.getElementById('offlineOverlay');
     if (overlay) {
@@ -1505,9 +1509,13 @@ function applyServerNameToSidebar(serverName) {
     if (!scn) return;
     const baseName = serverName || '01V96';
     if (document.body.classList.contains('is-offline')) {
-        scn.innerText = window.isDemoMode ? `${baseName} (demo)` : `${baseName} (offline)`;
+        window.currentScnNameText = window.isDemoMode ? `${baseName} (demo)` : `${baseName} (offline)`;
     } else {
-        scn.innerText = baseName;
+        window.currentScnNameText = baseName;
+    }
+    if ((!window.sidebarScnDisplayMode || window.sidebarScnDisplayMode === 'name') && scn) {
+        scn.innerText = window.currentScnNameText;
+        if (typeof autoScaleElement === 'function') autoScaleElement(scn);
     }
 }
 

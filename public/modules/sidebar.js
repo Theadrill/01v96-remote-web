@@ -257,11 +257,60 @@ window.addEventListener('orientationchange', () => {
     setTimeout(updateViewportInfo, 200);
 });
 window.addEventListener('load', updateViewportInfo);
+// Alternância do texto do cabeçalho da sidebar #scn (Nome da Mesa 3s / Relógio 7s)
+window.sidebarScnDisplayMode = 'name';
+window.currentScnNameText = window.currentScnNameText || '01V96';
+
+function getFormattedSidebarTime() {
+    const now = new Date();
+    const hrs = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    const secs = String(now.getSeconds()).padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+}
+
+function startScnHeaderToggle() {
+    const scn = document.getElementById('scn');
+    if (!scn) return;
+
+    setInterval(() => {
+        if (window.sidebarScnDisplayMode === 'clock') {
+            const scnEl = document.getElementById('scn');
+            if (scnEl) {
+                scnEl.innerText = getFormattedSidebarTime();
+            }
+        }
+    }, 1000);
+
+    function step() {
+        const scnEl = document.getElementById('scn');
+        if (!scnEl) return;
+
+        if (window.sidebarScnDisplayMode === 'name') {
+            window.sidebarScnDisplayMode = 'clock';
+            scnEl.innerText = getFormattedSidebarTime();
+            autoScaleElement(scnEl);
+            setTimeout(step, 7000);
+        } else {
+            window.sidebarScnDisplayMode = 'name';
+            scnEl.innerText = window.currentScnNameText || '01V96';
+            autoScaleElement(scnEl);
+            setTimeout(step, 3000);
+        }
+    }
+
+    window.sidebarScnDisplayMode = 'name';
+    scn.innerText = window.currentScnNameText || '01V96';
+    autoScaleElement(scn);
+    setTimeout(step, 3000);
+}
+
 // Inicialização Global
 window.addEventListener('DOMContentLoaded', () => {
     updateViewportInfo();
     updateLayoutButtons();
     autoScaleElement(document.getElementById('scn'));
+    startScnHeaderToggle();
 });
 
 // Controle de Nomes dos Canais

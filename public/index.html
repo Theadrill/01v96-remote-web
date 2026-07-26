@@ -204,7 +204,8 @@
         </div>
         <button class="side-btn btn-meters-musician" id="musicianMetersBtn" onclick="toggleMusicianMeters()">MOSTRAR
             NÍVEIS</button>
-        <button class="side-btn btn-meters-musician active" id="volumeGeralBtn" onclick="toggleVolumeGeral()">VOL<br>GERAL</button>
+        <button class="side-btn btn-meters-musician active" id="volumeGeralBtn"
+            onclick="toggleVolumeGeral()">VOL<br>GERAL</button>
         <button class="side-btn btn-fs-musician" id="musicianFsBtn" onclick="toggleFullScreen()">
             <svg class="inline-style-2" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                 stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24">
@@ -257,7 +258,8 @@
                 <div class="inline-style-14" style="margin-top: 12px;">
                     <span class="inline-style-15">Barra de Rolagem Desktop</span>
                     <label class="switch">
-                        <input id="toggleDesktopScrollbar" onchange="toggleDesktopScrollbar(this.checked)" type="checkbox" />
+                        <input id="toggleDesktopScrollbar" onchange="toggleDesktopScrollbar(this.checked)"
+                            type="checkbox" />
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -301,7 +303,8 @@
                 <div class="inline-style-14">
                     <span class="inline-style-15">FLAT: não resetar HPF/LPF</span>
                     <label class="switch">
-                        <input id="toggleEqFlatSkipHpfLpf" onchange="updateEqFlatConfig(this.checked)" type="checkbox" />
+                        <input id="toggleEqFlatSkipHpfLpf" onchange="updateEqFlatConfig(this.checked)"
+                            type="checkbox" />
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -350,22 +353,33 @@
                         <p class="inline-style-21">Ir para o Tailscale automaticamente</p>
                     </div>
                     <label class="switch">
-                        <input id="toggleAutoRedirectHttps" onchange="updateAutoRedirectHttps(this.checked)" type="checkbox" />
+                        <input id="toggleAutoRedirectHttps" onchange="updateAutoRedirectHttps(this.checked)"
+                            type="checkbox" />
                         <span class="slider"></span>
                     </label>
                 </div>
             </div>
             <!-- Footer com GitHub e Créditos -->
-            <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 12px; color: rgba(255,255,255,0.5);">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 8px;">
-                    <a href="https://github.com/Theadrill/01v96-remote-web" target="_blank" rel="noopener noreferrer" style="color: rgba(255,255,255,0.7); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
-                        <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor" style="display: inline-block; vertical-align: middle;">
-                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-2.17-.25-4.43-1.09-4.43-4.82 0-1.06.38-1.93 1.01-2.62-.1-.24-.44-1.24.1-2.58 0 0 .82-.26 2.7 1.01.78-.22 1.63-.33 2.48-.33.85 0 1.7.11 2.48.33 1.88-1.28 2.7-1.01 2.7-1.01.55 1.34.2 2.34.1 2.58.64.69 1.01 1.56 1.01 2.62 0 3.71-2.28 4.56-4.46 4.81.35.3.66.9.66 1.81 0 1.31-.01 2.37-.01 2.69 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            <div
+                style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 12px; color: rgba(255,255,255,0.5);">
+                <div
+                    style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 8px;">
+                    <a href="https://github.com/Theadrill/01v96-remote-web" target="_blank" rel="noopener noreferrer"
+                        style="color: rgba(255,255,255,0.7); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.2s;"
+                        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
+                        <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor"
+                            style="display: inline-block; vertical-align: middle;">
+                            <path
+                                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-2.17-.25-4.43-1.09-4.43-4.82 0-1.06.38-1.93 1.01-2.62-.1-.24-.44-1.24.1-2.58 0 0 .82-.26 2.7 1.01.78-.22 1.63-.33 2.48-.33.85 0 1.7.11 2.48.33 1.88-1.28 2.7-1.01 2.7-1.01.55 1.34.2 2.34.1 2.58.64.69 1.01 1.56 1.01 2.62 0 3.71-2.28 4.56-4.46 4.81.35.3.66.9.66 1.81 0 1.31-.01 2.37-.01 2.69 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
                         </svg>
                         GitHub Oficial
                     </a>
                 </div>
-                <p style="margin: 0;">Criado por: <a href="https://instagram.com/rodrigo_vernaschi" target="_blank" rel="noopener noreferrer" style="color: #e1306c; text-decoration: none; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Rodrigo Vernaschi</a></p>
+                <p style="margin: 0;">Criado por: <a href="https://instagram.com/rodrigo_vernaschi" target="_blank"
+                        rel="noopener noreferrer"
+                        style="color: #e1306c; text-decoration: none; font-weight: 500; transition: opacity 0.2s;"
+                        onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Rodrigo Vernaschi</a>
+                </p>
             </div>
             <div class="modal-actions inline-style-1">
                 <button class="btn-connect" onclick="conn()">CONECTAR</button>
@@ -548,8 +562,7 @@
             <div class="inline-style-30">
                 <button class="btn-connect inline-style-31" id="btnConfirmAssign"
                     onclick="confirmAssignScene()">CONFIRMAR</button>
-<button class="btn-close inline-style-31"
-    onclick="closeAssignSceneModal()">CANCELAR</button>
+                <button class="btn-close inline-style-31" onclick="closeAssignSceneModal()">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -612,8 +625,7 @@
             <div class="fx-patch-grid" id="fxPatchGrid">
                 <!-- Botões gerados via JS -->
             </div>
-            <button class="btn-close inline-style-49"
-                onclick="closeFxPatchSelector()">CANCELAR</button>
+            <button class="btn-close inline-style-49" onclick="closeFxPatchSelector()">CANCELAR</button>
         </div>
     </div>
     <!-- Modal de Seleção de Cenas -->
@@ -1118,43 +1130,68 @@
     </div>
     <!-- Modal de Monitoramento de Áudio (Ouvir Áudio) -->
     <div class="modal-overlay styled-monitoringModal" id="monitoringModal">
-        <div class="modal-content" style="width:90%; max-width:380px; padding:20px; display:flex; flex-direction:column; gap:16px;">
+        <div class="modal-content"
+            style="width:90%; max-width:380px; padding:20px; display:flex; flex-direction:column; gap:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Ouvir Áudio</span>
-                <button onclick="document.getElementById('monitoringModal').style.display='none'" style="background:none; border:none; color:#777; font-size:24px; cursor:pointer;">&times;</button>
+                <span
+                    style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Ouvir
+                    Áudio</span>
+                <button onclick="document.getElementById('monitoringModal').style.display='none'"
+                    style="background:none; border:none; color:#777; font-size:24px; cursor:pointer;">&times;</button>
             </div>
             <div style="display:flex; flex-direction:column; gap:6px;">
                 <label style="color:#aaa; font-size:11px;">DISPOSITIVO DO SERVIDOR</label>
-                <select id="monitoringServerDevice" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                <select id="monitoringServerDevice"
+                    style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
                     <option value="default_in">Dispositivo Padrão</option>
                 </select>
-                <button onclick="refreshMonitoringDevices()" style="background:#333; border:1px solid #555; color:#fff; border-radius:5px; padding:6px 12px; font-size:11px; cursor:pointer;">Atualizar Dispositivos</button>
+                <button onclick="refreshMonitoringDevices()"
+                    style="background:#333; border:1px solid #555; color:#fff; border-radius:5px; padding:6px 12px; font-size:11px; cursor:pointer;">Atualizar
+                    Dispositivos</button>
             </div>
             <div style="display:flex; flex-direction:column; gap:6px;">
                 <label style="color:#aaa; font-size:11px;">FORMATO</label>
                 <div style="display:flex; gap:8px;">
-                    <button id="monitoringFmtPcm" onclick="selectMonitoringFormat('pcm')" style="flex:1; padding:10px; border-radius:8px; border:1px solid #555; background:#007bff; color:#fff; cursor:pointer; font-size:12px;">Puro (PCM)</button>
-                    <button id="monitoringFmtOpus" onclick="selectMonitoringFormat('opus')" style="flex:1; padding:10px; border-radius:8px; border:1px solid #555; background:#444; color:#aaa; cursor:pointer; font-size:12px;">Comprimido (Opus)</button>
+                    <button id="monitoringFmtPcm" onclick="selectMonitoringFormat('pcm')"
+                        style="flex:1; padding:10px; border-radius:8px; border:1px solid #555; background:#007bff; color:#fff; cursor:pointer; font-size:12px;">Puro
+                        (PCM)</button>
+                    <button id="monitoringFmtOpus" onclick="selectMonitoringFormat('opus')"
+                        style="flex:1; padding:10px; border-radius:8px; border:1px solid #555; background:#444; color:#aaa; cursor:pointer; font-size:12px;">Comprimido
+                        (Opus)</button>
                 </div>
             </div>
             <div id="monitoringBufferPcm" style="display:flex; flex-direction:column; gap:6px;">
                 <label style="color:#aaa; font-size:11px;">BUFFER (amostras)</label>
-                <input type="number" id="monitoringBufferSize" value="960" min="120" max="3840" step="120" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                <input type="number" id="monitoringBufferSize" value="960" min="120" max="3840" step="120"
+                    style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
             </div>
             <div id="monitoringBufferOpus" style="display:none; flex-direction:column; gap:6px;">
                 <label style="color:#aaa; font-size:11px;">BUFFER (amostras)</label>
-                <button id="monitoringBufferOpusBtn" onclick="toggleOpusBufferOptions()" style="width:100%; padding:12px; background:#222; border:1px solid #444; color:#fff; border-radius:5px; cursor:pointer; text-align:left; font-size:13px;">BUFFER: 960</button>
-                <div id="monitoringBufferOpusOptions" style="display:none; flex-direction:column; gap:4px; background:#1a1a1a; border:1px solid #333; border-radius:5px; padding:4px;">
-                    <button onclick="selectOpusBuffer(120)" style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#ccc; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">120 (2.5ms)</button>
-                    <button onclick="selectOpusBuffer(240)" style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#ccc; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">240 (5ms)</button>
-                    <button onclick="selectOpusBuffer(480)" style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#ccc; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">480 (10ms)</button>
-                    <button onclick="selectOpusBuffer(960)" style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#5cacee; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">960 (20ms)</button>
+                <button id="monitoringBufferOpusBtn" onclick="toggleOpusBufferOptions()"
+                    style="width:100%; padding:12px; background:#222; border:1px solid #444; color:#fff; border-radius:5px; cursor:pointer; text-align:left; font-size:13px;">BUFFER:
+                    960</button>
+                <div id="monitoringBufferOpusOptions"
+                    style="display:none; flex-direction:column; gap:4px; background:#1a1a1a; border:1px solid #333; border-radius:5px; padding:4px;">
+                    <button onclick="selectOpusBuffer(120)"
+                        style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#ccc; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">120
+                        (2.5ms)</button>
+                    <button onclick="selectOpusBuffer(240)"
+                        style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#ccc; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">240
+                        (5ms)</button>
+                    <button onclick="selectOpusBuffer(480)"
+                        style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#ccc; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">480
+                        (10ms)</button>
+                    <button onclick="selectOpusBuffer(960)"
+                        style="width:100%; padding:14px; background:#222; border:none; border-radius:4px; color:#5cacee; cursor:pointer; font-size:14px; font-weight:bold; text-align:center;">960
+                        (20ms)</button>
                 </div>
             </div>
             <div id="monitoringStatus" style="color:#888; font-size:11px; text-align:center; min-height:16px;"></div>
             <div style="display:flex; gap:6px;">
-                <button id="monitoringToggleBtn" onclick="toggleMonitoring()" style="flex:1; padding:12px; border-radius:8px; border:none; background:#28a745; color:#fff; cursor:pointer; font-size:13px; font-weight:bold;">INICIAR</button>
-                <button onclick="document.getElementById('monitoringModal').style.display='none'" style="padding:12px 20px; border-radius:8px; border:1px solid #555; background:#444; color:#aaa; cursor:pointer; font-size:13px;">FECHAR</button>
+                <button id="monitoringToggleBtn" onclick="toggleMonitoring()"
+                    style="flex:1; padding:12px; border-radius:8px; border:none; background:#28a745; color:#fff; cursor:pointer; font-size:13px; font-weight:bold;">INICIAR</button>
+                <button onclick="document.getElementById('monitoringModal').style.display='none'"
+                    style="padding:12px 20px; border-radius:8px; border:1px solid #555; background:#444; color:#aaa; cursor:pointer; font-size:13px;">FECHAR</button>
             </div>
         </div>
     </div>
@@ -1266,7 +1303,8 @@
     <script src="app.js"></script>
 
     <!-- Mobile Menu Modal Overlay -->
-    <div id="mobileMenuModal" class="mobile-menu-modal-overlay" onclick="if(!event.target.closest('.mobile-menu-item')) this.classList.remove('active')">
+    <div id="mobileMenuModal" class="mobile-menu-modal-overlay"
+        onclick="if(!event.target.closest('.mobile-menu-item')) this.classList.remove('active')">
         <div class="mobile-menu-content">
             <div id="mobileMenuList" class="mobile-menu-list">
             </div>

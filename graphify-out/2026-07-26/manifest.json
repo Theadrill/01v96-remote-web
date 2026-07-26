@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "public/modules/sidebar.js": {
-    "mtime": 1785037842.5782776,
-    "ast_hash": "7e53c0870286d0368b00f3f30f3777e8",
+    "mtime": 1785037739.3480923,
+    "ast_hash": "c22ddeb714116f08d738cc64a6656427",
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
