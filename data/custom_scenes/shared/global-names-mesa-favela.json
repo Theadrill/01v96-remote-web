@@ -1,14 +1,6 @@
 {
   "mesa_nome": "mesa-favela",
   "channels": {
-    "20": {
-      "name": "CELULAR",
-      "short": "CELU"
-    },
-    "24": {
-      "name": "",
-      "short": "    "
-    },
     "33": {
       "name": "REVERB VOZ",
       "short": "REVE"
@@ -20,6 +12,14 @@
     "23": {
       "name": "MIC DJ",
       "short": "MICD"
+    },
+    "20": {
+      "name": "CELULAR",
+      "short": "CELU"
+    },
+    "24": {
+      "name": "MIC MC",
+      "short": "MICM"
     }
   }
 }
