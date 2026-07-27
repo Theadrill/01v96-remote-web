@@ -898,5 +898,85 @@ Componentes visuais agnósticos criados para atender a qualquer tipo de parâmet
   - Isso elimina perdas de foco, interrupções no movimento do mouse e saltos indesejados de scroll.
 - **Gestão de Sincronização em Tempo Real:** Trata reconexões de socket, recalls de preset na mesa física com cooldown de segurança contra loops, e Lazy-Sync dinâmico ao abrir o editor.
 
+---
+
+### 10.7. Plano de Correção Técnica e Regras de Sincronização Definitivas
+
+Nesta seção documentamos o plano passo a passo de engenharia para corrigir os problemas de sincronização, eliminar loops de resync e garantir o comportamento correto do estado dos efeitos em tempo real.
+
+#### 10.7.1. Regras e Princípios Fundamentais da Solução
+1. **Garantia de Busca Única (Single-Fetch Guarantee):**
+   - O operador **NUNCA** deve abrir a tela de efeitos e ser surpreendido por um sync a cada abertura.
+   - O sync dos 14+ parâmetros internos de um slot ocorre **uma única vez** ao abrir a tela (`syncedSlots[slot] = true`).
+   - Os dados são salvos na RAM do servidor e na RAM do frontend. Reabrir a tela do mesmo slot lê **100% da RAM**, sem enviar nenhuma nova requisição SysEx à mesa física.
+   - O resync só deve e pode ser acionado quando ocorrer um **RECALL DE PRESET** real na mesa física.
+2. **Eliminação de Loops e Falsos Alarmes (Zero Resync Loop):**
+   - O recebimento de parâmetros de efeito (`0x30` / `fxSlotParamsUpdate` / `fxParamUpdate`) **NUNCA** deve reinvalidar a flag de sincronização.
+   - Reconexões de WebSocket (Alt-Tab ou oscilação de rede) apenas lêem a RAM do servidor; **NUNCA** marcam slots como des-sincronizados nem forçam resyncs.
+   - Botões de navegação da mesa não afetam a flag de sincronização dos efeitos.
+3. **Consistência do Estado Visual em Tempo Real (Bypass & Cards):**
+   - O servidor e o app permanecem 100% conscientes das alterações na mesa física em tempo real.
+   - Alterações no parâmetro de Bypass (`param 52`) atualizam instantaneamente o card da máquina na tela de visão geral dos 4 slots (`efeitos.js`), aplicando contorno vermelho e o ícone indicativo de pausa.
+
+---
+
+#### 10.7.2. Passo a Passo de Implementação Técnica
+
+##### Passo 1: Parser SysEx no Servidor Rust (`server_rust/src/midi/protocol.rs`)
+- Adicionar no enum `ParsedMidi`:
+  ```rust
+  FxLibraryRecall { slot: u8, preset: u8 }
+  ```
+- No parser de mensagens SysEx de entrada, capturar o comando de Recall de Preset de Efeito (`Section 0x7F`, `Opcode 0x10`):
+  ```rust
+  // Mensagem capturada da mesa: F0 43 10 3E 7F 10 [SLOT] 00 [PRESET] 00 [PRESET] F7
+  if section == 0x7F && opcode == 0x10 {
+      let slot_idx = (slot_raw.saturating_sub(1)) & 0x03; // Mapeia 0x01..0x04 para 0..3
+      return ParsedMidi::FxLibraryRecall { slot: slot_idx, preset: preset_id };
+  }
+  ```
+
+##### Passo 2: Receptor MIDI & Gestor de Estado (`server_rust/src/midi_receiver.rs` & `state.rs`)
+- Ao receber `ParsedMidi::FxLibraryRecall { slot, preset }`:
+  1. Limpar a entrada de parâmetros daquele slot específico no estado em memória: `global_state.fx_params.get_mut(&slot).map(|map| map.clear());`.
+  2. Disparar evento WebSocket Socket.IO limpo e explícito para todos os clientes conectados:
+     ```rust
+     socket.broadcast().emit("fxLibraryRecall", json!({ "slot": slot, "preset": preset })).await;
+     ```
+
+##### Passo 3: Manipuladores de Socket no Servidor (`server_rust/src/socket_handlers.rs`)
+- Garantir que a requisição de parâmetros (`requestFxSlotParams`) retorne instantaneamente do cache `state.fx_params` se a RAM já contiver os parâmetros do slot (`if already_synced && !force`), sem enviar requisições MIDI à mesa.
+- Garantir que o evento `requestFxTypes` enviado ao conectar o socket retorne apenas a lista atual de tipos para popular os nomes, sem acionar flags de resync no frontend.
+
+##### Passo 4: Frontend Engine (`public/modules/FXS/fx_core.js`)
+- **Refatorar o Handler de `fxLibraryRecall`:**
+  ```javascript
+  socket.on('fxLibraryRecall', function(data) {
+      if (!data || data.slot === undefined) return;
+      const slot = data.slot;
+
+      // 1. Limpa o cache local do slot que sofreu o recall
+      syncedSlots[slot] = false;
+      fxParamsState[slot] = {};
+
+      // 2. Se o slot modificado for O SLOT QUE ESTÁ ABERTO ATUALMENTE na tela:
+      if (isModalOpen() && currentSlotIdx === slot) {
+          showEditorSyncOverlay();
+          isSyncingSlot[slot] = true;
+          socket.emit('requestFxSlotParams', { slot: slot, force: true });
+      }
+      // Se o slot estiver FECHADO, nada mais é feito. Na próxima vez que o usuário abrir o slot,
+      // syncedSlots[slot] estará false e o Lazy-Sync rodará 1 única vez.
+  });
+  ```
+- **Remover a Gambiarra de Adivinhar Recall em `fxTypesUpdate`:**
+  - Remover a lógica que forçava `syncedSlots` para `false` ao receber tipos iguais ou após tempo limite (cooldown hack).
+  - O `fxTypesUpdate` passa a cuidar estritamente de atualizar nomes, IDs e os campos globais de Mix (`param 48`) e Bypass (`param 52`).
+
+##### Passo 5: Atualização Visual de Bypass no Overview (`public/modules/FXS/efeitos.js`)
+- Conectar o listener de `fxParamUpdate` e `fxTypesUpdate` ao renderizador do overview `efeitos.js`.
+- Ao receber `param === 52` (Bypass), atualizar a propriedade `bypass` do slot em `fxSlots[slot].bypass` e chamar a atualização do card da máquina no overview (`renderProcessorCard` / `rerenderIfOpen`), adicionando a classe `fx-card-bypassed` com borda vermelha e o distintivo de pausa visual.
+
+
 
 
