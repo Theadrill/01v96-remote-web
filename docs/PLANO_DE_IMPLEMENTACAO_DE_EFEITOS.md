@@ -977,6 +977,47 @@ Nesta seção documentamos o plano passo a passo de engenharia para corrigir os 
 - Conectar o listener de `fxParamUpdate` e `fxTypesUpdate` ao renderizador do overview `efeitos.js`.
 - Ao receber `param === 52` (Bypass), atualizar a propriedade `bypass` do slot em `fxSlots[slot].bypass` e chamar a atualização do card da máquina no overview (`renderProcessorCard` / `rerenderIfOpen`), adicionando a classe `fx-card-bypassed` com borda vermelha e o distintivo de pausa visual.
 
+---
+
+## 11. Registro de Descobertas e Soluções Implementadas
+
+### 11.1. Decodificação Exata do Pacote SysEx de Recall de FX (`0x7F 0x10` e `0x7F 0x50`)
+- **Anatomia do Pacote Enviado pela Mesa 01V96:**
+  `F0 43 10 3E 7F 10 [ACTION] 00 [PRESET] 00 [SLOT] F7`
+- **Mapeamento de Bytes Críticos:**
+  - `message[4] = 0x7F`: Seção 127 (Biblioteca / Memória).
+  - `message[5] = 0x10` / `0x50`: Opcode de Recall / Commit.
+  - `message[6] = 0x04`: Sub-tipo / Ação de **FX Library Preset Recall** (`0x00` = Scene Recall, `0x20` = Scene Store, `0x04` = FX Preset Recall). Outros valores indicam bibliotecas distintas (ex: `0x26`/`0x46` = Channel Library, `0x41` = EQ, `0x42` = Comp, `0x43` = Gate).
+  - `message[8]`: Número do Preset selecionado (ex: `0x03` = Preset 3).
+  - `message[10]`: **Índice Real do Slot de Efeito (0-based)**:
+    - `0x00` = FX1 (Slot 1)
+    - `0x01` = FX2 (Slot 2)
+    - `0x02` = FX3 (Slot 3)
+    - `0x03` = FX4 (Slot 4)
+- **Correção Aplicada (`server_rust/src/midi/protocol.rs`):**
+  A regra de decodificação foi atualizada para extrair o slot diretamente de `(message[10] & 0x03)` e validar estritamente se `message[6] == 0x04`. Isso corrigiu o bug onde o recall no Slot 2 era atribuído ao Slot 4 e impediu falsos disparos quando presets de canal, EQ ou comp eram salvos na mesa.
+
+### 11.2. Solicitação do Parâmetro 0x31 (Effect Type ID) no Servidor
+- **Inclusão do Parâmetro 0x31 (`socket_handlers.rs`):**
+  Adicionado o código de parâmetro `0x31` (parâmetro 49) ao array de requisições de parâmetros do slot (`requestFxSlotParams`).
+- **Garantia de Suporte a Presets Customizados:**
+  Permite que o aplicativo consulte diretamente a mesa sobre o ID real do algoritmo (0..63) em qualquer preset de fábrica (1..64) ou preset personalizado criado pelo usuário (65..99), definindo corretamente o nome e o tema visual do efeito.
+
+### 11.3. Sincronização de RAM do Servidor e Atualização Dinâmica do Cabeçalho
+- **Atualização na RAM do Servidor (`server_rust/src/state.rs` & `midi_receiver.rs`):**
+  Ao processar o `FxLibraryRecall`, o servidor Rust atualiza imediatamente a estrutura `state.fx_types[slot]` com o novo `type_id` (`preset - 1`) e emite o evento `fxTypesUpdate`.
+- **Prevenção de Reversão de Cabeçalho:**
+  Anteriormente, o servidor mantinha o tipo de efeito antigo em memória durante a requisição de parâmetros e, ao concluir, sobrescrevia a tela do aplicativo de volta para o cabeçalho antigo. Com o sincronismo no servidor, o cabeçalho e o tema de cor (`theme-hall`, `theme-room`, `theme-stage`, `theme-plate`) permanecem atualizados e fixos antes, durante e após o overlay de carregamento.
+
+### 11.4. Sincronização em Tempo Real do Estado de Bypass
+- **Integração Overview x Editor (`public/modules/FXS/efeitos.js` & `fx_core.js`):**
+  - Implementada a função `syncFxSlotsFromCore()` no overview (`efeitos.js`), lendo o estado atual do parâmetro 52 (Bypass) e do `fxTypeState`.
+  - Atualizadas as funções `closeFxEditor()` e `sendParamChange(52)` para disparar a re-renderização do overview ao fechar o editor ou ao alterar o bypass pelo aplicativo.
+  - Adicionada a função `toggleSlotBypass(idx)` permitindo acionar o bypass diretamente pelos botões `||` / `>` nos cards de máquinas na tela de visão geral.
+- **Ajuste na Emissão de Socket no Backend (`socket_handlers.rs`):**
+  Alterada a emissão de `changeFxParam` de `socket.broadcast().emit` para `io.emit`, garantindo que tanto os outros clientes da rede quanto a própria aba que originou o comando recebam a confirmação da mudança e mantenham o card do overview destacado em vermelho (`.fx-bypass-on`).
+
+
 
 
 

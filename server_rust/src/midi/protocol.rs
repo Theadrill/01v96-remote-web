@@ -77,13 +77,19 @@ pub fn bytes_to_fader(bytes: &[u8]) -> i64 {
 }
 
 pub fn bytes_to_signed(bytes: &[u8]) -> i64 {
+    if bytes.is_empty() || bytes.len() > 8 {
+        return bytes_to_fader(bytes);
+    }
     let mut val: i64 = 0;
     for &b in bytes {
         val = (val << 7) | (b as i64);
     }
     let num_bits = bytes.len() * 7;
-    let sign_bit = 1 << (num_bits - 1);
-    let mask = (1 << num_bits) - 1;
+    if num_bits == 0 || num_bits >= 64 {
+        return val;
+    }
+    let sign_bit = 1i64 << (num_bits - 1);
+    let mask = (1i64 << num_bits).wrapping_sub(1);
     if (val & sign_bit) != 0 {
         val -= mask + 1;
     }
