@@ -307,11 +307,11 @@
 
         if (schema && schema.supported) {
             if (!syncedSlots[slotIdx] && !isSyncingSlot[slotIdx]) {
-                console.log(`[FX] 🚀 Abrindo slot FX${slotIdx + 1} des-sincronizado. Solicitando dados da mesa...`);
+                console.log(`[FX] 🚀 Abrindo slot FX${slotIdx + 1}. Solicitando parâmetros ao servidor...`);
                 showEditorSyncOverlay();
                 isSyncingSlot[slotIdx] = true;
                 if (typeof socket !== 'undefined') {
-                    socket.emit('requestFxSlotParams', { slot: slotIdx, force: true });
+                    socket.emit('requestFxSlotParams', { slot: slotIdx });
                 }
             } else {
                 hideEditorSyncOverlay();

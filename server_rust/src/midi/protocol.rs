@@ -490,14 +490,17 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
     // --- PHYSICAL SCENE RECALL / STORE & FX PRESET RECALL ---
     if message.len() >= 12 && message[3] == 0x3E && message[4] == 0x7F && message[5] == 0x10 {
-        let action_or_slot = message[6];
+        let action = message[6];
         let scene_or_preset = message[8];
-        if action_or_slot == 0x00 {
+        if action == 0x00 {
             return Some(ParsedMidi::PhysicalSceneRecall(scene_or_preset));
-        } else if action_or_slot == 0x20 {
+        } else if action == 0x20 {
             return Some(ParsedMidi::PhysicalSceneStore(scene_or_preset));
-        } else if (1..=4).contains(&action_or_slot) {
-            let slot = (action_or_slot - 1) as usize;
+        } else {
+            // FX Library Recall (Action 0x04):
+            // message[8] = preset number
+            // message[10] = slot index (0=FX1, 1=FX2, 2=FX3, 3=FX4)
+            let slot = (message[10] & 0x03) as usize;
             return Some(ParsedMidi::FxLibraryRecall {
                 slot,
                 preset: scene_or_preset,
@@ -507,13 +510,8 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
 
     // --- FX RECALL COMMIT (Section 127, Group 80 / 0x50) ---
     if message.len() >= 12 && message[3] == 0x3E && message[4] == 0x7F && message[5] == 0x50 {
-        let slot_raw = message[6];
         let preset = message[8];
-        let slot = if (1..=4).contains(&slot_raw) {
-            (slot_raw - 1) as usize
-        } else {
-            (slot_raw & 0x03) as usize
-        };
+        let slot = (message[10] & 0x03) as usize;
         return Some(ParsedMidi::FxLibraryRecall { slot, preset });
     }
 
