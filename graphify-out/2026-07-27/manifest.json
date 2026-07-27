@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/midi/protocol.rs": {
-    "mtime": 1785135715.0121956,
-    "ast_hash": "463c92b4a6bcd729228aa6c508167656",
+    "mtime": 1785135382.1467936,
+    "ast_hash": "be199c1a00d89c80f6f361a9384fcecf",
     "semantic_hash": ""
   },
   "server_rust/src/midi/remote_client.rs": {
@@ -2520,13 +2520,13 @@
     "semantic_hash": ""
   },
   "log/monitor_log.txt": {
-    "mtime": 1785136026.927744,
-    "ast_hash": "bcfddec6ca7e08d66f2f3e8969638b7f",
+    "mtime": 1785135471.891855,
+    "ast_hash": "0659a4fd6eff73994c0cf0e5b6ca51e4",
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785136029.1276228,
-    "ast_hash": "16de788273597b3edb259c0bcba672d5",
+    "mtime": 1785135475.6845155,
+    "ast_hash": "a33cc2d7a25af8e924f9687fb27cf1f1",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
