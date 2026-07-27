@@ -538,124 +538,70 @@
         socket.on('fxTypesUpdate', function(data) {
             if (!data) return;
 
-            let isInitial = true;
-            let hasDifferentType = false;
-
             for (let i = 0; i < 4; i++) {
-                if (lastFxTypeId[i] !== -1) isInitial = false;
                 const d = data[i] || data[String(i)];
-                if (d && d.id !== undefined && lastFxTypeId[i] !== -1 && lastFxTypeId[i] !== d.id) {
-                    hasDifferentType = true;
-                }
-            }
+                if (d) {
+                    const oldId = lastFxTypeId[i];
+                    const newId = d.id !== undefined ? d.id : fxTypeState[i].id;
 
-            // CARGA INICIAL (no boot / primeira carga): Apenas salva os IDs e estado local
-            if (isInitial) {
-                for (let i = 0; i < 4; i++) {
-                    const d = data[i] || data[String(i)];
-                    if (d && d.id !== undefined) lastFxTypeId[i] = d.id;
-                    if (d) {
-                        fxTypeState[i].id = d.id !== undefined ? d.id : fxTypeState[i].id;
-                        fxTypeState[i].name = d.name || fxTypeState[i].name;
-                        fxTypeState[i].bypass = d.bypass !== undefined ? d.bypass : fxTypeState[i].bypass;
-                        fxTypeState[i].mix = d.mix !== undefined ? d.mix : fxTypeState[i].mix;
-
-                        if (d.mix !== undefined) fxParamsState[i][48] = d.mix;
-                        if (d.bypass !== undefined) fxParamsState[i][52] = d.bypass ? 1 : 0;
-                    }
-                }
-                rerenderIfOpen();
-                return;
-            }
-
-            // CASO 1: Algoritmo mudou (ex: Hall -> Room)
-            if (hasDifferentType) {
-                console.log('[FX] 🔀 Mudança de Tipo/Algoritmo detectada!');
-                for (let i = 0; i < 4; i++) {
-                    const d = data[i] || data[String(i)];
-                    if (d && d.id !== undefined && lastFxTypeId[i] !== d.id) {
+                    // Se o algoritmo (ID) mudou no slot i (ex: Reverb -> Delay)
+                    if (oldId !== -1 && oldId !== newId) {
+                        console.log(`[FX] 🔀 Mudança de algoritmo no Slot ${i + 1}: ${oldId} -> ${newId}`);
                         syncedSlots[i] = false;
                         fxParamsState[i] = {};
-                        lastFxTypeId[i] = d.id;
                     }
-                    if (d) {
-                        fxTypeState[i].id = d.id !== undefined ? d.id : fxTypeState[i].id;
-                        fxTypeState[i].name = d.name || fxTypeState[i].name;
-                        fxTypeState[i].bypass = d.bypass !== undefined ? d.bypass : fxTypeState[i].bypass;
-                        fxTypeState[i].mix = d.mix !== undefined ? d.mix : fxTypeState[i].mix;
 
-                        if (d.mix !== undefined) fxParamsState[i][48] = d.mix;
-                        if (d.bypass !== undefined) fxParamsState[i][52] = d.bypass ? 1 : 0;
-                    }
-                }
+                    lastFxTypeId[i] = newId;
+                    fxTypeState[i].id = newId;
+                    fxTypeState[i].name = d.name || fxTypeState[i].name;
+                    fxTypeState[i].bypass = d.bypass !== undefined ? d.bypass : fxTypeState[i].bypass;
+                    fxTypeState[i].mix = d.mix !== undefined ? d.mix : fxTypeState[i].mix;
 
-                if (isModalOpen() && !isSyncingSlot[currentSlotIdx]) {
-                    isSyncingSlot[currentSlotIdx] = true;
-                    showEditorSyncOverlay();
-                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+                    if (d.mix !== undefined) fxParamsState[i][48] = d.mix;
+                    if (d.bypass !== undefined) fxParamsState[i][52] = d.bypass ? 1 : 0;
                 }
-                rerenderIfOpen();
-                return;
             }
 
-            // CASO 2: Todos os 4 IDs vieram idênticos (Recall do MESMO Preset na mesa!)
-            // Proteção com Cooldown de 3 segundos para que o re-sync execute UMA VEZ e NUNCA entre em loop!
-            const now = Date.now();
-            if (now - lastSameTypeRecallSyncTime > 3000) {
-                lastSameTypeRecallSyncTime = now;
-                console.log('[FX] 🔄 Recall do MESMO Preset detectado na mesa! Resyncing...');
-                for (let i = 0; i < 4; i++) {
-                    syncedSlots[i] = false;
-                    fxParamsState[i] = {};
-                    const d = data[i] || data[String(i)];
-                    if (d) {
-                        fxTypeState[i].id = d.id !== undefined ? d.id : fxTypeState[i].id;
-                        fxTypeState[i].name = d.name || fxTypeState[i].name;
-                        fxTypeState[i].bypass = d.bypass !== undefined ? d.bypass : fxTypeState[i].bypass;
-                        fxTypeState[i].mix = d.mix !== undefined ? d.mix : fxTypeState[i].mix;
-
-                        if (d.mix !== undefined) fxParamsState[i][48] = d.mix;
-                        if (d.bypass !== undefined) fxParamsState[i][52] = d.bypass ? 1 : 0;
-                    }
-                }
-
-                if (isModalOpen() && !isSyncingSlot[currentSlotIdx]) {
+            // Se o editor estiver aberto no slot cuja máquina mudou de tipo e não estiver sincronizada
+            if (isModalOpen() && !syncedSlots[currentSlotIdx] && !isSyncingSlot[currentSlotIdx]) {
+                const typeId = fxTypeState[currentSlotIdx]?.id;
+                const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
+                if (schema && schema.supported) {
                     isSyncingSlot[currentSlotIdx] = true;
                     showEditorSyncOverlay();
                     socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
-                }
-            } else {
-                for (let i = 0; i < 4; i++) {
-                    const d = data[i] || data[String(i)];
-                    if (d) {
-                        fxTypeState[i].id = d.id !== undefined ? d.id : fxTypeState[i].id;
-                        fxTypeState[i].name = d.name || fxTypeState[i].name;
-                        fxTypeState[i].bypass = d.bypass !== undefined ? d.bypass : fxTypeState[i].bypass;
-                        fxTypeState[i].mix = d.mix !== undefined ? d.mix : fxTypeState[i].mix;
-
-                        if (d.mix !== undefined) fxParamsState[i][48] = d.mix;
-                        if (d.bypass !== undefined) fxParamsState[i][52] = d.bypass ? 1 : 0;
-                    }
                 }
             }
 
             rerenderIfOpen();
         });
 
-        socket.on('fxLibraryRecall', function() {
-            console.log('[FX RECALL] 🔄 fxLibraryRecall recebido da mesa!');
-            lastSameTypeRecallSyncTime = Date.now();
-            for (let i = 0; i < 4; i++) {
-                syncedSlots[i] = false;
-                fxParamsState[i] = {};
-            }
+        socket.on('fxLibraryRecall', function(data) {
+            console.log('[FX RECALL] 🔄 Evento fxLibraryRecall recebido da mesa:', data);
+            const slot = (data && data.slot !== undefined) ? parseInt(data.slot, 10) : -1;
 
-            isSyncingSlot[currentSlotIdx] = false;
+            if (slot >= 0 && slot < 4) {
+                syncedSlots[slot] = false;
+                fxParamsState[slot] = {};
+                isSyncingSlot[slot] = false;
 
-            if (isModalOpen()) {
-                isSyncingSlot[currentSlotIdx] = true;
-                showEditorSyncOverlay();
-                socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+                if (isModalOpen() && currentSlotIdx === slot) {
+                    console.log(`[FX RECALL] Slot ${slot + 1} está ABERTO! Disparando resync imediato...`);
+                    isSyncingSlot[slot] = true;
+                    showEditorSyncOverlay();
+                    socket.emit('requestFxSlotParams', { slot: slot, force: true });
+                }
+            } else {
+                for (let i = 0; i < 4; i++) {
+                    syncedSlots[i] = false;
+                    fxParamsState[i] = {};
+                    isSyncingSlot[i] = false;
+                }
+                if (isModalOpen()) {
+                    isSyncingSlot[currentSlotIdx] = true;
+                    showEditorSyncOverlay();
+                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+                }
             }
         });
     }

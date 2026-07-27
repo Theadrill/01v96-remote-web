@@ -472,8 +472,11 @@ pub enum ParsedMidi {
         channel: usize,
         value: f64,
     },
-    /// FX Recall de preset detectado na mesa (section 127, group 80 / 0x50)
-    FxRecallDetected,
+    /// FX Recall de preset detectado na mesa com indicação do slot (0..3) e do preset (1..N)
+    FxLibraryRecall {
+        slot: usize,
+        preset: u8,
+    },
 }
 
 pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
@@ -485,20 +488,33 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
         return None;
     }
 
-    // --- PHYSICAL SCENE RECALL / STORE ---
+    // --- PHYSICAL SCENE RECALL / STORE & FX PRESET RECALL ---
     if message.len() >= 12 && message[3] == 0x3E && message[4] == 0x7F && message[5] == 0x10 {
-        let action = message[6];
-        let scene_idx = message[8];
-        if action == 0x00 {
-            return Some(ParsedMidi::PhysicalSceneRecall(scene_idx));
-        } else if action == 0x20 {
-            return Some(ParsedMidi::PhysicalSceneStore(scene_idx));
+        let action_or_slot = message[6];
+        let scene_or_preset = message[8];
+        if action_or_slot == 0x00 {
+            return Some(ParsedMidi::PhysicalSceneRecall(scene_or_preset));
+        } else if action_or_slot == 0x20 {
+            return Some(ParsedMidi::PhysicalSceneStore(scene_or_preset));
+        } else if (1..=4).contains(&action_or_slot) {
+            let slot = (action_or_slot - 1) as usize;
+            return Some(ParsedMidi::FxLibraryRecall {
+                slot,
+                preset: scene_or_preset,
+            });
         }
     }
 
     // --- FX RECALL COMMIT (Section 127, Group 80 / 0x50) ---
     if message.len() >= 12 && message[3] == 0x3E && message[4] == 0x7F && message[5] == 0x50 {
-        return Some(ParsedMidi::FxRecallDetected);
+        let slot_raw = message[6];
+        let preset = message[8];
+        let slot = if (1..=4).contains(&slot_raw) {
+            (slot_raw - 1) as usize
+        } else {
+            (slot_raw & 0x03) as usize
+        };
+        return Some(ParsedMidi::FxLibraryRecall { slot, preset });
     }
 
     // --- PRIORITY 0: PAN ---

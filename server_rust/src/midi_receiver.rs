@@ -474,10 +474,10 @@ pub fn start_rx_loop(
                                     });
                                 }
                             }
-                            crate::midi::protocol::ParsedMidi::FxRecallDetected => {
+                            crate::midi::protocol::ParsedMidi::FxLibraryRecall { slot, preset } => {
                                 if conn_mgr_recv.is_fully_synced() {
-                                    tracing::info!("🔄 [FX RECALL] Recall de preset de efeitos executado na mesa!");
-                                    let _ = io_clone.emit("fxLibraryRecall", &serde_json::json!({})).await;
+                                    tracing::info!("🔄 [FX RECALL] Recall de preset de efeitos executado no Slot {} (Preset {})!", slot + 1, preset);
+                                    let _ = io_clone.emit("fxLibraryRecall", &serde_json::json!({ "slot": slot, "preset": preset })).await;
                                 }
                             }
                             _ => {}

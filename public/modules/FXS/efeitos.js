@@ -266,6 +266,18 @@
         socket.on('fxInputsUpdate', applyFxInputs);
         socket.on('fxOutputsUpdate', applyFxOutputs);
 
+        socket.on('fxParamUpdate', function(data) {
+            if (!data || data.slot === undefined || data.slot < 0 || data.slot > 3) return;
+            const slot = data.slot;
+            if (data.param === 52) {
+                fxSlots[slot].bypass = data.value > 0;
+                rerenderIfOpen();
+            } else if (data.param === 48) {
+                fxSlots[slot].mix = data.value;
+                rerenderIfOpen();
+            }
+        });
+
         socket.on('fxSyncStatus', (data) => {
             const active = (typeof data === 'object') ? !!data.active : !!data;
             isSyncingFxs = active;

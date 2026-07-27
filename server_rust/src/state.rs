@@ -884,7 +884,13 @@ impl GlobalState {
                     }
                 }
             }
-            crate::midi::protocol::ParsedMidi::FxRecallDetected => {}
+            crate::midi::protocol::ParsedMidi::FxLibraryRecall { slot, preset: _ } => {
+                if *slot < 4 {
+                    if let Some(params_map) = self.fx_params.get_mut(slot) {
+                        params_map.clear();
+                    }
+                }
+            }
         }
     }
 
