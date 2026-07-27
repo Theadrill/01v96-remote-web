@@ -323,6 +323,13 @@
         const modal = document.getElementById('fxEditorModal');
         if (modal) modal.style.display = 'none';
         hideEditorSyncOverlay();
+
+        if (typeof window.syncFxSlotsFromCore === 'function') {
+            window.syncFxSlotsFromCore();
+        }
+        if (typeof window.renderEffectsScreen === 'function') {
+            window.renderEffectsScreen();
+        }
     }
 
     function showEditorSyncOverlay() {
@@ -336,29 +343,45 @@
     }
 
     // ── Alterar Parâmetro no Servidor (SysEx) ─────────────────────────
-    function sendParamChange(sysExParam, newRawVal) {
-        fxParamsState[currentSlotIdx][sysExParam] = newRawVal;
+    function sendParamChange(sysExParam, newRawVal, slotOverride) {
+        const slotIdx = slotOverride !== undefined ? slotOverride : currentSlotIdx;
+        if (!fxParamsState[slotIdx]) fxParamsState[slotIdx] = {};
+        fxParamsState[slotIdx][sysExParam] = newRawVal;
 
-        // Atualização instantânea dirigida do DOM para evitar perdas de foco/arrasto e saltos de scroll
-        const updated = updateSingleParamDom(sysExParam, newRawVal);
-        if (!updated) {
-            rerenderIfOpen();
+        if (sysExParam === 52) {
+            if (fxTypeState[slotIdx]) {
+                fxTypeState[slotIdx].bypass = (newRawVal > 0);
+            }
+            if (typeof window.syncFxSlotsFromCore === 'function') {
+                window.syncFxSlotsFromCore();
+            }
+            if (typeof window.renderEffectsScreen === 'function') {
+                window.renderEffectsScreen();
+            }
+        }
+
+        if (slotIdx === currentSlotIdx) {
+            const updated = updateSingleParamDom(sysExParam, newRawVal);
+            if (!updated) {
+                rerenderIfOpen();
+            }
         }
 
         if (typeof socket !== 'undefined') {
             socket.emit('changeFxParam', {
-                slot: currentSlotIdx,
+                slot: slotIdx,
                 param: sysExParam,
                 value: newRawVal
             });
         }
     }
 
-    function toggleBypass() {
-        const raw = fxParamsState[currentSlotIdx] || {};
-        const currentBypass = raw[52] !== undefined ? raw[52] : (fxTypeState[currentSlotIdx]?.bypass ? 1 : 0);
+    function toggleBypass(slotOverride) {
+        const slotIdx = slotOverride !== undefined ? slotOverride : currentSlotIdx;
+        const raw = fxParamsState[slotIdx] || {};
+        const currentBypass = raw[52] !== undefined ? raw[52] : (fxTypeState[slotIdx]?.bypass ? 1 : 0);
         const newBypass = currentBypass > 0 ? 0 : 1;
-        sendParamChange(52, newBypass);
+        sendParamChange(52, newBypass, slotIdx);
     }
 
     // ── Interações de Drag & Wheel ───────────────────────────────────
@@ -495,6 +518,18 @@
 
             if (data.params) {
                 fxParamsState[slot] = Object.assign({}, fxParamsState[slot], data.params);
+
+                // Atualiza o tipo e nome do efeito a partir do parâmetro 49 (Type ID) se presente
+                const typeIdVal = data.params[49] !== undefined ? data.params[49] : data.params[0x31];
+                if (typeIdVal !== undefined) {
+                    const typeId = Math.round(typeIdVal);
+                    const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
+                    if (schema) {
+                        fxTypeState[slot].id = typeId;
+                        fxTypeState[slot].name = schema.name || fxTypeState[slot].name;
+                        lastFxTypeId[slot] = typeId;
+                    }
+                }
             }
 
             if (Object.keys(fxParamsState[slot]).length >= 14) {
@@ -506,24 +541,36 @@
             }
 
             if (slot === currentSlotIdx && isModalOpen()) {
-                let allUpdated = true;
-                for (const [pByteStr, pVal] of Object.entries(data.params || {})) {
-                    const pByte = parseInt(pByteStr, 10);
-                    if (!updateSingleParamDom(pByte, pVal)) {
-                        allUpdated = false;
-                    }
-                }
-                if (!allUpdated) {
-                    rerenderIfOpen();
-                }
+                renderModal();
+            }
+
+            if (typeof window.syncFxSlotsFromCore === 'function') {
+                window.syncFxSlotsFromCore();
+            }
+            if (typeof window.renderEffectsScreen === 'function') {
+                window.renderEffectsScreen();
             }
         });
 
         socket.on('fxParamUpdate', function(data) {
             if (!data || data.slot === undefined || data.param === undefined) return;
-            fxParamsState[data.slot][data.param] = data.value;
+            const slot = data.slot;
+            if (!fxParamsState[slot]) fxParamsState[slot] = {};
+            fxParamsState[slot][data.param] = data.value;
 
-            if (data.slot === currentSlotIdx && isModalOpen()) {
+            if (data.param === 52) {
+                if (fxTypeState[slot]) {
+                    fxTypeState[slot].bypass = (data.value > 0);
+                }
+                if (typeof window.syncFxSlotsFromCore === 'function') {
+                    window.syncFxSlotsFromCore();
+                }
+                if (typeof window.renderEffectsScreen === 'function') {
+                    window.renderEffectsScreen();
+                }
+            }
+
+            if (slot === currentSlotIdx && isModalOpen()) {
                 // Se o usuário estiver arrastando este parâmetro, preserva o controle de arrasto
                 if (isDragging && dragElement && parseInt(dragElement.getAttribute('data-sysex'), 10) === data.param) {
                     return;
@@ -579,14 +626,27 @@
         socket.on('fxLibraryRecall', function(data) {
             console.log('[FX RECALL] 🔄 Evento fxLibraryRecall recebido da mesa:', data);
             const slot = (data && data.slot !== undefined) ? parseInt(data.slot, 10) : -1;
+            const preset = (data && data.preset !== undefined) ? parseInt(data.preset, 10) : -1;
 
             if (slot >= 0 && slot < 4) {
                 syncedSlots[slot] = false;
                 fxParamsState[slot] = {};
                 isSyncingSlot[slot] = false;
 
+                // Mapeia presets embutidos (1..64) para os algoritmos numéricos (0..63) da Yamaha 01V96
+                if (preset >= 1 && preset <= 64) {
+                    const typeId = preset - 1;
+                    const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
+                    if (schema) {
+                        fxTypeState[slot].id = typeId;
+                        fxTypeState[slot].name = schema.name || fxTypeState[slot].name;
+                        lastFxTypeId[slot] = typeId;
+                    }
+                }
+
                 if (isModalOpen() && currentSlotIdx === slot) {
-                    console.log(`[FX RECALL] Slot ${slot + 1} está ABERTO! Disparando resync imediato...`);
+                    console.log(`[FX RECALL] Slot ${slot + 1} está ABERTO! Atualizando cabeçalho e disparando resync...`);
+                    renderModal();
                     isSyncingSlot[slot] = true;
                     showEditorSyncOverlay();
                     socket.emit('requestFxSlotParams', { slot: slot, force: true });
@@ -622,6 +682,7 @@
         startStepperHold: startStepperHold,
         stopStepperHold: stopStepperHold,
         getCurrentSlot: () => currentSlotIdx,
+        getTypeState: () => fxTypeState,
         getParamsState: () => fxParamsState
     };
 

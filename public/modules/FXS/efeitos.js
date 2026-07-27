@@ -115,23 +115,7 @@
     }
 
     function logFxOutputMapping() {
-        const fxSlotInfo = [
-            { val: 121, name: 'FX1 Out1' },
-            { val: 122, name: 'FX1 Out2' },
-            { val: 129, name: 'FX2 Out1' },
-            { val: 130, name: 'FX2 Out2' },
-            { val: 137, name: 'FX3 Out1' },
-            { val: 138, name: 'FX3 Out2' },
-            { val: 139, name: 'FX4 Out1' },
-            { val: 140, name: 'FX4 Out2' },
-        ];
-        console.log('[FX] === FX Output Mapping ===');
-        for (const info of fxSlotInfo) {
-            const dests = findAllFxOutputDests(info.val);
-            const labels = dests.map(d => fxOutputDestLabel(d));
-            console.log('[FX]   ' + info.name + ' (val=' + info.val + '): ' +
-                (dests.length === 0 ? 'NOT ROUTED' : dests.map((d, i) => d + '=' + labels[i]).join(', ')));
-        }
+        // Verbose debug log removed
     }
 
     function applyFxOutputs(data) {
@@ -329,6 +313,35 @@
 
     // ── Renderização ──────────────────────────────────────────────────
 
+    function syncFxSlotsFromCore() {
+        if (!window.FXCore || !window.FXCore.getTypeState) return;
+        const types = window.FXCore.getTypeState();
+        const params = window.FXCore.getParamsState();
+        if (!types) return;
+        for (let i = 0; i < 4; i++) {
+            if (types[i]) {
+                fxSlots[i].effectName = types[i].name || fxSlots[i].effectName;
+                const bypassFromParam = (params && params[i] && params[i][52] !== undefined)
+                    ? (params[i][52] > 0)
+                    : undefined;
+                fxSlots[i].bypass = bypassFromParam !== undefined ? bypassFromParam : (types[i].bypass || false);
+                fxSlots[i].mix = types[i].mix !== undefined ? types[i].mix : fxSlots[i].mix;
+            }
+        }
+    }
+    window.syncFxSlotsFromCore = syncFxSlotsFromCore;
+
+    function toggleSlotBypass(idx, event) {
+        if (event) event.stopPropagation();
+        if (window.FXCore && window.FXCore.toggleBypass) {
+            window.FXCore.toggleBypass(idx);
+        } else {
+            fxSlots[idx].bypass = !fxSlots[idx].bypass;
+            renderEffectsScreen();
+        }
+    }
+    window.toggleSlotBypass = toggleSlotBypass;
+
     function renderSlot(slot, idx) {
         const bypassCls = slot.bypass ? 'fx-bypass-on' : '';
         const bypassIcon = slot.bypass ? '||' : '>';
@@ -349,8 +362,6 @@
         const outDestR = findFxOutputDest(outSlotVals[1]);
         const lblOutL = outDestL != null ? fxOutputDestLabel(outDestL) : 'OFF';
         const lblOutR = outDestR != null ? fxOutputDestLabel(outDestR) : 'OFF';
-        console.log('[FX] renderSlot(' + idx + '): Out1 val=' + outSlotVals[0] + ' dest=' + outDestL + ' lbl=' + lblOutL +
-            ' | Out2 val=' + outSlotVals[1] + ' dest=' + outDestR + ' lbl=' + lblOutR);
         const clsOutL = outDestL != null ? 'fx-patch-active' : 'fx-patch-off';
         const clsOutR = outDestR != null ? 'fx-patch-active' : 'fx-patch-off';
 
@@ -371,7 +382,7 @@
             <div class="fx-processor ${bypassCls}" onclick="if(!event.target.closest('.fx-bypass-btn')) openFxEditor(${idx})">
                 <span class="fx-proc-id">${slot.id}</span>
                 <span class="fx-proc-name">${slot.effectName}</span>
-                <button class="fx-bypass-btn" title="Bypass">${bypassIcon}</button>
+                <button class="fx-bypass-btn" title="Bypass" onclick="toggleSlotBypass(${idx}, event)">${bypassIcon}</button>
             </div>
             <div class="fx-side-col fx-side-out">
                 <div class="fx-side-row">
@@ -394,6 +405,8 @@
             console.log('[FX] renderEffectsScreen: container efeitosModalBody NOT FOUND');
             return;
         }
+
+        syncFxSlotsFromCore();
         console.log('[FX] renderEffectsScreen: container found, fxOutputs keys=' + Object.keys(fxOutputs).length);
 
         const columnsHTML = `

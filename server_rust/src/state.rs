@@ -884,10 +884,22 @@ impl GlobalState {
                     }
                 }
             }
-            crate::midi::protocol::ParsedMidi::FxLibraryRecall { slot, preset: _ } => {
+            crate::midi::protocol::ParsedMidi::FxLibraryRecall { slot, preset } => {
                 if *slot < 4 {
                     if let Some(params_map) = self.fx_params.get_mut(slot) {
                         params_map.clear();
+                    }
+                    if *preset >= 1 && *preset <= 64 {
+                        let type_id = (*preset - 1) as u32;
+                        let name = crate::midi::fx_list::resolve_fx_name(type_id);
+                        let entry = self.fx_types.entry(*slot).or_insert_with(|| FxTypeState {
+                            id: 0,
+                            name: "Unknown".to_string(),
+                            bypass: false,
+                            mix: 100.0,
+                        });
+                        entry.id = type_id;
+                        entry.name = name;
                     }
                 }
             }

@@ -2318,7 +2318,7 @@ pub fn register_handlers(
                                 let config = crate::config::AppConfig::load();
                                 let throttle_ms = config.time_between_fxs_requests;
                                 let params = [
-                                    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+                                    0x31, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
                                     0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 48, 52
                                 ];
                                 for &p in &params {
@@ -2345,9 +2345,10 @@ pub fn register_handlers(
         // --- CHANGE FX PARAM ---
         let sched_change_fx_param = scheduler_socket.clone();
         let state_change_fx_param = global_state_socket.clone();
+        let io_change_fx_param = io.clone();
         socket.on(
             "changeFxParam",
-            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
                 let slot = data.get("slot").and_then(|v| v.as_u64()).map(|v| v as u8);
                 let param = data.get("param").and_then(|v| v.as_u64()).map(|v| v as u8);
                 let value = data.get("value").and_then(|v| v.as_f64());
@@ -2369,7 +2370,7 @@ pub fn register_handlers(
                                 fx.bypass = value > 0.0;
                             }
                         }
-                        let _ = socket.broadcast().emit("fxParamUpdate", &serde_json::json!({
+                        let _ = io_change_fx_param.emit("fxParamUpdate", &serde_json::json!({
                             "slot": slot,
                             "param": param,
                             "value": value
