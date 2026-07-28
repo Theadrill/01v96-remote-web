@@ -50,12 +50,6 @@
       "file": "custom_names_scene-O PGD DE VCS 360-mesa-maria.json"
     },
     {
-      "custom_name": "SOMALIA 360",
-      "physical_scene": "SOMALIA 360",
-      "physical_id": 34,
-      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
-    },
-    {
       "custom_name": "ANAKA 360",
       "physical_scene": "ANAKA 360",
       "physical_id": 40,
@@ -96,6 +90,12 @@
       "physical_scene": "ANDRE RIC 360",
       "physical_id": 41,
       "file": "custom_names_scene-ANDRE RIC 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SOMALIA 360",
+      "physical_scene": "SOMALIA 360",
+      "physical_id": 34,
+      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
     }
   ]
 }
