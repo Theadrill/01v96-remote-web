@@ -62,7 +62,7 @@ impl MasterMeter {
         best_step
     }
 
-    pub fn parse(&self, message: &[u8]) -> Option<u8> {
+    pub fn parse(&self, message: &[u8]) -> Option<(u8, u8)> {
         if message.len() < 13 {
             return None;
         }
@@ -76,6 +76,6 @@ impl MasterMeter {
         let left = self.convert_value(left_raw);
         let right = self.convert_value(right_raw);
 
-        Some(left.max(right))
+        Some((left, right))
     }
 }

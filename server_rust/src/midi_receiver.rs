@@ -309,9 +309,10 @@ pub fn start_rx_loop(
                                 {
                                     if is_master {
                                         let mm = master_meter_recv.read().await;
-                                        if let Some(m_level) = mm.parse(&packet) {
+                                        if let Some((m_left, m_right)) = mm.parse(&packet) {
                                             let mut buf = meter_buffer_emit.lock().unwrap();
-                                            buf[32] = m_level as f64;
+                                            buf[32] = m_left as f64;
+                                            buf[33] = m_right as f64;
                                         }
                                     } else {
                                         let mut buf = meter_buffer_emit.lock().unwrap();

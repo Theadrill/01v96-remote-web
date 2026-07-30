@@ -108,12 +108,17 @@ impl MeterEngine {
             let num_channels = data_bytes_available / 2;
 
             if is_master_meter {
-                // Simplificacao temporaria. Na Yamaha, 32 eh o master.
-                let step = message[9].min(32) as usize;
-                let val = self.master_calibration[step];
-                self.set_target(32, val);
+                let left_step = message[9].min(32) as usize;
+                let right_step = message.get(11).copied().unwrap_or(0).min(32) as usize;
+                let left_val = self.master_calibration[left_step];
+                let right_val = self.master_calibration[right_step];
+                self.set_target(32, left_val);
+                self.set_target(33, right_val);
                 if 32 < self.num_channels {
-                    self.current_raw_steps[32] = step as u8;
+                    self.current_raw_steps[32] = left_step as u8;
+                }
+                if 33 < self.num_channels {
+                    self.current_raw_steps[33] = right_step as u8;
                 }
                 return;
             }

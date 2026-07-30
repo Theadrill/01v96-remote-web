@@ -1215,11 +1215,11 @@ function applyMetersToDOM(smoothedLevels, now) {
                 const finalPercent = smoothedLevels[levelIdx];
                 let isPeaking = finalPercent >= 98;
 
-                if (cached.curtains && cached.curtains.length > 0) {
+                    if (cached.curtains && cached.curtains.length > 0) {
                     cached.curtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
-                    if (cached.curtains.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
-                        const pIdx = levelIdx + 1;
+                    if (cached.curtains.length > 1 && (cached.dataCh === 'master' || (levelIdx >= 60 && levelIdx <= 66))) {
+                        const pIdx = (cached.dataCh === 'master') ? 33 : (levelIdx + 1);
                         if (pIdx < smoothedLevels.length) {
                             const partnerPercent = smoothedLevels[pIdx];
                             cached.curtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
@@ -1233,8 +1233,8 @@ function applyMetersToDOM(smoothedLevels, now) {
                     }
                     cached.mobileCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
-                    if (cached.mobileCurtains.length > 1 && levelIdx >= 60 && levelIdx <= 66) {
-                        const pIdx = levelIdx + 1;
+                    if (cached.mobileCurtains.length > 1 && (cached.dataCh === 'master' || (levelIdx >= 60 && levelIdx <= 66))) {
+                        const pIdx = (cached.dataCh === 'master') ? 33 : (levelIdx + 1);
                         if (pIdx < smoothedLevels.length) {
                             const partnerPercent = smoothedLevels[pIdx];
                             cached.mobileCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
@@ -1277,8 +1277,9 @@ function applyMetersToDOM(smoothedLevels, now) {
                     cached.curtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+                    const pIdx = (cached.dataCh === 'master') ? 33 :
+                        ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && cached.curtains.length > 1 && pIdx < smoothedLevels.length) {
                         partnerPercent = smoothedLevels[pIdx];
@@ -1293,8 +1294,9 @@ function applyMetersToDOM(smoothedLevels, now) {
                     cached.mobileCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+                    const pIdx = (cached.dataCh === 'master') ? 33 :
+                        ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && cached.mobileCurtains.length > 1 && pIdx < smoothedLevels.length) {
                         partnerPercent = smoothedLevels[pIdx];
