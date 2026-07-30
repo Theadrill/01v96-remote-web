@@ -158,5 +158,51 @@ Engenharia reversa das mensagens SysEx enviadas e recebidas ao alterar os pontos
 
 > [!NOTE]
 > Ao contrário do chaveamento individual por canal, a Yamaha 01V96 gerencia o ponto de leitura de sinal da régua de LEDs de forma global para todos os canais de entrada (`TARGET 0x00`) e para todas as saídas (`TARGET 0x01`).
+>
+> ---
+>
+> ## 6. Descobertas de Engenharia Reversa — Sync de Posição dos Medidores (0x30 Read)
+>
+> ### 6.1. Request Format Testado
+> Foram testados 10 formatos diferentes de request `0x30` para o elemento `0x0C` (`Section 0x0D`, `Group 0x03`):
+>
+> | Formato | Request Hex | Descrição |
+> |---------|-------------|-----------|
+> | A1 | `F0 43 30 3E 0D 03 0C 00 00 F7` | Input, channel=0x00 |
+> | A2 | `F0 43 30 3E 0D 03 0C 01 00 F7` | Output, channel=0x00 |
+> | B1 | `F0 43 30 3E 0D 03 0C 00 01 F7` | Input, byte_count=0x01 |
+> | B2 | `F0 43 30 3E 0D 03 0C 01 01 F7` | Output, byte_count=0x01 |
+> | C1 | `F0 43 30 3E 0D 03 0C 00 05 F7` | Input, byte_count=0x05 |
+> | C2 | `F0 43 30 3E 0D 03 0C 01 05 F7` | Output, byte_count=0x05 |
+> | D1 | `F0 43 30 3E 0D 03 0C 00 00 00 F7` | Input, sub-param+channel |
+> | D2 | `F0 43 30 3E 0D 03 0C 01 00 00 F7` | Output, sub-param+channel |
+> | E1 | `F0 43 30 3E 0D 03 0C 00 00 00 01 F7` | Input, formato meter completo |
+> | E2 | `F0 43 30 3E 0D 03 0C 01 00 00 01 F7` | Output, formato meter completo |
+>
+> ### 6.2. Respostas Recebidas
+> **Apenas 2 respostas `0D 03 0C` foram recebidas, AMBAS com `param=0x01` (Output/Master):**
+>
+> ```
+> <- F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7
+> <- F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7
+> ```
+>
+> **Nenhuma resposta para `param=0x00` (Input/Channels) em nenhum formato testado.**
+>
+> ### 6.3. Parsing da Resposta
+> ```
+> F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7
+>                      ↑              ↑
+>                    param=0x01   value=0x02 (Post-Fader)
+> ```
+> - **Byte 7**: `param` (0x01 = Output/Master)
+> - **Byte 12** (último antes de F7): `value` (0x00=Pre-EQ, 0x01=Pre-Fader, 0x02=Post-Fader)
+> - **Bytes 8-11**: `00 00 00 00` (reservado/padding)
+>
+> ### 6.4. Conclusão Importante
+> - ✅ **Output/Master position** (`param=0x01`): **LÊ via `0x30`** — funciona perfeitamente
+> - ❌ **Input/Channels position** (`param=0x00`): **NÃO lê via `0x30`** — sem resposta em nenhum formato
+> - 📝 O Studio Manager provavelmente lê a posição dos Inputs do arquivo `.sm2` (projeto), não da mesa
+> - 🔧 **Implementação**: O sync inicial deve ler apenas `param=0x01` (Output); para Inputs usar `localStorage` + defaults
 
 
