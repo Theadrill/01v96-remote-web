@@ -1,0 +1,11 @@
+{
+  "eslint.enable": false,
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false,
+  "markdown.validate.enabled": false,
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  }
+}

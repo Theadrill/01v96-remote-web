@@ -1017,6 +1017,46 @@ Nesta seção documentamos o plano passo a passo de engenharia para corrigir os 
 - **Ajuste na Emissão de Socket no Backend (`socket_handlers.rs`):**
   Alterada a emissão de `changeFxParam` de `socket.broadcast().emit` para `io.emit`, garantindo que tanto os outros clientes da rede quanto a própria aba que originou o comando recebam a confirmação da mudança e mantenham o card do overview destacado em vermelho (`.fx-bypass-on`).
 
+---
+
+## 12. Mapeamento de Algoritmo: Multiband Compressor (M.BAND DYNA.)
+
+Catalogação de todos os parâmetros do efeito **M.BAND DYNA.** (Compressor Multibanda), capturados interativamente via `studio.js` e Studio Manager.
+
+### 12.1. Tabela Geral de Parâmetros
+
+| # | Nome do Parâmetro | SysEx (Hex/Dec) | Valor Mínimo (Hex / Dec / Texto) | Valor Máximo (Hex / Dec / Texto) | Status / Lógica de Conversão |
+|---|---|---|---|---|---|
+| 1 | **LOW GAIN** | `0x10` (16 dec) | `0x00 00` / `0` / `-96.0dB` | `0x08 38` / `1080` / `+12.0dB` | ✅ **Linear:** `(val - 960) / 10` dB (passos de 0.1dB, 0.0dB = 960 / `0x07 40`) |
+| 2 | **MID GAIN** | `0x11` (17 dec) | `0x00 00` / `0` / `-96.0dB` | `0x08 38` / `1080` / `+12.0dB` | ✅ **Linear:** `(val - 960) / 10` dB (passos de 0.1dB, 0.0dB = 960 / `0x07 40`) |
+| 3 | **HI. GAIN** | `0x12` (18 dec) | `0x00 00` / `0` / `-96.0dB` | `0x08 38` / `1080` / `+12.0dB` | ✅ **Linear:** `(val - 960) / 10` dB (passos de 0.1dB, 0.0dB = 960 / `0x07 40`) |
+| 4 | **PRESENCE** | `0x13` (19 dec) | `0x00 00` / `0` / `-10` | `0x00 14` / `20` / `+10` | ✅ **Linear:** `val - 10` (passos de 1, centro 0 = 10 / `0x00 0A`) |
+| 5 | **CMP.THRE** | `0x18` (24 dec) | `0x00 00` / `0` / `-24.0dB` | `0x01 70` / `240` / `0.0dB` | ✅ **Linear:** `(val - 240) / 10` dB (passos de 0.1dB, 240 passos) |
+| 6 | **CMP.RAT** | `0x19` (25 dec) | `0x00 00` / `0` / `1:1` | `0x00 0E` / `14` / `20:1` | ✅ **Lookup (15 pontos):** `['1:1', '1.1:1', '1.3:1', '1.5:1', '1.7:1', '2:1', '2.5:1', '3:1', '3.5:1', '4:1', '5:1', '6:1', '8:1', '10:1', '20:1']` |
+| 7 | **CMP.ATK** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 8 | **CMP.REL** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 9 | **CMP.KNEE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 10 | **LOOKUP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 11 | **CMP.BYP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 12 | **L-M XOVR** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 13 | **M-H XOVR** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 14 | **SLOPE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 15 | **CEILING** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 16 | **EXP.THRE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 17 | **EXP.RAT** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 18 | **EXP.REL** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 19 | **EXP.BYP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 20 | **LIM.THRE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 21 | **LIM.ATK** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 22 | **LIM.REL** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 23 | **LIM.BYP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 24 | **LIM.KNEE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 25 | **SOLO LOW** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 26 | **SOLO MID** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 27 | **SOLO HIGH** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 28 | **BYPASS (Mix)**| ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 29 | **MIX BALANCE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+
 
 
 
