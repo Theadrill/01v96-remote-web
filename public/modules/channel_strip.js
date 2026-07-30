@@ -202,17 +202,11 @@ function createDesktopStrip(config) {
                 <div class="master-meter-divider">MEDIDORES</div>
                 <div class="master-meter-group">
                     <span class="master-meter-label">MASTER:</span>
-                    <div class="master-meter-pills">
-                        <button class="master-meter-pill">PRE</button>
-                        <button class="master-meter-pill active">POST</button>
-                    </div>
+                    <button id="master-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('master')">PRE</button>
                 </div>
                 <div class="master-meter-group">
                     <span class="master-meter-label">CANAIS:</span>
-                    <div class="master-meter-pills">
-                        <button class="master-meter-pill">PRE</button>
-                        <button class="master-meter-pill active">POST</button>
-                    </div>
+                    <button id="channels-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('channels')">PRE</button>
                 </div>
             </div>
             ` : ''}
@@ -981,3 +975,29 @@ async function clearAllSolos() {
         await new Promise(r => setTimeout(r, 30));
     }
 }
+
+/**
+ * Placeholder para abertura do futuro modal de configuração de medidores.
+ */
+window.openMeterConfigModal = function(target) {
+    console.log(`[MEDIDORES CONFIG] Clique no indicador ${target} (Modal será implementado futuramente).`);
+};
+
+/**
+ * Atualiza o texto do botão indicador de medidores no canal Master (Desktop).
+ * @param {'master' | 'channels'} target 
+ * @param {number | string} mode (0/pre_eq => "PRE EQ", 1/pre => "PRE", 2/post => "POST")
+ */
+window.updateMeterIndicatorUI = function(target, mode) {
+    const btnId = target === 'master' ? 'master-meter-indicator-btn' : 'channels-meter-indicator-btn';
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    let label = 'PRE';
+    if (mode === 0 || mode === '00' || mode === 'pre_eq') label = 'PRE EQ';
+    else if (mode === 1 || mode === '01' || mode === 'pre' || mode === 'pre_fader') label = 'PRE';
+    else if (mode === 2 || mode === '02' || mode === 'post' || mode === 'post_fader') label = 'POST';
+
+    btn.textContent = label;
+    console.log(`[MEDIDORES UI] Indicador ${target} atualizado para: ${label}`);
+};

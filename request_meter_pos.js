@@ -1,37 +1,19 @@
 const midi = require('midi');
 
 /**
- * Sends READ-ONLY requests (0x30) for meter position (0D 03 0C)
- * Tests different request formats to find which one works for both Input and Output params.
+ * Script de Leitura Inicial + Monitoramento Contínuo (Real-Time Listener)
+ * 1. Puxa os valores atuais de posição dos medidores via 0x30 (Read Request)
+ * 2. Mantém o Listener ativo em tempo real exibindo as alterações feitas na mesa física.
  */
 
 const REQUESTS = [
-  // --- Format A: channel=0x00 (standard build_request pattern) ---
-  { label: 'A1 INP (chan=00)', sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x00, 0x00, 0xF7] },
-  { label: 'A2 OUT (chan=00)', sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x01, 0x00, 0xF7] },
-  // --- Format B: byte_count=0x01 (build_fx_type_request pattern) ---
-  { label: 'B1 INP (bc=01)',   sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x00, 0x01, 0xF7] },
-  { label: 'B2 OUT (bc=01)',   sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x01, 0x01, 0xF7] },
-  // --- Format C: byte_count=0x05 (all data bytes) ---
-  { label: 'C1 INP (bc=05)',   sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x00, 0x05, 0xF7] },
-  { label: 'C2 OUT (bc=05)',   sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x01, 0x05, 0xF7] },
-  // --- Format D: with sub-param 0x00, channel=0x00 (extra field) ---
-  { label: 'D1 INP (+sub)',    sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x00, 0x00, 0x00, 0xF7] },
-  { label: 'D2 OUT (+sub)',    sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x01, 0x00, 0x00, 0xF7] },
-  // --- Format E: like master_meter format (param=00, ch=00, extra=00, bc=01) ---
-  // master_meter format: F0 43 30 3E 0D 21 04 00 7F 00 01 F7
-  // Adapted for 0D 03 0C:
-  { label: 'E1 INP (full)',    sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x00, 0x00, 0x00, 0x01, 0xF7] },
-  { label: 'E2 OUT (full)',    sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x01, 0x00, 0x00, 0x01, 0xF7] },
+  { label: '0D 03 0C 00 (INPUTS)',  sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x00, 0x00, 0xF7] },
+  { label: '0D 03 0C 01 (OUTPUTS)', sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x01, 0x00, 0xF7] },
 ];
 
-const LISTEN_MS = 4000;
-let responses = [];
-
-function toHex(msg) {
-  if (!msg || msg.length === 0) return '(empty)';
-  const hex = Buffer.from(msg).toString('hex').toUpperCase().match(/.{1,2}/g);
-  return hex ? hex.join(' ') : '(empty)';
+function timestamp() {
+  const d = new Date();
+  return d.toTimeString().split(' ')[0];
 }
 
 function findYamahaPort() {
@@ -53,7 +35,7 @@ function findYamahaPort() {
 
 const { yamahaIn, yamahaOut } = findYamahaPort();
 if (yamahaIn === -1 || yamahaOut === -1) {
-  console.error('Yamaha 01V96 not found on MIDI ports');
+  console.error('Yamaha 01V96 não encontrada nas portas MIDI.');
   process.exit(1);
 }
 
@@ -63,68 +45,58 @@ input.openPort(yamahaIn);
 output.openPort(yamahaOut);
 input.ignoreTypes(false, false, false);
 
-console.log(`Yamaha 01V96 IN:${yamahaIn} OUT:${yamahaOut}`);
+console.log(`Yamaha 01V96 Conectada [IN:${yamahaIn} OUT:${yamahaOut}]`);
+console.log('🔄 Sincronizando estado inicial via 0x30...');
 console.log('');
 
+let isInitialSync = true;
+let initialSyncDone = false;
+
 input.on('message', (_deltaTime, message) => {
-  if (message[0] === 0xFE) return;
-  responses.push(message);
-  const hex = toHex(message);
-  // Only print responses matching 0D 03 to avoid meter noise
-  if (message.length >= 6 && message[4] === 0x0D && message[5] === 0x03) {
-    console.log(`  <- ${hex}`);
+  if (message[0] === 0xFE) return; // ignora active sensing
+  if (message.length >= 6 && message[4] === 0x0D && message[5] === 0x21) return; // ignora streaming de audio meters
+
+  // Processa mensagens de parâmetro de medidores (0D 03 0C)
+  if (message.length >= 8 && message[0] === 0xF0 && message[1] === 0x43
+      && message[2] === 0x10 && message[3] === 0x3E
+      && message[4] === 0x0D && message[5] === 0x03 && message[6] === 0x0C) {
+    const param = message[7];
+    const valueByte = message[message.length - 2];
+
+    const targetStr = param === 0 ? 'INPUTS (00)' : param === 1 ? 'OUTPUTS (01)' : `Param 0x${param.toString(16)}`;
+    const valStr = valueByte === 0 ? 'Pre-EQ (0x00)' :
+                   valueByte === 1 ? 'Pre-Fader (0x01)' :
+                   valueByte === 2 ? 'Post-Fader (0x02)' :
+                   `0x${valueByte.toString(16).padStart(2, '0')}`;
+
+    if (isInitialSync) {
+      console.log(`  <- [ESTADO INICIAL] ${targetStr} => ${valStr}`);
+    } else {
+      console.log(`[${timestamp()}] 🎛️ ALTERAÇÃO NA MESA -> ${targetStr} => ${valStr}`);
+    }
   }
 });
 
+// Envia as requisições de sincronização inicial
 let idx = 0;
 function sendNext() {
   if (idx >= REQUESTS.length) {
-    console.log('');
-    console.log('All requests sent. Waiting for responses...');
-    setTimeout(summarize, LISTEN_MS);
+    setTimeout(() => {
+      isInitialSync = false;
+      initialSyncDone = true;
+      console.log('');
+      console.log('====================================================');
+      console.log('🎧 MONITORAMENTO EM TEMPO REAL ATIVO (Somente Escuta)');
+      console.log('   Altere as opções na mesa física para ver os logs...');
+      console.log('====================================================');
+      console.log('');
+    }, 1000);
     return;
   }
   const req = REQUESTS[idx];
-  console.log(`-> ${req.label}`);
   output.sendMessage(req.sysex);
   idx++;
-  setTimeout(sendNext, 100);
+  setTimeout(sendNext, 300);
 }
+
 sendNext();
-
-function summarize() {
-  console.log('');
-  console.log('=== SUMMARY ===');
-  let found = 0;
-  for (const msg of responses) {
-    if (msg.length >= 8 && msg[0] === 0xF0 && msg[1] === 0x43
-        && msg[2] === 0x10 && msg[3] === 0x3E
-        && msg[4] === 0x0D && msg[5] === 0x03 && msg[6] === 0x0C) {
-      found++;
-      const param = msg[7];
-      // The value is the last non-F7 byte (or near it in the data payload)
-      const valueByte = msg[msg.length - 2];
-      let dataStr = '';
-      for (let i = 8; i < msg.length - 1; i++) {
-        dataStr += ' ' + msg[i].toString(16).padStart(2, '0');
-      }
-      const target = param === 0 ? 'INPUT (canais)' :
-                     param === 1 ? 'OUTPUT (master)' :
-                     `?0x${param.toString(16)}`;
-      const valStr = valueByte === 0 ? 'Pre-EQ' :
-                     valueByte === 1 ? 'Pre-Fader' :
-                     valueByte === 2 ? 'Post-Fader' :
-                     `0x${valueByte.toString(16)}`;
-      console.log(`  [RESP] ${target} = ${valStr} (data:${dataStr})`);
-    }
-  }
-  if (found === 0) {
-    console.log('  No response received for 0D 03 0C');
-  } else {
-    console.log(`  Total: ${found} response(s) for 0D 03 0C`);
-  }
-
-  input.closePort();
-  output.closePort();
-  process.exit(0);
-}
