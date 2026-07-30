@@ -4,33 +4,56 @@ Este documento descreve a arquitetura de engenharia reversa, protocolo MIDI SysE
 
 ---
 
-## 1. FASE 1 (PRIORITÁRIA): Meters do Canal Master Desktop (Seletor PRE / POST)
+## 1. FASE 1 (PRIORITÁRIA): Painel de Controle de Medidores no Modo Desktop
 
-Esta é a **primeira tarefa** de implementação de meters no projeto. O objetivo é integrar os botões de alternância `[PRE]` / `[POST]` no Master do layout Desktop, com calibração cirúrgica da régua de LEDs baseada na tabela `steps.json`.
+Esta é a **primeira tarefa** de implementação visual de controle de medidores. O objetivo é integrar o bloco de seletores no painel Desktop, permitindo alternar a captação de sinal dos medidores tanto do **MASTER** quanto dos **CANAIS** usando os comandos SysEx globais descobertos.
 
-### 1.1. Passo a Passo da Implementação Técnica
+> [!IMPORTANT]
+> **RESTRICAO DE ESCOPO DE LAYOUT:**
+> Este bloco de seletores será implementado **SOMENTE no modo Desktop**. No modo Mobile, estas opções serão tratadas futuramente em um modal à parte (não fazer nenhuma implementação para mobile nesta etapa).
 
-#### Passo 1: Servidor Rust (`server_rust/src/midi/master_meter.rs` e `socket_handlers.rs`)
-1. **Adicionar Parâmetro de Modo no `MasterMeter`:**
-   - Adicionar o estado do modo (`MeterMode::PreFader` vs `MeterMode::PostFader`) na estrutura `MasterMeter`.
-   - `MeterMode::PreFader`: Constrói a requisição apontando para o sub-parâmetro `0x00` (`Pre-Fader`).
-   - `MeterMode::PostFader`: Constrói a requisição apontando para o sub-parâmetro `0x02` (`Post-Fader`).
-2. **Integração Estrita com `steps.json`:**
-   - Garantir que o valor bruto recebido da mesa (0 a 32 steps) seja processado obrigatoriamente por `MasterMeter::convert_value(&self.steps)`.
-   - **Proibido utilizar interpolação linear genérica**. A conversão deve respeitar rigorosamente a curva logarítmica/não-linear da Yamaha.
-3. **Handler de Socket.IO (`setMasterMeterMode`):**
-   - Criar evento WebSocket `setMasterMeterMode { mode: "pre" | "post" }` para alterar o modo em tempo real sem desconectar a sessão MIDI.
+### 1.1. Estrutura Visual do Bloco (Modo Desktop)
 
-#### Passo 2: Componentes do Frontend (Layout Desktop Master)
-1. **Adicionar Seletor Visual PRE / POST:**
-   - No contêiner visual do Fader Master no modo Desktop, inserir dois botões de chaveamento estilo pill: **`[PRE]`** e **`[POST]`**.
-   - O botão ativo deve ter destaque visual (borda iluminada/cor ativa).
-2. **Emissão de Evento e Estado Local:**
-   - Ao clicar em `[PRE]`, emitir `socket.emit('setMasterMeterMode', { mode: 'pre' })`.
-   - Ao clicar em `[POST]`, emitir `socket.emit('setMasterMeterMode', { mode: 'post' })`.
-3. **Mapeamento Cirúrgico da Régua de LEDs (`-∞` a `+10dB`):**
-   - Vincular os passos retornados pela tabela `steps.json` diretamente à altura da barra de LEDs SVG/CSS.
-   - Garantir que a marcação de `0dB` na régua impressa na tela acenda no exato momento em que o hardware da mesa acusar `0dB`.
+No painel do Master no layout Desktop, teremos o seguinte agrupamento de controles:
+
+```text
+MEDIDORES
+
+MASTER:
+[ PRE ]  [ POST ]
+
+CANAIS:
+[ PRE ]  [ POST ]
+```
+
+### 1.2. Mapeamento de Ações e SysEx Correspondente
+
+#### 1. Seletor `MASTER:` (`PRE / POST`)
+- **[ PRE ]**: Envia o SysEx Global para Saídas em modo Pre-Fader:
+  `F0 43 10 3E 0D 03 0C 01 00 00 00 00 01 F7`
+- **[ POST ]**: Envia o SysEx Global para Saídas em modo Post-Fader:
+  `F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7`
+
+#### 2. Seletor `CANAIS:` (`PRE / POST`)
+- **[ PRE ]**: Envia o SysEx Global para Canais em modo Pre-Fader:
+  `F0 43 10 3E 0D 03 0C 00 00 00 00 00 01 F7`
+- **[ POST ]**: Envia o SysEx Global para Canais em modo Post-Fader:
+  `F0 43 10 3E 0D 03 0C 00 00 00 00 00 02 F7`
+
+### 1.3. Passo a Passo da Implementação Técnica
+
+#### Passo 1: Backend Rust (`server_rust/src/socket_handlers.rs`)
+1. **Eventos WebSocket de Posição de Medidores:**
+   - Registrador do evento `setGlobalMeterPosition { target: "master" | "channels", mode: "pre" | "post" }`.
+   - Ao receber o evento, enviar a mensagem SysEx apropriada para a mesa via `scheduler.enqueue`.
+   - Retransmitir a atualização de estado para todos os clientes conectados (`globalMeterPositionUpdated`).
+
+#### Passo 2: Componentes do Frontend (`public/modules/channel_strip.js` e `socket.js`)
+1. **Renderização dos Seletores (Apenas no Fader Master Desktop):**
+   - Renderizar o bloco **MEDIDORES** com sub-rótulos **MASTER:** e **CANAIS:** e botões de pílula `[PRE]` / `[POST]`.
+2. **Persistência em `localStorage`:**
+   - Salvar `01v96_master_meter_pos` (`'pre'` | `'post'`) e `01v96_channels_meter_pos` (`'pre'` | `'post'`).
+   - Restaurar as preferências ao carregar a página e enviá-las na reconexão (`socket.on('connect')`).
 
 ---
 
@@ -88,32 +111,50 @@ Quando a tela de edição detalhada de um canal (Selected Channel) está ativa n
 
 ### 3.2. Elemento `0x04`: Stereo Master Bus Output Meters
 
-Quando o canal selecionado é o Master Stereo (`STEREO-L` / `STEREO-R`), o Studio Manager faz o polling do `Element 0x04` (`0D 21 04`) solicitando 3 pontos de leitura do fluxo de sinal do barramento Master:
+Quando o canal selecionado é o Master Stereo (`STEREO-L` / `STEREO-R`), o Studio Manager faz o polling do `Element 0x04` (`0D 21 04`) solicitando pontos de leitura do barramento Master estéreo. Os sub-canais representam os **canais L e R do barramento Master**, e não pontos de medição Pre/Post:
 
-| Sub-canal (`CHANNEL`) | Tipo de Meter | Descrição / Ponto de Leitura no Fluxo de Sinal |
+| Sub-canal (`PARAM`) | Tipo de Meter | Descrição / Canal Lido |
 |---|---|---|
-| `0x00` | **Master Pre-Fader** | Leitura do sinal do Master antes do Fader (Pre-Fader Level) |
-| `0x02` | **Master Post-Fader** | Leitura do sinal do Master após o Fader (Post-Fader Level, exibido ao lado do Fader) |
+| `0x00` | **Master L Level** | Leitura do canal **Left** do barramento Stereo Master |
+| `0x02` | **Master R Level** | Leitura do canal **Right** do barramento Stereo Master |
 | `0x03` | **Master Peak / Balance** | Leitura de pico/atuação do controle de Balance (`BAL L-R`) |
 
 > [!NOTE]
-> Mesmo que a tela do Selected Channel exiba visualmente apenas 1 barra vertical de fader, o firmware da 01V96 e o Studio Manager monitoram simultaneamente o sinal **Pre-Fader (`0x00`)**, **Post-Fader (`0x02`)** e **Pico (`0x03`)** para atualizar dinamicamente indicadores de clipping, LEDs de pré/pós e o medidor visual do fader.
+> Mesmo que a tela do Selected Channel exiba visualmente apenas 1 barra vertical de fader, o firmware da 01V96 e o Studio Manager monitoram simultaneamente o sinal de **L (`0x00`)**, **R (`0x02`)** e **Pico/Balance (`0x03`)** para atualizar dinamicamente indicadores de clipping, LEDs de pré/pós e o medidor visual do fader.
 
 > [!IMPORTANT]
 > **Requisito de UI Desktop — Seletor Alternável PRE / POST no Canal Master:**
-> No modo Desktop da interface web, o Canal Master possuirá botões visuais de alternância **[PRE]** e **[POST]**:
-> - **Ao selecionar [PRE]:** O aplicativo chaveia as requisições de medição para o sub-parâmetro **Pre-Fader (`0x00`)**, exibindo o nível de entrada bruto independente da posição do fader.
-> - **Ao selecionar [POST]:** O aplicativo chaveia as requisições para o sub-parâmetro **Post-Fader (`0x02`)**, refletindo visualmente a posição do fader de volume em tempo real.
+> O chaveamento **PRE / POST** dos medidores do Master **NÃO** é feito via troca de sub-param do Element 0x04. O ponto de leitura (Pre/Post) é controlado de forma **global** por uma chave SysEx independente (ver Seção 5.2, Alvo `0x01` — Saídas). O Element 0x04 sempre lê o ponto atualmente configurado nessa chave global para os canais L e R:
+> - **Ao selecionar [PRE]:** A chave global é comutada para Pre-Fader. As requisições dos sub-params `0x00` (L) e `0x02` (R) passam a refletir o nível **antes** do fader.
+> - **Ao selecionar [POST]:** A chave global é comutada para Post-Fader. As requisições dos mesmos sub-params passam a refletir o nível **após** o fader.
 
 ---
 
-## 4. Calibração de Escala Visual via Tabela de Steps (`steps.json`)
+## 5. Configurações Globais de Posição de Medição (Global Meter Position Setup)
 
-Para que os níveis de dB lidos via SysEx reflitam com precisão cirúrgica a régua graduada do fader (`-∞`, `-50`, `-40`, `-30`, `-20`, `-15`, `-10`, `-5`, `0`, `+5`, `+10dB`):
+Engenharia reversa das mensagens SysEx enviadas e recebidas ao alterar os pontos globais de captação dos medidores de sinal (Pre-EQ, Pre-Fader, Post-Fader) nas telas de Setup da mesa Yamaha 01V96.
 
-1. **Tabela de Referência Calibrada (`steps.json` / `MasterMeter`):**
-   - Os valores brutos lidos da mesa (0 a 32 steps de LED) **NÃO** devem ser renderizados usando interpolação linear genérica.
-   - Devem obrigatoriamente ser passados pela tabela de lookup `steps.json` já integrada no servidor Rust (`MasterMeter::convert_value`), mapeando a curva não-linear real da Yamaha 01V96.
-2. **Paridade 1:1 entre Hardware e Web:**
-   - Garante que quando o LED da mesa acender no indicador de `0dB`, o LED correspondente na interface web acenda exatamente sobre a marca de `0dB` da régua visual.
+### 5.1. Estrutura das Mensagens SysEx de Meter Position
+- **Formato:** `F0 43 10 3E 0D 03 0C [TARGET] 00 00 00 00 [VALUE] F7`
+- **Seção / Grupo / Elemento:** `Section 0x0D` / `Group 0x03` / `Element 0x0C`
+
+### 5.2. Mapeamento de Alvos (`TARGET`) e Posições (`VALUE`)
+
+#### Alvo 1: Canais de Entrada (CH1-32 e Stereo Inputs) — `TARGET = 0x00`
+| Posição do Medidor | Valor Hex (`VALUE`) | SysEx Capturado |
+|---|---|---|
+| **Pre-EQ** | `0x00` | `F0 43 10 3E 0D 03 0C 00 00 00 00 00 00 F7` |
+| **Pre-Fader** | `0x01` | `F0 43 10 3E 0D 03 0C 00 00 00 00 00 01 F7` |
+| **Post-Fader** | `0x02` | `F0 43 10 3E 0D 03 0C 00 00 00 00 00 02 F7` |
+
+#### Alvo 2: Saídas (BUS 1-8, AUX 1-8 e STEREO MASTER) — `TARGET = 0x01`
+| Posição do Medidor | Valor Hex (`VALUE`) | SysEx Capturado |
+|---|---|---|
+| **Pre-EQ** | `0x00` | `F0 43 10 3E 0D 03 0C 01 00 00 00 00 00 F7` |
+| **Pre-Fader** | `0x01` | `F0 43 10 3E 0D 03 0C 01 00 00 00 00 01 F7` |
+| **Post-Fader** | `0x02` | `F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7` |
+
+> [!NOTE]
+> Ao contrário do chaveamento individual por canal, a Yamaha 01V96 gerencia o ponto de leitura de sinal da régua de LEDs de forma global para todos os canais de entrada (`TARGET 0x00`) e para todas as saídas (`TARGET 0x01`).
+
 
