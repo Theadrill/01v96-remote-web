@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "docs/PLANO_DE_IMPLEMENTACAO_DE_EFEITOS.md": {
-    "mtime": 1785135454.3618002,
-    "ast_hash": "c9eecbabf33f4d12e4526f307f390612",
+    "mtime": 1785376744.355594,
+    "ast_hash": "ad31a8527ad6a8dade5b604fffe14ca4",
     "semantic_hash": ""
   },
   "docs/PLANO_MIGRACAO_RUST.md": {
@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785373742.398277,
-    "ast_hash": "c654ab5adada91adac4cde7656457aa6",
+    "mtime": 1785376711.8260252,
+    "ast_hash": "e53d3a691cc92649904b3386b749fdcb",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -3242,6 +3242,16 @@
   "studio.js": {
     "mtime": 1785373922.5028539,
     "ast_hash": "f728ece4581e6b345c73ac5eb6e93203",
+    "semantic_hash": ""
+  },
+  ".vscode/settings.json": {
+    "mtime": 1785376450.7315667,
+    "ast_hash": "77a3eadf3dc33ad48b4e19d8fe6cc0d4",
+    "semantic_hash": ""
+  },
+  "log/studio_log.txt": {
+    "mtime": 1785376848.2134666,
+    "ast_hash": "062848c343147c70246127f4be4b9773",
     "semantic_hash": ""
   }
 }

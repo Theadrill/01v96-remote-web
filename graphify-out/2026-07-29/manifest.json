@@ -2450,8 +2450,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-maria.json": {
-    "mtime": 1785120613.3159382,
-    "ast_hash": "a298c6068121d7c71ddf090f6c6d38cb",
+    "mtime": 1785371659.1735888,
+    "ast_hash": "4f31bf30454aec994b72d91f33270e00",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-teste.json": {
@@ -2520,13 +2520,13 @@
     "semantic_hash": ""
   },
   "log/monitor_log.txt": {
-    "mtime": 1785136026.927744,
-    "ast_hash": "bcfddec6ca7e08d66f2f3e8969638b7f",
+    "mtime": 1785137777.0572593,
+    "ast_hash": "6eee22143e9a918bcff03f2ec180e931",
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785136029.1276228,
-    "ast_hash": "16de788273597b3edb259c0bcba672d5",
+    "mtime": 1785373742.398277,
+    "ast_hash": "c654ab5adada91adac4cde7656457aa6",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -2675,8 +2675,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SOMALIA 360-mesa-maria.json": {
-    "mtime": 1782951779.7153976,
-    "ast_hash": "5681821c1f6d682c35e75be429b70744",
+    "mtime": 1785371659.1715717,
+    "ast_hash": "5b916dc00d5929b5ad05a0d5b08d28a4",
     "semantic_hash": ""
   },
   "package.json": {
@@ -3237,6 +3237,11 @@
   "docs/problema_efeitos.md": {
     "mtime": 1785120613.3187954,
     "ast_hash": "550aee59dbca04a5ac61575d4dc18ad8",
+    "semantic_hash": ""
+  },
+  "studio.js": {
+    "mtime": 1785373922.5028539,
+    "ast_hash": "f728ece4581e6b345c73ac5eb6e93203",
     "semantic_hash": ""
   }
 }
