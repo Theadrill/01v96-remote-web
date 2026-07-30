@@ -396,6 +396,9 @@ async fn queue_all_params_inner(
     let mut requests: Vec<Vec<u8>> = Vec::with_capacity(700);
 
     requests.push(midi::master_meter::MasterMeter::build_stop_request());
+    // Requests de posição global de medidores (0D 03 0C 00 = Inputs, 0D 03 0C 01 = Outputs)
+    requests.push(vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x00, 0x00, 0xF7]);
+    requests.push(vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x03, 0x0C, 0x01, 0x00, 0xF7]);
     requests.extend(midi::pan::build_pan_sync_requests());
 
     for st in 0..4u8 {

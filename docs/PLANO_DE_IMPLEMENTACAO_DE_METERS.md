@@ -184,5 +184,20 @@ F0 43 10 3E 0D 03 0C [TARGET] 00 00 00 00 [VALUE] F7
 
 ### 6.3. Conclusão Final de Implementação
 - ✅ **INPUTS position (`param=0x00`)**: Lê via `0x30` e escreve via `0x10` (`0D 03 0C 00`).
-- ✅ **OUTPUTS position (`param=0x01`)**: Lê via `0x30` e escreve via `0x10` (`0D 03 0C 01`).
+- ✅ **OUTPUTS position (`param=0x01`)**: Lê via `0x30` entre todos os alvos e escreve via `0x10` (`0D 03 0C 01`).
 - 🔧 **Sincronização Inicial**: No boot/conexão do app Rust, enviar os dois comandos `0x30` acima para descobrir o estado real atual da mesa física.
+
+---
+
+## 7. Status da Implementação (Concluído e Testado em Mesa Física)
+
+### 7.1. Backend Rust (`server_rust`)
+- **`sync_manager.rs`**: Integradas as requisições `0x30` (`0D 03 0C 00` e `0D 03 0C 01`) na rotina cirúrgica do `initial_sync` sem causar nenhum efeito colateral nos demais parâmetros.
+- **`protocol.rs`**: Criada a variante `ParsedMidi::GlobalMeterPosition { target, mode }` e o parser correspondente para interceptar SysEx do registrador `0D 03 0C`.
+- **`state.rs`**: Adicionados os campos `global_meter_pos_master` e `global_meter_pos_channels` ao `GlobalState`.
+- **`midi_receiver.rs`**: Emissão em tempo real do evento WebSocket `globalMeterPositionUpdated` para todos os clientes conectados ao receber alterações físicas na mesa.
+
+### 7.2. Frontend Web (`public/modules/channel_strip.js` e `style.css`)
+- **Visual Desktop (Master Card)**: Implementados botões indicadores para `MASTER:` e `CANAIS:` com largura retangular alinhada de `35px` para os rótulos e `38px` para os botões.
+- **Exibição Dinâmica**: Rótulos `PREEQ`, `PRE` e `POST` mapeados diretamente do estado sincronizado e preservados na memória global JS (`window.currentMeterPosMasterLabel` e `window.currentMeterPosChannelsLabel`).
+- **Placeholder de Modal**: Criada a função `openMeterConfigModal(target)` pronta para acionar o futuro modal de configuração de medidores.

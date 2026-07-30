@@ -482,6 +482,13 @@ pub fn start_rx_loop(
                                     let _ = io_clone.emit("fxLibraryRecall", &serde_json::json!({ "slot": slot, "preset": preset })).await;
                                 }
                             }
+                            crate::midi::protocol::ParsedMidi::GlobalMeterPosition { target, mode } => {
+                                tracing::info!("🎛️ [METER POSITION] Target: {}, Mode: {}", target, mode);
+                                let _ = io_clone.emit("globalMeterPositionUpdated", &serde_json::json!({
+                                    "target": target,
+                                    "mode": mode
+                                })).await;
+                            }
                             _ => {}
                         }
                     }

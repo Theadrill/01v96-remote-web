@@ -548,6 +548,14 @@ socket.on('dynamicsState', (data) => {
     }
 });
 
+// Recebe atualizações em tempo real da posição dos medidores (0D 03 0C)
+socket.on('globalMeterPositionUpdated', (data) => {
+    console.log('🎛️ [METER POSITION SOCKET EVENT]', data);
+    if (data && data.target && data.mode !== undefined && typeof window.updateMeterIndicatorUI === 'function') {
+        window.updateMeterIndicatorUI(data.target, data.mode);
+    }
+});
+
 // LOGICA DE DEBUG - permanecida para compatibilidade residual
 socket.on('dynamicsDebugLog', (data) => {
     console.log(`%c[DEBUG DYNAMICS] Resposta legada:`, 'color: gray; font-size: 11px;');
@@ -631,6 +639,13 @@ socket.on('sync', (s) => {
         if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function' && s.master.pan !== undefined) {
             window.updatePanIndicator('master', s.master.pan);
         }
+    }
+
+    if (s.globalMeterPosMaster !== undefined && typeof window.updateMeterIndicatorUI === 'function') {
+        window.updateMeterIndicatorUI('master', s.globalMeterPosMaster);
+    }
+    if (s.globalMeterPosChannels !== undefined && typeof window.updateMeterIndicatorUI === 'function') {
+        window.updateMeterIndicatorUI('channels', s.globalMeterPosChannels);
     }
 
     // Atualiza os indicadores de Pan após o sync completo (desktop apenas)

@@ -202,11 +202,11 @@ function createDesktopStrip(config) {
                 <div class="master-meter-divider">MEDIDORES</div>
                 <div class="master-meter-group">
                     <span class="master-meter-label">MASTER:</span>
-                    <button id="master-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('master')">PRE</button>
+                    <button id="master-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('master')">${window.currentMeterPosMasterLabel || 'PRE'}</button>
                 </div>
                 <div class="master-meter-group">
                     <span class="master-meter-label">CANAIS:</span>
-                    <button id="channels-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('channels')">PRE</button>
+                    <button id="channels-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('channels')">${window.currentMeterPosChannelsLabel || 'PRE'}</button>
                 </div>
             </div>
             ` : ''}
@@ -989,15 +989,21 @@ window.openMeterConfigModal = function(target) {
  * @param {number | string} mode (0/pre_eq => "PRE EQ", 1/pre => "PRE", 2/post => "POST")
  */
 window.updateMeterIndicatorUI = function(target, mode) {
-    const btnId = target === 'master' ? 'master-meter-indicator-btn' : 'channels-meter-indicator-btn';
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-
     let label = 'PRE';
-    if (mode === 0 || mode === '00' || mode === 'pre_eq') label = 'PRE EQ';
+    if (mode === 0 || mode === '00' || mode === 'pre_eq') label = 'PREEQ';
     else if (mode === 1 || mode === '01' || mode === 'pre' || mode === 'pre_fader') label = 'PRE';
     else if (mode === 2 || mode === '02' || mode === 'post' || mode === 'post_fader') label = 'POST';
 
-    btn.textContent = label;
+    if (target === 'master') {
+        window.currentMeterPosMasterLabel = label;
+    } else {
+        window.currentMeterPosChannelsLabel = label;
+    }
+
+    const btnId = target === 'master' ? 'master-meter-indicator-btn' : 'channels-meter-indicator-btn';
+    const btn = document.getElementById(btnId);
+    if (btn) {
+        btn.textContent = label;
+    }
     console.log(`[MEDIDORES UI] Indicador ${target} atualizado para: ${label}`);
 };

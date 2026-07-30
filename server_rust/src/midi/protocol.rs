@@ -483,6 +483,10 @@ pub enum ParsedMidi {
         slot: usize,
         preset: u8,
     },
+    GlobalMeterPosition {
+        target: String,
+        mode: String,
+    },
 }
 
 pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
@@ -590,6 +594,22 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             is_master,
             group,
             levels,
+        });
+    }
+
+    // --- GLOBAL METER POSITION (Section 0x0D, Group 0x03, Element 0x0C) ---
+    if section == 13 && group == 3 && element == 12 {
+        let target = if parameter == 0 { "channels" } else { "master" };
+        let value_byte = message.get(message.len() - 2).copied().unwrap_or(0);
+        let mode = match value_byte {
+            0 => "pre_eq",
+            1 => "pre",
+            2 => "post",
+            _ => "pre",
+        };
+        return Some(ParsedMidi::GlobalMeterPosition {
+            target: target.to_string(),
+            mode: mode.to_string(),
         });
     }
 

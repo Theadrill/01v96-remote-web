@@ -183,6 +183,10 @@ pub struct GlobalState {
     pub fx_outputs: HashMap<usize, f64>,
     #[serde(rename = "tailscaleUrl")]
     pub tailscale_url: Option<String>,
+    #[serde(rename = "globalMeterPosMaster")]
+    pub global_meter_pos_master: String,
+    #[serde(rename = "globalMeterPosChannels")]
+    pub global_meter_pos_channels: String,
     /// Sender half of the FX sync pipeline ack channel (UnboundedSender — never drops signals).
     /// Installed by SyncManager before starting the FX sync task; set to None when done.
     /// midi_receiver calls send() here after processing each FX Input/Output MIDI response.
@@ -435,6 +439,8 @@ impl GlobalState {
                 map
             },
             tailscale_url: None,
+            global_meter_pos_master: "pre".to_string(),
+            global_meter_pos_channels: "pre".to_string(),
             fx_sync_ack_tx: None,
         }
     }
@@ -901,6 +907,13 @@ impl GlobalState {
                         entry.id = type_id;
                         entry.name = name;
                     }
+                }
+            }
+            crate::midi::protocol::ParsedMidi::GlobalMeterPosition { target, mode } => {
+                if target == "master" {
+                    self.global_meter_pos_master = mode.clone();
+                } else if target == "channels" {
+                    self.global_meter_pos_channels = mode.clone();
                 }
             }
         }
