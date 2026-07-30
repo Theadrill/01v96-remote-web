@@ -515,8 +515,8 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         type: "main",
         dataCh: isMaster ? "master" : i,
         onTop: musicianMode,  // Botão ON no topo apenas no modo músico
-        isPaired: !isMaster && s.paired,
-        partnerId: !isMaster && s.paired ? s.pairedWith : null
+        isPaired: isMaster || (!isMaster && s.paired),
+        partnerId: !isMaster && s.paired ? s.pairedWith : (isMaster ? 'master-r' : null)
     });
 }
 
