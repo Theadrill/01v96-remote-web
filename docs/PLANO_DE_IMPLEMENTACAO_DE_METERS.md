@@ -14,48 +14,47 @@ Esta é a **primeira tarefa** de implementação visual de controle de medidores
 
 ### 1.1. Estrutura Visual do Bloco (Modo Desktop)
 
-No painel do Master no layout Desktop, teremos o seguinte agrupamento de controles:
+No painel do Master no layout Desktop, teremos um bloco compacto de **indicadores de posição atual dos medidores**:
 
 ```text
 MEDIDORES
 
 MASTER:
-[ PRE ]  [ POST ]
+[ PRE ]    <-- Botão indicador refletindo a posição do Master (PRE / POST / PRE EQ)
 
 CANAIS:
-[ PRE ]  [ POST ]
+[ PRE ]    <-- Botão indicador refletindo a posição dos Canais (PRE / POST / PRE EQ)
 ```
 
-![Exemplo do canal master no frontend](screenshot-master.png)
+> [!NOTE]
+> **Comportamento dos Botões Indicadores:**
+> Cada botão exibe o rótulo da posição atual sincronizada com a mesa (`PRE`, `POST` ou `PRE EQ`). Ao clicar no botão, ele servirá no futuro para abrir um modal de configuração global de medidores (o modal não será construído nesta etapa).
 
 ### 1.2. Mapeamento de Ações e SysEx Correspondente
 
-#### 1. Seletor `MASTER:` (`PRE / POST`)
-- **[ PRE ]**: Envia o SysEx Global para Saídas em modo Pre-Fader:
-  `F0 43 10 3E 0D 03 0C 01 00 00 00 00 01 F7`
-- **[ POST ]**: Envia o SysEx Global para Saídas em modo Post-Fader:
-  `F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7`
+#### 1. Sincronização Inicial (`0x30 Read Request`)
+Ao conectar à mesa, o backend enviará estritamente os dois comandos essenciais de leitura:
+- **Inputs (Canais)**: `F0 43 30 3E 0D 03 0C 00 00 F7`
+- **Outputs (Master)**: `F0 43 30 3E 0D 03 0C 01 00 F7`
 
-#### 2. Seletor `CANAIS:` (`PRE / POST`)
-- **[ PRE ]**: Envia o SysEx Global para Canais em modo Pre-Fader:
-  `F0 43 10 3E 0D 03 0C 00 00 00 00 00 01 F7`
-- **[ POST ]**: Envia o SysEx Global para Canais em modo Post-Fader:
-  `F0 43 10 3E 0D 03 0C 00 00 00 00 00 02 F7`
+#### 2. Atualizações em Tempo Real (Mesa -> Servidor -> Frontend)
+Ao alterar a posição diretamente na mesa física, a mesa transmitirá:
+- `F0 43 10 3E 0D 03 0C [TARGET] 00 00 00 00 [VALUE] F7`
+  - `TARGET = 00` (Inputs) / `TARGET = 01` (Outputs)
+  - `VALUE = 00` (Pre-EQ) / `01` (Pre-Fader) / `02` (Post-Fader)
 
 ### 1.3. Passo a Passo da Implementação Técnica
 
-#### Passo 1: Backend Rust (`server_rust/src/socket_handlers.rs`)
-1. **Eventos WebSocket de Posição de Medidores:**
-   - Registrador do evento `setGlobalMeterPosition { target: "master" | "channels", mode: "pre" | "post" }`.
-   - Ao receber o evento, enviar a mensagem SysEx apropriada para a mesa via `scheduler.enqueue`.
-   - Retransmitir a atualização de estado para todos os clientes conectados (`globalMeterPositionUpdated`).
+#### Passo 1: Frontend (`public/modules/channel_strip.js` e `socket.js`)
+1. **Renderização dos Indicadores no Fader Master (Desktop):**
+   - Renderizar o bloco **MEDIDORES** no Master com os botões indicadores `MASTER:` e `CANAIS:`.
+   - Atualizar dinamicamente o texto/rótulo dos botões (`PRE EQ`, `PRE`, `POST`) de acordo com o estado recebido.
+   - Logar no `console.log` do navegador os valores recebidos no sync inicial e nas alterações em tempo real.
 
-#### Passo 2: Componentes do Frontend (`public/modules/channel_strip.js` e `socket.js`)
-1. **Renderização dos Seletores (Apenas no Fader Master Desktop):**
-   - Renderizar o bloco **MEDIDORES** com sub-rótulos **MASTER:** e **CANAIS:** e botões de pílula `[PRE]` / `[POST]`.
-2. **Persistência em `localStorage`:**
-   - Salvar `01v96_master_meter_pos` (`'pre'` | `'post'`) e `01v96_channels_meter_pos` (`'pre'` | `'post'`).
-   - Restaurar as preferências ao carregar a página e enviá-las na reconexão (`socket.on('connect')`).
+#### Passo 2: Backend Rust (`server_rust/src/...`) [APÓS APROVAÇÃO DO FRONT]
+1. **Sync Inicial Mínimo e Seguro:**
+   - Adicionar estritamente as requisições `0x30` de `0D 03 0C 00` e `0D 03 0C 01` na sequência de inicialização, sem alterar a estrutura existente.
+   - Armazenar no state local e retransmitir via WebSocket para o frontend.
 
 ---
 
@@ -158,51 +157,32 @@ Engenharia reversa das mensagens SysEx enviadas e recebidas ao alterar os pontos
 
 > [!NOTE]
 > Ao contrário do chaveamento individual por canal, a Yamaha 01V96 gerencia o ponto de leitura de sinal da régua de LEDs de forma global para todos os canais de entrada (`TARGET 0x00`) e para todas as saídas (`TARGET 0x01`).
->
-> ---
->
-> ## 6. Descobertas de Engenharia Reversa — Sync de Posição dos Medidores (0x30 Read)
->
-> ### 6.1. Request Format Testado
-> Foram testados 10 formatos diferentes de request `0x30` para o elemento `0x0C` (`Section 0x0D`, `Group 0x03`):
->
-> | Formato | Request Hex | Descrição |
-> |---------|-------------|-----------|
-> | A1 | `F0 43 30 3E 0D 03 0C 00 00 F7` | Input, channel=0x00 |
-> | A2 | `F0 43 30 3E 0D 03 0C 01 00 F7` | Output, channel=0x00 |
-> | B1 | `F0 43 30 3E 0D 03 0C 00 01 F7` | Input, byte_count=0x01 |
-> | B2 | `F0 43 30 3E 0D 03 0C 01 01 F7` | Output, byte_count=0x01 |
-> | C1 | `F0 43 30 3E 0D 03 0C 00 05 F7` | Input, byte_count=0x05 |
-> | C2 | `F0 43 30 3E 0D 03 0C 01 05 F7` | Output, byte_count=0x05 |
-> | D1 | `F0 43 30 3E 0D 03 0C 00 00 00 F7` | Input, sub-param+channel |
-> | D2 | `F0 43 30 3E 0D 03 0C 01 00 00 F7` | Output, sub-param+channel |
-> | E1 | `F0 43 30 3E 0D 03 0C 00 00 00 01 F7` | Input, formato meter completo |
-> | E2 | `F0 43 30 3E 0D 03 0C 01 00 00 01 F7` | Output, formato meter completo |
->
-> ### 6.2. Respostas Recebidas
-> **Apenas 2 respostas `0D 03 0C` foram recebidas, AMBAS com `param=0x01` (Output/Master):**
->
-> ```
-> <- F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7
-> <- F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7
-> ```
->
-> **Nenhuma resposta para `param=0x00` (Input/Channels) em nenhum formato testado.**
->
-> ### 6.3. Parsing da Resposta
-> ```
-> F0 43 10 3E 0D 03 0C 01 00 00 00 00 02 F7
->                      ↑              ↑
->                    param=0x01   value=0x02 (Post-Fader)
-> ```
-> - **Byte 7**: `param` (0x01 = Output/Master)
-> - **Byte 12** (último antes de F7): `value` (0x00=Pre-EQ, 0x01=Pre-Fader, 0x02=Post-Fader)
-> - **Bytes 8-11**: `00 00 00 00` (reservado/padding)
->
-> ### 6.4. Conclusão Importante
-> - ✅ **Output/Master position** (`param=0x01`): **LÊ via `0x30`** — funciona perfeitamente
-> - ❌ **Input/Channels position** (`param=0x00`): **NÃO lê via `0x30`** — sem resposta em nenhum formato
-> - 📝 O Studio Manager provavelmente lê a posição dos Inputs do arquivo `.sm2` (projeto), não da mesa
-> - 🔧 **Implementação**: O sync inicial deve ler apenas `param=0x01` (Output); para Inputs usar `localStorage` + defaults
 
+---
 
+## 6. Descobertas de Engenharia Reversa — Sync de Posição dos Medidores (0x30 Read & 0x10 Write)
+
+### 6.1. Protocolo Confirmado em Mesa Física (100% Validado)
+Após testes em tempo real na mesa Yamaha 01V96, foi confirmado que o registrador **`0D 03 0C`** funciona perfeitamente para **tanto LEITURA (`0x30`) quanto ESCRITA (`0x10`)** em ambos os alvos:
+
+| Alvo | Operação | Opcode | SysEx |
+|:---|:---|:---|:---|
+| **INPUTS (Canais 1-32 / StIn)** | **Leitura** | `0x30` | `F0 43 30 3E 0D 03 0C 00 00 F7` |
+| **INPUTS (Canais 1-32 / StIn)** | **Escrita** | `0x10` | `F0 43 10 3E 0D 03 0C 00 00 00 00 00 [VAL] F7` |
+| **OUTPUTS (Master L/R, Bus, Aux)** | **Leitura** | `0x30` | `F0 43 30 3E 0D 03 0C 01 00 F7` |
+| **OUTPUTS (Master L/R, Bus, Aux)** | **Escrita** | `0x10` | `F0 43 10 3E 0D 03 0C 01 00 00 00 00 [VAL] F7` |
+
+### 6.2. Parsing da Resposta de Leitura (`0x30`)
+```text
+F0 43 10 3E 0D 03 0C [TARGET] 00 00 00 00 [VALUE] F7
+                     ↑                    ↑
+                  Byte 7:              Byte 12:
+               00 = INPUTS          00 = Pre-EQ
+               01 = OUTPUTS         01 = Pre-Fader
+                                    02 = Post-Fader
+```
+
+### 6.3. Conclusão Final de Implementação
+- ✅ **INPUTS position (`param=0x00`)**: Lê via `0x30` e escreve via `0x10` (`0D 03 0C 00`).
+- ✅ **OUTPUTS position (`param=0x01`)**: Lê via `0x30` e escreve via `0x10` (`0D 03 0C 01`).
+- 🔧 **Sincronização Inicial**: No boot/conexão do app Rust, enviar os dois comandos `0x30` acima para descobrir o estado real atual da mesa física.
