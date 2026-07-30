@@ -26,6 +26,8 @@ CANAIS:
 [ PRE ]  [ POST ]
 ```
 
+![Exemplo do canal master no frontend](screenshot-master.png)
+
 ### 1.2. Mapeamento de Ações e SysEx Correspondente
 
 #### 1. Seletor `MASTER:` (`PRE / POST`)
