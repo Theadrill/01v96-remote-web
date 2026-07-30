@@ -1033,29 +1033,63 @@ Catalogação de todos os parâmetros do efeito **M.BAND DYNA.** (Compressor Mul
 | 4 | **PRESENCE** | `0x13` (19 dec) | `0x00 00` / `0` / `-10` | `0x00 14` / `20` / `+10` | ✅ **Linear:** `val - 10` (passos de 1, centro 0 = 10 / `0x00 0A`) |
 | 5 | **CMP.THRE** | `0x18` (24 dec) | `0x00 00` / `0` / `-24.0dB` | `0x01 70` / `240` / `0.0dB` | ✅ **Linear:** `(val - 240) / 10` dB (passos de 0.1dB, 240 passos) |
 | 6 | **CMP.RAT** | `0x19` (25 dec) | `0x00 00` / `0` / `1:1` | `0x00 0E` / `14` / `20:1` | ✅ **Lookup (15 pontos):** `['1:1', '1.1:1', '1.3:1', '1.5:1', '1.7:1', '2:1', '2.5:1', '3:1', '3.5:1', '4:1', '5:1', '6:1', '8:1', '10:1', '20:1']` |
-| 7 | **CMP.ATK** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 8 | **CMP.REL** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 9 | **CMP.KNEE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 10 | **LOOKUP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 11 | **CMP.BYP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 12 | **L-M XOVR** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 13 | **M-H XOVR** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 14 | **SLOPE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 15 | **CEILING** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 16 | **EXP.THRE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 17 | **EXP.RAT** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 18 | **EXP.REL** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 19 | **EXP.BYP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 20 | **LIM.THRE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 21 | **LIM.ATK** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 22 | **LIM.REL** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 23 | **LIM.BYP** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 24 | **LIM.KNEE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 25 | **SOLO LOW** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 26 | **SOLO MID** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 27 | **SOLO HIGH** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 28 | **BYPASS (Mix)**| ⏳ | ⏳ | ⏳ | ⏳ Pendente |
-| 29 | **MIX BALANCE** | ⏳ | ⏳ | ⏳ | ⏳ Pendente |
+| 7 | **CMP.ATK** | `0x1B` (27 dec) | `0x00 00` / `0` / `0ms` | `0x00 78` / `120` / `120ms` | ✅ **Linear 1:1:** `val` ms (passos de 1ms, 120 passos) |
+| 8 | **CMP.REL** | `0x1A` (26 dec) | `0x00 00` / `0` / `5ms` | `0x01 1F` / `159` / `42.3s` | ✅ **Tabela (160 passos):** Reutiliza a tabela `decayPoints` (5ms a 42.3s, Seção 5) |
+| 9 | **CMP.KNEE** | `0x1C` (28 dec) | `0x00 00` / `0` / `0` | `0x00 05` / `5` / `5` | ✅ **Linear 1:1:** `val` (0 = Hard a 5 = Soft, passos de 1) |
+| 10 | **LOOKUP** | `0x23` (35 dec) | `0x00 00` / `0` / `0.0ms` | `0x07 68` / `1000` / `100.0ms` | ✅ **Linear:** `val / 10` ms (passos de 0.1ms, 1000 passos) |
+| 11 | **CMP.BYP** | `0x1D` (29 dec) | `0x00 00` / `0` / `OFF` | `0x00 01` / `1` / `ON` | ✅ **Boolean Switch:** `0` = OFF (Bypass desligado), `1` = ON (Bypass ligado) |
+| 12 | **L-M XOVR** | `0x24` (36 dec) | `0x00 00` / `0` / `21.2Hz` | `0x00 67` / `103` / `8.00kHz` | ✅ **Tabela Freq (1/12 Oitava):** `FreqTable[val + 1]` (21.2Hz a 8.00kHz, 104 passos, Seção 2.1) |
+| 13 | **M-H XOVR** | `0x25` (37 dec) | `0x00 00` / `0` / `21.2Hz` | `0x00 67` / `103` / `8.00kHz` | ✅ **Tabela Freq (1/12 Oitava):** `FreqTable[val + 1]` (21.2Hz a 8.00kHz, 104 passos, Seção 2.1) |
+| 14 | **SLOPE** | `0x26` (38 dec) | `0x00 00` / `0` / `-6dB` | `0x00 01` / `1` / `-12dB` | ✅ **Lookup (2 opções):** `[' - 6dB', ' - 12dB']` (`0` = -6dB, `1` = -12dB) |
+| 15 | **CEILING** | `0x27` (39 dec) | `0x00 00` / `0` / `-6.0dB` | `0x00 3D` / `61` / `OFF` | ✅ **Linear + Texto Especial:** `0..60` = `(val - 60) / 10` dB (passos de 0.1dB, **Último Numeral = 0.0dB no step 60 / `0x3C`**). **Valor Final do Knob (step 61 / `0x3D`) = Texto "OFF"**. |
+| 16 | **EXP.THRE** | `0x14` (20 dec) | `0x00 00` / `0` / `-54.0dB` | `0x02 2C` / `300` / `-24.0dB` | ✅ **Linear:** `(val - 540) / 10` dB (passos de 0.1dB, 300 passos) |
+| 17 | **EXP.RAT** | `0x15` (21 dec) | `0x00 00` / `0` / `1:1` | `0x00 0F` / `15` / `∞:1` | ✅ **Lookup (16 pontos) + Texto Especial:** `['1:1', '1.1:1', '1.3:1', '1.5:1', '1.7:1', '2:1', '2.5:1', '3:1', '3.5:1', '4:1', '5:1', '6:1', '8:1', '10:1', '20:1', '∞:1']`. (**Último Ratio Numeral = 20:1 no step 14 / `0x0E`**). **Valor Final do Knob (step 15 / `0x0F`) = Texto "∞:1" (INF:1)**. |
+| 18 | **EXP.REL** | `0x16` (22 dec) | `0x00 00` / `0` / `5ms` | `0x01 1F` / `159` / `42.3s` | ✅ **Tabela (160 passos):** Reutiliza a tabela `decayPoints` (5ms a 42.3s, Seção 5) |
+| 19 | **EXP.BYP** | `0x17` (23 dec) | `0x00 00` / `0` / `OFF` | `0x00 01` / `1` / `ON` | ✅ **Boolean Switch:** `0` = OFF (Bypass desligado), `1` = ON (Bypass ligado) |
+| 20 | **LIM.THRE** | `0x1E` (30 dec) | `0x00 00` / `0` / `-12.0dB` | `0x00 78` / `120` / `0.0dB` | ✅ **Linear:** `(val - 120) / 10` dB (passos de 0.1dB, 120 passos) |
+| 21 | **LIM.ATK** | `0x20` (32 dec) | `0x00 00` / `0` / `0ms` | `0x00 78` / `120` / `120ms` | ✅ **Linear 1:1:** `val` ms (passos de 1ms, 120 passos) |
+| 22 | **LIM.REL** | `0x1F` (31 dec) | `0x00 00` / `0` / `5ms` | `0x01 1F` / `159` / `42.3s` | ✅ **Tabela (160 passos):** Reutiliza a tabela `decayPoints` (5ms a 42.3s, Seção 5) |
+| 23 | **LIM.BYP** | `0x22` (34 dec) | `0x00 00` / `0` / `OFF` | `0x00 01` / `1` / `ON` | ✅ **Boolean Switch:** `0` = OFF (Bypass desligado), `1` = ON (Bypass ligado) |
+| 24 | **LIM.KNEE** | `0x21` (33 dec) | `0x00 00` / `0` / `0` | `0x00 05` / `5` / `5` | ✅ **Linear 1:1:** `val` (0 = Hard a 5 = Soft, passos de 1) |
+| 25 | **SOLO LOW** | `0x2D` (45 dec) | `0x00 00` / `0` / `OFF` | `0x00 01` / `1` / `ON` | ✅ **Boolean Switch:** `0` = OFF (Solo desligado), `1` = ON (Solo da banda grave) |
+| 26 | **SOLO MID** | `0x2E` (46 dec) | `0x00 00` / `0` / `OFF` | `0x00 01` / `1` / `ON` | ✅ **Boolean Switch:** `0` = OFF (Solo desligado), `1` = ON (Solo da banda média) |
+| 27 | **SOLO HIGH** | `0x2F` (47 dec) | `0x00 00` / `0` / `OFF` | `0x00 01` / `1` / `ON` | ✅ **Boolean Switch:** `0` = OFF (Solo desligado), `1` = ON (Solo da banda aguda) |
+| 28 | **BYPASS (Mix)**| `0x34` (52 dec) | `0x00 00` / `0` / `OFF` | `0x00 01` / `1` / `ON` | ✅ **Boolean Switch (Comum):** `0` = Efeito Ativo (ON), `1` = Bypassed (Mudo) |
+| 29 | **MIX BALANCE** | `0x30` (48 dec) | `0x00 00` / `0` / `0%` | `0x00 64` / `100` / `100%` | ✅ **Linear (Comum):** `val` % (0% a 100%, passos de 1%, 101 passos) |
+
+### 12.2. Regras de Interdependência dos Crossovers (L-M XOVR e M-H XOVR)
+
+> [!IMPORTANT]
+> **Comportamento de Acoplamento Físico (Push/Clamp):**
+> Os pontos de divisão de frequência não podem se sobrepor (`L-M XOVR <= M-H XOVR`).
+> - **Empurrão Superior:** Ao aumentar a frequência do `L-M XOVR` de modo que ultrapasse o valor atual do `M-H XOVR`, o hardware e a UI devem automaticamente "empurrar" o `M-H XOVR` para o mesmo valor (ou mantê-lo `>= L-M XOVR`).
+> - **Puxão Inferior:** Ao diminuir o `M-H XOVR` para um valor menor que o `L-M XOVR`, o `L-M XOVR` deve ser reduzido automaticamente para acompanhar a nova barreira.
+
+---
+
+### 12.3. Endereçamento e Polling dos Meters (IN/OUT L/R e Gain Reduction GR L/M/H)
+
+Análise detalhada do tráfego SysEx de requisição de medição (`Element 0x06` / `Group 0x21` / `Section 0x0D`) enviado pelo Studio Manager para a tela do Multiband Compressor.
+
+#### 12.3.1. Estrutura do SysEx de Requisição de Meter
+- **Formato (Host -> Mesa):** `F0 43 30 3E 0D 21 06 [CHANNEL] 00 00 04 F7`
+- **Formato (Mesa -> Host):** `F0 43 10 3E 0D 21 06 [CHANNEL] [B0 B1 B2 B3] F7`
+
+#### 12.3.2. Mapeamento dos 11 Canais de Medição (`CHANNEL` byte)
+
+| Sub-canal (`CHANNEL`) | Tipo de Meter | Descrição / Canal |
+|---|---|---|
+| `0x00` | Level Meter | Slot FX Input/Output - Canal 1 (L) |
+| `0x01` | Level Meter | Slot FX Input/Output - Canal 2 (R) |
+| `0x02` .. `0x07` | Level Meter | Reservados para os demais canais de nível L/R |
+| `0x10` (16 dec) | **GR Meter** | **Gain Reduction - Banda LOW (L)** |
+| `0x11` (17 dec) | **GR Meter** | **Gain Reduction - Banda MID (M)** |
+| `0x12` (18 dec) | **GR Meter** | **Gain Reduction - Banda HIGH (H)** |
+
+> [!NOTE]
+> As 3 requisições nos canais `0x10`, `0x11` e `0x12` correspondem exatamente às **3 colunas de medição de atenuamento do Gain Reduction (L, M, H)** exibidas na caixa inferior direita da tela do efeito.
+
+
 
 
 

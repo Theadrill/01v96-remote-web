@@ -195,16 +195,25 @@ const C = {
     blue: "\x1b[34m", dim: "\x1b[2m", reset: "\x1b[0m"
 };
 
-// Processador com reassembly para exibir mensagens completas enviadas pelo Studio Manager
 const processStudioMessage = createSysExHandler((message) => {
     sCount++;
 
-    if (isMeterRequest(message) || matchesCustomFilter(message)) {
-        if (matchesCustomFilter(message)) filteredCount++;
+    if (matchesCustomFilter(message)) {
+        filteredCount++;
         return;
     }
 
     const ts = new Date().toLocaleTimeString();
+    if (isMeterRequest(message)) {
+        console.log(`\x1b[33m[${ts}] 📊 [METER REQ] (${message.length}b): ${toHex(message)}\x1b[0m`);
+        return;
+    }
+
+    if (isMeterData(message)) {
+        console.log(`\x1b[35m[${ts}] 📊 [METER DATA] (${message.length}b): ${toHex(message)}\x1b[0m`);
+        return;
+    }
+
     console.log(`${C.blue}[${ts}] 💻 Studio Manager (${message.length}b): ${toHex(message)}${C.reset}`);
 });
 
