@@ -197,6 +197,26 @@ function createDesktopStrip(config) {
                 <div id="${nameId}" class="desk-ch-name">${name}</div>
             </div>
 
+            ${isMaster ? `
+            <div class="master-meter-section">
+                <div class="master-meter-divider">MEDIDORES</div>
+                <div class="master-meter-group">
+                    <span class="master-meter-label">MASTER:</span>
+                    <div class="master-meter-pills">
+                        <button class="master-meter-pill">PRE</button>
+                        <button class="master-meter-pill active">POST</button>
+                    </div>
+                </div>
+                <div class="master-meter-group">
+                    <span class="master-meter-label">CANAIS:</span>
+                    <div class="master-meter-pills">
+                        <button class="master-meter-pill">PRE</button>
+                        <button class="master-meter-pill active">POST</button>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+
             <button id="${onId}" class="btn-on-desk ${isOn ? 'on-active' : ''}" onclick="${onAction}">ON</button>
 
             <div class="nudge-zone-desk" onpointerdown="${onNudgeStartAction}(${evtCh}, 1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" onclick="event.stopPropagation()">
@@ -264,7 +284,7 @@ function createDesktopStrip(config) {
                 };
 
                 let tracksHTML = getPanTrackHTML(evtCh);
-                if (isPaired && partnerId !== null) {
+                if (isPaired && partnerId !== null && !isMaster) {
                     tracksHTML += getPanTrackHTML(partnerId);
                 }
                 return tracksHTML;
@@ -357,8 +377,8 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         dbLabel: rawToDb(val, false, isMaster),
         configAction: musicianMode ? "" : (idPrefix ? "" : `openChannelConfig(event, ${isMaster ? 52 : i})`), // Evita recursão no mini-fader
         type: "main",
-        isPaired: !isMaster && s.paired,
-        partnerId: !isMaster && s.paired ? s.pairedWith : null,
+        isPaired: isMaster || (!isMaster && s.paired),
+        partnerId: !isMaster && s.paired ? s.pairedWith : (isMaster ? 'master-r' : null),
         dataCh: isMaster ? "master" : i
     });
 }

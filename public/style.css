@@ -1506,6 +1506,66 @@ body.layout-desktop .sidebar-macros {
     background: #3d1a1a;
 }
 
+.master-meter-section {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 4px;
+    gap: 4px;
+    border-top: 1px solid #555;
+    border-bottom: 1px solid #555;
+    margin: 4px 4px 0 4px;
+}
+
+.master-meter-divider {
+    font-size: 9px;
+    font-weight: 800;
+    color: #ddd;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.master-meter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.master-meter-label {
+    font-size: 8px;
+    font-weight: 700;
+    color: #ccc;
+    text-align: left;
+    padding-left: 2px;
+}
+
+.master-meter-pills {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+}
+
+.master-meter-pill {
+    flex: 1;
+    height: 20px;
+    border: 1px solid #555;
+    border-radius: 3px;
+    background: #2a2a2a;
+    color: #888;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    text-align: center;
+    line-height: 20px;
+}
+
+.master-meter-pill.active {
+    background: #5cacee;
+    color: #000;
+    border-color: #8dc8f7;
+}
+
 .desk-label {
     height: 35px;
     background: #333;
