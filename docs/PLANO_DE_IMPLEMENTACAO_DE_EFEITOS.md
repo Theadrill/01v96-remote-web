@@ -1,3 +1,162 @@
+# RESUMO EXECUTIVO (para LLM)
+
+> **Como usar:** Este resumo cobre o arquivo inteiro. Leia-o primeiro. Consulte apenas a seção indicada pelo link quando precisar de detalhes byte-a-byte ou das tabelas completas HOLD/DECAY (não copiadas aqui por tamanho). Última leitura integral: 2026-07-31.
+
+## Mapa de Conteúdo
+
+| Seção | Conteúdo | Link |
+|---|---|---|
+| §1 | Endereçamento direto de parâmetros + controles comuns | [→ §1](#1-documentação-técnica) |
+| §2 | Tabela de frequências 1/12 oitava (HPF/LPF) | [→ §2](#2-estrutura-e-arquitetura-proposta) |
+| §3 | Reverb Standard (IDs 0-3): 14 params + conversões | [→ §3](#3-mapeamento-de-algoritmos) |
+| §4 | Tabela completa HOLD (216 passos) | [→ §4](#4-tabela-de-referência-hold-0x1c) |
+| §5 | Tabela completa DECAY (160 passos) | [→ §5](#5-tabela-de-referência-decay-0x1d) |
+| §6 | FX Input Patch: 59 source IDs (IN) | [→ §6](#6-mapeamento-de-patch-source--fx-inputs) |
+| §7 | Tela de efeitos modular concluída (`public/modules/FXS/`) | [→ §7](#71-tela-de-máquinas-de-efeitos--etapa-1-e-refatoração-modular-concluídas) |
+| §8 | FX Output Patch: destination-indexed, 91 destinos | [→ §8](#8-mapeamento-de-patch-destination--fx-outputs) |
+| §9 | Pipeline de sincronização e latência de hardware | [→ §9](#9-sincronização-de-efeitos-filtros-de-latência-e-pipeline) |
+| §10 | Lazy-Sync, plano técnico e regras de sincronização | [→ §10](#10-implementação-de-telas-de-efeitos) |
+| §11 | Descobertas: decode de Recall FX, 0x31, bypass | [→ §11](#11-registro-de-descobertas-e-soluções-implementadas) |
+| §12 | Multiband Compressor (29 params + meters) | [→ §12](#12-mapeamento-de-algoritmo-multiband-compressor-mband-dyna) |
+
+---
+
+## §1 Endereçamento de Parâmetros (Controle Direto)
+
+- **Write:** `F0 43 10 3E 7F 01 58 [PARAM] [SLOT] 00 00 00 [VAL] F7`
+- **Slot:** `00`=FX1, `01`=FX2, `02`=FX3, `03`=FX4
+- **Controles comuns a todos os efeitos:** Mix Balance `0x30`(48) range `00-64` HEX (0-100%); Effect Type `0x31`(49) = ID do algoritmo; Bypass `0x34`(52): `00`=Ativo(ON), `01`=Mudo(Bypass).
+
+## §2 Frequências (Padrão Yamaha)
+
+- Tabela `FreqTable` de 1/12 oitava p/ HPF/LPF: 121 valores de `20.0` a `20.0k` (lista completa na linha 40). Usada nos filtros do Reverb e nos crossovers do Multiband.
+
+## §3 Reverb Standard (IDs 0, 1, 2, 3 — Hall/Room/Stage/Plate)
+
+**Status: ✅ PRONTO PARA IMPLEMENTAÇÃO** (HOLD/DECAY verificados por auditoria).
+
+| Hex | Nome | Conversão |
+|---|---|---|
+| 10 | INI. DLY | `Combined/10` (0.0–500.0ms) |
+| 11 | Rev Time | por faixa: `0-47`: `v*0.1+0.3` (0.3–5.0s); `48-57`: `(v-47)*0.5+5.0` (5.5–10s); `58-67`: `(v-57)+10` (11–20s); `68-82`: `(v-67)*5+20` (25–95s); `83`: 99.0s fixo |
+| 12 | HI.RATIO | `(v+1)/10` (0.1–1.0) |
+| 13 | LO.RATIO | `(v+1)/10` (0.1–2.4) |
+| 14 | DIFF. | `v` (0–10) |
+| 15 | DENSITY | `v` (0–100) |
+| 16 | HPF | `FreqTable[val]` (0=Thru, 1=21.2Hz…) |
+| 17 | LPF | `FreqTable[val+16]` (105=Thru/16.0kHz) |
+| 18 | E/R DLY | `Combined/10` (0.0–100.0ms) |
+| 19 | E/R BAL. | `v` (0–100%) |
+| 1A | GATE | `0`=OFF; `1-61`: `val-61` (-60 a 0dB) |
+| 1B | ATTACK | `v` (0–120ms) |
+| 1C | HOLD | Tabela `holdPoints` com **216 entradas** (0.02ms–1.96s) — mapeamento granular total, sem interpolação |
+| 1D | DECAY | Tabela `decayPoints` com **160 entradas** (5ms–42.3s) |
+
+**HOLD checkpoints:** step 50=1.52ms; 76=4.69ms (corrigido p/ erro de cascata); 160=170ms; 200=1.02s; 215=1.96s (máx). Ranges: 0-10 linear (0.02–0.52ms); 11-150 progressão geométrica (20.6ms–117ms); 151-215 auditoria 1:1 (122ms–1.96s). **Progresso: 100% mapeado.**
+
+## §4 Tabela HOLD completa
+
+Tabela absoluta de 216 passos (0.02ms → 1960ms) verificada por auditoria manual. Não duplicada aqui por tamanho — [consulte §4](#4-tabela-de-referência-hold-0x1c) para valores exatos.
+
+## §5 Tabela DECAY completa
+
+Tabela de 160 passos (5ms → 42.3s), herdada do processador GATE da 01V96. Reutilizada pelo Multiband (CMP.REL/EXP.REL/LIM.REL). Step 159 = 42.3s. [Consulte §5](#5-tabela-de-referência-decay-0x1d) para valores exatos.
+
+## §6 Patch Source — FX Inputs (IN)
+
+- **Endereço:** Section `0D`, Group `02`, Element `03`, Param `00`=IN L / `01`=IN R, Channel `00`-`03`=FX1-4. **Não existe endereço por botão**: o endereço identifica o jack do FX; o botão escolhido vira apenas o **valor** (source ID).
+- **Query:** `F0 43 30 3E 0D 02 03 [LR] [SLOT] F7`
+- **Resposta/Change:** `F0 43 10 3E 0D 02 03 [LR] [SLOT] [B0 B1 B2 B3] F7` — source ID em encoding fader Yamaha (28-bit/7-bit chunks). Ex.: `109`→`00 00 00 6D`; `137`→`00 00 01 09`. Write validado via capture SM (mesmo envelope, 14 bytes).
+- **59 source IDs** (todos ✅ read; write validado):
+  - 0 = NONE; 1-8 = AUX1-8; 13-44 = INSCH1-32 (`id = 12+n`); 109-116 = INSBUS1-8 (`id = 108+n`); 117-124 = INSAUX1-8 (`id = 116+n`); 137 = INSSTL; 138 = INSSTR. Gaps 9-12, 45-108, 125-136 não usados.
+- **Status impl.:** catálogo ✅ completo; read ✅ (`requestFxInputs`); builder write no server (`build_fx_input_change`/control) ❌; UI seletor de IN ❌. **Pronto para implementação de edição.**
+- **Nota:** encoding de FX Input difere do Channel Input/Insert (137/138 = INSSTL/INSSTR aqui, mas = FX3 Out1/Out2 no patch de canal `routing.js`). Labels SM sem espaços (`NONE/INSCH/INSBUS/INSAUX/INSSTL/INSSTR`) vs aliases atuais do frontend — unificar.
+
+## §7 Tela de Máquinas de Efeitos (Concluída)
+
+**✅ Concluída** — overview 4 slots + arquitetura Schema-Driven em `public/modules/FXS/`:
+- `efeitos.js` (overview: IN Patch → Processador → OUT Patch), `fx_core.js` (motor de estado, Lazy-Sync, drag/wheel/stepper, dual layout, escuta WebSocket), `fx_registry.js` (catálogo declarativo de algoritmos), `fx_components.js` (knobs, stepper cards, switch cards, headers, card groups, tab bars), `fx_routing.js` (patch IN/OUT), `fx_utils.js` (formatadores ms/s/Hz/kHz/%/dB/ratios), `fx.css`.
+- Integrado em `public/index.html` (modais `efeitosModal` + `fxEditorModal` + scripts), `sidebar.js`, `style.css`.
+- Recursos: Lazy-Sync por slot (batch sob demanda + cache RAM), layout Desktop (grid de cartões) / Mobile (abas + steppers touch), atualização cirúrgica do DOM sem perda de foco/scroll.
+
+## §8 Patch Destination — FX Outputs (OUT)
+
+- **Modelo destination-indexed:** o SysEx aponta para o **DESTINO** (ex. CH1) e o valor diz a **fonte** (slot FX Out). IN do FX é o oposto (endereço = jack, valor = fonte).
+- **Query:** `F0 43 30 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] F7` · **Resposta/Change:** `F0 43 10 3E 0D 02 [ELEMENT] [PARAM] [CHANNEL] [B0..B3] F7`
+- **Famílias de destino:** CH1-32 → el `01`/param `00`/ch 0-31 (`kChannelInput`); STIN1L-4R → el `01` ch 32-39; INSCH1-32 → el `02` (`kChannelInsertIn`); INSBUS1-8 → el `07` (`kBusInsertInput`); INSAUX1-8 → el `08` (`kAUXInsertInput`); INSSTL/INSSTR → el `0A` (`kStereoInsertInput`).
+- **91 destinos** = NONE(1) + CH(32) + STIN(8) + INSCH(32) + INSBUS(8) + INSAUX(8) + INSST(2). **"MASTER L/R" não existe no seletor**: equivale a INSSTL/INSSTR (el `0A`, reads antigos rotulam como "MASTER L/R").
+- **Valores FX Out (bytes 4):** FX1=121/122 (`00 00 00 79/7A`), FX2=129/130 (`00 00 01 01/02`), FX3=137/138 (`00 00 01 09/0A`), FX4=139/140 (`00 00 01 0B/0C`). Padrão +8 por FX até FX3; depois +2.
+- **Ex. capturado (write validado):** CH1 → FX1 Out1 = `F0 43 10 3E 0D 02 01 00 00 00 00 00 79 F7`. Padrão SM: Change + Request + eco da mesa (request/eco opcionais no app; essencial é o change `0x10`).
+- **NONE:** não é destino próprio = desconectar (gravar OFF no destino atual que tem o slot, ou restaurar fonte anterior — UX a definir).
+- **Validação read:** INSBUS1→FX1Out1, INSBUS2→FX1Out2, CH24→FX2Out1, INSBUS3→FX3Out1, INSBUS4→FX3Out2, INSSTL(el10 ch0)→FX4Out1, INSSTR(el10 ch1)→FX4Out2 — todos ✅.
+- **Status impl.:** catálogo 91 opções ✅; modelo ✅; valores 121-140 ✅; write CH1-32 ✅ (validado CH1); write STIN/INSCH/INSBUS/INSAUX/INSST ⏳ (endereçados, sem capture); UI seletor OUT ❌; lógica NONE/mover OUT ❌.
+
+## §9 Pipeline de Sincronização
+
+- **Fase 1 — FX Inputs (batch):** 8 requests (`kEffectInput/kEffectIn`, 4 slots × L/R) com throttle configurável.
+- **Fase 2 — FX Outputs (batch):** requests `build_fx_output_request` para todos os destinos; ativa `is_output_patch_active=true` (parser discrimina respostas de output patch); coleta acks em background por até **5.0s** antes de restaurar o estado.
+- **Latência:** a mesa atrasa MIDI sob estresse (sync inicial). Parametrizado via `config.json` → `time_between_fxs_requests`, lido na inicialização e propagado ao `SyncManager`. **Padrão calibrado: 150 (ms).**
+
+## §10 Telas de Efeitos (Lazy-Sync e Regras)
+
+- **Requisições são 1-para-1** (`0x30` por parâmetro); **não existe** bulk dos 14 params. Bulk Dump (`0x20`) do boot traz só cena geral + ID do Effect Type, não os 14 params.
+- **Lazy-Sync por slot:** boot sincroniza faders/mutes/EQs/aux/panning/EffectType(`0x31`)/patches. Ao abrir o editor: algoritmo suportado (IDs 0-3) e `syncedSlots[slot]==false` → batch de 16 requests (`0x10..0x1D`, `0x30`, `0x34`) com throttling, marca synced e cacheia em RAM; se synced → lê 100% da RAM. Não suportado (4+) → "EFEITO EM CONSTRUÇÃO", **sem** tráfego MIDI.
+- **Tempo real:** escuta `0x10` do Element `0x58` → evento WS `fxParamUpdate {slot, param, value}`.
+- **Organização UI:** Desktop = grid de 4 cartões (Saída & Filtros / Tempo & Espectro / Reflexões & Difusão / Envelope do Gate); Mobile = abas (TEMPO/REFLEXÕES/FILTROS/GATE) com steppers.
+- **Plano técnico (§10.4):** servidor `build_fx_param_request(slot, param)` montando `F0 43 30 3E 7F 01 58 [PARAM] [SLOT] F7`; parser Element `0x58` atualiza `GlobalState` e emite `fxParamUpdate`; frontend `syncedSlots[4]`/`fxParams[4]`, socket `requestFxSlotParams`/`changeFxParam`.
+- **FX Library Recall (§10.5):** recall na mesa → evento invalida cache (`syncedSlots=false`, limpa params); se o slot está visível → `requestFxSlotParams` + overlay de sync; re-render automática.
+- **Arquitetura Schema-Driven (§10.6):** registrar novo algoritmo = entrada declarativa no `FXRegistry` (id, name, colorTheme, supported, categories, params: key/name/sysEx/category/min/max/defaultVal/formatFn). Componentes genéricos: `renderKnob`, `renderStepperCard`, `renderSwitchCard`, `renderCardGroup`, `renderMobileTabs`, `renderUnderConstruction`. `FXCore` com `updateSingleParamDom` (nó `data-sysex`) + detecção mobile/desktop (localStorage) + gestão de reconexão/recall com cooldown anti-loop.
+- **§10.7 Regras definitivas (CRÍTICAS):**
+  1. **Single-Fetch Guarantee:** sync dos params internos ocorre **1 única vez** por slot; reabrir = 100% RAM, zero SysEx. Resync só por recall real de preset na mesa.
+  2. **Zero Resync Loop:** receber params (`0x30`/`fxSlotParamsUpdate`/`fxParamUpdate`) **nunca** reinvalida sync; reconexão WS só lê RAM do servidor; botões de navegação da mesa não afetam a flag.
+  3. **Bypass em tempo real:** param 52 atualiza o card do overview (`fx-card-bypassed`, borda vermelha + pausa).
+  - Recall invalida **somente** via evento `fxLibraryRecall` (servidor limpa `state.fx_params[slot]` e faz broadcast). Removida a gambiarra de adivinhar recall em `fxTypesUpdate` (agora só nomes/IDs/Mix(48)/Bypass(52)).
+  - Parser Rust: `ParsedMidi::FxLibraryRecall { slot, preset }` (Section `0x7F`, opcode `0x10`).
+
+## §11 Registro de Descobertas e Soluções
+
+- **Decode de Recall FX:** `F0 43 10 3E 7F 10 [ACTION] 00 [PRESET] 00 [SLOT] F7`. `[4]`=0x7F (biblioteca/memória); `[5]`=0x10 recall / 0x50 commit; `[6]`=0x04 **FX preset recall** (0x00=Scene recall, 0x20=Scene store; 0x26/0x46=Channel lib, 0x41=EQ, 0x42=Comp, 0x43=Gate); `[8]`=preset#; `[10]`=slot real 0-based (0=FX1…3=FX4). **Correção aplicada:** slot = `message[10] & 0x03` e validar `message[6]==0x04` (corrigiu bug: recall do Slot 2 ia para o Slot 4; evitou falsos disparos de canais/EQ/comp).
+- **0x31 (Effect Type ID)** adicionado ao array de `requestFxSlotParams` → consulta o ID real (0..63) em presets de fábrica (1..64) e customizados (65..99), definindo nome/tema.
+- **RAM do servidor:** recall atualiza `state.fx_types[slot] = preset-1` e emite `fxTypesUpdate` antes/durante o overlay → cabeçalho/tema (`theme-hall/room/stage/plate`) não revertem.
+- **Bypass tempo real:** `syncFxSlotsFromCore()` no overview; `toggleSlotBypass(idx)` nos cards `||`/`>`; `closeFxEditor()` e `sendParamChange(52)` re-renderizam o overview. Backend: `changeFxParam` trocou `socket.broadcast().emit` por **`io.emit`** (a aba que originou também recebe confirmação e mantém o card vermelho).
+
+## §12 Multiband Compressor (M.BAND DYNA.)
+
+**29 params mapeados** (valores de 2 bytes 14-bit `0xHH LL`):
+
+| Hex | Nome | Conversão |
+|---|---|---|
+| 10-12 | LOW/MID/HI GAIN | `(val-960)/10` dB (-96..+12, passos 0.1dB; 0dB=960=`07 40`) |
+| 13 | PRESENCE | `val-10` (-10..+10) |
+| 18 | CMP.THRE | `(val-240)/10` dB (-24..0) |
+| 19 | CMP.RAT | lookup 15 pts: 1:1…20:1 |
+| 1A | CMP.REL | tabela `decayPoints` (160 passos) |
+| 1B | CMP.ATK | 0–120ms |
+| 1C | CMP.KNEE | 0–5 (Hard→Soft) |
+| 1D | CMP.BYP | bool (0=OFF,1=ON) |
+| 23 | LOOKUP | `val/10` ms (0–100ms) |
+| 24 | L-M XOVR | `FreqTable[val+1]` (21.2Hz–8kHz) |
+| 25 | M-H XOVR | `FreqTable[val+1]` (21.2Hz–8kHz) |
+| 26 | SLOPE | `['-6dB','-12dB']` |
+| 27 | CEILING | 0-60: `(val-60)/10` dB (step 60=0.0dB); **step 61 = texto "OFF"** |
+| 14 | EXP.THRE | `(val-540)/10` dB (-54..-24) |
+| 15 | EXP.RAT | lookup 16 pts; **step 15 = "∞:1"** |
+| 16 | EXP.REL | `decayPoints` |
+| 17 | EXP.BYP | bool |
+| 1E | LIM.THRE | `(val-120)/10` dB (-12..0) |
+| 1F | LIM.REL | `decayPoints` |
+| 20 | LIM.ATK | 0–120ms |
+| 21 | LIM.KNEE | 0–5 |
+| 22 | LIM.BYP | bool |
+| 2D/2E/2F | SOLO LOW/MID/HIGH | bool |
+| 30 | MIX BALANCE | 0–100% |
+| 34 | BYPASS | bool comum |
+
+- **Crossover coupling (PUSH/CLAMP):** `L-M XOVR <= M-H XOVR`. Aumentar L-M além do M-H "empurra" o M-H; diminuir M-H abaixo do L-M "puxa" o L-M.
+- **Meters:** req `F0 43 30 3E 0D 21 06 [CH] 00 00 04 F7`; resp `F0 43 10 3E 0D 21 06 [CH] [B0..B3] F7`. CH `0x00`/`0x01`=Level L/R; `0x10`/`0x11`/`0x12`=GR LOW/MID/HIGH (3 colunas de atenuação da tela).
+
+---
+
 # Status do Parâmetro HOLD (Gate Reverb)
 - [x] 0 - 150 (Manual Audit - Done)
 - [x] 151 - 175 (Manual Audit - Done)
