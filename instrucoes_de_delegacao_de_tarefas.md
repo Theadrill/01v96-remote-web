@@ -42,3 +42,17 @@ echo "Próxima instrução..." | opencode run -c --auto --format json
 ## 3. Regras de Qualidade e Segurança
 * **Reutilização de Contexto (`-c`)**: Sempre utilizar a flag `-c` para evitar que o OpenCode precise re-analisar a estrutura do projeto do zero a cada comando.
 * **Validação Obrigatória**: Todo código gerado pelo OpenCode deve ser revisado via `git diff` e validado via compilação antes de ser considerado pronto.
+
+---
+
+## 4. Regras Rígidas de Execução (Obrigatório Incluir nos Prompts)
+
+Sempre que uma tarefa for delegada ao **OpenCode**, o prompt enviado DEVE conter a seguinte seção explicita no início das instruções:
+
+```text
+REGRAS RÍGIDAS DE EXECUÇÃO:
+- NÃO rode `cargo build --release` ou `cargo build`. Se precisar verificar o código Rust, use APENAS `cargo check`.
+- Valide os arquivos JavaScript usando `node --check`.
+- NÃO faça commit do git (`git commit` é proibido).
+```
+
