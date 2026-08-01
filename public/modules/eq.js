@@ -170,61 +170,61 @@ function renderEQ(ch) {
         sideBtnPhase.classList.toggle('phase-norm', !isPhase);
     }
     body.innerHTML = `
-        <div class="eq-container" style="display:flex; flex-direction:column; width:100%; height:100%; overflow:visible; touch-action:none;">
-            <div style="background:#1a1a1a; padding:12px; display:flex; justify-content:center; align-items:center; flex-shrink:0; flex-wrap:wrap; gap:10px;">
-                <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-                    <button id="headerBtnPhase" class="btn-state ${isPhase ? 'phase-inv' : 'phase-norm'}" style="width:80px; height:38px; font-size:11px; margin:0;" onclick="togglePhase(${ch})">Ø PHASE</button>
-                    <button id="headerBtnFlat" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#dc3545; border-color:#dc3545; color:#fff;" onclick="flatEQ(${ch})">FLAT</button>
-                    <button id="headerBtnCopy" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#007bff; color:#fff;" onclick="copyEQ(${ch})">COPIAR</button>
-                    <button id="headerBtnPaste" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:${window.clipboardMode ? '#fff' : '#444'}; color:${window.clipboardMode ? '#000' : '#fff'}; opacity:${window.clipboardMode ? '1' : '0.4'};" ${window.clipboardMode ? '' : 'disabled'} onclick="pasteClipboard(${ch})">COLAR</button>
-                    <button id="headerBtnATT" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:#444; color:#fff;" onclick="toggleATTModal(true)">EQ ATT</button>
-                    <button id="headerBtnRTA" class="btn-state" style="width:80px; height:38px; font-size:11px; margin:0; background:${window.rtaSource && window.rtaSource !== 'none' ? '#28a745' : '#444'}; color:#fff; border:none;" onclick="window.toggleRTAModal()">RTA</button>
-                    <button id="headerBtnEQOn" class="btn-state ${isEqOn ? 'on-active' : ''}" style="width:80px; height:38px; font-size:11px; margin:0; color:#fff;" onclick="toggleEQ(${ch})">EQ ON</button>
+        <div class="eq-container">
+            <div class="eq-header">
+                <div class="eq-header-row">
+                    <button id="headerBtnPhase" class="btn-state eq-header-btn ${isPhase ? 'phase-inv' : 'phase-norm'}" onclick="togglePhase(${ch})">Ø PHASE</button>
+                    <button id="headerBtnFlat" class="btn-state eq-header-btn eq-header-btn-flat" onclick="flatEQ(${ch})">FLAT</button>
+                    <button id="headerBtnCopy" class="btn-state eq-header-btn eq-header-btn-copy" onclick="copyEQ(${ch})">COPIAR</button>
+                    <button id="headerBtnPaste" class="btn-state eq-header-btn ${window.clipboardMode ? 'eq-header-btn-paste-on' : 'eq-header-btn-paste-off'}" ${window.clipboardMode ? '' : 'disabled'} onclick="pasteClipboard(${ch})">COLAR</button>
+                    <button id="headerBtnATT" class="btn-state eq-header-btn eq-header-btn-dark" onclick="toggleATTModal(true)">EQ ATT</button>
+                    <button id="headerBtnRTA" class="btn-state eq-header-btn ${window.rtaSource && window.rtaSource !== 'none' ? 'eq-header-btn-rta-on' : 'eq-header-btn-rta-off'}" onclick="window.toggleRTAModal()">RTA</button>
+                    <button id="headerBtnEQOn" class="btn-state eq-header-btn eq-header-btn-eqon ${isEqOn ? 'on-active' : ''}" onclick="toggleEQ(${ch})">EQ ON</button>
                 </div>
             </div>
-            <div class="eq-content-wrapper" style="display:flex; flex:1; width:100%; min-height:0; overflow:hidden;">
-                <div class="eq-main-area" style="flex:1; display:flex; flex-direction:column; min-width:0;">
-                    <div class="eq-graph-container" style="position:relative;">
-                        <canvas id="eqCanvas" style="display:block; width:100%; height:100%; position:absolute; top:0; left:0; z-index:1;"></canvas>
-                        <canvas id="rtaCanvas" style="display:block; width:100%; height:100%; position:absolute; top:0; left:0; z-index:0; pointer-events:none;"></canvas>
+            <div class="eq-content-wrapper">
+                <div class="eq-main-area">
+                    <div class="eq-graph-container">
+                        <canvas id="eqCanvas"></canvas>
+                        <canvas id="rtaCanvas"></canvas>
                         
                         <!-- Balão de ajuste de Q (Aparece ao lado da banda selecionada) -->
-                        <div id="eqBubble" onpointerdown="resetBubbleTimer()" style="display:none; position:absolute; background:#222; border:1px solid #444; border-radius:12px; padding:6px; z-index:100; flex-direction:row; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.6); pointer-events:auto; transform:translate(15px, -50%);">
-                            <button class="nav-btn" style="width:34px; height:34px; font-size:22px; cursor:pointer;" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
-                            <span style="font-size:12px; color:#888; font-weight:bold; margin:0 8px; font-family:sans-serif;">Q</span>
-                            <button class="nav-btn" style="width:34px; height:34px; font-size:20px; cursor:pointer;" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
+                        <div id="eqBubble" onpointerdown="resetBubbleTimer()">
+                            <button class="nav-btn eq-bubble-q-btn" onpointerdown="startQNudge(-1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">-</button>
+                            <span class="eq-bubble-q-label">Q</span>
+                            <button class="nav-btn eq-bubble-q-btn eq-bubble-q-btn-plus" onpointerdown="startQNudge(1)" onpointerup="stopQNudge()" onpointerleave="stopQNudge()">+</button>
                         </div>
                     </div>
 
                     <!-- NOVO: Fader de Frequência Horizontal -->
-                    <div id="eqFreqFaderContainer" class="eq-freq-fader-container" style="opacity: 0.3; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startFreqNudge(-1)" onpointerup="stopFreqNudge()" onpointerleave="stopFreqNudge()" onpointercancel="stopFreqNudge()">-</button>
-                        <input type="range" id="eqFreqFaderInput" class="eq-freq-fader-input" min="0" max="124" step="1" value="72" orient="horizontal" oninput="eqFreqInput(event)" style="flex: 1;">
-                        <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startFreqNudge(1)" onpointerup="stopFreqNudge()" onpointerleave="stopFreqNudge()" onpointercancel="stopFreqNudge()">+</button>
+                    <div id="eqFreqFaderContainer" class="eq-freq-fader-container">
+                        <button class="nav-btn eq-nudge-btn" onpointerdown="startFreqNudge(-1)" onpointerup="stopFreqNudge()" onpointerleave="stopFreqNudge()" onpointercancel="stopFreqNudge()">-</button>
+                        <input type="range" id="eqFreqFaderInput" class="eq-freq-fader-input" min="0" max="124" step="1" value="72" orient="horizontal" oninput="eqFreqInput(event)">
+                        <button class="nav-btn eq-nudge-btn" onpointerdown="startFreqNudge(1)" onpointerup="stopFreqNudge()" onpointerleave="stopFreqNudge()" onpointercancel="stopFreqNudge()">+</button>
                     </div>
 
-                    <div id="eqInfo" style="background:#111; color:#777; font-size:10px; padding:5px 35px 18px 35px; font-family:monospace; height:20px; border-top: 1px solid #222;">
+                    <div id="eqInfo">
                         Canais 1 e 4: Pressione e segure para HPF/LPF...
                     </div>
                 </div>
 
                 <!-- NOVO: Fader de Ganho Lateral (Referência AirFader) -->
-                <div id="eqGainFaderContainer" class="eq-fader-container" style="opacity: 0.3; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startGainNudge(1)" onpointerup="stopGainNudge()" onpointerleave="stopGainNudge()" onpointercancel="stopGainNudge()">+</button>
-                    <div id="eqFaderVal" class="eq-fader-val" style="margin: 0;">+18.0</div>
+                <div id="eqGainFaderContainer" class="eq-fader-container">
+                    <button class="nav-btn eq-nudge-btn" onpointerdown="startGainNudge(1)" onpointerup="stopGainNudge()" onpointerleave="stopGainNudge()" onpointercancel="stopGainNudge()">+</button>
+                    <div id="eqFaderVal" class="eq-fader-val">+18.0</div>
                     <input type="range" id="eqFaderInput" class="eq-fader-input" min="-180" max="180" step="1" value="0" orient="vertical" oninput="eqGainInput(event)">
-                    <div id="eqFaderLabel" class="eq-fader-label" style="margin: 0;">GAIN</div>
-                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 22px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startGainNudge(-1)" onpointerup="stopGainNudge()" onpointerleave="stopGainNudge()" onpointercancel="stopGainNudge()">-</button>
+                    <div id="eqFaderLabel" class="eq-fader-label">GAIN</div>
+                    <button class="nav-btn eq-nudge-btn eq-nudge-btn-lg" onpointerdown="startGainNudge(-1)" onpointerup="stopGainNudge()" onpointerleave="stopGainNudge()" onpointercancel="stopGainNudge()">-</button>
                 </div>
             </div>
 
             <!-- Modal de Contexto para HPF/LPF -->
-            <div id="eqContextMenu" style="display:none; position:absolute; background:#222; border:1px solid #555; border-radius:10px; padding:10px; z-index:5000; box-shadow:0 8px 25px rgba(0,0,0,0.8); flex-direction:column; gap:5px;">
-                <p style="margin:0 0 5px 0; font-size:9px; color:#aaa; text-align:center; text-transform:uppercase;">Tipo de Filtro</p>
-                <div id="eqModeButtons" style="display:flex; flex-direction:column; gap:5px;">
-                    <button id="btnModeNormal" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">NORMAL</button>
-                    <button id="btnModeShelf" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">SHELF</button>
-                    <button id="btnModeSpecial" class="btn-state" style="margin:0; width:110px; height:32px; font-size:10px;">HPF</button>
+            <div id="eqContextMenu">
+                <p class="eq-context-menu-title">Tipo de Filtro</p>
+                <div id="eqModeButtons">
+                    <button id="btnModeNormal" class="btn-state eq-mode-btn">NORMAL</button>
+                    <button id="btnModeShelf" class="btn-state eq-mode-btn">SHELF</button>
+                    <button id="btnModeSpecial" class="btn-state eq-mode-btn">HPF</button>
                 </div>
             </div>
 

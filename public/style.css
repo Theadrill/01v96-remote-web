@@ -3058,6 +3058,9 @@ body.is-portrait .eq-graph-container {
     padding: 15px 0;
     box-sizing: border-box;
     display: none;
+    opacity: 0.3;
+    pointer-events: none;
+    gap: 6px;
     /* Escondido por padrÃƒÂ£o, aparece em landscape/largo */
 }
 
@@ -3140,6 +3143,10 @@ body.is-portrait .eq-fader-container {
     box-sizing: border-box;
     border-top: 1px solid #222;
     display: none;
+    opacity: 0.3;
+    pointer-events: none;
+    justify-content: center;
+    gap: 8px;
     /* Escondido por padrÃƒÂ£o, aparece em landscape/largo */
 }
 
@@ -3166,6 +3173,7 @@ body.is-portrait .eq-freq-fader-container {
     cursor: pointer !important;
     pointer-events: auto !important;
     writing-mode: horizontal-tb !important;
+    flex: 1;
 }
 
 .eq-freq-fader-input::-webkit-slider-thumb {
@@ -3187,6 +3195,224 @@ body.is-portrait .eq-freq-fader-container {
     border: 1px solid #000;
     border-radius: 3px;
     cursor: pointer;
+}
+
+/* --- EQ Screen: classes consolidadas (sem CSS inline) --- */
+.eq-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    touch-action: none;
+}
+
+.eq-header {
+    background: #1a1a1a;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.eq-header-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.eq-header-btn {
+    width: 80px;
+    height: 38px;
+    font-size: 11px;
+    margin: 0;
+}
+
+.eq-header-btn-flat {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+.eq-header-btn-copy {
+    background: #007bff;
+    color: #fff;
+}
+
+.eq-header-btn-dark {
+    background: #444;
+    color: #fff;
+}
+
+.eq-header-btn-paste-on {
+    background: #fff;
+    color: #000;
+    opacity: 1;
+}
+
+.eq-header-btn-paste-off {
+    background: #444;
+    color: #fff;
+    opacity: 0.4;
+}
+
+.eq-header-btn-rta-on {
+    background: #28a745;
+    color: #fff;
+    border: none;
+}
+
+.eq-header-btn-rta-off {
+    background: #444;
+    color: #fff;
+    border: none;
+}
+
+.eq-header-btn-eqon {
+    color: #fff;
+}
+
+.eq-content-wrapper {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.eq-main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+#eqCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#rtaCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#eqBubble {
+    display: none;
+    position: absolute;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 6px;
+    z-index: 100;
+    flex-direction: row;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+    transform: translate(15px, -50%);
+}
+
+.eq-bubble-q-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.eq-bubble-q-btn-plus {
+    font-size: 20px;
+}
+
+.eq-bubble-q-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: bold;
+    margin: 0 8px;
+    font-family: sans-serif;
+}
+
+.eq-nudge-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 20px;
+    font-weight: bold;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.eq-nudge-btn-lg {
+    font-size: 22px;
+}
+
+#eqInfo {
+    background: #111;
+    color: #777;
+    font-size: 10px;
+    padding: 5px 35px 18px 35px;
+    font-family: monospace;
+    height: 20px;
+    border-top: 1px solid #222;
+}
+
+#eqFaderVal {
+    margin: 0;
+}
+
+#eqFaderLabel {
+    margin: 0;
+}
+
+#eqContextMenu {
+    display: none;
+    position: absolute;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 5000;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
+    flex-direction: column;
+    gap: 5px;
+}
+
+.eq-context-menu-title {
+    margin: 0 0 5px 0;
+    font-size: 9px;
+    color: #aaa;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#eqModeButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.eq-mode-btn {
+    margin: 0;
+    width: 110px;
+    height: 32px;
+    font-size: 10px;
 }
 
 /* Ajuste fino dos botÃƒÂµes laterais em retrato */
