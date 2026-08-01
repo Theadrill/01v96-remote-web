@@ -99,6 +99,10 @@
     "name": "PALCO",
     "scriptId": "lumikit"
   },
+  "9": {
+    "name": "MACRO 10",
+    "scriptId": "channel_toggler"
+  },
   "globalConfig": {
     "lumikit": {
       "ip": "pcfavela",
