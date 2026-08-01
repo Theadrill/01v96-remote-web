@@ -112,6 +112,8 @@ pub fn router(
             "/macros/sync",
             axum::routing::post(sync_preset).delete(delete_preset),
         )
+        .route("/macros/compare", axum::routing::get(compare_slots))
+        .route("/macros/sync/check", axum::routing::get(sync_check))
         .route(
             "/macros/config/{mod_id}",
             axum::routing::get(get_mod_config).post(save_mod_config),
@@ -192,21 +194,33 @@ async fn get_slots(Query(q): Query<PresetQuery>) -> Json<Value> {
     let local_dir = macros_dir.join("local");
     let shared_dir = macros_dir.join("shared");
 
+    let read_profile = |path: &StdPath| -> Option<Value> {
+        if !path.exists() {
+            return None;
+        }
+        let content = std::fs::read_to_string(path).ok()?;
+        serde_json::from_str(&content).ok()
+    };
+
     if let Some(preset) = q.preset {
         let local_path = local_dir.join(format!("profile_{}.json", preset));
         let shared_path = shared_dir.join(format!("profile_{}.json", preset));
+        let sync_shared = q.sync_shared.as_deref() == Some("true");
 
-        if local_path.exists()
-            && let Ok(c) = std::fs::read_to_string(&local_path)
-            && let Ok(v) = serde_json::from_str(&c)
-        {
-            return Json(v);
-        }
-        if shared_path.exists()
-            && let Ok(c) = std::fs::read_to_string(&shared_path)
-            && let Ok(v) = serde_json::from_str(&c)
-        {
-            return Json(v);
+        if sync_shared {
+            if let Some(v) = read_profile(&shared_path) {
+                return Json(v);
+            }
+            if let Some(v) = read_profile(&local_path) {
+                return Json(v);
+            }
+        } else {
+            if let Some(v) = read_profile(&local_path) {
+                return Json(v);
+            }
+            if let Some(v) = read_profile(&shared_path) {
+                return Json(v);
+            }
         }
         Json(json!({}))
     } else {
@@ -232,6 +246,99 @@ async fn get_slots(Query(q): Query<PresetQuery>) -> Json<Value> {
             profiles.insert("default".to_string(), true);
         }
         Json(json!(profiles))
+    }
+}
+
+async fn compare_slots(Query(q): Query<PresetQuery>) -> Json<Value> {
+    let preset = q.preset.unwrap_or_else(|| "default".to_string());
+    let macros_dir = root_dir().join("public/modules/macros/profiles");
+    let local_path = macros_dir
+        .join("local")
+        .join(format!("profile_{}.json", preset));
+    let shared_path = macros_dir
+        .join("shared")
+        .join(format!("profile_{}.json", preset));
+
+    let read_profile = |path: &StdPath| -> Option<Value> {
+        if !path.exists() {
+            return None;
+        }
+        let content = std::fs::read_to_string(path).ok()?;
+        serde_json::from_str(&content).ok()
+    };
+
+    let local_data = read_profile(&local_path);
+    let shared_data = read_profile(&shared_path);
+    let is_identical = match (&local_data, &shared_data) {
+        (Some(local), Some(shared)) => local == shared,
+        _ => false,
+    };
+
+    Json(json!({
+        "preset": preset,
+        "exists_local": local_data.is_some(),
+        "exists_shared": shared_data.is_some(),
+        "is_identical": is_identical,
+        "local_data": local_data,
+        "shared_data": shared_data,
+    }))
+}
+
+async fn sync_check() -> impl IntoResponse {
+    let root = crate::config::get_project_root();
+
+    let remote = tokio::process::Command::new("git")
+        .args(["config", "--get", "remote.origin.url"])
+        .current_dir(&root)
+        .output()
+        .await;
+
+    let url = match remote {
+        Ok(out) if out.status.success() => {
+            String::from_utf8_lossy(&out.stdout).trim().to_string()
+        }
+        _ => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "error": "no git remote configured" })),
+            )
+                .into_response();
+        }
+    };
+
+    if url.is_empty() {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(json!({ "error": "no git remote configured" })),
+        )
+            .into_response();
+    }
+
+    let mut child = match tokio::process::Command::new("git")
+        .args(["ls-remote", &url, "HEAD"])
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .current_dir(&root)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+    {
+        Ok(child) => child,
+        Err(_) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "error": "git unavailable" })),
+            )
+                .into_response();
+        }
+    };
+
+    match tokio::time::timeout(std::time::Duration::from_secs(10), child.wait()).await {
+        Ok(Ok(status)) if status.success() => Json(json!({ "online": true })).into_response(),
+        _ => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(json!({ "error": "remote unreachable" })),
+        )
+            .into_response(),
     }
 }
 

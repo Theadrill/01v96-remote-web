@@ -59,55 +59,82 @@ async function detectCurrentPreset() {
 }
 
 window.toggleSharedSync = async function(enabled) {
-    // Persist UI state first
-    localStorage.setItem(`macro_sync_shared_${currentPreset}`, enabled);
-    console.log(`☁️ Auto-Sync Shared para [${currentPreset}]: ${enabled ? 'ON' : 'OFF'}`);
-
-    // If enabling, ensure current preset is saved and trigger sync
-    if (enabled) {
-        try {
-            await saveGlobalSlotsManifest();
-            const resp = await fetch(`/api/macros/sync?preset=${encodeURIComponent(currentPreset)}`, { method: 'POST' });
-            if (!resp.ok) {
-                const err = await resp.json().catch(() => ({}));
-                console.warn('⚠️ Falha ao iniciar sync:', err);
-            } else {
-                console.log('☁️ Sync iniciado para preset', currentPreset);
-            }
-        } catch (e) { console.warn('⚠️ Erro ao salvar ou iniciar sync:', e); }
-        return;
-    }
+    const chk = document.getElementById('chkSharedSync');
 
     // If disabling, show confirmation modal before removing remote preset
-    const chk = document.getElementById('chkSharedSync');
-    // Re-check checkbox visually until user confirms or cancels
-    if (chk) chk.checked = true;
-    const modal = document.getElementById('macroUnshareConfirmModal');
-    const btn = document.getElementById('confirmUnshareBtn');
-    if (!modal || !btn) {
-        // Fallback: perform unshare immediately
-        await performUnshare();
+    if (!enabled) {
+        // Persist UI state first
+        localStorage.setItem(`macro_sync_shared_${currentPreset}`, false);
+        console.log(`☁️ Auto-Sync Shared para [${currentPreset}]: OFF`);
+
+        // Re-check checkbox visually until user confirms or cancels
+        if (chk) chk.checked = true;
+        const modal = document.getElementById('macroUnshareConfirmModal');
+        const btn = document.getElementById('confirmUnshareBtn');
+        if (!modal || !btn) {
+            // Fallback: perform unshare immediately
+            await performUnshare();
+            return;
+        }
+
+        modal.style.display = 'flex';
+        const cancelBtn = document.getElementById('cancelUnshareBtn');
+        const onConfirm = async () => {
+            cleanup();
+            await performUnshare();
+        };
+        const onCancel = () => {
+            cleanup();
+            // restore checkbox to checked state
+            if (chk) chk.checked = true;
+        };
+        function cleanup() {
+            try { btn.removeEventListener('click', onConfirm); } catch(e){}
+            try { cancelBtn.removeEventListener('click', onCancel); } catch(e){}
+            modal.style.display = 'none';
+        }
+        btn.addEventListener('click', onConfirm);
+        if (cancelBtn) cancelBtn.addEventListener('click', onCancel);
         return;
     }
 
-    modal.style.display = 'flex';
-    const cancelBtn = document.getElementById('cancelUnshareBtn');
-    const onConfirm = async () => {
-        cleanup();
-        await performUnshare();
-    };
-    const onCancel = () => {
-        cleanup();
-        // restore checkbox to checked state
-        if (chk) chk.checked = true;
-    };
-    function cleanup() {
-        try { btn.removeEventListener('click', onConfirm); } catch(e){}
-        try { cancelBtn.removeEventListener('click', onCancel); } catch(e){}
-        modal.style.display = 'none';
+    console.log(`☁️ Auto-Sync Shared para [${currentPreset}]: ON`);
+
+    // Etapa 1: Pre-flight check de conectividade com a nuvem/Git
+    let checkOk = false;
+    try {
+        const checkResp = await fetch('/api/macros/sync/check').catch(() => null);
+        checkOk = !!(checkResp && checkResp.ok);
+    } catch (e) { checkOk = false; }
+    if (!checkOk) {
+        alert('⚠️ Não foi possível conectar ao serviço de nuvem/Git. A sincronização permanece desativada.');
+        if (chk) chk.checked = false;
+        localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
+        return;
     }
-    btn.addEventListener('click', onConfirm);
-    if (cancelBtn) cancelBtn.addEventListener('click', onCancel);
+
+    // Etapa 2: Checagem de existência e comparação com o perfil remoto
+    let compData = null;
+    try {
+        const compResp = await fetch(`/api/macros/compare?preset=${encodeURIComponent(currentPreset)}`);
+        compData = await compResp.json();
+    } catch (e) {
+        console.error("Erro ao comparar perfis:", e);
+        alert('⚠️ Erro ao verificar a versão do perfil na nuvem. Tente novamente.');
+        if (chk) chk.checked = false;
+        localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
+        return;
+    }
+
+    // Caso C: Conflito de perfis -> exibe o modal de comparação
+    if (compData && compData.exists_shared && !compData.is_identical) {
+        showMacroSyncDiff(compData);
+        return;
+    }
+
+    // Caso A (primeiro sync) ou Caso B (versões idênticas) -> modal de confirmação
+    const isFirstUpload = !(compData && compData.exists_shared);
+    openSyncActivationConfirm(isFirstUpload);
 };
 
 async function performUnshare() {
@@ -128,6 +155,134 @@ async function performUnshare() {
         alert('Erro ao comunicar com o servidor para remover o preset.');
     }
 }
+
+function openSyncActivationConfirm(isFirstUpload) {
+    const modal = document.getElementById('macroSyncConfirmModal');
+    if (!modal) return;
+    const titleEl = document.getElementById('macroSyncConfirmTitle');
+    const textEl = document.getElementById('macroSyncConfirmText');
+    const yesBtn = document.getElementById('macroSyncConfirmYes');
+    if (titleEl) titleEl.textContent = 'ATIVAR SINCRONIZAÇÃO';
+    if (textEl) {
+        textEl.textContent = isFirstUpload
+            ? 'Este preset ainda não existe na nuvem. O perfil local será enviado para a nuvem e a sincronização será ativada. Deseja continuar?'
+            : 'Os perfis local e da nuvem são idênticos. Deseja ativar a sincronização com a nuvem?';
+    }
+    if (yesBtn) yesBtn.textContent = isFirstUpload ? 'SIM, ENVIAR' : 'SIM, ATIVAR';
+    modal.style.display = 'flex';
+}
+
+window.applySyncActivation = async function () {
+    const modal = document.getElementById('macroSyncConfirmModal');
+    if (modal) modal.style.display = 'none';
+    localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'true');
+    const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = true;
+    try {
+        await saveGlobalSlotsManifest();
+        console.log('☁️ Sincronização com a nuvem ativada para o preset', currentPreset);
+    } catch (e) {
+        console.error('☁️ Erro ao salvar durante ativação da sincronização:', e);
+    }
+};
+
+window.cancelSyncActivation = function () {
+    const modal = document.getElementById('macroSyncConfirmModal');
+    if (modal) modal.style.display = 'none';
+    const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = false;
+    localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
+};
+
+function showMacroSyncDiff(compData) {
+    renderDiffSummary('diffLocalSummary', compData.local_data || {});
+    renderDiffSummary('diffSharedSummary', compData.shared_data || {});
+    document.getElementById('macroSyncDiffModal').style.display = 'flex';
+}
+
+function renderDiffSummary(containerId, data) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    const keys = Object.keys(data).filter(k => k !== 'globalConfig');
+    const total = document.createElement('div');
+    total.className = 'styled-macroSyncDiffTotal';
+    total.innerText = `${keys.length} BOTÃO(ÕES)`;
+    container.appendChild(total);
+
+    if (keys.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'styled-macroSyncDiffEmpty';
+        empty.innerText = 'Nenhuma macro configurada';
+        container.appendChild(empty);
+        return;
+    }
+
+    keys.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+    keys.forEach(k => {
+        const item = data[k];
+        const name = (item && typeof item === 'object' && item.name) ? item.name : `MACRO ${parseInt(k, 10) + 1}`;
+        const mod = (item && typeof item === 'object' && item.scriptId) ? item.scriptId : '';
+        const row = document.createElement('div');
+        row.className = 'styled-macroSyncDiffItem';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'styled-macroSyncDiffItemName';
+        nameSpan.innerText = name;
+        const modSpan = document.createElement('span');
+        modSpan.className = 'styled-macroSyncDiffItemMod';
+        modSpan.innerText = mod;
+        row.appendChild(nameSpan);
+        row.appendChild(modSpan);
+        container.appendChild(row);
+    });
+}
+
+window.uploadLocalToCloud = async function () {
+    document.getElementById('macroSyncDiffModal').style.display = 'none';
+    localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'true');
+    const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = true;
+    try {
+        await saveGlobalSlotsManifest();
+        console.log('☁️ Perfil local enviado para a nuvem.');
+    } catch (e) {
+        console.error('☁️ Erro ao enviar perfil local para a nuvem:', e);
+    }
+};
+
+window.downloadCloudToLocal = async function () {
+    const modal = document.getElementById('macroSyncDiffModal');
+    try {
+        const res = await fetch(`/api/macros/slots?preset=${encodeURIComponent(currentPreset)}&syncShared=true`);
+        const data = await res.json() || {};
+        globalMacroConfig = data.globalConfig || {};
+        assignedMacros = {};
+        Object.keys(data).forEach(k => {
+            if (k !== 'globalConfig') {
+                assignedMacros[k] = (typeof data[k] === 'string') ? { scriptId: data[k], name: `MACRO ${parseInt(k, 10) + 1}` } : data[k];
+            }
+        });
+        await fetch(`/api/macros/slots?preset=${encodeURIComponent(currentPreset)}&syncShared=false`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'true');
+        const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = true;
+        if (modal) modal.style.display = 'none';
+        renderMacros();
+        loadExternalScripts();
+        console.log('☁️ Perfil da nuvem baixado para o computador.');
+    } catch (e) {
+        console.error('☁️ Erro ao baixar perfil da nuvem:', e);
+        alert('Erro ao baixar perfil da nuvem. Verifique os logs do servidor.');
+    }
+};
+
+window.cancelSyncDiff = function () {
+    const modal = document.getElementById('macroSyncDiffModal');
+    if (modal) modal.style.display = 'none';
+    const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = false;
+    localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
+};
 
 function updatePresetUI() {
     const label = document.getElementById('currentPresetLabel');
@@ -265,7 +420,8 @@ async function refreshAvailableScripts() {
 
 async function loadGlobalSlotsManifest() {
     try {
-        const res = await fetch(`/api/macros/slots?preset=${currentPreset}`);
+        const syncState = localStorage.getItem(`macro_sync_shared_${currentPreset}`) === 'true';
+        const res = await fetch(`/api/macros/slots?preset=${currentPreset}&syncShared=${syncState}`);
         const data = await res.json() || {};
         
         // Separa os slots da configuração global embutida

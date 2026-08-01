@@ -7088,6 +7088,210 @@ body:not(.layout-desktop) * {
     margin-top: 15px;
 }
 
+/* ── Modal de Confirmação de Ativação de Sincronização ─────────── */
+.styled-macroSyncConfirmModal {
+    z-index: 20050;
+    display: none;
+}
+
+.macro-sync-confirm-content {
+    width: 90%;
+    max-width: 340px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.macro-sync-confirm-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.macro-sync-confirm-btns {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.macro-sync-confirm-text {
+    font-size: 13px;
+    color: #ccc;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.macro-sync-confirm-btn {
+    flex: 1;
+    padding: 12px 4px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.macro-sync-confirm-btn:active {
+    transform: scale(0.95);
+    filter: brightness(0.85);
+}
+
+.macro-sync-confirm-yes {
+    background: #28a745;
+    color: #fff;
+}
+
+.macro-sync-confirm-no {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+}
+
+/* ── Modal de Comparação de Perfis Local vs. Nuvem ─────────────── */
+.styled-macroSyncDiffModal {
+    z-index: 20000;
+    display: none;
+}
+
+.styled-macroSyncDiffContent {
+    max-width: 520px;
+    width: 92%;
+    background: #1a1a1a;
+    border: 2px solid #ff9800;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+}
+
+.styled-macroSyncDiffTitle {
+    margin: 0 0 10px 0;
+    color: #ffb74d;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+}
+
+.styled-macroSyncDiffText {
+    margin: 0 0 18px 0;
+    color: #bbb;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.styled-macroSyncDiffColumns {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.styled-macroSyncDiffColumn {
+    flex: 1;
+    min-width: 0;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.styled-macroSyncDiffColumnTitle {
+    margin: 0;
+    color: #aaa;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.styled-macroSyncDiffList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.styled-macroSyncDiffTotal {
+    font-size: 10px;
+    font-weight: 800;
+    color: #00e676;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.styled-macroSyncDiffItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+.styled-macroSyncDiffItemName {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.styled-macroSyncDiffItemMod {
+    font-size: 9px;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.styled-macroSyncDiffEmpty {
+    font-size: 11px;
+    color: #555;
+    text-align: center;
+}
+
+.styled-macroSyncDiffActions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.styled-macroSyncDiffUploadBtn {
+    background: #2e7d32;
+    margin: 0;
+    height: 45px;
+    font-size: 12px;
+}
+
+.styled-macroSyncDiffDownloadBtn {
+    background: #1976d2;
+    margin: 0;
+    height: 45px;
+    font-size: 12px;
+}
+
+.styled-macroSyncDiffCancelBtn {
+    margin: 0;
+    height: 45px;
+}
+
+@media (max-width: 480px) {
+    .macro-sync-confirm-content {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+}
+
 .styled-sceneDeleteModal {
     z-index: 19500;
     display: none;

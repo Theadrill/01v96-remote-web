@@ -784,6 +784,49 @@
             </div>
         </div>
     </div>
+    <!-- Modal de Confirmação de Ativação de Sincronização com a Nuvem -->
+    <div class="modal-overlay styled-macroSyncConfirmModal" id="macroSyncConfirmModal">
+        <div class="modal-content macro-sync-confirm-content">
+            <div class="macro-sync-confirm-row">
+                <span id="macroSyncConfirmTitle" class="meter-config-section-title">Ativar Sincronização?</span>
+            </div>
+            <div class="macro-sync-confirm-row">
+                <span id="macroSyncConfirmText" class="macro-sync-confirm-text"></span>
+            </div>
+            <div class="macro-sync-confirm-btns">
+                <button id="macroSyncConfirmYes" class="macro-sync-confirm-btn macro-sync-confirm-yes"
+                    onclick="applySyncActivation()">SIM, ATIVAR</button>
+                <button id="macroSyncConfirmNo" class="macro-sync-confirm-btn macro-sync-confirm-no"
+                    onclick="cancelSyncActivation()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Comparação de Perfis Local vs. Nuvem (Conflito de Sincronização) -->
+    <div class="modal-overlay styled-macroSyncDiffModal" id="macroSyncDiffModal">
+        <div class="modal-content styled-macroSyncDiffContent">
+            <h3 class="styled-macroSyncDiffTitle">☁️ Conflito de Perfil Detectado</h3>
+            <p class="styled-macroSyncDiffText">A versão salva na nuvem difere da versão salva
+                localmente. Escolha como deseja prosseguir:</p>
+            <div class="styled-macroSyncDiffColumns">
+                <div class="styled-macroSyncDiffColumn">
+                    <h4 class="styled-macroSyncDiffColumnTitle">💻 Perfil Local</h4>
+                    <div class="styled-macroSyncDiffList" id="diffLocalSummary"></div>
+                </div>
+                <div class="styled-macroSyncDiffColumn">
+                    <h4 class="styled-macroSyncDiffColumnTitle">☁️ Perfil na Nuvem</h4>
+                    <div class="styled-macroSyncDiffList" id="diffSharedSummary"></div>
+                </div>
+            </div>
+            <div class="styled-macroSyncDiffActions">
+                <button class="btn-connect styled-macroSyncDiffUploadBtn" id="btnUploadLocalToCloud"
+                    onclick="uploadLocalToCloud()">📤 Enviar Perfil Local</button>
+                <button class="btn-connect styled-macroSyncDiffDownloadBtn" id="btnDownloadCloudToLocal"
+                    onclick="downloadCloudToLocal()">📥 Baixar Perfil da Nuvem</button>
+                <button class="btn-close styled-macroSyncDiffCancelBtn" id="btnCancelSyncDiff"
+                    onclick="cancelSyncDiff()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
     <!-- Modal de Biblioteca de Macros (Listagem da pasta) -->
     <div class="modal-overlay styled-macroLibraryModal" id="macroLibraryModal">
         <div class="modal-content inline-style-61">
