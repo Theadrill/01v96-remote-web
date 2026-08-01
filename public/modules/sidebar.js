@@ -895,7 +895,7 @@ function renderDock(mode) {
         }
     }
 
-    if (layoutMode === 'desktop' && mode !== 'main' && mode !== 'musician') {
+    if (mode !== 'main' && mode !== 'musician') {
         buttons.unshift({ label: 'CONFIG', action: "document.getElementById('configModal').style.display='flex'", cls: 'dock-config' });
     }
 
