@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "public/modules/channel_strip.js": {
-    "mtime": 1785551193.6459029,
-    "ast_hash": "d38c982fbbfd0dccd9954a4eac482cfd",
+    "mtime": 1785564479.2772987,
+    "ast_hash": "6e0cb3ea065078dc3a191fbb27399d6a",
     "semantic_hash": ""
   },
   "public/modules/compressor.js": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "public/modules/sidebar.js": {
-    "mtime": 1785551193.6500745,
-    "ast_hash": "b0f99a6fd56e9b9df93211a1fdb326c4",
+    "mtime": 1785564869.7871106,
+    "ast_hash": "be4ef5256cc32995e187e143422c7a11",
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785563520.3280015,
-    "ast_hash": "f83bc1a75df416dca7c499ffcd9c2c33",
+    "mtime": 1785565737.18311,
+    "ast_hash": "5d8b609633a59236a808d2af6fc9dcd6",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -3287,6 +3287,11 @@
   "docs/screenshot-master.png": {
     "mtime": 1785388523.0643895,
     "ast_hash": "f8bbdd33e55900cbb08dd64754213568",
+    "semantic_hash": ""
+  },
+  "instrucoes_de_delegacao_de_tarefas.md": {
+    "mtime": 1785565582.2806134,
+    "ast_hash": "ec83b7759b2b338243aa2f15b7d22a95",
     "semantic_hash": ""
   }
 }

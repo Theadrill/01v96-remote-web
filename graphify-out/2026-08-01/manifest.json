@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
-    "mtime": 1785562408.1753044,
-    "ast_hash": "14af76cb1b7eccac4e6aba54792d01a5",
+    "mtime": 1785563381.088527,
+    "ast_hash": "10e7cbda248745e71dd059a7cf0bec48",
     "semantic_hash": ""
   },
   "public/modules/splash_screen.js": {
@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785562466.366071,
-    "ast_hash": "5da1971741077047d8c4dca1155e3c28",
+    "mtime": 1785563520.3280015,
+    "ast_hash": "f83bc1a75df416dca7c499ffcd9c2c33",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
