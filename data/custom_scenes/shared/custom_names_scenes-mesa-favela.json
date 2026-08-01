@@ -20,12 +20,6 @@
       "file": "custom_names_scene-SARU-mesa-favela.json"
     },
     {
-      "custom_name": "SEXTETO",
-      "physical_scene": "SEXTETO",
-      "physical_id": 34,
-      "file": "custom_names_scene-SEXTETO-mesa-favela.json"
-    },
-    {
       "custom_name": "REGIS",
       "physical_scene": "REGIS",
       "physical_id": 12,
@@ -36,6 +30,12 @@
       "physical_scene": "PISEIRO",
       "physical_id": 38,
       "file": "custom_names_scene-PISEIRO-mesa-favela.json"
+    },
+    {
+      "custom_name": "SEXTETO",
+      "physical_scene": "SEXTETO",
+      "physical_id": 34,
+      "file": "custom_names_scene-SEXTETO-mesa-favela.json"
     }
   ]
 }
