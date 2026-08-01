@@ -1,5 +1,46 @@
 let faderCardsCache = null;
 
+// --- Sincronização por URL Hash (Redirecionamento Automático HTTPS) ---
+// Sincroniza 'auto_redirect_https' entre as origens http:// e https:// via hash da URL
+// no momento dos redirecionamentos. A preferência continua 100% individual por
+// dispositivo/celular (localStorage), sem exigir login nem banco de dados.
+function applyAutoRedirectHashSync() {
+    if (!window.location.hash) return;
+
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const syncVal = hashParams.get('sync_https');
+    if (syncVal === null) return;
+
+    if (syncVal === 'true') {
+        localStorage.setItem('auto_redirect_https', 'true');
+        const httpOrigin = hashParams.get('http_origin');
+        if (httpOrigin) {
+            localStorage.setItem('http_origin', httpOrigin);
+        }
+    } else if (syncVal === 'false') {
+        localStorage.setItem('auto_redirect_https', 'false');
+    }
+
+    // Limpa a hash da URL
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+
+    // Atualiza o estado visual do checkbox (se existir no DOM)
+    const toggle = document.getElementById('toggleAutoRedirectHttps');
+    if (toggle) toggle.checked = localStorage.getItem('auto_redirect_https') === 'true';
+}
+applyAutoRedirectHashSync();
+
+// Monta a URL de destino do redirecionamento automático HTTPS anexando a hash de
+// sincronização quando a origem atual é http:// (salvando a origem de retorno).
+function buildAutoRedirectTarget(tailscaleUrl) {
+    let targetUrl = tailscaleUrl;
+    if (window.location.protocol === 'http:') {
+        localStorage.setItem('http_origin', window.location.origin);
+        targetUrl = tailscaleUrl + '#sync_https=true&http_origin=' + encodeURIComponent(window.location.origin);
+    }
+    return targetUrl;
+}
+
 // Decide o que fazer com a splash screen baseado no status do .env no servidor.
 // Chamado pelo listener de 'portsList' e 'setupStatus' (via 'connect' → 'checkSetupStatus').
 // - envStatus !== 'complete': limpa localStorage e mostra tela de cadastro
@@ -831,7 +872,7 @@ socket.on('portsList', (data) => {
     }
     const autoRedirect = localStorage.getItem('auto_redirect_https') === 'true';
     if (autoRedirect && data.tailscaleUrl && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        window.location.href = data.tailscaleUrl;
+        window.location.href = buildAutoRedirectTarget(data.tailscaleUrl);
         return;
     }
 
@@ -1020,10 +1061,27 @@ window.updateOpenBrowser = function (enabled) {
 };
 
 window.updateAutoRedirectHttps = function (enabled) {
-    localStorage.setItem('auto_redirect_https', enabled);
-    if (enabled && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        if (window.lastTailscaleUrl) {
-            window.location.href = window.lastTailscaleUrl;
+    localStorage.setItem('auto_redirect_https', enabled ? 'true' : 'false');
+    const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    if (enabled) {
+        // Se estiver em http:// (e não for localhost/127.0.0.1): salva a origem e
+        // redireciona ao Tailscale HTTPS com a hash de sincronização.
+        if (window.location.protocol === 'http:' && !isLocalHost) {
+            localStorage.setItem('http_origin', window.location.origin);
+            if (window.lastTailscaleUrl) {
+                window.location.href = buildAutoRedirectTarget(window.lastTailscaleUrl);
+            }
+        }
+    } else {
+        // Se estiver em https://: volta para a origem HTTP salva, sincronizando a desativação.
+        if (window.location.protocol === 'https:') {
+            let httpOrigin = localStorage.getItem('http_origin');
+            if (!httpOrigin) {
+                httpOrigin = 'http://' + window.location.hostname.split('.')[0] + ':4000';
+            }
+            const targetUrl = httpOrigin + '/#sync_https=false';
+            window.location.href = targetUrl;
         }
     }
 };
@@ -1043,7 +1101,7 @@ socket.on('tailscaleUrl', (data) => {
     }
     const autoRedirect = localStorage.getItem('auto_redirect_https') === 'true';
     if (autoRedirect && data.url && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        window.location.href = data.url;
+        window.location.href = buildAutoRedirectTarget(data.url);
     }
 });
 

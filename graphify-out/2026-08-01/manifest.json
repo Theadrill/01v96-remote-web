@@ -125,8 +125,8 @@
     "semantic_hash": ""
   },
   "public/modules/macros.js": {
-    "mtime": 1785561202.8100855,
-    "ast_hash": "5bf17552aca9f677d13b6971bcdfe393",
+    "mtime": 1785562191.4408264,
+    "ast_hash": "ca67d6749fc226f197af2bd2a93703c7",
     "semantic_hash": ""
   },
   "public/modules/macros/channel_toggler.js": {
@@ -150,7 +150,7 @@
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/shared/profile_pcfavela.json": {
-    "mtime": 1785053296.6687849,
+    "mtime": 1785562176.325667,
     "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
     "semantic_hash": ""
   },
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
-    "mtime": 1785396097.426196,
-    "ast_hash": "7afca820508ee44512999c79d1edbdd4",
+    "mtime": 1785562408.1753044,
+    "ast_hash": "14af76cb1b7eccac4e6aba54792d01a5",
     "semantic_hash": ""
   },
   "public/modules/splash_screen.js": {
@@ -525,8 +525,8 @@
     "semantic_hash": ""
   },
   "public/index.html": {
-    "mtime": 1785561149.88283,
-    "ast_hash": "31834fc60d99cf09578f8c63462995d7",
+    "mtime": 1785562191.4386878,
+    "ast_hash": "1fefba617776217ced5adcf4efde5b1c",
     "semantic_hash": ""
   },
   "reverse_dll_project/BIBLIA_TECNICA_01V96.md": {
@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785561932.0243917,
-    "ast_hash": "9aa1ca262b7132c7de53ca29980e8d3d",
+    "mtime": 1785562466.366071,
+    "ast_hash": "5da1971741077047d8c4dca1155e3c28",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -2635,7 +2635,7 @@
     "semantic_hash": ""
   },
   "server_rust/src/tailscale_http.rs": {
-    "mtime": 1785561896.8111136,
+    "mtime": 1785562191.4456813,
     "ast_hash": "c83b123e91e0066e415b3aad6c17c88c",
     "semantic_hash": ""
   },
@@ -3195,7 +3195,7 @@
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/local/profile_pcfavela.json": {
-    "mtime": 1785561502.0360265,
+    "mtime": 1785562222.0517497,
     "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
     "semantic_hash": ""
   },
