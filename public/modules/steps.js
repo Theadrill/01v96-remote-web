@@ -26,8 +26,7 @@ window.calibrateStep = function(step, isMaster = false) {
     // Se não houver valor definido para esse step, consideramos -inf
     if (dbValue === undefined || dbValue <= -138) return 0;
     
-    // Para o Master, a escala visual é deslocada em 10dB (0dB é o topo 1023)
-    const rawVal = dbToRaw(isMaster ? dbValue + 10 : dbValue);
+    const rawVal = dbToRaw(dbValue);
     let percent = (rawVal / 1023) * 100;
 
     // Curva de sensibilidade no topo (Step 32 / Clip)
