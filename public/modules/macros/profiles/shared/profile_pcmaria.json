@@ -101,6 +101,10 @@
     "name": "fog",
     "scriptId": "lumikit"
   },
+  "9": {
+    "name": "MACRO 10",
+    "scriptId": "lumikit"
+  },
   "globalConfig": {
     "lumikit": {
       "ip": "pcmaria",
