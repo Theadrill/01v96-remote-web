@@ -978,7 +978,7 @@ async function clearAllSolos() {
 
 /**
  * Abre o modal de configuração da posição dos medidores.
- * Somente LEITURA do estado — nenhum comando de escrita (0x10) é enviado à mesa.
+ * Ao abrir não envia nada à mesa — somente sincroniza o estado já conhecido.
  */
 window.openMeterConfigModal = function(target) {
     const modal = document.getElementById('meterConfigModal');
@@ -989,7 +989,7 @@ window.openMeterConfigModal = function(target) {
         window.updateMeterConfigModalUI('master', window.currentMeterPosMaster || 'pre');
     }
     modal.style.display = 'flex';
-    console.log(`[MEDIDORES CONFIG] Modal aberto (${target}). Somente leitura — nenhum write enviado.`);
+    console.log(`[MEDIDORES CONFIG] Modal aberto (${target}).`);
 };
 
 /**
@@ -1036,4 +1036,25 @@ window.updateMeterConfigModalUI = function(target, modeKey) {
     group.querySelectorAll('.meter-config-pos-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.mode === modeKey);
     });
+};
+
+/**
+ * Envia o write global de posição dos medidores (0D 03 0C) para a mesa.
+ * @param {'master' | 'channels'} target 
+ * @param {'pre_eq' | 'pre' | 'post'} modeKey
+ */
+window.setMeterPosition = function(target, modeKey) {
+    const valueMap = { pre_eq: 0, pre: 1, post: 2 };
+    const typeMap = {
+        channels: 'kSetupMeterSetup/kMeterSetupInpPoint',
+        master:   'kSetupMeterSetup/kMeterSetupOutPoint'
+    };
+    const value = valueMap[modeKey];
+    const type = typeMap[target];
+    if (value === undefined || !type) return;
+    socket.emit('control', { type, channel: 0, value });
+    console.log(`[MEDIDORES CONFIG] Write 0D 03 0C (${type}) = ${value} (${modeKey})`);
+    if (typeof window.updateMeterIndicatorUI === 'function') {
+        window.updateMeterIndicatorUI(target, modeKey);
+    }
 };

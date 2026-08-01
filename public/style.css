@@ -1605,8 +1605,12 @@ body.layout-desktop .sidebar-macros {
     font-weight: 800;
     letter-spacing: 0.5px;
     text-align: center;
-    cursor: default;
+    cursor: pointer;
     transition: all 0.15s ease;
+}
+
+.meter-config-pos-btn:active {
+    transform: scale(0.96);
 }
 
 .meter-config-pos-btn.active {
