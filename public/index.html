@@ -11,7 +11,7 @@
     <meta content="01V96 LIVE" name="apple-mobile-web-app-title" />
     <meta content="yes" name="mobile-web-app-capable" />
     <title>01V96 - LIVE SAFE</title>
-    <link href="style.css?v=1.0.4" rel="stylesheet" />
+    <link href="style.css?v=1.0.5" rel="stylesheet" />
     <link href="modules/FXS/fx.css?v=1.0.1" rel="stylesheet" />
     <!-- UI UPDATE: 2026-06-07 -->
     <script src="/vendor/socket.io.min.js"></script>
@@ -1226,12 +1226,27 @@
             <button onclick="document.getElementById('meterConfigModal').style.display='none'" class="meter-config-close">FECHAR</button>
         </div>
     </div>
+    <!-- Modal de Confirmação - ON do Canal Master -->
+    <div class="modal-overlay styled-masterOnConfirmModal" id="masterOnConfirmModal">
+        <div class="modal-content master-on-confirm-content" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; justify-content:center; align-items:center;">
+                <span id="masterOnConfirmTitle" class="meter-config-section-title">Ligar o Canal Master?</span>
+            </div>
+            <div style="display:flex; justify-content:center; align-items:center;">
+                <span id="masterOnConfirmText" class="master-on-confirm-text">O canal master está desligado. Deseja ligá-lo?</span>
+            </div>
+            <div style="display:flex; gap:8px; width:100%;">
+                <button id="masterOnConfirmYes" class="master-on-confirm-btn master-on-confirm-yes" onclick="confirmMasterOnApply()">SIM, LIGAR</button>
+                <button class="master-on-confirm-btn master-on-confirm-no" onclick="document.getElementById('masterOnConfirmModal').style.display='none'">CANCELAR</button>
+            </div>
+        </div>
+    </div>
     <!-- Overlay Info (gerenciado por overlay_info.js) -->
     <div class="overlay-info styled-blockingOverlay" id="overlayInfo"></div>
     <script src="modules/globals.js?v=4"></script>
     <script src="modules/macros/core.js"></script>
     <script src="modules/macros.js"></script>
-    <script src="modules/channel_strip.js?v=23"></script>
+    <script src="modules/channel_strip.js?v=24"></script>
     <script src="modules/eq.js?v=5"></script>
     <script src="modules/rta.js?v=1"></script>
     <script src="modules/monitoring.js?v=1"></script>

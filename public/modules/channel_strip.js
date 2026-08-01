@@ -350,7 +350,7 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         isOn = s[`aux${activeMix}On`] || false;
     }
 
-    let onAction = isMaster ? "toggleState('kStereoChannelOn/kChannelOn', 'master')" : `toggleState('kInputChannelOn/kChannelOn', ${i})`;
+    let onAction = isMaster ? "confirmMasterOn()" : `toggleState('kInputChannelOn/kChannelOn', ${i})`;
     if ((musicianMode || technicianMixMode) && !isMaster) {
         onAction = `toggleState('kInputAUX/kAUX${activeMix}On', ${i})`;
     }
@@ -490,7 +490,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
         isOn = s[`aux${activeMix}On`] || false;
     }
 
-    let onAction = isMaster ? "toggleState('kStereoChannelOn/kChannelOn', 'master')" : `toggleState('kInputChannelOn/kChannelOn', ${i})`;
+    let onAction = isMaster ? "confirmMasterOn()" : `toggleState('kInputChannelOn/kChannelOn', ${i})`;
     if ((musicianMode || technicianMixMode) && !isMaster) {
         onAction = `toggleState('kInputAUX/kAUX${activeMix}On', ${i})`;
     }
@@ -1060,4 +1060,36 @@ window.setMeterPosition = function(target, modeKey) {
     if (typeof window.updateMeterIndicatorUI === 'function') {
         window.updateMeterIndicatorUI(target, modeKey);
     }
+};
+
+/**
+ * Abre o modal de confirmação antes de ligar/desligar o canal MASTER.
+ */
+window.confirmMasterOn = function() {
+    const modal = document.getElementById('masterOnConfirmModal');
+    if (!modal) return;
+    const turningOn = !masterState.on;
+    const titleEl = document.getElementById('masterOnConfirmTitle');
+    if (titleEl) titleEl.textContent = turningOn ? 'LIGAR CANAL MASTER' : 'DESLIGAR CANAL MASTER';
+    const textEl = document.getElementById('masterOnConfirmText');
+    if (textEl) {
+        textEl.textContent = turningOn
+            ? 'O canal master está DESLIGADO. Deseja LIGAR o áudio agora?'
+            : 'O canal master está LIGADO. Deseja DESLIGAR o áudio agora?';
+    }
+    const yesBtn = document.getElementById('masterOnConfirmYes');
+    if (yesBtn) {
+        yesBtn.textContent = turningOn ? 'SIM, LIGAR' : 'SIM, DESLIGAR';
+        yesBtn.classList.toggle('danger', !turningOn);
+    }
+    modal.style.display = 'flex';
+};
+
+/**
+ * Aplica a mudança de estado do canal MASTER após confirmação.
+ */
+window.confirmMasterOnApply = function() {
+    const modal = document.getElementById('masterOnConfirmModal');
+    if (modal) modal.style.display = 'none';
+    toggleState('kStereoChannelOn/kChannelOn', 'master');
 };

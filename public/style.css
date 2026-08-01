@@ -1644,6 +1644,63 @@ body.layout-desktop .sidebar-macros {
     }
 }
 
+.styled-masterOnConfirmModal {
+    z-index: 2500 !important;
+}
+
+.master-on-confirm-content {
+    width: 90%;
+    max-width: 340px;
+}
+
+.master-on-confirm-text {
+    font-size: 13px;
+    color: #ccc;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.master-on-confirm-btn {
+    flex: 1;
+    padding: 12px 4px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.master-on-confirm-btn:active {
+    transform: scale(0.95);
+    filter: brightness(0.85);
+}
+
+.master-on-confirm-yes {
+    background: #28a745;
+    color: #fff;
+}
+
+.master-on-confirm-yes.danger {
+    background: #dc3545;
+}
+
+.master-on-confirm-no {
+    background: #2b2b2b;
+    color: #777;
+    border: 1px solid #444;
+}
+
+@media (max-width: 480px) {
+    .master-on-confirm-content {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+}
+
 .desk-label {
     height: 35px;
     background: #333;
