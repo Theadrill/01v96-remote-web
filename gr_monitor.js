@@ -1,19 +1,20 @@
 const midi = require('midi');
 
 const ELEMENT = 0x00;
-const SUB_GATE_GR = 0x03;
-const SUB_COMP_GR = 0x05;
+const SUB_COMP_GR = 0x03;
+const SUB_GATE_GR = 0x05;
 const CHANNEL = 0x00; // 0x00 = CH01
 const LENGTH = 0x01;
 const POLL_MS = 100;
 
 const REQUESTS = [
-    { label: 'COMP', visible: false, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_GATE_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
-    { label: 'GATE', visible: true, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_COMP_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
+    { label: 'COMP', visible: false, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_COMP_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
+    { label: 'GATE', visible: true, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_GATE_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
 ];
 
-const IDLE = 0x0FFF;
-const FULL_SCALE_DB = 24;
+const IDLE = 0x0FFF; // 4095 (0 dB)
+const FULL_SCALE_GR_STEPS = 767; // 4095 (0 dB) a 3328 (-18 dB)
+const FULL_SCALE_GR_DB = 18;
 
 function findYamahaPorts() {
     const inp = new midi.Input();
@@ -44,8 +45,11 @@ function toHex(msg) {
 }
 
 function formatGR(raw) {
-    const db = ((IDLE - raw) / IDLE) * FULL_SCALE_DB;
-    const flag = raw === IDLE ? ' (idle)' : db >= 0.05 ? ` (${db.toFixed(2)} dB)` : ' (idle)';
+    if (raw >= IDLE) {
+        return `0x${raw.toString(16).toUpperCase().padStart(4, '0')} (idle)`;
+    }
+    const db = ((IDLE - raw) / FULL_SCALE_GR_STEPS) * FULL_SCALE_GR_DB;
+    const flag = db >= 0.05 ? ` (-${db.toFixed(2)} dB)` : ' (idle)';
     return `0x${raw.toString(16).toUpperCase().padStart(4, '0')}${flag}`;
 }
 
@@ -86,14 +90,14 @@ input.on('message', (_deltaTime, message) => {
 
     if (message.length !== 12 || message[0] !== 0xF0 || message[1] !== 0x43 || message[2] !== 0x10) return;
     if (message[3] !== 0x3E || message[4] !== 0x0D || message[5] !== 0x21) return;
-    if (message[6] !== ELEMENT || message[7] !== SUB_GATE_GR && message[7] !== SUB_COMP_GR) return;
+    if (message[6] !== ELEMENT || (message[7] !== SUB_GATE_GR && message[7] !== SUB_COMP_GR)) return;
     if (message[8] !== CHANNEL) return;
 
-    const label = message[7] === SUB_GATE_GR ? 'COMP' : 'GATE';
+    const label = message[7] === SUB_GATE_GR ? 'GATE' : 'COMP';
     const req = REQUESTS.find(r => r.label === label);
     if (!req || !req.visible) return;
     const raw = ((message[9] & 0x7f) << 7) | (message[10] & 0x7f);
-    console.log(`[${timestamp()}] ${label} GR = ${formatGR(raw)}`);
+    process.stdout.write(`\r[${timestamp()}] ${label} GR = ${formatGR(raw)} | step ${raw}\x1b[K`);
 });
 
 function sendNext() {
@@ -106,7 +110,9 @@ sendNext();
 
 process.on('SIGINT', () => {
     console.log('\nEncerrando monitor GR...');
-    input.closePort();
-    output.closePort();
-    process.exit();
+    try {
+        input.closePort();
+        output.closePort();
+    } catch (_) {}
+    process.exit(0);
 });

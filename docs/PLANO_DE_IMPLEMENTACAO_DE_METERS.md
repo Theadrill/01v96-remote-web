@@ -101,14 +101,14 @@ Quando a tela de edição detalhada de um canal (Selected Channel) está ativa n
 |---|---|---|
 | `0x00` | **Fader Level Meter** | Barra principal de nível do canal ao lado do Fader de volume (`-∞` a `+10`) |
 | `0x02` | **Gate Level Meter** | Barra de nível de sinal de saída do Gate (`OVER 0 -3 ...`) |
-| `0x03` | **Gate GR Meter** | **Gain Reduction do Gate** (Atuação da atenuação do Gate, `0` a `-18dB`) |
+| `0x03` | **Comp GR Meter** | **Gain Reduction do Compressor** (Atuação da compressão, `0` a `-18dB`) |
 | `0x04` | **Comp Level Meter** | Barra de nível de sinal de saída do Compressor (`OUT`) |
-| `0x05` | **Comp GR Meter** | **Gain Reduction do Compressor** (Atuação da compressão, `0` a `-18dB`) |
+| `0x05` | **Gate GR Meter** | **Gain Reduction do Gate** (Atuação da atenuação do Gate, `0` a `-18dB`) |
 
 > [!IMPORTANT]
 > **Adaptação Dinâmica do Selected Channel:**
 > - Em **Canais de Entrada (CH1-CH32)**: O Gate está presente, gerando 5 requisições no `Element 0x00` (`0x00`, `0x02`, `0x03`, `0x04`, `0x05`).
-> - Em **Canais Master (STEREO-L / STEREO-R)**: O Gate **não existe** (a caixa do Gate fica vazia). O Studio Manager interrompe as requisições de Gate (`0x02` e `0x03`), mantendo apenas os 2 meters do Compressor (`0x00` e `0x05`) e adicionando 3 requisições do **Elemento `0x04`** (Stereo Bus Output).
+> - Em **Canais Master (STEREO-L / STEREO-R)**: O Gate **não existe** (a caixa do Gate fica vazia). O Studio Manager interrompe as requisições de Gate (`0x02` e `0x05`), mantendo apenas os meters do Compressor (`0x00`, `0x04` e `0x03`) e adicionando 3 requisições do **Elemento `0x04`** (Stereo Bus Output).
 
 ### 3.2. Elemento `0x04`: Stereo Master Bus Output Meters
 
