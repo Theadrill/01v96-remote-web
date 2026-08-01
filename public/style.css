@@ -2123,14 +2123,14 @@ body.layout-desktop .sidebar-macros {
 
 /* ---- MOCK: Novo PAN Mobile (slider horizontal estilo dyn) ---- */
 .etc-pan-mock-original {
-    display: none;
-}
-
-.etc-pan-mock-container {
     flex: 1;
     min-width: 120px;
     display: flex;
     flex-direction: column;
+}
+
+.etc-pan-mock-container {
+    display: none;
 }
 
 .etc-pan-mock-title {
