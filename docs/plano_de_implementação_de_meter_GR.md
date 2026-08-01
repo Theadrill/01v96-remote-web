@@ -115,4 +115,39 @@ TAREFAS A REALIZAR:
 ## 5. Status da Documentação
 
 1. Documento atualizado com os dados validados em mesa física.
-2. **Pronto para execução do OpenCode mediante autorização.**
+2. **Implementação de Frontend e Backend realizada nesta sessão (sem commit do git).**
+
+---
+
+## 6. Relatório do Progresso de Implementação (Passo a Passo)
+
+### 6.1. O que foi feito até o momento:
+
+1. **Backend Rust (`server_rust`):**
+   - **`src/midi/protocol.rs`**: Adicionada a variante `GrMeter { channel, sub_channel, raw_step }` ao enum `ParsedMidi` e implementado o parser para respostas SysEx de 12 bytes (`Section 0x0D`, `Group 0x21`, `Element 0x00`, sub-canais `0x05` = Gate GR e `0x03` = Comp GR).
+   - **`src/state.rs`**: Adicionado o match arm para `ParsedMidi::GrMeter` em `apply_midi`.
+   - **`src/midi_receiver.rs`**: Interceptado `ParsedMidi::GrMeter` para emitir o evento WebSocket `grMeterData` com o payload `{ "channel": ch, "type": "gate"|"comp", "raw_step": step }` e repassar o buffer bruto em `meterDataRaw`.
+   - **`src/socket_handlers.rs`**: Adicionado o disparo inicial das duas requisições SysEx `0D 21 00` dos sub-canais `0x05` (Gate GR) e `0x03` (Comp GR) no handler do evento `requestDynamics`.
+   - **Validação:** Executado `cargo check` com **sucesso (0 erros)**.
+
+2. **Frontend Web (`public/`):**
+   - **`public/style.css`**: Criadas as classes `.dyn-meter-track-gr` e `.dyn-meter-fill-gr` ancoradas no lado direito (`right: 0`) com gradiente amarelo/vermelho vindo da direita para a esquerda.
+   - **`public/modules/gate.js`**: Adicionada a estrutura visual da barra `gateGrMeter` acima da barra de saída do Gate com os marcadores de escala `-18`, `-12`, `-6`, `0`.
+   - **`public/modules/compressor.js`**: Adicionada a estrutura visual da barra `compGrMeter` acima da barra de saída do Compressor com os marcadores de escala `-18`, `-12`, `-6`, `0`.
+   - **`public/modules/socket.js`**: Implementado o ouvinte `socket.on('grMeterData')` aplicando a fórmula exata `((4095 - raw_step) / 767) * 100` para atualizar a largura (`style.width`) dos elementos `gateGrMeter` e `compGrMeter` em tempo real.
+   - **`public/modules/dynamics.js`**: Implementado o loop contínuo de polling `startGrPolling(ch)` e `stopGrPolling()` que dispara requisições `requestDynamics` a cada 100ms enquanto a aba de dinâmicas estiver ativa no canal selecionado (`ch` de 0 a 31).
+   - **`public/modules/sidebar.js`**: Integrado o cancelamento do polling `stopGrPolling()` ao trocar de abas ou fechar a configuração do canal.
+   - **Diagnóstico & Correção da causa raiz:** O medidor anteriormente só atualizava no Canal 1 porque o script de testes `gr_monitor.js` no terminal estava solicitando continuamente apenas o canal 1. Com a inclusão da rotina contínua `startGrPolling(ch)` em `dynamics.js`, **todos os canais de 1 a 32 agora realizam o polling em tempo real dos seus respectivos medidores de GR ao abrir o modal**.
+   - **Validação:** Executado `node --check` em todos os scripts JS modificados com **sucesso (0 erros)**.
+
+3. **Status de Git:**
+   - **Nenhum commit foi realizado** (respeitada a restrição de não fazer `git commit`).
+
+---
+
+### 6.2. Onde a próxima LLM / agente deve continuar (Se necessário):
+
+- **Status Atual:** A implementação completa de backend (Rust WebSocket emission) e frontend (HTML/CSS/JS socket listener + polling contínuo para todos os canais CH1-32) dos medidores de GR está **100% pronta e compilando sem erros**.
+- **Próximos passos para testes ou validação:**
+  1. Testar em mesa física abrindo o modal de Dinâmicos em qualquer canal (CH1 a CH32).
+  2. Verificar se as barras de Gain Reduction do Gate e do Compressor respondem visualmente crescendo da direita para a esquerda em qualquer canal selecionado.

@@ -4004,6 +4004,26 @@ body.is-portrait .dyn-box {
     transition: width 0.05s linear;
 }
 
+.dyn-meter-track-gr {
+    height: 12px;
+    background: #111;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #333;
+    margin-bottom: 6px;
+}
+
+.dyn-meter-fill-gr {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to left, #ffc107 0%, #dc3545 100%);
+    transition: width 0.05s linear;
+}
+
 .dyn-meter-labels {
     display: flex;
     justify-content: space-between;

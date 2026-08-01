@@ -28,6 +28,14 @@ function renderCompressor(container, ch) {
         </div>
 
         <div class="dyn-meter-container">
+            <div class="dyn-meter-wrapper" style="position: relative; margin-bottom: 8px;">
+                <div class="dyn-meter-track-gr">
+                    <div class="dyn-meter-fill-gr" id="compGrMeter"></div>
+                </div>
+                <div class="dyn-meter-labels">
+                    <span>-18</span><span>-12</span><span>-6</span><span>0</span>
+                </div>
+            </div>
             <div class="dyn-meter-wrapper" style="position: relative;">
                 <div class="dyn-thresh-arrow" id="compThreshArrow"></div>
                 <div class="dyn-meter-track">

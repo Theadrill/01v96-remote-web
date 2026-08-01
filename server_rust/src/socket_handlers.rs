@@ -549,6 +549,7 @@ pub fn register_handlers(
         );
 
         let state_dyn = global_state_socket.clone();
+        let scheduler_dyn = scheduler_socket.clone();
         socket.on(
             "requestDynamics",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
@@ -571,6 +572,12 @@ pub fn register_handlers(
                                 "comp": cs.comp
                             }),
                         );
+                    }
+                    if ch <= 31 {
+                        let req_gate = vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x00, 0x05, ch as u8, 0x00, 0x01, 0xF7];
+                        let req_comp = vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x00, 0x03, ch as u8, 0x00, 0x01, 0xF7];
+                        scheduler_dyn.enqueue(req_gate, 0).await;
+                        scheduler_dyn.enqueue(req_comp, 0).await;
                     }
                 }
             },

@@ -340,6 +340,22 @@ pub fn start_rx_loop(
                                     }
                                 }
                             }
+                            crate::midi::protocol::ParsedMidi::GrMeter {
+                                channel,
+                                sub_channel,
+                                raw_step,
+                            } => {
+                                meter_raw_emission = Some(packet.clone());
+                                let gr_type = if sub_channel == 0x05 { "gate" } else { "comp" };
+                                emission = Some((
+                                    "grMeterData",
+                                    serde_json::json!({
+                                        "channel": channel,
+                                        "type": gr_type,
+                                        "raw_step": raw_step
+                                    }),
+                                ));
+                            }
                             crate::midi::protocol::ParsedMidi::ControlChange {
                                 msg_type,
                                 channel,

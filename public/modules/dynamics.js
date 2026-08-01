@@ -43,6 +43,36 @@ window.stopDynNudge = function() {
     }
 };
 
+let grPollingInterval = null;
+
+window.startGrPolling = function(ch) {
+    window.stopGrPolling();
+    if (ch === null || ch === undefined || ch > 31) return;
+
+    const request = () => {
+        if (typeof socket !== 'undefined' && socket) {
+            socket.emit('requestDynamics', { channel: ch });
+        }
+    };
+
+    request();
+
+    grPollingInterval = setInterval(() => {
+        if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'dyn' && activeConfigChannel === ch) {
+            request();
+        } else {
+            window.stopGrPolling();
+        }
+    }, 100);
+};
+
+window.stopGrPolling = function() {
+    if (grPollingInterval) {
+        clearInterval(grPollingInterval);
+        grPollingInterval = null;
+    }
+};
+
 function renderDynamics(ch) {
     const body = document.querySelector('.ch-modal-body');
     
@@ -66,8 +96,8 @@ function renderDynamics(ch) {
         renderCompressor(container, ch);
     }
     
-    // Pede as dinâmicas à mesa sempre que abrir a aba dyn de um canal
-    if (typeof socket !== 'undefined' && socket) {
-        socket.emit('requestDynamics', { channel: ch });
+    // Inicia o polling contínuo de dinâmicas/GR para o canal selecionado
+    if (typeof window.startGrPolling === 'function') {
+        window.startGrPolling(ch);
     }
 }

@@ -487,6 +487,12 @@ pub enum ParsedMidi {
         target: String,
         mode: String,
     },
+    /// Gain Reduction meter de Gate ou Comp (Element 0x00, sub-canal 0x05=Gate, 0x03=Comp)
+    GrMeter {
+        channel: usize,
+        sub_channel: u8,
+        raw_step: u16,
+    },
 }
 
 pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
@@ -538,6 +544,22 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
     let element = message[6];
     let parameter = message[7];
     let channel = message[8] as usize;
+
+    // --- GR METER (Gate GR: sub 0x05, Comp GR: sub 0x03, Element 0x00) ---
+    // Resposta: F0 43 10 3E 0D 21 00 [sub] [ch] [hi] [lo] F7 (12 bytes)
+    if message.len() == 12
+        && section == 0x0D
+        && group == 0x21
+        && element == 0x00
+        && (parameter == 0x03 || parameter == 0x05)
+    {
+        let raw_step = (((message[9] & 0x7F) as u16) << 7) | (message[10] & 0x7F) as u16;
+        return Some(ParsedMidi::GrMeter {
+            channel: channel,
+            sub_channel: parameter,
+            raw_step,
+        });
+    }
 
     // --- METER DATA ---
     let is_master_meter = message.len() == 14 && section == 13 && group == 33 && element == 4;

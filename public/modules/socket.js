@@ -1547,6 +1547,22 @@ socket.on('meterDataRaw', (rawBytes) => {
     }
 });
 
+socket.on('grMeterData', (data) => {
+    if (!data || activeConfigChannel === null) return;
+    if (data.channel !== activeConfigChannel) return;
+
+    const step = data.raw_step;
+    const percent = Math.min(Math.max(((4095 - step) / 767) * 100, 0), 100);
+
+    if (data.type === 'gate') {
+        const el = document.getElementById('gateGrMeter');
+        if (el) el.style.width = `${percent.toFixed(1)}%`;
+    } else if (data.type === 'comp') {
+        const el = document.getElementById('compGrMeter');
+        if (el) el.style.width = `${percent.toFixed(1)}%`;
+    }
+});
+
 socket.on('setupResult', (data) => {
     if (typeof window.onSetupResult === 'function') {
         window.onSetupResult(data);

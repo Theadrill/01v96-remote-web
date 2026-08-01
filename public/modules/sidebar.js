@@ -201,6 +201,7 @@ if (savedOrientation) setOrientation(savedOrientation);
 function switchTab(tabId) {
     activeConfigTab = tabId;
     if (window.stopEQAnimation) stopEQAnimation();
+    if (window.stopGrPolling) window.stopGrPolling();
 
     const vgSlot = document.getElementById('miniFaderVolumeGeral');
     if (vgSlot) vgSlot.remove();
