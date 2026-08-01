@@ -1,0 +1,112 @@
+const midi = require('midi');
+
+const ELEMENT = 0x00;
+const SUB_GATE_GR = 0x03;
+const SUB_COMP_GR = 0x05;
+const CHANNEL = 0x00; // 0x00 = CH01
+const LENGTH = 0x01;
+const POLL_MS = 100;
+
+const REQUESTS = [
+    { label: 'COMP', visible: false, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_GATE_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
+    { label: 'GATE', visible: true, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_COMP_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
+];
+
+const IDLE = 0x0FFF;
+const FULL_SCALE_DB = 24;
+
+function findYamahaPorts() {
+    const inp = new midi.Input();
+    const out = new midi.Output();
+    let yamahaIn = -1, yamahaOut = -1;
+
+    for (let i = 0; i < inp.getPortCount(); i++) {
+        const name = inp.getPortName(i).toLowerCase();
+        if (yamahaIn === -1 && name.includes('yamaha')) yamahaIn = i;
+    }
+    for (let i = 0; i < out.getPortCount(); i++) {
+        const name = out.getPortName(i).toLowerCase();
+        if (yamahaOut === -1 && name.includes('yamaha')) yamahaOut = i;
+    }
+
+    inp.closePort();
+    out.closePort();
+    return { yamahaIn, yamahaOut };
+}
+
+function timestamp() {
+    return new Date().toLocaleTimeString();
+}
+
+function toHex(msg) {
+    const hex = Buffer.from(msg).toString('hex').toUpperCase().match(/.{1,2}/g);
+    return hex ? hex.join(' ') : '(empty)';
+}
+
+function formatGR(raw) {
+    const db = ((IDLE - raw) / IDLE) * FULL_SCALE_DB;
+    const flag = raw === IDLE ? ' (idle)' : db >= 0.05 ? ` (${db.toFixed(2)} dB)` : ' (idle)';
+    return `0x${raw.toString(16).toUpperCase().padStart(4, '0')}${flag}`;
+}
+
+const { yamahaIn, yamahaOut } = findYamahaPorts();
+if (yamahaIn === -1 || yamahaOut === -1) {
+    console.error('\nPorta Yamaha 01V96 nao encontrada nas portas MIDI.');
+    process.exit(1);
+}
+
+const input = new midi.Input();
+const output = new midi.Output();
+input.openPort(yamahaIn);
+output.openPort(yamahaOut);
+input.ignoreTypes(false, false, false);
+
+console.log(`\nYAMAHA 01V96 CONECTADA [IN:${yamahaIn} OUT:${yamahaOut}]`);
+console.log(`Monitorando GR do CH01 (canal 0x00, elemento 0x00, ${LENGTH} valor)`);
+console.log('Idle = 0x0FFF; valores menores indicam Gain Reduction ativo\n');
+
+let sysexBuffer = null;
+
+input.on('message', (_deltaTime, message) => {
+    if (message[0] === 0xFE) return;
+
+    const startsWithF0 = message[0] === 0xF0;
+    const endsWithF7 = message[message.length - 1] === 0xF7;
+
+    if (startsWithF0 && !endsWithF7) {
+        sysexBuffer = Array.from(message);
+        return;
+    }
+    if (!startsWithF0 && sysexBuffer) {
+        for (const b of message) sysexBuffer.push(b);
+        if (!endsWithF7) return;
+        message = sysexBuffer;
+        sysexBuffer = null;
+    }
+
+    if (message.length !== 12 || message[0] !== 0xF0 || message[1] !== 0x43 || message[2] !== 0x10) return;
+    if (message[3] !== 0x3E || message[4] !== 0x0D || message[5] !== 0x21) return;
+    if (message[6] !== ELEMENT || message[7] !== SUB_GATE_GR && message[7] !== SUB_COMP_GR) return;
+    if (message[8] !== CHANNEL) return;
+
+    const label = message[7] === SUB_GATE_GR ? 'COMP' : 'GATE';
+    const req = REQUESTS.find(r => r.label === label);
+    if (!req || !req.visible) return;
+    const raw = ((message[9] & 0x7f) << 7) | (message[10] & 0x7f);
+    console.log(`[${timestamp()}] ${label} GR = ${formatGR(raw)}`);
+});
+
+function sendNext() {
+    const req = REQUESTS[(Date.now() / POLL_MS) % REQUESTS.length | 0];
+    output.sendMessage(req.sysex);
+    setTimeout(sendNext, POLL_MS);
+}
+
+sendNext();
+
+process.on('SIGINT', () => {
+    console.log('\nEncerrando monitor GR...');
+    input.closePort();
+    output.closePort();
+    process.exit();
+});
