@@ -198,15 +198,15 @@ function createDesktopStrip(config) {
             </div>
 
             ${isMaster ? `
-            <div class="master-meter-section">
+            <div class="master-meter-section" onclick="openMeterConfigModal('master')">
                 <div class="master-meter-divider">MEDIDORES</div>
                 <div class="master-meter-group">
                     <span class="master-meter-label">MASTER:</span>
-                    <button id="master-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('master')">${window.currentMeterPosMasterLabel || 'PRE'}</button>
+                    <span id="master-meter-indicator-btn" class="master-meter-badge">${window.currentMeterPosMasterLabel || 'PRE'}</span>
                 </div>
                 <div class="master-meter-group">
                     <span class="master-meter-label">CANAIS:</span>
-                    <button id="channels-meter-indicator-btn" class="master-meter-indicator-btn" onclick="openMeterConfigModal('channels')">${window.currentMeterPosChannelsLabel || 'PRE'}</button>
+                    <span id="channels-meter-indicator-btn" class="master-meter-badge">${window.currentMeterPosChannelsLabel || 'PRE'}</span>
                 </div>
             </div>
             ` : ''}

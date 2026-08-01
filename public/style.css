@@ -1514,6 +1514,14 @@ body.layout-desktop .sidebar-macros {
     border-top: 1px solid #555;
     border-bottom: 1px solid #555;
     margin: 4px 2px 0 2px;
+    cursor: pointer;
+    transition: background 0.15s ease, filter 0.15s ease;
+    border-radius: 4px;
+}
+
+.master-meter-section:hover {
+    filter: brightness(1.15);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .master-meter-divider {
@@ -1542,7 +1550,8 @@ body.layout-desktop .sidebar-macros {
     flex: 0 0 35px;
 }
 
-.master-meter-indicator-btn {
+.master-meter-badge {
+    display: inline-block;
     width: 38px;
     min-width: 38px;
     flex: 0 0 38px;
@@ -1554,19 +1563,11 @@ body.layout-desktop .sidebar-macros {
     font-size: 8px;
     font-weight: 800;
     letter-spacing: 0.2px;
-    cursor: pointer;
     padding: 0;
     text-align: center;
     line-height: 18px;
-    transition: all 0.15s ease;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.4);
     box-sizing: border-box;
-}
-
-.master-meter-indicator-btn:hover {
-    background: #283747;
-    border-color: #5cacee;
-    color: #ffffff;
 }
 
 /* ── Modal de Configuração da Posição dos Medidores ──────────────── */
