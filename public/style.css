@@ -2565,6 +2565,50 @@ body.layout-desktop .ch-modal-overlay {
     color: #f0d0ff;
 }
 
+/* ── Dock button MEDIDORES (somente mobile landscape estreito) ─────── */
+.dock-meter-config {
+    background: #0e639c;
+    color: #bcd9f5;
+    border-color: #0e639c;
+}
+
+.dock-meter-config:hover {
+    background: #1273b8;
+    color: #e0f0ff;
+}
+
+.dock-meter-config {
+    display: none;
+}
+
+@media screen and (orientation: landscape) and (max-width: 1023px) {
+    body:not(.layout-desktop) .dock-meter-config {
+        display: block;
+    }
+}
+
+/* ── Botão MEDIDORES no strip master mobile (somente telas grandes landscape) ── */
+.mobile-master-medidores-btn {
+    display: none;
+    font-size: 9px;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    background: #00a44e;
+    color: white;
+    border-color: #00ff88;
+}
+
+.mobile-master-medidores-btn:active {
+    filter: brightness(0.85);
+    transform: scale(0.95);
+}
+
+@media screen and (orientation: landscape) and (min-width: 1024px) {
+    body:not(.layout-desktop) .mobile-master-medidores-btn {
+        display: block;
+    }
+}
+
 .ch-modal-body {
     flex: 1;
     display: flex;

@@ -433,6 +433,9 @@ function createMobileStrip(config) {
             
             ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
             ${!onTop ? onBtn : ''}
+            ${isMaster ? `
+            <button class="btn-state mobile-master-medidores-btn" onclick="openMeterConfigModal('master')">MEDIDORES</button>
+            ` : ''}
 
             <div class="nudge-zone" onpointerdown="${onNudgeStartAction}(${evtCh}, 1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                 <button class="btn-nudge pointer-none">+</button>

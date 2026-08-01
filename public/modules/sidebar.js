@@ -841,6 +841,7 @@ function renderDock(mode) {
             buttons.push({ label: isOutsOn ? 'SAIR' : 'MIX/BUS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
             buttons.push({ label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' });
             buttons.push({ label: 'EFEITOS', action: 'openEffectsModal()', cls: 'dock-efeitos' });
+            buttons.push({ label: 'MEDIDORES', action: "if(typeof openMeterConfigModal==='function') openMeterConfigModal('master')", cls: 'dock-meter-config' });
             if (typeof layerNavEnabled !== 'undefined' && layerNavEnabled) {
                 buttons.push({ label: '1-16', action: 'setLayer(0)', cls: 'dock-layer' + (activeLayerStart === 0 ? ' active-tab' : '') });
                 buttons.push({ label: '17-32', action: 'setLayer(16)', cls: 'dock-layer' + (activeLayerStart === 16 ? ' active-tab' : '') });
@@ -1185,6 +1186,7 @@ function renderMobileMenu(mode) {
             }
             buttonsConfig.push({ label: 'MIX / BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" });
             buttonsConfig.push({ label: 'EFEITOS', cls: 'menu-btn-solid-purple', action: "if(typeof openEffectsModal === 'function') { openEffectsModal(); }" });
+            buttonsConfig.push({ label: 'MEDIDORES', cls: 'menu-btn-solid-blue', action: "if(typeof openMeterConfigModal === 'function') { openMeterConfigModal('master'); }" });
             break;
 
         case 'channelConfig':
