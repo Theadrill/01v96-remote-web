@@ -1247,3 +1247,36 @@ function renderMobileMenu(mode) {
         menuList.appendChild(buttonElement);
     });
 }
+
+/**
+ * Reset de Cache e Forçar Recarregamento da Aplicação
+ * Limpa CacheStorage e ServiceWorkers preservando 100% o localStorage.
+ */
+window.resetAppCacheAndReload = async function () {
+    try {
+        console.log("🧹 Iniciando limpeza de cache da aplicação...");
+
+        // 1. Limpa todas as instâncias da CacheStorage API
+        if ('caches' in window) {
+            const cacheKeys = await caches.keys();
+            await Promise.all(cacheKeys.map(key => caches.delete(key)));
+            console.log("✅ Caches da CacheStorage API limpos:", cacheKeys);
+        }
+
+        // 2. Desregistra Service Workers se existirem
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+                await registration.unregister();
+            }
+            console.log("✅ Service Workers desregistrados:", registrations.length);
+        }
+    } catch (err) {
+        console.warn("⚠️ Erro ao limpar alguns caches:", err);
+    } finally {
+        console.log("🔄 Recarregando página com cache-busting...");
+        // 3. Força o recarregamento da página com parâmetro timestamp na URL
+        const cleanPath = window.location.pathname;
+        window.location.href = cleanPath + '?reload=' + Date.now();
+    }
+};

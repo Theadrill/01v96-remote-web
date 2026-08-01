@@ -11,8 +11,8 @@
     <meta content="01V96 LIVE" name="apple-mobile-web-app-title" />
     <meta content="yes" name="mobile-web-app-capable" />
     <title>01V96 - LIVE SAFE</title>
-    <link href="style.css" rel="stylesheet" />
-    <link href="modules/FXS/fx.css?v=1" rel="stylesheet" />
+    <link href="style.css?v=1.0.1" rel="stylesheet" />
+    <link href="modules/FXS/fx.css?v=1.0.1" rel="stylesheet" />
     <!-- UI UPDATE: 2026-06-07 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script>
@@ -331,6 +331,12 @@
                 <button class="btn-connect inline-style-17" onclick="confirmResetConfig()">RESETAR CONFIGURAÇÃO</button>
                 <p class="styled-serverConfigStatus" id="serverConfigStatus">
                 </p>
+            </div>
+            <!-- Seção de Cache & Atualização (PWA / iPhone) -->
+            <div class="config-section">
+                <p class="config-section-header">Cache & Atualização (PWA / iPhone)</p>
+                <button class="btn-connect inline-style-17" onclick="resetAppCacheAndReload()">RESETAR CACHE E RECARREGAR</button>
+                <p class="inline-style-12">Limpa arquivos estáticos em cache (WASM/JS/CSS) e recarrega o app mantendo suas configurações intactas.</p>
             </div>
             <div class="inline-style-18">
                 <div class="inline-style-19">
@@ -1193,6 +1199,31 @@
                 <button onclick="document.getElementById('monitoringModal').style.display='none'"
                     style="padding:12px 20px; border-radius:8px; border:1px solid #555; background:#444; color:#aaa; cursor:pointer; font-size:13px;">FECHAR</button>
             </div>
+        </div>
+    </div>
+    <!-- Modal de Configuração da Posição dos Medidores (somente leitura do estado) -->
+    <div class="modal-overlay styled-meterConfigModal" id="meterConfigModal">
+        <div class="modal-content meter-config-content" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; justify-content:center; align-items:center;">
+                <span style="font-weight:bold; color:#777; font-size:14px; text-transform:uppercase; letter-spacing:1px; text-align:center;">Posição dos Medidores</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <span class="meter-config-section-title">Outputs (Master - Mix - Bus)</span>
+                <div class="meter-config-btn-group" id="meterConfigMasterGroup">
+                    <button class="meter-config-pos-btn" data-target="master" data-mode="pre_eq">PRE EQ</button>
+                    <button class="meter-config-pos-btn" data-target="master" data-mode="pre">PRE FADER</button>
+                    <button class="meter-config-pos-btn" data-target="master" data-mode="post">POST FADER</button>
+                </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <span class="meter-config-section-title">Input (1-32 e ST-IN)</span>
+                <div class="meter-config-btn-group" id="meterConfigChannelsGroup">
+                    <button class="meter-config-pos-btn" data-target="channels" data-mode="pre_eq">PRE EQ</button>
+                    <button class="meter-config-pos-btn" data-target="channels" data-mode="pre">PRE FADER</button>
+                    <button class="meter-config-pos-btn" data-target="channels" data-mode="post">POST FADER</button>
+                </div>
+            </div>
+            <button onclick="document.getElementById('meterConfigModal').style.display='none'" class="meter-config-close">FECHAR</button>
         </div>
     </div>
     <!-- Overlay Info (gerenciado por overlay_info.js) -->

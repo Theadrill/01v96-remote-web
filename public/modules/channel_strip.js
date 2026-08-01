@@ -977,27 +977,40 @@ async function clearAllSolos() {
 }
 
 /**
- * Placeholder para abertura do futuro modal de configuração de medidores.
+ * Abre o modal de configuração da posição dos medidores.
+ * Somente LEITURA do estado — nenhum comando de escrita (0x10) é enviado à mesa.
  */
 window.openMeterConfigModal = function(target) {
-    console.log(`[MEDIDORES CONFIG] Clique no indicador ${target} (Modal será implementado futuramente).`);
+    const modal = document.getElementById('meterConfigModal');
+    if (!modal) return;
+    // Sincroniza os botões ativos com o último estado conhecido antes de exibir.
+    if (typeof window.updateMeterConfigModalUI === 'function') {
+        window.updateMeterConfigModalUI('channels', window.currentMeterPosChannels || 'pre');
+        window.updateMeterConfigModalUI('master', window.currentMeterPosMaster || 'pre');
+    }
+    modal.style.display = 'flex';
+    console.log(`[MEDIDORES CONFIG] Modal aberto (${target}). Somente leitura — nenhum write enviado.`);
 };
 
 /**
- * Atualiza o texto do botão indicador de medidores no canal Master (Desktop).
+ * Atualiza o texto do botão indicador de medidores no canal Master (Desktop)
+ * e o botão ativo do modal de configuração de medidores.
  * @param {'master' | 'channels'} target 
  * @param {number | string} mode (0/pre_eq => "PRE EQ", 1/pre => "PRE", 2/post => "POST")
  */
 window.updateMeterIndicatorUI = function(target, mode) {
     let label = 'PRE';
-    if (mode === 0 || mode === '00' || mode === 'pre_eq') label = 'PREEQ';
-    else if (mode === 1 || mode === '01' || mode === 'pre' || mode === 'pre_fader') label = 'PRE';
-    else if (mode === 2 || mode === '02' || mode === 'post' || mode === 'post_fader') label = 'POST';
+    let modeKey = 'pre';
+    if (mode === 0 || mode === '00' || mode === 'pre_eq') { label = 'PREEQ'; modeKey = 'pre_eq'; }
+    else if (mode === 1 || mode === '01' || mode === 'pre' || mode === 'pre_fader') { label = 'PRE'; modeKey = 'pre'; }
+    else if (mode === 2 || mode === '02' || mode === 'post' || mode === 'post_fader') { label = 'POST'; modeKey = 'post'; }
 
     if (target === 'master') {
         window.currentMeterPosMasterLabel = label;
+        window.currentMeterPosMaster = modeKey;
     } else {
         window.currentMeterPosChannelsLabel = label;
+        window.currentMeterPosChannels = modeKey;
     }
 
     const btnId = target === 'master' ? 'master-meter-indicator-btn' : 'channels-meter-indicator-btn';
@@ -1005,5 +1018,22 @@ window.updateMeterIndicatorUI = function(target, mode) {
     if (btn) {
         btn.textContent = label;
     }
+    if (typeof window.updateMeterConfigModalUI === 'function') {
+        window.updateMeterConfigModalUI(target, modeKey);
+    }
     console.log(`[MEDIDORES UI] Indicador ${target} atualizado para: ${label}`);
+};
+
+/**
+ * Atualiza o botão ativo (visual) do modal de configuração de medidores.
+ * @param {'master' | 'channels'} target 
+ * @param {string} modeKey ('pre_eq' | 'pre' | 'post')
+ */
+window.updateMeterConfigModalUI = function(target, modeKey) {
+    const groupId = target === 'master' ? 'meterConfigMasterGroup' : 'meterConfigChannelsGroup';
+    const group = document.getElementById(groupId);
+    if (!group) return;
+    group.querySelectorAll('.meter-config-pos-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === modeKey);
+    });
 };

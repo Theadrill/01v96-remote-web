@@ -1569,6 +1569,77 @@ body.layout-desktop .sidebar-macros {
     color: #ffffff;
 }
 
+/* ── Modal de Configuração da Posição dos Medidores ──────────────── */
+.styled-meterConfigModal {
+    z-index: 2500 !important;
+}
+
+.meter-config-content {
+    width: 90%;
+    max-width: 380px;
+}
+
+.meter-config-section-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #aaa;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.meter-config-btn-group {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+}
+
+.meter-config-pos-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #2b2b2b;
+    color: #777;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-align: center;
+    cursor: default;
+    transition: all 0.15s ease;
+}
+
+.meter-config-pos-btn.active {
+    background: #5cacee;
+    border-color: #5cacee;
+    color: #111820;
+}
+
+.meter-config-close {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #dc3545;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 13px;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.meter-config-close:active {
+    transform: scale(0.95);
+    filter: brightness(0.8);
+}
+
+@media (max-width: 480px) {
+    .meter-config-content {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+}
+
 .desk-label {
     height: 35px;
     background: #333;
