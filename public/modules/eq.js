@@ -229,78 +229,82 @@ function renderEQ(ch) {
             </div>
 
             <!-- Modal do Atenuador (EQ ATT) -->
-            <div id="eqATTModal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#181818; border:1px solid #444; border-radius:15px; padding:25px; z-index:6000; box-shadow:0 15px 50px rgba(0,0,0,0.9); flex-direction:column; align-items:center; width:85%; max-width:400px; max-height:90dvh; overflow-y:auto; gap:25px;">
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center; border-bottom:1px solid #333; padding-bottom:10px;">
-                    <span style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Ganho de EQ (ATT)</span>
-                    <button onclick="toggleATTModal(false)" style="background:none; border:none; color:#777; font-size:24px; cursor:pointer; padding:0 5px;">&times;</button>
+            <div class="modal-overlay styled-eqATTModal" id="eqATTModal">
+                <div class="modal-content eq-modal-content">
+                <div class="eq-modal-header">
+                    <span class="eq-modal-title">Ganho de EQ (ATT)</span>
+                    <button onclick="toggleATTModal(false)" class="eq-modal-close">&times;</button>
                 </div>
-                <div id="eqATTVal" style="font-size:32px; color:#5cacee; font-family:monospace; font-weight:bold;">0.0 dB</div>
-                <div style="width:100%; padding:10px 0; display:flex; align-items:center; justify-content:center; gap:8px; min-width:0;">
-                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startATTNudge(-1)" onpointerup="stopATTNudge()" onpointerleave="stopATTNudge()" onpointercancel="stopATTNudge()">-</button>
-                    <input type="range" id="eqATTInput" min="-960" max="120" step="1" value="0" style="flex:1; min-width:0; height:12px; -webkit-appearance:none; background:#333; border-radius:6px; outline:none; cursor:pointer;" oninput="eqATTInput(event)">
-                    <button class="nav-btn" style="width: 34px; height: 34px; font-size: 20px; font-weight: bold; background: #222; border: 1px solid #444; border-radius: 6px; color: #fff; cursor: pointer; flex-shrink: 0;" onpointerdown="startATTNudge(1)" onpointerup="stopATTNudge()" onpointerleave="stopATTNudge()" onpointercancel="stopATTNudge()">+</button>
+                <div id="eqATTVal" class="eq-att-value">0.0 dB</div>
+                <div class="eq-att-slider-row">
+                    <button class="nav-btn eq-att-nudge-btn" onpointerdown="startATTNudge(-1)" onpointerup="stopATTNudge()" onpointerleave="stopATTNudge()" onpointercancel="stopATTNudge()">-</button>
+                    <input type="range" id="eqATTInput" min="-960" max="120" step="1" value="0" class="eq-att-range" oninput="eqATTInput(event)">
+                    <button class="nav-btn eq-att-nudge-btn" onpointerdown="startATTNudge(1)" onpointerup="stopATTNudge()" onpointerleave="stopATTNudge()" onpointercancel="stopATTNudge()">+</button>
                 </div>
-                <p style="margin:0; font-size:10px; color:#666; text-align:center;">Ajuste o ganho de entrada do equalizador</p>
+                <p class="eq-modal-hint">Ajuste o ganho de entrada do equalizador</p>
                 <button onclick="resetEQATT()" class="btn-att-reset">RESETAR</button>
-                <button onclick="toggleATTModal(false)" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; margin-top:4px;">FECHAR</button>
+                <button onclick="toggleATTModal(false)" class="nav-btn eq-modal-close-btn">FECHAR</button>
+                </div>
             </div>
             
             <!-- Modal do RTA -->
-            <div id="rtaModal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#181818; border:1px solid #444; border-radius:15px; padding:25px; z-index:6000; box-shadow:0 15px 50px rgba(0,0,0,0.9); flex-direction:column; align-items:center; width:85%; max-width:400px; max-height:90dvh; overflow-y:auto; gap:25px;">
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center; border-bottom:1px solid #333; padding-bottom:10px;">
-                    <span id="rtaModalTitle" style="font-weight:bold; color:#777; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Fonte do RTA</span>
-                    <button onclick="document.getElementById('rtaModal').style.display='none'" style="background:none; border:none; color:#777; font-size:24px; cursor:pointer; padding:0 5px;">&times;</button>
+            <div class="modal-overlay styled-rtaModal" id="rtaModal">
+                <div class="modal-content eq-modal-content">
+                <div class="eq-modal-header">
+                    <span id="rtaModalTitle" class="eq-modal-title">Fonte do RTA</span>
+                    <button onclick="document.getElementById('rtaModal').style.display='none'" class="eq-modal-close">&times;</button>
                 </div>
                 
                 <!-- Step 1: Choose Source Type -->
-                <div id="rtaStep1" style="width:100%; display:flex; flex-direction:column; gap:10px;">
-                    <div style="display:flex; flex-direction:column; gap:5px; margin-bottom: 5px;">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <label style="color:#aaa; font-size:11px;">Resolução (FFT)</label>
-                                <input type="number" id="rtaFftSize" value="4096" min="256" max="32768" step="256" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                <div id="rtaStep1" class="rta-step">
+                    <div class="rta-step-block">
+                        <div class="rta-field-grid">
+                            <div class="rta-field">
+                                <label class="rta-field-label">Resolução (FFT)</label>
+                                <input type="number" id="rtaFftSize" value="4096" min="256" max="32768" step="256" class="rta-field-input">
                             </div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <label style="color:#aaa; font-size:11px;">Suavização (%)</label>
-                                <input type="number" id="rtaSmoothing" value="90" min="0" max="100" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            <div class="rta-field">
+                                <label class="rta-field-label">Suavização (%)</label>
+                                <input type="number" id="rtaSmoothing" value="90" min="0" max="100" step="1" class="rta-field-input">
                             </div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <label style="color:#aaa; font-size:11px;">Pico (Segs)</label>
-                                <input type="number" id="rtaPeakHoldTime" value="8" min="1" max="20" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            <div class="rta-field">
+                                <label class="rta-field-label">Pico (Segs)</label>
+                                <input type="number" id="rtaPeakHoldTime" value="8" min="1" max="20" step="1" class="rta-field-input">
                             </div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <label style="color:#aaa; font-size:11px;">Queda (vel)</label>
-                                <input type="number" id="rtaDecayRate" value="10" min="1" max="100" step="1" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                            <div class="rta-field">
+                                <label class="rta-field-label">Queda (vel)</label>
+                                <input type="number" id="rtaDecayRate" value="10" min="1" max="100" step="1" class="rta-field-input">
                             </div>
                         </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding: 10px 0; border-top: 1px solid #333; margin-top: 5px;">
-                            <span style="color:#bbb; font-size:13px;">Mostrar Infos (Fonte, Max Sinal)</span>
-                            <label class="switch" style="margin:0;">
+                        <div class="rta-status-row">
+                            <span class="rta-status-label">Mostrar Infos (Fonte, Max Sinal)</span>
+                            <label class="switch rta-status-switch">
                                 <input type="checkbox" id="rtaShowStatus" checked onchange="window.applyRTASettings()">
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <button onclick="window.applyRTASettings()" class="nav-btn" style="width:100%; height:35px; background:#28a745; border-radius:5px; font-size:12px; margin-top:5px; color:#fff;">Aplicar Alterações</button>
+                        <button onclick="window.applyRTASettings()" class="nav-btn rta-apply-btn">Aplicar Alterações</button>
                     </div>
-                    <button onclick="window.showRtaStep2('local')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Microfone do Dispositivo Atual</button>
-                    <button onclick="window.showRtaStep2('server')" class="nav-btn" style="width:100%; height:45px; background:#444; border-radius:8px; color:#fff;">Dispositivo do Servidor</button>
-                    <button onclick="window.selectRTASource('simulated', 'default_in', parseInt(document.getElementById('rtaFftSize').value) || 4096, parseInt(document.getElementById('rtaSmoothing').value) || 90, parseInt(document.getElementById('rtaPeakHoldTime').value) || 8)" class="nav-btn" style="width:100%; height:45px; background:#005cbf; border-radius:8px; margin-top: 5px; color:#fff;">Áudio Simulado (Modo Teste)</button>
-                    <button onclick="window.disableRTA()" class="nav-btn" style="width:100%; height:45px; background:#8b0000; border-radius:8px; margin-top: 10px; color:#fff;">DESATIVAR RTA</button>
+                    <button onclick="window.showRtaStep2('local')" class="nav-btn rta-action-btn">Microfone do Dispositivo Atual</button>
+                    <button onclick="window.showRtaStep2('server')" class="nav-btn rta-action-btn">Dispositivo do Servidor</button>
+                    <button onclick="window.selectRTASource('simulated', 'default_in', parseInt(document.getElementById('rtaFftSize').value) || 4096, parseInt(document.getElementById('rtaSmoothing').value) || 90, parseInt(document.getElementById('rtaPeakHoldTime').value) || 8)" class="nav-btn rta-action-btn-sim">Áudio Simulado (Modo Teste)</button>
+                    <button onclick="window.disableRTA()" class="nav-btn rta-action-btn-off">DESATIVAR RTA</button>
                 </div>
 
                 <!-- Step 2: Configure and Connect -->
-                <div id="rtaStep2" style="width:100%; display:none; flex-direction:column; gap:10px;">
-                    <div style="display:flex; flex-direction:column; gap:5px;">
-                        <label id="rtaDeviceLabel" style="color:#aaa; font-size:11px;">Dispositivo de Áudio</label>
-                        <select id="rtaServerDevice" style="background:#222; border:1px solid #444; color:#fff; border-radius:5px; padding:8px; width:100%; box-sizing:border-box;">
+                <div id="rtaStep2" class="rta-step rta-step-hidden">
+                    <div class="rta-field">
+                        <label id="rtaDeviceLabel" class="rta-field-label">Dispositivo de Áudio</label>
+                        <select id="rtaServerDevice" class="rta-field-input">
                             <option value="default_in">Carregando dispositivos...</option>
                         </select>
                     </div>
                     
-                    <div style="display:flex; gap:10px; margin-top: 15px;">
-                        <button onclick="window.showRtaStep1()" class="nav-btn" style="flex:1; height:45px; background:#555; border-radius:8px; color:#fff;">VOLTAR</button>
-                        <button onclick="window.connectRTA()" class="nav-btn" style="flex:1; height:45px; background:#28a745; border-radius:8px; color:#fff;">CONECTAR</button>
+                    <div class="rta-step-btn-row">
+                        <button onclick="window.showRtaStep1()" class="nav-btn rta-step-btn-back">VOLTAR</button>
+                        <button onclick="window.connectRTA()" class="nav-btn rta-step-btn-connect">CONECTAR</button>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -1454,33 +1458,4 @@ window.resetEQATT = function() {
     const attPrefix = getChannelParamPrefix(ch);
     socket.emit('control', { type: `${attPrefix}Attenuator/kAtt`, channel: ch, value: 0 });
 };
-
-// NOVO: Fechar modais ao clicar fora (capture phase para garantir execução antes do stopPropagation)
-document.addEventListener('pointerdown', (e) => {
-    let closedAny = false;
-    // Fecha RTA Modal se clicar fora
-    const rtaModal = document.getElementById('rtaModal');
-    if (rtaModal && rtaModal.style.display !== 'none') {
-        const rtaBtn = document.getElementById('headerBtnRTA');
-        if (!rtaModal.contains(e.target) && (!rtaBtn || !rtaBtn.contains(e.target))) {
-            rtaModal.style.display = 'none';
-            closedAny = true;
-        }
-    }
-    
-    // Fecha EQ ATT Modal se clicar fora
-    const attModal = document.getElementById('eqATTModal');
-    if (attModal && attModal.style.display !== 'none') {
-        const attBtn = document.getElementById('headerBtnATT');
-        if (!attModal.contains(e.target) && (!attBtn || !attBtn.contains(e.target))) {
-            window.toggleATTModal(false);
-            closedAny = true;
-        }
-    }
-
-    if (closedAny) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-}, true);
 

@@ -518,7 +518,10 @@ window.saveChannelName = function () {
 updateViewportInfo();
 
 // Fechar modais ao clicar fora do conteúdo (no fundo/backdrop)
-window.addEventListener('pointerdown', (e) => {
+// Usa 'click' em vez de 'pointerdown': no touch, o pointerdown fecha o overlay
+// antes do click sintético, que atravessa para o botão por baixo e o dispara.
+// Com 'click', o overlay ainda está visível no momento do clique.
+window.addEventListener('click', (e) => {
     let closedAny = false;
     if (e.target.classList.contains('modal-overlay')) {
         if (e.target.id === 'assignSceneModal' && typeof closeAssignSceneModal === 'function') {
