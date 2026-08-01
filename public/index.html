@@ -801,6 +801,26 @@
             </div>
         </div>
     </div>
+    <!-- Modal de Desativação de Sincronização com a Nuvem -->
+    <div class="modal-overlay styled-macroSyncDisableModal" id="macroSyncDisableModal">
+        <div class="modal-content macro-sync-confirm-content">
+            <div class="macro-sync-confirm-row">
+                <span id="macroSyncDisableTitle" class="meter-config-section-title">Desativar Sincronização?</span>
+            </div>
+            <div class="macro-sync-confirm-row">
+                <span id="macroSyncDisableText" class="macro-sync-confirm-text">Este preset ficará apenas neste
+                    computador. Escolha como deseja prosseguir:</span>
+            </div>
+            <div class="macro-sync-disable-btns">
+                <button id="btnDisableOnly" class="macro-sync-disable-btn macro-sync-disable-blue"
+                    onclick="applyDisableOnly()">DESATIVAR APENAS</button>
+                <button id="btnDisableRemove" class="macro-sync-disable-btn macro-sync-disable-blue"
+                    onclick="applyDisableAndRemove()">DESATIVAR E REMOVER DA NUVEM</button>
+                <button id="btnCancelDisable" class="macro-sync-disable-btn macro-sync-disable-red"
+                    onclick="cancelDisableSync()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
     <!-- Modal de Comparação de Perfis Local vs. Nuvem (Conflito de Sincronização) -->
     <div class="modal-overlay styled-macroSyncDiffModal" id="macroSyncDiffModal">
         <div class="modal-content styled-macroSyncDiffContent">

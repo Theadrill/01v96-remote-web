@@ -826,6 +826,9 @@ socket.on('connectionState', (state) => {
 });
 
 socket.on('portsList', (data) => {
+    if (data.tailscaleUrl) {
+        window.lastTailscaleUrl = data.tailscaleUrl;
+    }
     const autoRedirect = localStorage.getItem('auto_redirect_https') === 'true';
     if (autoRedirect && data.tailscaleUrl && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         window.location.href = data.tailscaleUrl;
@@ -1018,6 +1021,11 @@ window.updateOpenBrowser = function (enabled) {
 
 window.updateAutoRedirectHttps = function (enabled) {
     localStorage.setItem('auto_redirect_https', enabled);
+    if (enabled && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        if (window.lastTailscaleUrl) {
+            window.location.href = window.lastTailscaleUrl;
+        }
+    }
 };
 
 window.toggleCanvasMode = function (enabled) {
@@ -1030,6 +1038,9 @@ window.toggleCanvasMode = function (enabled) {
 };
 
 socket.on('tailscaleUrl', (data) => {
+    if (data.url) {
+        window.lastTailscaleUrl = data.url;
+    }
     const autoRedirect = localStorage.getItem('auto_redirect_https') === 'true';
     if (autoRedirect && data.url && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         window.location.href = data.url;

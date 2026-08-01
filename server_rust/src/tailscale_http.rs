@@ -32,7 +32,7 @@ pub fn setup_tailscale_serve(port: u16, global_state: Arc<RwLock<crate::state::G
                     let url_clone = url.clone();
                     tokio::spawn(async move {
                         gs.write().await.tailscale_url = Some(url_clone.clone());
-                        let _ = io_clone.emit("tailscaleUrl", &serde_json::json!({ "url": url_clone }));
+                        let _ = io_clone.emit("tailscaleUrl", &serde_json::json!({ "url": url_clone })).await;
                     });
                 } else {
                     info!("🚀 [TAILSCALE] Proxy ja configurado para a porta {}.", port);
@@ -64,7 +64,7 @@ pub fn setup_tailscale_serve(port: u16, global_state: Arc<RwLock<crate::state::G
                         let url_clone = url.clone();
                         tokio::spawn(async move {
                             gs.write().await.tailscale_url = Some(url_clone.clone());
-                            let _ = io_clone.emit("tailscaleUrl", &serde_json::json!({ "url": url_clone }));
+                            let _ = io_clone.emit("tailscaleUrl", &serde_json::json!({ "url": url_clone })).await;
                         });
                     } else {
                         info!("✅ [TAILSCALE] Proxy configurado com sucesso.");

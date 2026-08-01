@@ -7151,6 +7151,48 @@ body:not(.layout-desktop) * {
     border: none;
 }
 
+/* ── Modal de Desativação de Sincronização ─────────────────────── */
+.styled-macroSyncDisableModal {
+    z-index: 20020;
+    display: none;
+}
+
+.macro-sync-disable-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.macro-sync-disable-btn {
+    width: 100%;
+    height: 45px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.macro-sync-disable-btn:active {
+    transform: scale(0.95);
+    filter: brightness(0.85);
+}
+
+.macro-sync-disable-blue {
+    background: #1976d2;
+    color: #fff;
+}
+
+.macro-sync-disable-red {
+    background: #dc3545;
+    color: #fff;
+}
+
 /* ── Modal de Comparação de Perfis Local vs. Nuvem ─────────────── */
 .styled-macroSyncDiffModal {
     z-index: 20000;

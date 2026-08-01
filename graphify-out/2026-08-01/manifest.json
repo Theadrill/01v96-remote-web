@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "config.json": {
-    "mtime": 1785038264.834599,
-    "ast_hash": "d9b4320192e4b88bef5051ca5f3eb083",
+    "mtime": 1785553304.1523674,
+    "ast_hash": "0791dba6e472ef275e242acbb65d6c7c",
     "semantic_hash": ""
   },
   "eslint.config.mjs": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "public/modules/channel_strip.js": {
-    "mtime": 1783745728.8471022,
-    "ast_hash": "d8ef80d8ef5d79aa38c9d342568d5ef4",
+    "mtime": 1785551193.6459029,
+    "ast_hash": "d38c982fbbfd0dccd9954a4eac482cfd",
     "semantic_hash": ""
   },
   "public/modules/compressor.js": {
@@ -100,8 +100,8 @@
     "semantic_hash": ""
   },
   "public/modules/eq.js": {
-    "mtime": 1784162435.4754775,
-    "ast_hash": "3b3dedd5b31273719e2a135ac0ded7d6",
+    "mtime": 1785551193.6477401,
+    "ast_hash": "51236becf5655de45420fb4f0fbabb87",
     "semantic_hash": ""
   },
   "public/modules/events.js": {
@@ -125,8 +125,8 @@
     "semantic_hash": ""
   },
   "public/modules/macros.js": {
-    "mtime": 1782960631.1060314,
-    "ast_hash": "1cefba1095a6ad7f5b9fe15acfe59292",
+    "mtime": 1785561202.8100855,
+    "ast_hash": "5bf17552aca9f677d13b6971bcdfe393",
     "semantic_hash": ""
   },
   "public/modules/macros/channel_toggler.js": {
@@ -165,8 +165,8 @@
     "semantic_hash": ""
   },
   "public/modules/routing.js": {
-    "mtime": 1784427964.9589703,
-    "ast_hash": "fc41feb310b2bb1b9d37ca8b1537f875",
+    "mtime": 1785551193.6490693,
+    "ast_hash": "9a4019c2e7e87cb53c4862ec341e0484",
     "semantic_hash": ""
   },
   "public/modules/scene_grid.js": {
@@ -185,13 +185,13 @@
     "semantic_hash": ""
   },
   "public/modules/sidebar.js": {
-    "mtime": 1785038106.6765575,
-    "ast_hash": "7e53c0870286d0368b00f3f30f3777e8",
+    "mtime": 1785551193.6500745,
+    "ast_hash": "b0f99a6fd56e9b9df93211a1fdb326c4",
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
-    "mtime": 1785038106.678406,
-    "ast_hash": "735e2ebd8a569871373f72bc2cf14d6a",
+    "mtime": 1785396097.426196,
+    "ast_hash": "7afca820508ee44512999c79d1edbdd4",
     "semantic_hash": ""
   },
   "public/modules/splash_screen.js": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "public/modules/steps.js": {
-    "mtime": 1780576123.5841553,
-    "ast_hash": "b8e8f309b8f73a5d6ec95356412eea97",
+    "mtime": 1785551193.6526039,
+    "ast_hash": "0f825f663b83fafaf67357624b0197cf",
     "semantic_hash": ""
   },
   "public/steps.json": {
@@ -245,8 +245,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/api/macros.rs": {
-    "mtime": 1783305662.3686073,
-    "ast_hash": "75a8ef0ee6b043760bb75a91bfe23d19",
+    "mtime": 1785561122.2134788,
+    "ast_hash": "5ce55e726bb872145d02330f4758eb12",
     "semantic_hash": ""
   },
   "server_rust/src/api/mod.rs": {
@@ -270,7 +270,7 @@
     "semantic_hash": ""
   },
   "server_rust/src/main.rs": {
-    "mtime": 1785038106.6855595,
+    "mtime": 1785388501.7813318,
     "ast_hash": "d8dc0a5e0b5e753c29df0282b5819dbd",
     "semantic_hash": ""
   },
@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/midi/master_meter.rs": {
-    "mtime": 1780576123.714511,
-    "ast_hash": "fa034dfc7644477ea846d1416df25402",
+    "mtime": 1785389788.7357752,
+    "ast_hash": "c346da186835c54aa42ba0c6364eb85c",
     "semantic_hash": ""
   },
   "server_rust/src/midi/meter_dummy.rs": {
@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/midi/protocol.rs": {
-    "mtime": 1785135715.0121956,
-    "ast_hash": "463c92b4a6bcd729228aa6c508167656",
+    "mtime": 1785396111.852285,
+    "ast_hash": "3af9feaa456f5d6c4f3f6b2a014c284d",
     "semantic_hash": ""
   },
   "server_rust/src/midi/remote_client.rs": {
@@ -335,12 +335,12 @@
     "semantic_hash": ""
   },
   "server_rust/src/midi_receiver.rs": {
-    "mtime": 1785132448.2916892,
-    "ast_hash": "54f23206153779ecbb649481db54b97f",
+    "mtime": 1785396028.7917469,
+    "ast_hash": "5fb596c9edc3a350ca529e0273fc2c14",
     "semantic_hash": ""
   },
   "server_rust/src/network/connection.rs": {
-    "mtime": 1781744136.9092531,
+    "mtime": 1785388501.7860825,
     "ast_hash": "5329c89a8fdbcc7a62db76bda2bcca4c",
     "semantic_hash": ""
   },
@@ -350,8 +350,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/network/sync_manager.rs": {
-    "mtime": 1785038106.6918688,
-    "ast_hash": "5962f90efbf8cc389509f7b64e8e1b1d",
+    "mtime": 1785396037.5134504,
+    "ast_hash": "ff3f726550c199b043dbf78e05f917ce",
     "semantic_hash": ""
   },
   "server_rust/src/scene_manager.rs": {
@@ -360,13 +360,13 @@
     "semantic_hash": ""
   },
   "server_rust/src/socket_handlers.rs": {
-    "mtime": 1785133101.6370301,
-    "ast_hash": "0a1033c2eff89e2a604f6e4c5eac6004",
+    "mtime": 1785551193.6574101,
+    "ast_hash": "e27d05519eb46bfe7309728d355a0777",
     "semantic_hash": ""
   },
   "server_rust/src/state.rs": {
-    "mtime": 1785132448.2955012,
-    "ast_hash": "f33e490f4091121e8a95089e35614fca",
+    "mtime": 1785395993.231006,
+    "ast_hash": "da18da11b7f2dd78a101d684e1a65d55",
     "semantic_hash": ""
   },
   "server_rust/src/tray.rs": {
@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "docs/PLANO_DE_IMPLEMENTACAO_DE_EFEITOS.md": {
-    "mtime": 1785379063.5045722,
-    "ast_hash": "f714f6fdb07b63b878b5a2fe28a37a19",
+    "mtime": 1785551193.6417067,
+    "ast_hash": "d253361ce67f3fc27762bdbb59353e51",
     "semantic_hash": ""
   },
   "docs/PLANO_MIGRACAO_RUST.md": {
@@ -525,8 +525,8 @@
     "semantic_hash": ""
   },
   "public/index.html": {
-    "mtime": 1785045209.7206855,
-    "ast_hash": "80eb0fc6a69e50d5259d8f8162f11cfc",
+    "mtime": 1785561149.88283,
+    "ast_hash": "31834fc60d99cf09578f8c63462995d7",
     "semantic_hash": ""
   },
   "reverse_dll_project/BIBLIA_TECNICA_01V96.md": {
@@ -2445,8 +2445,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-favela.json": {
-    "mtime": 1784782909.4104347,
-    "ast_hash": "dad01e837433923794561420e32241c1",
+    "mtime": 1785551893.1079075,
+    "ast_hash": "c33e421667416ebb2670485903a6aca8",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-maria.json": {
@@ -2500,8 +2500,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/global-names-mesa-favela.json": {
-    "mtime": 1785132416.689847,
-    "ast_hash": "550eb12daee87bda253ce33d4b022fd7",
+    "mtime": 1785551911.6305144,
+    "ast_hash": "202069b29c60bb7c33cb173a923ff708",
     "semantic_hash": ""
   },
   "docs/mapeamento_de_comandos.md": {
@@ -2520,13 +2520,13 @@
     "semantic_hash": ""
   },
   "log/monitor_log.txt": {
-    "mtime": 1785137777.0572593,
-    "ast_hash": "6eee22143e9a918bcff03f2ec180e931",
+    "mtime": 1785391497.569239,
+    "ast_hash": "131719a7e3a401fd7a7f3f0d85cbf97c",
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785379735.5183496,
-    "ast_hash": "5efff91ba0c01afd8e3c82a508c884b6",
+    "mtime": 1785561932.0243917,
+    "ast_hash": "9aa1ca262b7132c7de53ca29980e8d3d",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -2535,8 +2535,8 @@
     "semantic_hash": ""
   },
   "client_wasm/src/meters.rs": {
-    "mtime": 1781922246.505964,
-    "ast_hash": "bda6940155b8b4050b432d9f967c1a57",
+    "mtime": 1785389808.0049984,
+    "ast_hash": "a66124f538dc8e4f9366310d3274fa6e",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-CENA TESTE 22-mesa-teste.json": {
@@ -2575,13 +2575,13 @@
     "semantic_hash": ""
   },
   "public/wasm/client_wasm.js": {
-    "mtime": 1781922246.5174644,
-    "ast_hash": "05e5a8664dae170946293f12079612bc",
+    "mtime": 1785551204.77614,
+    "ast_hash": "7c51568d2b88625bfc93aa7b1b94408e",
     "semantic_hash": ""
   },
   "public/wasm/package.json": {
-    "mtime": 1781744136.9055564,
-    "ast_hash": "b0ed64002d8ba56b9da9887bad29e445",
+    "mtime": 1785551207.4513156,
+    "ast_hash": "f6955dc4306c1e2cba81e6ef0851ea0c",
     "semantic_hash": ""
   },
   "server_rust/src/name_resolver.rs": {
@@ -2635,8 +2635,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/tailscale_http.rs": {
-    "mtime": 1781744136.913392,
-    "ast_hash": "77e6a5fe6e6443032d2223cfaf823c5a",
+    "mtime": 1785561896.8111136,
+    "ast_hash": "c83b123e91e0066e415b3aad6c17c88c",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-ANAKA 360-mesa-maria.json": {
@@ -3065,8 +3065,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SEXTETO-mesa-favela.json": {
-    "mtime": 1784345659.9779596,
-    "ast_hash": "8a33ea3599e17e0a9a722882249e726b",
+    "mtime": 1785551893.105905,
+    "ast_hash": "cfbaea6b2777de5081c9773eb67ef2ed",
     "semantic_hash": ""
   },
   "fx_list.json": {
@@ -3180,33 +3180,23 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scene-SEXTETO-mesa-favela.json": {
-    "mtime": 1784345659.976388,
-    "ast_hash": "8a33ea3599e17e0a9a722882249e726b",
+    "mtime": 1785551893.1044881,
+    "ast_hash": "cfbaea6b2777de5081c9773eb67ef2ed",
     "semantic_hash": ""
   },
   "data/custom_scenes/local/custom_names_scenes-mesa-favela.json": {
-    "mtime": 1784782909.4089227,
-    "ast_hash": "dad01e837433923794561420e32241c1",
+    "mtime": 1785551893.1069083,
+    "ast_hash": "c33e421667416ebb2670485903a6aca8",
     "semantic_hash": ""
   },
   "data/custom_scenes/local/global-names-mesa-favela.json": {
-    "mtime": 1785132416.687842,
-    "ast_hash": "550eb12daee87bda253ce33d4b022fd7",
+    "mtime": 1785551911.6291952,
+    "ast_hash": "202069b29c60bb7c33cb173a923ff708",
     "semantic_hash": ""
   },
   "public/modules/macros/profiles/local/profile_pcfavela.json": {
-    "mtime": 1785124216.5121112,
-    "ast_hash": "1cf4d6d4b8c13a07cb498bf5c906939a",
-    "semantic_hash": ""
-  },
-  "public/wasm/client_wasm.d.ts": {
-    "mtime": 1781506406.5251741,
-    "ast_hash": "909c3a33c4da1b7b31bc26762cf1a511",
-    "semantic_hash": ""
-  },
-  "public/wasm/client_wasm_bg.wasm.d.ts": {
-    "mtime": 1781506406.526306,
-    "ast_hash": "c2f8357e9a7d13753ef93870984ee2b8",
+    "mtime": 1785561502.0360265,
+    "ast_hash": "50d6b6a1a8e8e546bcacd7a107f43ddd",
     "semantic_hash": ""
   },
   "tmp/fix_eq.ps1": {
@@ -3250,13 +3240,53 @@
     "semantic_hash": ""
   },
   "log/studio_log.txt": {
-    "mtime": 1785380180.695203,
-    "ast_hash": "7654cdce97a3edd47bfde68561399293",
+    "mtime": 1785391400.2671983,
+    "ast_hash": "bf4bd40f5ca99b966fe00e6193a536a1",
     "semantic_hash": ""
   },
   "docs/PLANO_DE_IMPLEMENTACAO_DE_METERS.md": {
-    "mtime": 1785380094.4812708,
-    "ast_hash": "8c5b4973798b19b81a2a9e6722cc69a0",
+    "mtime": 1785396987.1642103,
+    "ast_hash": "8fb0bc2364065f51431bac291da8247f",
+    "semantic_hash": ""
+  },
+  "monitor_sem_filtros.js": {
+    "mtime": 1785391379.4320507,
+    "ast_hash": "c463e9c5906a1794fd058e8846d4eaaa",
+    "semantic_hash": ""
+  },
+  "public/pkg/client_wasm.d.ts": {
+    "mtime": 1785385151.1857305,
+    "ast_hash": "fbfdcbcd9bb4560625578787bd104242",
+    "semantic_hash": ""
+  },
+  "public/pkg/client_wasm.js": {
+    "mtime": 1785385151.184706,
+    "ast_hash": "5e0376e18ea399b74220123ad68d240d",
+    "semantic_hash": ""
+  },
+  "public/pkg/client_wasm_bg.wasm.d.ts": {
+    "mtime": 1785385151.1867342,
+    "ast_hash": "faf0d19ab46282232bcb6dc3d07f0491",
+    "semantic_hash": ""
+  },
+  "public/pkg/package.json": {
+    "mtime": 1785385154.6632187,
+    "ast_hash": "9348063a05b968be30963f6172ebb426",
+    "semantic_hash": ""
+  },
+  "request_meter_pos.js": {
+    "mtime": 1785395063.2618384,
+    "ast_hash": "96e5e4d9a57525af36cd4e27322293d0",
+    "semantic_hash": ""
+  },
+  "docs/plano_de_implementa\u00e7\u00e3o_update_macros.md": {
+    "mtime": 1785560490.5997553,
+    "ast_hash": "77a85a647f4a270c6b897381fea1c8f1",
+    "semantic_hash": ""
+  },
+  "docs/screenshot-master.png": {
+    "mtime": 1785388523.0643895,
+    "ast_hash": "f8bbdd33e55900cbb08dd64754213568",
     "semantic_hash": ""
   }
 }

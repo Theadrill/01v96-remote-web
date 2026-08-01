@@ -1,16 +1,16 @@
 # Graph Report - 01v96-remote-web  (2026-08-01)
 
 ## Corpus Check
-- 645 files · ~13,053,896 words
+- 645 files · ~13,034,335 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 21857 nodes · 24124 edges · 5592 communities (2448 shown, 3144 thin omitted)
+- 21857 nodes · 24124 edges · 5597 communities (2453 shown, 3144 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 1180 edges (avg confidence: 0.79)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f80ed2f8`
+- Built from commit: `072ed657`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -2545,6 +2545,7 @@
 - [[_COMMUNITY_Good|Good]]
 - [[_COMMUNITY_See Also|See Also]]
 - [[_COMMUNITY_What to Document|What to Document]]
+- [[_COMMUNITY_Community 2611|Community 2611]]
 - [[_COMMUNITY_Bad|Bad]]
 - [[_COMMUNITY_Categories|Categories]]
 - [[_COMMUNITY_Community 2614|Community 2614]]
@@ -2562,6 +2563,7 @@
 - [[_COMMUNITY_Community 2626|Community 2626]]
 - [[_COMMUNITY_Good|Good]]
 - [[_COMMUNITY_Community 2628|Community 2628]]
+- [[_COMMUNITY_Community 2629|Community 2629]]
 - [[_COMMUNITY_Propagated Errors|Propagated Errors]]
 - [[_COMMUNITY_See Also|See Also]]
 - [[_COMMUNITY_Simple Single Error|Simple Single Error]]
@@ -2599,6 +2601,7 @@
 - [[_COMMUNITY_Why It Matters|Why It Matters]]
 - [[_COMMUNITY_Bad|Bad]]
 - [[_COMMUNITY_Broken Link Detection|Broken Link Detection]]
+- [[_COMMUNITY_Community 2667|Community 2667]]
 - [[_COMMUNITY_doc-link-types|doc-link-types]]
 - [[_COMMUNITY_Community 2669|Community 2669]]
 - [[_COMMUNITY_Link Syntax|Link Syntax]]
@@ -2638,6 +2641,7 @@
 - [[_COMMUNITY_Key Elements of Safety Documentation|Key Elements of Safety Documentation]]
 - [[_COMMUNITY_Pattern Unsafe Blocks in Safe Functions|Pattern: Unsafe Blocks in Safe Functions]]
 - [[_COMMUNITY_Pattern Unsafe Trait Implementations|Pattern: Unsafe Trait Implementations]]
+- [[_COMMUNITY_Community 2707|Community 2707]]
 - [[_COMMUNITY_Why It Matters|Why It Matters]]
 - [[_COMMUNITY_Bad|Bad]]
 - [[_COMMUNITY_Combining with thiserror|Combining with thiserror]]
@@ -2706,6 +2710,7 @@
 - [[_COMMUNITY_Clippy Lints|Clippy Lints]]
 - [[_COMMUNITY_Community 2774|Community 2774]]
 - [[_COMMUNITY_`expect()` vs `unwrap()`|`expect()` vs `unwrap()`]]
+- [[_COMMUNITY_Community 2776|Community 2776]]
 - [[_COMMUNITY_See Also|See Also]]
 - [[_COMMUNITY_Why It Matters|Why It Matters]]
 - [[_COMMUNITY_Bad|Bad]]
@@ -2875,6 +2880,7 @@
 - [[_COMMUNITY_mem-arena-allocator|mem-arena-allocator]]
 - [[_COMMUNITY_Performance Impact|Performance Impact]]
 - [[_COMMUNITY_See Also|See Also]]
+- [[_COMMUNITY_Community 2946|Community 2946]]
 - [[_COMMUNITY_When to Use Arenas|When to Use Arenas]]
 - [[_COMMUNITY_Community 2948|Community 2948]]
 - [[_COMMUNITY_API Patterns|API Patterns]]
@@ -2896,6 +2902,7 @@
 - [[_COMMUNITY_Community 2965|Community 2965]]
 - [[_COMMUNITY_static_assertions Crate|static_assertions Crate]]
 - [[_COMMUNITY_Testing Size Stability|Testing Size Stability]]
+- [[_COMMUNITY_Community 2968|Community 2968]]
 - [[_COMMUNITY_Why It Matters|Why It Matters]]
 - [[_COMMUNITY_Bad|Bad]]
 - [[_COMMUNITY_CompactString for Small Strings|CompactString for Small Strings]]
@@ -2947,11 +2954,15 @@
 - [[_COMMUNITY_Memory Comparison|Memory Comparison]]
 - [[_COMMUNITY_See Also|See Also]]
 - [[_COMMUNITY_Why It Matters|Why It Matters]]
+- [[_COMMUNITY_Community 3034|Community 3034]]
 - [[_COMMUNITY_Community 3035|Community 3035]]
 - [[_COMMUNITY_Community 3036|Community 3036]]
+- [[_COMMUNITY_Community 3037|Community 3037]]
 - [[_COMMUNITY_Community 3038|Community 3038]]
 - [[_COMMUNITY_Community 3039|Community 3039]]
 - [[_COMMUNITY_Community 3040|Community 3040]]
+- [[_COMMUNITY_Community 3041|Community 3041]]
+- [[_COMMUNITY_Community 3042|Community 3042]]
 - [[_COMMUNITY_Community 3043|Community 3043]]
 - [[_COMMUNITY_Community 3044|Community 3044]]
 - [[_COMMUNITY_Community 3045|Community 3045]]
@@ -2962,18 +2973,14 @@
 - [[_COMMUNITY_Community 3050|Community 3050]]
 - [[_COMMUNITY_Community 3051|Community 3051]]
 - [[_COMMUNITY_Community 3052|Community 3052]]
+- [[_COMMUNITY_Community 3053|Community 3053]]
 - [[_COMMUNITY_Community 3054|Community 3054]]
 - [[_COMMUNITY_Community 3055|Community 3055]]
 - [[_COMMUNITY_Community 3056|Community 3056]]
-- [[_COMMUNITY_Community 3057|Community 3057]]
-- [[_COMMUNITY_Community 3059|Community 3059]]
 - [[_COMMUNITY_Community 3060|Community 3060]]
 - [[_COMMUNITY_Community 3062|Community 3062]]
-- [[_COMMUNITY_Community 3064|Community 3064]]
-- [[_COMMUNITY_Community 3065|Community 3065]]
 - [[_COMMUNITY_Community 3066|Community 3066]]
 - [[_COMMUNITY_Community 3067|Community 3067]]
-- [[_COMMUNITY_Community 3068|Community 3068]]
 - [[_COMMUNITY_Community 3069|Community 3069]]
 - [[_COMMUNITY_Community 3070|Community 3070]]
 - [[_COMMUNITY_Community 3072|Community 3072]]
@@ -2982,12 +2989,10 @@
 - [[_COMMUNITY_Community 3076|Community 3076]]
 - [[_COMMUNITY_Community 3078|Community 3078]]
 - [[_COMMUNITY_Community 3079|Community 3079]]
-- [[_COMMUNITY_Community 3080|Community 3080]]
 - [[_COMMUNITY_Community 3081|Community 3081]]
 - [[_COMMUNITY_Community 3083|Community 3083]]
 - [[_COMMUNITY_Community 3084|Community 3084]]
 - [[_COMMUNITY_Community 3085|Community 3085]]
-- [[_COMMUNITY_Community 3086|Community 3086]]
 - [[_COMMUNITY_Community 3087|Community 3087]]
 - [[_COMMUNITY_str|str]]
 - [[_COMMUNITY_axum Router - HTTP server serving static files and API routes|axum Router - HTTP server serving static files and API routes]]
@@ -5511,11 +5516,11 @@
   monitor.js → public/vendor/socket.io.min.js
 - `Frontend JS modules: globals, channel_strip, eq, gate, compressor, dynamics, auxs_sends, events, steps, socket, sidebar, routing, scroll, splash_screen, app` --semantically_similar_to--> `MidiAssembler: descarta 0xFE/0xFD/0xF8 Active Sensing/Clock, monta SysEx F0...F7`  [INFERRED] [semantically similar]
   tmp/working_version/01v96-remote-web-main/public/index.html → docs/ARCHITECTURE_REFACTOR_PLAN.md
+- `sideEffects` --extends--> `./snippets/*`  [EXTRACTED]
+  client_wasm/pkg/package.json → public/wasm/package.json
 - `async_main()` --calls--> `is_heartbeat()`  [INFERRED]
   remote_midi_server/src/main.rs → midi_common/src/framing.rs
 - `async_main()` --calls--> `read_frame()`  [INFERRED]
-  remote_midi_server/src/main.rs → midi_common/src/framing.rs
-- `async_main()` --calls--> `is_heartbeat()`  [INFERRED]
   remote_midi_server/src/main.rs → midi_common/src/framing.rs
 
 ## Import Cycles
@@ -5546,7 +5551,7 @@
 - **Yamaha 01V96 FX parameters (HOLD/DECAY/Rev Time) via SysEx F0 43 10 3E 7F 01 58** — docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_sysex_structure, docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_hold_table, docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_decay_table, docs_PLANO_DE_IMPLEMENTACAO_DE_EFEITOS_reverb_standard, log_fx_test_log_fx1_decay [INFERRED 0.85]
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 
-## Communities (5592 total, 3144 thin omitted)
+## Communities (5597 total, 3144 thin omitted)
 
 ### Community 0 - "Mixer UI Client Modules (channel strip, EQ, gate, aux, routing)"
 Cohesion: 0.53
@@ -5561,8 +5566,8 @@ Cohesion: 0.40
 Nodes (5): MidiAssembler: descarta 0xFE/0xFD/0xF8 Active Sensing/Clock, monta SysEx F0...F7, public/index.html (legacy frontend), Frontend JS modules: globals, channel_strip, eq, gate, compressor, dynamics, auxs_sends, events, steps, socket, sidebar, routing, scroll, splash_screen, app, Sidebar: CONFIG / OUTS / SYNC + EQ/DYN/AUXS/ETC tabs, Splash screen TÉCNICO/MÚSICO + 4-digit password gate
 
 ### Community 6 - "Graphify Knowledge Graph Tool"
-Cohesion: 0.16
-Nodes (27): MidiInput, async_main(), establish_midi(), get_project_root(), main(), MidiConnectionState, MiniConfig, Box (+19 more)
+Cohesion: 0.10
+Nodes (37): is_heartbeat(), read_frame(), Result, Vec, write_frame(), MidiInput, R, async_main() (+29 more)
 
 ### Community 10 - "Node.js Legacy MIDI Functions"
 Cohesion: 0.03
@@ -5610,7 +5615,7 @@ Nodes (11): anti-premature-optimize, Bad, Common Premature Optimizations, Docume
 
 ### Community 35 - "Community 35"
 Cohesion: 0.14
-Nodes (23): silk_find_pred_coefs_fix(), silk_ltp_scale_ctrl_fix(), silk_float_to_fixed_q7(), silk_quant_ltp_gains(), silk_limit(), silk_limit_32(), silk_mla(), silk_smulbb() (+15 more)
+Nodes (24): silk_find_pred_coefs_fix(), silk_ltp_scale_ctrl_fix(), silk_float_to_fixed_q7(), silk_quant_ltp_gains(), silk_ltp_analysis_filter_fix(), silk_limit(), silk_limit_32(), silk_mla() (+16 more)
 
 ### Community 39 - "OpenCode TUI Config"
 Cohesion: 0.05
@@ -5929,8 +5934,8 @@ Cohesion: 0.15
 Nodes (12): Bad, Cargo Configuration, Checking Enabled Features, Common Target CPUs, Feature Detection at Runtime, Good, Multi-Architecture Builds, opt-target-cpu (+4 more)
 
 ### Community 132 - "Community 132"
-Cohesion: 0.12
-Nodes (23): SilkEncoderControl, SilkEncoderState, silk_find_pred_coefs_fix(), silk_ltp_scale_ctrl_fix(), silk_process_gains_fix(), silk_float_to_fixed_q7(), silk_gains_id(), silk_quant_ltp_gains() (+15 more)
+Cohesion: 0.10
+Nodes (24): silk_control_encoder(), silk_setup_complexity(), silk_setup_fs(), silk_control_snr(), silk_encode(), silk_encode_do_vad(), silk_encode_prefill(), silk_encode_indices() (+16 more)
 
 ### Community 133 - "Community 133"
 Cohesion: 0.20
@@ -5957,8 +5962,8 @@ Cohesion: 0.31
 Nodes (7): execute(), onClear(), onConfigure(), renderBtns(), renderExtraBtns(), renderSec(), renderUI()
 
 ### Community 139 - "Community 139"
-Cohesion: 0.11
-Nodes (31): silk_add_sat16(), silk_add_sat32(), silk_find_pitch_lags_fix(), silk_p_ana_calc_corr_st3(), silk_p_ana_calc_energy_st3(), silk_pitch_analysis_core(), lpc_analysis_filter_ref(), mac16_16() (+23 more)
+Cohesion: 0.10
+Nodes (52): hp_cutoff(), silk_ana_filt_bank_1(), silk_biquad_alt_stride1(), silk_biquad_alt_stride2(), silk_decode_core(), silk_lpc_analysis_filter_offset(), silk_add_lshift32(), silk_lshift() (+44 more)
 
 ### Community 141 - "Community 141"
 Cohesion: 0.15
@@ -6105,8 +6110,8 @@ Cohesion: 0.05
 Nodes (42): 1. Accessibility (CRITICAL), 2. Touch & Interaction (CRITICAL), 3. Performance (HIGH), 4. Layout & Responsive (HIGH), 5. Typography & Color (MEDIUM), 6. Animation (MEDIUM), 7. Style Selection (MEDIUM), 8. Charts & Data (LOW) (+34 more)
 
 ### Community 180 - "Community 180"
-Cohesion: 0.11
-Nodes (23): is_heartbeat(), read_frame(), Result, Vec, write_frame(), RemoteClient, R, RemoteClient (+15 more)
+Cohesion: 0.16
+Nodes (13): RemoteClient, RemoteClient, AppConfig, Arc, AtomicBool, Mutex, Receiver, Result (+5 more)
 
 ### Community 181 - "Community 181"
 Cohesion: 0.12
@@ -7613,8 +7618,8 @@ Cohesion: 0.33
 Nodes (5): Arquitetura e Persistência de Dados, Fluxo de Interação e UI, Novas Dúvidas em Aberto, Plano de Implementação: Custom Layer (Visão de Grupos), Visão Geral
 
 ### Community 602 - "Community 602"
-Cohesion: 0.10
-Nodes (30): Default, Self, SideInfoIndices, SilkEncoderStateCommon, SilkNSQState, silk_gains_dequant(), silk_gains_quant(), silk_add32() (+22 more)
+Cohesion: 0.07
+Nodes (47): Default, Self, SideInfoIndices, SilkEncoderStateCommon, SilkNSQState, silk_float_to_fixed_q7(), silk_gains_dequant(), silk_gains_id() (+39 more)
 
 ### Community 603 - "Community 603"
 Cohesion: 0.20
@@ -7657,8 +7662,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 17
 
 ### Community 615 - "Community 615"
-Cohesion: 0.03
-Nodes (67): api-serde-optional, Bad, Feature Documentation, Good, Macro Pattern, Multiple Optional Dependencies, See Also, Testing with Features (+59 more)
+Cohesion: 0.17
+Nodes (12): Bad, Categories, doc-cargo-metadata, Good, Include/Exclude, Keywords Best Practices, License Patterns, Recommended Fields (+4 more)
 
 ### Community 620 - "Community 620"
 Cohesion: 0.67
@@ -7865,8 +7870,8 @@ Cohesion: 0.20
 Nodes (10): async-broadcast-pubsub, Bad, Broadcast Semantics, Broadcast vs Watch, Clone Requirement, Event Bus Pattern, Good, Handling Lagging Receivers (+2 more)
 
 ### Community 689 - "Community 689"
-Cohesion: 0.10
-Nodes (36): SilkDecoderControl, SilkDecoderState, SilkEncoderStateCommon, SilkEncoderControl, SilkEncoderState, silk_decode_core(), energy_flp(), inner_product_flp() (+28 more)
+Cohesion: 0.09
+Nodes (42): SilkEncoderControl, SilkEncoderState, SilkDecoderControl, SilkDecoderState, SilkEncoderStateCommon, SilkEncoderControl, SilkEncoderState, silk_find_pred_coefs_fix() (+34 more)
 
 ### Community 690 - "Community 690"
 Cohesion: 0.22
@@ -7997,7 +8002,7 @@ Cohesion: 0.25
 Nodes (3): getPatchName(), _pairCtx, selectPatch()
 
 ### Community 777 - "Community 777"
-Cohesion: 0.07
+Cohesion: 0.06
 Nodes (8): Autovectorization (Stable), Choosing an Approach, opt-simd-portable, Platform-Specific (When Needed), Portable SIMD (Nightly), See Also, Why It Matters, wide Crate (Stable)
 
 ### Community 778 - "anti-collect-intermediate"
@@ -8186,7 +8191,7 @@ Nodes (49): async-bounded-channel, Bad, Channel Types, Choosing Buffer Size, Goo
 
 ### Community 845 - "Community 845"
 Cohesion: 0.03
-Nodes (64): api-builder-must-use, Apply to Entire Type, Bad, Clippy Lint, Good, Message Guidelines, See Also, Standard Library Examples (+56 more)
+Nodes (55): api-builder-must-use, Apply to Entire Type, Bad, Clippy Lint, Good, Message Guidelines, See Also, Standard Library Examples (+47 more)
 
 ### Community 846 - "Community 846"
 Cohesion: 0.20
@@ -8237,8 +8242,8 @@ Cohesion: 0.20
 Nodes (10): anti-format-hot-path, Bad, Clippy Lint, Comparison, Good, Pattern: Display Implementation, Pattern: Formatter Buffer Pool, See Also (+2 more)
 
 ### Community 869 - "get_names"
-Cohesion: 0.67
-Nodes (3): name, short, 11
+Cohesion: 0.10
+Nodes (34): silk_residual_energy_fix(), silk_find_ltp_fix(), silk_add32(), silk_add_sat16(), silk_add_sat32(), silk_clz32(), silk_rshift32(), silk_sub32() (+26 more)
 
 ### Community 881 - "name-type-param-single"
 Cohesion: 0.22
@@ -8378,11 +8383,11 @@ Nodes (6): Do not use this skill when, Instructions, JavaScript Testing Patterns
 
 ### Community 939 - "Community 939"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 12, 22
+Nodes (7): name, short, name, short, channels, 1, 12
 
 ### Community 940 - "Community 940"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 3, 36
 
 ### Community 941 - "Community 941"
 Cohesion: 0.29
@@ -8406,7 +8411,7 @@ Nodes (7): name, short, name, short, channels, 11, 12
 
 ### Community 946 - "Community 946"
 Cohesion: 0.09
-Nodes (46): silk_process_gains_fix(), silk_encode_frame(), silk_gains_dequant(), silk_gains_id(), silk_gains_quant(), silk_lin2log(), silk_log2lin(), silk_burg_modified_fix() (+38 more)
+Nodes (45): silk_process_gains_fix(), silk_encode_frame(), silk_gains_dequant(), silk_gains_id(), silk_gains_quant(), silk_lin2log(), silk_log2lin(), silk_burg_modified_fix() (+37 more)
 
 ### Community 947 - "Community 947"
 Cohesion: 0.38
@@ -8422,11 +8427,11 @@ Nodes (8): Bad, Good, Module Structure, Multiple Test Modules, See Also, test-cf
 
 ### Community 950 - "Community 950"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 23, 36
 
 ### Community 952 - "Community 952"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 955 - "Community 955"
 Cohesion: 0.29
@@ -8434,7 +8439,7 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 956 - "Community 956"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 957 - "Community 957"
 Cohesion: 0.29
@@ -8442,7 +8447,7 @@ Nodes (6): name, short, channels, 13, scene_id, scene_name
 
 ### Community 958 - "Community 958"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 36, 8
 
 ### Community 959 - "Community 959"
 Cohesion: 0.29
@@ -8450,23 +8455,23 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 960 - "Community 960"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 24, 36
+Nodes (7): name, short, name, short, channels, 36, 7
 
 ### Community 961 - "Community 961"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 11, 12
+Nodes (7): name, short, name, short, channels, 1, 12
 
 ### Community 962 - "Community 962"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 23, 36
 
 ### Community 963 - "Community 963"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 23, 36
 
 ### Community 964 - "Community 964"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 23, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 965 - "Community 965"
 Cohesion: 0.29
@@ -8482,7 +8487,7 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 968 - "Community 968"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 24, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 969 - "Community 969"
 Cohesion: 0.29
@@ -8490,7 +8495,7 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 970 - "Community 970"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 971 - "Community 971"
 Cohesion: 0.10
@@ -8506,15 +8511,15 @@ Nodes (9): Bad, Cargo.toml, Dynamic Dispatch Alternative, Good, mockall Crate, S
 
 ### Community 975 - "Community 975"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 976 - "Community 976"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 23, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 977 - "Community 977"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 978 - "Community 978"
 Cohesion: 0.29
@@ -8542,11 +8547,11 @@ Nodes (7): name, short, name, short, channels, 18, 36
 
 ### Community 1000 - "Community 1000"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 21, 36
+Nodes (7): name, short, name, short, channels, 3, 36
 
 ### Community 1001 - "Community 1001"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 36, 5
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 1003 - "Community 1003"
 Cohesion: 0.22
@@ -8804,6 +8809,10 @@ Nodes (3): name, short, 20
 Cohesion: 0.67
 Nodes (3): name, short, 21
 
+### Community 1102 - "Community 1102"
+Cohesion: 0.22
+Nodes (5): input, midi, output, REQUESTS, { yamahaIn, yamahaOut }
+
 ### Community 1105 - "Community 1105"
 Cohesion: 0.22
 Nodes (9): Bad, Comparison, Good, Pattern: Transform and Reuse, perf-collect-into, Pre-1.83 Alternative: extend, See Also, Supported Collections (+1 more)
@@ -8901,8 +8910,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 40
 
 ### Community 1143 - "Community 1143"
-Cohesion: 0.22
-Nodes (5): input, midi, output, REQUESTS, { yamahaIn, yamahaOut }
+Cohesion: 0.20
+Nodes (10): Bad, Broken Link Detection, Common Patterns, doc-link-types, Good, Link Syntax, Linking to Trait Items, Module-Level Documentation (+2 more)
 
 ### Community 1144 - "Community 1144"
 Cohesion: 0.67
@@ -8958,7 +8967,7 @@ Nodes (8): 10.7.1. Regras e Princípios Fundamentais da Solução, 10.7.2. Passo
 
 ### Community 1158 - "Community 1158"
 Cohesion: 0.29
-Nodes (7): name, short, name, short, channels, 18, 36
+Nodes (7): name, short, name, short, channels, 21, 36
 
 ### Community 1159 - "Community 1159"
 Cohesion: 0.20
@@ -9057,8 +9066,8 @@ Cohesion: 0.67
 Nodes (3): master, name, short
 
 ### Community 1183 - "Community 1183"
-Cohesion: 0.05
-Nodes (35): api-common-traits, Bad, Common Trait Bundles, Good, Manual Implementations, Minimum Recommended, See Also, Serde Traits (+27 more)
+Cohesion: 0.04
+Nodes (45): api-common-traits, Bad, Common Trait Bundles, Good, Manual Implementations, Minimum Recommended, See Also, Serde Traits (+37 more)
 
 ### Community 1185 - "Community 1185"
 Cohesion: 0.67
@@ -9201,8 +9210,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 33
 
 ### Community 1223 - "Community 1223"
-Cohesion: 0.10
-Nodes (56): hp_cutoff(), silk_ana_filt_bank_1(), silk_biquad_alt_stride1(), silk_biquad_alt_stride2(), silk_decode_core(), silk_lpc_analysis_filter_offset(), silk_ltp_analysis_filter_fix(), silk_add32_ovflw() (+48 more)
+Cohesion: 0.50
+Nodes (4): 11, config, name, scriptId
 
 ### Community 1225 - "Community 1225"
 Cohesion: 0.67
@@ -9230,7 +9239,7 @@ Nodes (3): name, short, 39
 
 ### Community 1231 - "Community 1231"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 11
 
 ### Community 1232 - "Community 1232"
 Cohesion: 0.67
@@ -9353,8 +9362,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 17
 
 ### Community 1263 - "Community 1263"
-Cohesion: 0.50
-Nodes (4): 11, config, name, scriptId
+Cohesion: 0.20
+Nodes (9): Bad, CI Integration, Good, Lint Categories, lint-workspace-lints, Per-Crate Overrides, Recommended Lint Configuration, See Also (+1 more)
 
 ### Community 1264 - "Community 1264"
 Cohesion: 0.67
@@ -9366,7 +9375,7 @@ Nodes (3): name, short, 19
 
 ### Community 1266 - "Community 1266"
 Cohesion: 0.67
-Nodes (3): name, short, 1
+Nodes (3): name, short, 24
 
 ### Community 1267 - "Community 1267"
 Cohesion: 0.67
@@ -9489,8 +9498,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 6
 
 ### Community 1297 - "Community 1297"
-Cohesion: 0.67
-Nodes (3): name, short, 21
+Cohesion: 0.20
+Nodes (10): Bad, Complete Workspace Example, Dev and Build Dependencies, Good, Internal Crate Dependencies, Optional Dependencies, Override Features, proj-workspace-deps (+2 more)
 
 ### Community 1298 - "Community 1298"
 Cohesion: 0.67
@@ -9534,7 +9543,7 @@ Nodes (3): name, short, 13
 
 ### Community 1310 - "Community 1310"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 18
 
 ### Community 1311 - "Community 1311"
 Cohesion: 0.36
@@ -9621,8 +9630,8 @@ Cohesion: 0.67
 Nodes (3): name, short, 22
 
 ### Community 1333 - "Community 1333"
-Cohesion: 0.67
-Nodes (3): name, short, 18
+Cohesion: 0.22
+Nodes (9): Bad, Common Panic Conditions, doc-panics-section, Good, Pattern: Debug-Only Panics, Pattern: Panic vs Return Error, Provide Non-Panicking Alternatives, See Also (+1 more)
 
 ### Community 1334 - "Community 1334"
 Cohesion: 0.67
@@ -9695,10 +9704,6 @@ Nodes (3): name, short, 40
 ### Community 1352 - "Community 1352"
 Cohesion: 0.67
 Nodes (3): name, short, 4
-
-### Community 1353 - "Community 1353"
-Cohesion: 0.67
-Nodes (3): name, short, 21
 
 ### Community 1354 - "Community 1354"
 Cohesion: 0.67
@@ -9801,8 +9806,8 @@ Cohesion: 0.11
 Nodes (36): close(), decodeReverbParams(), degFromPct(), detectDefaultLayoutMode(), formatDecayStep(), formatHoldStep(), formatHpfStep(), formatLpfStep() (+28 more)
 
 ### Community 1381 - "Community 1381"
-Cohesion: 0.10
-Nodes (23): silk_control_encoder(), silk_setup_complexity(), silk_setup_fs(), silk_control_snr(), silk_encode(), silk_encode_do_vad(), silk_encode_prefill(), silk_encode_indices() (+15 more)
+Cohesion: 0.25
+Nodes (8): Full Recommended Lints, Important Correctness Lints, lint-deny-correctness, Running Clippy, See Also, Setup, What It Catches, Why It Matters
 
 ### Community 1390 - "Community 1390"
 Cohesion: 0.67
@@ -10253,8 +10258,8 @@ Cohesion: 0.22
 Nodes (8): editor.quickSuggestions, comments, other, strings, eslint.enable, javascript.validate.enable, markdown.validate.enabled, typescript.validate.enable
 
 ### Community 1597 - "Community 1597"
-Cohesion: 0.67
-Nodes (3): name, short, 23
+Cohesion: 0.25
+Nodes (8): Bad, Exceptions, Good, name-crate-no-rs, Repository Naming, See Also, When Context Is Needed, Why It Matters
 
 ### Community 1600 - "Community 1600"
 Cohesion: 0.67
@@ -10430,7 +10435,7 @@ Nodes (3): name, short, 4
 
 ### Community 1692 - "Community 1692"
 Cohesion: 0.67
-Nodes (3): name, short, 1
+Nodes (3): name, short, 18
 
 ### Community 1693 - "Community 1693"
 Cohesion: 0.67
@@ -10502,7 +10507,7 @@ Nodes (3): name, short, 22
 
 ### Community 1713 - "Community 1713"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 22
 
 ### Community 1732 - "Community 1732"
 Cohesion: 0.67
@@ -10746,7 +10751,7 @@ Nodes (3): name, short, 7
 
 ### Community 1833 - "Community 1833"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 18
 
 ### Community 1834 - "Community 1834"
 Cohesion: 0.67
@@ -11210,7 +11215,7 @@ Nodes (3): name, short, 39
 
 ### Community 2044 - "Community 2044"
 Cohesion: 0.67
-Nodes (3): name, short, 7
+Nodes (3): name, short, 23
 
 ### Community 2045 - "Community 2045"
 Cohesion: 0.67
@@ -11234,7 +11239,7 @@ Nodes (3): name, short, 7
 
 ### Community 2050 - "Community 2050"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 21
 
 ### Community 2072 - "Community 2072"
 Cohesion: 0.67
@@ -11306,7 +11311,7 @@ Nodes (3): name, short, 5
 
 ### Community 2089 - "Community 2089"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 18
 
 ### Community 2090 - "Community 2090"
 Cohesion: 0.67
@@ -11370,7 +11375,7 @@ Nodes (3): name, short, 39
 
 ### Community 2128 - "Community 2128"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 23
 
 ### Community 2129 - "Community 2129"
 Cohesion: 0.67
@@ -11482,7 +11487,7 @@ Nodes (3): name, short, 24
 
 ### Community 2185 - "Contributing"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 21
 
 ### Community 2186 - "How to use it"
 Cohesion: 0.67
@@ -11950,7 +11955,7 @@ Nodes (3): name, short, 20
 
 ### Community 2306 - "Community 2306"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 21
 
 ### Community 2307 - "impl Trait Positions"
 Cohesion: 0.67
@@ -11958,11 +11963,11 @@ Nodes (3): name, short, 22
 
 ### Community 2308 - "Pattern: Enum Instead of dyn"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 21
 
 ### Community 2309 - "See Also"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 18
 
 ### Community 2310 - "When to Use Box<dyn Trait>"
 Cohesion: 0.67
@@ -13136,6 +13141,10 @@ Nodes (3): name, short, 6
 Cohesion: 0.67
 Nodes (3): name, short, 7
 
+### Community 2611 - "Community 2611"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
 ### Community 2612 - "Bad"
 Cohesion: 0.67
 Nodes (3): name, short, 9
@@ -13199,6 +13208,10 @@ Nodes (3): name, short, 22
 ### Community 2628 - "Community 2628"
 Cohesion: 0.67
 Nodes (3): name, short, 23
+
+### Community 2629 - "Community 2629"
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 2630 - "Propagated Errors"
 Cohesion: 0.67
@@ -13348,13 +13361,17 @@ Nodes (3): name, short, 1
 Cohesion: 0.67
 Nodes (3): name, short, 20
 
+### Community 2667 - "Community 2667"
+Cohesion: 0.67
+Nodes (3): name, short, 18
+
 ### Community 2668 - "doc-link-types"
 Cohesion: 0.67
 Nodes (3): name, short, 22
 
 ### Community 2670 - "Link Syntax"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 24
 
 ### Community 2671 - "Linking to Trait Items"
 Cohesion: 0.67
@@ -13495,6 +13512,10 @@ Nodes (3): name, short, 1
 ### Community 2706 - "Pattern: Unsafe Trait Implementations"
 Cohesion: 0.67
 Nodes (3): name, short, 20
+
+### Community 2707 - "Community 2707"
+Cohesion: 0.67
+Nodes (3): name, short, 24
 
 ### Community 2708 - "Why It Matters"
 Cohesion: 0.67
@@ -13654,7 +13675,7 @@ Nodes (3): name, short, 22
 
 ### Community 2748 - "expect() Message Guidelines"
 Cohesion: 0.67
-Nodes (3): name, short, 23
+Nodes (3): name, short, 11
 
 ### Community 2749 - "Community 2749"
 Cohesion: 0.67
@@ -13759,6 +13780,10 @@ Nodes (3): name, short, 24
 ### Community 2775 - "`expect()` vs `unwrap()`"
 Cohesion: 0.67
 Nodes (3): name, short, 10
+
+### Community 2776 - "Community 2776"
+Cohesion: 0.67
+Nodes (3): name, short, 18
 
 ### Community 2777 - "See Also"
 Cohesion: 0.67
@@ -14126,7 +14151,7 @@ Nodes (3): name, short, 22
 
 ### Community 2869 - "Community 2869"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 23
 
 ### Community 2870 - "Workspace Formatting"
 Cohesion: 0.67
@@ -14211,10 +14236,6 @@ Nodes (3): name, short, 6
 ### Community 2890 - "Redundant Operations"
 Cohesion: 0.67
 Nodes (3): name, short, 7
-
-### Community 2891 - "Community 2891"
-Cohesion: 0.67
-Nodes (3): name, short, 21
 
 ### Community 2892 - "Unnecessary Complexity"
 Cohesion: 0.67
@@ -14346,7 +14367,7 @@ Nodes (3): name, short, 39
 
 ### Community 2925 - "Suspicious Comparisons"
 Cohesion: 0.67
-Nodes (3): name, short, 3
+Nodes (3): name, short, 21
 
 ### Community 2926 - "Suspicious Method Calls"
 Cohesion: 0.67
@@ -14370,7 +14391,7 @@ Nodes (3): name, short, 7
 
 ### Community 2931 - "Community 2931"
 Cohesion: 0.67
-Nodes (3): name, short, 24
+Nodes (3): name, short, 3
 
 ### Community 2932 - "Good"
 Cohesion: 0.67
@@ -14424,6 +14445,10 @@ Nodes (3): name, short, 1
 Cohesion: 0.67
 Nodes (3): name, short, 20
 
+### Community 2946 - "Community 2946"
+Cohesion: 0.67
+Nodes (3): name, short, 24
+
 ### Community 2947 - "When to Use Arenas"
 Cohesion: 0.67
 Nodes (3): name, short, 22
@@ -14431,6 +14456,10 @@ Nodes (3): name, short, 22
 ### Community 2948 - "Community 2948"
 Cohesion: 0.67
 Nodes (3): name, short, 23
+
+### Community 2949 - "API Patterns"
+Cohesion: 0.67
+Nodes (3): name, short, 21
 
 ### Community 2950 - "ArrayString for Stack Strings"
 Cohesion: 0.67
@@ -14504,6 +14533,10 @@ Nodes (3): name, short, 40
 Cohesion: 0.67
 Nodes (3): name, short, 4
 
+### Community 2968 - "Community 2968"
+Cohesion: 0.67
+Nodes (3): name, short, 18
+
 ### Community 2969 - "Why It Matters"
 Cohesion: 0.67
 Nodes (3): name, short, 6
@@ -14514,7 +14547,7 @@ Nodes (3): name, short, 7
 
 ### Community 2971 - "CompactString for Small Strings"
 Cohesion: 0.67
-Nodes (3): name, short, 8
+Nodes (3): name, short, 18
 
 ### Community 2972 - "Good"
 Cohesion: 0.67
@@ -14684,11 +14717,19 @@ Nodes (3): name, short, 9
 Cohesion: 0.67
 Nodes (3): name, short, 3
 
+### Community 3034 - "Community 3034"
+Cohesion: 0.67
+Nodes (3): name, short, 23
+
 ### Community 3035 - "Community 3035"
 Cohesion: 0.67
 Nodes (3): name, short, 23
 
 ### Community 3036 - "Community 3036"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
+### Community 3037 - "Community 3037"
 Cohesion: 0.67
 Nodes (3): name, short, 21
 
@@ -14704,17 +14745,25 @@ Nodes (3): name, short, 23
 Cohesion: 0.67
 Nodes (3): name, short, 8
 
+### Community 3041 - "Community 3041"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
+### Community 3042 - "Community 3042"
+Cohesion: 0.67
+Nodes (3): name, short, 21
+
 ### Community 3044 - "Community 3044"
 Cohesion: 0.67
 Nodes (3): name, short, 23
 
 ### Community 3045 - "Community 3045"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 5
 
 ### Community 3046 - "Community 3046"
 Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 24
 
 ### Community 3047 - "Community 3047"
 Cohesion: 0.67
@@ -14736,6 +14785,10 @@ Nodes (3): name, short, 23
 Cohesion: 0.67
 Nodes (3): name, short, 23
 
+### Community 3053 - "Community 3053"
+Cohesion: 0.67
+Nodes (3): name, short, 23
+
 ### Community 3054 - "Community 3054"
 Cohesion: 0.67
 Nodes (3): name, short, 8
@@ -14746,37 +14799,17 @@ Nodes (3): name, short, 18
 
 ### Community 3056 - "Community 3056"
 Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 3057 - "Community 3057"
-Cohesion: 0.67
-Nodes (3): name, short, 21
-
-### Community 3059 - "Community 3059"
-Cohesion: 0.67
-Nodes (3): name, short, 21
+Nodes (3): name, short, 8
 
 ### Community 3062 - "Community 3062"
 Cohesion: 0.67
 Nodes (3): name, short, 5
-
-### Community 3064 - "Community 3064"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 3065 - "Community 3065"
-Cohesion: 0.67
-Nodes (3): name, short, 18
 
 ### Community 3066 - "Community 3066"
 Cohesion: 0.67
 Nodes (3): name, short, 21
 
 ### Community 3067 - "Community 3067"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
-### Community 3068 - "Community 3068"
 Cohesion: 0.67
 Nodes (3): name, short, 18
 
@@ -14812,10 +14845,6 @@ Nodes (3): name, short, 23
 Cohesion: 0.67
 Nodes (3): name, short, 24
 
-### Community 3080 - "Community 3080"
-Cohesion: 0.67
-Nodes (3): name, short, 18
-
 ### Community 3081 - "Community 3081"
 Cohesion: 0.67
 Nodes (3): name, short, 3
@@ -14831,10 +14860,6 @@ Nodes (3): name, short, 23
 ### Community 3085 - "Community 3085"
 Cohesion: 0.67
 Nodes (3): name, short, 24
-
-### Community 3086 - "Community 3086"
-Cohesion: 0.67
-Nodes (3): name, short, 21
 
 ### Community 3087 - "Community 3087"
 Cohesion: 0.67
@@ -14892,8 +14917,8 @@ Nodes (27): SilkEncoderControl, SilkEncoderState, Vec, silk_add_sat16(), silk_ad
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `OpusEncoder` connect `Community 1039` to `Community 1221`, `Community 1381`, `Community 165`, `Community 1223`, `Community 1457`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `OpusEncoder` connect `Community 1039` to `Community 132`, `Community 1221`, `Community 165`, `Community 139`, `Community 1457`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Why does `register_handlers()` connect `Community 106` to `Community 1`, `Community 66`, `Community 99`, `Community 100`, `Community 1457`, `Graphify Workflows`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Are the 43 inferred relationships involving `silk_smlawb()` (e.g. with `silk_ana_filt_bank_1()` and `silk_biquad_alt_stride1()`) actually correct?**
@@ -14904,5 +14929,5 @@ _Questions this graph is uniquely positioned to answer:_
   _14501 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.10960960960960961 - nodes in this community are weakly interconnected._
-- **Should `Node.js Legacy MIDI Functions` be split into smaller, more focused modules?**
-  _Cohesion score 0.03188405797101449 - nodes in this community are weakly interconnected._
+- **Should `Graphify Knowledge Graph Tool` be split into smaller, more focused modules?**
+  _Cohesion score 0.10299003322259136 - nodes in this community are weakly interconnected._

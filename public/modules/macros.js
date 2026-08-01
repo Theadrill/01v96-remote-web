@@ -61,40 +61,20 @@ async function detectCurrentPreset() {
 window.toggleSharedSync = async function(enabled) {
     const chk = document.getElementById('chkSharedSync');
 
-    // If disabling, show confirmation modal before removing remote preset
+    // If disabling, show the 3-option modal (disable only / disable + remove / cancel)
     if (!enabled) {
-        // Persist UI state first
-        localStorage.setItem(`macro_sync_shared_${currentPreset}`, false);
         console.log(`☁️ Auto-Sync Shared para [${currentPreset}]: OFF`);
 
-        // Re-check checkbox visually until user confirms or cancels
+        // Re-check checkbox visually until user decides
         if (chk) chk.checked = true;
-        const modal = document.getElementById('macroUnshareConfirmModal');
-        const btn = document.getElementById('confirmUnshareBtn');
-        if (!modal || !btn) {
-            // Fallback: perform unshare immediately
-            await performUnshare();
-            return;
+        const modal = document.getElementById('macroSyncDisableModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        } else {
+            // Fallback: disable sync only
+            if (chk) chk.checked = false;
+            localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
         }
-
-        modal.style.display = 'flex';
-        const cancelBtn = document.getElementById('cancelUnshareBtn');
-        const onConfirm = async () => {
-            cleanup();
-            await performUnshare();
-        };
-        const onCancel = () => {
-            cleanup();
-            // restore checkbox to checked state
-            if (chk) chk.checked = true;
-        };
-        function cleanup() {
-            try { btn.removeEventListener('click', onConfirm); } catch(e){}
-            try { cancelBtn.removeEventListener('click', onCancel); } catch(e){}
-            modal.style.display = 'none';
-        }
-        btn.addEventListener('click', onConfirm);
-        if (cancelBtn) cancelBtn.addEventListener('click', onCancel);
         return;
     }
 
@@ -155,6 +135,61 @@ async function performUnshare() {
         alert('Erro ao comunicar com o servidor para remover o preset.');
     }
 }
+
+// Desativa apenas: mantém o preset local, sem tocar na versão da nuvem
+window.applyDisableOnly = function () {
+    const modal = document.getElementById('macroSyncDisableModal');
+    if (modal) modal.style.display = 'none';
+    const chk = document.getElementById('chkSharedSync');
+    if (chk) chk.checked = false;
+    localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
+    console.log(`☁️ Sincronização desativada para [${currentPreset}]. Alterações serão apenas locais.`);
+};
+
+// Desativa e remove: reabre o modal de remoção da nuvem (lógica já existente)
+window.applyDisableAndRemove = async function () {
+    const modal = document.getElementById('macroSyncDisableModal');
+    if (modal) modal.style.display = 'none';
+    const chk = document.getElementById('chkSharedSync');
+    if (chk) chk.checked = true;
+
+    const unshareModal = document.getElementById('macroUnshareConfirmModal');
+    const btn = document.getElementById('confirmUnshareBtn');
+    if (!unshareModal || !btn) {
+        // Fallback: perform unshare immediately
+        await performUnshare();
+        return;
+    }
+
+    unshareModal.style.display = 'flex';
+    const cancelBtn = document.getElementById('cancelUnshareBtn');
+    const onConfirm = async () => {
+        cleanup();
+        await performUnshare();
+    };
+    const onCancel = () => {
+        cleanup();
+        // mantém o estado consistente: sincronização continua ativa
+        if (chk) chk.checked = true;
+        localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'true');
+    };
+    function cleanup() {
+        try { btn.removeEventListener('click', onConfirm); } catch(e){}
+        try { cancelBtn.removeEventListener('click', onCancel); } catch(e){}
+        unshareModal.style.display = 'none';
+    }
+    btn.addEventListener('click', onConfirm);
+    if (cancelBtn) cancelBtn.addEventListener('click', onCancel);
+};
+
+window.cancelDisableSync = function () {
+    const modal = document.getElementById('macroSyncDisableModal');
+    if (modal) modal.style.display = 'none';
+    const chk = document.getElementById('chkSharedSync');
+    if (chk) chk.checked = true;
+    localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'true');
+    console.log(`☁️ Desativação cancelada para [${currentPreset}]. Sincronização permanece ativa.`);
+};
 
 function openSyncActivationConfirm(isFirstUpload) {
     const modal = document.getElementById('macroSyncConfirmModal');
