@@ -100,26 +100,48 @@ window.renderRouting = function(chIdx) {
         tracksHTML += getPanTrackHTML(partnerLogicCh);
     }
     const isMobilePan = typeof layoutMode !== 'undefined' && layoutMode !== 'desktop';
+    let mockPanVal = 0;
+    const mockPanStateRef = getChannelStateById(primaryLogicCh);
+    if (mockPanStateRef && mockPanStateRef.pan !== undefined) {
+        mockPanVal = mockPanStateRef.pan;
+    }
     const panSectionHTML = isMobilePan ? `
-        <div style="flex: 1; min-width: 120px; display: flex; flex-direction: column;">
-            <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Pan</p>
-            <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
-                <div style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 18px; flex: 1; display: flex; align-items: center; justify-content: center;">
-                    <div class="desk-pan-indicator" id="pani-mobile-${chIdx}" style="flex: 1; max-width: 100%; background: transparent; border: none; box-shadow: none;"
-                        onwheel="handleWheelPan(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})" 
-                        ondblclick="resetPan(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})"
-                        onpointerdown="startPanLongPress(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})"
-                        onpointermove="handlePanPointerMove(event)"
-                        onpointerup="stopPanLongPress(event)"
-                        onpointerleave="stopPanLongPress(event)"
-                        onpointercancel="stopPanLongPress(event)">
-                    <span class="desk-pan-l">L</span>
-                    <div class="desk-pan-tracks-container">
-                        ${tracksHTML}
+        <div class="etc-pan-mock-original">
+            <div style="flex: 1; min-width: 120px; display: flex; flex-direction: column;">
+                <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Pan</p>
+                <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+                    <div style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 18px; flex: 1; display: flex; align-items: center; justify-content: center;">
+                        <div class="desk-pan-indicator" id="pani-mobile-${chIdx}" style="flex: 1; max-width: 100%; background: transparent; border: none; box-shadow: none;"
+                            onwheel="handleWheelPan(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})" 
+                            ondblclick="resetPan(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})"
+                            onpointerdown="startPanLongPress(event, ${primaryLogicCh}, ${isPaired ? partnerLogicCh : 'null'})"
+                            onpointermove="handlePanPointerMove(event)"
+                            onpointerup="stopPanLongPress(event)"
+                            onpointerleave="stopPanLongPress(event)"
+                            onpointercancel="stopPanLongPress(event)">
+                        <span class="desk-pan-l">L</span>
+                        <div class="desk-pan-tracks-container">
+                            ${tracksHTML}
+                        </div>
+                        <span class="desk-pan-r">R</span>
                     </div>
-                    <span class="desk-pan-r">R</span>
+                </div>
                 </div>
             </div>
+        </div>
+        <div class="etc-pan-mock-container">
+            <p class="etc-pan-mock-title">Pan</p>
+            <div class="etc-pan-mock-body">
+                <div class="etc-pan-mock-box">
+                    <div class="etc-pan-mock">
+                        <div class="etc-pan-mock-labels">
+                            <span>L</span>
+                            <span class="etc-pan-mock-center">C</span>
+                            <span>R</span>
+                        </div>
+                        <input type="range" id="etcPanMockSl-${chIdx}" class="dyn-slider etc-pan-mock-slider" min="-63" max="63" step="1" value="${mockPanVal}" onpointerup="onMockPanTap(event, 'etcPanMockSl-${chIdx}')">
+                    </div>
+                </div>
             </div>
         </div>
     ` : '';
@@ -213,6 +235,34 @@ window.renderRouting = function(chIdx) {
         if (routeContainer) {
             routeContainer.innerHTML += renderPairSection(chIdx);
         }
+    }
+};
+
+let mockPanTapTimer = null;
+let mockPanLastTapTime = 0;
+
+window.resetMockPanToCenter = function(sliderId) {
+    const el = document.getElementById(sliderId);
+    if (el) el.value = 0;
+};
+
+window.onMockPanTap = function(e, sliderId) {
+    const now = Date.now();
+    if (now - mockPanLastTapTime < 300) {
+        if (mockPanTapTimer) {
+            clearTimeout(mockPanTapTimer);
+            mockPanTapTimer = null;
+        }
+        mockPanLastTapTime = 0;
+        resetMockPanToCenter(sliderId);
+        e.preventDefault();
+        e.stopPropagation();
+    } else {
+        mockPanLastTapTime = now;
+        mockPanTapTimer = setTimeout(() => {
+            mockPanLastTapTime = 0;
+            mockPanTapTimer = null;
+        }, 300);
     }
 };
 
