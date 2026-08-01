@@ -198,6 +198,26 @@ pub fn register_handlers(
                 }
                 info!("Controle recebido: {:?}", *data);
 
+                // Posição global de medidores (0D 03 0C): a mesa não ecoa writes,
+                // então propagamos a mudança para todos os clientes manualmente.
+                let meter_target = if data.msg_type == "kSetupMeterSetup/kMeterSetupInpPoint" {
+                    let mode = match data.value as i64 {
+                        0 => "pre_eq",
+                        2 => "post",
+                        _ => "pre",
+                    };
+                    Some(("channels", mode))
+                } else if data.msg_type == "kSetupMeterSetup/kMeterSetupOutPoint" {
+                    let mode = match data.value as i64 {
+                        0 => "pre_eq",
+                        2 => "post",
+                        _ => "pre",
+                    };
+                    Some(("master", mode))
+                } else {
+                    None
+                };
+
                 // Atualiza o estado interno
                 {
                     let mut state = state_arc_control.write().await;
@@ -207,12 +227,26 @@ pub fn register_handlers(
                         value: data.value,
                     };
                     state.apply_midi(&parsed);
+                    if let Some((target, mode)) = meter_target {
+                        if target == "master" {
+                            state.global_meter_pos_master = mode.to_string();
+                        } else {
+                            state.global_meter_pos_channels = mode.to_string();
+                        }
+                    }
                 }
 
                 // Broadcast para TODOS os clientes (incluindo o enviador) para macros funcionarem corretamente
                 if let Ok(val) = serde_json::to_value(&*data) {
                     socket.emit("update", &val).ok();
                     socket.broadcast().emit("update", &val).await.ok();
+                }
+
+                // Propaga a posição dos medidores para todos os clientes (mesma forma do caminho de MIDI-in)
+                if let Some((target, mode)) = meter_target {
+                    let payload = serde_json::json!({ "target": target, "mode": mode });
+                    socket.emit("globalMeterPositionUpdated", &payload).ok();
+                    socket.broadcast().emit("globalMeterPositionUpdated", &payload).await.ok();
                 }
 
                 let is_binary = data.msg_type.contains("On") || data.msg_type.contains("Solo");
