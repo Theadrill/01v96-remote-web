@@ -70,7 +70,7 @@
     {
       "custom_name": "PGD ONLINE 360",
       "physical_scene": "PGD ONLINE 360",
-      "physical_id": 5,
+      "physical_id": 37,
       "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     },
     {
@@ -90,12 +90,6 @@
       "physical_scene": "SOMALIA 360",
       "physical_id": 34,
       "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
-    },
-    {
-      "custom_name": "LIVRE P SONHAR",
-      "physical_scene": "LIVRE P SONHAR",
-      "physical_id": 37,
-      "file": "custom_names_scene-LIVRE P SONHAR-mesa-maria.json"
     }
   ]
 }
