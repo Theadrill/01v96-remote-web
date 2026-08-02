@@ -1417,7 +1417,8 @@ function applyMetersToDOM(smoothedLevels, now) {
 
         const miniCard = document.getElementById(miniCardId);
         if (miniCard) {
-            const levelIdx = activeConfigChannel;
+            const isMasterMini = (activeConfigChannel === 52 || activeConfigChannel === 'master');
+            const levelIdx = isMasterMini ? 32 : activeConfigChannel;
             const finalPercent = smoothedLevels[levelIdx] || 0;
 
             const deskCurtains = miniCard.querySelectorAll('.desk-meter-curtain');
@@ -1431,8 +1432,9 @@ function applyMetersToDOM(smoothedLevels, now) {
 
                 if (deskCurtains.length > 1) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+                    const pIdx = isMasterMini ? 33 :
+                        ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
                         const partnerPercent = smoothedLevels[pIdx];
@@ -1446,8 +1448,9 @@ function applyMetersToDOM(smoothedLevels, now) {
 
                 if (mobileCurtains.length > 1) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
-                    const pIdx = (s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null);
+                    const pIdx = isMasterMini ? 33 :
+                        ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
+                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
                         const partnerPercent = smoothedLevels[pIdx];
@@ -1532,7 +1535,7 @@ socket.on('meterDataRaw', (rawBytes) => {
 
     // --- Atualização em tempo real das meters internas de Gate/Comp se o modal estiver aberto ---
     if (activeConfigChannel !== null && wasmMeterEngine) {
-        const isMaster = activeConfigChannel === 'master';
+        const isMaster = activeConfigChannel === 'master' || activeConfigChannel === 52;
         const levelIdx = isMaster ? 32 : activeConfigChannel;
         const rawStep = wasmMeterEngine.get_raw_step(levelIdx);
 
