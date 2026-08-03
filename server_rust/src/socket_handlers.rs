@@ -553,7 +553,13 @@ pub fn register_handlers(
         socket.on(
             "requestDynamics",
             move |socket: SocketRef, data: Data<serde_json::Value>| async move {
-                if let Some(ch) = data.get("channel").and_then(|v| v.as_u64()) {
+                let ch_val = data.get("channel");
+                let is_master = ch_val.and_then(|v| v.as_str()) == Some("master")
+                    || ch_val.and_then(|v| v.as_u64()) == Some(52);
+                if is_master {
+                    let req_comp = vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x04, 0x03, 0x00, 0x00, 0x01, 0xF7];
+                    scheduler_dyn.enqueue(req_comp, 0).await;
+                } else if let Some(ch) = ch_val.and_then(|v| v.as_u64()) {
                     let ch = ch as usize;
                     let state = state_dyn.read().await;
                     let ch_state = if ch <= 31 {

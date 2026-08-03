@@ -101,24 +101,24 @@ Quando a tela de edição detalhada de um canal (Selected Channel) está ativa n
 |---|---|---|
 | `0x00` | **Fader Level Meter** | Barra principal de nível do canal ao lado do Fader de volume (`-∞` a `+10`) |
 | `0x02` | **Gate Level Meter** | Barra de nível de sinal de saída do Gate (`OVER 0 -3 ...`) |
-| `0x03` | **Comp GR Meter** | **Gain Reduction do Compressor** (Atuação da compressão, `0` a `-18dB`) |
+| `0x03` | **Comp GR Meter** | **Gain Reduction do Compressor** (`Element 0x00` para CH1-32 / `Element 0x04` para Master Stereo) |
 | `0x04` | **Comp Level Meter** | Barra de nível de sinal de saída do Compressor (`OUT`) |
-| `0x05` | **Gate GR Meter** | **Gain Reduction do Gate** (Atuação da atenuação do Gate, `0` a `-18dB`) |
+| `0x05` | **Gate GR Meter** | **Gain Reduction do Gate** (Atuação da atenuação do Gate, `0` a `-18dB`, apenas CH1-32) |
 
 > [!IMPORTANT]
 > **Adaptação Dinâmica do Selected Channel:**
-> - Em **Canais de Entrada (CH1-CH32)**: O Gate está presente, gerando 5 requisições no `Element 0x00` (`0x00`, `0x02`, `0x03`, `0x04`, `0x05`).
-> - Em **Canais Master (STEREO-L / STEREO-R)**: O Gate **não existe** (a caixa do Gate fica vazia). O Studio Manager interrompe as requisições de Gate (`0x02` e `0x05`), mantendo apenas os meters do Compressor (`0x00`, `0x04` e `0x03`) e adicionando 3 requisições do **Elemento `0x04`** (Stereo Bus Output).
+> - Em **Canais de Entrada (CH1-CH32)**: O Gate está presente, gerando requisições no `Element 0x00` (`0x00`, `0x02`, `0x03`, `0x04`, `0x05`).
+> - Em **Canais Master (STEREO-L / STEREO-R)**: O Gate **não existe** (a caixa do Gate fica vazia). O Studio Manager e a mesa operam o **Compressor GR do Master no `Element 0x04` (`Sub-canal 0x03`, `Channel 0x00`)**, além dos meters de saída stereo (`Element 0x04` `0x00` e `0x02`).
 
-### 3.2. Elemento `0x04`: Stereo Master Bus Output Meters
+### 3.2. Elemento `0x04`: Stereo Master Bus Output & Comp GR Meters
 
-Quando o canal selecionado é o Master Stereo (`STEREO-L` / `STEREO-R`), o Studio Manager faz o polling do `Element 0x04` (`0D 21 04`) solicitando pontos de leitura do barramento Master estéreo. Os sub-canais representam os **canais L e R do barramento Master**, e não pontos de medição Pre/Post:
+Quando o canal selecionado é o Master Stereo (`STEREO-L` / `STEREO-R`), o Studio Manager faz o polling do `Element 0x04` (`0D 21 04`) solicitando pontos de leitura do barramento Master estéreo:
 
 | Sub-canal (`PARAM`) | Tipo de Meter | Descrição / Canal Lido |
 |---|---|---|
 | `0x00` | **Master L Level** | Leitura do canal **Left** do barramento Stereo Master |
 | `0x02` | **Master R Level** | Leitura do canal **Right** do barramento Stereo Master |
-| `0x03` | **Master Peak / Balance** | Leitura de pico/atuação do controle de Balance (`BAL L-R`) |
+| `0x03` | **Master Comp GR / Peak** | **Gain Reduction do Compressor do Master** (`Sub 0x03`, `Ch 0x00`) e leitura de pico/balance |
 
 > [!NOTE]
 > Mesmo que a tela do Selected Channel exiba visualmente apenas 1 barra vertical de fader, o firmware da 01V96 e o Studio Manager monitoram simultaneamente o sinal de **L (`0x00`)**, **R (`0x02`)** e **Pico/Balance (`0x03`)** para atualizar dinamicamente indicadores de clipping, LEDs de pré/pós e o medidor visual do fader.

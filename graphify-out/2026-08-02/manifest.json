@@ -90,13 +90,13 @@
     "semantic_hash": ""
   },
   "public/modules/compressor.js": {
-    "mtime": 1785637949.8863337,
-    "ast_hash": "50fe1c172277b0f3831084371ce1fe4f",
+    "mtime": 1780576123.5581362,
+    "ast_hash": "908041cc909b795f5d7d3fbf4209a14e",
     "semantic_hash": ""
   },
   "public/modules/dynamics.js": {
-    "mtime": 1785725200.0966868,
-    "ast_hash": "46fb44e4e1bcefdc5a7f3e4ebff88788",
+    "mtime": 1780576123.5581362,
+    "ast_hash": "083d7ccffa37d6b98c74ebc6d3a27654",
     "semantic_hash": ""
   },
   "public/modules/eq.js": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "public/modules/gate.js": {
-    "mtime": 1785637949.8886595,
-    "ast_hash": "d60365cdc572fbd1d0c04e25809b5120",
+    "mtime": 1780576123.5616424,
+    "ast_hash": "45046ffccb510e01c9a9f5a0fdc0e116",
     "semantic_hash": ""
   },
   "public/modules/globals.js": {
@@ -185,13 +185,13 @@
     "semantic_hash": ""
   },
   "public/modules/sidebar.js": {
-    "mtime": 1785637949.8906708,
-    "ast_hash": "356e42c9c968f6d45fd61c7d8debf1a0",
+    "mtime": 1785564869.7871106,
+    "ast_hash": "be4ef5256cc32995e187e143422c7a11",
     "semantic_hash": ""
   },
   "public/modules/socket.js": {
-    "mtime": 1785637949.892588,
-    "ast_hash": "c561dd9843a396400f86cf051b64393f",
+    "mtime": 1785563381.088527,
+    "ast_hash": "10e7cbda248745e71dd059a7cf0bec48",
     "semantic_hash": ""
   },
   "public/modules/splash_screen.js": {
@@ -295,7 +295,7 @@
     "semantic_hash": ""
   },
   "server_rust/src/midi/meter_dummy.rs": {
-    "mtime": 1785570998.1760273,
+    "mtime": 1783557958.3751535,
     "ast_hash": "835cfb049ca257ff09cf627bb1755d5b",
     "semantic_hash": ""
   },
@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "server_rust/src/midi/protocol.rs": {
-    "mtime": 1785725182.0921195,
-    "ast_hash": "de11c0290f92c1381ae683a16bd3d301",
+    "mtime": 1785396111.852285,
+    "ast_hash": "3af9feaa456f5d6c4f3f6b2a014c284d",
     "semantic_hash": ""
   },
   "server_rust/src/midi/remote_client.rs": {
@@ -335,12 +335,12 @@
     "semantic_hash": ""
   },
   "server_rust/src/midi_receiver.rs": {
-    "mtime": 1785637949.903698,
-    "ast_hash": "70d9e7989e5bf6eebed33283abb3ab90",
+    "mtime": 1785396028.7917469,
+    "ast_hash": "5fb596c9edc3a350ca529e0273fc2c14",
     "semantic_hash": ""
   },
   "server_rust/src/network/connection.rs": {
-    "mtime": 1785570998.1777112,
+    "mtime": 1785388501.7860825,
     "ast_hash": "5329c89a8fdbcc7a62db76bda2bcca4c",
     "semantic_hash": ""
   },
@@ -360,13 +360,13 @@
     "semantic_hash": ""
   },
   "server_rust/src/socket_handlers.rs": {
-    "mtime": 1785725240.1110656,
-    "ast_hash": "0975e059362c48052dad5044efb28255",
+    "mtime": 1785551193.6574101,
+    "ast_hash": "e27d05519eb46bfe7309728d355a0777",
     "semantic_hash": ""
   },
   "server_rust/src/state.rs": {
-    "mtime": 1785637949.9072628,
-    "ast_hash": "07812ef5568c694b4b618824ebf4df51",
+    "mtime": 1785395993.231006,
+    "ast_hash": "da18da11b7f2dd78a101d684e1a65d55",
     "semantic_hash": ""
   },
   "server_rust/src/tray.rs": {
@@ -525,7 +525,7 @@
     "semantic_hash": ""
   },
   "public/index.html": {
-    "mtime": 1785570998.172296,
+    "mtime": 1785562191.4386878,
     "ast_hash": "1fefba617776217ced5adcf4efde5b1c",
     "semantic_hash": ""
   },
@@ -2435,8 +2435,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-PGD ONLINE 360-mesa-maria.json": {
-    "mtime": 1785637949.8764753,
-    "ast_hash": "78b6fe7a8cc8c32297c6de621fd4c724",
+    "mtime": 1784946243.7809072,
+    "ast_hash": "268f266333b4b20cf3f19e5822085ff9",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scene-SARU-mesa-favela.json": {
@@ -2450,8 +2450,8 @@
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-maria.json": {
-    "mtime": 1785723103.3821983,
-    "ast_hash": "b00d6b40e49525ddff7e040671e1803c",
+    "mtime": 1785371659.1735888,
+    "ast_hash": "4f31bf30454aec994b72d91f33270e00",
     "semantic_hash": ""
   },
   "data/custom_scenes/shared/custom_names_scenes-mesa-teste.json": {
@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785725256.3879645,
-    "ast_hash": "2adaf90d128014c978d32ada07dd70a3",
+    "mtime": 1785565737.18311,
+    "ast_hash": "5d8b609633a59236a808d2af6fc9dcd6",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -2535,7 +2535,7 @@
     "semantic_hash": ""
   },
   "client_wasm/src/meters.rs": {
-    "mtime": 1785570960.0351994,
+    "mtime": 1785389808.0049984,
     "ast_hash": "a66124f538dc8e4f9366310d3274fa6e",
     "semantic_hash": ""
   },
@@ -2575,12 +2575,12 @@
     "semantic_hash": ""
   },
   "public/wasm/client_wasm.js": {
-    "mtime": 1785571007.2469378,
+    "mtime": 1785551204.77614,
     "ast_hash": "7c51568d2b88625bfc93aa7b1b94408e",
     "semantic_hash": ""
   },
   "public/wasm/package.json": {
-    "mtime": 1785571010.4977126,
+    "mtime": 1785551207.4513156,
     "ast_hash": "f6955dc4306c1e2cba81e6ef0851ea0c",
     "semantic_hash": ""
   },
@@ -3245,8 +3245,8 @@
     "semantic_hash": ""
   },
   "docs/PLANO_DE_IMPLEMENTACAO_DE_METERS.md": {
-    "mtime": 1785725172.9810028,
-    "ast_hash": "092f3c80a2669ead6b5094988b359945",
+    "mtime": 1785396987.1642103,
+    "ast_hash": "8fb0bc2364065f51431bac291da8247f",
     "semantic_hash": ""
   },
   "monitor_sem_filtros.js": {
@@ -3290,53 +3290,8 @@
     "semantic_hash": ""
   },
   "instrucoes_de_delegacao_de_tarefas.md": {
-    "mtime": 1785568130.2149303,
-    "ast_hash": "a99082e7a2e27ef92b64af0deb34c6aa",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/shared/custom_names_scene-DC JEITO 360-mesa-maria.json": {
-    "mtime": 1785723103.3791869,
-    "ast_hash": "d4bb3489a66249cbd19f352e81997f72",
-    "semantic_hash": ""
-  },
-  "data/custom_scenes/shared/custom_names_scene-LIVRE P SONHAR 3-mesa-maria.json": {
-    "mtime": 1785637949.874969,
-    "ast_hash": "e46b2f48d63a41a92b73b9e3ad4cbeab",
-    "semantic_hash": ""
-  },
-  "gr_monitor.js": {
-    "mtime": 1785724818.3000624,
-    "ast_hash": "2d280b36b292ac70f067ccd837e679be",
-    "semantic_hash": ""
-  },
-  "docs/plano_de_implementa\u00e7\u00e3o_de_meter_GR.md": {
-    "mtime": 1785725166.8339446,
-    "ast_hash": "801b709890965cb36a473e1c33cdf00b",
-    "semantic_hash": ""
-  },
-  "log/gr_gate_diag.txt": {
-    "mtime": 1785573095.9925373,
-    "ast_hash": "b0c0f89b2488cff787bd37602d1e1524",
-    "semantic_hash": ""
-  },
-  "log/gr_gate_diag_err.txt": {
-    "mtime": 1785573092.0009012,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "log/gr_monitor_check_639211594300084634.txt": {
-    "mtime": 1785573433.1608229,
-    "ast_hash": "9f60d05c1ec76bdc9250bc49b548781e",
-    "semantic_hash": ""
-  },
-  "log/gr_monitor_test.txt": {
-    "mtime": 1785573381.7388825,
-    "ast_hash": "b38eaf23a0da7954c201f66f0cf4bccb",
-    "semantic_hash": ""
-  },
-  "log/gr_monitor_test_err.txt": {
-    "mtime": 1785573377.657503,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "mtime": 1785565582.2806134,
+    "ast_hash": "ec83b7759b2b338243aa2f15b7d22a95",
     "semantic_hash": ""
   }
 }

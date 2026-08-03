@@ -545,17 +545,18 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
     let parameter = message[7];
     let channel = message[8] as usize;
 
-    // --- GR METER (Gate GR: sub 0x05, Comp GR: sub 0x03, Element 0x00) ---
-    // Resposta: F0 43 10 3E 0D 21 00 [sub] [ch] [hi] [lo] F7 (12 bytes)
+    // --- GR METER (Gate GR: sub 0x05, Comp GR: sub 0x03; Element 0x00 for CH1-32, Element 0x04 for Master) ---
+    // Resposta: F0 43 10 3E 0D 21 [element] [sub] [ch] [hi] [lo] F7 (12 bytes)
     if message.len() == 12
         && section == 0x0D
         && group == 0x21
-        && element == 0x00
+        && (element == 0x00 || element == 0x04)
         && (parameter == 0x03 || parameter == 0x05)
     {
         let raw_step = (((message[9] & 0x7F) as u16) << 7) | (message[10] & 0x7F) as u16;
+        let mapped_ch = if element == 0x04 { 52 } else { channel };
         return Some(ParsedMidi::GrMeter {
-            channel: channel,
+            channel: mapped_ch,
             sub_channel: parameter,
             raw_step,
         });

@@ -47,7 +47,9 @@ let grPollingInterval = null;
 
 window.startGrPolling = function(ch) {
     window.stopGrPolling();
-    if (ch === null || ch === undefined || ch > 31) return;
+    if (ch === null || ch === undefined) return;
+    const isMaster = ch === 'master' || ch === 52;
+    if (!isMaster && ch > 31) return;
 
     const request = () => {
         if (typeof socket !== 'undefined' && socket) {

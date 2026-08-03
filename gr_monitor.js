@@ -1,15 +1,13 @@
 const midi = require('midi');
 
-const ELEMENT = 0x00;
-const SUB_COMP_GR = 0x03;
-const SUB_GATE_GR = 0x05;
-const CHANNEL = 0x00; // 0x00 = CH01
+const ELEMENT = 0x04; // 0x04 = Master Stereo Bus
+const SUB_COMP_GR = 0x03; // Comp GR
+const CHANNEL = 0x00;
 const LENGTH = 0x01;
 const POLL_MS = 100;
 
 const REQUESTS = [
-    { label: 'COMP', visible: false, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_COMP_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
-    { label: 'GATE', visible: true, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_GATE_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
+    { label: 'COMP', visible: true, sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, SUB_COMP_GR, CHANNEL, 0x00, LENGTH, 0xF7] },
 ];
 
 const IDLE = 0x0FFF; // 4095 (0 dB)
@@ -39,11 +37,6 @@ function timestamp() {
     return new Date().toLocaleTimeString();
 }
 
-function toHex(msg) {
-    const hex = Buffer.from(msg).toString('hex').toUpperCase().match(/.{1,2}/g);
-    return hex ? hex.join(' ') : '(empty)';
-}
-
 function formatGR(raw) {
     if (raw >= IDLE) {
         return `0x${raw.toString(16).toUpperCase().padStart(4, '0')} (idle)`;
@@ -66,7 +59,7 @@ output.openPort(yamahaOut);
 input.ignoreTypes(false, false, false);
 
 console.log(`\nYAMAHA 01V96 CONECTADA [IN:${yamahaIn} OUT:${yamahaOut}]`);
-console.log(`Monitorando GR do CH01 (canal 0x00, elemento 0x00, ${LENGTH} valor)`);
+console.log(`Monitorando GR do MASTER (Elemento 0x04, Sub-canal 0x03, ${LENGTH} valor)`);
 console.log('Idle = 0x0FFF; valores menores indicam Gain Reduction ativo\n');
 
 let sysexBuffer = null;
@@ -90,19 +83,14 @@ input.on('message', (_deltaTime, message) => {
 
     if (message.length !== 12 || message[0] !== 0xF0 || message[1] !== 0x43 || message[2] !== 0x10) return;
     if (message[3] !== 0x3E || message[4] !== 0x0D || message[5] !== 0x21) return;
-    if (message[6] !== ELEMENT || (message[7] !== SUB_GATE_GR && message[7] !== SUB_COMP_GR)) return;
-    if (message[8] !== CHANNEL) return;
+    if (message[6] !== ELEMENT || message[7] !== SUB_COMP_GR || message[8] !== CHANNEL) return;
 
-    const label = message[7] === SUB_GATE_GR ? 'GATE' : 'COMP';
-    const req = REQUESTS.find(r => r.label === label);
-    if (!req || !req.visible) return;
     const raw = ((message[9] & 0x7f) << 7) | (message[10] & 0x7f);
-    process.stdout.write(`\r[${timestamp()}] ${label} GR = ${formatGR(raw)} | step ${raw}\x1b[K`);
+    process.stdout.write(`\r[${timestamp()}] COMP GR MASTER = ${formatGR(raw)} | step ${raw}\x1b[K`);
 });
 
 function sendNext() {
-    const req = REQUESTS[(Date.now() / POLL_MS) % REQUESTS.length | 0];
-    output.sendMessage(req.sysex);
+    output.sendMessage(REQUESTS[0].sysex);
     setTimeout(sendNext, POLL_MS);
 }
 

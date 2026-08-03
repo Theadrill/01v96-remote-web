@@ -8,8 +8,9 @@ Este documento contém o planejamento arquitetural e as instruções de delegaç
 
 Na tela de Dinâmicos de cada canal individual:
 * **Meter Superior (Novo - GR):** Medidor de Gain Reduction atuando da **direita para a esquerda** (0 dB à direita, atenuação crescendo para a esquerda até -18 dB).
-  * **Card de GATE:** Conectado ao parâmetro SysEx **Gate GR Meter** (`Sub-canal 0x05` do `Element 0x00`).
-  * **Card de COMPRESSOR:** Conectado ao parâmetro SysEx **Comp GR Meter** (`Sub-canal 0x03` do `Element 0x00`).
+  * **Card de GATE (Canais CH1-32):** Conectado ao parâmetro SysEx **Gate GR Meter** (`Sub-canal 0x05` do `Element 0x00`).
+  * **Card de COMPRESSOR (Canais CH1-32):** Conectado ao parâmetro SysEx **Comp GR Meter** (`Sub-canal 0x03` do `Element 0x00`).
+  * **Card de COMPRESSOR (Master Stereo):** Conectado ao parâmetro SysEx **Master Comp GR Meter** (`Sub-canal 0x03` do `Element 0x04`, `Channel 0x00`). *Validado em mesa física*. (O Master não possui Gate).
 * **Meter Inferior (Existente - Output Level):** Permanece atuando da **esquerda para a direita** (saída do módulo).
   * **Card de GATE:** `Sub-canal 0x02` (Gate Level Meter).
   * **Card de COMPRESSOR:** `Sub-canal 0x04` (Comp Level Meter).
