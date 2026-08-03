@@ -1352,31 +1352,35 @@ pub fn register_handlers(
                     scheduler_save.enqueue(store_sysex, 0).await;
                     tracing::info!("[TIMING] store enqueue: {:?}", t_start.elapsed());
 
-                    let original_scene_index = {
+                    let (original_scene_index, active_scene_name) = {
                         let state = state_save.read().await;
-                        state.scene_manager.active_scene_index
-                    };
-
-                    let original_name = {
-                        let state = state_save.read().await;
-                        state.scene_manager.scenes[index as usize]
+                        let active_idx = state.scene_manager.active_scene_index;
+                        let active_name = state
+                            .scene_manager
+                            .current_scene
                             .as_ref()
                             .map(|s| s.name.clone())
-                            .unwrap_or_default()
+                            .unwrap_or_else(|| {
+                                state.scene_manager.scenes[active_idx as usize]
+                                    .as_ref()
+                                    .map(|s| s.name.clone())
+                                    .unwrap_or_default()
+                            });
+                        (active_idx, active_name)
                     };
 
                     let target_name = data
                         .get("newName")
                         .and_then(|v| v.as_str())
                         .map(|n| n.trim().to_uppercase())
-                        .unwrap_or(original_name.clone())
+                        .unwrap_or_else(|| active_scene_name.clone())
                         .chars()
                         .take(16)
                         .collect::<String>();
                     let target_name_padded = format!("{: <16}", target_name);
 
                     if target_name_padded.trim().to_uppercase()
-                        != original_name.trim().to_uppercase()
+                        != active_scene_name.trim().to_uppercase()
                     {
                         tokio::time::sleep(std::time::Duration::from_millis(500)).await;
                         tracing::info!("[TIMING] after 500ms sleep: {:?}", t_start.elapsed());
@@ -1391,7 +1395,7 @@ pub fn register_handlers(
                         tokio::time::sleep(std::time::Duration::from_millis(700)).await;
                         tracing::info!("[TIMING] after 700ms sleep: {:?}", t_start.elapsed());
                     } else {
-                        tracing::info!("[TIMING] nome nao mudou, sem delays: {:?}", t_start.elapsed());
+                        tracing::info!("[TIMING] nome igual a cena ativa, sem delays: {:?}", t_start.elapsed());
                     }
 
                     // Update state and emit events only after MIDI commands completed
