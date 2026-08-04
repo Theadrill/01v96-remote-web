@@ -246,9 +246,9 @@ function createDesktopStrip(config) {
             
             <div class="desk-pan-indicator" id="pani${ids.card || `${pfx}card${id}`}"
                  ${layoutMode === 'desktop' && hasPan ? `
-                    onwheel="handleWheelPan(event, ${evtCh}, ${partnerId})" 
-                    ondblclick="resetPan(event, ${evtCh}, ${partnerId})"
-                    onpointerdown="startPanLongPress(event, ${evtCh}, ${partnerId})"
+                    onwheel="handleWheelPan(event, ${evtCh}, ${isMaster ? 'null' : partnerId})" 
+                    ondblclick="resetPan(event, ${evtCh}, ${isMaster ? 'null' : partnerId})"
+                    onpointerdown="startPanLongPress(event, ${evtCh}, ${isMaster ? 'null' : partnerId})"
                     onpointermove="handlePanPointerMove(event)"
                     onpointerup="stopPanLongPress(event)"
                     onpointerleave="stopPanLongPress(event)"
@@ -299,8 +299,12 @@ function updatePanIndicator(channel, panValue) {
     // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%
     const pct = ((panValue + 63) / 126) * 100;
 
+    const isMaster = (channel === 52 || channel === 'master' || channel === "'master'");
+    const targetCh = isMaster ? 'master' : channel;
+    const selector = `.desk-pan-track[data-pan-ch="${targetCh}"], .desk-pan-track[data-pan-ch="'${targetCh}'"], .desk-pan-track[data-pan-ch="${channel}"]`;
+
     // Busca todas as trilhas na UI (desktop card ou mobile routing etc)
-    const tracks = document.querySelectorAll(`.desk-pan-track[data-pan-ch="${channel}"]`);
+    const tracks = document.querySelectorAll(selector);
 
     tracks.forEach(track => {
         const thumb = track.querySelector('.desk-pan-thumb');

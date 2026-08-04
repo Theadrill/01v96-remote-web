@@ -922,6 +922,9 @@ impl GlobalState {
 
     fn get_target_for_mt(&mut self, mt: &str, channel: usize) -> Option<&mut dyn ChannelLike> {
         if mt.starts_with("kInput") || mt == "kPan" {
+            if channel == 52 {
+                return Some(&mut self.master as &mut dyn ChannelLike);
+            }
             if channel <= 31 {
                 return self
                     .channels

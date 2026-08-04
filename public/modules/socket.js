@@ -142,15 +142,15 @@ socket.on('update', (d) => {
 
     // --- PAN ---
     if (d.type === 'kPan') {
-        // Atualiza estado local
-        const s = d.channel === 'master'
+        const isMaster = d.channel === 'master' || d.channel === 52 || d.channel === "'master'";
+        const s = isMaster
             ? masterState
             : (typeof getChannelStateById === 'function' ? getChannelStateById(d.channel) : null);
         if (s) s.pan = d.value;
 
         // Atualiza o indicador visual (apenas no layout desktop)
         if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function') {
-            window.updatePanIndicator(d.channel, d.value);
+            window.updatePanIndicator(isMaster ? 'master' : d.channel, d.value);
         }
         return;
     }

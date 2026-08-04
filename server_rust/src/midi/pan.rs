@@ -60,31 +60,55 @@ pub enum PanTarget {
 
 pub fn build_pan_change(channel: i64, pan_value: f64) -> Option<Vec<u8>> {
     let target = global_channel_to_pan_index(channel)?;
-    let bytes = pan_value_to_bytes(pan_value);
-    let mut packet = Vec::with_capacity(14);
-    packet.extend_from_slice(HEADER);
-    packet.push(0x10);
-    packet.push(MODEL_ID);
 
     match target {
         PanTarget::Input(ch_idx) => {
+            let bytes = pan_value_to_bytes(pan_value);
+            let mut packet = Vec::with_capacity(14);
+            packet.extend_from_slice(HEADER);
+            packet.push(0x10);
+            packet.push(MODEL_ID);
             packet.push(PAN_SECTION);
             packet.push(PAN_GROUP);
             packet.push(PAN_ELEMENT);
             packet.push(PAN_PARAM);
             packet.push(ch_idx as u8);
+            packet.extend_from_slice(&bytes);
+            packet.extend_from_slice(FOOTER);
+            Some(packet)
         }
         PanTarget::Master => {
+            let bytes_l = pan_value_to_bytes(-pan_value);
+            let bytes_r = pan_value_to_bytes(pan_value);
+            let mut packet = Vec::with_capacity(28);
+
+            // Sub-elemento L (0x00): -pan_value
+            packet.extend_from_slice(HEADER);
+            packet.push(0x10);
+            packet.push(MODEL_ID);
+            packet.push(PAN_SECTION);
+            packet.push(PAN_GROUP);
+            packet.push(MASTER_ELEMENT);
+            packet.push(MASTER_PARAM);
+            packet.push(0x00);
+            packet.extend_from_slice(&bytes_l);
+            packet.extend_from_slice(FOOTER);
+
+            // Sub-elemento R (0x01): +pan_value
+            packet.extend_from_slice(HEADER);
+            packet.push(0x10);
+            packet.push(MODEL_ID);
             packet.push(PAN_SECTION);
             packet.push(PAN_GROUP);
             packet.push(MASTER_ELEMENT);
             packet.push(MASTER_PARAM);
             packet.push(0x01);
+            packet.extend_from_slice(&bytes_r);
+            packet.extend_from_slice(FOOTER);
+
+            Some(packet)
         }
     }
-    packet.extend_from_slice(&bytes);
-    packet.extend_from_slice(FOOTER);
-    Some(packet)
 }
 
 pub fn build_pan_request(channel: i64) -> Option<Vec<u8>> {
@@ -107,7 +131,7 @@ pub fn build_pan_request(channel: i64) -> Option<Vec<u8>> {
             packet.push(PAN_GROUP);
             packet.push(MASTER_ELEMENT);
             packet.push(MASTER_PARAM);
-            packet.push(0x01);
+            packet.push(0x00);
         }
     }
     packet.extend_from_slice(FOOTER);
@@ -140,8 +164,12 @@ pub fn parse_pan_message(message: &[u8]) -> Option<ParsedMidi> {
         return super::protocol::cc("kPan", global_ch as usize, pan_value);
     }
 
-    if sec == PAN_SECTION && grp == PAN_GROUP && elem == MASTER_ELEMENT && ch_idx == 1 {
-        return super::protocol::cc("kPan", 52, pan_value);
+    if sec == PAN_SECTION && grp == PAN_GROUP && elem == MASTER_ELEMENT {
+        if ch_idx == 0 {
+            return super::protocol::cc("kPan", 52, -pan_value);
+        } else if ch_idx == 1 {
+            return super::protocol::cc("kPan", 52, pan_value);
+        }
     }
 
     None

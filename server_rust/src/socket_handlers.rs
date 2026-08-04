@@ -19,7 +19,7 @@ pub struct ControlData {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PanData {
-    pub channel: usize,
+    pub channel: serde_json::Value,
     pub value: f64,
 }
 
@@ -436,23 +436,39 @@ pub fn register_handlers(
                 if !require_setup(&socket) {
                     return;
                 }
-                info!("Pan recebido: CH={} Val={}", data.channel, data.value);
+                let ch_num: usize = match &data.channel {
+                    serde_json::Value::Number(n) => n.as_u64().unwrap_or(0) as usize,
+                    serde_json::Value::String(s) => {
+                        if s == "master" {
+                            52
+                        } else {
+                            s.parse::<usize>().unwrap_or(0)
+                        }
+                    }
+                    _ => 0,
+                };
+                info!("Pan recebido: CH={} (raw={:?}) Val={}", ch_num, data.channel, data.value);
 
                 // Update state
                 {
                     let mut state = state_pan.write().await;
                     let parsed = crate::midi::protocol::ParsedMidi::ControlChange {
                         msg_type: "kPan".to_string(),
-                        channel: data.channel,
+                        channel: ch_num,
                         value: data.value,
                     };
                     state.apply_midi(&parsed);
                 }
 
                 // Broadcast to all clients (matching Node.js format)
+                let update_ch = if ch_num == 52 {
+                    serde_json::json!("master")
+                } else {
+                    serde_json::json!(ch_num)
+                };
                 let update = serde_json::json!({
                     "type": "kPan",
-                    "channel": data.channel,
+                    "channel": update_ch,
                     "value": data.value
                 });
                 socket.emit("update", &update).ok();
@@ -460,7 +476,7 @@ pub fn register_handlers(
 
                 // Send to mesa via pan module
                 if let Some(sysex) =
-                    crate::midi::pan::build_pan_change(data.channel as i64, data.value)
+                    crate::midi::pan::build_pan_change(ch_num as i64, data.value)
                 {
                     scheduler_pan.enqueue(sysex, 0).await;
                 }

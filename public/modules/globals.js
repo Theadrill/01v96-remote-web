@@ -33,7 +33,7 @@ for (let i = 0; i < 8; i++) {
     busesState.push({ value: 0, on: false, solo: false, name: `BUS ${i+1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null, insert: { on: false, position: 0, patch_in: 0 }, stereo: false });
 }
 
-let masterState = { value: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };
+let masterState = { value: 0, pan: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };
 channelStates[52] = masterState; // Map for canvas engine
 let activeConfigChannel = null;
 let activeConfigTab = "aux"; // Auxiliares por padrão
