@@ -1063,25 +1063,32 @@ window.setMeterPosition = function(target, modeKey) {
 };
 
 /**
- * Abre o modal de confirmação antes de ligar/desligar o canal MASTER.
+ * Abre o modal de confirmação apenas ao DESLIGAR o canal MASTER.
+ * Se o canal estiver desligado, ele é ligado diretamente sem confirmação.
  */
 window.confirmMasterOn = function() {
+    if (!masterState.on) {
+        toggleState('kStereoChannelOn/kChannelOn', 'master');
+        return;
+    }
+
     const modal = document.getElementById('masterOnConfirmModal');
     if (!modal) return;
-    const turningOn = !masterState.on;
+
     const titleEl = document.getElementById('masterOnConfirmTitle');
-    if (titleEl) titleEl.textContent = turningOn ? 'LIGAR CANAL MASTER' : 'DESLIGAR CANAL MASTER';
+    if (titleEl) titleEl.textContent = 'DESLIGAR CANAL MASTER';
+
     const textEl = document.getElementById('masterOnConfirmText');
     if (textEl) {
-        textEl.textContent = turningOn
-            ? 'O canal master está DESLIGADO. Deseja LIGAR o áudio agora?'
-            : 'O canal master está LIGADO. Deseja DESLIGAR o áudio agora?';
+        textEl.textContent = 'O canal master está LIGADO. Deseja DESLIGAR o áudio agora?';
     }
+
     const yesBtn = document.getElementById('masterOnConfirmYes');
     if (yesBtn) {
-        yesBtn.textContent = turningOn ? 'SIM, LIGAR' : 'SIM, DESLIGAR';
-        yesBtn.classList.toggle('danger', !turningOn);
+        yesBtn.textContent = 'SIM, DESLIGAR';
+        yesBtn.classList.add('danger');
     }
+
     modal.style.display = 'flex';
 };
 
