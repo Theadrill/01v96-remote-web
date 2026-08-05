@@ -600,6 +600,14 @@ pub fn register_handlers(
                         let req_comp = vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x00, 0x03, ch as u8, 0x00, 0x01, 0xF7];
                         scheduler_dyn.enqueue(req_gate, 0).await;
                         scheduler_dyn.enqueue(req_comp, 0).await;
+                    } else if (36..=43).contains(&ch) {
+                        // AUX 1-8: Elemento 0x02, Sub 0x03 (Comp GR), canal local ch - 36
+                        let req_comp = vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x02, 0x03, (ch - 36) as u8, 0x00, 0x01, 0xF7];
+                        scheduler_dyn.enqueue(req_comp, 0).await;
+                    } else if (44..=51).contains(&ch) {
+                        // BUS 1-8: Elemento 0x01, Sub 0x03 (Comp GR), canal local ch - 44
+                        let req_comp = vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x01, 0x03, (ch - 44) as u8, 0x00, 0x01, 0xF7];
+                        scheduler_dyn.enqueue(req_comp, 0).await;
                     }
                 }
             },
