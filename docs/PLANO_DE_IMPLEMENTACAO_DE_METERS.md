@@ -93,41 +93,60 @@ A mesa Yamaha 01V96 opera a uma taxa física de transmissão MIDI de **31.25 kbp
 
 ## 3. Mapeamento de Elementos e Sub-Canais
 
-### 3.1. Elemento `0x00`: Selected Channel (Canal Selecionado)
+A 01V96 organiza o polling de medidores (`0D 21`) por **Elemento SysEx** de acordo com a família do barramento selecionado (Selected Channel):
 
-Quando a tela de edição detalhada de um canal (Selected Channel) está ativa no aplicativo ou Studio Manager, a requisição utiliza o `Element 0x00` (`0D 21 00`):
+| Elemento SysEx | Família de Barramentos | Sub-canal `0x00` | Sub-canal `0x02` | Sub-canal `0x03` (Comp GR) | Sub-canal `0x04` | Sub-canal `0x05` (Gate GR) |
+|:---:|:---|:---|:---|:---:|:---|:---:|
+| **`0x00`** | **Inputs (CH1-32)** | Fader Level Meter | Gate Level Out | **Comp GR Meter** | Comp Level Out | **Gate GR Meter** |
+| **`0x01`** | **BUS (BUS 1-8)** | Bus Level Meter L | Bus Level Meter R/Sub | **Comp GR Meter** | Bus Level Out | *(Sem Gate)* |
+| **`0x02`** | **AUX (AUX 1-8)** | Aux Level Meter L | Aux Level Meter R/Sub | **Comp GR Meter** | Aux Level Out | *(Sem Gate)* |
+| **`0x04`** | **Master Stereo** | Master L Level | Master R Level | **Comp GR Meter** | Master Level Out | *(Sem Gate)* |
 
-| Sub-canal (`CHANNEL`) | Tipo de Meter | Descrição / Localização Visual no Print |
+### 3.1. Elemento `0x00`: Inputs (Canais 1-32)
+
+Quando a tela de edição detalhada de um canal de entrada (CH1-32) está ativa:
+
+| Sub-canal (`PARAM`) | Tipo de Meter | Descrição / Localização Visual |
 |---|---|---|
-| `0x00` | **Fader Level Meter** | Barra principal de nível do canal ao lado do Fader de volume (`-∞` a `+10`) |
-| `0x02` | **Gate Level Meter** | Barra de nível de sinal de saída do Gate (`OVER 0 -3 ...`) |
-| `0x03` | **Comp GR Meter** | **Gain Reduction do Compressor** (`Element 0x00` para CH1-32 / `Element 0x04` para Master Stereo) |
+| `0x00` | **Fader Level Meter** | Barra principal de nível do canal ao lado do Fader (`-∞` a `+10`) |
+| `0x02` | **Gate Level Meter** | Barra de nível de sinal de saída do Gate |
+| `0x03` | **Comp GR Meter** | **Gain Reduction do Compressor** (`0` a `-18dB`) |
 | `0x04` | **Comp Level Meter** | Barra de nível de sinal de saída do Compressor (`OUT`) |
-| `0x05` | **Gate GR Meter** | **Gain Reduction do Gate** (Atuação da atenuação do Gate, `0` a `-18dB`, apenas CH1-32) |
+| `0x05` | **Gate GR Meter** | **Gain Reduction do Gate** (`0` a `-18dB`) |
 
-> [!IMPORTANT]
-> **Adaptação Dinâmica do Selected Channel:**
-> - Em **Canais de Entrada (CH1-CH32)**: O Gate está presente, gerando requisições no `Element 0x00` (`0x00`, `0x02`, `0x03`, `0x04`, `0x05`).
-> - Em **Canais Master (STEREO-L / STEREO-R)**: O Gate **não existe** (a caixa do Gate fica vazia). O Studio Manager e a mesa operam o **Compressor GR do Master no `Element 0x04` (`Sub-canal 0x03`, `Channel 0x00`)**, além dos meters de saída stereo (`Element 0x04` `0x00` e `0x02`).
+### 3.2. Elemento `0x01`: BUS (BUS 1 ao 8)
 
-### 3.2. Elemento `0x04`: Stereo Master Bus Output & Comp GR Meters
+Quando o canal selecionado é um Barramento BUS (BUS 1-8):
 
-Quando o canal selecionado é o Master Stereo (`STEREO-L` / `STEREO-R`), o Studio Manager faz o polling do `Element 0x04` (`0D 21 04`) solicitando pontos de leitura do barramento Master estéreo:
+| Sub-canal (`PARAM`) | Tipo de Meter | Descrição / Canal Lido |
+|---|---|---|
+| `0x00` | **BUS Level L** | Leitura principal de nível de saída do BUS |
+| `0x02` | **BUS Level R/Sub** | Leitura estéreo / sub do BUS |
+| `0x03` | **BUS Comp GR Meter** | **Gain Reduction do Compressor do BUS** (`0` a `-18dB`) |
+
+### 3.3. Elemento `0x02`: AUX (AUX 1 ao 8)
+
+Quando o canal selecionado é uma Saída Auxiliar (AUX 1-8):
+
+| Sub-canal (`PARAM`) | Tipo de Meter | Descrição / Canal Lido |
+|---|---|---|
+| `0x00` | **AUX Level L** | Leitura principal de nível de saída do AUX |
+| `0x02` | **AUX Level R/Sub** | Leitura estéreo / sub do AUX |
+| `0x03` | **AUX Comp GR Meter** | **Gain Reduction do Compressor do AUX** (`0` a `-18dB`) |
+
+### 3.4. Elemento `0x04`: Stereo Master Bus Output & Comp GR Meters
+
+Quando o canal selecionado é o Master Stereo (`STEREO-L` / `STEREO-R`):
 
 | Sub-canal (`PARAM`) | Tipo de Meter | Descrição / Canal Lido |
 |---|---|---|
 | `0x00` | **Master L Level** | Leitura do canal **Left** do barramento Stereo Master |
 | `0x02` | **Master R Level** | Leitura do canal **Right** do barramento Stereo Master |
-| `0x03` | **Master Comp GR / Peak** | **Gain Reduction do Compressor do Master** (`Sub 0x03`, `Ch 0x00`) e leitura de pico/balance |
-
-> [!NOTE]
-> Mesmo que a tela do Selected Channel exiba visualmente apenas 1 barra vertical de fader, o firmware da 01V96 e o Studio Manager monitoram simultaneamente o sinal de **L (`0x00`)**, **R (`0x02`)** e **Pico/Balance (`0x03`)** para atualizar dinamicamente indicadores de clipping, LEDs de pré/pós e o medidor visual do fader.
+| `0x03` | **Master Comp GR** | **Gain Reduction do Compressor do Master** (`0` a `-18dB`) |
 
 > [!IMPORTANT]
-> **Requisito de UI Desktop — Seletor Alternável PRE / POST no Canal Master:**
-> O chaveamento **PRE / POST** dos medidores do Master **NÃO** é feito via troca de sub-param do Element 0x04. O ponto de leitura (Pre/Post) é controlado de forma **global** por uma chave SysEx independente (ver Seção 5.2, Alvo `0x01` — Saídas). O Element 0x04 sempre lê o ponto atualmente configurado nessa chave global para os canais L e R:
-> - **Ao selecionar [PRE]:** A chave global é comutada para Pre-Fader. As requisições dos sub-params `0x00` (L) e `0x02` (R) passam a refletir o nível **antes** do fader.
-> - **Ao selecionar [POST]:** A chave global é comutada para Post-Fader. As requisições dos mesmos sub-params passam a refletir o nível **após** o fader.
+> **Padronização Universal do Comp GR:**
+> O **Compressor Gain Reduction** opera impreterivelmente no **`Sub-canal 0x03`** em todas as 4 famílias de barramentos da 01V96. Apenas o **Elemento SysEx** altera (`0x00` para CH, `0x01` para BUS, `0x02` para AUX e `0x04` para Master).
 
 ---
 

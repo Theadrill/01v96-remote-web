@@ -6,14 +6,25 @@ Este documento contém o planejamento arquitetural e as instruções de delegaç
 
 ## 1. Visão Geral da Funcionalidade e Mapeamento Confirmado
 
-Na tela de Dinâmicos de cada canal individual:
+Na tela de Dinâmicos de cada canal/barramento:
 * **Meter Superior (Novo - GR):** Medidor de Gain Reduction atuando da **direita para a esquerda** (0 dB à direita, atenuação crescendo para a esquerda até -18 dB).
   * **Card de GATE (Canais CH1-32):** Conectado ao parâmetro SysEx **Gate GR Meter** (`Sub-canal 0x05` do `Element 0x00`).
   * **Card de COMPRESSOR (Canais CH1-32):** Conectado ao parâmetro SysEx **Comp GR Meter** (`Sub-canal 0x03` do `Element 0x00`).
-  * **Card de COMPRESSOR (Master Stereo):** Conectado ao parâmetro SysEx **Master Comp GR Meter** (`Sub-canal 0x03` do `Element 0x04`, `Channel 0x00`). *Validado em mesa física*. (O Master não possui Gate).
+  * **Card de COMPRESSOR (Buses BUS 1-8):** Conectado ao parâmetro SysEx **BUS Comp GR Meter** (`Sub-canal 0x03` do `Element 0x01`). *Validado em logs do Studio Manager*.
+  * **Card de COMPRESSOR (Auxiliares AUX 1-8):** Conectado ao parâmetro SysEx **AUX Comp GR Meter** (`Sub-canal 0x03` do `Element 0x02`). *Validado em logs do Studio Manager*.
+  * **Card de COMPRESSOR (Master Stereo):** Conectado ao parâmetro SysEx **Master Comp GR Meter** (`Sub-canal 0x03` do `Element 0x04`, `Channel 0x00`). *Validado em mesa física*. (Buses, Auxiliares e Master não possuem Gate).
 * **Meter Inferior (Existente - Output Level):** Permanece atuando da **esquerda para a direita** (saída do módulo).
   * **Card de GATE:** `Sub-canal 0x02` (Gate Level Meter).
-  * **Card de COMPRESSOR:** `Sub-canal 0x04` (Comp Level Meter).
+  * **Card de COMPRESSOR:** `Sub-canal 0x04` (Comp Level Meter para CH1-32; `Sub-canal 0x00` para AUX/BUS/Master).
+
+### Mapeamento Consolidado por Família de Barramento
+
+| Tipo de Canal | Elemento SysEx | Comp GR Meter | Gate GR Meter |
+|---|:---:|:---:|:---:|
+| **Inputs (CH1-32)** | `Element 0x00` | `Sub 0x03` | `Sub 0x05` |
+| **Buses (BUS 1-8)** | `Element 0x01` | `Sub 0x03` | *(Sem Gate)* |
+| **Auxiliares (AUX 1-8)** | `Element 0x02` | `Sub 0x03` | *(Sem Gate)* |
+| **Master Stereo** | `Element 0x04` | `Sub 0x03` | *(Sem Gate)* |
 
 ---
 
