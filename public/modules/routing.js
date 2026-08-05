@@ -133,6 +133,7 @@ window.renderRouting = function(chIdx) {
             <p class="etc-pan-title">Pan</p>
             <div class="etc-pan-body">
                 <div class="etc-pan-box">
+                    <button type="button" class="etc-pan-reset" onclick="resetMobilePanToCenter('etcPanSl-${chIdx}', ${primaryLogicCh})">resetar</button>
                     <div class="etc-pan">
                         <div class="etc-pan-labels">
                             <span>L</span>

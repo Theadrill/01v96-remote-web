@@ -2150,6 +2150,7 @@ body.layout-desktop .sidebar-macros {
 }
 
 .etc-pan-box {
+    position: relative;
     background: #222;
     border: 1px solid #444;
     border-radius: 10px;
@@ -2158,6 +2159,26 @@ body.layout-desktop .sidebar-macros {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.etc-pan-reset {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 1px 7px;
+    font-size: 9px;
+    line-height: 13px;
+    font-weight: bold;
+    color: #ff4d4d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .etc-pan {
