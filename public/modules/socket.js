@@ -152,6 +152,12 @@ socket.on('update', (d) => {
         if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function') {
             window.updatePanIndicator(isMaster ? 'master' : d.channel, d.value);
         }
+
+        // Sincroniza o slider do PAN Mobile na aba ETC em tempo real
+        if (activeConfigTab === 'etc') {
+            const panSlider = document.getElementById(`etcPanSl-${d.channel}`);
+            if (panSlider) panSlider.value = d.value;
+        }
         return;
     }
 

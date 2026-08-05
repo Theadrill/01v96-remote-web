@@ -100,13 +100,13 @@ window.renderRouting = function(chIdx) {
         tracksHTML += getPanTrackHTML(partnerLogicCh);
     }
     const isMobilePan = typeof layoutMode !== 'undefined' && layoutMode !== 'desktop';
-    let mockPanVal = 0;
-    const mockPanStateRef = getChannelStateById(primaryLogicCh);
-    if (mockPanStateRef && mockPanStateRef.pan !== undefined) {
-        mockPanVal = mockPanStateRef.pan;
+    let etcPanVal = 0;
+    const etcPanStateRef = getChannelStateById(primaryLogicCh);
+    if (etcPanStateRef && etcPanStateRef.pan !== undefined) {
+        etcPanVal = etcPanStateRef.pan;
     }
     const panSectionHTML = isMobilePan ? `
-        <div class="etc-pan-mock-original">
+        <div class="etc-pan-legacy">
             <div style="flex: 1; min-width: 120px; display: flex; flex-direction: column;">
                 <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Pan</p>
                 <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
@@ -129,17 +129,17 @@ window.renderRouting = function(chIdx) {
                 </div>
             </div>
         </div>
-        <div class="etc-pan-mock-container">
-            <p class="etc-pan-mock-title">Pan</p>
-            <div class="etc-pan-mock-body">
-                <div class="etc-pan-mock-box">
-                    <div class="etc-pan-mock">
-                        <div class="etc-pan-mock-labels">
+        <div class="etc-pan-container">
+            <p class="etc-pan-title">Pan</p>
+            <div class="etc-pan-body">
+                <div class="etc-pan-box">
+                    <div class="etc-pan">
+                        <div class="etc-pan-labels">
                             <span>L</span>
-                            <span class="etc-pan-mock-center">C</span>
+                            <span class="etc-pan-center">C</span>
                             <span>R</span>
                         </div>
-                        <input type="range" id="etcPanMockSl-${chIdx}" class="dyn-slider etc-pan-mock-slider" min="-63" max="63" step="1" value="${mockPanVal}" onpointerup="onMockPanTap(event, 'etcPanMockSl-${chIdx}')">
+                        <input type="range" id="etcPanSl-${chIdx}" class="dyn-slider etc-pan-slider" min="-63" max="63" step="1" value="${etcPanVal}" oninput="onMobilePanChange(event, ${primaryLogicCh})" onpointerup="onMobilePanTap(event, 'etcPanSl-${chIdx}', ${primaryLogicCh})">
                     </div>
                 </div>
             </div>
@@ -151,7 +151,7 @@ window.renderRouting = function(chIdx) {
             <!-- Top Row: Patch + Pan -->
             <div style="display: flex; gap: 15px; align-items: stretch; flex-wrap: wrap;">
                 <!-- Seção de Patch -->
-                <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column;">
+                <div style="flex: 1; display: flex; flex-direction: column;">
                     <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Entrada do Canal (Patch)</p>
                     <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
                         <!-- Patch do Canal Principal -->
@@ -238,30 +238,44 @@ window.renderRouting = function(chIdx) {
     }
 };
 
-let mockPanTapTimer = null;
-let mockPanLastTapTime = 0;
+let mobilePanTapTimer = null;
+let mobilePanLastTapTime = 0;
 
-window.resetMockPanToCenter = function(sliderId) {
-    const el = document.getElementById(sliderId);
-    if (el) el.value = 0;
+window.onMobilePanChange = function(e, ch) {
+    const newPan = parseInt(e.target.value, 10);
+    const state = getChannelStateById(ch);
+    if (state) state.pan = newPan;
+    if (appReady && typeof socket !== 'undefined' && socket) {
+        socket.emit('setPan', { channel: ch, value: newPan });
+    }
 };
 
-window.onMockPanTap = function(e, sliderId) {
+window.resetMobilePanToCenter = function(sliderId, ch) {
+    const el = document.getElementById(sliderId);
+    if (el) el.value = 0;
+    const state = getChannelStateById(ch);
+    if (state) state.pan = 0;
+    if (appReady && typeof socket !== 'undefined' && socket) {
+        socket.emit('setPan', { channel: ch, value: 0 });
+    }
+};
+
+window.onMobilePanTap = function(e, sliderId, ch) {
     const now = Date.now();
-    if (now - mockPanLastTapTime < 300) {
-        if (mockPanTapTimer) {
-            clearTimeout(mockPanTapTimer);
-            mockPanTapTimer = null;
+    if (now - mobilePanLastTapTime < 300) {
+        if (mobilePanTapTimer) {
+            clearTimeout(mobilePanTapTimer);
+            mobilePanTapTimer = null;
         }
-        mockPanLastTapTime = 0;
-        resetMockPanToCenter(sliderId);
+        mobilePanLastTapTime = 0;
+        resetMobilePanToCenter(sliderId, ch);
         e.preventDefault();
         e.stopPropagation();
     } else {
-        mockPanLastTapTime = now;
-        mockPanTapTimer = setTimeout(() => {
-            mockPanLastTapTime = 0;
-            mockPanTapTimer = null;
+        mobilePanLastTapTime = now;
+        mobilePanTapTimer = setTimeout(() => {
+            mobilePanLastTapTime = 0;
+            mobilePanTapTimer = null;
         }, 300);
     }
 };

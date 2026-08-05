@@ -2122,19 +2122,19 @@ body.layout-desktop .sidebar-macros {
     box-shadow: 0 0 7px rgba(168, 85, 247, 0.8);
 }
 
-/* ---- MOCK: Novo PAN Mobile (slider horizontal estilo dyn) ---- */
-.etc-pan-mock-original {
-    flex: 1;
-    min-width: 120px;
-    display: flex;
-    flex-direction: column;
-}
-
-.etc-pan-mock-container {
+/* ---- Novo PAN Mobile (slider horizontal estilo dyn) ---- */
+.etc-pan-legacy {
     display: none;
 }
 
-.etc-pan-mock-title {
+.etc-pan-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 120px;
+}
+
+.etc-pan-title {
     font-size: 10px;
     color: #666;
     text-transform: uppercase;
@@ -2142,14 +2142,14 @@ body.layout-desktop .sidebar-macros {
     margin-bottom: 15px;
 }
 
-.etc-pan-mock-body {
+.etc-pan-body {
     display: flex;
     flex-direction: column;
     gap: 12px;
     flex: 1;
 }
 
-.etc-pan-mock-box {
+.etc-pan-box {
     background: #222;
     border: 1px solid #444;
     border-radius: 10px;
@@ -2160,14 +2160,14 @@ body.layout-desktop .sidebar-macros {
     justify-content: center;
 }
 
-.etc-pan-mock {
+.etc-pan {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.etc-pan-mock-labels {
+.etc-pan-labels {
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -2177,15 +2177,15 @@ body.layout-desktop .sidebar-macros {
     user-select: none;
 }
 
-.etc-pan-mock-center {
+.etc-pan-center {
     color: #5cacee;
 }
 
-.etc-pan-mock-slider.dyn-slider::-webkit-slider-thumb {
+.etc-pan-slider.dyn-slider::-webkit-slider-thumb {
     width: 16px;
 }
 
-.etc-pan-mock-slider.dyn-slider::-moz-range-thumb {
+.etc-pan-slider.dyn-slider::-moz-range-thumb {
     width: 16px;
 }
 
