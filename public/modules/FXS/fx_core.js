@@ -227,12 +227,12 @@
         }
 
         if (schema.showMeters === true) {
-            startMeterDemo();
+            startFxMeters();
             if (typeof socket !== 'undefined' && socket.emit) {
                 socket.emit('requestFxMeters');
             }
         } else {
-            stopMeterDemo();
+            stopFxMeters();
         }
     }
 
@@ -376,7 +376,7 @@
         });
     }
 
-    // ── Meters de Telemetria (Placeholder Visual até a lógica chegar) ──
+    // ── Meters de Telemetria (dados reais da mesa via MIDI) ──
     function renderMbandMeters(schema, decoded) {
         const soloState = (key) => {
             const item = decoded && decoded.params[key];
@@ -392,8 +392,7 @@
                 inL: 0, inLVal: '-48dB',
                 inR: 0, inRVal: '-48dB'
             },
-            total: 12,
-            live: true
+            total: 12
         });
     }
 
@@ -422,12 +421,42 @@
         }
     }
 
-    function startMeterDemo() {
-        startMeterPolling();
+    // Foco contínuo do slot FX em edição (espelha o gr_monitor): a 01V96 só
+    // streama os meters 0x06 do FX cujo editor está em foco. Roda APENAS
+    // enquanto o modal do editor estiver aberto (startFxMeters/stopFxMeters).
+    let fxFocusTimer = null;
+
+    function startFxFocus() {
+        if (fxFocusTimer) return;
+        if (typeof socket !== 'undefined' && socket.emit) {
+            socket.emit('focusFxSlot', { slot: currentSlotIdx });
+        }
+        fxFocusTimer = setInterval(() => {
+            if (!isModalOpen()) {
+                stopFxFocus();
+                return;
+            }
+            if (typeof socket !== 'undefined' && socket.emit) {
+                socket.emit('focusFxSlot', { slot: currentSlotIdx });
+            }
+        }, 2000);
     }
 
-    function stopMeterDemo() {
+    function stopFxFocus() {
+        if (fxFocusTimer) {
+            clearInterval(fxFocusTimer);
+            fxFocusTimer = null;
+        }
+    }
+
+    function startFxMeters() {
+        startMeterPolling();
+        startFxFocus();
+    }
+
+    function stopFxMeters() {
         stopMeterPolling();
+        stopFxFocus();
     }
 
     function updateFxMeterFromMidi(channel, rawVal) {
@@ -479,41 +508,6 @@
         if (valEl) valEl.textContent = dbVal;
     }
 
-    function animateMeterDemo() {
-        if (!isModalOpen()) {
-            stopMeterDemo();
-            return;
-        }
-        const typeId = fxTypeState[currentSlotIdx] ? fxTypeState[currentSlotIdx].id : currentSlotIdx;
-        const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
-        if (!schema || schema.showMeters !== true) {
-            stopMeterDemo();
-            return;
-        }
-
-        const modal = document.getElementById('fxEditorModal');
-        if (!modal) return;
-        const tracks = modal.querySelectorAll('.fx-meter-track.fx-meter-live');
-        tracks.forEach(track => {
-            const segs = track.querySelectorAll('.fx-meter-seg');
-            if (!segs.length) return;
-            const maxLit = segs.length;
-            const lit = Math.max(1, Math.floor(Math.random() * maxLit * 0.85));
-            segs.forEach(seg => {
-                const i = parseInt(seg.getAttribute('data-i'), 10) || 0;
-                seg.classList.toggle('lit', i < lit);
-                seg.classList.toggle('peak', i === lit - 1);
-            });
-            const meterEl = track.closest('.fx-meter');
-            if (meterEl) {
-                const valEl = meterEl.querySelector('.fx-meter-val');
-                if (valEl) {
-                    valEl.textContent = Math.round((lit / maxLit) * 30 - 30) + 'dB';
-                }
-            }
-        });
-    }
-
     function setActiveTab(tabId) {
         activeTabId = tabId;
         rerenderIfOpen();
@@ -548,7 +542,7 @@
         const modal = document.getElementById('fxEditorModal');
         if (modal) modal.style.display = 'none';
         hideEditorSyncOverlay();
-        stopMeterDemo();
+        stopFxMeters();
 
         if (typeof window.syncFxSlotsFromCore === 'function') {
             window.syncFxSlotsFromCore();

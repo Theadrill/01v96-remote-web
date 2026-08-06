@@ -2459,11 +2459,31 @@ pub fn register_handlers(
         let sched_fx_meters = scheduler_socket.clone();
         socket.on(
             "requestFxMeters",
-            move |_socket: SocketRef, _data: Data<serde_json::Value>| async move {
+            move |_socket: SocketRef| async move {
                 let channels = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12];
                 for ch in channels {
                     let req = crate::midi::protocol::build_fx_meter_request(ch);
                     sched_fx_meters.enqueue(req, 0).await;
+                }
+            },
+        );
+
+        // --- FOCUS FX SLOT (mantém o foco do editor p/ os meters 0x06 streamarem) ---
+        // A 01V96 só envia os meters de Elemento 0x06 do FX cujo editor está em edição.
+        // Fazer o foco uma única vez ao abrir não basta; re-lemos a seção de Effect
+        // (0x7F, group 0x01, element 0x58) do slot periodicamente, como no gr_monitor.
+        let sched_fx_focus = scheduler_socket.clone();
+        socket.on(
+            "focusFxSlot",
+            move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if let Some(slot) = data.get("slot").and_then(|v| v.as_u64()).map(|v| v as u8) {
+                    if slot < 4 {
+                        for &p in &[0x31u8, 0x10, 0x11, 0x12] {
+                            if let Some(req) = crate::midi::protocol::build_fx_param_request(slot, p) {
+                                sched_fx_focus.enqueue(req, 0).await;
+                            }
+                        }
+                    }
                 }
             },
         );

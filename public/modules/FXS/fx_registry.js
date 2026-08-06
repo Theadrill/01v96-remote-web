@@ -11,7 +11,6 @@
 
     function getSchema(typeId) {
         if (registry[typeId]) return registry[typeId];
-        if (typeId === 49) return registry[43] || null;
         return null;
     }
 
@@ -69,15 +68,15 @@
     registerSchema(2, createReverbSchema(2, 'Reverb Stage', 'REVERB STAGE', 'theme-stage', 3));
     registerSchema(3, createReverbSchema(3, 'Reverb Plate', 'REVERB PLATE', 'theme-plate', 4));
 
-    // ── Schema do Multiband Compressor (M.BAND DYNA. - ID 43) ─────────
+    // ── Schema do Multiband Compressor (M.BAND DYNA. - ID 49) ─────────
     function createMultibandSchema() {
         return {
-            id: 43,
+            id: 49,
             typeKey: 'M.BAND DYNA.',
             name: 'Multiband Compressor',
             category: 'Dynamic',
             colorTheme: 'theme-mband',
-            defaultConcept: 43,
+            defaultConcept: 49,
             supported: true,
             showMeters: true,
             categories: [
@@ -128,7 +127,7 @@
         };
     }
 
-    registerSchema(43, createMultibandSchema());
+    registerSchema(49, createMultibandSchema());
 
     // Expor Globalmente
     window.FXRegistry = {

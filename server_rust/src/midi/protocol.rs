@@ -573,14 +573,17 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
     }
 
     // --- FX METERS (Section 0x0D, Group 0x21, Element 0x06) ---
-    // Resposta: F0 43 10 3E 0D 21 06 [CHANNEL] [B0 B1 B2 B3] F7 (13-14 bytes)
+    // Resposta real da 01V96 (18 bytes): F0 43 10 3E 0D 21 06 [CHANNEL] 00 B0 B1 B2 B3 B4 B5 B6 B7 F7
+    // B2 (message[11]) é o MSB e B3 (message[12]) é o LSB do valor de 14 bits.
     if message.len() >= 13
         && section == 0x0D
         && group == 0x21
         && element == 0x06
     {
         let meter_ch = parameter as usize;
-        let raw_val = (((message[10] & 0x7F) as u16) << 7) | ((message[11] & 0x7F) as u16);
+        let msb = if message.len() >= 13 { message[11] } else { message[10] };
+        let lsb = if message.len() >= 13 { message[12] } else { message[11] };
+        let raw_val = (((msb & 0x7F) as u16) << 7) | ((lsb & 0x7F) as u16);
         return Some(ParsedMidi::FxMeterData {
             channel: meter_ch,
             raw_val,

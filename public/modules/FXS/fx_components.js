@@ -130,7 +130,7 @@
     }
 
     // ── Componente: Meter de Telemetria (Barra Vertical de LED) ───────
-    function renderMeterColumn({ label, value = '', lit = 0, total = 12, live = false, cls = '', ch = undefined }) {
+    function renderMeterColumn({ label, value = '', lit = 0, total = 12, cls = '', ch = undefined }) {
         let segs = '';
         for (let i = 0; i < total; i++) {
             const isLit = i < lit;
@@ -140,19 +140,19 @@
         return `
         <div class="fx-meter${cls ? ' fx-meter-' + cls : ''}"${ch !== undefined ? ' data-meter-ch="' + ch + '"' : ''}>
             <span class="fx-meter-label">${label}</span>
-            <div class="fx-meter-track${live ? ' fx-meter-live' : ''}">
+            <div class="fx-meter-track">
                 ${segs}
             </div>
             <span class="fx-meter-val">${value}</span>
         </div>`;
     }
 
-    function renderMeters({ bands = [], stereo = null, total = 12, live = true }) {
+    function renderMeters({ bands = [], stereo = null, total = 12 }) {
         const bandGroups = bands.map(b => `
         <div class="fx-meter-group fx-meter-band">
             <div class="fx-meter-group-title">${b.name}</div>
             <div class="fx-meter-pair">
-                ${renderMeterColumn({ label: 'GR', value: b.grVal || '0dB', lit: b.gr || 0, total, live, cls: 'gr', ch: b.grCh })}
+                ${renderMeterColumn({ label: 'GR', value: b.grVal || '0dB', lit: b.gr || 0, total, cls: 'gr', ch: b.grCh })}
             </div>
             ${b.solo ? renderSwitchCard({ label: 'SOLO', active: b.solo.active, sysEx: b.solo.sysEx, paramKey: b.solo.key }) : ''}
         </div>`).join('');
@@ -161,8 +161,8 @@
         <div class="fx-meter-group fx-meter-stereo">
             <div class="fx-meter-group-title">STEREO</div>
             <div class="fx-meter-pair">
-                ${renderMeterColumn({ label: 'L', value: stereo.inLVal || '-36dB', lit: stereo.inL || 0, total, live, ch: 0 })}
-                ${renderMeterColumn({ label: 'R', value: stereo.inRVal || '-36dB', lit: stereo.inR || 0, total, live, ch: 1 })}
+                ${renderMeterColumn({ label: 'L', value: stereo.inLVal || '-36dB', lit: stereo.inL || 0, total, ch: 0 })}
+                ${renderMeterColumn({ label: 'R', value: stereo.inRVal || '-36dB', lit: stereo.inR || 0, total, ch: 1 })}
             </div>
         </div>` : '';
 
