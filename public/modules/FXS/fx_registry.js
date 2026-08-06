@@ -66,6 +66,67 @@
     registerSchema(2, createReverbSchema(2, 'Reverb Stage', 'REVERB STAGE', 'theme-stage', 3));
     registerSchema(3, createReverbSchema(3, 'Reverb Plate', 'REVERB PLATE', 'theme-plate', 4));
 
+    // ── Schema do Multiband Compressor (M.BAND DYNA. - ID 49) ────────
+    function createMultibandSchema() {
+        return {
+            id: 49,
+            typeKey: 'M.BAND DYNA.',
+            name: 'Multiband Compressor',
+            category: 'Dynamic',
+            colorTheme: 'theme-mband',
+            defaultConcept: 49,
+            supported: true,
+            showMeters: true,
+            categories: [
+                { id: 'gain', title: 'Ganho' },
+                { id: 'comp', title: 'Compressor' },
+                { id: 'xover', title: 'Crossover' },
+                { id: 'exp', title: 'Expansor' },
+                { id: 'lim', title: 'Limiter' }
+            ],
+            params: [
+                // ── Grupo Ganho ────────────────────────────────────────
+                { sysEx: 16, key: 'lowGain', name: 'LOW GAIN', min: 0, max: 1080, defaultVal: 960, unit: 'dB', category: 'gain', formatFn: v => ((v - 960) / 10).toFixed(1) + 'dB' },
+                { sysEx: 45, key: 'soloLow', name: 'SOLO LOW', min: 0, max: 1, defaultVal: 0, unit: '', category: 'meter', widget: 'switch', formatFn: v => (v === 1 ? 'ON' : 'OFF') },
+                { sysEx: 17, key: 'midGain', name: 'MID GAIN', min: 0, max: 1080, defaultVal: 960, unit: 'dB', category: 'gain', formatFn: v => ((v - 960) / 10).toFixed(1) + 'dB' },
+                { sysEx: 46, key: 'soloMid', name: 'SOLO MID', min: 0, max: 1, defaultVal: 0, unit: '', category: 'meter', widget: 'switch', formatFn: v => (v === 1 ? 'ON' : 'OFF') },
+                { sysEx: 18, key: 'hiGain', name: 'HI. GAIN', min: 0, max: 1080, defaultVal: 960, unit: 'dB', category: 'gain', formatFn: v => ((v - 960) / 10).toFixed(1) + 'dB' },
+                { sysEx: 47, key: 'soloHigh', name: 'SOLO HIGH', min: 0, max: 1, defaultVal: 0, unit: '', category: 'meter', widget: 'switch', formatFn: v => (v === 1 ? 'ON' : 'OFF') },
+                { sysEx: 19, key: 'presence', name: 'PRESENCE', min: 0, max: 20, defaultVal: 10, unit: '', category: 'gain', formatFn: v => (v - 10 >= 0 ? '+' : '') + (v - 10) },
+
+                // ── Grupo Compressor ───────────────────────────────────
+                { sysEx: 24, key: 'cmpThre', name: 'CMP.THRE', min: 0, max: 240, defaultVal: 120, unit: 'dB', category: 'comp', formatFn: v => ((v - 240) / 10).toFixed(1) + 'dB' },
+                { sysEx: 25, key: 'cmpRat', name: 'CMP.RAT', min: 0, max: 14, defaultVal: 5, unit: '', category: 'comp', formatFn: v => ['1:1', '1.1:1', '1.3:1', '1.5:1', '1.7:1', '2:1', '2.5:1', '3:1', '3.5:1', '4:1', '5:1', '6:1', '8:1', '10:1', '20:1'][v] },
+                { sysEx: 27, key: 'cmpAtk', name: 'CMP.ATK', min: 0, max: 120, defaultVal: 20, unit: 'ms', category: 'comp', formatFn: v => Math.round(v) + 'ms' },
+                { sysEx: 26, key: 'cmpRel', name: 'CMP.REL', min: 0, max: 159, defaultVal: 69, unit: 'ms', category: 'comp', formatFn: 'formatDecayStep' },
+                { sysEx: 28, key: 'cmpKnee', name: 'CMP.KNEE', min: 0, max: 5, defaultVal: 0, unit: '', category: 'comp', formatFn: v => String(Math.round(v)) },
+                { sysEx: 35, key: 'lookup', name: 'LOOKUP', min: 0, max: 1000, defaultVal: 0, unit: 'ms', category: 'comp', formatFn: v => (v / 10).toFixed(1) + 'ms' },
+                { sysEx: 29, key: 'cmpByp', name: 'CMP.BYP', min: 0, max: 1, defaultVal: 0, unit: '', category: 'comp', widget: 'switch', formatFn: v => (v === 1 ? 'ON' : 'OFF') },
+
+                // ── Grupo Crossover ────────────────────────────────────
+                { sysEx: 36, key: 'lmXovr', name: 'L-M XOVR', min: 0, max: 103, defaultVal: 47, unit: 'Hz', category: 'xover', formatFn: v => window.FXUtils.formatHpfStep(v + 1) },
+                { sysEx: 37, key: 'mhXovr', name: 'M-H XOVR', min: 0, max: 103, defaultVal: 80, unit: 'Hz', category: 'xover', formatFn: v => window.FXUtils.formatHpfStep(v + 1) },
+                { sysEx: 38, key: 'slope', name: 'SLOPE', min: 0, max: 1, defaultVal: 1, unit: '', category: 'xover', formatFn: v => (v === 1 ? '-12dB' : '-6dB') },
+                { sysEx: 39, key: 'ceiling', name: 'CEILING', min: 0, max: 61, defaultVal: 61, unit: 'dB', category: 'xover', formatFn: v => (v === 61 ? 'OFF' : ((v - 60) / 10).toFixed(1) + 'dB') },
+
+                // ── Grupo Expansor ─────────────────────────────────────
+                { sysEx: 20, key: 'expThre', name: 'EXP.THRE', min: 0, max: 300, defaultVal: 0, unit: 'dB', category: 'exp', formatFn: v => ((v - 540) / 10).toFixed(1) + 'dB' },
+                { sysEx: 21, key: 'expRat', name: 'EXP.RAT', min: 0, max: 15, defaultVal: 0, unit: '', category: 'exp', formatFn: v => ['1:1', '1.1:1', '1.3:1', '1.5:1', '1.7:1', '2:1', '2.5:1', '3:1', '3.5:1', '4:1', '5:1', '6:1', '8:1', '10:1', '20:1', '∞:1'][v] },
+                { sysEx: 22, key: 'expRel', name: 'EXP.REL', min: 0, max: 159, defaultVal: 69, unit: 'ms', category: 'exp', formatFn: 'formatDecayStep' },
+                { sysEx: 23, key: 'expByp', name: 'EXP.BYP', min: 0, max: 1, defaultVal: 0, unit: '', category: 'exp', widget: 'switch', formatFn: v => (v === 1 ? 'ON' : 'OFF') },
+
+                // ── Grupo Limiter ──────────────────────────────────────
+                { sysEx: 30, key: 'limThre', name: 'LIM.THRE', min: 0, max: 120, defaultVal: 120, unit: 'dB', category: 'lim', formatFn: v => ((v - 120) / 10).toFixed(1) + 'dB' },
+                { sysEx: 32, key: 'limAtk', name: 'LIM.ATK', min: 0, max: 120, defaultVal: 0, unit: 'ms', category: 'lim', formatFn: v => Math.round(v) + 'ms' },
+                { sysEx: 31, key: 'limRel', name: 'LIM.REL', min: 0, max: 159, defaultVal: 69, unit: 'ms', category: 'lim', formatFn: 'formatDecayStep' },
+                { sysEx: 33, key: 'limKnee', name: 'LIM.KNEE', min: 0, max: 5, defaultVal: 0, unit: '', category: 'lim', formatFn: v => String(Math.round(v)) },
+                { sysEx: 34, key: 'limByp', name: 'LIM.BYP', min: 0, max: 1, defaultVal: 0, unit: '', category: 'lim', widget: 'switch', formatFn: v => (v === 1 ? 'ON' : 'OFF') }
+            ]
+        };
+    }
+
+    registerSchema(49, createMultibandSchema());
+
     // Expor Globalmente
     window.FXRegistry = {
         registerSchema: registerSchema,

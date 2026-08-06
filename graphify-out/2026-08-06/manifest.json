@@ -2525,8 +2525,8 @@
     "semantic_hash": ""
   },
   "log/server_rust_log.txt": {
-    "mtime": 1785986956.5885484,
-    "ast_hash": "60f5ecc198ac9c8abfd59f3c3dc82828",
+    "mtime": 1785986804.8343942,
+    "ast_hash": "17d0d93d9823b38f3e7262ce72e23025",
     "semantic_hash": ""
   },
   "client_wasm/src/lib.rs": {
@@ -3115,8 +3115,8 @@
     "semantic_hash": ""
   },
   "public/modules/FXS/fx_components.js": {
-    "mtime": 1785986878.159433,
-    "ast_hash": "93f98747962fef5d2f74ba19a05f8cb2",
+    "mtime": 1785986453.459224,
+    "ast_hash": "e606c96b6b76bbdca1d81bb4af3d3b7a",
     "semantic_hash": ""
   },
   "public/modules/FXS/fx_routing.js": {

@@ -129,6 +129,69 @@
         </div>`;
     }
 
+    // ── Componente: Meter de Telemetria (Barra Vertical de LED) ───────
+    function renderMeterColumn({ label, value = '', lit = 0, total = 12, live = false, cls = '' }) {
+        let segs = '';
+        for (let i = 0; i < total; i++) {
+            const isLit = i < lit;
+            const isPeak = isLit && i === lit - 1;
+            segs += `<div class="fx-meter-seg${isLit ? ' lit' : ''}${isPeak ? ' peak' : ''}" data-i="${i}"></div>`;
+        }
+        return `
+        <div class="fx-meter${cls ? ' fx-meter-' + cls : ''}">
+            <span class="fx-meter-label">${label}</span>
+            <div class="fx-meter-track${live ? ' fx-meter-live' : ''}">
+                ${segs}
+            </div>
+            <span class="fx-meter-val">${value}</span>
+        </div>`;
+    }
+
+    function renderMeters({ bands = [], stereo = null, total = 12, live = true }) {
+        const bandGroups = bands.map(b => `
+        <div class="fx-meter-group fx-meter-band">
+            <div class="fx-meter-group-title">${b.name}</div>
+            <div class="fx-meter-pair">
+                ${renderMeterColumn({ label: 'LVL', value: b.levelVal || '', lit: b.level, total, live })}
+                ${renderMeterColumn({ label: 'GR', value: b.grVal || '', lit: b.gr, total, live, cls: 'gr' })}
+            </div>
+            ${b.solo ? renderSwitchCard({ label: 'SOLO', active: b.solo.active, sysEx: b.solo.sysEx, paramKey: b.solo.key }) : ''}
+        </div>`).join('');
+
+        const stereoGroup = stereo ? `
+        <div class="fx-meter-group fx-meter-stereo">
+            <div class="fx-meter-group-title">STEREO</div>
+            <div class="fx-meter-pair">
+                <div class="fx-meter-subpair fx-meter-in-pair">
+                    ${renderMeterColumn({ label: 'IN L', value: stereo.inLVal || '', lit: stereo.inL, total, live })}
+                    ${renderMeterColumn({ label: 'IN R', value: stereo.inRVal || '', lit: stereo.inR, total, live })}
+                </div>
+                <div class="fx-meter-subpair fx-meter-out-pair">
+                    ${renderMeterColumn({ label: 'OUT L', value: stereo.outLVal || '', lit: stereo.outL, total, live })}
+                    ${renderMeterColumn({ label: 'OUT R', value: stereo.outRVal || '', lit: stereo.outR, total, live })}
+                </div>
+            </div>
+        </div>` : '';
+
+        return `
+        <div class="fx-meters-block">
+            <div class="fx-meters-bar-head">
+                <span class="fx-meters-title">NÍVEIS</span>
+                <div class="fx-meters-scale-pill">
+                    <span class="scale-lbl">ESCALA:</span>
+                    <span class="scale-item green">-24</span>
+                    <span class="scale-item yellow">-12</span>
+                    <span class="scale-item yellow">-6</span>
+                    <span class="scale-item red">0 dB</span>
+                </div>
+            </div>
+            <div class="fx-meters-row">
+                ${bandGroups}
+                ${stereoGroup}
+            </div>
+        </div>`;
+    }
+
     // ── Componente: Seletor / Dropdown / Pills ────────────────────────
     function renderSelectorCard({ label, options = [], selectedVal, onSelect, sysEx, paramKey }) {
         const ctrl = controllerRef();
@@ -190,6 +253,8 @@
         renderSwitchCard: renderSwitchCard,
         renderSelectorCard: renderSelectorCard,
         renderUnderConstruction: renderUnderConstruction,
+        renderMeterColumn: renderMeterColumn,
+        renderMeters: renderMeters,
         degFromPct: degFromPct
     };
 

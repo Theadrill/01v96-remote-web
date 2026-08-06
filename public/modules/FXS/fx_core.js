@@ -199,7 +199,9 @@
         }
 
         let bodyHtml = '';
-        if (currentLayoutMode === 'desktop') {
+        if (schema.showMeters === true) {
+            bodyHtml = renderMbandBody(schema, decoded);
+        } else if (currentLayoutMode === 'desktop') {
             bodyHtml = renderDesktopGrid(schema, decoded);
         } else {
             bodyHtml = renderMobileTabs(schema, decoded, categories);
@@ -222,6 +224,12 @@
         const newScrollBody = contentContainer.querySelector('.fx-ed-scroll-body');
         if (newScrollBody && savedScrollTop > 0) {
             newScrollBody.scrollTop = savedScrollTop;
+        }
+
+        if (schema.showMeters === true) {
+            startMeterDemo();
+        } else {
+            stopMeterDemo();
         }
     }
 
@@ -289,6 +297,154 @@
         </div>`;
     }
 
+    // ── Layout Multiband Compressor (Meters + Grupos, sem Abas) ────────
+    function renderMbandBody(schema, decoded) {
+        const isDesktop = currentLayoutMode === 'desktop';
+        const categories = schema.categories || [];
+        let groupsHtml = '';
+
+        categories.forEach(cat => {
+            const catParams = schema.params.filter(p => p.category === cat.id).sort((a, b) => {
+                if (a.widget === 'switch' && b.widget !== 'switch') return 1;
+                if (a.widget !== 'switch' && b.widget === 'switch') return -1;
+                return 0;
+            });
+            let controlsHtml = '';
+
+            if (isDesktop) {
+                let knobsHtml = '';
+                catParams.forEach(p => {
+                    const item = decoded.params[p.key];
+                    if (!item) return;
+                    knobsHtml += renderMbandControl(p, item, isDesktop);
+                });
+                controlsHtml = window.FXComponents.renderCardGroup({
+                    title: cat.title,
+                    content: knobsHtml
+                });
+            } else {
+                let steppersHtml = '<div class="c3-card-section">';
+                catParams.forEach(p => {
+                    const item = decoded.params[p.key];
+                    if (!item) return;
+                    steppersHtml += renderMbandControl(p, item, isDesktop);
+                });
+                steppersHtml += '</div>';
+                controlsHtml = `
+                <div class="fx-card-group">
+                    <div class="fx-card-header">${cat.title}</div>
+                    ${steppersHtml}
+                </div>`;
+            }
+
+            groupsHtml += controlsHtml;
+        });
+
+        return `
+        <div class="concept-view concept-mband">
+            ${renderMbandMeters(schema, decoded)}
+            ${groupsHtml}
+        </div>`;
+    }
+
+    function renderMbandControl(p, item, isDesktop) {
+        if (p.widget === 'switch') {
+            return window.FXComponents.renderSwitchCard({
+                label: p.name,
+                active: item.rawVal > 0,
+                sysEx: p.sysEx,
+                paramKey: p.key
+            });
+        }
+        if (isDesktop) {
+            return window.FXComponents.renderKnob({
+                label: p.name,
+                value: item.displayVal,
+                percent: item.pct,
+                sysEx: p.sysEx,
+                paramKey: p.key
+            });
+        }
+        return window.FXComponents.renderStepperCard({
+            title: p.name,
+            value: item.displayVal,
+            sysEx: p.sysEx,
+            paramKey: p.key
+        });
+    }
+
+    // ── Meters de Telemetria (Placeholder Visual até a lógica chegar) ──
+    function renderMbandMeters(schema, decoded) {
+        const soloState = (key) => {
+            const item = decoded && decoded.params[key];
+            return !!(item && item.rawVal > 0);
+        };
+        return window.FXComponents.renderMeters({
+            bands: [
+                { name: 'LOW', level: 7, levelVal: '-10dB', gr: 3, grVal: '-3dB', solo: { sysEx: 45, key: 'soloLow', active: soloState('soloLow') } },
+                { name: 'MID', level: 9, levelVal: '-6dB', gr: 2, grVal: '-2dB', solo: { sysEx: 46, key: 'soloMid', active: soloState('soloMid') } },
+                { name: 'HIGH', level: 5, levelVal: '-14dB', gr: 4, grVal: '-4dB', solo: { sysEx: 47, key: 'soloHigh', active: soloState('soloHigh') } }
+            ],
+            stereo: {
+                inL: 9, inLVal: '-6dB',
+                inR: 8, inRVal: '-8dB',
+                outL: 8, outLVal: '-8dB',
+                outR: 7, outRVal: '-10dB'
+            },
+            total: 12,
+            live: true
+        });
+    }
+
+    let meterDemoTimer = null;
+
+    function startMeterDemo() {
+        if (meterDemoTimer) return;
+        meterDemoTimer = setInterval(animateMeterDemo, 150);
+    }
+
+    function stopMeterDemo() {
+        if (meterDemoTimer) {
+            clearInterval(meterDemoTimer);
+            meterDemoTimer = null;
+        }
+    }
+
+    function animateMeterDemo() {
+        if (!isModalOpen()) {
+            stopMeterDemo();
+            return;
+        }
+        const typeId = fxTypeState[currentSlotIdx] ? fxTypeState[currentSlotIdx].id : currentSlotIdx;
+        const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
+        if (!schema || schema.showMeters !== true) {
+            stopMeterDemo();
+            return;
+        }
+
+        const modal = document.getElementById('fxEditorModal');
+        if (!modal) return;
+        const tracks = modal.querySelectorAll('.fx-meter-track.fx-meter-live');
+        tracks.forEach(track => {
+            const segs = track.querySelectorAll('.fx-meter-seg');
+            if (!segs.length) return;
+            const maxLit = segs.length;
+            const lit = Math.max(1, Math.floor(Math.random() * maxLit * 0.85));
+            segs.forEach(seg => {
+                const i = parseInt(seg.getAttribute('data-i'), 10) || 0;
+                seg.classList.toggle('lit', i < lit);
+                seg.classList.toggle('peak', i === lit - 1);
+            });
+            const meterEl = track.closest('.fx-meter');
+            if (meterEl) {
+                const valEl = meterEl.querySelector('.fx-meter-val');
+                if (valEl) {
+                    valEl.textContent = Math.round((lit / maxLit) * 30 - 30) + 'dB';
+                }
+            }
+        });
+    }
+
     function setActiveTab(tabId) {
         activeTabId = tabId;
         rerenderIfOpen();
@@ -323,6 +479,7 @@
         const modal = document.getElementById('fxEditorModal');
         if (modal) modal.style.display = 'none';
         hideEditorSyncOverlay();
+        stopMeterDemo();
 
         if (typeof window.syncFxSlotsFromCore === 'function') {
             window.syncFxSlotsFromCore();
@@ -382,6 +539,13 @@
         const currentBypass = raw[52] !== undefined ? raw[52] : (fxTypeState[slotIdx]?.bypass ? 1 : 0);
         const newBypass = currentBypass > 0 ? 0 : 1;
         sendParamChange(52, newBypass, slotIdx);
+    }
+
+    function toggleSwitch(el) {
+        const info = getParamInfoFromElement(el);
+        if (!info) return;
+        const newVal = info.currentRaw > 0 ? 0 : 1;
+        sendParamChange(info.sysEx, newVal);
     }
 
     // ── Interações de Drag & Wheel ───────────────────────────────────
@@ -676,6 +840,7 @@
         setLayoutMode: setLayoutMode,
         setActiveTab: setActiveTab,
         toggleBypass: toggleBypass,
+        toggleSwitch: toggleSwitch,
         sendParamChange: sendParamChange,
         startKnobDrag: startKnobDrag,
         handleWheelKnob: handleWheelKnob,

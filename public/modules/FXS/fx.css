@@ -51,6 +51,12 @@
     --bg-header: linear-gradient(135deg, #4c0519 0%, #0f172a 100%);
 }
 
+.fx-ed-container.theme-mband {
+    --accent-color: #f97316;
+    --accent-glow: #ea580c;
+    --bg-header: linear-gradient(135deg, #7c2d12 0%, #0f172a 100%);
+}
+
 /* Watermark Overlay Transversal DEMONSTRAÇÃO */
 .fx-demo-overlay {
     position: absolute;
@@ -438,6 +444,402 @@
     padding: 2px 6px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   SWITCH CARD (CHAVE ON/OFF - SOLO / BYPASS)
+   -------------------------------------------------------------------------- */
+.fx-switch-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.5);
+    padding: 10px 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 82px;
+}
+
+.fx-switch-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.fx-switch-card.active {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
+}
+
+.fx-switch-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #cbd5e1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.fx-switch-card.active .fx-switch-label {
+    color: #fff;
+}
+
+.fx-switch-pill {
+    width: 46px;
+    height: 22px;
+    border-radius: 999px;
+    background: #1e293b;
+    border: 1px solid #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.fx-switch-pill .fx-switch-text {
+    font-size: 9px;
+    font-weight: 900;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+}
+
+.fx-switch-card.active .fx-switch-pill {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.fx-switch-card.active .fx-switch-pill .fx-switch-text {
+    color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   METERS DE TELEMETRIA (MULTIBAND - BARRAS VERTICAIS DE LED)
+   -------------------------------------------------------------------------- */
+.fx-meters-block {
+    background: rgba(8, 11, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.05), 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.fx-meters-bar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fx-meters-title {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+}
+
+.fx-meters-scale-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.fx-meters-scale-pill .scale-lbl {
+    color: #64748b;
+    letter-spacing: 0.5px;
+    margin-right: 2px;
+}
+
+.fx-meters-scale-pill .scale-item {
+    font-variant-numeric: tabular-nums;
+    color: #94a3b8;
+}
+
+.fx-meters-scale-pill .scale-item.green {
+    color: #4ade80;
+}
+
+.fx-meters-scale-pill .scale-item.yellow {
+    color: #facc15;
+}
+
+.fx-meters-scale-pill .scale-item.red {
+    color: #f87171;
+}
+
+.fx-meters-row {
+    display: flex;
+    gap: 14px;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.fx-meter-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 84px;
+}
+
+.fx-meter-band {
+    min-width: 84px;
+}
+
+.fx-meter-stereo {
+    min-width: 160px;
+}
+
+.fx-meter-group-title {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #cbd5e1;
+}
+
+.fx-meter-pair {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+}
+
+.fx-meter-subpair {
+    display: flex;
+    gap: 1.5px;
+    align-items: flex-end;
+}
+
+.fx-meter-stereo .fx-meter-pair {
+    gap: 22px;
+}
+
+.fx-meter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: 32px;
+    flex-shrink: 0;
+}
+
+.fx-meter-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.fx-meter-track {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+    width: 14px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 2px;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.fx-meter-seg {
+    flex: 1;
+    border-radius: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: background 0.08s linear, box-shadow 0.08s linear;
+}
+
+/* Escala de cor do LED (verde -> amarelo -> vermelho, de baixo para cima) */
+.fx-meter-seg.lit:nth-child(-n+6) {
+    background: #22c55e;
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.55);
+}
+
+.fx-meter-seg.lit:nth-child(n+7):nth-child(-n+9) {
+    background: #eab308;
+    box-shadow: 0 0 4px rgba(234, 179, 8, 0.55);
+}
+
+.fx-meter-seg.lit:nth-child(n+10) {
+    background: #ef4444;
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.65);
+}
+
+.fx-meter-seg.peak {
+    animation: fx-meter-peak-blink 0.45s steps(2) infinite;
+}
+
+@keyframes fx-meter-peak-blink {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(0.5); }
+}
+
+/* Variação do medidor de Gain Reduction (invertido: preenche de cima para baixo) */
+.fx-meter-gr .fx-meter-track {
+    flex-direction: column;
+}
+
+.fx-meter-gr .fx-meter-seg.lit:nth-child(-n+3) {
+    background: #ef4444;
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
+}
+
+.fx-meter-gr .fx-meter-seg.lit:nth-child(n+4):nth-child(-n+6) {
+    background: #eab308;
+    box-shadow: 0 0 4px rgba(234, 179, 8, 0.55);
+}
+
+.fx-meter-gr .fx-meter-seg.lit:nth-child(n+7) {
+    background: #22c55e;
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.55);
+}
+
+.fx-meter-group .fx-switch-card {
+    margin-top: 4px;
+    width: 100%;
+    min-height: 28px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 4px;
+    padding: 3px 6px;
+}
+
+.fx-meter-group .fx-switch-card .fx-switch-label {
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.fx-meter-group .fx-switch-card .fx-switch-pill {
+    width: 32px;
+    height: 16px;
+}
+
+.fx-meter-group .fx-switch-card .fx-switch-text {
+    font-size: 8px;
+}
+
+.fx-meter-val {
+    font-size: 8px;
+    font-weight: 800;
+    color: #38bdf8;
+    font-variant-numeric: tabular-nums;
+    min-height: 12px;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .fx-meters-row {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 6px;
+    }
+    .fx-meter-band {
+        flex: 1 1 28%;
+        min-width: 80px;
+    }
+    .fx-meter-stereo {
+        flex: 1 1 100%;
+        min-width: 100%;
+        margin-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 6px;
+    }
+}
+
+/* Layout do Multiband (Meters + Grupos Empilhados, sem Abas) */
+.concept-view.concept-mband {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.concept-mband .fx-card-group {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.concept-mband .fx-card-header {
+    color: var(--accent-color);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+}
+
+.concept-mband .knobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    align-content: start;
+}
+
+.concept-mband .knob-box {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.concept-mband .knob-box:hover {
+    background: rgba(15, 23, 42, 0.88);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.concept-mband .knob-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #e2e8f0;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.concept-mband .knob-val-badge {
+    background: rgba(15, 23, 42, 0.95);
+    color: var(--accent-color);
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    min-width: 46px;
+    text-align: center;
+    letter-spacing: 0.3px;
 }
 
 /* --------------------------------------------------------------------------
