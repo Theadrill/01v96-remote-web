@@ -356,6 +356,19 @@ pub fn start_rx_loop(
                                     }),
                                 ));
                             }
+                            crate::midi::protocol::ParsedMidi::FxMeterData {
+                                channel,
+                                raw_val,
+                            } => {
+                                meter_raw_emission = Some(packet.clone());
+                                emission = Some((
+                                    "fxMeterData",
+                                    serde_json::json!({
+                                        "channel": channel,
+                                        "raw_val": raw_val
+                                    }),
+                                ));
+                            }
                             crate::midi::protocol::ParsedMidi::ControlChange {
                                 msg_type,
                                 channel,

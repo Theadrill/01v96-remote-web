@@ -493,6 +493,11 @@ pub enum ParsedMidi {
         sub_channel: u8,
         raw_step: u16,
     },
+    /// FX Meter Data (Element 0x06: channels 0x00=IN L, 0x01=IN R, 0x02=OUT L, 0x03=OUT R, 0x10=GR Low, 0x11=GR Mid, 0x12=GR High)
+    FxMeterData {
+        channel: usize,
+        raw_val: u16,
+    },
 }
 
 pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
@@ -564,6 +569,21 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             channel: mapped_ch,
             sub_channel: parameter,
             raw_step,
+        });
+    }
+
+    // --- FX METERS (Section 0x0D, Group 0x21, Element 0x06) ---
+    // Resposta: F0 43 10 3E 0D 21 06 [CHANNEL] [B0 B1 B2 B3] F7 (13-14 bytes)
+    if message.len() >= 13
+        && section == 0x0D
+        && group == 0x21
+        && element == 0x06
+    {
+        let meter_ch = parameter as usize;
+        let raw_val = (((message[10] & 0x7F) as u16) << 7) | ((message[11] & 0x7F) as u16);
+        return Some(ParsedMidi::FxMeterData {
+            channel: meter_ch,
+            raw_val,
         });
     }
 
@@ -1223,4 +1243,10 @@ fn name_channel_mapping(channel: u8) -> (u8, u8) {
     } else {
         (4, channel)
     }
+}
+
+/// Monta requisição de LEITURA de Medidor de Efeito (0x30 Read Request — NENHUM WRITE)
+/// Section 0x0D, Group 0x21, Element 0x06, Channel/Param = ch
+pub fn build_fx_meter_request(channel: u8) -> Vec<u8> {
+    vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x06, channel, 0x00, 0x00, 0x04, 0xF7]
 }

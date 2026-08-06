@@ -130,7 +130,7 @@
     }
 
     // ── Componente: Meter de Telemetria (Barra Vertical de LED) ───────
-    function renderMeterColumn({ label, value = '', lit = 0, total = 12, live = false, cls = '' }) {
+    function renderMeterColumn({ label, value = '', lit = 0, total = 12, live = false, cls = '', ch = undefined }) {
         let segs = '';
         for (let i = 0; i < total; i++) {
             const isLit = i < lit;
@@ -138,7 +138,7 @@
             segs += `<div class="fx-meter-seg${isLit ? ' lit' : ''}${isPeak ? ' peak' : ''}" data-i="${i}"></div>`;
         }
         return `
-        <div class="fx-meter${cls ? ' fx-meter-' + cls : ''}">
+        <div class="fx-meter${cls ? ' fx-meter-' + cls : ''}"${ch !== undefined ? ' data-meter-ch="' + ch + '"' : ''}>
             <span class="fx-meter-label">${label}</span>
             <div class="fx-meter-track${live ? ' fx-meter-live' : ''}">
                 ${segs}
@@ -152,8 +152,7 @@
         <div class="fx-meter-group fx-meter-band">
             <div class="fx-meter-group-title">${b.name}</div>
             <div class="fx-meter-pair">
-                ${renderMeterColumn({ label: 'LVL', value: b.levelVal || '', lit: b.level, total, live })}
-                ${renderMeterColumn({ label: 'GR', value: b.grVal || '', lit: b.gr, total, live, cls: 'gr' })}
+                ${renderMeterColumn({ label: 'GR', value: b.grVal || '0dB', lit: b.gr || 0, total, live, cls: 'gr', ch: b.grCh })}
             </div>
             ${b.solo ? renderSwitchCard({ label: 'SOLO', active: b.solo.active, sysEx: b.solo.sysEx, paramKey: b.solo.key }) : ''}
         </div>`).join('');
@@ -162,14 +161,8 @@
         <div class="fx-meter-group fx-meter-stereo">
             <div class="fx-meter-group-title">STEREO</div>
             <div class="fx-meter-pair">
-                <div class="fx-meter-subpair fx-meter-in-pair">
-                    ${renderMeterColumn({ label: 'IN L', value: stereo.inLVal || '', lit: stereo.inL, total, live })}
-                    ${renderMeterColumn({ label: 'IN R', value: stereo.inRVal || '', lit: stereo.inR, total, live })}
-                </div>
-                <div class="fx-meter-subpair fx-meter-out-pair">
-                    ${renderMeterColumn({ label: 'OUT L', value: stereo.outLVal || '', lit: stereo.outL, total, live })}
-                    ${renderMeterColumn({ label: 'OUT R', value: stereo.outRVal || '', lit: stereo.outR, total, live })}
-                </div>
+                ${renderMeterColumn({ label: 'L', value: stereo.inLVal || '-36dB', lit: stereo.inL || 0, total, live, ch: 0 })}
+                ${renderMeterColumn({ label: 'R', value: stereo.inRVal || '-36dB', lit: stereo.inR || 0, total, live, ch: 1 })}
             </div>
         </div>` : '';
 
@@ -179,8 +172,9 @@
                 <span class="fx-meters-title">NÍVEIS</span>
                 <div class="fx-meters-scale-pill">
                     <span class="scale-lbl">ESCALA:</span>
-                    <span class="scale-item green">-24</span>
-                    <span class="scale-item yellow">-12</span>
+                    <span class="scale-item green">-48</span>
+                    <span class="scale-item green">-30</span>
+                    <span class="scale-item yellow">-18</span>
                     <span class="scale-item yellow">-6</span>
                     <span class="scale-item red">0 dB</span>
                 </div>

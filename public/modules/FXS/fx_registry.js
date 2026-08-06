@@ -10,11 +10,14 @@
     }
 
     function getSchema(typeId) {
-        return registry[typeId] || null;
+        if (registry[typeId]) return registry[typeId];
+        if (typeId === 49) return registry[43] || null;
+        return null;
     }
 
     function isSupported(typeId) {
-        return !!(registry[typeId] && registry[typeId].supported);
+        const schema = getSchema(typeId);
+        return !!(schema && schema.supported);
     }
 
     // ── Schema Base para Reverb Standard (IDs 0, 1, 2, 3) ─────────────
@@ -66,15 +69,15 @@
     registerSchema(2, createReverbSchema(2, 'Reverb Stage', 'REVERB STAGE', 'theme-stage', 3));
     registerSchema(3, createReverbSchema(3, 'Reverb Plate', 'REVERB PLATE', 'theme-plate', 4));
 
-    // ── Schema do Multiband Compressor (M.BAND DYNA. - ID 49) ────────
+    // ── Schema do Multiband Compressor (M.BAND DYNA. - ID 43) ─────────
     function createMultibandSchema() {
         return {
-            id: 49,
+            id: 43,
             typeKey: 'M.BAND DYNA.',
             name: 'Multiband Compressor',
             category: 'Dynamic',
             colorTheme: 'theme-mband',
-            defaultConcept: 49,
+            defaultConcept: 43,
             supported: true,
             showMeters: true,
             categories: [
@@ -125,7 +128,7 @@
         };
     }
 
-    registerSchema(49, createMultibandSchema());
+    registerSchema(43, createMultibandSchema());
 
     // Expor Globalmente
     window.FXRegistry = {

@@ -818,6 +818,7 @@ impl GlobalState {
             }
             crate::midi::protocol::ParsedMidi::MeterData { .. } => {}
             crate::midi::protocol::ParsedMidi::GrMeter { .. } => {}
+            crate::midi::protocol::ParsedMidi::FxMeterData { .. } => {}
             crate::midi::protocol::ParsedMidi::SceneNumber(scene) => {
                 self.scene_number = *scene as usize;
                 self.scene_manager.set_active_scene(*scene);

@@ -228,6 +228,9 @@
 
         if (schema.showMeters === true) {
             startMeterDemo();
+            if (typeof socket !== 'undefined' && socket.emit) {
+                socket.emit('requestFxMeters');
+            }
         } else {
             stopMeterDemo();
         }
@@ -381,33 +384,99 @@
         };
         return window.FXComponents.renderMeters({
             bands: [
-                { name: 'LOW', level: 7, levelVal: '-10dB', gr: 3, grVal: '-3dB', solo: { sysEx: 45, key: 'soloLow', active: soloState('soloLow') } },
-                { name: 'MID', level: 9, levelVal: '-6dB', gr: 2, grVal: '-2dB', solo: { sysEx: 46, key: 'soloMid', active: soloState('soloMid') } },
-                { name: 'HIGH', level: 5, levelVal: '-14dB', gr: 4, grVal: '-4dB', solo: { sysEx: 47, key: 'soloHigh', active: soloState('soloHigh') } }
+                { name: 'LOW', gr: 0, grVal: '0dB', grCh: 16, solo: { sysEx: 45, key: 'soloLow', active: soloState('soloLow') } },
+                { name: 'MID', gr: 0, grVal: '0dB', grCh: 17, solo: { sysEx: 46, key: 'soloMid', active: soloState('soloMid') } },
+                { name: 'HIGH', gr: 0, grVal: '0dB', grCh: 18, solo: { sysEx: 47, key: 'soloHigh', active: soloState('soloHigh') } }
             ],
             stereo: {
-                inL: 9, inLVal: '-6dB',
-                inR: 8, inRVal: '-8dB',
-                outL: 8, outLVal: '-8dB',
-                outR: 7, outRVal: '-10dB'
+                inL: 0, inLVal: '-48dB',
+                inR: 0, inRVal: '-48dB'
             },
             total: 12,
             live: true
         });
     }
 
-    let meterDemoTimer = null;
+    let meterPollTimer = null;
+
+    function startMeterPolling() {
+        if (meterPollTimer) return;
+        if (typeof socket !== 'undefined' && socket.emit) {
+            socket.emit('requestFxMeters');
+        }
+        meterPollTimer = setInterval(() => {
+            if (!isModalOpen()) {
+                stopMeterPolling();
+                return;
+            }
+            if (typeof socket !== 'undefined' && socket.emit) {
+                socket.emit('requestFxMeters');
+            }
+        }, 120);
+    }
+
+    function stopMeterPolling() {
+        if (meterPollTimer) {
+            clearInterval(meterPollTimer);
+            meterPollTimer = null;
+        }
+    }
 
     function startMeterDemo() {
-        if (meterDemoTimer) return;
-        meterDemoTimer = setInterval(animateMeterDemo, 150);
+        startMeterPolling();
     }
 
     function stopMeterDemo() {
-        if (meterDemoTimer) {
-            clearInterval(meterDemoTimer);
-            meterDemoTimer = null;
+        stopMeterPolling();
+    }
+
+    function updateFxMeterFromMidi(channel, rawVal) {
+        if (!isModalOpen()) return;
+        const modal = document.getElementById('fxEditorModal');
+        if (!modal) return;
+
+        const maxLit = 12;
+        let lit = 0;
+        let dbVal = '0dB';
+
+        if (channel >= 16) {
+            // --- GAIN REDUCTION (0x10=LOW, 0x11=MID, 0x12=HIGH) ---
+            // Escala do GR da Yamaha 01V96: 0 a -18 dB (Step 4095 = 0 dB; Step 3328 = -18 dB)
+            // Delta de 767 steps para 18 dB. Qualquer atenuação > 18 dB preenche 100% da barra.
+            const is14bit = rawVal > 1023;
+            const grStep = is14bit ? Math.max(0, 4095 - rawVal) : Math.max(0, 1023 - rawVal);
+            const maxGrStep = is14bit ? 767 : 256;
+            const pct = Math.min(100, Math.max(0, (grStep / maxGrStep) * 100));
+            lit = Math.round((pct / 100) * maxLit);
+            const dbNum = Math.round((pct / 100) * 18);
+            dbVal = dbNum === 0 ? '0dB' : '-' + dbNum + 'dB';
+        } else {
+            // --- LEVEL METERS (0x00=L, 0x01=R) ---
+            // Escala da 01V96: 0 dB lá no topo até -48 dB lá embaixo.
+            // 0 (ou <=37) = Silêncio (-48 dB). Valores maiores sobem na escala até 0 dB.
+            const maxVal = (rawVal > 1023) ? 4095 : 1023;
+            if (rawVal <= 37) {
+                lit = 0;
+                dbVal = '-48dB';
+            } else {
+                const pct = Math.min(100, Math.max(0, (rawVal / maxVal) * 100));
+                lit = Math.round((pct / 100) * maxLit);
+                dbVal = Math.round((pct / 100) * 48 - 48) + 'dB';
+            }
         }
+
+        const meterEl = modal.querySelector(`.fx-meter[data-meter-ch="${channel}"]`);
+        if (!meterEl) return;
+
+        const segs = meterEl.querySelectorAll('.fx-meter-seg');
+        segs.forEach(seg => {
+            const i = parseInt(seg.getAttribute('data-i'), 10) || 0;
+            seg.classList.toggle('lit', i < lit);
+            seg.classList.toggle('peak', i === lit - 1 && lit > 0);
+        });
+
+        const valEl = meterEl.querySelector('.fx-meter-val');
+        if (valEl) valEl.textContent = dbVal;
     }
 
     function animateMeterDemo() {
@@ -827,6 +896,11 @@
                     socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
                 }
             }
+        });
+
+        socket.on('fxMeterData', function(data) {
+            if (!data) return;
+            updateFxMeterFromMidi(data.channel, data.raw_val);
         });
     }
 

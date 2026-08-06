@@ -2455,6 +2455,19 @@ pub fn register_handlers(
             },
         );
 
+        // --- REQUEST FX METERS (READ-ONLY 0x30 SYSEX — NENHUM WRITE) ---
+        let sched_fx_meters = scheduler_socket.clone();
+        socket.on(
+            "requestFxMeters",
+            move |_socket: SocketRef, _data: Data<serde_json::Value>| async move {
+                let channels = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12];
+                for ch in channels {
+                    let req = crate::midi::protocol::build_fx_meter_request(ch);
+                    sched_fx_meters.enqueue(req, 0).await;
+                }
+            },
+        );
+
         // --- SET FX INPUT PATCH ---
         // Payload: { slot: 0-3, lr: 0|1, source_id: u32 }
         let sched_set_fx_in = scheduler_socket.clone();
