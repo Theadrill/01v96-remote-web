@@ -525,6 +525,13 @@
         renderModal();
 
         if (schema && schema.supported) {
+            if (schema.showMeters === true || typeId === 49) {
+                startFxMeters();
+                if (typeof socket !== 'undefined' && socket.emit) {
+                    socket.emit('focusFxSlot', { slot: slotIdx });
+                    socket.emit('requestFxMeters');
+                }
+            }
             if (!syncedSlots[slotIdx] && !isSyncingSlot[slotIdx]) {
                 showEditorSyncOverlay();
                 isSyncingSlot[slotIdx] = true;
@@ -793,6 +800,17 @@
                 }
                 if (typeof window.renderEffectsScreen === 'function') {
                     window.renderEffectsScreen();
+                }
+            } else if (data.param === 49 || data.param === 0x31) {
+                const typeId = Math.round(data.value);
+                const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
+                if (schema && fxTypeState[slot]) {
+                    fxTypeState[slot].id = typeId;
+                    fxTypeState[slot].name = schema.name || fxTypeState[slot].name;
+                    lastFxTypeId[slot] = typeId;
+                    if (slot === currentSlotIdx && isModalOpen()) {
+                        renderModal();
+                    }
                 }
             }
 

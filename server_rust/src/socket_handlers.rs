@@ -2512,6 +2512,8 @@ pub fn register_handlers(
                 {
                     let mut state = state_set_fx_in.write().await;
                     state.fx_inputs.insert(idx, source_id as f64);
+                    // Manter paridade: mapa global de output patches (porta -> source_id)
+                    state.out_patches_fx.insert(idx, source_id as f64);
                 }
 
                 if let Some(pkt) = crate::midi::protocol::build_fx_input_change(slot, lr, source_id) {

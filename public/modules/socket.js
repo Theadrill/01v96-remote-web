@@ -608,6 +608,34 @@ socket.on('dynamicsDebugLog', (data) => {
     console.log(`%c[DEBUG DYNAMICS] Resposta legada:`, 'color: gray; font-size: 11px;');
 });
 
+// Atualiza o mapa global de Output Patches a partir das entradas de efeitos (FX Inputs).
+// Porta 0..7 -> source_id. Necessario para o modal de Insert encontrar o "INSERT OUT" correto.
+socket.on('fxInputsUpdate', (data) => {
+    if (!data || typeof data !== 'object') return;
+    if (!window.globalOutPatches) {
+        window.globalOutPatches = { omni: {}, adat: {}, fx: {}, slot: {}, '2tr': {} };
+    }
+    if (!window.globalOutPatches.fx) window.globalOutPatches.fx = {};
+    for (const [key, val] of Object.entries(data)) {
+        const port = parseInt(key, 10);
+        if (isNaN(port) || port < 0 || port > 7) continue;
+        window.globalOutPatches.fx[port] = val;
+    }
+    if (activeConfigTab === 'etc'
+        && activeConfigChannel !== null
+        && activeConfigChannel !== undefined
+        && ((activeConfigChannel >= 0 && activeConfigChannel <= 31)
+            || (activeConfigChannel >= 44 && activeConfigChannel <= 51)
+            || (activeConfigChannel >= 60 && activeConfigChannel <= 67))
+        && typeof renderRouting === 'function') {
+        try {
+            renderRouting(activeConfigChannel);
+        } catch (e) {
+            console.warn('[fxInputsUpdate] renderRouting ignorado:', e);
+        }
+    }
+});
+
 // Listener de updateName consolidado acima.
 
 socket.on('sync', (s) => {

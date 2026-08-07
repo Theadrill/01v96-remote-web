@@ -627,6 +627,9 @@ impl GlobalState {
                     self.out_patches_2tr.insert(*channel, v);
                 } else if mt == "kEffectInput/kEffectIn" {
                     self.fx_inputs.insert(*channel, v);
+                    // Manter paridade com o mapa de output patches (porta 0..7 -> source_id),
+                    // pois o modal de Insert busca o INSERT OUT neste mapa.
+                    self.out_patches_fx.insert(*channel, v);
                 } else if mt == "kChannelInput/kChannelIn" {
                     if let Some(ch) = self.channels.get_mut(channel) {
                         ch.patch = v;
