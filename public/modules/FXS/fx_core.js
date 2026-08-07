@@ -859,20 +859,9 @@
                 fxParamsState[slot] = {};
                 isSyncingSlot[slot] = false;
 
-                // Mapeia presets embutidos (1..64) para os algoritmos numéricos (0..63) da Yamaha 01V96
-                if (preset >= 1 && preset <= 64) {
-                    const typeId = preset - 1;
-                    const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
-                    if (schema) {
-                        const prevId = lastFxTypeId[slot];
-                        if (prevId !== typeId) {
-                            console.log(`🎵 [FX] Slot ${slot + 1}: Preset "${schema.name}" (ID: ${typeId})`);
-                        }
-                        fxTypeState[slot].id = typeId;
-                        fxTypeState[slot].name = schema.name || fxTypeState[slot].name;
-                        lastFxTypeId[slot] = typeId;
-                    }
-                }
+                // O preset da biblioteca nao corresponde ao ID real do algoritmo no DSP
+                // (ex: Preset 44 -> algoritmo 49). O ID correto chega via fxTypesUpdate
+                // apos o server consultar o parametro 0x31 na mesa. Nao mapear aqui.
 
                 if (isModalOpen() && currentSlotIdx === slot) {
                     renderModal();
