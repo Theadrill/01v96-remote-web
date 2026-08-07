@@ -96,6 +96,12 @@
       "physical_scene": "DC JEITO 360",
       "physical_id": 27,
       "file": "custom_names_scene-DC JEITO 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE 360",
+      "physical_scene": "PGD ONLINE 360",
+      "physical_id": 5,
+      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     }
   ]
 }
