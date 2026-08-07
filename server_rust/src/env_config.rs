@@ -176,6 +176,18 @@ pub fn load_password() -> Option<String> {
         .cloned()
 }
 
+pub fn load_github_token() -> Option<String> {
+    if let Ok(v) = std::env::var("GITHUB_TOKEN")
+        && !v.is_empty()
+    {
+        return Some(v);
+    }
+    let map = load_env_map();
+    map.get("GITHUB_TOKEN")
+        .filter(|v| !v.is_empty())
+        .cloned()
+}
+
 #[allow(dead_code)]
 pub fn delete_env() -> Result<(), String> {
     let path = get_env_path();

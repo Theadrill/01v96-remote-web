@@ -11,6 +11,7 @@ use std::path::{Path as StdPath, PathBuf};
 use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
 use crate::SHUTDOWN_TX;
+use super::custom_scene_history;
 
 // Git Sync state
 lazy_static::lazy_static! {
@@ -96,6 +97,7 @@ pub async fn enqueue_git_sync(files: Vec<String>, message: String, delay_ms: u64
 pub fn router(
     state: Arc<RwLock<crate::state::GlobalState>>,
     csm: Arc<RwLock<crate::custom_scenes::CustomSceneManager>>,
+    io: socketioxide::SocketIo,
 ) -> axum::Router {
     axum::Router::new()
         .route("/names", axum::routing::get(get_names))
@@ -123,8 +125,22 @@ pub fn router(
         // New endpoints for status page
         .route("/log", axum::routing::get(get_log))
         .route("/restart", axum::routing::post(restart_server))
+        // Custom scenes version history & restore
+        .route(
+            "/custom-scenes/history/local",
+            axum::routing::get(custom_scene_history::history_local),
+        )
+        .route(
+            "/custom-scenes/history/github",
+            axum::routing::get(custom_scene_history::history_github),
+        )
+        .route(
+            "/custom-scenes/restore",
+            axum::routing::post(custom_scene_history::restore),
+        )
         .with_state(state)
         .layer(Extension(csm))
+        .layer(Extension(io))
 }
 
 fn root_dir() -> PathBuf {

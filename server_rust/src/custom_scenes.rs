@@ -624,6 +624,36 @@ impl CustomSceneManager {
         self.operation_queue.new_token()
     }
 
+    /// Sobrescreve o arquivo da cena (local + shared) com a versão restaurada e
+    /// atualiza o cache. Rejeita conteúdo que não seja um JSON de cena válido.
+    pub fn restore_scene(&mut self, filename: &str, content: &str) -> Result<(), String> {
+        let scene: CustomScene = serde_json::from_str(content)
+            .map_err(|e| format!("JSON de cena inválido: {}", e))?;
+
+        let local_path = self.data_dir.join("local").join(filename);
+        let shared_path = self.data_dir.join("shared").join(filename);
+
+        if let Some(parent) = local_path.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+        if let Some(parent) = shared_path.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+
+        save_json_atomic(&local_path, &scene);
+        save_json_atomic(&shared_path, &scene);
+
+        let mtime = SystemTime::now();
+        self.cache.insert(filename.to_string(), CachedScene { scene, mtime });
+        self.dirty_files.insert(filename.to_string());
+
+        // Garante que o arquivo restaurado seja sincronizado de volta ao GitHub.
+        self.registry_dirty = true;
+
+        tracing::info!("[CUSTOM] scene '{}' restaurada a partir de versão anterior", filename);
+        Ok(())
+    }
+
     pub fn rename_mesa(
         &mut self,
         old_name: &str,

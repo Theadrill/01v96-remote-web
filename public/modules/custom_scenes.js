@@ -301,6 +301,7 @@ socket.on('assignResult', (data) => {
 window.openSceneDetails = function(index) {
     const scene = window.customScenesData[index];
     if (!scene) return;
+    window.detailsSceneFile = scene.file;
     document.getElementById('detailsSceneName').textContent = 'Cena: ' + (scene.physical_scene || scene.file);
     document.getElementById('detailsTableBody').innerHTML = '<tr><td colspan="3" style="color:#666; padding:20px; text-align:center;">Carregando...</td></tr>';
     document.getElementById('sceneDetailsModal').style.display = 'flex';
@@ -351,3 +352,145 @@ window.confirmCopyScene = function() {
     });
     document.getElementById('copySceneModal').style.display = 'none';
 };
+
+// --- RESTAURAÇÃO DE VERSÕES ANTERIORES (Local vs GitHub) ---
+
+window.openRestoreSourceModal = function() {
+    if (!window.detailsSceneFile) return;
+    document.getElementById('restoreSourceModal').style.display = 'flex';
+};
+
+window.requestCustomSceneHistory = function(source) {
+    const file = window.detailsSceneFile;
+    if (!file) return;
+    const url = '/api/custom-scenes/history/' + source + '?file=' + encodeURIComponent(file);
+    const overlay = typeof OverlayInfo !== 'undefined' && OverlayInfo.show;
+    document.getElementById('restoreSourceModal').style.display = 'none';
+
+    fetch(url)
+        .then(async (res) => {
+            if (!res.ok) {
+                let errMsg = 'Erro HTTP ' + res.status;
+                try {
+                    const data = await res.json();
+                    if (data && data.error) errMsg = data.error;
+                } catch (e) {}
+                throw new Error(errMsg);
+            }
+            return res.json();
+        })
+        .then((data) => {
+            const versions = (data && data.versions) || [];
+            if (versions.length === 0) {
+                if (overlay) OverlayInfo.show('error', 'NENHUMA VERSÃO ANTERIOR');
+                else alert('Nenhuma versão anterior encontrada para esta cena.');
+                return;
+            }
+            showRestoreVersionsModal(data.file, source, versions);
+        })
+        .catch((err) => {
+            console.error('[CUSTOM] Falha ao buscar histórico:', err);
+            if (overlay) OverlayInfo.show('error', 'HISTÓRICO INDISPONÍVEL');
+            else alert('Falha ao buscar histórico: ' + err.message);
+        });
+};
+
+function formatRestoreDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const now = new Date();
+    const diffMs = now - d;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const pad = (n) => String(n).padStart(2, '0');
+    const time = pad(d.getHours()) + ':' + pad(d.getMinutes());
+    if (diffDays === 0) return 'Hoje às ' + time;
+    if (diffDays === 1) return 'Ontem às ' + time;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const thatDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (thatDay.getFullYear() === today.getFullYear()) {
+        const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+        return d.getDate() + ' ' + months[d.getMonth()] + ' às ' + time;
+    }
+    return d.toLocaleDateString('pt-BR') + ' às ' + time;
+}
+
+function shortSha(sha) {
+    return sha ? sha.substring(0, 7) : '';
+}
+
+window.showRestoreVersionsModal = function(file, source, versions) {
+    document.getElementById('restoreVersionsSceneName').textContent = 'Arquivo: ' + file;
+    const list = document.getElementById('restoreVersionsList');
+    if (!versions || versions.length === 0) {
+        list.innerHTML = '<p style="color:#666; font-size:12px; padding:10px;">Nenhuma versão anterior disponível.</p>';
+        document.getElementById('restoreVersionsModal').style.display = 'flex';
+        return;
+    }
+    let html = '';
+    for (let i = 0; i < versions.length; i++) {
+        const v = versions[i];
+        const author = v.author || 'Desconhecido';
+        const dateLabel = formatRestoreDate(v.date);
+        const msg = v.message || 'Sem mensagem';
+        html += '<div style="background:#222; border:1px solid #333; border-radius:8px; padding:10px; margin-bottom:8px; text-align:left;">';
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">';
+        html += '<span style="background:#4a3a2a; border:1px solid #a84; color:#fa4; border-radius:4px; padding:2px 6px; font-size:10px; font-family:monospace;">' + escHtml(shortSha(v.commit_sha)) + '</span>';
+        html += '<span style="color:#888; font-size:10px;">' + escHtml(author) + ' · ' + escHtml(dateLabel) + '</span>';
+        html += '</div>';
+        html += '<div style="color:#ccc; font-size:11px; margin-bottom:8px;">' + escHtml(msg) + '</div>';
+        html += '<button class="btn-connect inline-style-46" onclick="openRestoreConfirm(\'' + escHtml(v.commit_sha) + '\', \'' + source + '\')" style="width:100%; font-size:11px;">RESTAURAR ESTA VERSÃO</button>';
+        html += '</div>';
+    }
+    list.innerHTML = html;
+    document.getElementById('restoreVersionsModal').style.display = 'flex';
+};
+
+window.openRestoreConfirm = function(commitSha, source) {
+    window.pendingRestore = { file: window.detailsSceneFile, source: source, commit_sha: commitSha };
+    document.getElementById('restoreConfirmModal').style.display = 'flex';
+};
+
+window.confirmRestoreScene = function() {
+    const pending = window.pendingRestore;
+    if (!pending) return;
+    document.getElementById('restoreConfirmModal').style.display = 'none';
+    const overlay = typeof OverlayInfo !== 'undefined' && OverlayInfo.show;
+
+    fetch('/api/custom-scenes/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pending)
+    })
+        .then(async (res) => {
+            if (!res.ok) {
+                let errMsg = 'Erro HTTP ' + res.status;
+                try {
+                    const data = await res.json();
+                    if (data && data.error) errMsg = data.error;
+                } catch (e) {}
+                throw new Error(errMsg);
+            }
+            return res.json();
+        })
+        .then((data) => {
+            document.getElementById('restoreVersionsModal').style.display = 'none';
+            if (overlay) OverlayInfo.show('success', 'CENA RESTAURADA');
+            // Recarrega a lista de cenas e re-preview da cena restaurada
+            socket.emit('listCustomScenes');
+            socket.emit('previewCustomScene', { file: pending.file });
+        })
+        .catch((err) => {
+            console.error('[CUSTOM] Falha na restauração:', err);
+            if (overlay) OverlayInfo.show('error', 'FALHA NA RESTAURAÇÃO');
+            else alert('Falha na restauração: ' + err.message);
+        });
+};
+
+// Quando o servidor confirma a restauração, atualiza os nomes exibidos na grade
+socket.on('customSceneRestored', (data) => {
+    console.log('[CUSTOM] customSceneRestored recebido', data);
+    if (typeof socket !== 'undefined' && socket) {
+        socket.emit('getActiveCustomChannels');
+    }
+});

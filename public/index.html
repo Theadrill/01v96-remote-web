@@ -591,8 +591,57 @@
                 </table>
             </div>
             <div class="inline-style-43">
+                <button class="btn-close inline-style-31" style="background:#2a2a4a; border-color:#44a; color:#58f;"
+                    onclick="openRestoreSourceModal()"><i></i> RESTAURAR VERSÃO</button>
                 <button class="btn-close inline-style-31"
                     onclick="document.getElementById('sceneDetailsModal').style.display='none'">FECHAR</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Restauração: Escolha da Fonte -->
+    <div class="modal-overlay styled-renameSceneModal" id="restoreSourceModal" style="z-index: 13500;">
+        <div class="modal-content inline-style-44">
+            <p class="inline-style-27">Restaurar Versão Anterior</p>
+            <p class="styled-customConfirmMsg">De onde deseja buscar o histórico de versões?</p>
+            <div style="display:flex; flex-direction:column; gap:10px; padding:10px 0;">
+                <button class="btn-connect inline-style-46" onclick="requestCustomSceneHistory('local')"
+                    style="font-size:13px;">💻 HISTÓRICO LOCAL</button>
+                <p style="color:#888; font-size:11px; margin:-4px 0 0 0; text-align:center;">Busca no repositório da
+                    própria máquina. Rápido e offline.</p>
+                <button class="btn-connect inline-style-46" onclick="requestCustomSceneHistory('github')"
+                    style="font-size:13px;">☁️ NUVEM GITHUB</button>
+                <p style="color:#888; font-size:11px; margin:-4px 0 0 0; text-align:center;">Busca commits salvos via
+                    Ninja Sync no repositório remoto.</p>
+            </div>
+            <div class="inline-style-25">
+                <button class="btn-close inline-style-31"
+                    onclick="document.getElementById('restoreSourceModal').style.display='none'">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Restauração: Lista de Versões -->
+    <div class="modal-overlay styled-renameSceneModal" id="restoreVersionsModal" style="z-index:13500;">
+        <div class="modal-content inline-style-44">
+            <p class="inline-style-27">Versões Anteriores</p>
+            <p class="styled-assignSceneName" id="restoreVersionsSceneName"></p>
+            <div id="restoreVersionsList" style="max-height:280px; overflow-y:auto;"></div>
+            <div class="inline-style-25">
+                <button class="btn-close inline-style-31"
+                    onclick="document.getElementById('restoreVersionsModal').style.display='none'">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Confirmação da Restauração -->
+    <div class="modal-overlay styled-renameSceneModal" id="restoreConfirmModal" style="z-index:13500;">
+        <div class="modal-content inline-style-44">
+            <p class="inline-style-27">Confirmar Restauração</p>
+            <h3 class="inline-style-45">Restaurar Nomes?</h3>
+            <p class="styled-customConfirmMsg">Tem certeza que deseja substituir os nomes atuais pelos nomes da versão
+                selecionada?</p>
+            <div class="inline-style-25">
+                <button class="btn-connect inline-style-46" onclick="confirmRestoreScene()">SIM, RESTAURAR</button>
+                <button class="btn-close inline-style-31"
+                    onclick="document.getElementById('restoreConfirmModal').style.display='none'">CANCELAR</button>
             </div>
         </div>
     </div>
