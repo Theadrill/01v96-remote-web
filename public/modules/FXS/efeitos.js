@@ -120,24 +120,6 @@
 
     function applyFxOutputs(data) {
         const newData = data || {};
-        const oldKeys = Object.keys(fxOutputs);
-        const newKeys = Object.keys(newData);
-        let changed = 0;
-        const diffs = [];
-        for (const k of newKeys) {
-            if (fxOutputs[k] !== newData[k]) {
-                changed++;
-                diffs.push(k + ': ' + fxOutputs[k] + ' -> ' + newData[k]);
-            }
-        }
-        for (const k of oldKeys) {
-            if (!(k in newData)) {
-                changed++;
-                diffs.push(k + ': ' + fxOutputs[k] + ' -> (removed)');
-            }
-        }
-        console.log('[FX] applyFxOutputs: changed=' + changed + '/' + newKeys.length + ' keys');
-        if (changed > 0) console.log('[FX] diffs:', diffs.join(', '));
         
         // Sync local insert input patch values
         for (const [keyStr, val] of Object.entries(newData)) {
@@ -165,7 +147,6 @@
     }
 
     function applyFxTypes(data) {
-        console.log('[FX] fxTypesUpdate recebido:', JSON.stringify(data));
         for (let i = 0; i < 4; i++) {
             const d = data[i] || data[String(i)];
             if (d) {
@@ -178,7 +159,6 @@
     }
 
     function applyFxInputs(data) {
-        console.log('[FX] fxInputsUpdate recebido:', JSON.stringify(data));
         for (const [key, val] of Object.entries(data)) {
             const i = parseInt(key, 10);
             if (isNaN(i) || i < 0 || i > 7) continue;
@@ -192,7 +172,6 @@
     function rerenderIfOpen() {
         const modal = document.getElementById('efeitosModal');
         const isOpen = modal && modal.style.display === 'flex';
-        console.log('[FX] rerenderIfOpen: modal exists=' + !!modal + ', display=' + (modal ? modal.style.display : 'N/A') + ', isOpen=' + isOpen);
         if (isOpen) {
             renderEffectsScreen();
         }
@@ -236,7 +215,6 @@
         // endereço MIDI).
         // Requerimento das rotas/tipos foi movido para o socket.js (on 'connect')
         // para garantir que seja solicitado de forma síncrona com o estado da rede.
-        console.log('[FX] Enviando requests iniciais de FX...');
         socket.emit('requestFxTypes');
         socket.emit('requestFxInputs');
         socket.emit('requestFxOutputs');
@@ -270,8 +248,7 @@
 
             if (active && isOpen) {
                 showSyncOverlay("CARREGANDO EFEITOS DA MESA...");
-            } else if (!active && isOpen) {
-                hideSyncOverlay();
+            } else if (!active && isOpen) {                hideSyncOverlay();
                 renderEffectsScreen();
             }
         });
@@ -290,7 +267,6 @@
                 if (isOpen) {
                     showSyncOverlay("AGUARDANDO FINALIZAR SINCRONIZAÇÃO COM A MESA");
                     pendingFxLoad = true;
-                    console.log('[FX] Sync ativo com modal aberto — exibindo overlay, aguardando sync...');
                 }
             } else {
                 // Sync terminou
@@ -299,7 +275,6 @@
                     if (pendingFxLoad) {
                         // Modal estava esperando o sync terminar — dispara agora
                         pendingFxLoad = false;
-                        console.log('[FX] Sync concluído — disparando lógica de FX (pendingFxLoad)...');
                         renderEffectsScreen();
                         dispatchFxRequests();
                     }
@@ -402,12 +377,11 @@
     function renderEffectsScreen() {
         const container = document.getElementById('efeitosModalBody');
         if (!container) {
-            console.log('[FX] renderEffectsScreen: container efeitosModalBody NOT FOUND');
+            console.warn('[FX] renderEffectsScreen: container efeitosModalBody NOT FOUND');
             return;
         }
 
         syncFxSlotsFromCore();
-        console.log('[FX] renderEffectsScreen: container found, fxOutputs keys=' + Object.keys(fxOutputs).length);
 
         const columnsHTML = `
         <div class="efeitos-title">MÁQUINAS DE EFEITOS</div>
@@ -420,9 +394,7 @@
             ${fxSlots.map((s, i) => renderSlot(s, i)).join('')}
         </div>`;
 
-        console.log('[FX] renderEffectsScreen: setting innerHTML (' + columnsHTML.length + ' chars)');
         container.innerHTML = columnsHTML;
-        console.log('[FX] renderEffectsScreen: DONE');
     }
 
     // ── Abertura / Fechamento do Modal ──────────────────────────────────
@@ -436,12 +408,10 @@
             // Mesa está sincronizando canais: bloqueia o modal
             showSyncOverlay("AGUARDANDO FINALIZAR SINCRONIZAÇÃO COM A MESA");
             pendingFxLoad = true;
-            console.log('[FX] Modal aberto durante sync principal...');
             renderEffectsScreen();
         } else if (isSyncingFxs) {
             // Mesa está sincronizando especificamente os Efeitos (background task do Rust)
             showSyncOverlay("CARREGANDO EFEITOS DA MESA...");
-            console.log('[FX] Modal aberto durante sync de FX...');
             renderEffectsScreen();
         } else {
             // Sync já concluído: dispara normalmente
@@ -473,7 +443,6 @@
     function openFxEditor(idx) {
         const slot = fxSlots[idx];
         const effectName = slot ? slot.effectName : '';
-        console.log('[FX] Abrindo slot FX' + (idx + 1) + ' (Tipo: ' + effectName + ')');
 
         if (window.FXCore && typeof window.FXCore.openFxEditor === 'function') {
             window.FXCore.openFxEditor(idx);
@@ -487,7 +456,6 @@
     function rerenderIfOpen() {
         const modal = document.getElementById('efeitosModal');
         const isOpen = modal && modal.style.display === 'flex';
-        console.log('[FX] rerenderIfOpen: modal exists=' + !!modal + ', display=' + (modal ? modal.style.display : 'N/A') + ', isOpen=' + isOpen);
         if (isOpen && !isSyncing && !isSyncingFxs) {
             // Só re-renderiza se não estiver em sync ou carregando FX
             renderEffectsScreen();

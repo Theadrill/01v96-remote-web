@@ -730,9 +730,14 @@ socket.on('scenesUpdated', (data) => {
         window.scenesLibrary = data.scenes;
     }
     if (data.currentScene) {
-        window.currentSceneNumber = data.currentScene.index;
-        window.currentSceneName = data.currentScene.name;
-        console.log(`🎬 Cena Atual Atualizada (scenesUpdated): ${window.currentSceneNumber} - ${window.currentSceneName}`);
+        const newNum = data.currentScene.index;
+        const newName = data.currentScene.name;
+        const changed = window.currentSceneNumber !== newNum || window.currentSceneName !== newName;
+        window.currentSceneNumber = newNum;
+        window.currentSceneName = newName;
+        if (changed) {
+            console.log(`🎬 Cena Atual Atualizada (scenesUpdated): ${window.currentSceneNumber} - ${window.currentSceneName}`);
+        }
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         // requestActiveCustomChannels() e requestGlobalNames() removidos para evitar flood
     }
@@ -743,9 +748,14 @@ socket.on('scenesUpdated', (data) => {
 
 socket.on('currentScene', (data) => {
     if (data) {
-        window.currentSceneNumber = data.index;
-        window.currentSceneName = data.name;
-        console.log(`🎬 Cena Atual Atualizada (currentScene): ${window.currentSceneNumber} - ${window.currentSceneName}`);
+        const newNum = data.index;
+        const newName = data.name;
+        const changed = window.currentSceneNumber !== newNum || window.currentSceneName !== newName;
+        window.currentSceneNumber = newNum;
+        window.currentSceneName = newName;
+        if (changed) {
+            console.log(`🎬 Cena Atual Atualizada (currentScene): ${window.currentSceneNumber} - ${window.currentSceneName}`);
+        }
         if (typeof updateSceneDisplay === 'function') updateSceneDisplay();
         // requestActiveCustomChannels() e requestGlobalNames() removidos
     }

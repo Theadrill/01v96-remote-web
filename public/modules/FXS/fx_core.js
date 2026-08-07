@@ -526,7 +526,6 @@
 
         if (schema && schema.supported) {
             if (!syncedSlots[slotIdx] && !isSyncingSlot[slotIdx]) {
-                console.log(`[FX] 🚀 Abrindo slot FX${slotIdx + 1}. Solicitando parâmetros ao servidor...`);
                 showEditorSyncOverlay();
                 isSyncingSlot[slotIdx] = true;
                 if (typeof socket !== 'undefined') {
@@ -817,10 +816,11 @@
                 if (d) {
                     const oldId = lastFxTypeId[i];
                     const newId = d.id !== undefined ? d.id : fxTypeState[i].id;
+                    const newName = d.name || fxTypeState[i].name || 'Efeito';
 
                     // Se o algoritmo (ID) mudou no slot i (ex: Reverb -> Delay)
                     if (oldId !== -1 && oldId !== newId) {
-                        console.log(`[FX] 🔀 Mudança de algoritmo no Slot ${i + 1}: ${oldId} -> ${newId}`);
+                        console.log(`🎵 [FX] Slot ${i + 1}: Preset "${newName}" (ID: ${newId})`);
                         syncedSlots[i] = false;
                         fxParamsState[i] = {};
                     }
@@ -851,7 +851,6 @@
         });
 
         socket.on('fxLibraryRecall', function(data) {
-            console.log('[FX RECALL] 🔄 Evento fxLibraryRecall recebido da mesa:', data);
             const slot = (data && data.slot !== undefined) ? parseInt(data.slot, 10) : -1;
             const preset = (data && data.preset !== undefined) ? parseInt(data.preset, 10) : -1;
 
@@ -865,6 +864,10 @@
                     const typeId = preset - 1;
                     const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
                     if (schema) {
+                        const prevId = lastFxTypeId[slot];
+                        if (prevId !== typeId) {
+                            console.log(`🎵 [FX] Slot ${slot + 1}: Preset "${schema.name}" (ID: ${typeId})`);
+                        }
                         fxTypeState[slot].id = typeId;
                         fxTypeState[slot].name = schema.name || fxTypeState[slot].name;
                         lastFxTypeId[slot] = typeId;
@@ -872,7 +875,6 @@
                 }
 
                 if (isModalOpen() && currentSlotIdx === slot) {
-                    console.log(`[FX RECALL] Slot ${slot + 1} está ABERTO! Atualizando cabeçalho e disparando resync...`);
                     renderModal();
                     isSyncingSlot[slot] = true;
                     showEditorSyncOverlay();

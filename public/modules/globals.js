@@ -1,6 +1,8 @@
 // 🚨 [CRITICAL SYNC LOGIC] - O socket DEVE ser inicializado aqui, como primeiro script.
 // Se mover para o app.js ou carregar depois, os listeners nos outros módulos darão erro de 'undefined'.
-const socket = io();
+const socket = io({
+    transports: ['websocket']
+});
 let appReady = false; 
 const NUM_CHANNELS = 32;
 let channelStates = [];
