@@ -2478,11 +2478,8 @@ pub fn register_handlers(
             move |_socket: SocketRef, data: Data<serde_json::Value>| async move {
                 if let Some(slot) = data.get("slot").and_then(|v| v.as_u64()).map(|v| v as u8) {
                     if slot < 4 {
-                        for &p in &[0x31u8, 0x10, 0x11, 0x12] {
-                            if let Some(req) = crate::midi::protocol::build_fx_param_request(slot, p) {
-                                sched_fx_focus.enqueue(req, 0).await;
-                            }
-                        }
+                        let req = crate::midi::protocol::build_fx_editor_focus(slot);
+                        sched_fx_focus.enqueue(req, 0).await;
                     }
                 }
             },

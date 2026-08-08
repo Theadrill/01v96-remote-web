@@ -27,7 +27,7 @@
         try {
             const saved = localStorage.getItem('fx_layout_mode');
             if (saved === 'mobile' || saved === 'desktop') return saved;
-        } catch (e) {}
+        } catch (e) { }
 
         const ua = navigator.userAgent || '';
         const platform = navigator.platform || '';
@@ -57,7 +57,7 @@
     function setLayoutMode(mode) {
         if (mode !== 'mobile' && mode !== 'desktop') return;
         currentLayoutMode = mode;
-        try { localStorage.setItem('fx_layout_mode', mode); } catch (e) {}
+        try { localStorage.setItem('fx_layout_mode', mode); } catch (e) { }
         rerenderIfOpen();
     }
 
@@ -199,7 +199,7 @@
         }
 
         let bodyHtml = '';
-        if (schema.showMeters === true) {
+        if (true) {
             bodyHtml = renderMbandBody(schema, decoded);
         } else if (currentLayoutMode === 'desktop') {
             bodyHtml = renderDesktopGrid(schema, decoded);
@@ -210,12 +210,12 @@
         contentContainer.innerHTML = `
         <div class="fx-ed-container ${schema.colorTheme || 'theme-hall'}">
             ${window.FXComponents.renderHeader({
-                slot: currentSlotIdx + 1,
-                effectName: currentTypeInfo.name || schema.name,
-                colorTheme: schema.colorTheme || 'theme-hall',
-                bypass: decoded.bypass,
-                currentMode: currentLayoutMode
-            })}
+            slot: currentSlotIdx + 1,
+            effectName: currentTypeInfo.name || schema.name,
+            colorTheme: schema.colorTheme || 'theme-hall',
+            bypass: decoded.bypass,
+            currentMode: currentLayoutMode
+        })}
             <div class="fx-ed-scroll-body">
                 ${bodyHtml}
             </div>
@@ -226,7 +226,7 @@
             newScrollBody.scrollTop = savedScrollTop;
         }
 
-        if (schema.showMeters === true) {
+        if (true) {
             startFxMeters();
             if (typeof socket !== 'undefined' && socket.emit) {
                 socket.emit('requestFxMeters');
@@ -525,7 +525,7 @@
         renderModal();
 
         if (schema && schema.supported) {
-            if (schema.showMeters === true || typeId === 49) {
+            if (true) {
                 startFxMeters();
                 if (typeof socket !== 'undefined' && socket.emit) {
                     socket.emit('focusFxSlot', { slot: slotIdx });
@@ -729,7 +729,7 @@
 
     // ── Listeners de Socket.IO ─────────────────────────────────────────
     if (typeof socket !== 'undefined') {
-        socket.on('connect', function() {
+        socket.on('connect', function () {
             for (let i = 0; i < 4; i++) isSyncingSlot[i] = false;
             hideEditorSyncOverlay();
 
@@ -745,7 +745,7 @@
             }
         });
 
-        socket.on('fxSlotParamsUpdate', function(data) {
+        socket.on('fxSlotParamsUpdate', function (data) {
             if (!data || data.slot === undefined) return;
             const slot = data.slot;
 
@@ -785,7 +785,7 @@
             }
         });
 
-        socket.on('fxParamUpdate', function(data) {
+        socket.on('fxParamUpdate', function (data) {
             if (!data || data.slot === undefined || data.param === undefined) return;
             const slot = data.slot;
             if (!fxParamsState[slot]) fxParamsState[slot] = {};
@@ -826,7 +826,7 @@
             }
         });
 
-        socket.on('fxTypesUpdate', function(data) {
+        socket.on('fxTypesUpdate', function (data) {
             if (!data) return;
 
             for (let i = 0; i < 4; i++) {
@@ -868,7 +868,7 @@
             rerenderIfOpen();
         });
 
-        socket.on('fxLibraryRecall', function(data) {
+        socket.on('fxLibraryRecall', function (data) {
             const slot = (data && data.slot !== undefined) ? parseInt(data.slot, 10) : -1;
             const preset = (data && data.preset !== undefined) ? parseInt(data.preset, 10) : -1;
 
@@ -901,7 +901,7 @@
             }
         });
 
-        socket.on('fxMeterData', function(data) {
+        socket.on('fxMeterData', function (data) {
             if (!data) return;
             updateFxMeterFromMidi(data.channel, data.raw_val);
         });

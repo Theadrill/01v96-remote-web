@@ -1253,3 +1253,10 @@ fn name_channel_mapping(channel: u8) -> (u8, u8) {
 pub fn build_fx_meter_request(channel: u8) -> Vec<u8> {
     vec![0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x06, channel, 0x00, 0x00, 0x04, 0xF7]
 }
+
+/// Comando de FOCO de editor de efeito capturado do Studio Manager.
+/// Instrui a 01V96 a streamar os meters GR do slot informado (0-3).
+/// Parameter Change (0x10), Section 0x0D, Group 0x04, Element 0x09, Param 0x05.
+pub fn build_fx_editor_focus(slot: u8) -> Vec<u8> {
+    vec![0xF0, 0x43, 0x10, 0x3E, 0x0D, 0x04, 0x09, 0x05, 0x00, 0x00, 0x00, 0x00, slot, 0xF7]
+}

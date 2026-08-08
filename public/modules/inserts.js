@@ -2,6 +2,7 @@
 
 window.openInsertModal = function(chIdx) {
     if (!appReady) return;
+    window._insertModalChannel = chIdx;
     const chData = getChannelStateById(chIdx) || {};
     if (!chData.insert) chData.insert = { on: false, position: 0, patch_in: 0 };
     
