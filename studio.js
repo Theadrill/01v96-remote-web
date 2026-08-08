@@ -9,6 +9,7 @@ if (!fs.existsSync(logDir)) {
 
 const logStream = fs.createWriteStream(path.join(logDir, 'studio_log.txt'), { flags: 'w' });
 const originalConsoleLog = console.log;
+logStream.write(`=== Sessão iniciada em ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()} ===\n`);
 console.log = function(...args) {
     const formattedMessage = require('util').format(...args);
     const cleanMessage = formattedMessage.replace(/\x1b\[[0-9;]*m/g, ''); // Remove ANSI color codes

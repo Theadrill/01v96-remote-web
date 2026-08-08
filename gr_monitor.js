@@ -1,38 +1,51 @@
 const midi = require('midi');
-const readline = require('readline');
+const fs = require('fs');
+const path = require('path');
 
-const ELEMENT = 0x06; // 0x06 = FX Meters (Element 6)
-const POLL_MS = 100;
-const SCAN_INTERVAL_MS = 5000;
+// ────────────────────────────────────────────────────────────────────────────
+// EXPERIMENTO v3: meters de FX da 01V96 via Element 0x06 — SOMENTE LEITURA.
+//
+// >> NENHUM PARAMETRO E ESCRITO NA MESA <<
+// Este script só envia REQUESTS de leitura (prefixo 0x30):
+//   F0 43 30 3E 0D 21 06 [CH] 00 00 04 F7
+// Nada é alterado (volume, patch, cena). A mesa envia apenas a leitura.
+//
+// Referência (log/studio_log.txt, SM aberto no FX2, GR atuando):
+//   O SM pediu esses canais e a mesa respondeu SOMENTE:
+//     F0 43 10 3E 0D 21 06 [CH] 00 [8 bytes] F7
+//   • Canais que respondem: 0x08, 0x09 (nível) e 0x10/0x11/0x12 (GR)
+//   • 0x00..0x07 NUNCA responderam nas captures reais.
+//   • O valor GR (que varia) está no par message[11]/message[12].
+//
+// IMPORTANTE: o stream de meters segue o slot cujo EDITOR está aberto no
+// momento na consola. Parao teste de atividade, abra o FX editor do slot
+// desejado na PRÓPRIA mesa (botão EDIT) ou use o app do projeto.
+// ────────────────────────────────────────────────────────────────────────────
 
-let currentBaseCh = 0x10;
+// ATENÇÃO: o stream 0x06 segue o editor de FX aberto na mesa na hora —
+// NÃO existe byte de slot no request. O número abaixo é só cosmético p/ log.
+const SLOT = process.argv[2] !== undefined ? parseInt(process.argv[2], 10) : 3; // 0=Fx1 … 3=FX4
 
-function generateRequests(baseCh) {
-    return [
-        { ch: baseCh, label: 'LOW', sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, baseCh, 0x00, 0x00, 0x04, 0xF7] },
-        { ch: baseCh + 1, label: 'MID', sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, baseCh + 1, 0x00, 0x00, 0x04, 0xF7] },
-        { ch: baseCh + 2, label: 'HIGH', sysex: [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, ELEMENT, baseCh + 2, 0x00, 0x00, 0x04, 0xF7] },
-    ];
-}
-
-let REQUESTS = generateRequests(currentBaseCh);
-
-const FX4_SLOT = 0x03;
-const FOCUS_REQUESTS = [
-    // COMANDO REAL DE FOCO DO STUDIO MANAGER PARA MUDAR O SLOT ATIVO NA MESA
-    [0xF0, 0x43, 0x10, 0x3E, 0x0D, 0x04, 0x09, 0x05, 0x00, 0x00, 0x00, 0x00, FX4_SLOT, 0xF7]
+// Canais: só o GR MID (0x11) por enquanto — menos ruído pra acompanhar.
+const METER_CHANNELS = [
+    { ch: 0x11, label: 'GR MID ', gr: true },
 ];
-const FOCUS_MS = 2000;
 
-const IDLE = 0x0FFF; // 4095 (0 dB)
-const FULL_SCALE_GR_STEPS = 767; // 4095 (0 dB) a 3328 (-18 dB)
-const FULL_SCALE_GR_DB = 18;
+const buildMeterRequest = (ch) => [0xF0, 0x43, 0x30, 0x3E, 0x0D, 0x21, 0x06, ch,
+                                   0x00, 0x00, 0x04, 0xF7];
+
+// Log: sempre o mesmo arquivo, sobrescreve a cada execucao
+const LOG_DIR = path.join(__dirname, 'log');
+const LOG_FILE = path.join(LOG_DIR, 'gr_monitor.txt');
+fs.mkdirSync(LOG_DIR, { recursive: true });
+const logStream = fs.createWriteStream(LOG_FILE, { flags: 'w' });
+
+const CYCLE_MS = 2000;
 
 function findYamahaPorts() {
     const inp = new midi.Input();
     const out = new midi.Output();
     let yamahaIn = -1, yamahaOut = -1;
-
     for (let i = 0; i < inp.getPortCount(); i++) {
         const name = inp.getPortName(i).toLowerCase();
         if (yamahaIn === -1 && name.includes('yamaha')) yamahaIn = i;
@@ -41,20 +54,13 @@ function findYamahaPorts() {
         const name = out.getPortName(i).toLowerCase();
         if (yamahaOut === -1 && name.includes('yamaha')) yamahaOut = i;
     }
-
     inp.closePort();
     out.closePort();
     return { yamahaIn, yamahaOut };
 }
 
-function formatGR(raw) {
-    if (raw === undefined || raw === null) return 'N/A';
-    const norm = raw & 0x0FFF;
-    if (norm >= IDLE) {
-        return `0x${norm.toString(16).toUpperCase().padStart(4, '0')}( 0.0dB)`;
-    }
-    const db = ((IDLE - norm) / FULL_SCALE_GR_STEPS) * FULL_SCALE_GR_DB;
-    return `0x${norm.toString(16).toUpperCase().padStart(4, '0')}(-${db.toFixed(1).padStart(4, ' ')}dB)`;
+function u14(msb, lsb) {
+    return (((msb & 0x7F) << 7) | (lsb & 0x7F)) & 0x0FFF;
 }
 
 const { yamahaIn, yamahaOut } = findYamahaPorts();
@@ -70,21 +76,23 @@ output.openPort(yamahaOut);
 input.ignoreTypes(false, false, false);
 
 console.log(`\nYAMAHA 01V96 CONECTADA [IN:${yamahaIn} OUT:${yamahaOut}]`);
-console.log(`SCANNING STARTING AT 0x${currentBaseCh.toString(16).toUpperCase()}...`);
+console.log(`Lendo meters do FX cujo EDITOR estiver aberto na mesa (SOMENTE requests 0x30, nada escrito)\n`);
 
 let sysexBuffer = null;
-let latestValues = {};
+let lastByChannel = {};
 
-input.on('message', (_deltaTime, message) => {
+const log = (line) => {
+    console.log(line);
+    logStream.write(line + '\n');
+};
+
+input.on('message', (_dt, message) => {
     if (message[0] === 0xFE) return;
 
     const startsWithF0 = message[0] === 0xF0;
     const endsWithF7 = message[message.length - 1] === 0xF7;
 
-    if (startsWithF0 && !endsWithF7) {
-        sysexBuffer = Array.from(message);
-        return;
-    }
+    if (startsWithF0 && !endsWithF7) { sysexBuffer = Array.from(message); return; }
     if (!startsWithF0 && sysexBuffer) {
         for (const b of message) sysexBuffer.push(b);
         if (!endsWithF7) return;
@@ -92,57 +100,40 @@ input.on('message', (_deltaTime, message) => {
         sysexBuffer = null;
     }
 
-    if (message.length < 12 || message[0] !== 0xF0 || message[1] !== 0x43 || message[2] !== 0x10) return;
-    if (message[3] !== 0x3E || message[4] !== 0x0D || message[5] !== 0x21 || message[6] !== ELEMENT) return;
+    // Resposta de meter FX: F0 43 10 3E 0D 21 06 [CH] 00 [dados] F7
+    if (message.length < 9 || message[0] !== 0xF0 || message[1] !== 0x43 ||
+        message[2] !== 0x10 || message[3] !== 0x3E || message[4] !== 0x0D ||
+        message[5] !== 0x21 || message[6] !== 0x06) return;
 
     const ch = message[7];
-    const msb = message.length >= 13 ? message[11] : message[10];
-    const lsb = message.length >= 13 ? message[12] : message[11];
-    const raw = ((msb & 0x7f) << 7) | (lsb & 0x7f);
-    latestValues[ch] = raw;
+    const entry = METER_CHANNELS.find((m) => m.ch === ch);
+    if (!entry) return;
 
-    if (ch >= currentBaseCh && ch <= currentBaseCh + 2) {
-        readline.cursorTo(process.stdout, 0);
-        readline.clearLine(process.stdout, 0);
-        const l = formatGR(latestValues[currentBaseCh]);
-        const m = formatGR(latestValues[currentBaseCh + 1]);
-        const h = formatGR(latestValues[currentBaseCh + 2]);
-        process.stdout.write(`SCANNING 0x${currentBaseCh.toString(16).toUpperCase()} | LOW:${l} MID:${m} HI:${h}`);
-    }
+    // valor 14-bit GR em message[11]/[12] (confirmado no log SM)
+    const msb = message[11];
+    const lsb = message[12];
+    const raw = u14(msb, lsb);
+
+    const stamp = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+    const prefix = entry.gr ? 'GR' : 'LV';
+    const line = `[${stamp}] ${prefix} ${entry.label} = 0x${raw.toString(16).toUpperCase().padStart(3, '0')} (${raw})`;
+    log(line);
+    lastByChannel[ch] = raw;
 });
 
-let reqIdx = 0;
-function sendNext() {
-    output.sendMessage(REQUESTS[reqIdx].sysex);
-    reqIdx = (reqIdx + 1) % REQUESTS.length;
-    setTimeout(sendNext, POLL_MS);
-}
-
-function sendFocus() {
-    for (const sysex of FOCUS_REQUESTS) {
-        output.sendMessage(sysex);
+function sendMeterCycle() {
+    for (const m of METER_CHANNELS) {
+        output.sendMessage(buildMeterRequest(m.ch));
     }
 }
-sendFocus();
-setInterval(sendFocus, FOCUS_MS);
-sendNext();
 
-// SCANNER LOOP
-setInterval(() => {
-    currentBaseCh += 3;
-    if (currentBaseCh > 0x1B) {
-        currentBaseCh = 0x10; // Reset
-    }
-    REQUESTS = generateRequests(currentBaseCh);
-    latestValues = {};
-    console.log(`\n--- CHANGING SCAN CHANNELS TO 0x${currentBaseCh.toString(16).toUpperCase()} ---`);
-}, SCAN_INTERVAL_MS);
+sendMeterCycle();
+setInterval(sendMeterCycle, CYCLE_MS);
 
 process.on('SIGINT', () => {
-    console.log('\nEncerrando monitor GR...');
-    try {
-        input.closePort();
-        output.closePort();
-    } catch (_) {}
+    log('\nEncerrando...');
+    try { input.closePort(); output.closePort(); } catch (_) {}
+    logStream.end();
+    log(`Log salvo em: ${LOG_FILE}`);
     process.exit(0);
 });
