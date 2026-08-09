@@ -108,6 +108,12 @@
       "physical_scene": "BAL GERAL 360",
       "physical_id": 42,
       "file": "custom_names_scene-BAL GERAL 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "NAMORAL 360",
+      "physical_scene": "NAMORAL 360",
+      "physical_id": 18,
+      "file": "custom_names_scene-NAMORAL 360-mesa-maria.json"
     }
   ]
 }
