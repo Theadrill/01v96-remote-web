@@ -386,20 +386,19 @@ pub fn start_rx_loop(
                                         value
                                     );
                                 }
+                                // REGRA DESATIVADA A PEDIDO DO USUÁRIO
                                 // Só emite 'update' para os clientes após o sync completo.
                                 // Durante o sync inicial, ~700 respostas MIDI chegam da mesa —
                                 // emiti-las individualmente causaria flicker na UI e sobrecarga
                                 // desnecessária. O sync final envia um 'sync' completo de qualquer forma.
-                                if conn_mgr_recv.is_fully_synced() {
-                                    emission = Some((
-                                        "update",
-                                        serde_json::json!({
-                                            "type": msg_type,
-                                            "channel": channel,
-                                            "value": value
-                                        }),
-                                    ));
-                                }
+                                emission = Some((
+                                    "update",
+                                    serde_json::json!({
+                                        "type": msg_type,
+                                        "channel": channel,
+                                        "value": value
+                                    }),
+                                ));
                                 if msg_type == "kEffectInput/kEffectIn" {
                                     fx_inputs_emission = Some(
                                         serde_json::to_value(&state.fx_inputs).unwrap_or_default(),

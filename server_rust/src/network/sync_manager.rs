@@ -476,6 +476,8 @@ async fn queue_all_params_inner(
             push_req(&mut requests, &format!("kInputComp/{}", p), i);
         }
         push_req(&mut requests, "kChannelInput/kChannelIn", i);
+        push_req(&mut requests, "kInputInsert/kInsertOn", i);
+        push_req(&mut requests, "kInputInsert/kInsertLocInsert", i);
         push_req(&mut requests, "kChannelInsertIn/kInsertIn", i);
         push_req(&mut requests, "kInputBus/kStereo", i);
         for b in 1..=8 {

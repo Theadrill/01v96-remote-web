@@ -391,7 +391,13 @@ window.clearPreviousInsertOut = function(chIdx) {
 }
 
 
-function getOutSourceName(val) {
+function getOutSourceName(val, type) {
+    if (type === 'fx') {
+        if (val >= 13 && val <= 44) return `INSERT CH ${val - 12}`;
+        if (val >= 109 && val <= 116) return `BUS ${val - 108}`;
+        if (val >= 117 && val <= 124) return `AUX ${val - 116}`;
+        return `SOURCE ${val}`;
+    }
     if (val >= 31 && val <= 62) return `INSERT CH ${val - 30}`;
     if (val >= 1 && val <= 8) return `BUS ${val}`;
     if (val >= 9 && val <= 16) return `AUX ${val - 8}`;
@@ -419,8 +425,8 @@ window.showInsertOutConfirmModal = function(chIdx, type, portIdx, srcValue, curr
     const overlay = document.getElementById('insertConfirmModalOverlay') || createInsertConfirmModalOverlay();
     const modal = document.getElementById('insertConfirmModalContent');
     
-    const currentName = getOutSourceName(currentAssignedSrc);
-    const newName = getOutSourceName(srcValue);
+    const currentName = getOutSourceName(currentAssignedSrc, type);
+    const newName = getOutSourceName(srcValue, type);
     const portName = getOutPortName(type, portIdx);
 
     const html = `
