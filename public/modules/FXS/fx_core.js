@@ -199,7 +199,7 @@
         }
 
         let bodyHtml = '';
-        if (true) {
+        if (schema.id === 49) {
             bodyHtml = renderMbandBody(schema, decoded);
         } else if (currentLayoutMode === 'desktop') {
             bodyHtml = renderDesktopGrid(schema, decoded);
@@ -226,7 +226,7 @@
             newScrollBody.scrollTop = savedScrollTop;
         }
 
-        if (true) {
+        if (schema.showMeters) {
             startFxMeters();
             if (typeof socket !== 'undefined' && socket.emit) {
                 socket.emit('requestFxMeters');
