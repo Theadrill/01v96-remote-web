@@ -513,6 +513,23 @@
         rerenderIfOpen();
     }
 
+    function getParamsToRequest(slotIdx) {
+        const typeInfo = fxTypeState[slotIdx] || {};
+        const typeId = typeInfo.id !== undefined ? typeInfo.id : slotIdx;
+        const schema = window.FXRegistry ? window.FXRegistry.getSchema(typeId) : null;
+        let params = [];
+        if (schema && schema.params) {
+            schema.params.forEach(p => {
+                if (!params.includes(p.sysEx)) params.push(p.sysEx);
+            });
+            if (!params.includes(48)) params.push(48);
+            if (!params.includes(52)) params.push(52);
+        } else {
+            params = [0x31, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 48, 52];
+        }
+        return params;
+    }
+
     // ── Abrir Editor de Efeito (Lazy Sync) ────────────────────────────
     function openFxEditor(slotIdx) {
         if (slotIdx < 0 || slotIdx > 3) return;
@@ -536,7 +553,7 @@
                 showEditorSyncOverlay();
                 isSyncingSlot[slotIdx] = true;
                 if (typeof socket !== 'undefined') {
-                    socket.emit('requestFxSlotParams', { slot: slotIdx });
+                    socket.emit('requestFxSlotParams', { slot: slotIdx, params: getParamsToRequest(slotIdx) });
                 }
             } else {
                 hideEditorSyncOverlay();
@@ -740,7 +757,7 @@
                 if (syncedSlots[currentSlotIdx]) {
                     renderModal();
                 } else {
-                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx });
+                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, params: getParamsToRequest(currentSlotIdx) });
                 }
             }
         });
@@ -861,7 +878,7 @@
                 if (schema && schema.supported) {
                     isSyncingSlot[currentSlotIdx] = true;
                     showEditorSyncOverlay();
-                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true, params: getParamsToRequest(currentSlotIdx) });
                 }
             }
 
@@ -885,7 +902,7 @@
                     renderModal();
                     isSyncingSlot[slot] = true;
                     showEditorSyncOverlay();
-                    socket.emit('requestFxSlotParams', { slot: slot, force: true });
+                    socket.emit('requestFxSlotParams', { slot: slot, force: true, params: getParamsToRequest(slot) });
                 }
             } else {
                 for (let i = 0; i < 4; i++) {
@@ -896,7 +913,7 @@
                 if (isModalOpen()) {
                     isSyncingSlot[currentSlotIdx] = true;
                     showEditorSyncOverlay();
-                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true });
+                    socket.emit('requestFxSlotParams', { slot: currentSlotIdx, force: true, params: getParamsToRequest(currentSlotIdx) });
                 }
             }
         });

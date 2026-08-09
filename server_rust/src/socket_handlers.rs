@@ -2389,14 +2389,26 @@ pub fn register_handlers(
                             let sched = sched_fx_slot.clone();
                             let state_inner = state_fx_slot.clone();
                             let socket_inner = socket.clone();
+                            let params_to_request: Vec<u8> = data
+                                .get("params")
+                                .and_then(|v| v.as_array())
+                                .map(|arr| {
+                                    arr.iter()
+                                        .filter_map(|v| v.as_u64().map(|n| n as u8))
+                                        .collect()
+                                })
+                                .unwrap_or_else(|| {
+                                    vec![
+                                        0x31, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+                                        0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 48, 52,
+                                    ]
+                                });
+                            
                             tokio::spawn(async move {
                                 let config = crate::config::AppConfig::load();
                                 let throttle_ms = config.time_between_fxs_requests;
-                                let params = [
-                                    0x31, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-                                    0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 48, 52
-                                ];
-                                for &p in &params {
+                                
+                                for &p in &params_to_request {
                                     if let Some(req) = crate::midi::protocol::build_fx_param_request(slot, p) {
                                         sched.enqueue(req, 0).await;
                                     }
