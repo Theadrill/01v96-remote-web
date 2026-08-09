@@ -603,9 +603,15 @@ async fn queue_all_params_inner(
         push_req(&mut requests, "kOutputPatch/k2tr", i);
     }
 
-    // FX Type queries (slot-indexed format, 4 slots)
+    // FX Type, Mix (48) e Bypass (52) queries (slot-indexed format, 4 slots)
     for i in 0..4u8 {
         if let Some(req) = midi::protocol::build_fx_type_request(i) {
+            requests.push(req);
+        }
+        if let Some(req) = midi::protocol::build_fx_param_request(i, 48) {
+            requests.push(req);
+        }
+        if let Some(req) = midi::protocol::build_fx_param_request(i, 52) {
             requests.push(req);
         }
     }
