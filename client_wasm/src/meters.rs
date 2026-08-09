@@ -130,11 +130,11 @@ impl MeterEngine {
 
                 let mut target_ch = None;
                 if group == 33 && element == 1 {
-                    let ch = 42 + channel + i;
-                    if (42..=49).contains(&ch) { target_ch = Some(ch); }
+                    let ch = 44 + channel + i;
+                    if (44..=51).contains(&ch) { target_ch = Some(ch); }
                 } else if group == 33 && element == 2 {
-                    let ch = 34 + channel + i;
-                    if (34..=41).contains(&ch) { target_ch = Some(ch); }
+                    let ch = 36 + channel + i;
+                    if (36..=43).contains(&ch) { target_ch = Some(ch); }
                 } else if group == 33 && element == 0 && _parameter == 0 && channel == 32 {
                     let ch = 60 + i;
                     if (60..=67).contains(&ch) { target_ch = Some(ch); }

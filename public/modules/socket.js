@@ -1373,8 +1373,8 @@ function applyMetersToDOM(smoothedLevels, now) {
 
             let levelIdx = -1;
             if (cached.dataCh === 'master') levelIdx = 32;
-            else if (i < 8) levelIdx = 34 + i;       // Mix 1-8
-            else if (i < 16) levelIdx = 42 + (i - 8); // Bus 1-8
+            else if (i < 8) levelIdx = 36 + i;       // Mix 1-8
+            else if (i < 16) levelIdx = 44 + (i - 8); // Bus 1-8
             else levelIdx = parseInt(cached.dataCh);
 
             if (levelIdx >= 0 && levelIdx < smoothedLevels.length) {
