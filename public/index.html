@@ -219,7 +219,23 @@
     <div class="modal-overlay styled-configModal" id="configModal">
         <div class="modal-content">
             <p class="config-modal-title">01V96 — LIVE CONTROL</p>
-            <p class="config-section-header inline-style-3">Entradas · Saídas · Configuração</p>
+            <p class="config-section-header inline-style-3">CONFIGURAÇÕES DO APLICATIVO</p>
+
+            <!-- Seção de Cenas (Visual) -->
+            <div class="config-section">
+                <p class="config-section-header">Gerenciamento de Cenas</p>
+                <div class="inline-style-6">
+                    <span class="styled-configSceneDisplay" id="configSceneDisplay">SINCRONIZANDO...</span>
+                </div>
+                <div class="inline-style-7">
+                    <button class="btn-connect inline-style-8" onclick="showSceneGrid('save')">SALVAR
+                        CENA</button>
+                    <button class="btn-connect inline-style-9" onclick="showSceneGrid('load')">CARREGAR
+                        CENA</button>
+                    <button class="btn-connect inline-style-10" onclick="showCustomScenes()">NOMES
+                        CUSTOMIZADOS</button>
+                </div>
+            </div>
 
             <!-- Painel de Endereços de Acesso ao Servidor -->
             <div class="network-info-container" id="networkInfoContainer">
@@ -237,21 +253,6 @@
             <select class="modal-select styled-offlineOverlay" id="sout"></select>
             <button class="btn-connect inline-style-4" onclick="forceSync()">MANUAL SYNC</button>
             <button class="btn-connect inline-style-5" onclick="restartServer()">REINICIAR SERVIDOR</button>
-            <!-- Seção de Cenas (Visual) -->
-            <div class="config-section">
-                <p class="config-section-header">Gerenciamento de Cenas</p>
-                <div class="inline-style-6">
-                    <span class="styled-configSceneDisplay" id="configSceneDisplay">SINCRONIZANDO...</span>
-                </div>
-                <div class="inline-style-7">
-                    <button class="btn-connect inline-style-8" onclick="showSceneGrid('save')">SALVAR
-                        CENA</button>
-                    <button class="btn-connect inline-style-9" onclick="showSceneGrid('load')">CARREGAR
-                        CENA</button>
-                    <button class="btn-connect inline-style-10" onclick="showCustomScenes()">NOMES
-                        CUSTOMIZADOS</button>
-                </div>
-            </div>
             <!-- Seção DMX (Reset) -->
             <div class="config-section">
                 <p class="config-section-header">Sistema de Iluminação</p>
