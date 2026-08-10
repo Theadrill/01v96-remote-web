@@ -546,7 +546,7 @@ window.addEventListener('click', (e) => {
         e.target.classList.remove('active');
         closedAny = true;
     }
-    
+
     if (closedAny) {
         e.stopPropagation();
         e.preventDefault();
@@ -743,7 +743,7 @@ window.onConfigReset = function () {
 };
 
 window.toggleLayerNav = function (enabled) {
-    try { localStorage.setItem('01v96_layer_nav', enabled ? 'true' : 'false'); } catch (e) {}
+    try { localStorage.setItem('01v96_layer_nav', enabled ? 'true' : 'false'); } catch (e) { }
     layerNavEnabled = enabled;
     activeLayerStart = 0;
     if (typeof initUI === 'function') initUI();
@@ -857,12 +857,12 @@ async function fetchAndRenderNetworkInfo() {
             const url = item.url || '';
 
             html += `
-                <div class="network-card" onclick="copyNetworkUrl('${escapeHtml(url)}', this.querySelector('.network-copy-btn'), event)" title="Clique para copiar ${escapeHtml(url)}">
+                <div class="network-card" onclick="copyNetworkUrl('${escapeHtml(url)}', this.querySelector('.network-copy-btn'), event, '${escapeHtml(label)}', '${categoryClass}')" title="Clique para copiar e ver QR Code de ${escapeHtml(url)}">
                     <div class="network-card-details">
                         <span class="network-card-badge ${categoryClass}">${escapeHtml(label)}</span>
                         <span class="network-card-url">${escapeHtml(url)}</span>
                     </div>
-                    <button class="network-copy-btn" onclick="copyNetworkUrl('${escapeHtml(url)}', this, event)">
+                    <button class="network-copy-btn" onclick="copyNetworkUrl('${escapeHtml(url)}', this, event, '${escapeHtml(label)}', '${categoryClass}')">
                         COPIAR
                     </button>
                 </div>
@@ -878,7 +878,7 @@ async function fetchAndRenderNetworkInfo() {
 
 window.fetchAndRenderNetworkInfo = fetchAndRenderNetworkInfo;
 
-window.copyNetworkUrl = function(url, btnElement, event) {
+window.copyNetworkUrl = function (url, btnElement, event, label, categoryClass) {
     if (event) {
         event.stopPropagation();
     }
@@ -888,12 +888,56 @@ window.copyNetworkUrl = function(url, btnElement, event) {
             OverlayInfo.show('copied', 'ENDEREÇO COPIADO!');
         }
         showCopiedFeedback(btnElement);
+        openQrCodeModal(url, label, categoryClass);
     };
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(triggerCopySuccess).catch(() => fallbackCopy(url, triggerCopySuccess));
     } else {
         fallbackCopy(url, triggerCopySuccess);
+    }
+};
+
+window.openQrCodeModal = function (url, label, categoryClass) {
+    const modal = document.getElementById('qrCodeModal');
+    if (!modal) return;
+
+    const qrBadge = document.getElementById('qrBadge');
+    const qrLabelText = document.getElementById('qrLabelText');
+    const qrUrlText = document.getElementById('qrUrlText');
+    const container = document.getElementById('qrCodeCanvasContainer');
+
+    if (qrBadge) {
+        qrBadge.className = 'network-card-badge ' + (categoryClass || 'badge-lan');
+        qrBadge.innerText = (label || 'REDE LOCAL').toUpperCase();
+    }
+    if (qrLabelText) qrLabelText.innerText = 'Escaneie para Conectar';
+    if (qrUrlText) qrUrlText.innerText = url;
+
+    if (container) {
+        container.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+            const size = window.innerWidth <= 480 ? 220 : 200;
+            new QRCode(container, {
+                text: url,
+                width: size,
+                height: size,
+                colorDark: '#000000',
+                colorLight: '#ffffff'
+            });
+        }
+    }
+
+    modal.style.display = 'flex';
+};
+
+window.closeQrCodeModal = function (event) {
+    if (event && event.target && event.target.closest('.qr-modal-card') && !event.target.classList.contains('qr-modal-close-icon') && !event.target.classList.contains('qr-modal-close-btn')) {
+        return;
+    }
+    const modal = document.getElementById('qrCodeModal');
+    if (modal) {
+        modal.style.display = 'none';
     }
 };
 
@@ -1230,7 +1274,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function handleMobileSairAction() {
     const modal = document.getElementById("mobileMenuModal");
-    
+
     // PRIORIDADE 1: Se o menu estiver aberto, apenas fecha o menu
     if (modal && modal.classList.contains("active")) {
         closeMobileMenu();
@@ -1321,11 +1365,11 @@ function renderMobileMenu(mode) {
         const buttonElement = document.createElement("button");
         buttonElement.innerText = btn.label;
         buttonElement.className = "mobile-menu-item";
-        
+
         if (btn.isConfig) {
             buttonElement.classList.add("menu-btn-solid-yellow"); // Aplica a cor de fundo amarela
         }
-        
+
         if (btn.cls) {
             buttonElement.classList.add(btn.cls);
         }
@@ -1334,7 +1378,7 @@ function renderMobileMenu(mode) {
         buttonElement.onclick = () => {
             // Fecha o menu antes de disparar a ação para limpar o fluxo visual
             closeMobileMenu();
-            
+
             // Executa a ação
             if (typeof btn.action === 'string') {
                 new Function(btn.action)();

@@ -15,6 +15,7 @@
     <link href="modules/FXS/fx.css?v=1.0.2" rel="stylesheet" />
     <!-- UI UPDATE: 2026-06-07 -->
     <script src="/vendor/socket.io.min.js"></script>
+    <script src="/vendor/qrcode.min.js"></script>
     <script>
         // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
         document.addEventListener('DOMContentLoaded', function () {
@@ -1481,6 +1482,32 @@
         onclick="if(!event.target.closest('.mobile-menu-item')) this.classList.remove('active')">
         <div class="mobile-menu-content">
             <div id="mobileMenuList" class="mobile-menu-list">
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrCodeModal" class="qr-modal-overlay" style="display: none;" onclick="closeQrCodeModal(event)">
+        <div class="qr-modal-card" onclick="event.stopPropagation()">
+            <div class="qr-modal-header">
+                <div class="qr-modal-title-wrap">
+                    <span id="qrBadge" class="network-card-badge badge-lan">REDE LOCAL</span>
+                    <span id="qrLabelText" class="qr-modal-label">Endereço de Acesso</span>
+                </div>
+                <button class="qr-modal-close-icon" onclick="closeQrCodeModal()">&times;</button>
+            </div>
+
+            <div class="qr-modal-body">
+                <div id="qrCodeCanvasContainer" class="qr-code-container"></div>
+                <div class="qr-modal-url" id="qrUrlText">http://192.168.1.111:4000</div>
+            </div>
+
+            <div class="qr-modal-copied-banner">
+                📋 LINK COPIADO!
+            </div>
+
+            <div class="qr-modal-footer">
+                <button class="qr-modal-close-btn" onclick="closeQrCodeModal()">FECHAR</button>
             </div>
         </div>
     </div>
