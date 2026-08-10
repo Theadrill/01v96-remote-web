@@ -8798,3 +8798,196 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
         }
     }
 }
+
+/* ==========================================================================
+   PAINEL DE ENDEREÇOS DE ACESSO AO SERVIDOR (CONFIG MODAL)
+   ========================================================================== */
+.network-info-container {
+    background: rgba(18, 22, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    text-align: left;
+}
+
+.network-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.network-info-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #4da6ff;
+    text-transform: uppercase;
+}
+
+.network-refresh-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e0e0e0;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.network-refresh-btn:hover {
+    background: rgba(77, 166, 255, 0.25);
+    color: #fff;
+    border-color: #4da6ff;
+}
+
+.network-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.network-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 8px 10px;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.network-card * {
+    cursor: pointer;
+}
+
+.network-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(77, 166, 255, 0.35);
+}
+
+.network-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.network-card-badge {
+    align-self: flex-start;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.badge-lan {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.4);
+}
+.badge-tailscale_magicdns {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.4);
+}
+.badge-tailscale_ip {
+    background: rgba(155, 89, 182, 0.2);
+    color: #9b59b6;
+    border: 1px solid rgba(155, 89, 182, 0.4);
+}
+.badge-tailscale_https {
+    background: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+    border: 1px solid rgba(241, 196, 15, 0.4);
+}
+.badge-localhost {
+    background: rgba(149, 165, 166, 0.2);
+    color: #95a5a6;
+    border: 1px solid rgba(149, 165, 166, 0.4);
+}
+
+.network-card-url {
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+.network-copy-btn {
+    background: rgba(77, 166, 255, 0.15);
+    border: 1px solid rgba(77, 166, 255, 0.35);
+    color: #4da6ff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.network-copy-btn:hover {
+    background: rgba(77, 166, 255, 0.3);
+    color: #ffffff;
+}
+
+.network-copy-btn.copied {
+    background: #2ecc71;
+    border-color: #2ecc71;
+    color: #111111;
+}
+
+.network-info-loading, .network-info-empty {
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+    padding: 10px 4px;
+}
+
+/* Otimização Responsiva para telas pequenas (ex: iPhone SE 3 - width <= 375px) */
+@media (max-width: 380px) {
+    .network-info-container {
+        padding: 8px 8px;
+        margin-top: 6px;
+        margin-bottom: 10px;
+    }
+    .network-info-title {
+        font-size: 10px;
+    }
+    .network-card {
+        padding: 6px 6px;
+        gap: 6px;
+    }
+    .network-card-badge {
+        font-size: 8px;
+        padding: 1px 4px;
+    }
+    .network-card-url {
+        font-size: 11px;
+    }
+    .network-copy-btn {
+        padding: 5px 8px;
+        font-size: 9px;
+    }
+}

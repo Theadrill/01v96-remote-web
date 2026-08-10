@@ -219,6 +219,18 @@
         <div class="modal-content">
             <p class="config-modal-title">01V96 — LIVE CONTROL</p>
             <p class="config-section-header inline-style-3">Entradas · Saídas · Configuração</p>
+
+            <!-- Painel de Endereços de Acesso ao Servidor -->
+            <div class="network-info-container" id="networkInfoContainer">
+                <div class="network-info-header">
+                    <span class="network-info-title">📡 ENDEREÇOS DE ACESSO AO SERVIDOR</span>
+                    <button class="network-refresh-btn" onclick="fetchAndRenderNetworkInfo()" title="Atualizar endereços">🔄</button>
+                </div>
+                <div class="network-info-list" id="networkInfoList">
+                    <div class="network-info-loading">🔍 Carregando endereços da rede...</div>
+                </div>
+            </div>
+
             <!-- Selects ocultos usados por conn() para índices de porta MIDI -->
             <select class="modal-select styled-offlineOverlay" id="sin"></select>
             <select class="modal-select styled-offlineOverlay" id="sout"></select>

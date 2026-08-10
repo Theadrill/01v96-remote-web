@@ -37,6 +37,12 @@ const OverlayInfo = (() => {
             textColor: '#17a2b8',
             autoHide: 3000,
         },
+        copied: {
+            icon: '<span style="font-size:16px;">📋</span>',
+            borderColor: '#007bff',
+            textColor: '#4da6ff',
+            autoHide: 2000,
+        },
     };
 
     function getOrCreateEl() {

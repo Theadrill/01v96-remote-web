@@ -813,7 +813,7 @@ function updateDesktopScrollbarState() {
 // Inicializa estado da barra de rolagem imediatamente
 updateDesktopScrollbarState();
 
-// Atualiza o display do nome do servidor sempre que o configModal abrir
+// Atualiza o display do nome do servidor e endereços de rede sempre que o configModal abrir
 document.addEventListener('DOMContentLoaded', () => {
     updateMacrosState();
     updateDesktopScrollbarState();
@@ -824,12 +824,105 @@ document.addEventListener('DOMContentLoaded', () => {
             refreshServerNameDisplay();
             updateMacrosState();
             updateDesktopScrollbarState();
+            fetchAndRenderNetworkInfo();
             const toggleChk = document.getElementById('toggleLayerNav');
             if (toggleChk) toggleChk.checked = !!layerNavEnabled;
         }
     });
     observer.observe(configModal, { attributes: true, attributeFilter: ['style'] });
 });
+
+async function fetchAndRenderNetworkInfo() {
+    const listContainer = document.getElementById('networkInfoList');
+    if (!listContainer) return;
+
+    listContainer.innerHTML = '<div class="network-info-loading">🔍 Buscando endereços da rede...</div>';
+
+    try {
+        const response = await fetch('/api/network-info');
+        if (!response.ok) throw new Error('Falha HTTP');
+        const data = await response.json();
+
+        if (!data.urls || data.urls.length === 0) {
+            listContainer.innerHTML = '<div class="network-info-empty">Nenhum endereço de rede ativo.</div>';
+            return;
+        }
+
+        const escapeHtml = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        let html = '';
+        data.urls.forEach(item => {
+            const categoryClass = 'badge-' + (item.category || 'localhost');
+            const label = item.label || 'Endereço';
+            const url = item.url || '';
+
+            html += `
+                <div class="network-card" onclick="copyNetworkUrl('${escapeHtml(url)}', this.querySelector('.network-copy-btn'), event)" title="Clique para copiar ${escapeHtml(url)}">
+                    <div class="network-card-details">
+                        <span class="network-card-badge ${categoryClass}">${escapeHtml(label)}</span>
+                        <span class="network-card-url">${escapeHtml(url)}</span>
+                    </div>
+                    <button class="network-copy-btn" onclick="copyNetworkUrl('${escapeHtml(url)}', this, event)">
+                        COPIAR
+                    </button>
+                </div>
+            `;
+        });
+
+        listContainer.innerHTML = html;
+    } catch (err) {
+        console.error('[NETWORK] Erro ao buscar endereços do servidor:', err);
+        listContainer.innerHTML = '<div class="network-info-empty">⚠️ Não foi possível carregar os endereços do servidor.</div>';
+    }
+}
+
+window.fetchAndRenderNetworkInfo = fetchAndRenderNetworkInfo;
+
+window.copyNetworkUrl = function(url, btnElement, event) {
+    if (event) {
+        event.stopPropagation();
+    }
+
+    const triggerCopySuccess = () => {
+        if (typeof OverlayInfo !== 'undefined' && OverlayInfo.show) {
+            OverlayInfo.show('copied', 'ENDEREÇO COPIADO!');
+        }
+        showCopiedFeedback(btnElement);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(triggerCopySuccess).catch(() => fallbackCopy(url, triggerCopySuccess));
+    } else {
+        fallbackCopy(url, triggerCopySuccess);
+    }
+};
+
+function fallbackCopy(url, onSuccess) {
+    const textArea = document.createElement('textarea');
+    textArea.value = url;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        if (typeof onSuccess === 'function') onSuccess();
+    } catch (e) {
+        console.error('[COPY] Erro no fallback de cópia', e);
+    }
+    document.body.removeChild(textArea);
+}
+
+function showCopiedFeedback(btnElement) {
+    if (!btnElement) return;
+    const originalText = btnElement.innerText;
+    btnElement.innerText = 'COPIADO!';
+    btnElement.classList.add('copied');
+    setTimeout(() => {
+        btnElement.innerText = originalText;
+        btnElement.classList.remove('copied');
+    }, 1500);
+}
 
 function renderDock(mode) {
     window.currentDockMode = mode;
