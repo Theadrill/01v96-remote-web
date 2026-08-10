@@ -46,6 +46,10 @@ impl SyncManager {
 
 
     pub fn is_busy(&self) -> bool {
+        self.is_syncing.load(Ordering::SeqCst) || self.is_syncing_fx.load(Ordering::SeqCst)
+    }
+
+    pub fn is_syncing(&self) -> bool {
         self.is_syncing.load(Ordering::SeqCst)
     }
 
@@ -239,7 +243,7 @@ impl SyncManager {
                 io.clone(),
                 state.clone(),
                 is_syncing,
-                is_fully_synced,
+                is_fully_synced.clone(),
                 true,
                 has_synced_names,
                 csm.clone(),
@@ -250,25 +254,17 @@ impl SyncManager {
             )
             .await;
 
-            let (state_json, scenes_state, current_scene_json, resolved_names) = {
+            let (scenes_state, current_scene_json) = {
                 let current_state = state.read().await;
-                let sj = serde_json::to_value(&*current_state).unwrap_or_default();
                 let ss = current_state.scene_manager.get_state();
                 let cs = current_state.scene_manager.current_scene.as_ref().map(|cs| serde_json::json!(cs));
-                let resolved = crate::name_resolver::resolve_all(&state, &csm).await;
-                let names_payload: Vec<serde_json::Value> = resolved
-                    .into_iter()
-                    .map(|r| serde_json::json!({ "id": r.ch, "name": r.name, "short_name": r.short }))
-                    .collect();
-                (sj, ss, cs, names_payload)
+                (ss, cs)
             };
 
-            let _ = io.emit("sync", &state_json).await;
             let _ = io.emit("scenesUpdated", &scenes_state).await;
             if let Some(ref cs_json) = current_scene_json {
                 let _ = io.emit("currentScene", cs_json).await;
             }
-            let _ = io.emit("resolvedNamesUpdated", &serde_json::json!({ "channels": resolved_names })).await;
 
             let _ = io.emit("syncStatus", &serde_json::json!({ "active": false })).await;
             tracing::info!("✅ [SyncManager] Manual Sync concluído com sucesso.");
@@ -918,6 +914,7 @@ async fn queue_all_params_inner(
         let state_fx = state.clone();
         let throttle_ms = time_between_fxs_requests;
         let is_syncing_fx_clone = is_syncing_fx.clone();
+        let is_fully_synced_fx_clone = is_fully_synced.clone();
         tokio::spawn(async move {
             is_syncing_fx_clone.store(true, Ordering::SeqCst);
             use crate::midi::protocol::FxSyncAck;
@@ -1004,6 +1001,7 @@ async fn queue_all_params_inner(
                 st.fx_sync_ack_tx = None;
             }
             is_syncing_fx_clone.store(false, Ordering::SeqCst);
+            is_fully_synced_fx_clone.store(true, Ordering::SeqCst);
             let _ = io_fx.emit("fxSyncStatus", &serde_json::json!({ "active": false })).await;
         });
     }

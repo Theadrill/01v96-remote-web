@@ -79,7 +79,7 @@ impl ConnectionManager {
     }
 
     pub fn is_syncing(&self) -> bool {
-        self.is_connected() && self.sync_manager.is_busy()
+        self.is_connected() && self.sync_manager.is_syncing()
     }
 
     pub fn emit_connection_state(&self) {
@@ -459,6 +459,7 @@ impl ConnectionManager {
     }
 
     pub fn trigger_manual_resync(&self) {
+        self.reset_activity();
         self.is_fully_synced.store(false, Ordering::SeqCst);
         self.sync_manager.fire_manual_resync(self.state.clone());
     }
