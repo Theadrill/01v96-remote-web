@@ -79,7 +79,10 @@
             btn.onclick = () => {
                 const idx = internalSlotConfig.indexOf(i);
                 if (idx === -1) internalSlotConfig.push(i); else internalSlotConfig.splice(idx, 1);
-                renderUI(slotIndex);
+                const nowSelected = internalSlotConfig.includes(i);
+                btn.style.background = nowSelected ? '#2e7d32' : '#333';
+                btn.style.color = nowSelected ? '#fff' : (isOnMixer ? '#fff' : '#888');
+                btn.style.border = isOnMixer ? '2px solid #ffcc00' : `1px solid ${nowSelected ? '#4caf50' : '#444'}`;
             };
             grid.appendChild(btn);
         }

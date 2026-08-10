@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+html {
+    touch-action: manipulation;
+}
+
 /* ── Sistema Global de Scrollbars Estilizadas ──────────────────────── */
 :root {
     --scrollbar-track-bg: #0f141c;
@@ -6815,6 +6819,162 @@ body:not(.layout-desktop) * {
     left: 50%;
     opacity: 0;
     pointer-events: none;
+}
+
+.macro-color-dropdown {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a1a;
+    border: 1px solid #6a1b9a;
+    border-radius: 12px;
+    padding: 16px;
+    z-index: 16000;
+    max-width: 340px;
+    width: 90vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    flex-direction: column;
+}
+
+.macro-color-dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.macro-color-dropdown-title {
+    color: #6a1b9a;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.macro-color-preview-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: #6a1b9a;
+    flex-shrink: 0;
+}
+
+.macro-color-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    overflow-y: auto;
+    max-height: 260px;
+    scrollbar-width: none;
+}
+
+.macro-color-grid::-webkit-scrollbar {
+    display: none;
+}
+
+.macro-color-swatch {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.1s, border-color 0.15s;
+    overflow: hidden;
+}
+
+.macro-color-swatch:active {
+    transform: scale(0.9);
+}
+
+.macro-color-swatch.selected {
+    border-color: #fff;
+    box-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+.macro-color-picker-modal {
+    z-index: 18000;
+    display: none;
+}
+
+.macro-color-picker-modal-content {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    background: #111;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.macro-color-picker-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.macro-color-picker-modal-title {
+    color: #6a1b9a;
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.macro-color-grid-modal {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: none;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 6px;
+}
+
+.macro-color-grid-modal .macro-color-swatch {
+    border-radius: 10px;
+    aspect-ratio: unset;
+}
+
+.macro-color-picker-modal-close {
+    flex: 0 0 50px;
+    width: 100%;
+    height: 50px;
+    min-height: 50px;
+    margin-top: 10px;
+    flex-shrink: 0;
+    background: #dc3545;
+    color: white;
+    border: 1px solid #721c24;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.macro-color-picker-modal-close:active {
+    transform: scale(0.95);
+    filter: brightness(0.8);
+}
+
+@media (max-width: 600px) {
+    .macro-color-dropdown {
+        display: none;
+    }
+}
+
+@media (min-width: 601px) {
+    .macro-color-picker-modal {
+        display: none;
+    }
 }
 
 .inline-style-69 {

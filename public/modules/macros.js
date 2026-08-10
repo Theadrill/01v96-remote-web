@@ -14,6 +14,25 @@ let protectedPresets = ['default']; // Lista de nomes que não podem ser deletad
 let isMovingMacro = false;
 let moveSourceIndex = -1;
 
+const MACRO_COLOR_PALETTE = [
+    '#c62828','#e53935','#ff5722','#f4511e',
+    '#ef6c00','#f9a825','#fdd835','#c0ca33',
+    '#7cb342','#2e7d32','#00897b','#00acc1',
+    '#039be5','#1e88e5','#3949ab','#5e35b1',
+    '#8e24aa','#ad1457','#6d4c41','#757575',
+    '#f48fb1','#ce93d8','#90caf9','#80cbc4',
+    '#a5d6a7','#fff59d','#ffcc80','#ef9a9a',
+    '#ffffff','#000000'
+];
+
+function isLightColor(hex) {
+    const c = hex.replace('#', '');
+    const r = parseInt(c.substring(0, 2), 16);
+    const g = parseInt(c.substring(2, 4), 16);
+    const b = parseInt(c.substring(4, 6), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 > 160;
+}
+
 async function initMacros() {
     await detectCurrentPreset();
     await fetchProtectedPresets(); // Carrega lista de hosts do servidor
@@ -525,7 +544,10 @@ function renderMacros() {
         slot.style.cssText = `height: 85px; min-width: 0; box-sizing: border-box; border-radius: 12px; background: ${slotColor}; ${animCss} display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; user-select: none; -webkit-user-select: none; transition: transform 0.1s; padding: 5px; text-align: center; overflow: hidden;`;
         if (slotData && config) {
             const displayName = slotData.name || `MACRO ${i + 1}`; const modName = config.name || slotData.scriptId;
-            slot.innerHTML = `<span style="font-size: 11px; font-weight: 800; color: white; display: block; margin-bottom: 3px; line-height: 1.1; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${displayName.toUpperCase()}</span><span style="font-size: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${modName}</span>`;
+            const light = isLightColor(slotColor);
+            const textColor = light ? '#111' : 'white';
+            const subColor = light ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)';
+            slot.innerHTML = `<span style="font-size: 11px; font-weight: 800; color: ${textColor}; display: block; margin-bottom: 3px; line-height: 1.1; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${displayName.toUpperCase()}</span><span style="font-size: 8px; color: ${subColor}; text-transform: uppercase; letter-spacing: 0.5px; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${modName}</span>`;
         } else { slot.innerHTML = `<span style="font-size: 24px; color: #444;">+</span>`; }
 
         slot.onpointerdown = (e) => handleTouchStart(i, e);
@@ -566,6 +588,7 @@ function startMovingMacro() {
     isMovingMacro = true;
     moveSourceIndex = activeSlotIndex;
     document.getElementById('macroContextModal').style.display = 'none';
+    document.getElementById('macroColorDropdown').style.display = 'none';
 
     const modal = document.getElementById('macrosModal');
     const warning = document.createElement('div');
@@ -641,14 +664,67 @@ function showContextMenu(index) {
     const sd = assignedMacros[index]; if (!sd) return;
     activeSlotIndex = index;
     document.getElementById('ctxMacroName').innerText = sd.name;
-    const picker = document.getElementById('macroColorPicker');
     const config = macroDatabase[sd.scriptId];
-    if (picker) picker.value = sd.color || (config ? config.color || '#6a1b9a' : '#6a1b9a');
+    const currentColor = sd.color || (config ? config.color || '#6a1b9a' : '#6a1b9a');
+    initMacroColorPicker(currentColor);
     document.getElementById('macroContextModal').style.display = 'flex';
 }
+
+function initMacroColorPicker(currentColor) {
+    const grids = [document.getElementById('macroColorGrid'), document.getElementById('macroColorGridModal')];
+    grids.forEach(grid => {
+        if (!grid) return;
+        grid.innerHTML = '';
+        MACRO_COLOR_PALETTE.forEach(hex => {
+            const swatch = document.createElement('div');
+            swatch.className = 'macro-color-swatch';
+            if (hex.toLowerCase() === currentColor.toLowerCase()) swatch.classList.add('selected');
+            swatch.style.background = hex;
+            if (hex === '#ffffff') swatch.style.border = '2px solid #555';
+            swatch.setAttribute('data-color', hex);
+            swatch.onclick = () => window.saveMacroColor(hex);
+            grid.appendChild(swatch);
+        });
+    });
+    updateColorPickerPreview(currentColor);
+}
+
+function updateColorPickerPreview(hex) {
+    const border = isLightColor(hex) ? '2px solid #555' : '2px solid rgba(255,255,255,0.3)';
+    const preview = document.getElementById('macroColorPreview');
+    const previewModal = document.getElementById('macroColorPreviewModal');
+    if (preview) { preview.style.background = hex; preview.style.border = border; }
+    if (previewModal) { previewModal.style.background = hex; previewModal.style.border = border; }
+}
+
+window.openMacroColorPicker = function () {
+    const dropdown = document.getElementById('macroColorDropdown');
+    const modal = document.getElementById('macroColorPickerModal');
+    const isSmallScreen = window.innerWidth <= 600;
+    if (isSmallScreen) {
+        modal.style.display = 'flex';
+    } else {
+        dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+    }
+};
+
+window.closeMacroColorPickerModal = function () {
+    document.getElementById('macroColorPickerModal').style.display = 'none';
+};
+
+window.closeMacroColorDropdown = function () {
+    document.getElementById('macroColorDropdown').style.display = 'none';
+};
+
+window.addEventListener('resize', () => {
+    const dropdown = document.getElementById('macroColorDropdown');
+    const modal = document.getElementById('macroColorPickerModal');
+    if (window.innerWidth <= 600 && dropdown) dropdown.style.display = 'none';
+    if (window.innerWidth > 600 && modal) modal.style.display = 'none';
+});
 window.openMacroNameEditor = function () {
     const sd = assignedMacros[activeSlotIndex]; if (!sd) return;
-    document.getElementById('inputMacroName').value = sd.name; document.getElementById('macroContextModal').style.display = 'none'; document.getElementById('macroNameEditorModal').style.display = 'flex'; setTimeout(() => document.getElementById('inputMacroName').focus(), 100);
+    document.getElementById('inputMacroName').value = sd.name; document.getElementById('macroContextModal').style.display = 'none'; document.getElementById('macroColorDropdown').style.display = 'none'; document.getElementById('macroNameEditorModal').style.display = 'flex'; setTimeout(() => document.getElementById('inputMacroName').focus(), 100);
 };
 window.saveMacroName = async function () {
     const nn = document.getElementById('inputMacroName').value.trim();
@@ -662,13 +738,16 @@ window.saveMacroColor = async function (colorHex) {
         renderMacros();
     }
     document.getElementById('macroContextModal').style.display = 'none';
+    document.getElementById('macroColorDropdown').style.display = 'none';
+    document.getElementById('macroColorPickerModal').style.display = 'none';
 };
-window.changeSelectedMacro = function () { document.getElementById('macroContextModal').style.display = 'none'; openLibrary(activeSlotIndex); };
+window.changeSelectedMacro = function () { document.getElementById('macroContextModal').style.display = 'none'; document.getElementById('macroColorDropdown').style.display = 'none'; openLibrary(activeSlotIndex); };
 window.openMacroSettings = function () {
     const sd = assignedMacros[activeSlotIndex]; if (!sd) return;
     const config = macroDatabase[sd.scriptId];
     if (config && typeof config.onConfigure === 'function') {
         document.getElementById('macroContextModal').style.display = 'none';
+        document.getElementById('macroColorDropdown').style.display = 'none';
         document.getElementById('macroSettingsModal').style.display = 'flex';
 
         // Garante que os botÃµes SALVAR e LIMPAR executem as funÃ§Ãµes centralizadas
@@ -718,7 +797,7 @@ async function removeMacroFromSlot() {
     if (activeSlotIndex !== null) {
         const sd = assignedMacros[activeSlotIndex]; const config = sd ? macroDatabase[sd.scriptId] : null;
         if (config && typeof config.onDelete === 'function') await config.onDelete(activeSlotIndex);
-        delete assignedMacros[activeSlotIndex]; await saveGlobalSlotsManifest(); document.getElementById('macroContextModal').style.display = 'none'; renderMacros();
+        delete assignedMacros[activeSlotIndex]; await saveGlobalSlotsManifest(); document.getElementById('macroContextModal').style.display = 'none'; document.getElementById('macroColorDropdown').style.display = 'none'; renderMacros();
     }
 }
 
