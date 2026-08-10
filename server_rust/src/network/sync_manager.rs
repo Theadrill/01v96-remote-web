@@ -192,6 +192,89 @@ impl SyncManager {
         });
     }
 
+    pub fn fire_manual_resync(&self, state: Arc<RwLock<GlobalState>>) {
+        if self.is_syncing.swap(true, Ordering::SeqCst) {
+            tracing::info!("⚠️ [SyncManager] Manual sync já em andamento, ignorando nova chamada.");
+            return;
+        }
+
+        self.is_fully_synced.store(false, Ordering::SeqCst);
+
+        let sched = self.scheduler.clone();
+        let io = self.io.clone();
+        let is_syncing = self.is_syncing.clone();
+        let is_fully_synced = self.is_fully_synced.clone();
+        let has_synced_names = self.has_synced_names.load(Ordering::SeqCst);
+        let csm = self.csm.clone();
+        let chunk_size = self.chunk_size;
+        let chunk_delay_ms = self.chunk_delay_ms;
+        let time_between_fxs_requests = self.time_between_fxs_requests;
+        let is_syncing_fx = self.is_syncing_fx.clone();
+
+        tokio::spawn(async move {
+            tracing::info!("🔄 [SyncManager] Manual Sync iniciado: consultando Edit Buffer e cena ativa da 01V96...");
+            let _ = io
+                .emit(
+                    "syncStatus",
+                    &serde_json::json!({ "active": true, "type": "channels" }),
+                )
+                .await;
+
+            let edit_buffer = vec![
+                0xF0, 0x43, 0x20, 0x7E, 0x4C, 0x4D, 0x20, 0x20, 0x38, 0x43, 0x39, 0x33, 0x6D, 0x02,
+                0x00, 0xF7,
+            ];
+            sched.enqueue(edit_buffer, 1).await;
+
+            let scene_id_req1 = vec![0xF0, 0x43, 0x30, 0x3E, 127, 1, 0, 0, 0, 0xF7];
+            sched.enqueue(scene_id_req1, 1).await;
+
+            let scene_id_req2 = vec![0xF0, 0x43, 0x30, 0x3E, 13, 4, 10, 0, 0, 0xF7];
+            sched.enqueue(scene_id_req2, 1).await;
+
+            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
+            queue_all_params_inner(
+                sched,
+                io.clone(),
+                state.clone(),
+                is_syncing,
+                is_fully_synced,
+                true,
+                has_synced_names,
+                csm.clone(),
+                chunk_size,
+                chunk_delay_ms,
+                time_between_fxs_requests,
+                is_syncing_fx,
+            )
+            .await;
+
+            let (state_json, scenes_state, current_scene_json, resolved_names) = {
+                let current_state = state.read().await;
+                let sj = serde_json::to_value(&*current_state).unwrap_or_default();
+                let ss = current_state.scene_manager.get_state();
+                let cs = current_state.scene_manager.current_scene.as_ref().map(|cs| serde_json::json!(cs));
+                let resolved = crate::name_resolver::resolve_all(&state, &csm).await;
+                let names_payload: Vec<serde_json::Value> = resolved
+                    .into_iter()
+                    .map(|r| serde_json::json!({ "id": r.ch, "name": r.name, "short_name": r.short }))
+                    .collect();
+                (sj, ss, cs, names_payload)
+            };
+
+            let _ = io.emit("sync", &state_json).await;
+            let _ = io.emit("scenesUpdated", &scenes_state).await;
+            if let Some(ref cs_json) = current_scene_json {
+                let _ = io.emit("currentScene", cs_json).await;
+            }
+            let _ = io.emit("resolvedNamesUpdated", &serde_json::json!({ "channels": resolved_names })).await;
+
+            let _ = io.emit("syncStatus", &serde_json::json!({ "active": false })).await;
+            tracing::info!("✅ [SyncManager] Manual Sync concluído com sucesso.");
+        });
+    }
+
     pub fn fire_params_only(
         &self,
         force_names: bool,

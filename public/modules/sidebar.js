@@ -25,8 +25,17 @@ function updateMeterOpacity(v) {
 }
 
 function forceSync() {
-    socket.emit('forceSync');
+    console.log('🔄 [MANUAL SYNC] Botão MANUAL SYNC clicado!');
+    if (typeof OverlayInfo !== 'undefined' && OverlayInfo.show) {
+        OverlayInfo.show('sync', 'SINCRONIZANDO...');
+    }
+    if (typeof socket !== 'undefined' && socket && socket.emit) {
+        socket.emit('forceSync', {});
+    } else {
+        console.error('⚠️ [MANUAL SYNC] Socket não está disponível.');
+    }
 }
+window.forceSync = forceSync;
 
 function toggleOuts() {
     const efeitosModal = document.getElementById('efeitosModal');

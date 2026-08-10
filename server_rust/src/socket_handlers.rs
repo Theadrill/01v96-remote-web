@@ -1673,11 +1673,13 @@ pub fn register_handlers(
         let conn_mgr_fsync = conn_mgr_handler.clone();
         socket.on(
             "forceSync",
-            move |socket: SocketRef, _data: Data<serde_json::Value>| async move {
+            move |socket: SocketRef| async move {
+                tracing::info!("🔄 [SOCKET] Comando forceSync recebido no backend! Disparando manual resync...");
                 if !require_setup(&socket) {
+                    tracing::warn!("🚫 [SOCKET] forceSync bloqueado: setup incompleto.");
                     return;
                 }
-                conn_mgr_fsync.trigger_sync(true, "is_scene");
+                conn_mgr_fsync.trigger_manual_resync();
             },
         );
 

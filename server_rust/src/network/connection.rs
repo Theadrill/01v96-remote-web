@@ -458,6 +458,11 @@ impl ConnectionManager {
             .fire(force_names, sync_type, self.state.clone());
     }
 
+    pub fn trigger_manual_resync(&self) {
+        self.is_fully_synced.store(false, Ordering::SeqCst);
+        self.sync_manager.fire_manual_resync(self.state.clone());
+    }
+
     pub fn sync_names(&self) {
         self.is_fully_synced.store(false, Ordering::SeqCst);
         self.sync_manager.sync_names_only();
