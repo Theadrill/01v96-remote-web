@@ -233,9 +233,6 @@ impl SyncManager {
             let scene_id_req1 = vec![0xF0, 0x43, 0x30, 0x3E, 127, 1, 0, 0, 0, 0xF7];
             sched.enqueue(scene_id_req1, 1).await;
 
-            let scene_id_req2 = vec![0xF0, 0x43, 0x30, 0x3E, 13, 4, 10, 0, 0, 0xF7];
-            sched.enqueue(scene_id_req2, 1).await;
-
             tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 
             queue_all_params_inner(
