@@ -65,9 +65,9 @@ O servidor em Rust oferece performance superior, baixíssima latência e é o fo
 * **Git** configurado (para as funções de Auto-Sync/Ninja Sync).
 
 #### ⚡ Inicialização Rápida (Recomendado)
-Você pode iniciar os servidores diretamente através dos atalhos na raiz do projeto (não requer terminal aberto):
-* **Servidor Principal (Local)**: Dê um duplo clique no atalho `server_rust.lnk`.
-* **Servidor MIDI Remoto**: Dê um duplo clique no atalho `remote_midi_server.lnk`.
+Você pode iniciar os servidores diretamente através dos executáveis batch na raiz do projeto (não requer terminal aberto):
+* **Servidor Principal (Local)**: Dê um duplo clique no arquivo `iniciar_server_rust.bat`.
+* **Servidor MIDI Remoto**: Dê um duplo clique no arquivo `iniciar_remote_midi_server.bat`.
 
 ---
 
