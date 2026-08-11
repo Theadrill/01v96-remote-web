@@ -42,6 +42,7 @@ echo "Próxima instrução..." | opencode run -c --auto --format json
 ## 3. Regras de Qualidade e Segurança
 * **Reutilização de Contexto (`-c`)**: Sempre utilizar a flag `-c` para evitar que o OpenCode precise re-analisar a estrutura do projeto do zero a cada comando.
 * **Validação Obrigatória**: Todo código gerado pelo OpenCode deve ser revisado via `git diff` e validado via compilação antes de ser considerado pronto.
+* **Push e Graphify**: Push SÓ quando usuário pedir. Antes de push, rodar `graphify update .` e aguardar. Commitar código + graphify juntos.
 
 ---
 
