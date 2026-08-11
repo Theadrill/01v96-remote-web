@@ -65,9 +65,20 @@ O servidor em Rust oferece performance superior, baixíssima latência e é o fo
 * **Git** configurado (para as funções de Auto-Sync/Ninja Sync).
 
 #### ⚡ Inicialização Rápida (Recomendado)
-Você pode iniciar os servidores diretamente através dos executáveis batch na raiz do projeto (não requer terminal aberto):
-* **Servidor Principal (Local)**: Dê um duplo clique no arquivo `iniciar_server_rust.bat`.
-* **Servidor MIDI Remoto**: Dê um duplo clique no arquivo `iniciar_remote_midi_server.bat`.
+Você pode iniciar os servidores diretamente através dos executáveis na raiz do projeto (não requer terminal aberto):
+
+* **No Windows**:
+  * **Servidor Principal**: Dê um duplo clique no arquivo `iniciar_server_rust.bat`.
+  * **Servidor MIDI Remoto**: Dê um duplo clique no arquivo `iniciar_remote_midi_server.bat`.
+
+> [!NOTE]
+> **Suporte a macOS (Experimental / Não Testado)**:
+> Foram incluídos os scripts `iniciar_server_rust.command` e `iniciar_remote_midi_server.command` para inicialização via Finder no macOS. Como o desenvolvimento é focado primariamente no Windows, **não há garantias de funcionamento completo ou de suporte ao driver MIDI da Yamaha no macOS**.
+> * **Para rodar no macOS**: Dê um duplo clique nos arquivos `.command` correspondentes. (Se necessário, dê permissão via terminal com `chmod +x *.command`).
+
+> [!IMPORTANT]
+> **Driver MIDI USB da Yamaha**:
+> É indispensável instalar o **Yamaha USB-MIDI Driver** oficial no sistema onde a mesa 01V96 estiver conectada via cabo USB, garantindo que o programa reconheça a porta MIDI da mesa.
 
 ---
 
