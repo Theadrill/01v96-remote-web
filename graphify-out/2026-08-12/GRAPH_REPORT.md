@@ -1,16 +1,16 @@
-# Graph Report - 01v96-remote-web  (2026-08-12)
+# Graph Report - 01v96-remote-web  (2026-08-11)
 
 ## Corpus Check
-- 643 files · ~648,401 words
+- 643 files · ~648,396 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7377 nodes · 10437 edges · 725 communities (493 shown, 232 thin omitted)
+- 7377 nodes · 10437 edges · 727 communities (495 shown, 232 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 570 edges (avg confidence: 0.78)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5e854608`
+- Built from commit: `82db655d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -149,10 +149,10 @@
 - mem-reuse-collections
 - name-to-expensive
 - lumikit.js
-- silk_smlawb
+- sigproc_fix.rs
 - mem-arena-allocator
 - own-rwlock-readers
-- .agent/skills/rust-skills/rules/proj-lib-main-split.md
+- proj-lib-main-split
 - mem-boxed-slice
 - ChannelId
 - LOG DE EXECUCAO (Atualizado a cada passo concluido)
@@ -240,6 +240,7 @@
 - async-join-parallel
 - name-into-ownership
 - own-clone-explicit
+- perf-iter-lazy
 - test-arrange-act-assert
 - test-descriptive-names
 - test-tokio-async
@@ -267,7 +268,7 @@
 - mem-avoid-format
 - mem-reuse-collections
 - workflows/graphify.md
-- perf-collect-once
+- mem-with-capacity
 - own-arc-shared
 - proj-flat-small
 - own-rwlock-readers
@@ -280,7 +281,7 @@
 - qrcode.min.js
 - request_meter_pos.js
 - err-result-over-panic
-- own-borrow-over-clone
+- name-type-param-single
 - opt-simd-portable
 - own-slice-over-vec
 - anti-stringly-typed
@@ -301,7 +302,7 @@
 - own-rc-single-thread
 - own-refcell-interior
 - test-fixture-raii
-- 11. Registro de Descobertas e Soluções Implementadas
+- 10.6. Arquitetura Modular e Generalizada (Schema-Driven Frontend — `public/modules/FXS/`)
 - test_focus.js
 - test-mockall-mocking
 - async-select-racing
@@ -357,8 +358,8 @@
 - lint-pedantic-selective
 - doc-intra-links
 - lint-cargo-metadata
-- resampler.rs
-- silk_noise_shape_quantizer_voiced
+- silk_rshift_round
+- silk_smlawb
 - lint-warn-suspicious
 - perf-chain-avoid
 - lint-deny-correctness
@@ -371,7 +372,7 @@
 - name-iter-type-match
 - name-to-expensive
 - mem-arrayvec
-- nlsf.rs
+- lpc_analysis.rs
 - mem-assert-type-size
 - anti-index-over-iter
 - doc-panics-section
@@ -389,7 +390,6 @@
 - efeitos.js
 - perf-drain-reuse
 - doc-cargo-metadata
-- .agents/skills/rust-skills/rules/mem-with-capacity.md
 - anti-format-hot-path
 - doc-examples-section
 - proj-pub-use-reexport
@@ -405,6 +405,7 @@
 - opt-inline-small
 - api-from-not-into
 - api-serde-optional
+- own-clone-explicit
 - perf-chain-avoid
 - proj-mod-rs-dir
 - .agent/skills/rust-skills/rules/test-mock-traits.md
@@ -425,6 +426,7 @@
 - proj-mod-rs-dir
 - type-never-diverge
 - type-phantom-marker
+- name-funcs-snake
 - silk/macros.rs
 - fx_type_query/src/main.rs
 - Rust Skills
@@ -477,7 +479,7 @@
 - MonitoringManager
 - 3.1. Reverb Standard (IDs 0, 1, 2, 3)
 - 4. Passo a Passo de Implementação
-- silk_noise_shape_quantizer_del_dec
+- SilkEncoderStateCommon
 - Plano de Implementação — FPS FIX: True Zero-Copy Meter Engine
 - name-crate-no-rs
 - volume_geral.js
@@ -486,7 +488,7 @@
 - Plano de Implementação: Página de Status do Servidor
 - Canvas Channel Strip Feature Implementation Plan
 - fps_meter.js
-- .agent/skills/rust-skills/rules/name-funcs-snake.md
+- .agent/skills/rust-skills/rules/own-borrow-over-clone.md
 - name-is-has-bool
 - .agent/skills/rust-skills/rules/type-newtype-ids.md
 - Agent Rules
@@ -510,7 +512,7 @@
 - err-expect-bugs-only
 - err-no-unwrap-prod
 - Instruções de Delegação de Tarefas de Código (Antigravity ➔ OpenCode)
-- .agents/skills/rust-skills/rules/name-funcs-snake.md
+- name-consts-screaming
 - err-thiserror-lib
 - api-common-traits
 - api-non-exhaustive
@@ -745,7 +747,7 @@
 - **JavaScript Education & Best Practice Skills** — agent_skills_javascript_mastery_skill, agent_skills_javascript_pro_skill, agent_skills_javascript_testing_patterns_skill [INFERRED 0.85]
 - **Migration governance rules for AI agents** — docs_migration_no_commit_rule, docs_migration_preserve_features_rule, docs_migration_update_doc_rule, docs_migration_detailed_for_continuity_rule, docs_migration_test_after_code_rule [EXTRACTED 1.00]
 
-## Communities (725 total, 232 thin omitted)
+## Communities (727 total, 232 thin omitted)
 
 ### Community 0 - "search.js"
 Cohesion: 0.53
@@ -784,8 +786,8 @@ Cohesion: 0.11
 Nodes (17): 1. Histórico Git Local, 1. Painel de Detalhes da Cena Customizada (`public/modules/custom_scenes.js` ou equivalente), 2. Histórico Nuvem GitHub, 2. Modal de Escolha da Fonte (`Modal 1: Fonte`), 3. Modal de Escolha da Versão (`Modal 2: Versões`), 3. Restauração de Conteúdo, 📐 Arquitetura & Fluxo da Solução, 🛠️ Especificação de Endpoints (Backend Rust) (+9 more)
 
 ### Community 18 - "silk_smulbb"
-Cohesion: 0.12
-Nodes (30): silk_find_pred_coefs_fix(), silk_ltp_scale_ctrl_fix(), silk_float_to_fixed_q7(), silk_quant_ltp_gains(), silk_lin2log(), silk_log2lin(), silk_find_ltp_fix(), silk_add32() (+22 more)
+Cohesion: 0.13
+Nodes (25): silk_find_pred_coefs_fix(), silk_ltp_scale_ctrl_fix(), silk_float_to_fixed_q7(), silk_quant_ltp_gains(), silk_ltp_analysis_filter_fix(), silk_add_pos_sat32(), silk_limit(), silk_mla() (+17 more)
 
 ### Community 19 - ".agents/skills/rust-skills/rules/doc-examples-section.md"
 Cohesion: 0.09
@@ -824,11 +826,11 @@ Cohesion: 0.18
 Nodes (11): Bad, Built-in Const Assertions, Cargo.toml, Documenting Size Constraints, Good, mem-assert-type-size, See Also, static_assertions Crate (+3 more)
 
 ### Community 34 - ".agent/skills/rust-skills/rules/perf-profile-first.md"
-Cohesion: 0.12
+Cohesion: 0.13
 Nodes (11): anti-premature-optimize, Bad, Common Premature Optimizations, Document Optimizations, Good, Optimization Principles, Profile Tools, Profiling Workflow (+3 more)
 
 ### Community 35 - "anti-clone-excessive"
-Cohesion: 0.22
+Cohesion: 0.14
 Nodes (9): Alternatives to Clone, anti-clone-excessive, Bad, Detecting Excessive Clones, Good, Pattern: Clone on Write, See Also, When to Clone (+1 more)
 
 ### Community 36 - "anti-premature-optimize"
@@ -1080,8 +1082,8 @@ Cohesion: 0.18
 Nodes (11): Bad, Common Mistakes, Criterion's black_box, Good, Pattern: Benchmark Multiple Inputs, Pattern: Benchmark with Setup, perf-black-box-bench, See Also (+3 more)
 
 ### Community 111 - "Plano de Implementação de Efeitos - Yamaha 01V96"
-Cohesion: 0.14
-Nodes (14): 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles Comuns (Presentes em todos os efeitos), 1. Documentação Técnica, 2.1. Conversão de Frequências (Padrão Yamaha), 2. Estrutura e Arquitetura Proposta, 4. Tabela de Referência: HOLD (0x1C), 5. Tabela de Referência: DECAY (0x1D), 7.1. Tela de Máquinas de Efeitos — Etapa 1 (Mockada) (+6 more)
+Cohesion: 0.11
+Nodes (19): 11.1. Decodificação Exata do Pacote SysEx de Recall de FX (`0x7F 0x10` e `0x7F 0x50`), 11.2. Solicitação do Parâmetro 0x31 (Effect Type ID) no Servidor, 11.3. Sincronização de RAM do Servidor e Atualização Dinâmica do Cabeçalho, 11.4. Sincronização em Tempo Real do Estado de Bypass, 11. Registro de Descobertas e Soluções Implementadas, 1.1. Endereçamento de Parâmetros (Controle Direto), 1.2. Controles Comuns (Presentes em todos os efeitos), 1. Documentação Técnica (+11 more)
 
 ### Community 112 - "13. Fase 11: Gerenciador de Rede — Socket Handlers"
 Cohesion: 0.14
@@ -1161,7 +1163,7 @@ Nodes (10): api-impl-asref, AsRef vs Into vs Borrow, Bad, Common AsRef Implement
 
 ### Community 132 - "silk/mod.rs"
 Cohesion: 0.10
-Nodes (24): silk_control_encoder(), silk_setup_complexity(), silk_setup_fs(), decode_split(), silk_decode_pulses(), silk_decode_signs(), silk_shell_decoder(), silk_encode() (+16 more)
+Nodes (26): silk_control_encoder(), silk_setup_complexity(), silk_setup_fs(), decode_split(), silk_decode_pulses(), silk_decode_signs(), silk_shell_decoder(), silk_encode() (+18 more)
 
 ### Community 133 - ".agent/skills/rust-skills/rules/mem-with-capacity.md"
 Cohesion: 0.08
@@ -1187,9 +1189,9 @@ Nodes (9): Bad, Conversion Method Prefixes, Custom Types, Good, name-to-expensiv
 Cohesion: 0.31
 Nodes (7): execute(), onClear(), onConfigure(), renderBtns(), renderExtraBtns(), renderSec(), renderUI()
 
-### Community 139 - "silk_smlawb"
+### Community 139 - "sigproc_fix.rs"
 Cohesion: 0.09
-Nodes (49): silk_ana_filt_bank_1(), silk_biquad_alt_stride1(), silk_biquad_alt_stride2(), silk_decode_core(), silk_lpc_analysis_filter_offset(), silk_ltp_analysis_filter_fix(), silk_add_sat16(), silk_add_sat32() (+41 more)
+Nodes (39): silk_residual_energy_fix(), silk_find_ltp_fix(), silk_add32(), silk_add_rshift32(), silk_add_sat16(), silk_clz32(), silk_log2lin(), silk_rshift32() (+31 more)
 
 ### Community 140 - "mem-arena-allocator"
 Cohesion: 0.20
@@ -1199,8 +1201,8 @@ Nodes (10): Bad, Bumpalo Collections, Evidence from ROC Compiler, Good, mem-aren
 Cohesion: 0.22
 Nodes (9): Bad, Good, own-rwlock-readers, parking_lot::RwLock, Real-World Pattern: Cached Computation, See Also, When RwLock Hurts, Why It Matters (+1 more)
 
-### Community 142 - ".agent/skills/rust-skills/rules/proj-lib-main-split.md"
-Cohesion: 0.14
+### Community 142 - "proj-lib-main-split"
+Cohesion: 0.22
 Nodes (9): Bad, Good, Multiple Binaries, proj-lib-main-split, Project Structure, See Also, Testing Benefits, Why It Matters (+1 more)
 
 ### Community 143 - "mem-boxed-slice"
@@ -1547,6 +1549,10 @@ Nodes (9): Bad, Conversion Prefix Summary, Good, into_iter() Pattern, IntoIterat
 Cohesion: 0.22
 Nodes (9): Bad, clone_from Optimization, Custom Clone Implementation, Derive vs Manual Clone, Good, own-clone-explicit, See Also, When to Avoid Clone (+1 more)
 
+### Community 232 - "perf-iter-lazy"
+Cohesion: 0.22
+Nodes (9): Bad, Consuming Methods, Good, Lazy Iterator Methods, Pattern: Process Without Collecting, perf-iter-lazy, See Also, Short-Circuit Benefits (+1 more)
+
 ### Community 233 - "test-arrange-act-assert"
 Cohesion: 0.22
 Nodes (9): Async Tests, Bad, Complex Arrange, Good, Helper Functions, See Also, test-arrange-act-assert, Why It Matters (+1 more)
@@ -1647,9 +1653,9 @@ Nodes (9): Bad, CompactString for Small Strings, Good, mem-avoid-format, Pre-all
 Cohesion: 0.22
 Nodes (9): Bad, BufWriter Pattern, Clear vs Drain vs New, Good, HashMap Reuse, mem-reuse-collections, See Also, When to Create Fresh (+1 more)
 
-### Community 260 - "perf-collect-once"
+### Community 260 - "mem-with-capacity"
 Cohesion: 0.22
-Nodes (9): Bad, Comparison, Good, Pattern: Collect with Capacity, Pattern: Deferred Collection, perf-collect-once, See Also, When Intermediate Collection Is Needed (+1 more)
+Nodes (9): Bad, Collection Capacity Methods, Estimating Capacity, Evidence from Production Code, Good, mem-with-capacity, See Also, When to Skip (+1 more)
 
 ### Community 263 - "own-arc-shared"
 Cohesion: 0.22
@@ -1695,9 +1701,9 @@ Nodes (5): input, midi, output, REQUESTS, { yamahaIn, yamahaOut }
 Cohesion: 0.25
 Nodes (8): Bad, err-result-over-panic, Good, Library vs Application, Panic vs Result Decision Guide, See Also, When Panic IS Appropriate, Why It Matters
 
-### Community 279 - "own-borrow-over-clone"
-Cohesion: 0.29
-Nodes (7): Bad, Evidence, Good, own-borrow-over-clone, See Also, When Clone Is Acceptable, Why It Matters
+### Community 279 - "name-type-param-single"
+Cohesion: 0.25
+Nodes (8): Bad, Good, Multiple Type Parameters, name-type-param-single, See Also, Standard Type Parameter Names, Trait Bounds, Why It Matters
 
 ### Community 280 - "opt-simd-portable"
 Cohesion: 0.25
@@ -1779,9 +1785,9 @@ Nodes (7): Bad, Common Pattern: Rc<RefCell<T>>, Good, own-refcell-interior, Runt
 Cohesion: 0.29
 Nodes (7): Bad, Common RAII Patterns, Good, scopeguard Crate, See Also, test-fixture-raii, Why It Matters
 
-### Community 300 - "11. Registro de Descobertas e Soluções Implementadas"
+### Community 300 - "10.6. Arquitetura Modular e Generalizada (Schema-Driven Frontend — `public/modules/FXS/`)"
 Cohesion: 0.40
-Nodes (5): 11.1. Decodificação Exata do Pacote SysEx de Recall de FX (`0x7F 0x10` e `0x7F 0x50`), 11.2. Solicitação do Parâmetro 0x31 (Effect Type ID) no Servidor, 11.3. Sincronização de RAM do Servidor e Atualização Dinâmica do Cabeçalho, 11.4. Sincronização em Tempo Real do Estado de Bypass, 11. Registro de Descobertas e Soluções Implementadas
+Nodes (5): 10.6.1. Divisão de Responsabilidades dos Módulos, 10.6.2. Catálogo Declarativo de Efeitos (`FXRegistry`), 10.6.3. Componentes Genéricos de Interface (`FXComponents`), 10.6.4. Motor Central de Estado e Interatividade (`FXCore`), 10.6. Arquitetura Modular e Generalizada (Schema-Driven Frontend — `public/modules/FXS/`)
 
 ### Community 301 - "test_focus.js"
 Cohesion: 0.40
@@ -1999,13 +2005,13 @@ Nodes (12): Bad, Common Patterns, Disambiguation, doc-intra-links, Good, Link Sy
 Cohesion: 0.17
 Nodes (12): Complete Cargo.toml, Configuration, Dependency Issues, Feature Issues, lint-cargo-metadata, Missing Metadata, Multiple Crate Versions, Notable Lints (+4 more)
 
-### Community 662 - "resampler.rs"
-Cohesion: 0.27
-Nodes (9): rate_id(), ResamplerMode, Default, Self, silk_resampler_down_1_3(), silk_resampler_down_1_6(), SilkResampler, SilkResamplerDown1_3 (+1 more)
+### Community 662 - "silk_rshift_round"
+Cohesion: 0.11
+Nodes (31): silk_biquad_alt_stride1(), silk_biquad_alt_stride2(), silk_lpc_analysis_filter_offset(), silk_lpc_fit(), silk_rshift(), silk_rshift_round(), silk_sat16(), silk_bwexpander_32() (+23 more)
 
-### Community 663 - "silk_noise_shape_quantizer_voiced"
-Cohesion: 0.33
-Nodes (13): silk_add_lshift32(), silk_limit_32(), silk_rand(), silk_smlabb(), lpc_pred_generic(), lpc_pred_order10(), lpc_pred_order16(), lpc_pred_order6() (+5 more)
+### Community 663 - "silk_smlawb"
+Cohesion: 0.29
+Nodes (16): silk_lin2log(), silk_log2lin(), silk_add_lshift32(), silk_limit_32(), silk_mul(), silk_rand(), silk_smlawb(), lpc_pred_generic() (+8 more)
 
 ### Community 664 - "lint-warn-suspicious"
 Cohesion: 0.17
@@ -2055,9 +2061,9 @@ Nodes (17): Bad, Examples, Good, name-as-free, See Also, Standard Library Exampl
 Cohesion: 0.20
 Nodes (10): API Patterns, ArrayString for Stack Strings, ArrayVec vs SmallVec vs Vec, Bad, Cargo.toml, Good, mem-arrayvec, See Also (+2 more)
 
-### Community 695 - "nlsf.rs"
+### Community 695 - "lpc_analysis.rs"
 Cohesion: 0.13
-Nodes (22): silk_add_rshift(), silk_interpolate(), silk_interpolate_inplace(), energy_flp(), inner_product_flp(), lpc_inverse_pred_gain_qa(), silk_burg_modified_flp(), silk_find_lpc_fix() (+14 more)
+Nodes (20): silk_add_rshift(), silk_interpolate(), silk_interpolate_inplace(), energy_flp(), inner_product_flp(), lpc_inverse_pred_gain_qa(), silk_burg_modified_fix(), silk_burg_modified_flp() (+12 more)
 
 ### Community 699 - "mem-assert-type-size"
 Cohesion: 0.05
@@ -2097,7 +2103,7 @@ Nodes (9): anti-over-abstraction, Bad, Good, Prefer Concrete Types in Private Co
 
 ### Community 768 - "SilkDecoderState"
 Cohesion: 0.09
-Nodes (23): Default, Self, SilkDecoder, test_decoder_16khz(), test_decoder_creation(), test_decoder_init(), silk_decode_frame(), silk_decode_indices() (+15 more)
+Nodes (24): Default, Self, SilkDecoder, test_decoder_16khz(), test_decoder_creation(), test_decoder_init(), silk_decode_frame(), silk_decode_indices() (+16 more)
 
 ### Community 771 - "test-proptest-properties"
 Cohesion: 0.05
@@ -2126,10 +2132,6 @@ Nodes (10): Bad, Drain Methods, drain vs clear vs take, Good, Pattern: Batch Pro
 ### Community 801 - "doc-cargo-metadata"
 Cohesion: 0.06
 Nodes (31): Bad, Categories, doc-cargo-metadata, Good, Include/Exclude, Keywords Best Practices, License Patterns, Recommended Fields (+23 more)
-
-### Community 807 - ".agents/skills/rust-skills/rules/mem-with-capacity.md"
-Cohesion: 0.13
-Nodes (9): Bad, Collection Capacity Methods, Estimating Capacity, Evidence from Production Code, Good, mem-with-capacity, See Also, When to Skip (+1 more)
 
 ### Community 809 - "anti-format-hot-path"
 Cohesion: 0.20
@@ -2190,6 +2192,10 @@ Nodes (10): api-from-not-into, Bad, Blanket Implementation, Clippy Lint, Good, M
 ### Community 838 - "api-serde-optional"
 Cohesion: 0.20
 Nodes (10): api-serde-optional, Bad, Feature Documentation, Good, Macro Pattern, Multiple Optional Dependencies, See Also, Testing with Features (+2 more)
+
+### Community 839 - "own-clone-explicit"
+Cohesion: 0.22
+Nodes (9): Bad, clone_from Optimization, Custom Clone Implementation, Derive vs Manual Clone, Good, own-clone-explicit, See Also, When to Avoid Clone (+1 more)
 
 ### Community 840 - "perf-chain-avoid"
 Cohesion: 0.18
@@ -2256,8 +2262,8 @@ Cohesion: 0.22
 Nodes (9): api-builder-must-use, Apply to Entire Type, Bad, Clippy Lint, Good, Message Guidelines, See Also, Standard Library Examples (+1 more)
 
 ### Community 905 - ".agents/skills/rust-skills/rules/own-borrow-over-clone.md"
-Cohesion: 0.07
-Nodes (24): Bad, Common Lifetime Conventions, Elision Preferred, Good, name-lifetime-short, See Also, Serde Convention, Why It Matters (+16 more)
+Cohesion: 0.06
+Nodes (30): Bad, Common Lifetime Conventions, Elision Preferred, Good, name-lifetime-short, See Also, Serde Convention, Why It Matters (+22 more)
 
 ### Community 912 - "proj-mod-rs-dir"
 Cohesion: 0.18
@@ -2271,9 +2277,13 @@ Nodes (10): Bad, Coercion to Any Type, Current Limitations (Nightly), Diverging 
 Cohesion: 0.20
 Nodes (10): Bad, Common Uses, Expressing Borrowing, Expressing Ownership, Good, See Also, Type-Level State Machine, type-phantom-marker (+2 more)
 
+### Community 933 - "name-funcs-snake"
+Cohesion: 0.29
+Nodes (7): Acronyms in snake_case, Bad, Good, Local Variables, name-funcs-snake, See Also, Why It Matters
+
 ### Community 946 - "silk/macros.rs"
 Cohesion: 0.10
-Nodes (41): silk_process_gains_fix(), silk_encode_frame(), silk_gains_dequant(), silk_gains_id(), silk_gains_quant(), silk_burg_modified_fix(), silk_lpc_fit(), silk_add32_ovflw() (+33 more)
+Nodes (46): hp_cutoff(), silk_ana_filt_bank_1(), silk_process_gains_fix(), silk_decode_core(), silk_encode_frame(), silk_gains_dequant(), silk_gains_id(), silk_gains_quant() (+38 more)
 
 ### Community 971 - "fx_type_query/src/main.rs"
 Cohesion: 0.17
@@ -2356,7 +2366,7 @@ Cohesion: 0.05
 Nodes (33): Acceptable Ignoring (Documented), anti-empty-catch, Bad, Clippy Lint, Decision Guide, Good, Pattern: Best-Effort Operations, Pattern: Collect and Report (+25 more)
 
 ### Community 1156 - "anti-collect-intermediate"
-Cohesion: 0.07
+Cohesion: 0.06
 Nodes (26): anti-collect-intermediate, Bad, Comparison, Good, Iterator Methods That Avoid Collection, Pattern: Deferred Collection, See Also, When Collection Is Needed (+18 more)
 
 ### Community 1157 - "10.7.2. Passo a Passo de Implementação Técnica"
@@ -2440,8 +2450,8 @@ Cohesion: 0.22
 Nodes (9): Bad, Common Panic Conditions, doc-panics-section, Good, Pattern: Debug-Only Panics, Pattern: Panic vs Return Error, Provide Non-Panicking Alternatives, See Also (+1 more)
 
 ### Community 1335 - "10. IMPLEMENTAÇÃO DE TELAS DE EFEITOS"
-Cohesion: 0.10
-Nodes (20): 10.1.1. Natureza das Requisições SysEx (Parâmetro por Parâmetro), 10.1.2. Fluxo da Sincronização Sob Demanda (Lazy-Sync por Slot), 10.1. Comportamento do Protocolo MIDI SysEx e Estratégia Lazy-Sync, 10.2. Algoritmo Suportado: Reverb Standard (IDs 0, 1, 2, 3), 10.3. Status de Suporte de Algoritmos, 10.4. Plano Técnico de Implementação (Passo a Passo), 10.5. Atualização em Tempo Real via FX Library Recall (Mesa → Frontend), 10.6.1. Divisão de Responsabilidades dos Módulos (+12 more)
+Cohesion: 0.13
+Nodes (15): 10.1.1. Natureza das Requisições SysEx (Parâmetro por Parâmetro), 10.1.2. Fluxo da Sincronização Sob Demanda (Lazy-Sync por Slot), 10.1. Comportamento do Protocolo MIDI SysEx e Estratégia Lazy-Sync, 10.2. Algoritmo Suportado: Reverb Standard (IDs 0, 1, 2, 3), 10.3. Status de Suporte de Algoritmos, 10.4. Plano Técnico de Implementação (Passo a Passo), 10.5. Atualização em Tempo Real via FX Library Recall (Mesa → Frontend), 10. IMPLEMENTAÇÃO DE TELAS DE EFEITOS (+7 more)
 
 ### Community 1375 - "4. Implementacao Camada por Camada"
 Cohesion: 0.12
@@ -2475,9 +2485,9 @@ Nodes (4): 3.1. Reverb Standard (IDs 0, 1, 2, 3), 3. Mapeamento de Algoritmos, D
 Cohesion: 0.08
 Nodes (23): 1. Visão Geral, 2. Contexto do Projeto (Estrutura Relevante), 3.1 Modal de Configurações — Nova Seção "NAVEGAÇÃO", 3.2 Comportamento dos Botões na Sidebar (apenas `dockMode === 'main'`), 3.3 Renderização Condicionada por Layer, 3. Requisitos Funcionais, 4. Passo a Passo de Implementação, 5. Arquivos a Modificar (resumo) (+15 more)
 
-### Community 1590 - "silk_noise_shape_quantizer_del_dec"
-Cohesion: 0.11
-Nodes (27): Into, hp_cutoff(), silk_control_snr(), fix_const_q16(), fix_const_q7(), silk_hp_variable_cutoff(), silk_lshift(), silk_rshift() (+19 more)
+### Community 1590 - "SilkEncoderStateCommon"
+Cohesion: 0.16
+Nodes (11): Into, silk_control_snr(), fix_const_q16(), fix_const_q7(), silk_hp_variable_cutoff(), silk_nsq(), Default, Self (+3 more)
 
 ### Community 1594 - "Plano de Implementação — FPS FIX: True Zero-Copy Meter Engine"
 Cohesion: 0.10
@@ -2507,9 +2517,9 @@ Nodes (7): 1. Modificar `server_rust/src/main.rs`, 2. Criar `server_rust/src/api
 Cohesion: 0.29
 Nodes (6): Canvas Channel Strip Feature Implementation Plan, Execution Handoff, Task 1: Create Canvas Frontend Bifurcation & Feature Flag, Task 2: Create Canvas Engine (`canvas_engine.js`), Task 3: Create Render Engine (`canvas_strip.js`), Task 4: Create Interactivity Engine (`canvas_events.js`)
 
-### Community 1655 - ".agent/skills/rust-skills/rules/name-funcs-snake.md"
-Cohesion: 0.07
-Nodes (25): Bad, Common Lifetime Conventions, Elision Preferred, Good, name-lifetime-short, See Also, Serde Convention, Why It Matters (+17 more)
+### Community 1655 - ".agent/skills/rust-skills/rules/own-borrow-over-clone.md"
+Cohesion: 0.08
+Nodes (24): Bad, Common Lifetime Conventions, Elision Preferred, Good, name-lifetime-short, See Also, Serde Convention, Why It Matters (+16 more)
 
 ### Community 1692 - "name-is-has-bool"
 Cohesion: 0.22
@@ -2587,9 +2597,9 @@ Nodes (7): Bad, Clippy Lints, err-no-unwrap-prod, `expect()` vs `unwrap()`, Good
 Cohesion: 0.25
 Nodes (7): 1. Fluxo de Execução Sob Demanda, 2. Comandos CLI de Execução, 3. Regras de Qualidade e Segurança, 4. Regras Rígidas de Execução (Obrigatório Incluir nos Prompts), A) Início de uma Nova Tarefa (Primeira Chamada):, B) Chamadas Sequenciais (Reutilizando a Mesma Sessão/Contexto):, Instruções de Delegação de Tarefas de Código (Antigravity ➔ OpenCode)
 
-### Community 3057 - ".agents/skills/rust-skills/rules/name-funcs-snake.md"
-Cohesion: 0.06
-Nodes (30): Associated Constants, Bad, Environment and Config, Good, Lazy Static / OnceLock, name-consts-screaming, See Also, Why It Matters (+22 more)
+### Community 3057 - "name-consts-screaming"
+Cohesion: 0.25
+Nodes (8): Associated Constants, Bad, Environment and Config, Good, Lazy Static / OnceLock, name-consts-screaming, See Also, Why It Matters
 
 ### Community 3067 - "err-thiserror-lib"
 Cohesion: 0.25
@@ -2619,7 +2629,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Why does `register_handlers()` connect `GlobalState` to `CustomSceneManager`, `ConnectionManager`, `SyncManager`, `MidiScheduler`, `MonitoringManager`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `OpusEncoder` connect `opus-rs/src/lib.rs` to `CeltMode`, `silk/mod.rs`, `RangeCoder`, `MonitoringManager`, `resampler.rs`?**
+- **Why does `OpusEncoder` connect `opus-rs/src/lib.rs` to `CeltMode`, `silk/mod.rs`, `RangeCoder`, `MonitoringManager`, `silk_rshift_round`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Are the 43 inferred relationships involving `silk_smlawb()` (e.g. with `.encode()` and `silk_ana_filt_bank_1()`) actually correct?**
   _`silk_smlawb()` has 43 INFERRED edges - model-reasoned connections that need verification._
