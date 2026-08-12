@@ -3150,24 +3150,10 @@ body.is-portrait .eq-graph-container {
     border-left: 1px solid #333;
     padding: 15px 0;
     box-sizing: border-box;
-    display: none;
-    opacity: 0.3;
-    pointer-events: none;
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
     gap: 6px;
-    /* Escondido por padrÃƒÂ£o, aparece em landscape/largo */
-}
-
-/* Mostra apenas em telas largas ou landscape */
-@media screen and (min-width: 900px),
-(orientation: landscape) and (min-width: 600px) {
-    .eq-fader-container {
-        display: flex;
-    }
-}
-
-/* No modo retrato de celular, o ganho ÃƒÂ© feito apenas arrastando o ponto, fader some para poupar espaÃƒÂ§o */
-body.is-portrait .eq-fader-container {
-    display: none !important;
 }
 
 .eq-fader-val {
@@ -3235,24 +3221,10 @@ body.is-portrait .eq-fader-container {
     padding: 0 15px;
     box-sizing: border-box;
     border-top: 1px solid #222;
-    display: none;
-    opacity: 0.3;
-    pointer-events: none;
+    opacity: 1;
+    pointer-events: auto;
     justify-content: center;
     gap: 8px;
-    /* Escondido por padrÃƒÂ£o, aparece em landscape/largo */
-}
-
-/* Mostra apenas em telas largas ou landscape */
-@media screen and (min-width: 900px),
-(orientation: landscape) and (min-width: 600px) {
-    .eq-freq-fader-container {
-        display: flex;
-    }
-}
-
-body.is-portrait .eq-freq-fader-container {
-    display: none !important;
 }
 
 .eq-freq-fader-input {
@@ -4883,13 +4855,14 @@ body:not(.layout-desktop).is-portrait .ch-modal-overlay {
 /* Panel 1: Info (left) */
 body:not(.layout-desktop).is-portrait .sidebar-info {
     flex-shrink: 0;
-    width: 70px;
+    width: 85px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     margin: 0;
+    overflow: hidden;
 }
 
 body:not(.layout-desktop).is-portrait .sidebar-info #scn {
@@ -4913,6 +4886,9 @@ body:not(.layout-desktop).is-portrait .sidebar-info .ch-side-title {
     margin: 0 !important;
     line-height: 1.1;
     min-height: 0;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 body:not(.layout-desktop).is-portrait .sidebar-nav {
