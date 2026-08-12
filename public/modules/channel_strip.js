@@ -251,7 +251,6 @@ function createDesktopStrip(config) {
                     onpointerdown="startPanLongPress(event, ${evtCh}, ${isMaster ? 'null' : partnerId})"
                     onpointermove="handlePanPointerMove(event)"
                     onpointerup="stopPanLongPress(event)"
-                    onpointerleave="stopPanLongPress(event)"
                     onpointercancel="stopPanLongPress(event)"` : ''}>
                 ${hasPan ? `
                 <span class="desk-pan-l">L</span>

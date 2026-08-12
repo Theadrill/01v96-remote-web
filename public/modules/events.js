@@ -414,6 +414,7 @@ let panLongPressTimeout = null;
 let isPanDragging = false;
 let activePanChannel = null;
 let activePanTrack = null;
+let panPressStartTime;
 
 function startPanLongPress(e, ch1, ch2) {
     e.stopPropagation();
@@ -424,6 +425,7 @@ function startPanLongPress(e, ch1, ch2) {
     const target = e.currentTarget;
     const clientX = e.clientX;
     const clientY = e.clientY;
+    panPressStartTime = Date.now();
     
     // Decide qual canal usar (se houver dois)
     let ch = ch1;
@@ -434,7 +436,7 @@ function startPanLongPress(e, ch1, ch2) {
     }
 
     activePanChannel = ch;
-    activePanTrack = target;
+    activePanTrack = e.currentTarget.querySelector('.desk-pan-track') || e.currentTarget;
 
     panLongPressTimeout = setTimeout(() => {
         isPanDragging = true;
@@ -453,6 +455,16 @@ function handlePanPointerMove(e) {
 }
 
 function stopPanLongPress(e) {
+    if (!panPressStartTime && !panLongPressTimeout) return;
+    
+    const duration = panPressStartTime ? (Date.now() - panPressStartTime) : 0;
+    console.log('[Events] stopPanLongPress:', { isPanDragging, duration, layoutMode, activePanTrack, hasBubbleModal: typeof window.BubbleModal !== 'undefined' });
+    
+    if (!isPanDragging && duration > 0 && duration < 350 && layoutMode === 'desktop' && activePanTrack && typeof window.BubbleModal !== 'undefined') {
+        window.BubbleModal.show({ targetEl: activePanTrack, message: '💡 Clique e segure para ajustar o Pan' });
+    }
+    panPressStartTime = null;
+
     if (panLongPressTimeout) clearTimeout(panLongPressTimeout);
     panLongPressTimeout = null;
     
