@@ -15,6 +15,10 @@
     "name": "MACRO 3",
     "scriptId": "channel_toggler"
   },
+  "4": {
+    "name": "MACRO 5",
+    "scriptId": "lumikit"
+  },
   "globalConfig": {
     "lumikit": {
       "ip": "pcteste",
