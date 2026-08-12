@@ -8,16 +8,16 @@
       "file": "custom_names_scene-CENA TESTE 3-mesa-teste.json"
     },
     {
-      "custom_name": "TESTE 2",
-      "physical_scene": "TESTE 2",
-      "physical_id": 2,
-      "file": "custom_names_scene-TESTE 2-mesa-teste.json"
-    },
-    {
       "custom_name": "01V96 TESTE",
       "physical_scene": "01V96 TESTE",
       "physical_id": 1,
       "file": "custom_names_scene-01V96 TESTE-mesa-teste.json"
+    },
+    {
+      "custom_name": "8887776669",
+      "physical_scene": "8887776669",
+      "physical_id": 2,
+      "file": "custom_names_scene-8887776669-mesa-teste.json"
     }
   ]
 }

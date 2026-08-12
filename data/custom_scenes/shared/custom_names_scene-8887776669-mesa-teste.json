@@ -1,0 +1,174 @@
+{
+  "scene_name": "8887776669",
+  "scene_id": 2,
+  "channels": {
+    "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "26": {
+      "name": "CH26",
+      "short": "CH26"
+    },
+    "22": {
+      "name": "CH22",
+      "short": "CH22"
+    },
+    "14": {
+      "name": "CH14",
+      "short": "CH14"
+    },
+    "12": {
+      "name": "VOZ 2",
+      "short": "VOZ2"
+    },
+    "29": {
+      "name": "CH29",
+      "short": "CH29"
+    },
+    "19": {
+      "name": "CH19",
+      "short": "CH19"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "39": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "37": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "1": {
+      "name": "BUMBO",
+      "short": "BUMB"
+    },
+    "35": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "20": {
+      "name": "CH20",
+      "short": "CH20"
+    },
+    "31": {
+      "name": "CH31",
+      "short": "CH31"
+    },
+    "24": {
+      "name": "CH24",
+      "short": "CH24"
+    },
+    "10": {
+      "name": "CH10",
+      "short": "CH10"
+    },
+    "6": {
+      "name": "CH6",
+      "short": "CH6 "
+    },
+    "16": {
+      "name": "CH16",
+      "short": "CH16"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "8": {
+      "name": "DJJ",
+      "short": "DJJ "
+    },
+    "25": {
+      "name": "CH25",
+      "short": "CH25"
+    },
+    "2": {
+      "name": "CHIM",
+      "short": "CHIM"
+    },
+    "7": {
+      "name": "CH7",
+      "short": "CH7 "
+    },
+    "master": {
+      "name": "STEREO",
+      "short": "STER"
+    },
+    "15": {
+      "name": "CH15",
+      "short": "CH15"
+    },
+    "18": {
+      "name": "CH18",
+      "short": "CH18"
+    },
+    "23": {
+      "name": "CH23",
+      "short": "CH23"
+    },
+    "30": {
+      "name": "CH30",
+      "short": "CH30"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "27": {
+      "name": "CH27",
+      "short": "CH27"
+    },
+    "4": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "17": {
+      "name": "CH17",
+      "short": "CH17"
+    },
+    "mix1": {
+      "name": "SAIDA 1",
+      "short": "SAID"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "32": {
+      "name": "CH32",
+      "short": "CH32"
+    },
+    "5": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "11": {
+      "name": "VOZ 1",
+      "short": "VOZ1"
+    },
+    "9": {
+      "name": "TESTE",
+      "short": "TEST"
+    },
+    "21": {
+      "name": "CH21",
+      "short": "CH21"
+    },
+    "13": {
+      "name": "CH13",
+      "short": "CH13"
+    },
+    "28": {
+      "name": "CH28",
+      "short": "CH28"
+    }
+  }
+}
