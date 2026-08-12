@@ -40,7 +40,9 @@ echo "Próxima instrução..." | opencode run -c --auto --format json
 ---
 
 ## 3. Regras de Qualidade e Segurança
-* **Reutilização de Contexto (`-c`)**: Sempre utilizar a flag `-c` para evitar que o OpenCode precise re-analisar a estrutura do projeto do zero a cada comando.
+* **Gerenciamento de Contexto (`-c`)**:
+  * **Modelos Nuvem / Contexto Ilimitado**: Utilizar a flag `-c` para manter a memória entre chamadas sequenciais dentro da mesma sessão.
+  * **Modelos Locais / Contexto Limitado (ex: Ollama, LM Studio - Bonsai, Qwen)**: **OMITIR A FLAG `-c`**. Ao omitir a flag `-c`, o OpenCode inicia cada requisição em uma sessão limpa/zerada, evitando acúmulo de tokens do histórico e prevenindo erros de estouro de limite de contexto (`exceed_context_size_error`).
 * **Validação Obrigatória**: Todo código gerado pelo OpenCode deve ser revisado via `git diff` e validado via compilação antes de ser considerado pronto.
 * **Push**: Push SÓ quando usuário pedir.
 
