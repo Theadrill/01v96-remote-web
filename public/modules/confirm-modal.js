@@ -180,7 +180,6 @@ var ConfirmModal = (function () {
 
         // Overlay
         if (g.bg_overlay)      root.style.setProperty('--confirm-modal-bg-overlay', g.bg_overlay);
-        if (g.z_index_base)    root.style.setProperty('--confirm-modal-z-index', g.z_index_base);
 
         // Card
         if (cm.bg_content)     root.style.setProperty('--confirm-modal-bg-content', cm.bg_content);

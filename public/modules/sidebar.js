@@ -1037,7 +1037,7 @@ function renderDock(mode) {
                 buttons.push({ label: fsSvg, action: 'toggleFullScreen()', cls: 'dock-fs' });
             }
             buttons.push({ label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' });
-            buttons.push({ label: 'SAIR', action: "document.getElementById('logoutConfirmModal').style.display='flex'", cls: 'dock-close' });
+            buttons.push({ label: 'SAIR', action: 'showLogoutConfirm()', cls: 'dock-close' });
             break;
         }
     }
@@ -1062,6 +1062,21 @@ function isModalOpen(el) {
     return window.getComputedStyle(el).display !== 'none';
 }
 
+function showLogoutConfirm() {
+    ConfirmModal.show({
+        title: 'Confirmação',
+        message: 'Deseja realmente sair e voltar para a tela inicial?',
+        type: 'danger',
+        confirmText: 'SIM, SAIR',
+        cancelText: 'CANCELAR'
+    }).then(function(ok) {
+        if (ok) {
+            clearRole();
+            location.reload();
+        }
+    });
+}
+
 function triggerExitActiveMode() {
     const fxEditorModal = document.getElementById('fxEditorModal');
     if (isModalOpen(fxEditorModal)) {
@@ -1079,8 +1094,7 @@ function triggerExitActiveMode() {
     }
     const mode = window.currentDockMode;
     if (mode === 'main' || mode === 'musician') {
-        const modal = document.getElementById('logoutConfirmModal');
-        if (modal) modal.style.display = 'flex';
+        showLogoutConfirm();
     } else if (mode === 'channelConfig') {
         if (typeof closeChannelConfig === 'function') closeChannelConfig();
     } else if (mode === 'outs') {

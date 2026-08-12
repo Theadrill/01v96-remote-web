@@ -21,7 +21,6 @@
 # Usado por todos os modais do sistema
 global:
   bg_overlay: "rgba(0, 0, 0, 0.85)"
-  z_index_base: "15000"
 
 
 # ─── CONFIRM MODAL ─────────────────────────────────────────────
@@ -61,7 +60,7 @@ confirm_modal:
   icon_success_color: "#28a745"
   icon_size: "24px"
 
-  # Z-index
+  # Z-index (sempre alto pois é última etapa do fluxo)
   z_index: "15000"
 
 

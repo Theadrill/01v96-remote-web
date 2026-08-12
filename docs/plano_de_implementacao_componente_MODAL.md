@@ -121,7 +121,7 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 | 1 | `masterOnConfirmModal` | channel_strip.js | Sim/Não perigo | Média | [X] |
 | 2 | `customConfirmModal` | copy_paste.js | Sim/Não | Baixa | [X] |
 | 3 | `restoreConfirmModal` | index.html | Sim/Não perigo | Baixa | [X] |
-| 4 | `logoutConfirmModal` | index.html | Sim/Não | Baixa | [ ] |
+| 4 | `logoutConfirmModal` | index.html | Sim/Não | Baixa | [X] |
 | 5 | `macroDeleteConfirmModal` | index.html | Sim/Não perigo | Baixa | [ ] |
 | 6 | `sceneDeleteModal` | index.html | Sim/Não perigo | Baixa | [ ] |
 | 7 | `sceneConfirmModal` | index.html | Sim/Não + input | Alta | [ ] |
@@ -246,8 +246,8 @@ confirm_modal:
   icon_success_color: "#28a745"
   icon_size: "24px"
 
-  # Z-index
-  z_index: "9999"
+  # Z-index (sempre alto pois é última etapa do fluxo)
+  z_index: "15000"
 
 
 # ─── FUTUROS COMPONENTES ──────────────────────────────────────
