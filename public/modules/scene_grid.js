@@ -253,41 +253,39 @@ function _buildSceneBtn(scene, action, modal) {
  * @param {Element}     gridModal
  */
 function _openConfirmModal(scene, action, gridModal) {
-    const confirmModal   = document.getElementById('sceneConfirmModal');
-    const actionBtn      = document.getElementById('sceneConfirmActionBtn');
-    const renameContainer = document.getElementById('sceneRenameContainer');
-    const renameInput    = document.getElementById('sceneRenameInput');
-    const confirmText    = document.getElementById('sceneConfirmText');
-    const confirmTitle   = document.getElementById('sceneConfirmTitle');
-
     if (action === 'load') {
-        confirmTitle.innerText    = 'CARREGAR CENA?';
-        confirmTitle.style.color  = '#ffcc00';
-        confirmText.innerHTML     = `Deseja CARREGAR a cena <b>${scene.index} (${scene.name})</b>?<br><br>ISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`;
-        renameContainer.style.display = 'none';
-        actionBtn.style.background = '#28a745';
-        actionBtn.innerText = 'SIM, CARREGAR';
-        actionBtn.onclick = () => {
-            socket.emit('recallScene', { index: scene.index });
-            confirmModal.style.display = 'none';
-            gridModal.style.display   = 'none';
-            OverlayInfo.show('sync', 'CARREGANDO CENA...');
-        };
+        ConfirmModal.show({
+            title: 'CARREGAR CENA?',
+            message: `Deseja CARREGAR a cena ${scene.index} (${scene.name})?\n\nISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`,
+            type: 'warning',
+            confirmText: 'SIM, CARREGAR',
+            cancelText: 'CANCELAR'
+        }).then(function (ok) {
+            if (ok) {
+                socket.emit('recallScene', { index: scene.index });
+                gridModal.style.display = 'none';
+                OverlayInfo.show('sync', 'CARREGANDO CENA...');
+            }
+        });
     } else {
-        confirmTitle.innerText    = 'SALVAR CENA?';
-        confirmTitle.style.color  = '#dc3545';
-        confirmText.innerHTML     = `Deseja SALVAR a mixagem atual no slot <b>${scene.index}</b>?`;
-        renameContainer.style.display = 'block';
-        renameInput.value = (!scene.isEmpty && scene.name) ? scene.name : (window.currentSceneName || '');
-        actionBtn.style.background = '#dc3545';
-        actionBtn.innerText = 'SIM, SALVAR';
-        actionBtn.onclick = () => {
-            const newName = renameInput.value.trim().toUpperCase();
-            socket.emit('saveScene', { index: scene.index, newName, syncShared: window.customScenesSyncEnabled });
-            confirmModal.style.display = 'none';
-            gridModal.style.display   = 'none';
-        };
+        var defaultValue = (!scene.isEmpty && scene.name) ? scene.name : (window.currentSceneName || '');
+        ConfirmModal.show({
+            title: 'SALVAR CENA?',
+            message: `Deseja SALVAR a mixagem atual no slot ${scene.index}?`,
+            type: 'danger',
+            confirmText: 'SIM, SALVAR',
+            cancelText: 'CANCELAR',
+            input: {
+                label: 'NOME DA CENA (16 chars)',
+                defaultValue: defaultValue,
+                maxLength: 16
+            }
+        }).then(function (result) {
+            if (result.confirmed) {
+                var newName = result.value.trim().toUpperCase();
+                socket.emit('saveScene', { index: scene.index, newName, syncShared: window.customScenesSyncEnabled });
+                gridModal.style.display = 'none';
+            }
+        });
     }
-
-    confirmModal.style.display = 'flex';
 }

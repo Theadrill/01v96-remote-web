@@ -1,11 +1,11 @@
 // ConfirmModal — Componente reutilizável de modal de confirmação
 // Uso: ConfirmModal.show({ title, message, type }) → Promise<boolean>
+// Uso com input: ConfirmModal.show({ ..., input: { label, maxLength } }) → Promise<{ confirmed, value }>
 
 var ConfirmModal = (function () {
     'use strict';
 
     var _root = null;
-    var _overlay = null;
     var _content = null;
     var _iconEl = null;
     var _headerEl = null;
@@ -13,6 +13,8 @@ var ConfirmModal = (function () {
     var _footerEl = null;
     var _resolve = null;
     var _isOpen = false;
+    var _hasInput = false;
+    var _inputId = 'confirm-modal-input-' + Date.now();
 
     // ─── DOM helpers ────────────────────────────────────────────
 
@@ -75,10 +77,19 @@ var ConfirmModal = (function () {
 
         setTimeout(function () {
             _root.style.display = 'none';
+
             if (_resolve) {
-                _resolve(result);
+                if (_hasInput) {
+                    var input = document.getElementById(_inputId);
+                    var value = input ? input.value : '';
+                    _resolve({ confirmed: !!result, value: value });
+                } else {
+                    _resolve(result);
+                }
                 _resolve = null;
             }
+
+            _hasInput = false;
         }, 200);
     }
 
@@ -116,17 +127,61 @@ var ConfirmModal = (function () {
         var cancelText   = opts.cancelText   || 'CANCELAR';
         var btnType      = opts.btnType      || type;
         var showCancel   = opts.showCancel !== false;
+        var inputOpts    = opts.input || null;
 
         // Ícone
         _iconEl.innerHTML = _typeIcon(type, icon);
         _iconEl.className = 'confirm-modal-icon confirm-modal-icon--' + type;
 
-        // Título e mensagem
+        // Título
         _headerEl.textContent = title;
-        _bodyEl.textContent = message;
 
         // Variante de borda
         _content.className = 'confirm-modal-content confirm-modal-content--' + type;
+
+        // Body: mensagem + opcionalmente input + keyboard
+        _bodyEl.innerHTML = '';
+        _hasInput = false;
+
+        if (message) {
+            var msgEl = _el('div', { className: 'confirm-modal-message', textContent: message });
+            _bodyEl.appendChild(msgEl);
+        }
+
+        if (inputOpts) {
+            _hasInput = true;
+
+            if (inputOpts.label) {
+                var labelEl = _el('label', {
+                    className: 'confirm-modal-input-label',
+                    textContent: inputOpts.label
+                });
+                labelEl.setAttribute('for', _inputId);
+                _bodyEl.appendChild(labelEl);
+            }
+
+            var inputEl = _el('input', {
+                className: 'confirm-modal-input',
+                id: _inputId,
+                type: 'text'
+            });
+            if (inputOpts.maxLength) inputEl.setAttribute('maxlength', inputOpts.maxLength);
+            if (inputOpts.placeholder) inputEl.setAttribute('placeholder', inputOpts.placeholder);
+            if (inputOpts.defaultValue) inputEl.value = inputOpts.defaultValue;
+            _bodyEl.appendChild(inputEl);
+
+            // Virtual Keyboard
+            if (typeof VirtualKeyboard !== 'undefined') {
+                var keyboard = VirtualKeyboard.create(_inputId);
+                _bodyEl.appendChild(keyboard);
+            }
+
+            // Focar no input após render
+            requestAnimationFrame(function () {
+                inputEl.focus();
+                inputEl.select();
+            });
+        }
 
         // Botões
         _footerEl.innerHTML = '';
