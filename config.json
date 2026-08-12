@@ -4,7 +4,7 @@
   "loopmidi-monitor": false,
   "open_browser_startup": false,
   "use_canvas": false,
-  "demo_mode": false,
+  "demo_mode": true,
   "lumikit_ips": [
     "192.168.15.99",
     "192.168.1.111"
