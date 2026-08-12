@@ -711,14 +711,28 @@ function updateColorPickerPreview(hex) {
     if (previewModal) { previewModal.style.background = hex; previewModal.style.border = border; }
 }
 
-window.openMacroColorPicker = function () {
+window.openMacroColorPicker = async function () {
+    const contextModal = document.getElementById('macroContextModal');
+    if (contextModal) contextModal.style.display = 'none';
+
     const dropdown = document.getElementById('macroColorDropdown');
-    const modal = document.getElementById('macroColorPickerModal');
-    const isSmallScreen = window.innerWidth <= 600;
-    if (isSmallScreen) {
-        modal.style.display = 'flex';
+    if (dropdown) dropdown.style.display = 'none';
+
+    const sd = (typeof activeSlotIndex !== 'undefined' && assignedMacros) ? assignedMacros[activeSlotIndex] : null;
+    const initialColor = (sd && sd.color) ? sd.color : '#28a745';
+
+    if (typeof ColorPicker !== 'undefined' && ColorPicker.open) {
+        const chosenColor = await ColorPicker.open({
+            initialColor: initialColor,
+            mode: 'lite',
+            title: 'Escolher Cor da Macro'
+        });
+        if (chosenColor) {
+            saveMacroColor(chosenColor);
+        }
     } else {
-        dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+        const modal = document.getElementById('macroColorPickerModal');
+        if (modal) modal.style.display = 'flex';
     }
 };
 

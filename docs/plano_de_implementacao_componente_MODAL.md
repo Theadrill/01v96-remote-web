@@ -205,10 +205,10 @@ CSS variables: `--virtual-keyboard-*` (ex: `--virtual-keyboard-key-bg`)
 - [X] Adicionar suporte a sincronização no servidor para integração com o **Ninja Sync** (armazenando na pasta `shared/` / nuvem)
 
 ### 3.2 Componente Customizado `ColorPicker` (iOS / Touch Friendly)
-- [ ] Criar `public/modules/color-picker.js` (componente reutilizável de seleção de cor)
-- [ ] Desenvolver paleta com swatches predefinidos + seletor visual de tonalidades/HEX
-- [ ] Implementar exibição responsiva: Dropdown/Popover em Desktop e Modal Full-Screen em Mobile (`<= 600px`)
-- [ ] Testar em navegadores WebKit/iOS (iPhone/iPad) para garantir 100% de compatibilidade sem usar o `<input type="color">` nativo
+- [X] Criar `public/modules/color-picker.js` (componente reutilizável de seleção de cor)
+- [X] Desenvolver paleta com swatches predefinidos + seletor visual de tonalidades/HEX
+- [X] Implementar exibição responsiva: Dropdown/Popover em Desktop e Modal Full-Screen em Mobile (`<= 600px`)
+- [X] Testar em navegadores WebKit/iOS (iPhone/iPad) para garantir 100% de compatibilidade sem usar o `<input type="color">` nativo
 
 ### 3.3 Painel de Gerenciamento de Temas (UI)
 - [ ] Criar modal/seção "🎨 Temas & Aparência" no menu de configurações
