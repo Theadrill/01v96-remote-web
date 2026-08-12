@@ -1,0 +1,236 @@
+// ConfirmModal — Componente reutilizável de modal de confirmação
+// Uso: ConfirmModal.show({ title, message, type }) → Promise<boolean>
+
+var ConfirmModal = (function () {
+    'use strict';
+
+    var _root = null;
+    var _overlay = null;
+    var _content = null;
+    var _iconEl = null;
+    var _headerEl = null;
+    var _bodyEl = null;
+    var _footerEl = null;
+    var _resolve = null;
+    var _isOpen = false;
+
+    // ─── DOM helpers ────────────────────────────────────────────
+
+    function _el(tag, attrs) {
+        var e = document.createElement(tag);
+        if (attrs) {
+            Object.keys(attrs).forEach(function (k) {
+                if (k === 'className') {
+                    e.className = attrs[k];
+                } else if (k === 'textContent') {
+                    e.textContent = attrs[k];
+                } else {
+                    e.setAttribute(k, attrs[k]);
+                }
+            });
+        }
+        return e;
+    }
+
+    // ─── Criar estrutura DOM ────────────────────────────────────
+
+    function _buildDOM() {
+        if (_root) return;
+
+        _root = _el('div', { className: 'confirm-modal-overlay', id: 'confirmModalOverlay' });
+        _content = _el('div', { className: 'confirm-modal-content' });
+        _iconEl = _el('div', { className: 'confirm-modal-icon' });
+        _headerEl = _el('div', { className: 'confirm-modal-header' });
+        _bodyEl = _el('div', { className: 'confirm-modal-body' });
+        _footerEl = _el('div', { className: 'confirm-modal-footer' });
+
+        _content.appendChild(_iconEl);
+        _content.appendChild(_headerEl);
+        _content.appendChild(_bodyEl);
+        _content.appendChild(_footerEl);
+        _root.appendChild(_content);
+        document.body.appendChild(_root);
+
+        // Fechar com clique no overlay
+        _root.addEventListener('click', function (e) {
+            if (e.target === _root) {
+                _close(false);
+            }
+        });
+
+        // Fechar com ESC
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && _isOpen) {
+                _close(false);
+            }
+        });
+    }
+
+    // ─── Fechar modal ───────────────────────────────────────────
+
+    function _close(result) {
+        if (!_isOpen) return;
+        _isOpen = false;
+        _root.classList.remove('confirm-modal-visible');
+
+        setTimeout(function () {
+            _root.style.display = 'none';
+            if (_resolve) {
+                _resolve(result);
+                _resolve = null;
+            }
+        }, 200);
+    }
+
+    // ─── Mapear tipo para ícone FA ──────────────────────────────
+
+    function _typeIcon(type, icon) {
+        if (icon) return icon;
+
+        switch (type) {
+            case 'danger':  return '<i class="fas fa-exclamation-triangle"></i>';
+            case 'warning': return '<i class="fas fa-exclamation-circle"></i>';
+            case 'info':    return '<i class="fas fa-info-circle"></i>';
+            case 'primary': return '<i class="fas fa-check-circle"></i>';
+            default:        return '<i class="fas fa-question-circle"></i>';
+        }
+    }
+
+    // ─── Abrir modal ────────────────────────────────────────────
+
+    function _show(options) {
+        _buildDOM();
+
+        // Fechar modal anterior se aberto
+        if (_isOpen) {
+            _root.style.display = 'none';
+            _root.classList.remove('confirm-modal-visible');
+        }
+
+        var opts = options || {};
+        var title    = opts.title    || 'Confirmação';
+        var message  = opts.message  || '';
+        var type     = opts.type     || 'info';
+        var icon     = opts.icon     || null;
+        var confirmText  = opts.confirmText  || 'CONFIRMAR';
+        var cancelText   = opts.cancelText   || 'CANCELAR';
+        var btnType      = opts.btnType      || type;
+        var showCancel   = opts.showCancel !== false;
+
+        // Ícone
+        _iconEl.innerHTML = _typeIcon(type, icon);
+        _iconEl.className = 'confirm-modal-icon confirm-modal-icon--' + type;
+
+        // Título e mensagem
+        _headerEl.textContent = title;
+        _bodyEl.textContent = message;
+
+        // Variante de borda
+        _content.className = 'confirm-modal-content confirm-modal-content--' + type;
+
+        // Botões
+        _footerEl.innerHTML = '';
+
+        var confirmBtn = _el('button', {
+            className: 'confirm-modal-btn confirm-modal-btn--' + btnType,
+            textContent: confirmText
+        });
+        confirmBtn.addEventListener('click', function () {
+            _close(true);
+        });
+        _footerEl.appendChild(confirmBtn);
+
+        if (showCancel) {
+            var cancelBtn = _el('button', {
+                className: 'confirm-modal-btn confirm-modal-btn--secondary',
+                textContent: cancelText
+            });
+            cancelBtn.addEventListener('click', function () {
+                _close(false);
+            });
+            _footerEl.appendChild(cancelBtn);
+        }
+
+        // Mostrar
+        _root.style.display = 'flex';
+        _isOpen = true;
+        requestAnimationFrame(function () {
+            _root.classList.add('confirm-modal-visible');
+        });
+
+        return new Promise(function (resolve) {
+            _resolve = resolve;
+        });
+    }
+
+    // ─── Carregar tema YAML ─────────────────────────────────────
+
+    function _loadTheme(yamlContent) {
+        if (typeof jsyaml === 'undefined') {
+            console.warn('[ConfirmModal] js-yaml não carregado. Tema não aplicado.');
+            return;
+        }
+
+        var theme = jsyaml.load(yamlContent);
+        if (!theme) return;
+
+        var root = document.documentElement;
+        var g = theme.global || {};
+        var cm = theme.confirm_modal || {};
+
+        // Overlay
+        if (g.bg_overlay)      root.style.setProperty('--confirm-modal-bg-overlay', g.bg_overlay);
+        if (g.z_index_base)    root.style.setProperty('--confirm-modal-z-index', g.z_index_base);
+
+        // Card
+        if (cm.bg_content)     root.style.setProperty('--confirm-modal-bg-content', cm.bg_content);
+        if (cm.border_color)   root.style.setProperty('--confirm-modal-border-color', cm.border_color);
+        if (cm.border_radius)  root.style.setProperty('--confirm-modal-border-radius', cm.border_radius);
+        if (cm.padding)        root.style.setProperty('--confirm-modal-padding', cm.padding);
+        if (cm.max_width)      root.style.setProperty('--confirm-modal-max-width', cm.max_width);
+
+        // Tipografia
+        if (cm.text_primary)   root.style.setProperty('--confirm-modal-text-primary', cm.text_primary);
+        if (cm.text_secondary) root.style.setProperty('--confirm-modal-text-secondary', cm.text_secondary);
+        if (cm.text_muted)     root.style.setProperty('--confirm-modal-text-muted', cm.text_muted);
+
+        // Botões - Cores
+        if (cm.btn_primary)    root.style.setProperty('--confirm-modal-btn-primary', cm.btn_primary);
+        if (cm.btn_danger)     root.style.setProperty('--confirm-modal-btn-danger', cm.btn_danger);
+        if (cm.btn_warning)    root.style.setProperty('--confirm-modal-btn-warning', cm.btn_warning);
+        if (cm.btn_info)       root.style.setProperty('--confirm-modal-btn-info', cm.btn_info);
+        if (cm.btn_secondary)  root.style.setProperty('--confirm-modal-btn-secondary', cm.btn_secondary);
+
+        // Botões - Dimensões
+        if (cm.btn_height)         root.style.setProperty('--confirm-modal-btn-height', cm.btn_height);
+        if (cm.btn_radius)         root.style.setProperty('--confirm-modal-btn-radius', cm.btn_radius);
+        if (cm.btn_gap)            root.style.setProperty('--confirm-modal-btn-gap', cm.btn_gap);
+        if (cm.btn_font_weight)    root.style.setProperty('--confirm-modal-btn-font-weight', cm.btn_font_weight);
+        if (cm.btn_letter_spacing) root.style.setProperty('--confirm-modal-btn-letter-spacing', cm.btn_letter_spacing);
+
+        // Ícones
+        if (cm.icon_danger_color)  root.style.setProperty('--confirm-modal-icon-danger-color', cm.icon_danger_color);
+        if (cm.icon_warning_color) root.style.setProperty('--confirm-modal-icon-warning-color', cm.icon_warning_color);
+        if (cm.icon_info_color)    root.style.setProperty('--confirm-modal-icon-info-color', cm.icon_info_color);
+        if (cm.icon_success_color) root.style.setProperty('--confirm-modal-icon-success-color', cm.icon_success_color);
+        if (cm.icon_size)          root.style.setProperty('--confirm-modal-icon-size', cm.icon_size);
+
+        // Z-index
+        if (cm.z_index) root.style.setProperty('--confirm-modal-z-index', cm.z_index);
+    }
+
+    // ─── API pública ────────────────────────────────────────────
+
+    return {
+        show: _show,
+        loadTheme: _loadTheme
+    };
+})();
+
+// Auto-carregar tema no boot
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('themes/default.yaml')
+        .then(function (r) { return r.text(); })
+        .then(function (yaml) { ConfirmModal.loadTheme(yaml); })
+        .catch(function (e) { console.warn('[ConfirmModal] Tema não carregado:', e); });
+});

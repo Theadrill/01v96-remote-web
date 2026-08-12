@@ -21,7 +21,7 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 - Ao completar uma fase, marcar como `[X]` no checklist abaixo
 - **NÃO** prosseguir para a próxima fase sem autorização
 - Fases:
-  - [ ] **FASE 1** — Criação do Componente (INDEPENDENTE)
+  - [X] **FASE 1** — Criação do Componente (INDEPENDENTE)
   - [ ] **FASE 2** — Refatoração dos Modais Existentes
   - [ ] **FASE 3** — Painel de Configuração de Temas
 
@@ -50,62 +50,62 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para Fase 2.
 
 ### 1.1 Instalar dependências
-- [ ] Baixar `js-yaml.min.js` → `public/vendor/js-yaml.min.js`
-- [ ] Baixar FontAwesome Solid (all.min.css + webfonts/) → `public/vendor/fontawesome/`
-- [ ] Adicionar script tags no `index.html`
+- [X] Baixar `js-yaml.min.js` → `public/vendor/js-yaml.min.js`
+- [X] Baixar FontAwesome Solid (all.min.css + webfonts/) → `public/vendor/fontawesome/`
+- [X] Adicionar script tags no `index.html`
 
 ### 1.2 Criar estrutura de temas
-- [ ] Criar pasta `public/themes/`
-- [ ] Criar arquivo `public/themes/default.yaml` com variáveis globais
-- [ ] Variáveis organizadas por componente (confirm_modal, sidebar, faders, etc.)
-- [ ] Seção `confirm_modal:` com todas as variáveis `--confirm-modal-*`
-- [ ] Z-index dentro do componente confirm_modal
+- [X] Criar pasta `public/themes/`
+- [X] Criar arquivo `public/themes/default.yaml` com variáveis globais
+- [X] Variáveis organizadas por componente (confirm_modal, sidebar, faders, etc.)
+- [X] Seção `confirm_modal:` com todas as variáveis `--confirm-modal-*`
+- [X] Z-index dentro do componente confirm_modal
 
 ### 1.3 Criar classes CSS do componente
-- [ ] `.confirm-modal-overlay` — overlay de fundo
-- [ ] `.confirm-modal-content` — card do modal
-- [ ] `.confirm-modal-content--danger` — variante com borda vermelha
-- [ ] `.confirm-modal-content--warning` — variante com borda amarela
-- [ ] `.confirm-modal-content--info` — variante com borda azul
-- [ ] `.confirm-modal-header` — título
-- [ ] `.confirm-modal-body` — mensagem/conteúdo
-- [ ] `.confirm-modal-footer` — container dos botões
-- [ ] `.confirm-modal-btn` — botão base
-- [ ] `.confirm-modal-btn--primary` — verde (ação positiva)
-- [ ] `.confirm-modal-btn--danger` — vermelho (ação destrutiva)
-- [ ] `.confirm-modal-btn--warning` — amarelo (atenção)
-- [ ] `.confirm-modal-btn--info` — azul (informativo)
-- [ ] `.confirm-modal-btn--secondary` — cinza (cancelar)
-- [ ] `.confirm-modal-icon` — ícone (suporta FA ou emoji)
+- [X] `.confirm-modal-overlay` — overlay de fundo
+- [X] `.confirm-modal-content` — card do modal
+- [X] `.confirm-modal-content--danger` — variante com borda vermelha
+- [X] `.confirm-modal-content--warning` — variante com borda amarela
+- [X] `.confirm-modal-content--info` — variante com borda azul
+- [X] `.confirm-modal-header` — título
+- [X] `.confirm-modal-body` — mensagem/conteúdo
+- [X] `.confirm-modal-footer` — container dos botões
+- [X] `.confirm-modal-btn` — botão base
+- [X] `.confirm-modal-btn--primary` — verde (ação positiva)
+- [X] `.confirm-modal-btn--danger` — vermelho (ação destrutiva)
+- [X] `.confirm-modal-btn--warning` — amarelo (atenção)
+- [X] `.confirm-modal-btn--info` — azul (informativo)
+- [X] `.confirm-modal-btn--secondary` — cinza (cancelar)
+- [X] `.confirm-modal-icon` — ícone (suporta FA ou emoji)
 
 ### 1.4 Criar módulo JS (`confirm-modal.js`)
-- [ ] Classe `ConfirmModal` com método estático `show(options)`
-- [ ] Options: `{ title, message, confirmText, cancelText, type, icon, onConfirm, onCancel }`
-- [ ] Retorna `Promise<boolean>` (true = confirmou, false = cancelou)
-- [ ] Função `loadTheme(yamlContent)` que parseia YAML e aplica variáveis CSS
-- [ ] Gerencia estado: fecha modal anterior antes de abrir novo
-- [ ] Cria DOM dinamicamente (sem HTML estático no index.html)
-- [ ] Suporte a fechar com ESC e clique no overlay
+- [X] Classe `ConfirmModal` com método estático `show(options)`
+- [X] Options: `{ title, message, confirmText, cancelText, type, icon, onConfirm, onCancel }`
+- [X] Retorna `Promise<boolean>` (true = confirmou, false = cancelou)
+- [X] Função `loadTheme(yamlContent)` que parseia YAML e aplica variáveis CSS
+- [X] Gerencia estado: fecha modal anterior antes de abrir novo
+- [X] Cria DOM dinamicamente (sem HTML estático no index.html)
+- [X] Suporte a fechar com ESC e clique no overlay
 
 ### 1.5 Incluir no index.html
-- [ ] Adicionar `<script src="vendor/js-yaml.min.js">`
-- [ ] Adicionar `<link href="vendor/fontawesome/all.min.css" rel="stylesheet">`
-- [ ] Adicionar `<script src="modules/confirm-modal.js">`
+- [X] Adicionar `<script src="vendor/js-yaml.min.js">`
+- [X] Adicionar `<link href="vendor/fontawesome/all.min.css" rel="stylesheet">`
+- [X] Adicionar `<script src="modules/confirm-modal.js">`
 
 ### 1.6 Testes manuais
-- [ ] Testar todos os tipos: primary, danger, warning, info
-- [ ] Testar fechamento com ESC
-- [ ] Testar fechamento com clique no overlay
-- [ ] Testar Promise resolve/reject
-- [ ] Testar que modal anterior fecha ao abrir novo
-- [ ] Testar carregamento do tema YAML
-- [ ] Testar aplicação das variáveis CSS
-- [ ] Testar ícones FA e emojis
+- [X] Testar todos os tipos: primary, danger, warning, info
+- [X] Testar fechamento com ESC
+- [X] Testar fechamento com clique no overlay
+- [X] Testar Promise resolve/reject
+- [X] Testar que modal anterior fecha ao abrir novo
+- [X] Testar carregamento do tema YAML
+- [X] Testar aplicação das variáveis CSS
+- [X] Testar ícones FA e emojis
 
 ### 1.7 Rodar verificação de qualidade
-- [ ] Rodar linter (se existir)
-- [ ] Verificar erros no console do browser
-- [ ] Corrigir qualquer problema encontrado
+- [X] Rodar linter (se existir)
+- [X] Verificar erros no console do browser
+- [X] Corrigir qualquer problema encontrado
 
 ---
 

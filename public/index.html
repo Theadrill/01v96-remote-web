@@ -13,9 +13,11 @@
     <title>01V96 - LIVE SAFE</title>
     <link href="style.css?v=1.0.10" rel="stylesheet" />
     <link href="modules/FXS/fx.css?v=1.0.2" rel="stylesheet" />
+    <link href="vendor/fontawesome/all.min.css" rel="stylesheet" />
     <!-- UI UPDATE: 2026-06-07 -->
     <script src="/vendor/socket.io.min.js"></script>
     <script src="/vendor/qrcode.min.js"></script>
+    <script src="/vendor/js-yaml/js-yaml.min.js"></script>
     <script>
         // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
         document.addEventListener('DOMContentLoaded', function () {
@@ -1377,8 +1379,8 @@
             <button onclick="document.getElementById('meterConfigModal').style.display='none'" class="meter-config-close">FECHAR</button>
         </div>
     </div>
-    <!-- Modal de Confirmação - ON do Canal Master -->
-    <div class="modal-overlay styled-masterOnConfirmModal" id="masterOnConfirmModal">
+    <!-- Modal de Confirmação - ON do Canal Master (Oculto — usando ConfirmModal) -->
+    <div class="modal-overlay styled-masterOnConfirmModal" id="masterOnConfirmModal" style="display:none">
         <div class="modal-content master-on-confirm-content">
             <div class="master-on-confirm-row">
                 <span id="masterOnConfirmTitle" class="meter-config-section-title">DESLIGAR CANAL MASTER</span>
@@ -1502,6 +1504,7 @@
         }
     </script>
     <script src="app.js"></script>
+    <script src="modules/confirm-modal.js"></script>
 
     <!-- Mobile Menu Modal Overlay -->
     <div id="mobileMenuModal" class="mobile-menu-modal-overlay"
