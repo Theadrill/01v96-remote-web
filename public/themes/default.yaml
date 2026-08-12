@@ -61,7 +61,7 @@ confirm_modal:
   icon_size: "24px"
 
   # Z-index (sempre alto pois é última etapa do fluxo)
-  z_index: "15000"
+  z_index: "999999"
 
 
 # ─── FUTUROS COMPONENTES ──────────────────────────────────────

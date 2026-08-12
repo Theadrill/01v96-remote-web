@@ -9246,7 +9246,7 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--confirm-modal-z-index, 15000);
+    z-index: var(--confirm-modal-z-index, 999999);
     opacity: 0;
     transition: opacity 0.2s ease;
 }

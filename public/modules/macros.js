@@ -398,18 +398,26 @@ function askDeletePreset(name) {
     presetToDelete = name;
     const isProtected = protectedPresets.includes(name);
 
-    const confirmBtn = document.querySelector('#macroDeleteConfirmModal .btn-connect');
-    const modalText = document.getElementById('deleteConfirmText');
-
     if (isProtected) {
-        modalText.innerText = `Impossível deletar preset padrão gerado automaticamente [${name.toUpperCase()}]`;
-        if (confirmBtn) confirmBtn.style.display = 'none';
-    } else {
-        modalText.innerText = `Deseja deletar o preset [${name.toUpperCase()}]?`;
-        if (confirmBtn) confirmBtn.style.display = 'flex';
+        ConfirmModal.show({
+            title: 'Atenção!',
+            message: `Impossível deletar preset padrão gerado automaticamente [${name.toUpperCase()}]`,
+            type: 'warning',
+            showCancel: false,
+            confirmText: 'OK'
+        });
+        return;
     }
 
-    document.getElementById('macroDeleteConfirmModal').style.display = 'flex';
+    ConfirmModal.show({
+        title: 'Atenção!',
+        message: `Deseja deletar o preset [${name.toUpperCase()}]?`,
+        type: 'danger',
+        confirmText: 'DELETAR',
+        cancelText: 'CANCELAR'
+    }).then(function(ok) {
+        if (ok) confirmDeletePreset();
+    });
 }
 
 window.confirmDeletePreset = async function () {
@@ -418,7 +426,6 @@ window.confirmDeletePreset = async function () {
         const res = await fetch(`/api/macros/slots?preset=${presetToDelete}`, { method: 'DELETE' });
         if (res.ok) {
             console.log(`🗑️ Preset [${presetToDelete}] deletado.`);
-            document.getElementById('macroDeleteConfirmModal').style.display = 'none';
             if (currentPreset === presetToDelete) currentPreset = 'default';
             openPresetPicker(); // Atualiza a lista
         }
