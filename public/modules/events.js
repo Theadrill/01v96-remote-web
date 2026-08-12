@@ -594,24 +594,30 @@ function restrictSliderTrackTap(e) {
         let clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
 
         let clickPosPx, thumbPosPx;
+        let threshold;
 
         if (isVertical) {
+            // Mobile (vertical): corrige posição do thumb considerando seu tamanho real
+            const thumbSize = 40;
             clickPosPx = clientY - rect.top;
-            thumbPosPx = (1 - percent) * rect.height;
+            thumbPosPx = (1 - percent) * (rect.height - thumbSize) + thumbSize / 2;
+            threshold = thumbSize / 2 + 6; // ~26px: só permite tocar DENTRO do thumb
         } else {
+            // Desktop (horizontal): mantém comportamento original
             clickPosPx = clientX - rect.left;
             thumbPosPx = percent * rect.width;
+            threshold = 45;
         }
 
         const distance = Math.abs(clickPosPx - thumbPosPx);
-        const threshold = 45; // Tolerância para tocar no botão real
 
         if (distance > threshold) {
-            if (e.type === 'pointerdown' && e.pointerType === 'mouse') {
-                e.preventDefault(); // Mouse: podemos bloquear
-            } else if (e.type === 'touchstart' || e.pointerType === 'touch') {
-                // Em touch, se evitarmos preventDefault, a página poderá rolar (o que o usuário quer).
-                // Para impedir o salto estúpido, "desativamos" o input por um flash de tempo.
+            if (e.type === 'pointerdown') {
+                // Previne o salto do thumb no browser (mouse E touch)
+                e.preventDefault();
+            }
+            if (e.type === 'touchstart' || e.pointerType === 'touch') {
+                // Fallback: desabilita o input temporariamente como segurança
                 input.disabled = true;
                 setTimeout(() => { input.disabled = false; }, 600);
             }
