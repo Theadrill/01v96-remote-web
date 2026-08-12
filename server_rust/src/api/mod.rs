@@ -2,6 +2,7 @@ pub mod custom_scene_history;
 pub mod macros;
 pub mod names;
 pub mod system;
+pub mod themes;
 
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -15,4 +16,5 @@ pub fn router(
         .merge(macros::router(state.clone(), csm.clone(), io))
         .merge(system::router(state.clone()))
         .merge(names::router(state, csm))
+        .nest("/themes", themes::router())
 }

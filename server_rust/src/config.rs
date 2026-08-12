@@ -88,10 +88,19 @@ pub struct AppConfig {
     #[serde(default = "default_time_between_fxs_requests")]
     pub time_between_fxs_requests: u64,
 
+    #[serde(default = "default_active_theme")]
+    pub active_theme: String,
+
+    #[serde(default)]
+    pub ninja_sync_themes: bool,
 
     // Dados carregados dos outros JSONs
     #[serde(skip)]
     pub steps: serde_json::Value,
+}
+
+fn default_active_theme() -> String {
+    "default.yaml".to_string()
 }
 
 fn default_port() -> u16 {
@@ -361,6 +370,8 @@ impl AppConfig {
             monitoring_buffer_size: default_monitoring_buffer_size(),
             monitoring_format: default_monitoring_format(),
             time_between_fxs_requests: default_time_between_fxs_requests(),
+            active_theme: default_active_theme(),
+            ninja_sync_themes: false,
             steps: serde_json::Value::Null,
         }
 

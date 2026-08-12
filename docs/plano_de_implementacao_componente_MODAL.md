@@ -197,12 +197,12 @@ CSS variables: `--virtual-keyboard-*` (ex: `--virtual-keyboard-key-bg`)
 > ⚠️ **PARADA EXPLÍCITA** — Só iniciar após Fase 2 completa e aprovada.
 
 ### 3.1 Endpoints Backend (Rust)
-- [ ] Criar handler para listar temas na pasta `public/themes/` (`GET /api/themes`)
-- [ ] Criar handler para obter o conteúdo de um tema (`GET /api/themes/:name`)
-- [ ] Criar handler para salvar/criar um tema (`POST /api/themes/:name`)
-- [ ] Criar handler para excluir um tema (`DELETE /api/themes/:name`)
-- [ ] Criar handler para obter e persistir o tema ativo no `config.json` (`GET/POST /api/themes/active`)
-- [ ] Adicionar suporte a sincronização no servidor para integração com o **Ninja Sync** (armazenando na pasta `shared/` / nuvem)
+- [X] Criar handler para listar temas na pasta `public/themes/` (`GET /api/themes`)
+- [X] Criar handler para obter o conteúdo de um tema (`GET /api/themes/:name`)
+- [X] Criar handler para salvar/criar um tema (`POST /api/themes/:name`)
+- [X] Criar handler para excluir um tema (`DELETE /api/themes/:name`)
+- [X] Criar handler para obter e persistir o tema ativo no `config.json` (`GET/POST /api/themes/active`)
+- [X] Adicionar suporte a sincronização no servidor para integração com o **Ninja Sync** (armazenando na pasta `shared/` / nuvem)
 
 ### 3.2 Componente Customizado `ColorPicker` (iOS / Touch Friendly)
 - [ ] Criar `public/modules/color-picker.js` (componente reutilizável de seleção de cor)
