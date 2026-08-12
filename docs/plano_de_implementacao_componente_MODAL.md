@@ -120,7 +120,7 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 |---|----------|---------|------|--------------|--------|
 | 1 | `masterOnConfirmModal` | channel_strip.js | Sim/Não perigo | Média | [X] |
 | 2 | `customConfirmModal` | copy_paste.js | Sim/Não | Baixa | [X] |
-| 3 | `restoreConfirmModal` | index.html | Sim/Não perigo | Baixa | [ ] |
+| 3 | `restoreConfirmModal` | index.html | Sim/Não perigo | Baixa | [X] |
 | 4 | `logoutConfirmModal` | index.html | Sim/Não | Baixa | [ ] |
 | 5 | `macroDeleteConfirmModal` | index.html | Sim/Não perigo | Baixa | [ ] |
 | 6 | `sceneDeleteModal` | index.html | Sim/Não perigo | Baixa | [ ] |

@@ -448,13 +448,23 @@ window.showRestoreVersionsModal = function(file, source, versions) {
 
 window.openRestoreConfirm = function(commitSha, source) {
     window.pendingRestore = { file: window.detailsSceneFile, source: source, commit_sha: commitSha };
-    document.getElementById('restoreConfirmModal').style.display = 'flex';
+
+    ConfirmModal.show({
+        title: 'Confirmar Restauração',
+        message: 'Tem certeza que deseja substituir os nomes atuais pelos nomes da versão selecionada?',
+        type: 'warning',
+        confirmText: 'SIM, RESTAURAR',
+        cancelText: 'CANCELAR'
+    }).then(function(ok) {
+        if (ok) {
+            confirmRestoreScene();
+        }
+    });
 };
 
 window.confirmRestoreScene = function() {
     const pending = window.pendingRestore;
     if (!pending) return;
-    document.getElementById('restoreConfirmModal').style.display = 'none';
     const overlay = typeof OverlayInfo !== 'undefined' && OverlayInfo.show;
 
     fetch('/api/custom-scenes/restore', {
