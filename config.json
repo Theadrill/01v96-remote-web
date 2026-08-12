@@ -4,7 +4,7 @@
   "loopmidi-monitor": false,
   "open_browser_startup": false,
   "use_canvas": false,
-  "demo_mode": true,
+  "demo_mode": false,
   "lumikit_ips": [
     "192.168.15.99",
     "192.168.1.111"
@@ -45,5 +45,7 @@
   "eq_flat_skip_hpf_lpf": true,
   "monitoring_buffer_size": 960,
   "monitoring_format": "pcm",
-  "time_between_fxs_requests": 150
+  "time_between_fxs_requests": 150,
+  "active_theme": "teste_copia_copia.yaml",
+  "ninja_sync_themes": true
 }

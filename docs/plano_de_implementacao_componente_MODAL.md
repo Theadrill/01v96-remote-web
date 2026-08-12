@@ -22,7 +22,7 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 - **NÃO** prosseguir para a próxima fase sem autorização
 - Fases:
   - [X] **FASE 1** — Criação do Componente (INDEPENDENTE)
-  - [ ] **FASE 2** — Refatoração dos Modais Existentes
+  - [X] **FASE 2** — Refatoração dos Modais Existentes
   - [X] **FASE 3** — Painel de Configuração de Temas
 
 ---
