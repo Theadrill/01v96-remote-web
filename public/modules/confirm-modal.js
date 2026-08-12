@@ -151,7 +151,8 @@ var ConfirmModal = (function () {
         _hasInput = false;
 
         if (message) {
-            var msgEl = _el('div', { className: 'confirm-modal-message', textContent: message });
+            var msgEl = _el('div', { className: 'confirm-modal-message' });
+            msgEl.innerHTML = message;
             _bodyEl.appendChild(msgEl);
         }
 

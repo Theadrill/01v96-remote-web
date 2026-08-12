@@ -422,53 +422,22 @@ function getOutPortName(type, portIdx) {
 }
 
 window.showInsertOutConfirmModal = function(chIdx, type, portIdx, srcValue, currentAssignedSrc) {
-    const overlay = document.getElementById('insertConfirmModalOverlay') || createInsertConfirmModalOverlay();
-    const modal = document.getElementById('insertConfirmModalContent');
-    
     const currentName = getOutSourceName(currentAssignedSrc, type);
     const newName = getOutSourceName(srcValue, type);
     const portName = getOutPortName(type, portIdx);
 
-    const html = `
-        <div style="padding: 20px; text-align: center;">
-            <h3 style="margin-top:0; color:#dc3545; margin-bottom:15px;"><i class="fas fa-exclamation-triangle"></i> ATENÇÃO</h3>
-            <p style="color:#ddd; margin-bottom: 20px; font-size: 14px;">
-                A porta <strong>${portName}</strong> já está sendo usada por <strong>${currentName}</strong>.<br><br>
-                Deseja alterar o roteamento para <strong>${newName}</strong>?
-            </p>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="confirmInsertOut(${chIdx}, '${type}', ${portIdx}, ${srcValue})" style="flex:1; height:45px; background:#dc3545; border:none; color:#fff; border-radius:8px; font-weight:bold;">SIM</button>
-                <button onclick="closeInsertConfirmModal()" style="flex:1; height:45px; background:#444; border:none; color:#fff; border-radius:8px; font-weight:bold;">NÃO</button>
-            </div>
-        </div>
-    `;
-    modal.innerHTML = html;
-    overlay.style.display = 'flex';
+    ConfirmModal.show({
+        title: 'ATENÇÃO',
+        message: `A porta <strong>${portName}</strong> já está sendo usada por <strong>${currentName}</strong>.<br><br>Deseja alterar o roteamento para <strong>${newName}</strong>?`,
+        type: 'danger',
+        confirmText: 'SIM',
+        cancelText: 'NÃO'
+    }).then(function(ok) {
+        if (ok) {
+            executeSetInsertOut(chIdx, type, portIdx, srcValue);
+        }
+    });
 };
-
-window.confirmInsertOut = function(chIdx, type, portIdx, srcValue) {
-    closeInsertConfirmModal();
-    executeSetInsertOut(chIdx, type, portIdx, srcValue);
-};
-
-window.closeInsertConfirmModal = function() {
-    const overlay = document.getElementById('insertConfirmModalOverlay');
-    if (overlay) overlay.style.display = 'none';
-};
-
-function createInsertConfirmModalOverlay() {
-    const overlay = document.createElement('div');
-    overlay.id = 'insertConfirmModalOverlay';
-    overlay.classList.add('modal-overlay');
-    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:10005;';
-    const content = document.createElement('div');
-    content.id = 'insertConfirmModalContent';
-    content.style.cssText = 'background:#111; width:90%; max-width:350px; border-radius:15px; border:1px solid #444;';
-    overlay.addEventListener('click', function(e) { if(e.target === overlay) overlay.style.display = 'none'; });
-    overlay.appendChild(content);
-    document.body.appendChild(overlay);
-    return overlay;
-}
 
 window.closeInsertOutModal = function() {
     const overlay = document.getElementById('insertOutModalOverlay');

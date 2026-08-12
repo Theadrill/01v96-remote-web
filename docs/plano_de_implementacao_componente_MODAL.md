@@ -128,7 +128,7 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 | 8 | `macroSyncConfirmModal` | index.html | Sim/Não | Baixa | [X] |
 | 9 | `macroSyncDisableModal` | index.html | 3 opções | Média | [X] |
 | 10 | `copyOptionsModal` | index.html | 3 opções | Média | [X] |
-| 11 | `insertConfirmModal` | inserts.js | Sim/Não perigo | Baixa | [ ] |
+| 11 | `insertConfirmModal` | inserts.js | Sim/Não perigo | Baixa | [X] |
 
 ### Pré-requisito: Componente VirtualKeyboard
 

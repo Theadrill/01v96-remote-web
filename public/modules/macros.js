@@ -408,7 +408,7 @@ function askDeletePreset(name) {
     if (isProtected) {
         ConfirmModal.show({
             title: 'Atenção!',
-            message: `Impossível deletar preset padrão gerado automaticamente [${name.toUpperCase()}]`,
+            message: `Impossível deletar preset padrão gerado automaticamente [<strong>${name.toUpperCase()}</strong>]`,
             type: 'warning',
             showCancel: false,
             confirmText: 'OK'
@@ -418,7 +418,7 @@ function askDeletePreset(name) {
 
     ConfirmModal.show({
         title: 'Atenção!',
-        message: `Deseja deletar o preset [${name.toUpperCase()}]?`,
+        message: `Deseja deletar o preset [<strong>${name.toUpperCase()}</strong>]?`,
         type: 'danger',
         confirmText: 'DELETAR',
         cancelText: 'CANCELAR'

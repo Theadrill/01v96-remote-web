@@ -212,8 +212,8 @@ function _buildSceneBtn(scene, action, modal) {
         if (scene.isEmpty) return;
 
         ConfirmModal.show({
-            title: '⚠️ Deleção',
-            message: `Deseja DELETAR a cena ${scene.index} (${scene.name})? Todos os dados desta cena serão removidos permanentemente.`,
+            title: 'Deletar Cena',
+            message: `Deseja <strong>DELETAR</strong> a cena <strong>${scene.index} (${scene.name})</strong>? Todos os dados desta cena serão removidos permanentemente.`,
             type: 'danger',
             confirmText: 'DELETAR',
             cancelText: 'CANCELAR'
@@ -256,7 +256,7 @@ function _openConfirmModal(scene, action, gridModal) {
     if (action === 'load') {
         ConfirmModal.show({
             title: 'CARREGAR CENA?',
-            message: `Deseja CARREGAR a cena ${scene.index} (${scene.name})?\n\nISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`,
+            message: `Deseja CARREGAR a cena <strong>${scene.index} (${scene.name})</strong>?<br><br>ISSO SUBSTITUIRÁ A MIXAGEM ATUAL.`,
             type: 'warning',
             confirmText: 'SIM, CARREGAR',
             cancelText: 'CANCELAR'
@@ -271,7 +271,7 @@ function _openConfirmModal(scene, action, gridModal) {
         var defaultValue = (!scene.isEmpty && scene.name) ? scene.name : (window.currentSceneName || '');
         ConfirmModal.show({
             title: 'SALVAR CENA?',
-            message: `Deseja SALVAR a mixagem atual no slot ${scene.index}?`,
+            message: `Deseja SALVAR a mixagem atual no slot <strong>${scene.index}</strong>?`,
             type: 'danger',
             confirmText: 'SIM, SALVAR',
             cancelText: 'CANCELAR',
