@@ -319,18 +319,43 @@ var ConfirmModal = (function () {
         if (vk.keyboard_gap)        root.style.setProperty('--virtual-keyboard-gap', vk.keyboard_gap);
     }
 
+    function _alert(message, title, type) {
+        return _show({
+            title: title || 'AVISO',
+            message: message || '',
+            type: type || 'info',
+            confirmText: 'OK',
+            showCancel: false
+        });
+    }
+
     // ─── API pública ────────────────────────────────────────────
 
     return {
         show: _show,
+        alert: _alert,
         loadTheme: _loadTheme
     };
 })();
 
-// Auto-carregar tema no boot
+// Auto-carregar tema ativo no boot
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('themes/default.yaml')
-        .then(function (r) { return r.text(); })
-        .then(function (yaml) { ConfirmModal.loadTheme(yaml); })
-        .catch(function (e) { console.warn('[ConfirmModal] Tema não carregado:', e); });
+    fetch('/api/themes/active')
+        .then(function (r) {
+            if (!r.ok) throw new Error('Erro ao buscar tema ativo');
+            return r.json();
+        })
+        .then(function (data) {
+            if (data && data.content && typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
+                ConfirmModal.loadTheme(data.content);
+            } else {
+                throw new Error('Conteúdo do tema ativo vazio');
+            }
+        })
+        .catch(function (e) {
+            console.warn('[ConfirmModal] Fallback para default.yaml:', e);
+            fetch('themes/default.yaml')
+                .then(function (r) { return r.text(); })
+                .then(function (yaml) { ConfirmModal.loadTheme(yaml); });
+        });
 });

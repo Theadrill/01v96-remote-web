@@ -266,7 +266,7 @@
             <!-- Seção de Temas & Aparência -->
             <div class="config-section" style="margin-top: 15px;">
                 <p class="config-section-header">🎨 Temas & Aparência</p>
-                <button class="btn-connect" style="background:#1976d2; color:#fff; width:100%; margin-top:8px; padding:12px; font-weight:bold; border-radius:8px;" onclick="ThemeManager.openModal()">
+                <button class="btn-connect" style="width: 100%; margin-top: 8px; background: #1976d2; color: #fff;" onclick="ThemeManager.openModal()">
                     GERENCIAR TEMAS E CORES
                 </button>
             </div>
@@ -1299,6 +1299,7 @@
     <script src="modules/virtual-keyboard.js"></script>
     <script src="modules/color-picker.js"></script>
     <script src="modules/theme-manager.js"></script>
+    <script src="modules/theme-editor.js"></script>
 
     <!-- Modal de Gerenciamento de Temas (Fase 3.3) -->
     <div class="modal-overlay" id="themeManagerModal" style="display: none; z-index: 14000;">
@@ -1330,6 +1331,31 @@
 
             <div style="margin-top: 15px; text-align: right;">
                 <button class="btn-close" style="width: 100%; padding: 12px; font-weight: bold; border-radius: 8px;" onclick="ThemeManager.closeModal()">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Editor Visual de Temas (Fase 3.4 & 3.5) -->
+    <div class="modal-overlay" id="themeEditorModal" style="display: none; z-index: 15000;">
+        <div class="modal-content" style="max-width: 600px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; background: #1e1e1e; border: 1px solid #333; border-radius: 12px; color: #fff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 12px;">
+                <span id="themeEditorTitle" style="font-size: 1.2rem; font-weight: bold;">✏️ Editor de Tema</span>
+                <button style="background: transparent; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer;" onclick="ThemeEditor.close()">&times;</button>
+            </div>
+
+            <!-- Banner Somente Leitura (Fase 3.5 Proteção do default.yaml) -->
+            <div id="themeEditorReadOnlyBanner" class="te-readonly-banner" style="display: none;">
+                🛡️ ESTE É O TEMA PADRÃO DO SISTEMA (MODO SOMENTE LEITURA)
+            </div>
+
+            <!-- Container das Seções Auto-Categorizadas -->
+            <div id="themeEditorSections" style="flex: 1; overflow-y: auto; margin-bottom: 15px;">
+                <div class="theme-loading">⏳ Carregando estrutura do tema...</div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-close" style="flex: 1; padding: 12px; font-weight: bold; border-radius: 8px;" onclick="ThemeEditor.close()">CANCELAR</button>
+                <button id="themeEditorSaveBtn" class="btn-connect theme-btn-apply" style="flex: 1; padding: 12px; font-weight: bold; border-radius: 8px;" onclick="ThemeEditor.saveTheme()">SALVAR TEMA</button>
             </div>
         </div>
     </div>

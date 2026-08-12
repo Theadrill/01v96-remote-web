@@ -143,7 +143,9 @@ var ThemeManager = (function () {
             }
         } catch (e) {
             console.error('[ThemeManager] Erro ao aplicar tema:', e);
-            alert('Erro ao aplicar tema: ' + e.message);
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.alert) {
+                ConfirmModal.alert('Erro ao aplicar tema: ' + e.message, 'ERRO', 'danger');
+            }
         }
     }
 
@@ -201,7 +203,9 @@ var ThemeManager = (function () {
                 ThemeEditor.open(cleanName);
             }
         } catch (e) {
-            alert('Erro ao criar novo tema: ' + e.message);
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.alert) {
+                ConfirmModal.alert('Erro ao criar novo tema: ' + e.message, 'ERRO', 'danger');
+            }
         }
     }
 
@@ -248,7 +252,9 @@ var ThemeManager = (function () {
 
             await loadThemeList();
         } catch (e) {
-            alert('Erro ao duplicar tema: ' + e.message);
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.alert) {
+                ConfirmModal.alert('Erro ao duplicar tema: ' + e.message, 'ERRO', 'danger');
+            }
         }
     }
 
@@ -277,7 +283,9 @@ var ThemeManager = (function () {
 
             await loadThemeList();
         } catch (e) {
-            alert('Erro ao excluir tema: ' + e.message);
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.alert) {
+                ConfirmModal.alert('Erro ao excluir tema: ' + e.message, 'ERRO', 'danger');
+            }
         }
     }
 
@@ -311,7 +319,9 @@ var ThemeManager = (function () {
                 _ninjaSync = false;
             } catch (e) {
                 console.error('[ThemeManager] Erro ao alternar Ninja Sync:', e);
-                alert('Erro ao alternar Ninja Sync: ' + e.message);
+                if (typeof ConfirmModal !== 'undefined' && ConfirmModal.alert) {
+                    ConfirmModal.alert('Erro ao alternar Ninja Sync: ' + e.message, 'ERRO', 'danger');
+                }
                 if (toggleSync) toggleSync.checked = true;
             }
             return;
@@ -376,7 +386,9 @@ var ThemeManager = (function () {
             }
         } catch (e) {
             console.error('[ThemeManager] Erro na sincronização:', e);
-            alert('Erro ao ativar Ninja Sync: ' + e.message);
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.alert) {
+                ConfirmModal.alert('Erro ao ativar Ninja Sync: ' + e.message, 'ERRO', 'danger');
+            }
             if (toggleSync) toggleSync.checked = false;
         }
     }
@@ -398,11 +410,8 @@ var ThemeManager = (function () {
     }
 
     function editTheme(themeName) {
-        // Será integrado com o ThemeEditor (Fase 3.4)
         if (typeof ThemeEditor !== 'undefined' && ThemeEditor.open) {
             ThemeEditor.open(themeName);
-        } else {
-            alert(`O Editor de Temas para "${themeName}" estará disponível no próximo passo!`);
         }
     }
 

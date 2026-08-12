@@ -23,7 +23,7 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 - Fases:
   - [X] **FASE 1** — Criação do Componente (INDEPENDENTE)
   - [ ] **FASE 2** — Refatoração dos Modais Existentes
-  - [ ] **FASE 3** — Painel de Configuração de Temas
+  - [X] **FASE 3** — Painel de Configuração de Temas
 
 ---
 
@@ -218,26 +218,26 @@ CSS variables: `--virtual-keyboard-*` (ex: `--virtual-keyboard-key-bg`)
 - [X] Implementar botões de ação: `Novo Tema`, `Duplicar`, `Editar`, `Aplicar`, `Excluir`, `Restaurar Padrão`
 
 ### 3.4 Editor Visual Auto-Categorizado via YAML
-- [ ] Criar parser no JS que lê as chaves principais do YAML (`global:`, `confirm_modal:`, `virtual_keyboard:`, etc.)
-- [ ] Extrair os comentários `#` posicionados acima de cada chave de primeiro nível no YAML para utilizar como descrição da categoria
-- [ ] Implementar fallback gracioso caso não haja comentário `#`: formatar a chave de `snake_case` para **Title Case** e omitir o subtítulo de descrição suavemente
-- [ ] Renderizar automaticamente seções/cards (Accordions) por categoria com Título formatado + Descrição do comentário
-- [ ] Integrar campos de cor ao componente `ColorPicker` customizado
-- [ ] Implementar validação de sintaxe YAML via `js-yaml` antes de salvar
-- [ ] Garantir arquitetura 100% data-driven: novos componentes adicionados no `default.yaml` aparecem automaticamente no editor sem alterar o JS
+- [X] Criar parser no JS que lê as chaves principais do YAML (`global:`, `confirm_modal:`, `virtual_keyboard:`, etc.)
+- [X] Extrair os comentários `#` posicionados acima de cada chave de primeiro nível no YAML para utilizar como descrição da categoria
+- [X] Implementar fallback gracioso caso não haja comentário `#`: formatar a chave de `snake_case` para **Title Case** e omitir o subtítulo de descrição suavemente
+- [X] Renderizar automaticamente seções/cards (Accordions) por categoria com Título formatado + Descrição do comentário
+- [X] Integrar campos de cor ao componente `ColorPicker` customizado
+- [X] Implementar validação de sintaxe YAML via `js-yaml` antes de salvar
+- [X] Garantir arquitetura 100% data-driven: novos componentes adicionados no `default.yaml` aparecem automaticamente no editor sem alterar o JS
 
 ### 3.5 Proteção Inviolável do Tema Default (`default.yaml`)
-- [ ] Frontend: Ocultar/desabilitar os botões "Editar" e "Excluir" quando o tema `default.yaml` estiver selecionado
-- [ ] Frontend: Exibir o botão "Duplicar Tema" no lugar de editar para forçar a criação de uma cópia personalizável
-- [ ] Frontend: Caso o `default.yaml` seja aberto no editor, forçar formulário em modo somente-leitura (Read-Only) com aviso de proteção
-- [ ] Backend: Retornar HTTP 403 Forbidden caso haja qualquer tentativa de `POST` ou `DELETE` no endpoint `/api/themes/default`
-- [ ] Garantir que a ação "Restaurar Padrão" sempre aplique o `default.yaml` original como rota de segurança
+- [X] Frontend: Ocultar/desabilitar os botões "Editar" e "Excluir" quando o tema `default.yaml` estiver selecionado
+- [X] Frontend: Exibir o botão "Duplicar Tema" no lugar de editar para forçar a criação de uma cópia personalizável
+- [X] Frontend: Caso o `default.yaml` seja aberto no editor, forçar formulário em modo somente-leitura (Read-Only) com aviso de proteção
+- [X] Backend: Retornar HTTP 403 Forbidden caso haja qualquer tentativa de `POST` ou `DELETE` no endpoint `/api/themes/default`
+- [X] Garantir que a ação "Restaurar Padrão" sempre aplique o `default.yaml` original como rota de segurança
 
 ### 3.6 Persistência, Sincronização Ninja Sync e Reload
-- [ ] Salvar a escolha do tema ativo e a preferência do Ninja Sync na API do backend
-- [ ] Quando o Ninja Sync estiver ativo, espelhar a criação/edição/exclusão de temas no repositório compartilhado/nuvem
-- [ ] Executar `window.location.reload()` imediatamente após aplicar um novo tema para recarregar toda a aplicação com estilo limpo
-- [ ] Ao inicializar o app no boot, consultar a API para obter o tema ativo e carregar as variáveis CSS antes de renderizar a UI
+- [X] Salvar a escolha do tema ativo e a preferência do Ninja Sync na API do backend
+- [X] Quando o Ninja Sync estiver ativo, espelhar a criação/edição/exclusão de temas no repositório compartilhado/nuvem
+- [X] Executar `window.location.reload()` imediatamente após aplicar um novo tema para recarregar toda a aplicação com estilo limpo
+- [X] Ao inicializar o app no boot, consultar a API para obter o tema ativo e carregar as variáveis CSS antes de renderizar a UI
 
 ---
 

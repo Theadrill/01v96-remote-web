@@ -169,9 +169,20 @@ async fn list_themes() -> Result<Json<Vec<ThemeInfo>>, (StatusCode, Json<Value>)
 /// GET /api/themes/active
 async fn get_active_theme() -> Json<Value> {
     let config = AppConfig::load();
+    let themes_dir = get_themes_dir();
+    let theme_path = themes_dir.join(&config.active_theme);
+
+    let content = if theme_path.exists() {
+        fs::read_to_string(&theme_path).unwrap_or_default()
+    } else {
+        let default_path = themes_dir.join("default.yaml");
+        fs::read_to_string(&default_path).unwrap_or_default()
+    };
+
     Json(json!({
         "active_theme": config.active_theme,
-        "ninja_sync_themes": config.ninja_sync_themes
+        "ninja_sync_themes": config.ninja_sync_themes,
+        "content": content
     }))
 }
 
