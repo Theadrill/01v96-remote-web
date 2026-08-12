@@ -64,6 +64,31 @@ confirm_modal:
   z_index: "999999"
 
 
+# ─── VIRTUAL KEYBOARD ─────────────────────────────────────────
+# Teclado virtual reutilizável
+# Uso: VirtualKeyboard.create(targetInputId) → HTMLElement
+virtual_keyboard:
+  # Teclas
+  key_bg: "#333"
+  key_border: "1px solid #555"
+  key_color: "#fff"
+  key_height: "40px"
+  key_radius: "6px"
+  key_font_size: "16px"
+  key_font_weight: "bold"
+
+  # Backspace
+  backspace_bg: "#c62828"
+  backspace_border: "1px solid #e53935"
+
+  # Espaço
+  space_font_size: "14px"
+
+  # Layout
+  row_gap: "4px"
+  keyboard_gap: "4px"
+
+
 # ─── FUTUROS COMPONENTES ──────────────────────────────────────
 # Adicione novas seções conforme refatorar:
 #

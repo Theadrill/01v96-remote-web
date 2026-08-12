@@ -216,6 +216,21 @@ var ConfirmModal = (function () {
 
         // Z-index
         if (cm.z_index) root.style.setProperty('--confirm-modal-z-index', cm.z_index);
+
+        // Virtual Keyboard
+        var vk = theme.virtual_keyboard || {};
+        if (vk.key_bg)              root.style.setProperty('--virtual-keyboard-key-bg', vk.key_bg);
+        if (vk.key_border)          root.style.setProperty('--virtual-keyboard-key-border', vk.key_border);
+        if (vk.key_color)           root.style.setProperty('--virtual-keyboard-key-color', vk.key_color);
+        if (vk.key_height)          root.style.setProperty('--virtual-keyboard-key-height', vk.key_height);
+        if (vk.key_radius)          root.style.setProperty('--virtual-keyboard-key-radius', vk.key_radius);
+        if (vk.key_font_size)       root.style.setProperty('--virtual-keyboard-key-font-size', vk.key_font_size);
+        if (vk.key_font_weight)     root.style.setProperty('--virtual-keyboard-key-font-weight', vk.key_font_weight);
+        if (vk.backspace_bg)        root.style.setProperty('--virtual-keyboard-backspace-bg', vk.backspace_bg);
+        if (vk.backspace_border)    root.style.setProperty('--virtual-keyboard-backspace-border', vk.backspace_border);
+        if (vk.space_font_size)     root.style.setProperty('--virtual-keyboard-space-font-size', vk.space_font_size);
+        if (vk.row_gap)             root.style.setProperty('--virtual-keyboard-row-gap', vk.row_gap);
+        if (vk.keyboard_gap)        root.style.setProperty('--virtual-keyboard-gap', vk.keyboard_gap);
     }
 
     // ─── API pública ────────────────────────────────────────────

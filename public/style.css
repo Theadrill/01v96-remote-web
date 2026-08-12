@@ -5456,15 +5456,28 @@ body.layout-desktop .dock-close {
 }
 
 /* --- TECLADO VIRTUAL --- */
-.vk-btn {
-    background: #333;
-    border: 1px solid #555;
-    color: #fff;
-    border-radius: 6px;
-    height: 40px;
+.virtual-keyboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--virtual-keyboard-gap, 4px);
+    width: 100%;
+    margin-top: 10px;
+}
+
+.virtual-keyboard-row {
+    display: flex;
+    gap: var(--virtual-keyboard-row-gap, 4px);
+}
+
+.virtual-keyboard-btn {
+    background: var(--virtual-keyboard-key-bg, #333);
+    border: var(--virtual-keyboard-key-border, 1px solid #555);
+    color: var(--virtual-keyboard-key-color, #fff);
+    border-radius: var(--virtual-keyboard-key-radius, 6px);
+    height: var(--virtual-keyboard-key-height, 40px);
     flex: 1;
-    font-size: 16px;
-    font-weight: bold;
+    font-size: var(--virtual-keyboard-key-font-size, 16px);
+    font-weight: var(--virtual-keyboard-key-font-weight, bold);
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     transition: background 0.1s;
@@ -5474,21 +5487,21 @@ body.layout-desktop .dock-close {
     padding: 0;
 }
 
-.vk-btn:active {
+.virtual-keyboard-btn:active {
     background: #555;
     transform: translateY(2px);
     box-shadow: none;
 }
 
-.vk-backspace {
-    background: #c62828;
-    border-color: #e53935;
+.virtual-keyboard-backspace {
+    background: var(--virtual-keyboard-backspace-bg, #c62828);
+    border-color: var(--virtual-keyboard-backspace-border, 1px solid #e53935);
     flex: 1.5;
 }
 
-.vk-space {
+.virtual-keyboard-space {
     flex: 5;
-    font-size: 14px;
+    font-size: var(--virtual-keyboard-space-font-size, 14px);
     letter-spacing: 2px;
 }
 
@@ -5512,12 +5525,12 @@ screen and (max-height: 600px) {
 
 /* Teclado Compacto no Celular Deitado (Landscape) */
 @media screen and (max-height: 500px) and (orientation: landscape) {
-    .vk-btn {
+    .virtual-keyboard-btn {
         height: 28px !important;
         font-size: 11px !important;
     }
 
-    .vk-space {
+    .virtual-keyboard-space {
         font-size: 9px !important;
     }
 

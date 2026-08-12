@@ -130,6 +130,59 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 | 10 | `copyOptionsModal` | index.html | 3 opções | Média | [ ] |
 | 11 | `insertConfirmModal` | inserts.js | Sim/Não perigo | Baixa | [ ] |
 
+### Pré-requisito: Componente VirtualKeyboard
+
+O `sceneConfirmModal` requer input de texto + teclado virtual. Para suportar isso:
+
+#### Arquitetura
+
+```
+VirtualKeyboard (componente puro, reutilizável)
+├── Usado por ConfirmModal (quando option.input está presente)
+├── Usado por SceneSearch (campo de pesquisa de cenas)
+└── Usado por qualquer outro lugar no futuro
+```
+
+#### Etapas
+
+1. **YAML `default.yaml`** — Nova seção `virtual_keyboard:` com variáveis CSS
+2. **`virtual-keyboard.js`** — Componente puro que gera teclado dinamicamente
+   - `VirtualKeyboard.create(targetInputId)` → HTMLElement
+   - Funções `vkType`, `vkBackspace` ficam internas (não poluem global)
+   - Usa classes `.vk-btn`, `.vk-backspace`, `.vk-space` com variáveis CSS
+3. **`confirm-modal.js`** — Estender `show()` com opção `input`
+   - `{ label, defaultValue, maxLength }` → renderiza input + VirtualKeyboard
+   - Retorna `{ confirmed: boolean, value?: string }` quando tem input
+   - Sem input → retorna `boolean` (compatibilidade)
+4. **`scene_grid.js`** — Refatorar `_openConfirmModal()`
+   - LOAD → `ConfirmModal.show()` simples
+   - SAVE → `ConfirmModal.show()` com `input`
+5. **`index.html`** — Limpar
+   - Remover `#virtualKeyboard` (dentro do sceneConfirmModal)
+   - Remover `#virtualKeyboardSearch` (substituir por uso do componente)
+   - Remover scripts inline `vkType`, `vkBackspace`, `startVkBackspace`, `stopVkBackspace`
+6. **`style.css`** — `.vk-btn` usa variáveis CSS; `.confirm-modal-input` + label
+
+#### Variáveis CSS do VirtualKeyboard (YAML)
+
+```yaml
+virtual_keyboard:
+  key_bg: "#333"
+  key_border: "1px solid #555"
+  key_color: "#fff"
+  key_height: "40px"
+  key_radius: "6px"
+  key_font_size: "16px"
+  key_font_weight: "bold"
+  backspace_bg: "#c62828"
+  backspace_border: "1px solid #e53935"
+  space_font_size: "14px"
+  row_gap: "4px"
+  keyboard_gap: "4px"
+```
+
+CSS variables: `--virtual-keyboard-*` (ex: `--virtual-keyboard-key-bg`)
+
 ### Processo de refatoração (para cada modal):
 1. [ ] Localizar HTML do modal no `index.html` (ou criação dinâmica no JS)
 2. [ ] Substituir lógica de abrir/fechar por `ConfirmModal.show()`
@@ -170,10 +223,11 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 |---------|------|
 | `public/vendor/js-yaml.min.js` | **NOVO** — lib YAML |
 | `public/vendor/fontawesome/` | **NOVO** — ícones |
-| `public/style.css` | Adicionar classes `.confirm-modal-*` |
+| `public/style.css` | Adicionar classes `.confirm-modal-*` + `.vk-btn` variáveis |
 | `public/modules/confirm-modal.js` | **NOVO** — componente |
+| `public/modules/virtual-keyboard.js` | **NOVO** — componente de teclado |
 | `public/themes/default.yaml` | **NOVO** — tema global |
-| `public/index.html` | Adicionar script/link tags + remover modais refatorados |
+| `public/index.html` | Adicionar script/link tags + remover modais/teclados refatorados |
 | `public/modules/copy_paste.js` | Refatorar uso de `customConfirmModal` |
 | `public/modules/channel_strip.js` | Refatorar uso de `masterOnConfirmModal` |
 | `public/modules/inserts.js` | Refatorar uso de `insertConfirmModal` |
