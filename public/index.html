@@ -262,6 +262,14 @@
             <select class="modal-select styled-offlineOverlay" id="sout"></select>
             <button class="btn-connect inline-style-4" onclick="forceSync()">MANUAL SYNC</button>
             <button class="btn-connect inline-style-5" onclick="restartServer()">REINICIAR SERVIDOR</button>
+
+            <!-- Seção de Temas & Aparência -->
+            <div class="config-section" style="margin-top: 15px;">
+                <p class="config-section-header">🎨 Temas & Aparência</p>
+                <button class="btn-connect" style="background:#1976d2; color:#fff; width:100%; margin-top:8px; padding:12px; font-weight:bold; border-radius:8px;" onclick="ThemeManager.openModal()">
+                    GERENCIAR TEMAS E CORES
+                </button>
+            </div>
             <!-- Seção DMX (Reset) -->
             <div class="config-section">
                 <p class="config-section-header">Sistema de Iluminação</p>
@@ -1290,6 +1298,41 @@
     <script src="modules/confirm-modal.js"></script>
     <script src="modules/virtual-keyboard.js"></script>
     <script src="modules/color-picker.js"></script>
+    <script src="modules/theme-manager.js"></script>
+
+    <!-- Modal de Gerenciamento de Temas (Fase 3.3) -->
+    <div class="modal-overlay" id="themeManagerModal" style="display: none; z-index: 14000;">
+        <div class="modal-content" style="max-width: 550px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; background: #1e1e1e; border: 1px solid #333; border-radius: 12px; color: #fff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 15px;">
+                <span style="font-size: 1.2rem; font-weight: bold;">🎨 Temas & Aparência</span>
+                <button style="background: transparent; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer;" onclick="ThemeManager.closeModal()">&times;</button>
+            </div>
+
+            <!-- Ninja Sync Control -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #2b2b2b; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #444;">
+                <span style="font-size: 0.95rem; font-weight: 600;">☁️ Sincronizar Temas na Nuvem (Ninja Sync)</span>
+                <label class="switch">
+                    <input id="toggleNinjaSyncThemes" onchange="ThemeManager.toggleNinjaSyncThemes(this.checked)" type="checkbox" />
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Barra de Ações Rápidas -->
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn-connect" style="flex: 1; background: #28a745; color: #fff; padding: 10px; border-radius: 8px; font-weight: bold;" onclick="ThemeManager.createNewTheme()">➕ NOVO TEMA</button>
+                <button class="btn-connect" style="flex: 1; background: #ffc107; color: #000; padding: 10px; border-radius: 8px; font-weight: bold;" onclick="ThemeManager.restoreDefaultTheme()">🔄 RESTAURAR PADRÃO</button>
+            </div>
+
+            <!-- Container da Lista de Temas -->
+            <div id="themeListContainer" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+                <div class="theme-loading">⏳ Carregando temas...</div>
+            </div>
+
+            <div style="margin-top: 15px; text-align: right;">
+                <button class="btn-close" style="width: 100%; padding: 12px; font-weight: bold; border-radius: 8px;" onclick="ThemeManager.closeModal()">FECHAR</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Mobile Menu Modal Overlay -->
     <div id="mobileMenuModal" class="mobile-menu-modal-overlay"

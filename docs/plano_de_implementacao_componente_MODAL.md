@@ -211,11 +211,11 @@ CSS variables: `--virtual-keyboard-*` (ex: `--virtual-keyboard-key-bg`)
 - [X] Testar em navegadores WebKit/iOS (iPhone/iPad) para garantir 100% de compatibilidade sem usar o `<input type="color">` nativo
 
 ### 3.3 Painel de Gerenciamento de Temas (UI)
-- [ ] Criar modal/seção "🎨 Temas & Aparência" no menu de configurações
-- [ ] Exibir o tema ativo com selo visual
-- [ ] Listar todos os temas disponíveis carregados dinamicamente via `GET /api/themes`
-- [ ] Adicionar controle Toggle Switch `☁️ Sincronizar Temas na Nuvem (Ninja Sync)`
-- [ ] Implementar botões de ação: `Novo Tema`, `Duplicar`, `Editar`, `Aplicar`, `Excluir`, `Restaurar Padrão`
+- [X] Criar modal/seção "🎨 Temas & Aparência" no menu de configurações
+- [X] Exibir o tema ativo com selo visual
+- [X] Listar todos os temas disponíveis carregados dinamicamente via `GET /api/themes`
+- [X] Adicionar controle Toggle Switch `☁️ Sincronizar Temas na Nuvem (Ninja Sync)`
+- [X] Implementar botões de ação: `Novo Tema`, `Duplicar`, `Editar`, `Aplicar`, `Excluir`, `Restaurar Padrão`
 
 ### 3.4 Editor Visual Auto-Categorizado via YAML
 - [ ] Criar parser no JS que lê as chaves principais do YAML (`global:`, `confirm_modal:`, `virtual_keyboard:`, etc.)

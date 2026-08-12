@@ -9219,3 +9219,143 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
 .confirm-modal-btn:hover {
     filter: brightness(1.15);
 }
+
+/* ─── THEME MANAGER PANEL (FASE 3.3) ────────────────────────── */
+.theme-card {
+    background: #2b2b2b;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-card-active {
+    border-color: #28a745;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+}
+
+.theme-card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.theme-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.theme-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+.theme-badge-active {
+    background: #28a745;
+    color: #fff;
+}
+
+.theme-badge-default {
+    background: #1976d2;
+    color: #fff;
+}
+
+.theme-card-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.theme-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 8px 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    touch-action: manipulation;
+    transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.theme-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.theme-btn-apply {
+    background: #28a745;
+    color: #fff;
+}
+
+.theme-btn-active-label {
+    background: #1e3a1e;
+    color: #6c5;
+    cursor: default;
+    border: 1px solid #28a745;
+}
+
+.theme-btn-edit {
+    background: #1976d2;
+    color: #fff;
+}
+
+.theme-btn-dup {
+    background: #e67e22;
+    color: #fff;
+}
+
+.theme-btn-del {
+    background: #dc3545;
+    color: #fff;
+}
+
+.theme-btn-del:disabled {
+    background: #442222;
+    color: #885555;
+    cursor: not-allowed;
+}
+
+.theme-loading, .theme-empty, .theme-error {
+    text-align: center;
+    padding: 20px;
+    color: #aaa;
+    font-size: 0.95rem;
+}
+.theme-error { color: #ff6b6b; }
+
+/* Scrollbar estilizada do Container de Temas */
+#themeListContainer {
+    max-height: 380px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #3b82f6 #141824;
+}
+
+#themeListContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+#themeListContainer::-webkit-scrollbar-track {
+    background: #141824;
+    border-radius: 4px;
+}
+
+#themeListContainer::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 4px;
+}
+
+#themeListContainer::-webkit-scrollbar-thumb:hover {
+    background: #60a5fa;
+}

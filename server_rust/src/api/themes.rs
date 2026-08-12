@@ -1,7 +1,7 @@
 use axum::{
     extract::Path,
     http::StatusCode,
-    routing::{get},
+    routing::{get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -30,11 +30,18 @@ pub struct UpdateActiveThemePayload {
     pub ninja_sync_themes: Option<bool>,
 }
 
+#[derive(Deserialize, Debug)]
+pub struct SyncDirectionPayload {
+    pub direction: String,
+}
+
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_themes))
         .route("/active", get(get_active_theme).post(update_active_theme))
-        .route("/:name", get(get_theme).post(save_theme).delete(delete_theme))
+        .route("/compare", get(compare_themes))
+        .route("/sync_direction", post(set_sync_direction))
+        .route("/{name}", get(get_theme).post(save_theme).delete(delete_theme))
 }
 
 fn get_themes_dir() -> PathBuf {
@@ -193,6 +200,11 @@ async fn update_active_theme(
 
     if config.ninja_sync_themes {
         sync_themes_if_enabled(&config);
+        crate::api::macros::enqueue_git_sync(
+            vec!["data/shared/themes".to_string()],
+            "auto-sync: ninja sync themes enabled".to_string(),
+            3000,
+        ).await;
     }
 
     info!(
@@ -306,7 +318,12 @@ async fn save_theme(
     let config = AppConfig::load();
     if config.ninja_sync_themes {
         let shared_path = get_shared_themes_dir().join(&filename);
-        let _ = fs::write(shared_path, &yaml_content);
+        let _ = fs::write(&shared_path, &yaml_content);
+        crate::api::macros::enqueue_git_sync(
+            vec![format!("data/shared/themes/{}", filename)],
+            format!("auto-sync: theme {}", filename),
+            3000,
+        ).await;
     }
 
     info!("[THEMES] Tema salvou com sucesso: {}", filename);
@@ -360,7 +377,12 @@ async fn delete_theme(Path(name): Path<String>) -> Result<Json<Value>, (StatusCo
     if config.ninja_sync_themes {
         let shared_path = get_shared_themes_dir().join(&filename);
         if shared_path.exists() {
-            let _ = fs::remove_file(shared_path);
+            let _ = fs::remove_file(&shared_path);
+            crate::api::macros::enqueue_git_sync(
+                vec![format!("data/shared/themes/{}", filename)],
+                format!("auto-sync: deleted theme {}", filename),
+                3000,
+            ).await;
         }
     }
 
@@ -376,4 +398,129 @@ async fn delete_theme(Path(name): Path<String>) -> Result<Json<Value>, (StatusCo
         "success": true,
         "message": format!("Tema '{}' excluído com sucesso", filename)
     })))
+}
+
+/// GET /api/themes/compare
+async fn compare_themes() -> Json<Value> {
+    let public_dir = get_themes_dir();
+    let shared_dir = get_shared_themes_dir();
+
+    let mut differences = Vec::new();
+    let mut local_files = std::collections::HashMap::new();
+    let mut shared_files = std::collections::HashMap::new();
+
+    if let Ok(entries) = fs::read_dir(&public_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                    if name.ends_with(".yaml") || name.ends_with(".yml") {
+                        if let Ok(content) = fs::read_to_string(&path) {
+                            local_files.insert(name.to_string(), content);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if let Ok(entries) = fs::read_dir(&shared_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                    if name.ends_with(".yaml") || name.ends_with(".yml") {
+                        if let Ok(content) = fs::read_to_string(&path) {
+                            shared_files.insert(name.to_string(), content);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let mut all_keys: std::collections::HashSet<_> = local_files.keys().cloned().collect();
+    all_keys.extend(shared_files.keys().cloned());
+
+    for key in all_keys {
+        match (local_files.get(&key), shared_files.get(&key)) {
+            (Some(loc), Some(sha)) => {
+                if loc.trim() != sha.trim() {
+                    differences.push(json!({ "name": key, "status": "different" }));
+                }
+            }
+            (Some(_), None) => {
+                differences.push(json!({ "name": key, "status": "only_in_local" }));
+            }
+            (None, Some(_)) => {
+                differences.push(json!({ "name": key, "status": "only_in_shared" }));
+            }
+            (None, None) => {}
+        }
+    }
+
+    let identical = differences.is_empty();
+
+    Json(json!({
+        "identical": identical,
+        "differences": differences,
+        "local_count": local_files.len(),
+        "shared_count": shared_files.len()
+    }))
+}
+
+/// POST /api/themes/sync_direction
+async fn set_sync_direction(
+    Json(payload): Json<SyncDirectionPayload>,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    let public_dir = get_themes_dir();
+    let shared_dir = get_shared_themes_dir();
+    let mut config = AppConfig::load();
+
+    if payload.direction == "upload" {
+        // Copy public -> shared
+        if let Ok(entries) = fs::read_dir(&public_dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_file() {
+                    if let Some(name) = path.file_name() {
+                        let dest = shared_dir.join(name);
+                        let _ = fs::copy(&path, &dest);
+                    }
+                }
+            }
+        }
+        config.ninja_sync_themes = true;
+        config.save();
+
+        crate::api::macros::enqueue_git_sync(
+            vec!["data/shared/themes".to_string()],
+            "auto-sync: uploaded local themes to shared".to_string(),
+            3000,
+        ).await;
+
+        Ok(Json(json!({ "success": true, "direction": "upload", "ninja_sync_themes": true })))
+    } else if payload.direction == "download" {
+        // Copy shared -> public
+        if let Ok(entries) = fs::read_dir(&shared_dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_file() {
+                    if let Some(name) = path.file_name() {
+                        let dest = public_dir.join(name);
+                        let _ = fs::copy(&path, &dest);
+                    }
+                }
+            }
+        }
+        config.ninja_sync_themes = true;
+        config.save();
+
+        Ok(Json(json!({ "success": true, "direction": "download", "ninja_sync_themes": true })))
+    } else {
+        Err((
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "Direção de sincronização inválida" })),
+        ))
+    }
 }
