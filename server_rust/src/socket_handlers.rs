@@ -1541,6 +1541,7 @@ pub fn register_handlers(
                     return;
                 }
                 if let Some(index) = data.get("index").and_then(|v| v.as_u64()) {
+                    tracing::info!("SCENE Comando recebido: DELETAR Cena {}", index);
                     let delete_sysex = vec![
                         0xF0, 0x43, 0x10, 0x3E, 0x7F, 0x10, 0x60, 0x00, index as u8, 0xF7,
                     ];
