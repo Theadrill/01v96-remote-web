@@ -1,4 +1,8 @@
 {
+  "0": {
+    "name": "MACRO 1",
+    "scriptId": "lumikit"
+  },
   "1": {
     "color": "#ffffff",
     "name": "MACRO 2",
