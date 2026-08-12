@@ -475,20 +475,6 @@
             </div>
         </div>
     </div>
-    <!-- Modal de Confirmação Customizado para EQ -->
-    <div class="modal-overlay styled-customConfirmModal" id="customConfirmModal">
-        <div class="modal-content inline-style-23">
-            <h3 class="inline-style-24">
-                Confirmação de Cópia</h3>
-            <p class="styled-customConfirmMsg" id="customConfirmMsg">Deseja
-                colar as definições para este canal?</p>
-            <div class="inline-style-25">
-                <button class="styled-customConfirmOk" id="customConfirmOk">SIM,
-                    COLAR</button>
-                <button class="styled-customConfirmCancel" id="customConfirmCancel">CANCELAR</button>
-            </div>
-        </div>
-    </div>
     <!-- Modal de Edição de Nome do Canal -->
     <div class="modal-overlay styled-nameEditorModal" id="nameEditorModal">
         <div class="modal-content inline-style-26">
@@ -1377,21 +1363,6 @@
                 </div>
             </div>
             <button onclick="document.getElementById('meterConfigModal').style.display='none'" class="meter-config-close">FECHAR</button>
-        </div>
-    </div>
-    <!-- Modal de Confirmação - ON do Canal Master (Oculto — usando ConfirmModal) -->
-    <div class="modal-overlay styled-masterOnConfirmModal" id="masterOnConfirmModal" style="display:none">
-        <div class="modal-content master-on-confirm-content">
-            <div class="master-on-confirm-row">
-                <span id="masterOnConfirmTitle" class="meter-config-section-title">DESLIGAR CANAL MASTER</span>
-            </div>
-            <div class="master-on-confirm-row">
-                <span id="masterOnConfirmText" class="master-on-confirm-text">O canal master está LIGADO. Deseja DESLIGAR o áudio agora?</span>
-            </div>
-            <div class="master-on-confirm-btns">
-                <button id="masterOnConfirmYes" class="master-on-confirm-btn master-on-confirm-yes danger" onclick="confirmMasterOnApply()">SIM, DESLIGAR</button>
-                <button class="master-on-confirm-btn master-on-confirm-no" onclick="document.getElementById('masterOnConfirmModal').style.display='none'">CANCELAR</button>
-            </div>
         </div>
     </div>
     <!-- Overlay Info (gerenciado por overlay_info.js) -->

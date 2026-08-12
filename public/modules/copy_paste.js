@@ -36,21 +36,13 @@ window.executeCopyEQOnly = function() {
 };
 
 window.showCustomAlert = function(msg) {
-    const modal = document.getElementById('customConfirmModal');
-    const msgEl = document.getElementById('customConfirmMsg');
-    const okBtn = document.getElementById('customConfirmOk');
-    const cancelBtn = document.getElementById('customConfirmCancel');
-
-    msgEl.innerText = msg;
-    cancelBtn.style.display = 'none';
-    okBtn.innerText = 'OK';
-    modal.style.display = 'flex';
-
-    okBtn.onclick = () => {
-        modal.style.display = 'none';
-        cancelBtn.style.display = '';
-        okBtn.innerText = 'SIM';
-    };
+    ConfirmModal.show({
+        title: 'Aviso',
+        message: msg,
+        type: 'info',
+        confirmText: 'OK',
+        showCancel: false
+    });
 };
 
 window.executeCopyFullChannel = function() {
@@ -115,21 +107,15 @@ window.executeCopyFullChannel = function() {
 };
 
 window.showCustomConfirm = function(msg, onOk) {
-    const modal = document.getElementById('customConfirmModal');
-    const msgEl = document.getElementById('customConfirmMsg');
-    const okBtn = document.getElementById('customConfirmOk');
-    const cancelBtn = document.getElementById('customConfirmCancel');
-
-    msgEl.innerText = msg;
-    modal.style.display = 'flex';
-
-    okBtn.onclick = () => {
-        modal.style.display = 'none';
-        onOk();
-    };
-    cancelBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
+    ConfirmModal.show({
+        title: 'Confirmação de Cópia',
+        message: msg,
+        type: 'info',
+        confirmText: 'SIM',
+        cancelText: 'CANCELAR'
+    }).then(function(ok) {
+        if (ok) onOk();
+    });
 };
 
 window.pasteClipboard = function(ch) {

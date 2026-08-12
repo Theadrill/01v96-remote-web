@@ -111,15 +111,17 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 
 ## FASE 2 — Refatoração dos Modais Existentes
 > ⚠️ **PARADA EXPLÍCITA** — Só iniciar após Fase 1 completa e aprovada.
+>
+> **Flow:** Refatorar 1 modal por vez → aguardar teste do usuário → próximo modal.
 
 ### Modais a refatorar (por prioridade):
 
 | # | Modal ID | Arquivo | Tipo | Complexidade | Status |
 |---|----------|---------|------|--------------|--------|
-| 1 | `customConfirmModal` | copy_paste.js | Sim/Não | Baixa | [ ] |
-| 2 | `restoreConfirmModal` | index.html | Sim/Não perigo | Baixa | [ ] |
-| 3 | `logoutConfirmModal` | index.html | Sim/Não | Baixa | [ ] |
-| 4 | `masterOnConfirmModal` | channel_strip.js | Sim/Não perigo | Média | [ ] |
+| 1 | `masterOnConfirmModal` | channel_strip.js | Sim/Não perigo | Média | [X] |
+| 2 | `customConfirmModal` | copy_paste.js | Sim/Não | Baixa | [X] |
+| 3 | `restoreConfirmModal` | index.html | Sim/Não perigo | Baixa | [ ] |
+| 4 | `logoutConfirmModal` | index.html | Sim/Não | Baixa | [ ] |
 | 5 | `macroDeleteConfirmModal` | index.html | Sim/Não perigo | Baixa | [ ] |
 | 6 | `sceneDeleteModal` | index.html | Sim/Não perigo | Baixa | [ ] |
 | 7 | `sceneConfirmModal` | index.html | Sim/Não + input | Alta | [ ] |
@@ -133,8 +135,8 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 2. [ ] Substituir lógica de abrir/fechar por `ConfirmModal.show()`
 3. [ ] Remover HTML estático do `index.html` (se aplicável)
 4. [ ] Remover classes CSS órfãs do `style.css` (se aplicável)
-5. [ ] Testar funcionalidade
-6. [ ] Rodar linter/verificação de qualidade
+5. [ ] **PARADA — Aguardar teste do usuário**
+6. [ ] Só prosseguir para o próximo modal após aprovação
 
 ---
 

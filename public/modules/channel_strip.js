@@ -1076,31 +1076,14 @@ window.confirmMasterOn = function() {
         return;
     }
 
-    const modal = document.getElementById('masterOnConfirmModal');
-    if (!modal) return;
-
-    const titleEl = document.getElementById('masterOnConfirmTitle');
-    if (titleEl) titleEl.textContent = 'DESLIGAR CANAL MASTER';
-
-    const textEl = document.getElementById('masterOnConfirmText');
-    if (textEl) {
-        textEl.textContent = 'O canal master está LIGADO. Deseja DESLIGAR o áudio agora?';
-    }
-
-    const yesBtn = document.getElementById('masterOnConfirmYes');
-    if (yesBtn) {
-        yesBtn.textContent = 'SIM, DESLIGAR';
-        yesBtn.classList.add('danger');
-    }
-
-    modal.style.display = 'flex';
+    ConfirmModal.show({
+        title: 'DESLIGAR CANAL MASTER',
+        message: 'O canal master está LIGADO. Deseja DESLIGAR o áudio agora?',
+        type: 'danger',
+        confirmText: 'SIM, DESLIGAR',
+        cancelText: 'CANCELAR'
+    }).then(function(ok) {
+        if (ok) toggleState('kStereoChannelOn/kChannelOn', 'master');
+    });
 };
 
-/**
- * Aplica a mudança de estado do canal MASTER após confirmação.
- */
-window.confirmMasterOnApply = function() {
-    const modal = document.getElementById('masterOnConfirmModal');
-    if (modal) modal.style.display = 'none';
-    toggleState('kStereoChannelOn/kChannelOn', 'master');
-};
