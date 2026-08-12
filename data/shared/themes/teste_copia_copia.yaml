@@ -1,105 +1,40 @@
-# ════════════════════════════════════════════════════════════════
-# TEMA GLOBAL — 01V96 Remote Web
-# ════════════════════════════════════════════════════════════════
-#
-# Este arquivo define TODAS as variáveis CSS do projeto.
-# Para criar um novo tema, copie este arquivo, renomeie e edite.
-#
-# Estrutura por componente:
-#   - confirm_modal: Modal de confirmação reutilizável
-#   - sidebar:       Sidebar de navegação (futuro)
-#   - faders:        Área de faders (futuro)
-#   - header:        Cabeçalho (futuro)
-#   - eq:            Equalizador (futuro)
-#   - dynamics:      Gate/Compressor (futuro)
-#
-# Adicione novos componentes conforme forem sendo refatorados.
-# ════════════════════════════════════════════════════════════════
-
-
-# ─── OVERLAY GLOBAL ────────────────────────────────────────────
-# Usado por todos os modais do sistema
 global:
-  bg_overlay: "rgba(0, 0, 0, 0.85)"
-
-
-# ─── CONFIRM MODAL ─────────────────────────────────────────────
-# Modal de confirmação reutilizável (ConfirmModal)
-# Uso: ConfirmModal.show({ title, message, type })
+  bg_overlay: '#ffc107'
 confirm_modal:
-  # Fundo do card
-  bg_content: "#1a1a1a"
-  border_color: "#333"
-  border_radius: "12px"
-  padding: "24px"
-  max_width: "380px"
-
-  # Tipografia
-  text_primary: "#fff"
-  text_secondary: "#ccc"
-  text_muted: "#888"
-
-  # Botões - Cores
-  btn_primary: "#28a745"      # verde - ação positiva (SIM, CONFIRMAR)
-  btn_danger: "#dc3545"       # vermelho - ação destrutiva (DELETAR)
-  btn_warning: "#ffc107"      # amarelo - atenção
-  btn_info: "#1976d2"         # azul - informativo
-  btn_secondary: "#2b2b2b"    # cinza escuro - cancelar/voltar
-
-  # Botões - Dimensões
-  btn_height: "44px"
-  btn_radius: "8px"
-  btn_gap: "10px"
-  btn_font_weight: "800"
-  btn_letter_spacing: "0.5px"
-
-  # Ícones
-  icon_danger_color: "#dc3545"
-  icon_warning_color: "#ffc107"
-  icon_info_color: "#1976d2"
-  icon_success_color: "#28a745"
-  icon_size: "24px"
-
-  # Z-index (sempre alto pois é última etapa do fluxo)
-  z_index: "999999"
-
-
-# ─── VIRTUAL KEYBOARD ─────────────────────────────────────────
-# Teclado virtual reutilizável
-# Uso: VirtualKeyboard.create(targetInputId) → HTMLElement
+  bg_content: '#1a1a1a'
+  border_color: '#333'
+  border_radius: 12px
+  padding: 24px
+  max_width: 380px
+  text_primary: '#fff'
+  text_secondary: '#ccc'
+  text_muted: '#888'
+  btn_primary: '#28a745'
+  btn_danger: '#dc3545'
+  btn_warning: '#ffc107'
+  btn_info: '#1976d2'
+  btn_secondary: '#2b2b2b'
+  btn_height: 44px
+  btn_radius: 8px
+  btn_gap: 10px
+  btn_font_weight: '800'
+  btn_letter_spacing: 0.5px
+  icon_danger_color: '#dc3545'
+  icon_warning_color: '#ffc107'
+  icon_info_color: '#1976d2'
+  icon_success_color: '#28a745'
+  icon_size: 24px
+  z_index: '999999'
 virtual_keyboard:
-  # Teclas
-  key_bg: "#333"
-  key_border: "1px solid #555"
-  key_color: "#fff"
-  key_height: "40px"
-  key_radius: "6px"
-  key_font_size: "16px"
-  key_font_weight: "bold"
-
-  # Backspace
-  backspace_bg: "#c62828"
-  backspace_border: "1px solid #e53935"
-
-  # Espaço
-  space_font_size: "14px"
-
-  # Layout
-  row_gap: "4px"
-  keyboard_gap: "4px"
-
-
-# ─── FUTUROS COMPONENTES ──────────────────────────────────────
-# Adicione novas seções conforme refatorar:
-#
-# sidebar:
-#   ...
-#
-# faders:
-#   ...
-#
-# prompt_modal:       # Modal de prompt (input)
-#   ...
-#
-# alert_modal:        # Modal de alerta (só OK)
-#   ...
+  key_bg: '#333'
+  key_border: '1px solid #555'
+  key_color: '#fff'
+  key_height: 40px
+  key_radius: 6px
+  key_font_size: 16px
+  key_font_weight: bold
+  backspace_bg: '#c62828'
+  backspace_border: '1px solid #e53935'
+  space_font_size: 14px
+  row_gap: 4px
+  keyboard_gap: 4px
