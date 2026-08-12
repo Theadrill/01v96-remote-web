@@ -123,7 +123,7 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 | 3 | `restoreConfirmModal` | index.html | Sim/Não perigo | Baixa | [X] |
 | 4 | `logoutConfirmModal` | index.html | Sim/Não | Baixa | [X] |
 | 5 | `macroDeleteConfirmModal` | index.html | Sim/Não perigo | Baixa | [X] |
-| 6 | `sceneDeleteModal` | index.html | Sim/Não perigo | Baixa | [ ] |
+| 6 | `sceneDeleteModal` | index.html | Sim/Não perigo | Baixa | [X] |
 | 7 | `sceneConfirmModal` | index.html | Sim/Não + input | Alta | [ ] |
 | 8 | `macroSyncConfirmModal` | index.html | Sim/Não | Baixa | [ ] |
 | 9 | `macroSyncDisableModal` | index.html | 3 opções | Média | [ ] |

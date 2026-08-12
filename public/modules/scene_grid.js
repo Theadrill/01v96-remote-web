@@ -210,18 +210,20 @@ function _buildSceneBtn(scene, action, modal) {
     const handleLongPress = () => {
         isLongPress = true;
         if (scene.isEmpty) return;
-        const deleteModal = document.getElementById('sceneDeleteModal');
-        const deleteText  = document.getElementById('sceneDeleteText');
-        const deleteBtn   = document.getElementById('sceneDeleteActionBtn');
 
-        deleteText.innerHTML = `Deseja DELETAR a cena <b>${scene.index} (${scene.name})</b>?<br><br>Todos os dados desta cena serão removidos permanentemente.`;
-        deleteBtn.onclick = () => {
-            socket.emit('deleteScene', { index: scene.index });
-            deleteModal.style.display = 'none';
-            modal.style.display = 'none';
-            window.scenesLibrary = window.scenesLibrary.filter(s => s.index !== scene.index);
-        };
-        deleteModal.style.display = 'flex';
+        ConfirmModal.show({
+            title: '⚠️ Deleção',
+            message: `Deseja DELETAR a cena ${scene.index} (${scene.name})? Todos os dados desta cena serão removidos permanentemente.`,
+            type: 'danger',
+            confirmText: 'DELETAR',
+            cancelText: 'CANCELAR'
+        }).then(function(ok) {
+            if (ok) {
+                socket.emit('deleteScene', { index: scene.index });
+                modal.style.display = 'none';
+                window.scenesLibrary = window.scenesLibrary.filter(s => s.index !== scene.index);
+            }
+        });
     };
 
     const startLP  = () => { if (!scene.isEmpty) { isLongPress = false; longPressTimer = setTimeout(handleLongPress, 600); } };
