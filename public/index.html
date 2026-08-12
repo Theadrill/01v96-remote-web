@@ -459,22 +459,6 @@
             </div>
         </div>
     </div>
-    <!-- Modal de Opções de Cópia -->
-    <div class="modal-overlay styled-customConfirmModal" id="copyOptionsModal">
-        <div class="modal-content inline-style-23">
-            <h3 class="inline-style-24">
-                Opções de Cópia</h3>
-            <p class="styled-customConfirmMsg">O que você deseja copiar deste canal?</p>
-            <div class="inline-style-25" style="flex-direction:column; gap:6px;">
-                <button class="styled-customConfirmOk" style="width:100%" onclick="executeCopyEQOnly()">COPIAR APENAS
-                    EQ</button>
-                <button class="styled-customConfirmOk" style="width:100%; background:#8e44ad;"
-                    onclick="executeCopyFullChannel()">COPIAR CANAL TODO</button>
-                <button class="styled-customConfirmCancel" style="width:100%"
-                    onclick="document.getElementById('copyOptionsModal').style.display='none'">CANCELAR</button>
-            </div>
-        </div>
-    </div>
     <!-- Modal de Edição de Nome do Canal -->
     <div class="modal-overlay styled-nameEditorModal" id="nameEditorModal">
         <div class="modal-content inline-style-26">
@@ -812,43 +796,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal de Confirmação de Ativação de Sincronização com a Nuvem -->
-    <div class="modal-overlay styled-macroSyncConfirmModal" id="macroSyncConfirmModal">
-        <div class="modal-content macro-sync-confirm-content">
-            <div class="macro-sync-confirm-row">
-                <span id="macroSyncConfirmTitle" class="meter-config-section-title">Ativar Sincronização?</span>
-            </div>
-            <div class="macro-sync-confirm-row">
-                <span id="macroSyncConfirmText" class="macro-sync-confirm-text"></span>
-            </div>
-            <div class="macro-sync-confirm-btns">
-                <button id="macroSyncConfirmYes" class="macro-sync-confirm-btn macro-sync-confirm-yes"
-                    onclick="applySyncActivation()">SIM, ATIVAR</button>
-                <button id="macroSyncConfirmNo" class="macro-sync-confirm-btn macro-sync-confirm-no"
-                    onclick="cancelSyncActivation()">CANCELAR</button>
-            </div>
-        </div>
-    </div>
-    <!-- Modal de Desativação de Sincronização com a Nuvem -->
-    <div class="modal-overlay styled-macroSyncDisableModal" id="macroSyncDisableModal">
-        <div class="modal-content macro-sync-confirm-content">
-            <div class="macro-sync-confirm-row">
-                <span id="macroSyncDisableTitle" class="meter-config-section-title">Desativar Sincronização?</span>
-            </div>
-            <div class="macro-sync-confirm-row">
-                <span id="macroSyncDisableText" class="macro-sync-confirm-text">Este preset ficará apenas neste
-                    computador. Escolha como deseja prosseguir:</span>
-            </div>
-            <div class="macro-sync-disable-btns">
-                <button id="btnDisableOnly" class="macro-sync-disable-btn macro-sync-disable-blue"
-                    onclick="applyDisableOnly()">DESATIVAR APENAS</button>
-                <button id="btnDisableRemove" class="macro-sync-disable-btn macro-sync-disable-blue"
-                    onclick="applyDisableAndRemove()">DESATIVAR E REMOVER DA NUVEM</button>
-                <button id="btnCancelDisable" class="macro-sync-disable-btn macro-sync-disable-red"
-                    onclick="cancelDisableSync()">CANCELAR</button>
-            </div>
-        </div>
-    </div>
+
     <!-- Modal de Comparação de Perfis Local vs. Nuvem (Conflito de Sincronização) -->
     <div class="modal-overlay styled-macroSyncDiffModal" id="macroSyncDiffModal">
         <div class="modal-content styled-macroSyncDiffContent">

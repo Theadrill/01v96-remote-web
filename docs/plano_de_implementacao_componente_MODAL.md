@@ -125,9 +125,9 @@ Criar um componente reutilizável de modal de confirmação com sistema de temas
 | 5 | `macroDeleteConfirmModal` | index.html | Sim/Não perigo | Baixa | [X] |
 | 6 | `sceneDeleteModal` | index.html | Sim/Não perigo | Baixa | [X] |
 | 7 | `sceneConfirmModal` | index.html | Sim/Não + input | Alta | [X] |
-| 8 | `macroSyncConfirmModal` | index.html | Sim/Não | Baixa | [ ] |
-| 9 | `macroSyncDisableModal` | index.html | 3 opções | Média | [ ] |
-| 10 | `copyOptionsModal` | index.html | 3 opções | Média | [ ] |
+| 8 | `macroSyncConfirmModal` | index.html | Sim/Não | Baixa | [X] |
+| 9 | `macroSyncDisableModal` | index.html | 3 opções | Média | [X] |
+| 10 | `copyOptionsModal` | index.html | 3 opções | Média | [X] |
 | 11 | `insertConfirmModal` | inserts.js | Sim/Não perigo | Baixa | [ ] |
 
 ### Pré-requisito: Componente VirtualKeyboard
@@ -145,23 +145,23 @@ VirtualKeyboard (componente puro, reutilizável)
 
 #### Etapas
 
-1. **YAML `default.yaml`** — Nova seção `virtual_keyboard:` com variáveis CSS
-2. **`virtual-keyboard.js`** — Componente puro que gera teclado dinamicamente
+1. [X] **YAML `default.yaml`** — Nova seção `virtual_keyboard:` com variáveis CSS
+2. [X] **`virtual-keyboard.js`** — Componente puro que gera teclado dinamicamente
    - `VirtualKeyboard.create(targetInputId)` → HTMLElement
    - Funções `vkType`, `vkBackspace` ficam internas (não poluem global)
    - Usa classes `.vk-btn`, `.vk-backspace`, `.vk-space` com variáveis CSS
-3. **`confirm-modal.js`** — Estender `show()` com opção `input`
+3. [X] **`confirm-modal.js`** — Estender `show()` com opção `input`
    - `{ label, defaultValue, maxLength }` → renderiza input + VirtualKeyboard
    - Retorna `{ confirmed: boolean, value?: string }` quando tem input
    - Sem input → retorna `boolean` (compatibilidade)
-4. **`scene_grid.js`** — Refatorar `_openConfirmModal()`
+4. [X] **`scene_grid.js`** — Refatorar `_openConfirmModal()`
    - LOAD → `ConfirmModal.show()` simples
    - SAVE → `ConfirmModal.show()` com `input`
-5. **`index.html`** — Limpar
+5. [X] **`index.html`** — Limpar
    - Remover `#virtualKeyboard` (dentro do sceneConfirmModal)
    - Remover `#virtualKeyboardSearch` (substituir por uso do componente)
    - Remover scripts inline `vkType`, `vkBackspace`, `startVkBackspace`, `stopVkBackspace`
-6. **`style.css`** — `.vk-btn` usa variáveis CSS; `.confirm-modal-input` + label
+6. [X] **`style.css`** — `.vk-btn` usa variáveis CSS; `.confirm-modal-input` + label
 
 #### Variáveis CSS do VirtualKeyboard (YAML)
 

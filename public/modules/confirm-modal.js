@@ -14,6 +14,7 @@ var ConfirmModal = (function () {
     var _resolve = null;
     var _isOpen = false;
     var _hasInput = false;
+    var _customResult = null;
     var _inputId = 'confirm-modal-input-' + Date.now();
 
     // ─── DOM helpers ────────────────────────────────────────────
@@ -79,17 +80,23 @@ var ConfirmModal = (function () {
             _root.style.display = 'none';
 
             if (_resolve) {
-                if (_hasInput) {
+                if (_customResult !== null) {
+                    // Botões customizados: retorna o action
+                    _resolve(_customResult);
+                } else if (_hasInput) {
+                    // Com input: retorna { confirmed, value }
                     var input = document.getElementById(_inputId);
                     var value = input ? input.value : '';
                     _resolve({ confirmed: !!result, value: value });
                 } else {
+                    // Padrão: retorna boolean
                     _resolve(result);
                 }
                 _resolve = null;
             }
 
             _hasInput = false;
+            _customResult = null;
         }, 200);
     }
 
@@ -185,25 +192,48 @@ var ConfirmModal = (function () {
 
         // Botões
         _footerEl.innerHTML = '';
+        _customResult = null;
 
-        var confirmBtn = _el('button', {
-            className: 'confirm-modal-btn confirm-modal-btn--' + btnType,
-            textContent: confirmText
-        });
-        confirmBtn.addEventListener('click', function () {
-            _close(true);
-        });
-        _footerEl.appendChild(confirmBtn);
+        var customButtons = opts.buttons || null;
 
-        if (showCancel) {
-            var cancelBtn = _el('button', {
-                className: 'confirm-modal-btn confirm-modal-btn--secondary',
-                textContent: cancelText
+        if (customButtons && customButtons.length > 0) {
+            // Botões customizados: cada um tem { label, type, action }
+            _footerEl.style.flexDirection = 'column';
+            customButtons.forEach(function (btnDef) {
+                var btn = _el('button', {
+                    className: 'confirm-modal-btn confirm-modal-btn--' + (btnDef.type || 'info'),
+                    textContent: btnDef.label || 'OK'
+                });
+                btn.style.flex = 'none';
+                btn.addEventListener('click', function () {
+                    _customResult = btnDef.action || btnDef.label || 'ok';
+                    _close(true);
+                });
+                _footerEl.appendChild(btn);
             });
-            cancelBtn.addEventListener('click', function () {
-                _close(false);
+        } else {
+            // Padrão: confirm + cancel
+            _footerEl.style.flexDirection = '';
+
+            var confirmBtn = _el('button', {
+                className: 'confirm-modal-btn confirm-modal-btn--' + btnType,
+                textContent: confirmText
             });
-            _footerEl.appendChild(cancelBtn);
+            confirmBtn.addEventListener('click', function () {
+                _close(true);
+            });
+            _footerEl.appendChild(confirmBtn);
+
+            if (showCancel) {
+                var cancelBtn = _el('button', {
+                    className: 'confirm-modal-btn confirm-modal-btn--secondary',
+                    textContent: cancelText
+                });
+                cancelBtn.addEventListener('click', function () {
+                    _close(false);
+                });
+                _footerEl.appendChild(cancelBtn);
+            }
         }
 
         // Mostrar

@@ -7,16 +7,28 @@ window.pendingCopyChannel = null;
 
 window.copyEQ = function(ch) {
     window.pendingCopyChannel = ch;
-    const modal = document.getElementById('copyOptionsModal');
-    if (modal) modal.style.display = 'flex';
+
+    ConfirmModal.show({
+        title: 'Opções de Cópia',
+        message: 'O que você deseja copiar deste canal?',
+        type: 'info',
+        buttons: [
+            { label: 'COPIAR APENAS EQ', type: 'info', action: 'eq' },
+            { label: 'COPIAR CANAL TODO', type: 'primary', action: 'full' },
+            { label: 'CANCELAR', type: 'secondary', action: 'cancel' }
+        ]
+    }).then(function(result) {
+        if (result === 'eq') {
+            executeCopyEQOnly();
+        } else if (result === 'full') {
+            executeCopyFullChannel();
+        }
+    });
 };
 
 window.executeCopyEQOnly = function() {
     const ch = window.pendingCopyChannel;
     if (ch === null) return;
-    
-    const modal = document.getElementById('copyOptionsModal');
-    if (modal) modal.style.display = 'none';
 
     const state = getChannelStateById(ch);
     const s = state ? state.eq : null;
@@ -48,9 +60,6 @@ window.showCustomAlert = function(msg) {
 window.executeCopyFullChannel = function() {
     const ch = window.pendingCopyChannel;
     if (ch === null) return;
-
-    const modal = document.getElementById('copyOptionsModal');
-    if (modal) modal.style.display = 'none';
 
     const state = getChannelStateById(ch);
     if (!state) return;

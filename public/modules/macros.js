@@ -86,14 +86,26 @@ window.toggleSharedSync = async function(enabled) {
 
         // Re-check checkbox visually until user decides
         if (chk) chk.checked = true;
-        const modal = document.getElementById('macroSyncDisableModal');
-        if (modal) {
-            modal.style.display = 'flex';
-        } else {
-            // Fallback: disable sync only
-            if (chk) chk.checked = false;
-            localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
-        }
+        
+        ConfirmModal.show({
+            title: 'Desativar Sincronização?',
+            message: 'Este preset ficará apenas neste computador. Escolha como deseja prosseguir:',
+            type: 'warning',
+            buttons: [
+                { label: 'DESATIVAR APENAS', type: 'info', action: 'disableOnly' },
+                { label: 'DESATIVAR E REMOVER DA NUVEM', type: 'danger', action: 'disableAndRemove' },
+                { label: 'CANCELAR', type: 'secondary', action: 'cancel' }
+            ]
+        }).then(function(action) {
+            if (action === 'disableOnly') {
+                applyDisableOnly();
+            } else if (action === 'disableAndRemove') {
+                applyDisableAndRemove();
+            } else {
+                cancelDisableSync();
+            }
+        });
+
         return;
     }
 
@@ -157,8 +169,6 @@ async function performUnshare() {
 
 // Desativa apenas: mantém o preset local, sem tocar na versão da nuvem
 window.applyDisableOnly = function () {
-    const modal = document.getElementById('macroSyncDisableModal');
-    if (modal) modal.style.display = 'none';
     const chk = document.getElementById('chkSharedSync');
     if (chk) chk.checked = false;
     localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
@@ -167,8 +177,6 @@ window.applyDisableOnly = function () {
 
 // Desativa e remove: reabre o modal de remoção da nuvem (lógica já existente)
 window.applyDisableAndRemove = async function () {
-    const modal = document.getElementById('macroSyncDisableModal');
-    if (modal) modal.style.display = 'none';
     const chk = document.getElementById('chkSharedSync');
     if (chk) chk.checked = true;
 
@@ -202,8 +210,6 @@ window.applyDisableAndRemove = async function () {
 };
 
 window.cancelDisableSync = function () {
-    const modal = document.getElementById('macroSyncDisableModal');
-    if (modal) modal.style.display = 'none';
     const chk = document.getElementById('chkSharedSync');
     if (chk) chk.checked = true;
     localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'true');
@@ -211,24 +217,27 @@ window.cancelDisableSync = function () {
 };
 
 function openSyncActivationConfirm(isFirstUpload) {
-    const modal = document.getElementById('macroSyncConfirmModal');
-    if (!modal) return;
-    const titleEl = document.getElementById('macroSyncConfirmTitle');
-    const textEl = document.getElementById('macroSyncConfirmText');
-    const yesBtn = document.getElementById('macroSyncConfirmYes');
-    if (titleEl) titleEl.textContent = 'ATIVAR SINCRONIZAÇÃO';
-    if (textEl) {
-        textEl.textContent = isFirstUpload
-            ? 'Este preset ainda não existe na nuvem. O perfil local será enviado para a nuvem e a sincronização será ativada. Deseja continuar?'
-            : 'Os perfis local e da nuvem são idênticos. Deseja ativar a sincronização com a nuvem?';
-    }
-    if (yesBtn) yesBtn.textContent = isFirstUpload ? 'SIM, ENVIAR' : 'SIM, ATIVAR';
-    modal.style.display = 'flex';
+    var message = isFirstUpload
+        ? 'Este preset ainda não existe na nuvem. O perfil local será enviado para a nuvem e a sincronização será ativada. Deseja continuar?'
+        : 'Os perfis local e da nuvem são idênticos. Deseja ativar a sincronização com a nuvem?';
+    var confirmText = isFirstUpload ? 'SIM, ENVIAR' : 'SIM, ATIVAR';
+
+    ConfirmModal.show({
+        title: 'ATIVAR SINCRONIZAÇÃO',
+        message: message,
+        type: 'info',
+        confirmText: confirmText,
+        cancelText: 'CANCELAR'
+    }).then(function (ok) {
+        if (ok) {
+            applySyncActivation();
+        } else {
+            cancelSyncActivation();
+        }
+    });
 }
 
 window.applySyncActivation = async function () {
-    const modal = document.getElementById('macroSyncConfirmModal');
-    if (modal) modal.style.display = 'none';
     localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'true');
     const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = true;
     try {
@@ -240,8 +249,6 @@ window.applySyncActivation = async function () {
 };
 
 window.cancelSyncActivation = function () {
-    const modal = document.getElementById('macroSyncConfirmModal');
-    if (modal) modal.style.display = 'none';
     const chk = document.getElementById('chkSharedSync'); if (chk) chk.checked = false;
     localStorage.setItem(`macro_sync_shared_${currentPreset}`, 'false');
 };
