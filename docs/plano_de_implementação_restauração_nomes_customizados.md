@@ -10,7 +10,7 @@ Para qualquer desenvolvedor ou agente de IA (OpenCode) que for executar este pla
 
 1. 🛑 **NÃO fazer `git commit`**: O desenvolvedor/agente NÃO deve realizar commits no repositório a menos que o usuário solicite explicitamente.
 2. ⚡ **Validação de Código Rust (`cargo check`)**: Usar exclusivamente `cargo check` para verificar a compilação do código no servidor Rust. **NUNCA** usar `cargo build --release` sem solicitação direta do usuário.
-3. 📊 **Atualização do Graphify (`graphify update .`)**: NÃO executar `graphify update .` após cada pequena edição de código. O comando `graphify update .` só deve ser executado imediatamente antes de realizar um `git push` solicitado pelo usuário.
+3. ⚡ **Push**: Push SÓ quando usuário pedir.
 
 ---
 
