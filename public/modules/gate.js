@@ -79,45 +79,45 @@ function renderGate(container, ch) {
             <div class="dyn-param">
                 <label>THRESH</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateThreshSl', -1, ${ch}, 'kInputGate/kGateThreshold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateThreshSl', -1, ${ch}, 'kInputGate/kGateThreshold')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateThreshSl', -1, ${ch}, 'kInputGate/kGateThreshold')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="gateThreshSl" class="dyn-slider" min="-540" max="0" step="1" value="${state.thresh}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateThreshSl', 1, ${ch}, 'kInputGate/kGateThreshold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateThreshSl', 1, ${ch}, 'kInputGate/kGateThreshold')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateThreshSl', 1, ${ch}, 'kInputGate/kGateThreshold')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">-26.0</span>
             </div>
             <div class="dyn-param">
                 <label>RANGE</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateRangeSl', -1, ${ch}, 'kInputGate/kGateRange')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateRangeSl', -1, ${ch}, 'kInputGate/kGateRange')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateRangeSl', -1, ${ch}, 'kInputGate/kGateRange')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="gateRangeSl" class="dyn-slider" min="-60" max="0" step="1" value="${state.range}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateRangeSl', 1, ${ch}, 'kInputGate/kGateRange')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateRangeSl', 1, ${ch}, 'kInputGate/kGateRange')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateRangeSl', 1, ${ch}, 'kInputGate/kGateRange')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">-60dB</span>
             </div>
             <div class="dyn-param">
                 <label>ATTACK</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateAttackSl', -1, ${ch}, 'kInputGate/kGateAttack')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateAttackSl', -1, ${ch}, 'kInputGate/kGateAttack')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateAttackSl', -1, ${ch}, 'kInputGate/kGateAttack')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="gateAttackSl" class="dyn-slider" min="0" max="120" step="1" value="${state.attack}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateAttackSl', 1, ${ch}, 'kInputGate/kGateAttack')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateAttackSl', 1, ${ch}, 'kInputGate/kGateAttack')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateAttackSl', 1, ${ch}, 'kInputGate/kGateAttack')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">0ms</span>
             </div>
             <div class="dyn-param">
                 <label>HOLD</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateHoldSl', -1, ${ch}, 'kInputGate/kGateHold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateHoldSl', -1, ${ch}, 'kInputGate/kGateHold')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateHoldSl', -1, ${ch}, 'kInputGate/kGateHold')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="gateHoldSl" class="dyn-slider" min="0" max="${HOLD_STEPS.length - 1}" step="1" value="${state.hold}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateHoldSl', 1, ${ch}, 'kInputGate/kGateHold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateHoldSl', 1, ${ch}, 'kInputGate/kGateHold')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateHoldSl', 1, ${ch}, 'kInputGate/kGateHold')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">20ms</span>
             </div>
             <div class="dyn-param">
                 <label>DECAY</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateDecaySl', -1, ${ch}, 'kInputGate/kGateDecay')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateDecaySl', -1, ${ch}, 'kInputGate/kGateDecay')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateDecaySl', -1, ${ch}, 'kInputGate/kGateDecay')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="gateDecaySl" class="dyn-slider" min="0" max="${DECAY_STEPS.length - 1}" step="1" value="${state.decay}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('gateDecaySl', 1, ${ch}, 'kInputGate/kGateDecay')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('gateDecaySl', 1, ${ch}, 'kInputGate/kGateDecay')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('gateDecaySl', 1, ${ch}, 'kInputGate/kGateDecay')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">50ms</span>
             </div>

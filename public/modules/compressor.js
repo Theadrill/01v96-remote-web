@@ -51,54 +51,54 @@ function renderCompressor(container, ch) {
             <div class="dyn-param">
                 <label>THRESH</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compThreshSl', -1, ${ch}, '${prefix}Comp/kCompThreshold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compThreshSl', -1, ${ch}, '${prefix}Comp/kCompThreshold')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compThreshSl', -1, ${ch}, '${prefix}Comp/kCompThreshold')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="compThreshSl" class="dyn-slider" min="-540" max="0" step="1" value="${state.thresh}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compThreshSl', 1, ${ch}, '${prefix}Comp/kCompThreshold')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compThreshSl', 1, ${ch}, '${prefix}Comp/kCompThreshold')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compThreshSl', 1, ${ch}, '${prefix}Comp/kCompThreshold')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">-8.0</span>
             </div>
             <div class="dyn-param">
                 <label>RATIO</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compRatioSl', -1, ${ch}, '${prefix}Comp/kCompRatio')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compRatioSl', -1, ${ch}, '${prefix}Comp/kCompRatio')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compRatioSl', -1, ${ch}, '${prefix}Comp/kCompRatio')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="compRatioSl" class="dyn-slider" min="0" max="15" step="1" value="${state.ratio}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compRatioSl', 1, ${ch}, '${prefix}Comp/kCompRatio')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compRatioSl', 1, ${ch}, '${prefix}Comp/kCompRatio')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compRatioSl', 1, ${ch}, '${prefix}Comp/kCompRatio')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">2.5:1</span>
             </div>
             <div class="dyn-param">
                 <label>ATTACK</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compAttackSl', -1, ${ch}, '${prefix}Comp/kCompAttack')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compAttackSl', -1, ${ch}, '${prefix}Comp/kCompAttack')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compAttackSl', -1, ${ch}, '${prefix}Comp/kCompAttack')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="compAttackSl" class="dyn-slider" min="0" max="120" step="1" value="${state.attack}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compAttackSl', 1, ${ch}, '${prefix}Comp/kCompAttack')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compAttackSl', 1, ${ch}, '${prefix}Comp/kCompAttack')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compAttackSl', 1, ${ch}, '${prefix}Comp/kCompAttack')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">30ms</span>
             </div>
             <div class="dyn-param">
                 <label>RELEASE</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compReleaseSl', -1, ${ch}, '${prefix}Comp/kCompRelease')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compReleaseSl', -1, ${ch}, '${prefix}Comp/kCompRelease')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compReleaseSl', -1, ${ch}, '${prefix}Comp/kCompRelease')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="compReleaseSl" class="dyn-slider" min="0" max="${RELEASE_STEPS.length - 1}" step="1" value="${state.release}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compReleaseSl', 1, ${ch}, '${prefix}Comp/kCompRelease')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compReleaseSl', 1, ${ch}, '${prefix}Comp/kCompRelease')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compReleaseSl', 1, ${ch}, '${prefix}Comp/kCompRelease')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">250ms</span>
             </div>
             <div class="dyn-param">
                 <label>OUTGAIN</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compGainSl', -1, ${ch}, '${prefix}Comp/kCompGain')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compGainSl', -1, ${ch}, '${prefix}Comp/kCompGain')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compGainSl', -1, ${ch}, '${prefix}Comp/kCompGain')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="compGainSl" class="dyn-slider" min="0" max="180" step="1" value="${state.gain}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compGainSl', 1, ${ch}, '${prefix}Comp/kCompGain')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compGainSl', 1, ${ch}, '${prefix}Comp/kCompGain')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compGainSl', 1, ${ch}, '${prefix}Comp/kCompGain')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">0.0dB</span>
             </div>
             <div class="dyn-param">
                 <label>KNEE</label>
                 <div class="dyn-slider-wrap">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compKneeSl', -1, ${ch}, '${prefix}Comp/kCompKnee')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compKneeSl', -1, ${ch}, '${prefix}Comp/kCompKnee')" ontouchend="stopDynNudge()">-</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compKneeSl', -1, ${ch}, '${prefix}Comp/kCompKnee')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">-</button>
                     <input type="range" id="compKneeSl" class="dyn-slider" min="0" max="5" step="1" value="${state.knee}">
-                    <button class="dyn-nudge-btn" onmousedown="startDynNudge('compKneeSl', 1, ${ch}, '${prefix}Comp/kCompKnee')" onmouseup="stopDynNudge()" onmouseleave="stopDynNudge()" ontouchstart="startDynNudge('compKneeSl', 1, ${ch}, '${prefix}Comp/kCompKnee')" ontouchend="stopDynNudge()">+</button>
+                    <button class="dyn-nudge-btn" onpointerdown="startDynNudge('compKneeSl', 1, ${ch}, '${prefix}Comp/kCompKnee')" onpointerup="stopDynNudge()" onpointerleave="stopDynNudge()">+</button>
                 </div>
                 <span class="dyn-value">2</span>
             </div>
