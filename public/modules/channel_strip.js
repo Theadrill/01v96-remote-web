@@ -186,7 +186,15 @@ function createDesktopStrip(config) {
 
     return `
         <div class="fader-card-desktop ${customClass}" id="${ids.card || `${pfx}card${id}`}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
-            <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${configAction}">${title}</div>
+            <div class="desk-label-wrapper">
+                <div class="desk-label" id="${labelId}" style="cursor: pointer;" onclick="${configAction}">${title}</div>
+                ${dataCh !== undefined && dataCh !== '' ? `<div class="desk-label-lock" data-ch="${dataCh}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>` : ''}
+            </div>
             
             ${hasSolo ?
             `<button id="${soloId}" class="btn-cue ${solo ? 'solo-active' : ''}" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">SOLO</button>` :

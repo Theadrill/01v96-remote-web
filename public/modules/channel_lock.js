@@ -30,6 +30,8 @@
         return null;
     }
 
+    window.getChannelLockId = getLockIdForDataCh;
+
     function getLockIdFromElement(el) {
         if (!el) return null;
         const card = el.closest('.fader-card, .fader-card-desktop');
@@ -150,8 +152,29 @@
         window.confirmToggleChannelLock(lockId);
     }
 
+    // ── Click no cadeado do header (desktop) ───────────────────
+    function onHeaderLockClick(e) {
+        const lockIcon = e.target.closest('.desk-label-lock');
+        if (!lockIcon) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const dataCh = lockIcon.getAttribute('data-ch');
+        if (!dataCh) return;
+        const lockId = getLockIdForDataCh(dataCh);
+        if (!lockId) return;
+
+        window.confirmToggleChannelLock(lockId);
+    }
+
     // ── Delegação de eventos ───────────────────────────────────
+    let delegationInitialized = false;
+
     function initEventDelegation() {
+        if (delegationInitialized) return;
+        delegationInitialized = true;
+
         const containers = ['#faders-container', '#master-container'];
         containers.forEach(selector => {
             const el = document.querySelector(selector);
@@ -165,6 +188,7 @@
             el.addEventListener('pointerup', onTap, true);
 
             el.addEventListener('click', onBadgeClick, true);
+            el.addEventListener('click', onHeaderLockClick);
         });
     }
 
@@ -216,7 +240,6 @@
     // ── Init ───────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
         initEventDelegation();
-        setTimeout(initEventDelegation, 1000);
     });
 
     const originalInitUI = window.initUI;

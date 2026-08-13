@@ -126,7 +126,7 @@ channel_lock:
   hold_duration_ms: 750      # Tempo em milissegundos pressionado para abrir o modal de lock (reduzido para UX mais ágil)
   z_index: 100                 # Camada de profundidade da sobreposição do lock
   icon_class: "fas fa-lock"     # Classe do ícone FontAwesome
-  overlay_bg: "rgba(0, 0, 0, 0.40)"
+  overlay_bg: "rgba(0, 0, 0, 0.30)"
   overlay_backdrop_filter: "blur(2px)"
   icon_color: "#000000"
   icon_size: "32px"

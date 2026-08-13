@@ -1686,7 +1686,47 @@ body.layout-desktop .sidebar-macros {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.desk-label-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 35px;
     border-bottom: 1px solid #111;
+}
+
+.desk-label-lock {
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #888;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+    border-radius: 3px;
+}
+
+.desk-label-lock:hover {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.15);
+}
+
+.fader-card-desktop:hover .desk-label-lock {
+    opacity: 1;
+}
+
+.fader-card-desktop.channel-locked .desk-label-lock {
+    display: none !important;
 }
 
 .btn-cue {
