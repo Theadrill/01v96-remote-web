@@ -784,7 +784,7 @@ socket.on('sync', (s) => {
 
     if (typeof initUI === 'function') {
         console.log("♻️ [SOCKET] Re-inicializando UI após Sync Completo");
-        
+
         initUI();
         // 🔑 NÃO chamamos requestGlobalNames() aqui — os globals já estão em memória
         // (foram carregados no connect). Recarregar a cada sync causava o flash de nomes.
@@ -1057,7 +1057,7 @@ socket.on('portsList', (data) => {
         if (data.savedConfig.rta_fft_size !== undefined) {
             window.rtaConfig.fftSize = data.savedConfig.rta_fft_size;
         }
-        
+
         if (typeof window.updateRtaInputsUI === 'function') {
             window.updateRtaInputsUI();
         }
@@ -1097,7 +1097,7 @@ socket.on('eqFlatConfigUpdated', (data) => {
     }
 });
 
-window.updateEqFlatConfig = function(enabled) {
+window.updateEqFlatConfig = function (enabled) {
     window.eqFlatSkipHpfLpf = !!enabled;
     if (appReady) {
         socket.emit('updateEqFlatConfig', { skip_hpf_lpf: !!enabled });
@@ -1117,7 +1117,7 @@ socket.on('rtaConfigUpdated', (cfg) => {
     if (cfg.rta_fft_size !== undefined) {
         window.rtaConfig.fftSize = cfg.rta_fft_size;
     }
-    
+
     if (typeof window.updateRtaInputsUI === 'function') {
         window.updateRtaInputsUI();
     }
@@ -1125,7 +1125,7 @@ socket.on('rtaConfigUpdated', (cfg) => {
     window.rtaSmoothingFactor = Math.min(0.99, Math.max(0, window.rtaConfig.smoothing / 100));
     window.rtaPeakHoldTimeMs = window.rtaConfig.peakHoldTime * 1000;
     window.rtaDecayRate = window.rtaConfig.decayRate;
-    
+
     console.log("[RTA SOCKET LOG] rtaConfigUpdated recebeu dados e atualizou memória (window):", {
         rtaSmoothingFactor: window.rtaSmoothingFactor,
         rtaPeakHoldTimeMs: window.rtaPeakHoldTimeMs,
@@ -1326,11 +1326,11 @@ import('../wasm/client_wasm.js').then(async (wasm) => {
     wasmMeterEngine = new wasm.MeterEngine(80);
     window.wasmMeterEngine = wasmMeterEngine; // Expose globally for canvas_engine.js
     wasmMeterEngine.set_decay_rate(0.1); // Queda suave calibrada para escala 0-100
-    
+
     // TRUE ZERO COPY: Criamos um Float32Array apontando exatamente para o ponteiro de memória no WASM
     const ptr = wasmMeterEngine.get_levels_ptr();
     wasmMeterView = new Float32Array(wasmExports.memory.buffer, ptr, 80);
-    
+
     console.log("[WASM] MeterEngine initialized (TRUE zero-copy view)");
 
     wasmMidiDispatcher = new wasm.MidiDispatcher(16); // Default 16ms
@@ -1381,7 +1381,7 @@ function applyMetersToDOM(smoothedLevels, now) {
                 const finalPercent = smoothedLevels[levelIdx];
                 let isPeaking = finalPercent >= 98;
 
-                    if (cached.curtains && cached.curtains.length > 0) {
+                if (cached.curtains && cached.curtains.length > 0) {
                     cached.curtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
 
                     if (cached.curtains.length > 1 && (cached.dataCh === 'master' || (levelIdx >= 60 && levelIdx <= 66))) {
@@ -1445,7 +1445,7 @@ function applyMetersToDOM(smoothedLevels, now) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                     const pIdx = (cached.dataCh === 'master') ? 33 :
                         ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
+                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && cached.curtains.length > 1 && pIdx < smoothedLevels.length) {
                         partnerPercent = smoothedLevels[pIdx];
@@ -1462,7 +1462,7 @@ function applyMetersToDOM(smoothedLevels, now) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                     const pIdx = (cached.dataCh === 'master') ? 33 :
                         ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
+                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && cached.mobileCurtains.length > 1 && pIdx < smoothedLevels.length) {
                         partnerPercent = smoothedLevels[pIdx];
@@ -1516,7 +1516,7 @@ function applyMetersToDOM(smoothedLevels, now) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                     const pIdx = isMasterMini ? 33 :
                         ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
+                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
                         const partnerPercent = smoothedLevels[pIdx];
@@ -1532,7 +1532,7 @@ function applyMetersToDOM(smoothedLevels, now) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
                     const pIdx = isMasterMini ? 33 :
                         ((s && s.paired && s.pairedWith !== null) ? s.pairedWith :
-                        ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
+                            ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
                         const partnerPercent = smoothedLevels[pIdx];

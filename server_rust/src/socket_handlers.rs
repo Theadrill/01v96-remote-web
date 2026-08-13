@@ -48,6 +48,29 @@ fn require_setup(socket: &SocketRef) -> bool {
     false
 }
 
+fn is_valid_lock_channel(channel_id: &str) -> bool {
+    let ch = channel_id.trim().to_uppercase();
+    if ch == "MASTER" {
+        return true;
+    }
+    if let Some(num_str) = ch.strip_prefix("CH") {
+        if let Ok(num) = num_str.parse::<u32>() {
+            return (1..=32).contains(&num);
+        }
+    }
+    if let Some(num_str) = ch.strip_prefix("MIX") {
+        if let Ok(num) = num_str.parse::<u32>() {
+            return (1..=8).contains(&num);
+        }
+    }
+    if let Some(num_str) = ch.strip_prefix("BUS") {
+        if let Ok(num) = num_str.parse::<u32>() {
+            return (1..=8).contains(&num);
+        }
+    }
+    false
+}
+
 pub fn register_handlers(
     io: SocketIo,
     scheduler: Arc<MidiScheduler>,
@@ -120,12 +143,12 @@ pub fn register_handlers(
                         serde_json::to_value(&current_state.fx_inputs).unwrap_or_default();
                     socket_initial.emit("fxInputsUpdate", &fx_in_json).ok();
                 }
-                // Emit FX outputs for the efeitos module
+                // Emit locked channels state
                 {
                     let current_state = state_arc_connect.read().await;
-                    let fx_out_json =
-                        serde_json::to_value(&current_state.fx_outputs).unwrap_or_default();
-                    socket_initial.emit("fxOutputsUpdate", &fx_out_json).ok();
+                    let locked = current_state.locked_channels.read().unwrap();
+                    let locked_vec: Vec<String> = locked.iter().cloned().collect();
+                    socket_initial.emit("lockedChannelsUpdate", &serde_json::json!({ "lockedChannels": locked_vec })).ok();
                 }
             }
 
@@ -273,6 +296,48 @@ pub fn register_handlers(
                     converter,
                 ) {
                     scheduler_control.enqueue(sysex, 0).await;
+                }
+            },
+        );
+
+        let state_lock = global_state_socket.clone();
+        socket.on(
+            "toggle_channel_lock",
+            move |socket: SocketRef, data: Data<serde_json::Value>| async move {
+                if !require_setup(&socket) {
+                    return;
+                }
+                let raw_channel = data.get("channel")
+                    .or_else(|| data.get("channelId"))
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .trim()
+                    .to_uppercase();
+
+                if raw_channel.is_empty() || !is_valid_lock_channel(&raw_channel) {
+                    tracing::warn!("⚠️ [LOCK] Tentativa de lock com ID de canal inválido: '{}'", raw_channel);
+                    return;
+                }
+
+                let (updated_list, changed) = {
+                    let state = state_lock.read().await;
+                    let mut locked = state.locked_channels.write().unwrap();
+                    let was_present = locked.contains(&raw_channel);
+                    if was_present {
+                        locked.remove(&raw_channel);
+                        info!("🔓 [LOCK] Canal destravado: {}", raw_channel);
+                    } else {
+                        locked.insert(raw_channel.clone());
+                        info!("🔒 [LOCK] Canal travado: {}", raw_channel);
+                    }
+                    let list: Vec<String> = locked.iter().cloned().collect();
+                    (list, true)
+                };
+
+                if changed {
+                    let payload = serde_json::json!({ "lockedChannels": updated_list });
+                    socket.emit("lockedChannelsUpdate", &payload).ok();
+                    socket.broadcast().emit("lockedChannelsUpdate", &payload).await.ok();
                 }
             },
         );

@@ -187,6 +187,9 @@ pub struct GlobalState {
     pub global_meter_pos_master: String,
     #[serde(rename = "globalMeterPosChannels")]
     pub global_meter_pos_channels: String,
+    /// HashSet thread-safe contendo os IDs dos canais travados (ex: "CH1", "MASTER", "MIX1", "BUS1")
+    #[serde(skip)]
+    pub locked_channels: std::sync::Arc<std::sync::RwLock<std::collections::HashSet<String>>>,
     /// Sender half of the FX sync pipeline ack channel (UnboundedSender — never drops signals).
     /// Installed by SyncManager before starting the FX sync task; set to None when done.
     /// midi_receiver calls send() here after processing each FX Input/Output MIDI response.
@@ -441,6 +444,7 @@ impl GlobalState {
             tailscale_url: None,
             global_meter_pos_master: "pre".to_string(),
             global_meter_pos_channels: "pre".to_string(),
+            locked_channels: std::sync::Arc::new(std::sync::RwLock::new(std::collections::HashSet::new())),
             fx_sync_ack_tx: None,
         }
     }

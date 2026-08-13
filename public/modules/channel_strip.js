@@ -866,9 +866,9 @@ function initUI() {
 async function soloReplace(type, ch) {
     // Converte o identificador do canal para global ID numérico
     const targetCh = (typeof ch === 'string' && ch.startsWith('m')) ? 36 + parseInt(ch.substring(1), 10)
-                  : (typeof ch === 'string' && ch.startsWith('b')) ? 44 + parseInt(ch.substring(1), 10)
-                  : (ch === 'master' || ch === 52) ? 52
-                  : ch;
+        : (typeof ch === 'string' && ch.startsWith('b')) ? 44 + parseInt(ch.substring(1), 10)
+            : (ch === 'master' || ch === 52) ? 52
+                : ch;
 
     const toClear = [];
 
@@ -986,7 +986,7 @@ async function clearAllSolos() {
  * Abre o modal de configuração da posição dos medidores.
  * Ao abrir não envia nada à mesa — somente sincroniza o estado já conhecido.
  */
-window.openMeterConfigModal = function(target) {
+window.openMeterConfigModal = function (target) {
     const modal = document.getElementById('meterConfigModal');
     if (!modal) return;
     // Sincroniza os botões ativos com o último estado conhecido antes de exibir.
@@ -1004,7 +1004,7 @@ window.openMeterConfigModal = function(target) {
  * @param {'master' | 'channels'} target 
  * @param {number | string} mode (0/pre_eq => "PRE EQ", 1/pre => "PRE", 2/post => "POST")
  */
-window.updateMeterIndicatorUI = function(target, mode) {
+window.updateMeterIndicatorUI = function (target, mode) {
     let label = 'PRE';
     let modeKey = 'pre';
     if (mode === 0 || mode === '00' || mode === 'pre_eq') { label = 'PREEQ'; modeKey = 'pre_eq'; }
@@ -1035,7 +1035,7 @@ window.updateMeterIndicatorUI = function(target, mode) {
  * @param {'master' | 'channels'} target 
  * @param {string} modeKey ('pre_eq' | 'pre' | 'post')
  */
-window.updateMeterConfigModalUI = function(target, modeKey) {
+window.updateMeterConfigModalUI = function (target, modeKey) {
     const groupId = target === 'master' ? 'meterConfigMasterGroup' : 'meterConfigChannelsGroup';
     const group = document.getElementById(groupId);
     if (!group) return;
@@ -1049,11 +1049,11 @@ window.updateMeterConfigModalUI = function(target, modeKey) {
  * @param {'master' | 'channels'} target 
  * @param {'pre_eq' | 'pre' | 'post'} modeKey
  */
-window.setMeterPosition = function(target, modeKey) {
+window.setMeterPosition = function (target, modeKey) {
     const valueMap = { pre_eq: 0, pre: 1, post: 2 };
     const typeMap = {
         channels: 'kSetupMeterSetup/kMeterSetupInpPoint',
-        master:   'kSetupMeterSetup/kMeterSetupOutPoint'
+        master: 'kSetupMeterSetup/kMeterSetupOutPoint'
     };
     const value = valueMap[modeKey];
     const type = typeMap[target];
@@ -1069,7 +1069,7 @@ window.setMeterPosition = function(target, modeKey) {
  * Abre o modal de confirmação apenas ao DESLIGAR o canal MASTER.
  * Se o canal estiver desligado, ele é ligado diretamente sem confirmação.
  */
-window.confirmMasterOn = function() {
+window.confirmMasterOn = function () {
     if (!masterState.on) {
         toggleState('kStereoChannelOn/kChannelOn', 'master');
         return;
@@ -1081,7 +1081,7 @@ window.confirmMasterOn = function() {
         type: 'danger',
         confirmText: 'SIM, DESLIGAR',
         cancelText: 'CANCELAR'
-    }).then(function(ok) {
+    }).then(function (ok) {
         if (ok) toggleState('kStereoChannelOn/kChannelOn', 'master');
     });
 };

@@ -354,7 +354,7 @@ function handleWheelPan(e, ch1, ch2) {
 
     // Valor atual ou 0 (Centro)
     let currentPan = (state.pan !== undefined) ? state.pan : 0;
-    
+
     // Roda para cima (negativo deltaY) incrementa (move para R)
     // Roda para baixo (positivo deltaY) decrementa (move para L)
     const dir = e.deltaY < 0 ? 1 : -1;
@@ -425,14 +425,14 @@ function startPanLongPress(e, ch1, ch2) {
     }
     e.stopPropagation();
     e.preventDefault(); // Impede o disparo de mousedown legado
-    
+
     stopPanLongPress(e);
 
     const target = e.currentTarget;
     const clientX = e.clientX;
     const clientY = e.clientY;
     panPressStartTime = Date.now();
-    
+
     // Decide qual canal usar (se houver dois)
     let ch = ch1;
     if (ch2 !== undefined && ch2 !== null) {
@@ -455,17 +455,17 @@ function startPanLongPress(e, ch1, ch2) {
 
 function handlePanPointerMove(e) {
     if (!isPanDragging || activePanChannel === null || !activePanTrack) return;
-    
+
     e.preventDefault();
     jumpPanToPosition(activePanTrack, e.clientX, activePanChannel);
 }
 
 function stopPanLongPress(e) {
     if (!panPressStartTime && !panLongPressTimeout) return;
-    
+
     const duration = panPressStartTime ? (Date.now() - panPressStartTime) : 0;
     console.log('[Events] stopPanLongPress:', { isPanDragging, duration, layoutMode, activePanTrack, hasBubbleModal: typeof window.BubbleModal !== 'undefined' });
-    
+
     if (!isPanDragging && duration > 0 && duration < 350 && layoutMode === 'desktop' && activePanTrack && typeof window.BubbleModal !== 'undefined') {
         window.BubbleModal.show({ targetEl: activePanTrack, message: '💡 Clique e segure para ajustar o Pan' });
     }
@@ -473,11 +473,11 @@ function stopPanLongPress(e) {
 
     if (panLongPressTimeout) clearTimeout(panLongPressTimeout);
     panLongPressTimeout = null;
-    
+
     if (isPanDragging && activePanTrack && e && e.pointerId) {
         if (activePanTrack.releasePointerCapture) activePanTrack.releasePointerCapture(e.pointerId);
     }
-    
+
     isPanDragging = false;
     activePanChannel = null;
     activePanTrack = null;

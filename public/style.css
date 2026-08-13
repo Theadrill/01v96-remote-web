@@ -1573,7 +1573,7 @@ body.layout-desktop .sidebar-macros {
     padding: 0;
     text-align: center;
     line-height: 18px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.4);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
 }
 
@@ -6748,7 +6748,7 @@ body:not(.layout-desktop) * {
     z-index: 16000;
     max-width: 340px;
     width: 90vw;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
     flex-direction: column;
 }
 
@@ -6770,7 +6770,7 @@ body:not(.layout-desktop) * {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     background: #6a1b9a;
     flex-shrink: 0;
 }
@@ -6805,7 +6805,7 @@ body:not(.layout-desktop) * {
 
 .macro-color-swatch.selected {
     border-color: #fff;
-    box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
 .macro-color-picker-modal {
@@ -8776,21 +8776,25 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     color: #2ecc71;
     border: 1px solid rgba(46, 204, 113, 0.4);
 }
+
 .badge-tailscale_magicdns {
     background: rgba(52, 152, 219, 0.2);
     color: #3498db;
     border: 1px solid rgba(52, 152, 219, 0.4);
 }
+
 .badge-tailscale_ip {
     background: rgba(155, 89, 182, 0.2);
     color: #9b59b6;
     border: 1px solid rgba(155, 89, 182, 0.4);
 }
+
 .badge-tailscale_https {
     background: rgba(241, 196, 15, 0.2);
     color: #f1c40f;
     border: 1px solid rgba(241, 196, 15, 0.4);
 }
+
 .badge-localhost {
     background: rgba(149, 165, 166, 0.2);
     color: #95a5a6;
@@ -8834,7 +8838,8 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     color: #111111;
 }
 
-.network-info-loading, .network-info-empty {
+.network-info-loading,
+.network-info-empty {
     font-size: 11px;
     color: #aaa;
     text-align: center;
@@ -8848,20 +8853,25 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
         margin-top: 6px;
         margin-bottom: 10px;
     }
+
     .network-info-title {
         font-size: 10px;
     }
+
     .network-card {
         padding: 6px 6px;
         gap: 6px;
     }
+
     .network-card-badge {
         font-size: 8px;
         padding: 1px 4px;
     }
+
     .network-card-url {
         font-size: 11px;
     }
+
     .network-copy-btn {
         padding: 5px 8px;
         font-size: 9px;
@@ -9330,13 +9340,18 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     cursor: not-allowed;
 }
 
-.theme-loading, .theme-empty, .theme-error {
+.theme-loading,
+.theme-empty,
+.theme-error {
     text-align: center;
     padding: 20px;
     color: #aaa;
     font-size: 0.95rem;
 }
-.theme-error { color: #ff6b6b; }
+
+.theme-error {
+    color: #ff6b6b;
+}
 
 /* Scrollbar estilizada do Container de Temas */
 #themeListContainer {
@@ -9398,6 +9413,7 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     box-sizing: border-box;
     width: 100%;
 }
+
 .te-accordion-header:hover {
     background: #363636;
 }
@@ -9469,6 +9485,7 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     font-weight: bold;
     box-sizing: border-box;
 }
+
 .te-field-input:focus {
     outline: none;
     border-color: #1976d2;
@@ -9486,10 +9503,11 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     border-radius: 6px;
     border: 1px solid #555;
     cursor: pointer;
-    box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
     flex-shrink: 0;
     transition: transform 0.1s ease;
 }
+
 .te-color-swatch-box:active {
     transform: scale(0.9);
 }
