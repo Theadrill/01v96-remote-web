@@ -39,6 +39,10 @@
         return getLockIdForDataCh(card.getAttribute('data-ch'));
     }
 
+    function isLockZone(el) {
+        return el && el.closest('.desk-label, .desk-label-wrapper, .channel-lock-overlay, .ch-name, .ch-clickable-zone');
+    }
+
     function isDesktop() {
         return window.layoutMode === 'desktop';
     }
@@ -101,6 +105,7 @@
     function onPointerDown(e) {
         if (isDesktop()) return;
         if (e.button && e.button !== 0) return;
+        if (!isLockZone(e.target)) return;
 
         const lockId = getLockIdFromElement(e.target);
         if (!lockId) return;
@@ -122,6 +127,7 @@
     // ── Double-tap ─────────────────────────────────────────────
     function onTap(e) {
         if (isDesktop()) return;
+        if (!isLockZone(e.target)) return;
 
         const lockId = getLockIdFromElement(e.target);
         if (!lockId) return;
