@@ -331,6 +331,23 @@ var ConfirmModal = (function () {
         if (bm.arrow_color)            root.style.setProperty('--bm-arrow-color', bm.arrow_color);
         if (bm.duration !== undefined) root.style.setProperty('--bm-duration', bm.duration);
         if (bm.delay !== undefined)    root.style.setProperty('--bm-delay', bm.delay);
+
+        // Channel Lock Configuration
+        var cl = theme.channel_lock || {};
+        window.themeChannelLockConfig = {
+            hold_duration_ms: cl.hold_duration_ms !== undefined ? parseInt(cl.hold_duration_ms, 10) : 1500,
+            icon_class: cl.icon_class || 'fas fa-lock',
+            z_index: cl.z_index !== undefined ? cl.z_index : 100
+        };
+        if (cl.z_index !== undefined) root.style.setProperty('--channel-lock-z-index', cl.z_index);
+        if (cl.overlay_bg) root.style.setProperty('--channel-lock-overlay-bg', cl.overlay_bg);
+        if (cl.overlay_backdrop_filter) root.style.setProperty('--channel-lock-overlay-backdrop-filter', cl.overlay_backdrop_filter);
+        if (cl.icon_color) root.style.setProperty('--channel-lock-icon-color', cl.icon_color);
+        if (cl.icon_size) root.style.setProperty('--channel-lock-icon-size', cl.icon_size);
+        if (cl.border_locked) root.style.setProperty('--channel-lock-border-locked', cl.border_locked);
+        if (cl.border_color) root.style.setProperty('--channel-lock-border-color', cl.border_color);
+        if (cl.badge_bg) root.style.setProperty('--channel-lock-badge-bg', cl.badge_bg);
+        if (cl.badge_text_color) root.style.setProperty('--channel-lock-badge-text-color', cl.badge_text_color);
     }
 
     function _alert(message, title, type) {

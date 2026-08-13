@@ -12,12 +12,11 @@ const volumeGeral = createMacroFaderInstance({
     title: 'GERAL',
     titleLong: 'VOLUME GERAL',
     getChannelIds: () => {
+        const isChanLocked = (i) => window.lockedChannels && window.lockedChannels.includes("CH" + (i + 1));
         if (musicianMode) {
-            return Array.from({length: 32}, (_, i) => i).filter(i => !macroLockedChannels.includes(i));
+            return Array.from({length: 32}, (_, i) => i).filter(i => !macroLockedChannels.includes(i) && !isChanLocked(i));
         }
-        const all = [];
-        for (let i = 0; i < 32; i++) all.push(i);
-        return all;
+        return Array.from({length: 32}, (_, i) => i).filter(i => !isChanLocked(i));
     },
     showConfig: true,
     cardId: 'cardVolumeGeral',

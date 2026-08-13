@@ -197,10 +197,11 @@ const macroFader = createMacroFaderInstance({
     title: 'MACRO',
     titleLong: 'MACRO FADER',
     getChannelIds: () => {
+        const isChanLocked = (i) => window.lockedChannels && window.lockedChannels.includes("CH" + (i + 1));
         if (musicianMode) {
-            return Array.from({length: 32}, (_, i) => i).filter(i => !macroLockedChannels.includes(i));
+            return Array.from({length: 32}, (_, i) => i).filter(i => !macroLockedChannels.includes(i) && !isChanLocked(i));
         }
-        return macroSelectedChannels;
+        return macroSelectedChannels.filter(i => !isChanLocked(i));
     },
     showConfig: true,
     cardId: 'cardMacro',
@@ -272,7 +273,15 @@ function renderMacroGrid() {
         btn.style.fontSize = '11px';
         btn.style.position = 'relative';
 
-        if (isLockMode && isSelected) {
+        const isPhysicallyLocked = window.lockedChannels && window.lockedChannels.includes("CH" + (i + 1));
+
+        if (isPhysicallyLocked) {
+            btn.style.background = 'rgba(255, 68, 68, 0.15)';
+            btn.style.color = '#888';
+            btn.style.border = '1px dashed #ff4444';
+            btn.style.cursor = 'not-allowed';
+            btn.style.pointerEvents = 'none';
+        } else if (isLockMode && isSelected) {
             btn.style.background = '#cc3333';
             btn.style.color = '#fff';
         } else if (isSelected) {
@@ -283,21 +292,26 @@ function renderMacroGrid() {
             btn.style.color = '#fff';
         }
 
-        if (isOnMixer) {
-            btn.style.border = '2px solid #ffcc00';
-            btn.style.boxShadow = 'inset 0 0 5px rgba(255, 204, 0, 0.5)';
-        } else {
-            btn.style.border = '1px solid #444';
-            btn.style.boxShadow = 'none';
+        if (!isPhysicallyLocked) {
+            if (isOnMixer) {
+                btn.style.border = '2px solid #ffcc00';
+                btn.style.boxShadow = 'inset 0 0 5px rgba(255, 204, 0, 0.5)';
+            } else {
+                btn.style.border = '1px solid #444';
+                btn.style.boxShadow = 'none';
+            }
         }
 
-        const lockIcon = isLockMode && isSelected ? '<span style="position:absolute; top:2px; right:4px; font-size:20px;">🔒</span>' : '';
+        const lockIcon = isPhysicallyLocked 
+            ? '<span style="position:absolute; top:2px; right:4px; font-size:18px; opacity:0.8;">🔒</span>'
+            : (isLockMode && isSelected ? '<span style="position:absolute; top:2px; right:4px; font-size:20px;">🔒</span>' : '');
+
         const nameBlank = !chName.trim();
         if (nameBlank) {
             btn.innerHTML = `${i + 1}${lockIcon}`;
-            btn.style.color = '#555';
+            btn.style.color = isPhysicallyLocked ? '#555' : '#aaa';
         } else {
-            const numColor = isLockMode ? '#ccc' : 'inherit';
+            const numColor = isLockMode || isPhysicallyLocked ? '#ccc' : 'inherit';
             btn.innerHTML = `<span style="color:${numColor}">${i + 1} - </span>${chName.toUpperCase()}${lockIcon}`;
         }
         btn.onclick = () => toggleMacroChannel(i);

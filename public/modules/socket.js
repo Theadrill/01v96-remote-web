@@ -907,6 +907,15 @@ socket.on('customSceneLoaded', (data) => {
     }
 });
 
+socket.on('lockedChannelsUpdate', (data) => {
+    if (data && Array.isArray(data.lockedChannels)) {
+        window.lockedChannels = data.lockedChannels;
+        if (typeof window.updateLockedChannelsUI === 'function') {
+            window.updateLockedChannelsUI();
+        }
+    }
+});
+
 socket.on('saveNameResult', (data) => {
     if (data && data.success) {
         OverlayInfo.show('success', 'NOME CUSTOMIZADO SALVO');

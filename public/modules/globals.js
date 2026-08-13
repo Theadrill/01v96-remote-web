@@ -58,6 +58,12 @@ let layerNavEnabled = false;
 let activeLayerStart = 0;
 try { layerNavEnabled = localStorage.getItem('01v96_layer_nav') === 'true'; } catch (e) { }
 window.globalNames = null;
+window.lockedChannels = [];
+window.themeChannelLockConfig = {
+    hold_duration_ms: 1500,
+    icon_class: 'fas fa-lock',
+    z_index: 100
+};
 
 const container = document.getElementById('faders-container');
 

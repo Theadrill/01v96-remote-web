@@ -199,7 +199,7 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
     box-shadow: 0 0 10px #ff0000;
 }
 
-.fader-card>*:not(.mobile-meter-bg):not(.btn-state):not(.mobile-db-scale-overlay) {
+.fader-card>*:not(.mobile-meter-bg):not(.btn-state):not(.mobile-db-scale-overlay):not(.channel-lock-overlay) {
     position: relative;
     z-index: 2;
     text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
@@ -1499,7 +1499,7 @@ body.layout-desktop .sidebar-macros {
     background-image: none !important;
 }
 
-.fader-card-desktop>* {
+.fader-card-desktop>*:not(.channel-lock-overlay) {
     position: relative;
     z-index: 2;
 }
@@ -9532,4 +9532,79 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
 #themeEditorSections::-webkit-scrollbar-thumb {
     background: #3b82f6;
     border-radius: 4px;
+}
+
+/* ==========================================================================
+   CHANNEL LOCK OVERLAY STYLES
+   ========================================================================== */
+.fader-card, .fader-card-desktop {
+    position: relative;
+}
+
+.channel-lock-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    background-color: var(--channel-lock-overlay-bg, rgba(0, 0, 0, 0.78));
+    z-index: var(--channel-lock-z-index, 9999) !important;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 12px;
+    pointer-events: auto !important;
+    border-radius: inherit;
+    border-left: var(--channel-lock-border-locked, 2px solid #ff4444) !important;
+    border-right: var(--channel-lock-border-locked, 2px solid #ff4444) !important;
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+.layout-desktop .channel-lock-overlay {
+    border: none !important;
+    box-shadow: inset 2px 0 0 0 var(--channel-lock-border-color, #ff4444),
+                inset -2px 0 0 0 var(--channel-lock-border-color, #ff4444) !important;
+}
+
+.fader-card.channel-locked, .fader-card-desktop.channel-locked {
+    border: none !important;
+}
+
+.channel-lock-badge {
+    background-color: var(--channel-lock-badge-bg, #ff4444);
+    color: #ffff00 !important;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--channel-lock-icon-size, 22px);
+    cursor: pointer;
+}
+
+.channel-lock-svg {
+    stroke: #000000 !important;
+    width: 22px;
+    height: 22px;
+}
+
+.fader-card .desk-label,
+.fader-card .desk-ch-name-zone,
+.fader-card .ch-clickable-zone,
+.fader-card-desktop .desk-label,
+.fader-card-desktop .desk-ch-name-zone,
+.fader-card-desktop .ch-clickable-zone {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.channel-lock-overlay {
+    touch-action: manipulation;
 }
