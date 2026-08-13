@@ -379,6 +379,9 @@ function handleWheelPan(e, ch1, ch2) {
 }
 
 function resetPan(e, ch1, ch2) {
+    if (typeof window.BubbleModal !== 'undefined') {
+        window.BubbleModal.hide();
+    }
 
     e.preventDefault();
     e.stopPropagation();
@@ -417,6 +420,9 @@ let activePanTrack = null;
 let panPressStartTime;
 
 function startPanLongPress(e, ch1, ch2) {
+    if (typeof window.BubbleModal !== 'undefined') {
+        window.BubbleModal.hide();
+    }
     e.stopPropagation();
     e.preventDefault(); // Impede o disparo de mousedown legado
     

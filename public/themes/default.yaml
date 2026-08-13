@@ -118,4 +118,5 @@ bubble_modal:
   z_index: "999999"
   arrow_color: "#3b82f6"
   duration: 5000 # Duração de exibição do balão em ms (ex: 5000 = 5s)
+  delay: 300 # Tempo de espera em ms antes de exibir o balão (compatível com tempo de duplo clique)
 

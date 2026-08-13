@@ -1,6 +1,7 @@
 (function () {
   let overlayEl = null;
   let autoDismissTimer = null;
+  let showTimer = null;
 
   function closeOnOutsideClick(e) {
     if (overlayEl && !overlayEl.contains(e.target)) {
@@ -8,15 +9,44 @@
     }
   }
 
-  function show({ targetEl, message, duration }) {
-    console.log('[BubbleModal] show chamado:', { targetEl, message, duration });
-    // Se já existir uma bubble visível, remove imediatamente antes de criar a nova
+  function hideImmediate() {
+    if (showTimer) {
+      clearTimeout(showTimer);
+      showTimer = null;
+    }
+    if (autoDismissTimer) {
+      clearTimeout(autoDismissTimer);
+      autoDismissTimer = null;
+    }
     if (overlayEl) {
-      if (autoDismissTimer) clearTimeout(autoDismissTimer);
       if (overlayEl.parentNode) overlayEl.parentNode.removeChild(overlayEl);
       overlayEl = null;
       removeGlobalListener();
     }
+  }
+
+  function show({ targetEl, message, duration, delay }) {
+    console.log('[BubbleModal] show chamado:', { targetEl, message, duration, delay });
+    
+    // Se já existir uma bubble visível ou um agendamento pendente, cancela/remove imediatamente
+    hideImmediate();
+
+    const computed = window.getComputedStyle(document.documentElement);
+    const getCssVar = (name, fallback) => computed.getPropertyValue(name).trim() || fallback;
+    const effectiveDelay = delay !== undefined ? delay : parseInt(getCssVar('--bm-delay', '300'), 10);
+
+    if (effectiveDelay > 0) {
+      showTimer = setTimeout(() => {
+        showTimer = null;
+        renderBubble({ targetEl, message, duration, getCssVar });
+      }, effectiveDelay);
+    } else {
+      renderBubble({ targetEl, message, duration, getCssVar });
+    }
+  }
+
+  function renderBubble({ targetEl, message, duration, getCssVar }) {
+    if (!targetEl || !document.body.contains(targetEl)) return;
 
     const rect = targetEl.getBoundingClientRect();
     const overlay = document.createElement('div');
@@ -37,12 +67,8 @@
     overlay.appendChild(container);
     document.body.appendChild(overlay);
     overlayEl = overlay;
-    currentBubble = true;
 
     // Estilos dinâmicos oriundos dos tokens do tema YAML (public/themes/default.yaml -> bubble_modal)
-    const computed = window.getComputedStyle(document.documentElement);
-    const getCssVar = (name, fallback) => computed.getPropertyValue(name).trim() || fallback;
-
     overlay.style.backgroundColor = getCssVar('--bm-bg', '#1e293b');
     overlay.style.color = getCssVar('--bm-text', '#f8fafc');
     overlay.style.border = `1px solid ${getCssVar('--bm-border', '#3b82f6')}`;
@@ -77,9 +103,15 @@
   }
 
   function hide() {
+    if (showTimer) {
+      clearTimeout(showTimer);
+      showTimer = null;
+    }
+    if (autoDismissTimer) {
+      clearTimeout(autoDismissTimer);
+      autoDismissTimer = null;
+    }
     if (!overlayEl) return;
-    if (autoDismissTimer) clearTimeout(autoDismissTimer);
-    autoDismissTimer = null;
 
     overlayEl.classList.remove('fade-in');
     overlayEl.classList.add('fade-out');
@@ -107,6 +139,7 @@
   // Expose global BubbleModal object
   window.BubbleModal = {
     show: show,
-    hide: hide
+    hide: hide,
+    hideImmediate: hideImmediate
   };
-})();
+})();

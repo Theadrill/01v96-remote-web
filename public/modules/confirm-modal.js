@@ -317,6 +317,20 @@ var ConfirmModal = (function () {
         if (vk.space_font_size)     root.style.setProperty('--virtual-keyboard-space-font-size', vk.space_font_size);
         if (vk.row_gap)             root.style.setProperty('--virtual-keyboard-row-gap', vk.row_gap);
         if (vk.keyboard_gap)        root.style.setProperty('--virtual-keyboard-gap', vk.keyboard_gap);
+
+        // Bubble Modal
+        var bm = theme.bubble_modal || {};
+        if (bm.bg_color)               root.style.setProperty('--bm-bg', bm.bg_color);
+        if (bm.border_color)           root.style.setProperty('--bm-border', bm.border_color);
+        if (bm.border_radius)          root.style.setProperty('--bm-radius', bm.border_radius);
+        if (bm.text_color)             root.style.setProperty('--bm-text', bm.text_color);
+        if (bm.font_size)              root.style.setProperty('--bm-font-size', bm.font_size);
+        if (bm.padding)                root.style.setProperty('--bm-padding', bm.padding);
+        if (bm.shadow)                 root.style.setProperty('--bm-shadow', bm.shadow);
+        if (bm.z_index)                root.style.setProperty('--bm-z-index', bm.z_index);
+        if (bm.arrow_color)            root.style.setProperty('--bm-arrow-color', bm.arrow_color);
+        if (bm.duration !== undefined) root.style.setProperty('--bm-duration', bm.duration);
+        if (bm.delay !== undefined)    root.style.setProperty('--bm-delay', bm.delay);
     }
 
     function _alert(message, title, type) {
