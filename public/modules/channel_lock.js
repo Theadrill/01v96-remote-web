@@ -126,6 +126,8 @@
         const lockId = getLockIdFromElement(e.target);
         if (!lockId) return;
 
+        if (!window.lockedChannels || !window.lockedChannels.includes(lockId)) return;
+
         const now = Date.now();
         if (lastTapLockId === lockId && (now - lastTapTime) < DOUBLE_TAP_DELAY) {
             lastTapTime = 0;
