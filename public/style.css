@@ -1686,8 +1686,13 @@ body.layout-desktop .sidebar-macros {
     display: flex;
     align-items: center;
     justify-content: center;
+    border-bottom: 1px solid #111;
+}
+
+.desk-label-wrapper .desk-label {
     flex: 1;
     min-width: 0;
+    border-bottom: none;
 }
 
 .desk-label-wrapper {
