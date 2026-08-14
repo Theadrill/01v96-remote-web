@@ -437,7 +437,7 @@ function createMobileStrip(config) {
             `}
             ${getMobileScaleHTML()}
             ${onTop ? onBtn : ''}
-            <div class="ch-clickable-zone" onclick="${pfx && pfx === 'mini-' && config.type === 'main' ? 'openNameEditor()' : configAction}">
+            <div class="ch-clickable-zone top" onclick="${pfx && pfx === 'mini-' && config.type === 'main' ? 'openNameEditor()' : configAction}">
                 <h2 class="card-title">${title}</h2>
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
@@ -456,7 +456,7 @@ function createMobileStrip(config) {
                 <input type="range" id="${fId}" min="0" max="1023" value="${val}" orient="vertical" oninput="${inputCall}" onclick="event.stopPropagation()">
             </div>
             
-            <div class="ch-clickable-zone mt-auto" onclick="${configAction}">
+            <div class="ch-clickable-zone bottom mt-auto" onclick="${configAction}">
                 <div class="nudge-zone" onpointerdown="${onNudgeStartAction}(${evtCh}, -1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                     <button class="btn-nudge pointer-none">-</button>
                     <h1 id="${vId}" class="fader-val">${dbLabel}</h1>
@@ -629,7 +629,7 @@ function createOutputStrip(i, type, idPrefix = "") {
 
     const pfx = idPrefix || "";
     return `
-        <div class="fader-card ${customClass}" id="${pfx}card${prefix}${i}" ${type === 'stIn' ? `data-ch="${configId}" data-partner-ch="${configId + 1}"` : ''}>
+        <div class="fader-card ${customClass}" id="${pfx}card${prefix}${i}" ${type === 'stIn' ? `data-ch="${configId}" data-partner-ch="${configId + 1}"` : `data-ch="${configId}"`}>
             ${type === 'stIn' ? `
             <div class="mobile-meter-bg left"><div class="mobile-meter-curtain"></div></div>
             <div class="mobile-meter-bg right"><div class="mobile-meter-curtain"></div></div>
@@ -637,7 +637,7 @@ function createOutputStrip(i, type, idPrefix = "") {
             <div class="mobile-meter-bg"><div class="mobile-meter-curtain"></div></div>
             `}
             ${getMobileScaleHTML()}
-            <div class="ch-clickable-zone" onclick="${idPrefix ? "" : `openChannelConfig(event, ${configId})`}">
+            <div class="ch-clickable-zone top" onclick="${idPrefix ? "" : `openChannelConfig(event, ${configId})`}">
                 <h2 class="card-title" style="color: ${type === 'mix' ? '#ffcc00' : type === 'bus' ? '#00ffcc' : '#ff00ff'}">${title}</h2>
                 <div id="${pfx}name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>
@@ -653,7 +653,7 @@ function createOutputStrip(i, type, idPrefix = "") {
                 <input type="range" id="${pfx}f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${actionCh})" onclick="event.stopPropagation()">
             </div>
             
-            <div class="ch-clickable-zone mt-auto" onclick="${type === 'mix' && !idPrefix ? `enterTechnicianMixMode(${i})` : ''}">
+            <div class="ch-clickable-zone bottom mt-auto" onclick="${type === 'mix' && !idPrefix ? `enterTechnicianMixMode(${i})` : ''}">
                 <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, -1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                     <button class="btn-nudge pointer-none">-</button>
                     <h1 id="${pfx}v${prefix}${i}" class="fader-val">-∞</h1>
