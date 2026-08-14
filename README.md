@@ -193,7 +193,7 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [x] Atribuição de nome ao servidor/mesa.
 - [x] Patch de INSERTS nos canais.
 - [ ] Tela de EFEITOS.
-- [ ] **Sistema de Lock (Proteção) de Canais**: bloqueia a edição de canais enquanto estiverem emitindo áudio. Um canal "tocado" (com sinal ativo) fica protegido contra alterações acidentais de fader, mute, pan, EQ etc. durante a apresentação, liberando automaticamente quando o sinal cessar.
+- [x] **Sistema de Lock (Proteção) de Canais**.
 - [ ] **Macro Smart Channel Toggler**: defina um ou mais canais "guardiões" (locked) que nunca devem ser desligados. Ao ativar a macro, todos os demais canais são desligados instantaneamente, preservando apenas os canais escolhidos. O sistema memoriza quais canais foram desligados e, ao acionar novamente, religa exatamente os mesmos canais no estado anterior.
 
 
