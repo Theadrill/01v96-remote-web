@@ -1,61 +1,94 @@
-# Instruções de Delegação de Tarefas de Código (Antigravity ➔ OpenCode)
+# Instruções de Delegação de Tarefas de Código (Antigravity ➔ OpenCode / Orca)
 
-Este documento especifica o procedimento automatizado para delegação sob demanda de tarefas de desenvolvimento do **Antigravity (Orquestrador/Arquiteto)** para o **OpenCode (Coder/Executor)** em segundo plano.
-
----
-
-## 1. Fluxo de Execução Sob Demanda
-
-Quando o usuário solicitar o uso deste procedimento (ex: *"use as instruções de delegação para implementar X"*):
-
-1. **Antigravity (Orquestrador & Arquiteto)**:
-   * Analisa a arquitetura do projeto, arquivos envolvidos e regras de negócio.
-   * Cria o plano/prompt técnico cirúrgico e com zero ambiguidades.
-   * Dispara a execução não-interativa do OpenCode em segundo plano no terminal (`run_command`).
-
-2. **OpenCode (Coder & Executor)**:
-   * Processa a instrução em background usando o modo *Headless* (`--format json --auto`).
-   * Executa a edição/criação dos arquivos no disco.
-   * Preserva a memória e o contexto entre chamadas sequenciais usando a flag `-c` (`--continue`).
-
-3. **Validação & Finalização (Antigravity)**:
-   * Assim que a tarefa em background conclui, inspeciona o `git diff` para Code Review.
-   * Executa testes e validações de compilação/sintaxe (`cargo check`, `node --check`).
-   * Reporta o resultado ao usuário e/ou realiza o `git push`.
+Este documento especifica o procedimento padronizado para delegação sob demanda de tarefas de desenvolvimento do **Antigravity (Orquestrador/Arquiteto)** para execução de código.
 
 ---
 
-## 2. Comandos CLI de Execução
+## 📌 Passo 1: Seleção da Estratégia de Execução
 
-### A) Início de uma Nova Tarefa (Primeira Chamada):
-```powershell
-echo "Instrução técnica detalhada..." | opencode run --auto --format json
-```
+Sempre que o usuário solicitar a delegação de uma tarefa (ex: *"use as instruções de delegação para implementar X"*), o **Antigravity** deve verificar se o usuário já especificou a via de execução. Caso não tenha especificado, deve **perguntar ao usuário** qual estratégia prefere utilizar:
 
-### B) Chamadas Sequenciais (Reutilizando a Mesma Sessão/Contexto):
-```powershell
-echo "Próxima instrução..." | opencode run -c --auto --format json
-```
+1. **Opção A: Orca Orchestration (`orca-cli`)**
+   * *Quando usar:* Quando desejar visibilidade nos terminais do Orca ADE, acompanhamento interativo de TUI, rastreamento formal de tarefas e eventos de ciclo de vida (`worker_done`, `heartbeat`).
+2. **Opção B: OpenCode Direto (Headless CLI)**
+   * *Quando usar:* Para execuções rápidas e diretas em segundo plano no próprio shell/terminal, sem necessidade de interface visual ou overhead de coordenação.
 
----
-
-## 3. Regras de Qualidade e Segurança
-* **Gerenciamento de Contexto (`-c`)**:
-  * **Modelos Nuvem / Contexto Ilimitado**: Utilizar a flag `-c` para manter a memória entre chamadas sequenciais dentro da mesma sessão.
-  * **Modelos Locais / Contexto Limitado (ex: Ollama, LM Studio - Bonsai, Qwen)**: **OMITIR A FLAG `-c`**. Ao omitir a flag `-c`, o OpenCode inicia cada requisição em uma sessão limpa/zerada, evitando acúmulo de tokens do histórico e prevenindo erros de estouro de limite de contexto (`exceed_context_size_error`).
-* **Validação Obrigatória**: Todo código gerado pelo OpenCode deve ser revisado via `git diff` e validado via compilação antes de ser considerado pronto.
-* **Push**: Push SÓ quando usuário pedir.
+*(Nota: Se o usuário já declarar explicitamente no prompt inicial como deseja executar, esta pergunta é pulada e o fluxo segue diretamente para o Passo 2).*
 
 ---
 
-## 4. Regras Rígidas de Execução (Obrigatório Incluir nos Prompts)
+## 📌 Passo 2: Execução Técnica e Validação
 
-Sempre que uma tarefa for delegada ao **OpenCode**, o prompt enviado DEVE conter a seguinte seção explicita no início das instruções:
+### Modalidade A: Via Orca Orchestration (`orca-cli`)
+
+1. **Garantir/Vincular Run**:
+   ```powershell
+   orca orchestration run-create --objective "Descrição objetiva da tarefa" --json
+   ```
+2. **Verificar ou Iniciar Terminal do OpenCode**:
+   * Se já houver terminal ativo do OpenCode ocioso, reutilize seu `<handle>`.
+   * Caso contrário, crie um novo terminal e aguarde ficar pronto:
+     ```powershell
+     orca terminal create --worktree active --title "opencode-worker" --command "opencode" --json
+     orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 30000 --json
+     ```
+3. **Criar a Tarefa**:
+   ```powershell
+   orca orchestration task-create --spec "Instruções técnicas detalhadas com regras rígidas..." --json
+   ```
+4. **Despachar a Tarefa (com injeção de preâmbulo de orquestração)**:
+   ```powershell
+   orca orchestration dispatch --task <task_id> --to <handle> --inject --json
+   ```
+5. **Monitorar e Confirmar Conclusão**:
+   ```powershell
+   orca orchestration check --wait --types worker_done --timeout-ms 900000 --json
+   orca orchestration check --ack <delivery_id> --json
+   ```
+
+---
+
+### Modalidade B: Via OpenCode Direto (Headless CLI)
+
+> **Pergunta Obrigatória (se não especificado previamente):**
+> Antes de executar no modo OpenCode Direto, o Antigravity deve perguntar ao usuário:
+> *"Deseja executar mantendo o **CONTEXTO** da sessão anterior (`-c`) ou em uma sessão **SEM CONTEXTO** (limpa)?"*
+
+1. **Execução COM CONTEXTO (Mantém histórico da sessão / flag `-c`)**:
+   * *Primeira chamada:*
+     ```powershell
+     echo "REGRAS RÍGIDAS DE EXECUÇÃO... [Instrução técnica detalhada]" | opencode run --auto --format json
+     ```
+   * *Chamadas sequenciais acumulando contexto:*
+     ```powershell
+     echo "Próxima instrução..." | opencode run -c --auto --format json
+     ```
+2. **Execução SEM CONTEXTO (Sessão limpa e isolada / sem flag `-c`)**:
+   * *Ideal para modelos locais (Ollama/LM Studio) ou tarefas independentes para evitar estouro de tokens:*
+     ```powershell
+     echo "REGRAS RÍGIDAS DE EXECUÇÃO... [Instrução técnica detalhada]" | opencode run --auto --format json
+     ```
+
+---
+
+## 📌 Passo 3: Validação & Code Review Obrigatório
+
+Independentemente da modalidade escolhida:
+1. **Revisão de Código**: Inspecionar as alterações com `git diff` / `git status`.
+2. **Checagem de Sintaxe/Compilação**:
+   * Rust: executar `cargo check` (NUNCA `cargo build --release`).
+   * JavaScript / Node: validar com `node --check <arquivo.js>`.
+3. **Apresentação**: Reportar claramente ao usuário o que foi alterado e o resultado dos testes.
+
+---
+
+## ⚠️ Regras Rígidas de Execução (Obrigatório Incluir nos Prompts)
+
+Sempre que uma instrução for enviada ao **OpenCode** (seja via Orca ou Headless CLI), o prompt DEVE conter no cabeçalho a seguinte seção explícita:
 
 ```text
 REGRAS RÍGIDAS DE EXECUÇÃO:
 - NÃO rode `cargo build --release` ou `cargo build`. Se precisar verificar o código Rust, use APENAS `cargo check`.
 - Valide os arquivos JavaScript usando `node --check`.
-- NÃO faça commit do git (`git commit` é proibido).
+- NÃO faça commit nem push do git (`git commit` e `git push` são proibidos para o coder).
 ```
-
