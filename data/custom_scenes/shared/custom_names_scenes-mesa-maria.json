@@ -98,12 +98,6 @@
       "file": "custom_names_scene-DC JEITO 360-mesa-maria.json"
     },
     {
-      "custom_name": "PGD ONLINE 360",
-      "physical_scene": "PGD ONLINE 360",
-      "physical_id": 5,
-      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
-    },
-    {
       "custom_name": "BAL GERAL 360",
       "physical_scene": "BAL GERAL 360",
       "physical_id": 42,
@@ -114,6 +108,12 @@
       "physical_scene": "NAMORAL 360",
       "physical_id": 18,
       "file": "custom_names_scene-NAMORAL 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE 360",
+      "physical_scene": "PGD ONLINE 360",
+      "physical_id": 5,
+      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     }
   ]
 }
