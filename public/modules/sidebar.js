@@ -1011,6 +1011,10 @@ function renderDock(mode) {
                 action: `switchTab('${tab}')`,
                 cls: 'dock-tab' + (tab === activeConfigTab ? ' active-tab' : '')
             }));
+            if (activeConfigTab === 'aux' && activeConfigChannel !== null && activeConfigChannel >= 36 && activeConfigChannel <= 43) {
+                buttons.push({ label: 'COPIAR', action: 'copyActiveContext()', cls: 'dock-copy' });
+                buttons.push({ label: 'COLAR', action: 'pasteActiveContext()', id: 'dockBtnPasteMix', cls: 'dock-paste disabled' });
+            }
             buttons.push({ label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' });
             buttons.push({ label: 'SAIR', action: 'closeChannelConfig()', cls: 'dock-close' });
             break;
@@ -1024,6 +1028,8 @@ function renderDock(mode) {
         }
         case 'techMix': {
             buttons = [
+                { label: 'COPIAR', action: 'copyActiveContext()', cls: 'dock-copy' },
+                { label: 'COLAR', action: 'pasteActiveContext()', id: 'dockBtnPasteMix', cls: 'dock-paste disabled' },
                 { label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' },
                 { label: 'SAIR', action: 'exitTechnicianMixMode()', cls: 'dock-close' }
             ];
@@ -1049,6 +1055,10 @@ function renderDock(mode) {
     dock.innerHTML = buttons.map(b =>
         `<button class="dock-btn ${b.cls || ''}" onclick="${b.action}"${b.id ? ` id="${b.id}"` : ''}>${b.label}</button>`
     ).join('');
+
+    if (typeof window.updateCopyPasteUIState === 'function') {
+        window.updateCopyPasteUIState();
+    }
 
     // Sincroniza o novo menu mobile se ele não estiver ativo
     if (typeof renderMobileMenu === 'function' && document.getElementById('mobileMenuModal') && !document.getElementById('mobileMenuModal').classList.contains('active')) {
@@ -1354,13 +1364,28 @@ function renderMobileMenu(mode) {
             break;
 
         case 'channelConfig':
-        case 'techMix': // O modo de edição de barramento herda a mesma estrutura de canal
             buttonsConfig = [
                 { label: 'Configurações do App', isConfig: true, action: "document.getElementById('configModal').style.display='flex';" },
                 { label: 'EQ', cls: 'menu-btn-solid-blue', action: "if(typeof switchTab === 'function') { switchTab('eq'); }" },
                 { label: 'DYN', action: "if(typeof switchTab === 'function') { switchTab('dyn'); }" },
                 { label: 'AUX', cls: 'menu-btn-solid-green', action: "if(typeof switchTab === 'function') { switchTab('aux'); }" },
                 { label: 'ROUTING / ETC', cls: 'menu-btn-solid-red', action: "if(typeof switchTab === 'function') { switchTab('etc'); }" }
+            ];
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'aux' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && activeConfigChannel >= 36 && activeConfigChannel <= 43) {
+                buttonsConfig.push({ label: 'COPIAR', id: 'mobileMenuBtnCopy', cls: 'dock-copy', action: 'copyActiveContext()' });
+                buttonsConfig.push({ label: 'COLAR', id: 'mobileMenuBtnPaste', cls: 'dock-paste disabled', action: 'pasteActiveContext()' });
+            }
+            break;
+
+        case 'techMix': // O modo de edição de barramento herda a mesma estrutura de canal
+            buttonsConfig = [
+                { label: 'Configurações do App', isConfig: true, action: "document.getElementById('configModal').style.display='flex';" },
+                { label: 'EQ', cls: 'menu-btn-solid-blue', action: "if(typeof switchTab === 'function') { switchTab('eq'); }" },
+                { label: 'DYN', action: "if(typeof switchTab === 'function') { switchTab('dyn'); }" },
+                { label: 'AUX', cls: 'menu-btn-solid-green', action: "if(typeof switchTab === 'function') { switchTab('aux'); }" },
+                { label: 'ROUTING / ETC', cls: 'menu-btn-solid-red', action: "if(typeof switchTab === 'function') { switchTab('etc'); }" },
+                { label: 'COPIAR', id: 'mobileMenuBtnCopy', cls: 'dock-copy', action: 'copyActiveContext()' },
+                { label: 'COLAR', id: 'mobileMenuBtnPaste', cls: 'dock-paste disabled', action: 'pasteActiveContext()' }
             ];
             break;
 
@@ -1394,7 +1419,13 @@ function renderMobileMenu(mode) {
         }
 
         if (btn.cls) {
-            buttonElement.classList.add(btn.cls);
+            btn.cls.split(/\s+/).forEach(c => {
+                if (c) buttonElement.classList.add(c);
+            });
+        }
+
+        if (btn.id) {
+            buttonElement.id = btn.id;
         }
 
         // Configura o evento de clique injetando a ação string ou função nativa correspondente
@@ -1412,6 +1443,10 @@ function renderMobileMenu(mode) {
 
         menuList.appendChild(buttonElement);
     });
+
+    if (typeof window.updateCopyPasteUIState === 'function') {
+        window.updateCopyPasteUIState();
+    }
 }
 
 /**

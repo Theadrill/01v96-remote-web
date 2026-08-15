@@ -9653,3 +9653,31 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
 .channel-lock-overlay {
     touch-action: manipulation;
 }
+
+.dock-btn.disabled,
+.mobile-menu-item.disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+.dock-btn.active-paste-ready,
+.mobile-menu-item.active-paste-ready {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+    font-weight: 900 !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    opacity: 1 !important;
+}
+
+.dock-copy {
+    background: #0056b3 !important;
+    color: #ffffff !important;
+    border-color: #004085 !important;
+}
+
+.dock-paste {
+    background: #444 !important;
+    color: #ffffff !important;
+    border-color: #555 !important;
+}
