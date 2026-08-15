@@ -234,6 +234,8 @@ function switchTab(tabId) {
     if (tabId === 'dyn') { if (modeEl) modeEl.innerText = 'DYNAMICS'; renderDynamics(activeConfigChannel); }
     if (tabId === 'aux') { if (modeEl) modeEl.innerText = 'AUX SENDS'; renderAuxs(activeConfigChannel); }
     if (tabId === 'etc') { if (modeEl) modeEl.innerText = 'ROUTING / ETC'; renderRouting(activeConfigChannel); }
+
+    if (typeof renderDock === 'function' && activeConfigChannel !== null) renderDock('channelConfig');
 }
 
 
@@ -1011,7 +1013,7 @@ function renderDock(mode) {
                 action: `switchTab('${tab}')`,
                 cls: 'dock-tab' + (tab === activeConfigTab ? ' active-tab' : '')
             }));
-            if (activeConfigTab === 'aux' && activeConfigChannel !== null && activeConfigChannel >= 36 && activeConfigChannel <= 43) {
+            if (activeConfigTab === 'aux' && activeConfigChannel !== null) {
                 buttons.push({ label: 'COPIAR', action: 'copyActiveContext()', cls: 'dock-copy' });
                 buttons.push({ label: 'COLAR', action: 'pasteActiveContext()', id: 'dockBtnPasteMix', cls: 'dock-paste disabled' });
             }
@@ -1371,7 +1373,7 @@ function renderMobileMenu(mode) {
                 { label: 'AUX', cls: 'menu-btn-solid-green', action: "if(typeof switchTab === 'function') { switchTab('aux'); }" },
                 { label: 'ROUTING / ETC', cls: 'menu-btn-solid-red', action: "if(typeof switchTab === 'function') { switchTab('etc'); }" }
             ];
-            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'aux' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && activeConfigChannel >= 36 && activeConfigChannel <= 43) {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'aux' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null) {
                 buttonsConfig.push({ label: 'COPIAR', id: 'mobileMenuBtnCopy', cls: 'dock-copy', action: 'copyActiveContext()' });
                 buttonsConfig.push({ label: 'COLAR', id: 'mobileMenuBtnPaste', cls: 'dock-paste disabled', action: 'pasteActiveContext()' });
             }

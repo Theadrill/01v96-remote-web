@@ -31,6 +31,21 @@ function getMixDisplayName(mixNumber) {
     return name;
 }
 
+function getChannelDisplayName(ch) {
+    if (ch >= 36 && ch <= 43) {
+        return getMixDisplayName(ch - 35);
+    }
+    let name = '';
+    const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+    if (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) {
+        name = window.resolvedNames[ch].name;
+    } else if (stateRef && stateRef.name) {
+        name = stateRef.name;
+    }
+    const label = typeof getChannelLabel === 'function' ? getChannelLabel(ch) : ('CH ' + (ch + 1));
+    return name ? (label + ' (' + name + ')') : label;
+}
+
 // Buffer de Clipboard Contextual
 window.contextClipboard = {
     type: null,
@@ -125,6 +140,88 @@ function executePasteSendsOnFaders(targetMix) {
     });
 }
 
+// --- HANDLER ESPECÍFICO: INPUT CHANNEL AUX SENDS (CH 0-31, 60-67) ---
+
+function copyInputChannelAuxSends(ch) {
+    const state = getChannelStateById(ch);
+    if (!state) return;
+
+    const channelsData = [];
+    for (let i = 1; i <= 8; i++) {
+        const currentVal = (state['aux' + i] !== undefined) ? state['aux' + i] : 0;
+        const isOn = (state['aux' + i + 'On'] !== undefined) ? !!state['aux' + i + 'On'] : false;
+        channelsData.push({ aux: i, level: currentVal, on: isOn });
+    }
+
+    const sourceName = getChannelDisplayName(ch);
+
+    window.contextClipboard = {
+        type: 'input_channel_aux_sends',
+        sourceId: ch,
+        sourceName: sourceName,
+        expectedScreen: 'AUX DO CANAL (INPUT)',
+        data: channelsData,
+        validateTarget: function() {
+            return (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'aux' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && ((activeConfigChannel >= 0 && activeConfigChannel <= 31) || (activeConfigChannel >= 60 && activeConfigChannel <= 67)));
+        },
+        pasteHandler: function(targetCh) { executePasteInputChannelAuxSends(targetCh); }
+    };
+
+    if (typeof OverlayInfo !== 'undefined') {
+        OverlayInfo.show('copied', CLIPBOARD_MESSAGES.copied('AUX DE ' + sourceName));
+    }
+    window.updateCopyPasteUIState();
+}
+
+function executePasteInputChannelAuxSends(targetCh) {
+    var sourceName = window.contextClipboard.sourceName;
+    var targetName = getChannelDisplayName(targetCh);
+
+    ConfirmModal.show({
+        title: 'Colar Envios de Auxiliares',
+        message: 'Deseja colar os 8 envios de AUX de <b>' + sourceName + '</b> em <b>' + targetName + '</b>?<br><br><small style="color:#aaa;">Os 8 auxiliares receberão os mesmos níveis e estados ON/OFF.</small>',
+        type: 'primary',
+        confirmText: 'SIM, COLAR',
+        cancelText: 'CANCELAR'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
+
+        var items = window.contextClipboard.data;
+        items.forEach(function(item, index) {
+            setTimeout(function() {
+                var state = getChannelStateById(targetCh);
+                if (state) {
+                    state['aux' + item.aux] = item.level;
+                    state['aux' + item.aux + 'On'] = item.on;
+                }
+
+                if (activeConfigChannel === targetCh && activeConfigTab === 'aux') {
+                    var fader = document.getElementById('aux_f_' + item.aux);
+                    var valDisplay = document.getElementById('aux_v_' + item.aux);
+                    var btnOn = document.getElementById('aux_on_' + item.aux);
+
+                    if (fader) fader.value = item.level;
+                    if (valDisplay) valDisplay.innerText = rawToDb(item.level);
+                    if (btnOn) {
+                        if (item.on) {
+                            btnOn.classList.add('on-active');
+                        } else {
+                            btnOn.classList.remove('on-active');
+                        }
+                    }
+                }
+
+                socket.emit('control', { type: 'kInputAUX/kAUX' + item.aux + 'Level', channel: targetCh, value: item.level });
+                socket.emit('control', { type: 'kInputAUX/kAUX' + item.aux + 'On', channel: targetCh, value: item.on ? 1 : 0 });
+
+                if (index === items.length - 1 && typeof OverlayInfo !== 'undefined') {
+                    OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted('AUX DE ' + targetName));
+                }
+            }, index * 15);
+        });
+    });
+}
+
 // --- DESPACHANTES GLOBAIS ---
 
 window.copyActiveContext = function() {
@@ -134,6 +231,10 @@ window.copyActiveContext = function() {
     }
     if (activeConfigChannel !== null && activeConfigChannel >= 36 && activeConfigChannel <= 43 && activeConfigTab === 'aux') {
         copySendsOnFaders(activeConfigChannel - 35);
+        return;
+    }
+    if (activeConfigChannel !== null && ((activeConfigChannel >= 0 && activeConfigChannel <= 31) || (activeConfigChannel >= 60 && activeConfigChannel <= 67)) && activeConfigTab === 'aux') {
+        copyInputChannelAuxSends(activeConfigChannel);
         return;
     }
     if (typeof OverlayInfo !== 'undefined') {
@@ -161,12 +262,15 @@ window.pasteActiveContext = function() {
 
     if (typeof window.contextClipboard.pasteHandler === 'function') {
         var targetMix;
-        if (typeof technicianMixMode !== 'undefined' && technicianMixMode) {
+        if (window.contextClipboard.type === 'input_channel_aux_sends') {
+            window.contextClipboard.pasteHandler(activeConfigChannel);
+        } else if (typeof technicianMixMode !== 'undefined' && technicianMixMode) {
             targetMix = activeMix;
+            window.contextClipboard.pasteHandler(targetMix);
         } else if (activeConfigChannel !== null && activeConfigChannel >= 36 && activeConfigChannel <= 43 && activeConfigTab === 'aux') {
             targetMix = activeConfigChannel - 35;
+            window.contextClipboard.pasteHandler(targetMix);
         }
-        window.contextClipboard.pasteHandler(targetMix);
     }
 };
 
