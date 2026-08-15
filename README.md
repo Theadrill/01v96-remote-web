@@ -182,21 +182,21 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 
 ## 🧭 TODO
 
-- [x] Refatoração do motor de Faders Mobile.
-- [x] Sistema de Multi-Presets com detecção de Host.
-- [x] Modo "Sends on Faders" para Mixes.
-- [x] Ninja Sync (Auto-Git push/pull).
-- [x] **MIDI Bridge over Network**: Bridge de rede TCP ultra-rápida (com heartbeat, reconnect dinâmico e tray autônomo).
+- [x] Refatoração do motor de Faders Mobile
+- [x] Sistema de Multi-Presets com detecção de Host
+- [x] Modo "Sends on Faders" para Mixes
+- [x] Ninja Sync (Auto-Git push/pull)
+- [x] MIDI Bridge over Network
 - [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
-- [x] Fazer o meter do master funcionar.
-- [x] Sistema de cenas de nomes customizados.
-- [x] Atribuição de nome ao servidor/mesa.
-- [x] Patch de INSERTS nos canais.
+- [x] Fazer o meter do master funcionar
+- [x] Sistema de cenas de nomes customizados
+- [x] Atribuição de nome ao servidor/mesa
+- [x] Patch de INSERTS nos canais
 - [ ] **Tela de EFEITOS** (Em construção — Telas disponíveis: Efeitos, Reverb e Multiband Compressor).
-- [x] **Sistema de Lock (Proteção) de Canais**.
-- [ ] **Refatoração da Arquitetura de Macros**: migração para ecossistema modular com manifesto (`manifest.json`), biblioteca com cards ricos e pads com status dinâmico (`dyn_status` com letreiro animado).
+- [x] Sistema de Lock (Proteção) de Canais
+- [x] Refatoração da Arquitetura de Macros
 - [ ] **Macro Smart Channel Toggler**: defina um ou mais canais "guardiões" (locked) que nunca devem ser desligados. Ao ativar a macro, todos os demais canais são desligados instantaneamente, preservando apenas os canais escolhidos. O sistema memoriza quais canais foram desligados e, ao acionar novamente, religa exatamente os mesmos canais no estado anterior.
-- [x] **Copiar e Colar Mix de Auxiliares (Copy/Paste Aux Mix)**: copiar rapidamente o balanceamento de mix de um canal auxiliar (AUX) e colar em outro barramento.
+- [x] Copiar e Colar Mix de Auxiliares (Copy/Paste Aux Mix)
 - [ ] **Extensão do Módulo de Copiar e Colar Contextual**: expandir o sistema modular de cópia e colagem para todas as telas do aplicativo (atualmente implementado e funcional nas telas de mix de auxiliar/fone).
 - [ ] **Refatorar Módulo copy_paste.js**: limpeza e refatoração para retirar código legacy.
 - [ ] **Fallback para Navegadores Antigos (Legacy Browser Compatibility)**: adicionar fallbacks de CSS para unidades de viewport dinâmicas (`dvh`, `svh`, `lvh` — linha 7749 do `style.css`) e espaçamento `gap` em Flexbox.
