@@ -194,7 +194,9 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [x] Patch de INSERTS nos canais.
 - [ ] Tela de EFEITOS.
 - [x] **Sistema de Lock (Proteção) de Canais**.
+- [ ] **Refatoração da Arquitetura de Macros**: migração para ecossistema modular com manifesto (`manifest.json`), biblioteca com cards ricos e pads com status dinâmico (`dyn_status` com letreiro animado).
 - [ ] **Macro Smart Channel Toggler**: defina um ou mais canais "guardiões" (locked) que nunca devem ser desligados. Ao ativar a macro, todos os demais canais são desligados instantaneamente, preservando apenas os canais escolhidos. O sistema memoriza quais canais foram desligados e, ao acionar novamente, religa exatamente os mesmos canais no estado anterior.
+- [ ] **Copiar e Colar Mix de Auxiliares (Copy/Paste Aux Mix)**: copiar rapidamente o balanceamento de mix de um canal auxiliar (AUX) e colar em outro barramento.
 
 
 ---
