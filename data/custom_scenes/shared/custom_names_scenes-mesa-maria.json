@@ -38,12 +38,6 @@
       "file": "custom_names_scene-SAM LEVY 360-mesa-maria.json"
     },
     {
-      "custom_name": "O PGD DE VCS 360",
-      "physical_scene": "O PGD DE VCS 360",
-      "physical_id": 28,
-      "file": "custom_names_scene-O PGD DE VCS 360-mesa-maria.json"
-    },
-    {
       "custom_name": "ANAKA 360",
       "physical_scene": "ANAKA 360",
       "physical_id": 40,
@@ -114,6 +108,12 @@
       "physical_scene": "PGD ONLINE 360",
       "physical_id": 5,
       "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "O PGD DE VCS 3",
+      "physical_scene": "O PGD DE VCS 3",
+      "physical_id": 28,
+      "file": "custom_names_scene-O PGD DE VCS 3-mesa-maria.json"
     }
   ]
 }
