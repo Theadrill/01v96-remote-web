@@ -4482,11 +4482,37 @@ body.layout-horizontal .macro-fader-card {
     letter-spacing: 1px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     gap: 12px;
     z-index: 10002;
     border: 2px solid #0f0;
     animation: slideDownOverlay 0.4s ease-out;
     pointer-events: none;
+    box-sizing: border-box;
+    max-width: 90vw;
+}
+
+body.is-portrait .overlay-info {
+    width: 90% !important;
+    max-width: 90vw !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 10px 14px !important;
+    font-size: 12px !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 600px) {
+    .overlay-info {
+        width: 90% !important;
+        max-width: 90vw !important;
+        justify-content: center !important;
+        text-align: center !important;
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+        box-sizing: border-box !important;
+    }
 }
 
 @keyframes slideDownOverlay {

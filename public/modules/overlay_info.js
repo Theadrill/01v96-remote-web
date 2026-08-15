@@ -50,6 +50,7 @@ const OverlayInfo = (() => {
         if (!el) {
             el = document.createElement('div');
             el.id = 'overlayInfo';
+            el.classList.add('overlay-info');
             document.body.appendChild(el);
         }
         el.style.position = 'fixed';
@@ -59,6 +60,8 @@ const OverlayInfo = (() => {
         el.style.zIndex = '10002';
         el.style.pointerEvents = 'none';
         el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.textAlign = 'center';
         el.style.gap = '12px';
         el.style.borderRadius = '8px';
         el.style.padding = '10px 20px';
@@ -66,6 +69,7 @@ const OverlayInfo = (() => {
         el.style.fontWeight = 'bold';
         el.style.fontSize = '13px';
         el.style.letterSpacing = '1px';
+        el.style.boxSizing = 'border-box';
         return el;
     }
 
