@@ -222,6 +222,133 @@ function executePasteInputChannelAuxSends(targetCh) {
     });
 }
 
+// --- HANDLER ESPECÍFICO: DYNAMICS (GATE & COMPRESSOR) ---
+
+function copyDynamics(ch) {
+    const state = getChannelStateById(ch);
+    if (!state) return;
+
+    const sourceName = getChannelDisplayName(ch);
+
+    window.contextClipboard = {
+        type: 'dynamics',
+        sourceId: ch,
+        sourceName: sourceName,
+        expectedScreen: 'DYNAMICS (GATE / COMPRESSOR)',
+        data: {
+            gate: (state && state.gate) ? JSON.parse(JSON.stringify(state.gate)) : null,
+            comp: (state && state.comp) ? JSON.parse(JSON.stringify(state.comp)) : null
+        },
+        validateTarget: function() {
+            return (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'dyn' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && (activeConfigChannel <= 31 || (activeConfigChannel >= 36 && activeConfigChannel <= 52)));
+        },
+        pasteHandler: function(targetCh) { executePasteDynamics(targetCh); }
+    };
+
+    if (typeof OverlayInfo !== 'undefined') {
+        OverlayInfo.show('copied', CLIPBOARD_MESSAGES.copied('DYNAMICS DE ' + sourceName));
+    }
+    window.updateCopyPasteUIState();
+}
+
+function executePasteDynamics(targetCh) {
+    var sourceName = window.contextClipboard.sourceName;
+    var targetName = getChannelDisplayName(targetCh);
+
+    ConfirmModal.show({
+        title: 'Colar Definições de Dinâmica',
+        message: 'Deseja colar as definições de Dinâmica de <b>' + sourceName + '</b> em <b>' + targetName + '</b>?<br><br><small style="color:#aaa;">Os parâmetros de Gate e Compressor serão aplicados.</small>',
+        type: 'primary',
+        confirmText: 'SIM, COLAR',
+        cancelText: 'CANCELAR'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
+
+        var state = getChannelStateById(targetCh);
+        var commands = [];
+
+        // Gate (apenas canais de entrada 0..31)
+        if (targetCh <= 31 && window.contextClipboard.data.gate) {
+            state.gate = JSON.parse(JSON.stringify(window.contextClipboard.data.gate));
+            commands.push({ type: 'kInputGate/kGateOn', value: state.gate.on ? 1 : 0 });
+            commands.push({ type: 'kInputGate/kGateThreshold', value: state.gate.thresh });
+            commands.push({ type: 'kInputGate/kGateRange', value: state.gate.range });
+            commands.push({ type: 'kInputGate/kGateAttack', value: state.gate.attack });
+            commands.push({ type: 'kInputGate/kGateHold', value: state.gate.hold });
+            commands.push({ type: 'kInputGate/kGateDecay', value: state.gate.decay });
+        }
+
+        // Compressor
+        if (window.contextClipboard.data.comp) {
+            state.comp = JSON.parse(JSON.stringify(window.contextClipboard.data.comp));
+            var prefix = getChannelParamPrefix(targetCh);
+            commands.push({ type: prefix + 'Comp/kCompOn', value: state.comp.on ? 1 : 0 });
+            commands.push({ type: prefix + 'Comp/kCompThreshold', value: state.comp.thresh });
+            commands.push({ type: prefix + 'Comp/kCompRatio', value: state.comp.ratio });
+            commands.push({ type: prefix + 'Comp/kCompAttack', value: state.comp.attack });
+            commands.push({ type: prefix + 'Comp/kCompRelease', value: state.comp.release });
+            commands.push({ type: prefix + 'Comp/kCompGain', value: state.comp.gain });
+            commands.push({ type: prefix + 'Comp/kCompKnee', value: state.comp.knee });
+        }
+
+        commands.forEach(function(cmd, index) {
+            setTimeout(function() {
+                socket.emit('control', { type: cmd.type, channel: targetCh, value: cmd.value });
+
+                // Atualização visual em tempo real se a aba DYN estiver ativa no canal destino
+                if (activeConfigChannel === targetCh && activeConfigTab === 'dyn') {
+                    // Gate UI
+                    if (targetCh <= 31 && state.gate) {
+                        var gateOnBtn = document.getElementById('gateOn');
+                        if (gateOnBtn) gateOnBtn.classList.toggle('active', !!state.gate.on);
+
+                        var gateSliders = {
+                            'gateThreshSl': state.gate.thresh,
+                            'gateRangeSl': state.gate.range,
+                            'gateAttackSl': state.gate.attack,
+                            'gateHoldSl': state.gate.hold,
+                            'gateDecaySl': state.gate.decay
+                        };
+                        Object.keys(gateSliders).forEach(function(id) {
+                            var sl = document.getElementById(id);
+                            if (sl) {
+                                sl.value = gateSliders[id];
+                                sl.dispatchEvent(new Event('input'));
+                            }
+                        });
+                    }
+
+                    // Compressor UI
+                    if (state.comp) {
+                        var compOnBtn = document.getElementById('compOn');
+                        if (compOnBtn) compOnBtn.classList.toggle('active', !!state.comp.on);
+
+                        var compSliders = {
+                            'compThreshSl': state.comp.thresh,
+                            'compRatioSl': state.comp.ratio,
+                            'compAttackSl': state.comp.attack,
+                            'compReleaseSl': state.comp.release,
+                            'compGainSl': state.comp.gain,
+                            'compKneeSl': state.comp.knee
+                        };
+                        Object.keys(compSliders).forEach(function(id) {
+                            var sl = document.getElementById(id);
+                            if (sl) {
+                                sl.value = compSliders[id];
+                                sl.dispatchEvent(new Event('input'));
+                            }
+                        });
+                    }
+                }
+
+                if (index === commands.length - 1 && typeof OverlayInfo !== 'undefined') {
+                    OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted('DYNAMICS DE ' + targetName));
+                }
+            }, index * 15);
+        });
+    });
+}
+
 // --- DESPACHANTES GLOBAIS ---
 
 window.copyActiveContext = function() {
@@ -235,6 +362,10 @@ window.copyActiveContext = function() {
     }
     if (activeConfigChannel !== null && ((activeConfigChannel >= 0 && activeConfigChannel <= 31) || (activeConfigChannel >= 60 && activeConfigChannel <= 67)) && activeConfigTab === 'aux') {
         copyInputChannelAuxSends(activeConfigChannel);
+        return;
+    }
+    if (activeConfigChannel !== null && (activeConfigChannel <= 31 || (activeConfigChannel >= 36 && activeConfigChannel <= 52)) && activeConfigTab === 'dyn') {
+        copyDynamics(activeConfigChannel);
         return;
     }
     if (typeof OverlayInfo !== 'undefined') {
@@ -262,7 +393,9 @@ window.pasteActiveContext = function() {
 
     if (typeof window.contextClipboard.pasteHandler === 'function') {
         var targetMix;
-        if (window.contextClipboard.type === 'input_channel_aux_sends') {
+        if (window.contextClipboard.type === 'dynamics') {
+            window.contextClipboard.pasteHandler(activeConfigChannel);
+        } else if (window.contextClipboard.type === 'input_channel_aux_sends') {
             window.contextClipboard.pasteHandler(activeConfigChannel);
         } else if (typeof technicianMixMode !== 'undefined' && technicianMixMode) {
             targetMix = activeMix;

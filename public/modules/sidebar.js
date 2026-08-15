@@ -1013,7 +1013,7 @@ function renderDock(mode) {
                 action: `switchTab('${tab}')`,
                 cls: 'dock-tab' + (tab === activeConfigTab ? ' active-tab' : '')
             }));
-            if (activeConfigTab === 'aux' && activeConfigChannel !== null) {
+            if (activeConfigChannel !== null && (activeConfigTab === 'aux' || (activeConfigTab === 'dyn' && !(activeConfigChannel >= 60 && activeConfigChannel <= 67)))) {
                 buttons.push({ label: 'COPIAR', action: 'copyActiveContext()', cls: 'dock-copy' });
                 buttons.push({ label: 'COLAR', action: 'pasteActiveContext()', id: 'dockBtnPasteMix', cls: 'dock-paste disabled' });
             }
@@ -1373,7 +1373,7 @@ function renderMobileMenu(mode) {
                 { label: 'AUX', cls: 'menu-btn-solid-green', action: "if(typeof switchTab === 'function') { switchTab('aux'); }" },
                 { label: 'ROUTING / ETC', cls: 'menu-btn-solid-red', action: "if(typeof switchTab === 'function') { switchTab('etc'); }" }
             ];
-            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'aux' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null) {
+            if (typeof activeConfigTab !== 'undefined' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && (activeConfigTab === 'aux' || (activeConfigTab === 'dyn' && !(activeConfigChannel >= 60 && activeConfigChannel <= 67)))) {
                 buttonsConfig.push({ label: 'COPIAR', id: 'mobileMenuBtnCopy', cls: 'dock-copy', action: 'copyActiveContext()' });
                 buttonsConfig.push({ label: 'COLAR', id: 'mobileMenuBtnPaste', cls: 'dock-paste disabled', action: 'pasteActiveContext()' });
             }
