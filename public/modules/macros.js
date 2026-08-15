@@ -9,6 +9,7 @@ let assignedMacros = {};
 let activeSlotIndex = null;
 let longPressTimer = null;
 let availableScripts = [];
+let availableManifests = [];
 let currentPreset = 'default';
 let protectedPresets = ['default']; // Lista de nomes que não podem ser deletados
 let isMovingMacro = false;
@@ -482,8 +483,18 @@ window.savePresetAs = async function () {
 async function refreshAvailableScripts() {
     try {
         const res = await fetch('/api/macros');
-        availableScripts = await res.json() || [];
-    } catch (e) { availableScripts = []; }
+        const data = await res.json() || [];
+        availableManifests = data;
+        availableScripts = data.map(m => (typeof m === 'object' && m && m.id) ? m.id : m);
+    } catch (e) {
+        availableManifests = [];
+        availableScripts = [];
+    }
+}
+
+function findManifest(id) {
+    if (!id) return null;
+    return availableManifests.find(m => ((typeof m === 'object' && m && m.id) ? m.id : m) === id) || null;
 }
 
 async function loadGlobalSlotsManifest() {
@@ -541,38 +552,190 @@ function loadExternalScripts() {
 }
 function loadMacroScript(id) {
     if (!id || !availableScripts.includes(id) || document.getElementById(`script-macro-${id}`)) return;
-    const script = document.createElement('script'); script.id = `script-macro-${id}`;
-    script.src = `modules/macros/${id}.js?t=${Date.now()}`; document.body.appendChild(script);
+    const manifest = findManifest(id);
+    const entry = (manifest && manifest.entry) ? manifest.entry : 'main.js';
+    const cacheBust = `?t=${Date.now()}`;
+    const script = document.createElement('script');
+    script.id = `script-macro-${id}`;
+    script.src = (manifest && manifest.entry)
+        ? `modules/macros/${id}/${entry}${cacheBust}`
+        : `modules/macros/${id}.js${cacheBust}`;
+    document.body.appendChild(script);
+    if (manifest && manifest.style) {
+        if (window.MixerAPI && window.MixerAPI.styles && window.MixerAPI.styles.loadScopedCSS) {
+            window.MixerAPI.styles.loadScopedCSS(id, manifest.style);
+        }
+    }
 }
 function renderMacros() {
-    const grid = document.getElementById('macroSlotsGrid'); if (!grid) return; grid.innerHTML = '';
+    const grid = document.getElementById('macroSlotsGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
     for (let i = 0; i < TOTAL_SLOTS; i++) {
         const slotData = assignedMacros[i];
-        if (slotData && !availableScripts.includes(slotData.scriptId)) { delete assignedMacros[i]; saveGlobalSlotsManifest(); continue; }
         const config = slotData ? macroDatabase[slotData.scriptId] : null;
-        const slot = document.createElement('div'); slot.className = 'macro-slot';
-        const slotColor = (slotData && slotData.color) ? slotData.color : (config ? (config.color || '#4a148c') : '#222');
-        const defaultBorder = `2px solid ${config ? 'rgba(255,255,255,0.2)' : '#333'}`;
-        const isBlinking = (isMovingMacro && i === moveSourceIndex);
-        const animCss = isBlinking ? `animation: blink 1s infinite; border: 2px dashed #00ffcc; opacity:0.8;` : `border: ${defaultBorder};`;
-        slot.style.cssText = `height: 85px; min-width: 0; box-sizing: border-box; border-radius: 12px; background: ${slotColor}; ${animCss} display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; user-select: none; -webkit-user-select: none; transition: transform 0.1s; padding: 5px; text-align: center; overflow: hidden;`;
-        if (slotData && config) {
-            const displayName = slotData.name || `MACRO ${i + 1}`; const modName = config.name || slotData.scriptId;
-            const light = isLightColor(slotColor);
+        const isMissing = slotData && !availableScripts.includes(slotData.scriptId);
+
+        const slot = document.createElement('div');
+        slot.className = 'macro-slot';
+
+        // Determine slot styling
+        let slotBg, slotBorder, opacityStyle;
+        if (isMissing) {
+            slotBg = '#181818';
+            opacityStyle = 'opacity: 0.65;';
+            slotBorder = 'border: 2px solid #333;';
+        } else {
+            slotBg = (slotData && slotData.color) ? slotData.color : (config ? (config.color || '#4a148c') : '#222');
+            opacityStyle = '';
+            const defaultBorder = `2px solid ${config ? 'rgba(255,255,255,0.2)' : '#333'}`;
+            const isBlinking = (isMovingMacro && i === moveSourceIndex);
+            slotBorder = isBlinking ? 'animation: blink 1s infinite; border: 2px dashed #00ffcc; opacity:0.8;' : `border: ${defaultBorder};`;
+        }
+
+        slot.style.cssText = `height: 85px; min-width: 0; box-sizing: border-box; border-radius: 12px; background: ${slotBg}; ${slotBorder} ${opacityStyle} display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; user-select: none; -webkit-user-select: none; transition: transform 0.1s; padding: 5px; text-align: center; overflow: hidden;`;
+
+        if (isMissing) {
+            // Missing Macro State: show custom name + scriptId subtitle + MACRO AUSENTE badge
+            const displayName = slotData.name || `MACRO ${i + 1}`;
+            const modLabel = slotData.scriptId ? slotData.scriptId.toUpperCase() : '';
+            slot.innerHTML = `
+                <span style="font-size: 11px; font-weight: 800; color: #ccc; display: block; margin-bottom: 2px; line-height: 1.1; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${displayName.toUpperCase()}</span>
+                <span style="font-size: 8px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; max-width: 100%; word-break: break-word; overflow-wrap: break-word; margin-bottom: 4px;">${modLabel}</span>
+                <span style="font-size: 9px; font-weight: 700; color: #fff; background: #c62828; padding: 2px 6px; border-radius: 4px; line-height: 1.2;">MACRO AUSENTE</span>
+            `;
+            // Click disabled for missing macros
+            slot.style.cursor = 'not-allowed';
+            slot.onpointerdown = null;
+            slot.onpointerup = null;
+            slot.onpointerleave = null;
+            slot.onpointercancel = null;
+            slot.oncontextmenu = (e) => { e.preventDefault(); return false; };
+        } else if (slotData && config) {
+            // Normal configured pad with dyn_status support
+            const displayName = slotData.name || `MACRO ${i + 1}`;
+            const modName = config.name || slotData.scriptId;
+            const light = isLightColor(slotBg);
             const textColor = light ? '#111' : 'white';
             const subColor = light ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)';
-            slot.innerHTML = `<span style="font-size: 11px; font-weight: 800; color: ${textColor}; display: block; margin-bottom: 3px; line-height: 1.1; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${displayName.toUpperCase()}</span><span style="font-size: 8px; color: ${subColor}; text-transform: uppercase; letter-spacing: 0.5px; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${modName}</span>`;
-        } else { slot.innerHTML = `<span style="font-size: 24px; color: #444;">+</span>`; }
 
-        slot.onpointerdown = (e) => handleTouchStart(i, e);
-        slot.onpointerup = (e) => handleTouchEnd(i, e);
-        slot.onpointerleave = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
-        slot.onpointercancel = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
-        slot.oncontextmenu = (e) => { e.preventDefault(); return false; };
+            slot.innerHTML = `
+                <span style="font-size: 11px; font-weight: 800; color: ${textColor}; display: block; margin-bottom: 2px; line-height: 1.1; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${displayName.toUpperCase()}</span>
+                <span style="font-size: 8px; color: ${subColor}; text-transform: uppercase; letter-spacing: 0.5px; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">${modName}</span>
+                <div class="dyn-status" data-slot="${i}" style="font-size: 9px; font-weight: 700; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-top: 3px;"></div>
+            `;
+
+            slot.onpointerdown = (e) => handleTouchStart(i, e);
+            slot.onpointerup = (e) => handleTouchEnd(i, e);
+            slot.onpointerleave = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
+            slot.onpointercancel = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
+            slot.oncontextmenu = (e) => { e.preventDefault(); return false; };
+        } else {
+            // Empty slot
+            slot.innerHTML = `<span style="font-size: 24px; color: #444;">+</span>`;
+            slot.onpointerdown = (e) => handleTouchStart(i, e);
+            slot.onpointerup = (e) => handleTouchEnd(i, e);
+            slot.onpointerleave = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
+            slot.onpointercancel = (e) => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; e.currentTarget.style.transform = 'scale(1)'; } };
+            slot.oncontextmenu = (e) => { e.preventDefault(); return false; };
+        }
 
         grid.appendChild(slot);
     }
 }
+
+// ============================================================
+// Dynamic Pad System (dyn_status, colors, marquee)
+// ============================================================
+
+function isLightColorForBg(hex) {
+    return isLightColor(hex);
+}
+
+function computeDynamicTextBg(slotIndex) {
+    const sd = assignedMacros[slotIndex];
+    return (sd && sd.color) ? sd.color : '#222';
+}
+
+window.setMacroSlotStatus = function(slotIndex, text, options = {}) {
+    const grid = document.getElementById('macroSlotsGrid');
+    if (!grid) return;
+    const slotEl = grid.children[slotIndex];
+    if (!slotEl) return;
+    const dynEl = slotEl.querySelector('.dyn-status');
+    if (!dynEl) return;
+
+    dynEl.textContent = text || '';
+
+    if (options.color) {
+        dynEl.style.color = options.color;
+    } else if (text) {
+        const bg = computeDynamicTextBg(slotIndex);
+        const light = isLightColorForBg(bg);
+        dynEl.style.color = light ? '#111' : '#fff';
+    }
+
+    if (options.backgroundColor) {
+        dynEl.style.backgroundColor = options.backgroundColor;
+    } else if (text) {
+        dynEl.style.backgroundColor = 'rgba(255,255,255,0.1)';
+    }
+
+    dynEl.style.borderRadius = '4px';
+    dynEl.style.padding = text ? '1px 4px' : '0';
+
+    // Marquee effect for long text
+    if (text && text.length > 12) {
+        dynEl.style.whiteSpace = 'nowrap';
+        dynEl.style.overflow = 'hidden';
+        dynEl.style.textOverflow = 'ellipsis';
+        dynEl.style.animation = 'dynMarquee 4s linear infinite';
+        dynEl.style.maxWidth = '100%';
+    } else {
+        dynEl.style.animation = '';
+    }
+};
+
+window.setMacroDynamicColor = function(slotIndex, color) {
+    const grid = document.getElementById('macroSlotsGrid');
+    if (!grid) return;
+    const slotEl = grid.children[slotIndex];
+    if (!slotEl) return;
+    slotEl.style.background = color;
+};
+
+window.resetMacroDynamicSlot = function(slotIndex) {
+    const sd = assignedMacros[slotIndex];
+    if (!sd) return;
+    const config = macroDatabase[sd.scriptId];
+    const slotColor = sd.color || (config ? (config.color || '#4a148c') : '#222');
+    const grid = document.getElementById('macroSlotsGrid');
+    if (!grid) return;
+    const slotEl = grid.children[slotIndex];
+    if (!slotEl) return;
+    slotEl.style.background = slotColor;
+
+    // Reset dyn_status
+    const dynEl = slotEl.querySelector('.dyn-status');
+    if (dynEl) {
+        dynEl.textContent = '';
+        dynEl.style.color = '';
+        dynEl.style.backgroundColor = '';
+        dynEl.style.animation = '';
+        dynEl.style.padding = '0';
+    }
+};
+
+// Inject marquee keyframes once
+(function() {
+    if (document.getElementById('dynMarqueeStyle')) return;
+    const style = document.createElement('style');
+    style.id = 'dynMarqueeStyle';
+    style.textContent = `@keyframes dynMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }`;
+    document.head.appendChild(style);
+})();
+
 function handleTouchStart(index, e) {
     activeSlotIndex = index; const el = e.currentTarget;
     if (el) { el.style.transform = 'scale(0.92)'; el.style.transition = 'transform 0.1s'; }
@@ -667,13 +830,78 @@ function executeMacro(id, slotIndex) {
     }
 }
 async function openLibrary(index) {
-    activeSlotIndex = index; await refreshAvailableScripts(); const list = document.getElementById('macroLibraryList'); list.innerHTML = ''; document.getElementById('macroLibraryModal').style.display = 'flex';
-    availableScripts.forEach(id => {
-        const btn = document.createElement('button'); btn.className = 'btn-connect'; btn.style.cssText = 'background:#222; border:1px solid #333; margin-bottom:5px; text-align:left; padding-left:15px;';
-        btn.innerHTML = `<span style="color:#6a1b9a; font-weight:bold;">MOD:</span> ${id.toUpperCase()}`; btn.onclick = () => selectMacroFromLibrary(id); list.appendChild(btn);
+    activeSlotIndex = index;
+    await refreshAvailableScripts();
+    const list = document.getElementById('macroLibraryList');
+    list.innerHTML = '';
+    document.getElementById('macroLibraryModal').style.display = 'flex';
+
+    availableManifests.forEach(item => {
+        const manifest = (typeof item === 'object' && item) ? item : { id: item, name: item };
+        const id = manifest.id || item;
+        const card = document.createElement('div');
+        card.style.cssText = 'background:#1a1a1a; border:1px solid #333; border-radius:8px; padding:12px; margin-bottom:6px; cursor:pointer; transition: background 0.15s;';
+        card.onmouseenter = () => { card.style.background = '#2a2a2a'; };
+        card.onmouseleave = () => { card.style.background = '#1a1a1a'; };
+
+        const name = manifest.name || id.toUpperCase();
+        const version = manifest.version || '';
+        const description = manifest.description || '';
+        const color = manifest.color || '#6a1b9a';
+        const isSingleSlot = manifest.singleSlot === true;
+
+        let badgesHtml = '';
+        if (isSingleSlot) {
+            badgesHtml += '<span style="display:inline-block;background:#ff6f00;color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;margin-left:6px;font-weight:700;">1 SLOT</span>';
+        }
+        if (version) {
+            badgesHtml += `<span style="display:inline-block;background:#333;color:#aaa;font-size:9px;padding:1px 5px;border-radius:4px;margin-left:4px;">v${version}</span>`;
+        }
+
+        card.innerHTML = `
+            <div style="display:flex;align-items:center;margin-bottom:4px;">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:8px;flex-shrink:0;"></span>
+                <span style="color:#fff;font-weight:bold;font-size:13px;">${name}</span>
+                ${badgesHtml}
+            </div>
+            ${description ? `<div style="color:#999;font-size:11px;line-height:1.3;">${description}</div>` : ''}
+        `;
+        card.onclick = () => selectMacroFromLibrary(manifest);
+        list.appendChild(card);
     });
 }
-function selectMacroFromLibrary(id) { assignedMacros[activeSlotIndex] = { scriptId: id, name: `MACRO ${activeSlotIndex + 1}` }; saveGlobalSlotsManifest(); loadMacroScript(id); document.getElementById('macroLibraryModal').style.display = 'none'; renderMacros(); }
+function selectMacroFromLibrary(manifestOrId) {
+    const manifest = (typeof manifestOrId === 'object') ? manifestOrId : findManifest(manifestOrId);
+    const macroId = manifest ? (manifest.id || manifestOrId) : manifestOrId;
+
+    // singleSlot validation
+    if (manifest && manifest.singleSlot === true) {
+        const alreadyAssigned = Object.keys(assignedMacros).some(key => {
+            return parseInt(key) !== activeSlotIndex && assignedMacros[key] && assignedMacros[key].scriptId === macroId;
+        });
+        if (alreadyAssigned) {
+            if (typeof OverlayInfo !== 'undefined') {
+                OverlayInfo.show('Esta macro ja esta atribuida a outro slot e so permite uma instancia por vez.', 'warning');
+            } else {
+                alert('Esta macro ja esta atribuida a outro slot e so permite uma instancia por vez.');
+            }
+            return;
+        }
+    }
+
+    const slotName = (manifest && manifest.name) ? manifest.name : `MACRO ${activeSlotIndex + 1}`;
+    const slotColor = (manifest && manifest.color) ? manifest.color : '#6a1b9a';
+
+    assignedMacros[activeSlotIndex] = {
+        scriptId: macroId,
+        name: slotName,
+        color: slotColor
+    };
+    saveGlobalSlotsManifest();
+    loadMacroScript(macroId);
+    document.getElementById('macroLibraryModal').style.display = 'none';
+    renderMacros();
+}
 function showContextMenu(index) {
     const sd = assignedMacros[index]; if (!sd) return;
     activeSlotIndex = index;
@@ -823,9 +1051,24 @@ window.clearCurrentMacroSettings = function () {
 };
 async function removeMacroFromSlot() {
     if (activeSlotIndex !== null) {
-        const sd = assignedMacros[activeSlotIndex]; const config = sd ? macroDatabase[sd.scriptId] : null;
-        if (config && typeof config.onDelete === 'function') await config.onDelete(activeSlotIndex);
-        delete assignedMacros[activeSlotIndex]; await saveGlobalSlotsManifest(); document.getElementById('macroContextModal').style.display = 'none'; document.getElementById('macroColorDropdown').style.display = 'none'; renderMacros();
+        const sd = assignedMacros[activeSlotIndex];
+        const config = sd ? macroDatabase[sd.scriptId] : null;
+
+        // Call onDelete lifecycle hook if present
+        if (config && typeof config.onDelete === 'function') {
+            await config.onDelete(activeSlotIndex);
+        }
+
+        // Remove scoped CSS if the macro had styles
+        if (sd && sd.scriptId && window.MixerAPI && window.MixerAPI.styles && window.MixerAPI.styles.removeScopedCSS) {
+            window.MixerAPI.styles.removeScopedCSS(sd.scriptId);
+        }
+
+        delete assignedMacros[activeSlotIndex];
+        await saveGlobalSlotsManifest();
+        document.getElementById('macroContextModal').style.display = 'none';
+        document.getElementById('macroColorDropdown').style.display = 'none';
+        renderMacros();
     }
 }
 

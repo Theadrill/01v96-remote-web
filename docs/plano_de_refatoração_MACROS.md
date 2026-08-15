@@ -12,14 +12,18 @@ Além disso, este plano:
 5. Implementa a **Política Defensiva de Mod Ausente (*Missing Macro State*)** para garantir que a remoção ou erro temporário de um mod nunca apague as configurações salvas do operador.
 6. Implementa o **CSS Cleaner & Auto-Scoper** no `core.js` para sanitizar e blindar a aplicação contra conflitos de estilos.
 
+> [!IMPORTANT]
+> **Ambiente Isolado de Desenvolvimento (`public_refactor`)**:
+> Para não interromper nem interferir na aplicação ativa que está rodando em produção/ao vivo no ambiente local, foi criada uma cópia integral da pasta `public` chamada `public_refactor/`. Todo o desenvolvimento frontend, migração de módulos e novos recursos deste plano serão codificados exclusivamente dentro de `public_refactor/`. Somente após a conclusão e validação de todas as etapas é que os arquivos serão migrados/movidos para a pasta original `public/` para testes integrados.
+
 ---
 
 ## 2. Estrutura de Diretórios Padronizada
 
-Todas as macros devem seguir rigorosamente a estrutura de diretórios em `public/modules/macros/`:
+Todas as macros devem seguir rigorosamente a estrutura de diretórios em `public_refactor/modules/macros/` (durante o desenvolvimento) / `public/modules/macros/` (produção):
 
 ```text
-public/modules/macros/
+public_refactor/modules/macros/
 ├── core.js                           ← Contrato formal de isolamento, CSS Cleaner e API
 ├── macros.js                         ← Engine de renderização de slots, presets e orquestração
 ├── hosts.json                        ← Mapeamento de hosts/IPs para detecção de presets
@@ -261,30 +265,9 @@ Cada um dos 12 pads no grid passa a conter 3 camadas visuais:
 
 ## 10. Plano de Execução e Migração
 
-### Etapa 1: Backend Rust
-- [ ] Atualizar `list_macros()` em `server_rust/src/api/macros.rs` para ler os arquivos `manifest.json` de cada subpasta e retornar a lista de manifestos com suporte a `singleSlot`.
+- [x] Etapa 1: Backend Rust (Scanner de Manifestos)
+- [x] Etapa 2: Core & Engine de Macros (Frontend)
+- [x] Etapa 3: Migração das Macros Existentes (Lumikit & Channel Toggler)
+- [x] Etapa 4: Validação em Staging
+- [x] Etapa 5: Promoção / Migração para `public/`
 
-### Etapa 2: Core & Engine de Macros (Frontend)
-- [ ] Atualizar `public/modules/macros/core.js` com a nova API completa (`state`, `ui`, `storage`, `styles.loadScopedCSS` com CSS Cleaner, etc.).
-- [ ] Atualizar `public/modules/macros.js` para:
-  - Consumir o array de manifestos retornado por `GET /api/macros`.
-  - Atualizar `openLibrary(index)` para desenhar cards com Nome Real, Descrição, Badges e Cores.
-  - Implementar a validação de `singleSlot` ao selecionar macro da biblioteca.
-  - Executar o hook `onDelete(slotIndex)` ao limpar/remover um slot pelo menu de contexto.
-  - Implementar o comportamento defensivo **Mod Ausente (*Missing Macro State*)** exibindo o nome original no subtítulo e `MACRO AUSENTE` no `dyn_status`, sem alterar borda e sem deletar slots do perfil.
-  - Carregar scripts dinâmicos a partir de `modules/macros/${id}/${entry}` e injetar estilos sanitizados via `MixerAPI.styles.loadScopedCSS`.
-  - Implementar as funções de manipulação de `dyn_status` e `setDynamicColor` com animação marquee e contraste automático.
-
-### Etapa 3: Migração das Macros Existentes
-- [ ] Criar pasta `public/modules/macros/lumikit/`:
-  - Mover `lumikit.js` $\rightarrow$ `lumikit/main.js`.
-  - Criar `lumikit/manifest.json`.
-- [ ] Criar pasta `public/modules/macros/channel_toggler/`:
-  - Mover `channel_toggler.js` $\rightarrow$ `channel_toggler/main.js`.
-  - Criar `channel_toggler/manifest.json`.
-- [ ] Remover arquivos soltos antigos (`lumikit.js`, `channel_toggler.js`) da raiz de `public/modules/macros/`.
-
-### Etapa 4: Validação
-- [ ] Validar compilação Rust (`cargo check`).
-- [ ] Validar arquivos JavaScript (`node --check`).
-- [ ] Testar abertura da interface, modal de seleção da biblioteca de macros com os novos cards, simulação de mod ausente sem perda de dados, validação de `singleSlot`, teste do CSS Cleaner com injeção de seletores globais bloqueados, carregamento dos presets e execução das macros Lumikit e Toggler.

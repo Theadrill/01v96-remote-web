@@ -145,25 +145,73 @@ fn root_dir() -> PathBuf {
 }
 
 async fn list_macros() -> Json<Value> {
-    let mut macros = Vec::new();
-    let dir = root_dir().join("public").join("modules").join("macros");
-    if let Ok(entries) = std::fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            if let Ok(file_type) = entry.file_type()
-                && file_type.is_file()
-            {
-                let file_name = entry.file_name().to_string_lossy().to_string();
-                if file_name.ends_with(".js")
-                    && !file_name.ends_with(".server.js")
-                    && file_name != "core.js"
-                    && file_name != "macros.js"
+    let mut manifests = Vec::new();
+
+    // Helper to scan a macros directory for subdirectories with manifest.json
+    let scan_dir = |dir: PathBuf| -> Vec<Value> {
+        let mut found = Vec::new();
+        if !dir.exists() {
+            return found;
+        }
+        if let Ok(entries) = std::fs::read_dir(&dir) {
+            for entry in entries.flatten() {
+                if let Ok(file_type) = entry.file_type()
+                    && file_type.is_dir()
                 {
-                    macros.push(file_name.replace(".js", ""));
+                    let manifest_path = entry.path().join("manifest.json");
+                    if manifest_path.exists()
+                        && let Ok(content) = std::fs::read_to_string(&manifest_path)
+                        && let Ok(manifest) = serde_json::from_str::<Value>(&content)
+                    {
+                        found.push(manifest);
+                    }
+                }
+            }
+        }
+        found
+    };
+
+    // Scan primary directory: public/modules/macros/
+    let primary_dir = root_dir().join("public").join("modules").join("macros");
+    manifests.extend(scan_dir(primary_dir));
+
+    // Scan fallback directory: public_refactor/modules/macros/ (if exists and not already populated)
+    if manifests.is_empty() {
+        let fallback_dir = root_dir()
+            .join("public_refactor")
+            .join("modules")
+            .join("macros");
+        manifests.extend(scan_dir(fallback_dir));
+    }
+
+    // Backward compatibility: list old .js files in the root macros directory
+    // (excluding core.js, macros.js, *.server.js, and the 'profiles' directory)
+    if manifests.is_empty() {
+        let dir = root_dir().join("public").join("modules").join("macros");
+        if let Ok(entries) = std::fs::read_dir(dir) {
+            for entry in entries.flatten() {
+                if let Ok(file_type) = entry.file_type()
+                    && file_type.is_file()
+                {
+                    let file_name = entry.file_name().to_string_lossy().to_string();
+                    if file_name.ends_with(".js")
+                        && !file_name.ends_with(".server.js")
+                        && file_name != "core.js"
+                        && file_name != "macros.js"
+                    {
+                        let id = file_name.replace(".js", "");
+                        manifests.push(json!({
+                            "id": id,
+                            "name": id,
+                            "entry": file_name,
+                        }));
+                    }
                 }
             }
         }
     }
-    Json(json!(macros))
+
+    Json(json!(manifests))
 }
 
 async fn get_hosts() -> Json<Value> {

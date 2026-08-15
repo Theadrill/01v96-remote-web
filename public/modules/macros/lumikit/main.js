@@ -4,10 +4,8 @@
  * Agora integrado 100% no Profile principal.
  */
 (function () {
-    const ID = "lumikit";
-    let internalSlotConfig = {}; // Temporário para a UI de edição
+    let internalSlotConfig = {};
 
-    // 1. Execução (Recebe config do slot e config global do plugin)
     async function execute(slotIndex, slotConfig, globalConfig) {
         const actions = slotConfig || { scenes: [], extras: [] };
         const host = {
@@ -16,7 +14,6 @@
         };
         const baseUrl = `http://${host.ip}:${host.port}`;
 
-        // Executa todas cenas ativadas no slot (fire-and-forget, direto do browser)
         if (actions.scenes && actions.scenes.length > 0) {
             for (let scene of actions.scenes) {
                 try {
@@ -30,12 +27,10 @@
             }
         }
 
-        // Toggle de extras (status check precisa da resposta via proxy, press/release direto do browser)
         if (actions.extras && actions.extras.length > 0) {
             let efStatus = [];
             try {
                 const stRes = await MixerAPI.network.fetch(`${baseUrl}/services/main_get_ef_status`);
-                // Ajuste: O Proxy retorna { status, data }, e o Lumikit retorna { data: [...] }
                 if (stRes && stRes.data && stRes.data.data && stRes.data.data[0] && stRes.data.data[0].items) {
                     efStatus = stRes.data.data[0].items;
                 } else {
@@ -58,14 +53,12 @@
         }
     }
 
-    // 2. Configuração
     let currentCenasP1 = [];
     let currentCenasP2 = [];
     let currentExtras = [];
     let activeGlobalConfig = {};
 
     async function onConfigure(slotIndex, slotConfig, globalConfig) {
-        // Garante a estrutura correta igual ao Toggler
         internalSlotConfig = {
             scenes: (slotConfig && Array.isArray(slotConfig.scenes)) ? [...slotConfig.scenes] : [],
             extras: (slotConfig && Array.isArray(slotConfig.extras)) ? [...slotConfig.extras] : []
@@ -140,18 +133,15 @@
             const portVal = portInput ? parseInt(portInput.value) : NaN;
             activeGlobalConfig.port = (!isNaN(portVal)) ? portVal : 5000;
 
-            // Salva a configuração atual de IP/Porta global no JSON do preset atual no servidor
-            await MixerAPI.saveConfig(ID, slotIndex, internalSlotConfig, activeGlobalConfig);
-
-            // Sincroniza e recarrega os dados com as novas credenciais
+            await MixerAPI.saveConfig('lumikit', slotIndex, internalSlotConfig, activeGlobalConfig);
             onConfigure(slotIndex, internalSlotConfig, activeGlobalConfig);
         };
 
-        renderSec(grid, "CENAS - PÁGINA 1", "#ff5722");
+        renderSec(grid, "CENAS - PAGINA 1", "#ff5722");
         renderBtns(grid, slotIndex, 0, currentCenasP1);
-        renderSec(grid, "CENAS - PÁGINA 2", "#ffc107");
+        renderSec(grid, "CENAS - PAGINA 2", "#ffc107");
         renderBtns(grid, slotIndex, 1, currentCenasP2);
-        renderSec(grid, "FUNÇÕES EXTRAS", "#03a9f4");
+        renderSec(grid, "FUNCOES EXTRAS", "#03a9f4");
         renderExtraBtns(grid, slotIndex, currentExtras);
     }
 
@@ -208,7 +198,7 @@
         const portVal = portInput ? parseInt(portInput.value) : NaN;
         activeGlobalConfig.port = (!isNaN(portVal)) ? portVal : 5000;
 
-        await MixerAPI.saveConfig(ID, slotIndex, internalSlotConfig, activeGlobalConfig);
+        await MixerAPI.saveConfig('lumikit', slotIndex, internalSlotConfig, activeGlobalConfig);
         document.getElementById('macroSettingsModal').style.display = 'none';
     }
 
@@ -218,10 +208,10 @@
     }
 
     async function onDelete(slotIndex) {
-        await MixerAPI.saveConfig(ID, slotIndex, null);
+        await MixerAPI.saveConfig('lumikit', slotIndex, null);
     }
 
-    window.registerMacro(ID, {
+    MixerAPI.registerMacro('lumikit', {
         name: "Lumikit", color: "#ff5722",
         execute, onConfigure, onSave, onClear, onDelete
     });

@@ -1,0 +1,11 @@
+{
+  "id": "channel_toggler",
+  "name": "Channel Toggler",
+  "version": "1.0.0",
+  "author": "Theadrill",
+  "description": "Toggle ON/OFF simultaneo para multiplos canais selecionados",
+  "entry": "main.js",
+  "color": "#6a1b9a",
+  "icon": "toggle-on",
+  "singleSlot": false
+}
