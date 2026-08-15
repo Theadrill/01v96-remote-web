@@ -57,6 +57,32 @@ window.contextClipboard = {
     pasteHandler: null
 };
 
+/**
+ * Despacha uma fila de comandos de controle via socket sequencialmente
+ * com delay seguro (padrão: 20ms) para proteção do processador da 01V96.
+ */
+function dispatchThrottledCommands(commands, onComplete, intervalMs) {
+    var delay = (typeof intervalMs === 'number') ? intervalMs : 20;
+    if (!commands || commands.length === 0) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+
+    commands.forEach(function(cmd, index) {
+        setTimeout(function() {
+            if (cmd.type && cmd.channel !== undefined) {
+                socket.emit('control', { type: cmd.type, channel: cmd.channel, value: cmd.value });
+            }
+            if (typeof cmd.onExecute === 'function') {
+                cmd.onExecute();
+            }
+            if (index === commands.length - 1 && typeof onComplete === 'function') {
+                onComplete();
+            }
+        }, index * delay);
+    });
+}
+
 // --- HANDLER ESPECÍFICO: SENDS ON FADERS (MIX 1-8) ---
 
 function copySendsOnFaders(auxIdx) {
@@ -104,39 +130,50 @@ function executePasteSendsOnFaders(targetMix) {
         if (!confirmed) return;
 
         var items = window.contextClipboard.data;
-        items.forEach(function(item, index) {
-            setTimeout(function() {
-                var ch = item.ch;
-                var state = getChannelStateById(ch);
-                if (state) {
-                    state['aux' + targetMix] = item.level;
-                    state['aux' + targetMix + 'On'] = item.on;
+        var commands = [];
+
+        items.forEach(function(item) {
+            var ch = item.ch;
+            var state = getChannelStateById(ch);
+            if (state) {
+                state['aux' + targetMix] = item.level;
+                state['aux' + targetMix + 'On'] = item.on;
+            }
+
+            commands.push({
+                type: 'kInputAUX/kAUX' + targetMix + 'Level',
+                channel: ch,
+                value: item.level,
+                onExecute: function() {
+                    var fader = document.getElementById('aux_f_ch_' + ch);
+                    var valDisplay = document.getElementById('aux_v_ch_' + ch);
+                    if (fader) fader.value = item.level;
+                    if (valDisplay) valDisplay.innerText = rawToDb(item.level);
                 }
+            });
 
-                // Atualização da UI
-                var fader = document.getElementById('aux_f_ch_' + ch);
-                var valDisplay = document.getElementById('aux_v_ch_' + ch);
-                var btnOn = document.getElementById('aux_on_ch_' + ch);
-
-                if (fader) fader.value = item.level;
-                if (valDisplay) valDisplay.innerText = rawToDb(item.level);
-                if (btnOn) {
-                    if (item.on) {
-                        btnOn.classList.add('on-active');
-                    } else {
-                        btnOn.classList.remove('on-active');
+            commands.push({
+                type: 'kInputAUX/kAUX' + targetMix + 'On',
+                channel: ch,
+                value: item.on ? 1 : 0,
+                onExecute: function() {
+                    var btnOn = document.getElementById('aux_on_ch_' + ch);
+                    if (btnOn) {
+                        if (item.on) {
+                            btnOn.classList.add('on-active');
+                        } else {
+                            btnOn.classList.remove('on-active');
+                        }
                     }
                 }
-
-                // Emissão Socket
-                socket.emit('control', { type: 'kInputAUX/kAUX' + targetMix + 'Level', channel: ch, value: item.level });
-                socket.emit('control', { type: 'kInputAUX/kAUX' + targetMix + 'On', channel: ch, value: item.on ? 1 : 0 });
-
-                if (index === items.length - 1 && typeof OverlayInfo !== 'undefined') {
-                    OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted(targetName));
-                }
-            }, index * 15);
+            });
         });
+
+        dispatchThrottledCommands(commands, function() {
+            if (typeof OverlayInfo !== 'undefined') {
+                OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted(targetName));
+            }
+        }, 20);
     });
 }
 
@@ -159,7 +196,7 @@ function copyInputChannelAuxSends(ch) {
         type: 'input_channel_aux_sends',
         sourceId: ch,
         sourceName: sourceName,
-        expectedScreen: 'AUX DO CANAL (INPUT)',
+        expectedScreen: 'AUX DO CANAL',
         data: channelsData,
         validateTarget: function() {
             return (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'aux' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && ((activeConfigChannel >= 0 && activeConfigChannel <= 31) || (activeConfigChannel >= 60 && activeConfigChannel <= 67)));
@@ -178,8 +215,8 @@ function executePasteInputChannelAuxSends(targetCh) {
     var targetName = getChannelDisplayName(targetCh);
 
     ConfirmModal.show({
-        title: 'Colar Envios de Auxiliares',
-        message: 'Deseja colar os 8 envios de AUX de <b>' + sourceName + '</b> em <b>' + targetName + '</b>?<br><br><small style="color:#aaa;">Os 8 auxiliares receberão os mesmos níveis e estados ON/OFF.</small>',
+        title: 'Colar Envios AUX do Canal',
+        message: 'Deseja colar os envios AUX de <b>' + sourceName + '</b> em <b>' + targetName + '</b>?<br><br><small style="color:#aaa;">Os 8 envios AUX receberão os mesmos níveis e estados ON/OFF.</small>',
         type: 'primary',
         confirmText: 'SIM, COLAR',
         cancelText: 'CANCELAR'
@@ -187,38 +224,53 @@ function executePasteInputChannelAuxSends(targetCh) {
         if (!confirmed) return;
 
         var items = window.contextClipboard.data;
-        items.forEach(function(item, index) {
-            setTimeout(function() {
-                var state = getChannelStateById(targetCh);
-                if (state) {
-                    state['aux' + item.aux] = item.level;
-                    state['aux' + item.aux + 'On'] = item.on;
+        var commands = [];
+
+        items.forEach(function(item) {
+            var state = getChannelStateById(targetCh);
+            if (state) {
+                state['aux' + item.aux] = item.level;
+                state['aux' + item.aux + 'On'] = item.on;
+            }
+
+            commands.push({
+                type: 'kInputAUX/kAUX' + item.aux + 'Level',
+                channel: targetCh,
+                value: item.level,
+                onExecute: function() {
+                    if (activeConfigChannel === targetCh && activeConfigTab === 'aux') {
+                        var fader = document.getElementById('aux_f_' + item.aux);
+                        var valDisplay = document.getElementById('aux_v_' + item.aux);
+                        if (fader) fader.value = item.level;
+                        if (valDisplay) valDisplay.innerText = rawToDb(item.level);
+                    }
                 }
+            });
 
-                if (activeConfigChannel === targetCh && activeConfigTab === 'aux') {
-                    var fader = document.getElementById('aux_f_' + item.aux);
-                    var valDisplay = document.getElementById('aux_v_' + item.aux);
-                    var btnOn = document.getElementById('aux_on_' + item.aux);
-
-                    if (fader) fader.value = item.level;
-                    if (valDisplay) valDisplay.innerText = rawToDb(item.level);
-                    if (btnOn) {
-                        if (item.on) {
-                            btnOn.classList.add('on-active');
-                        } else {
-                            btnOn.classList.remove('on-active');
+            commands.push({
+                type: 'kInputAUX/kAUX' + item.aux + 'On',
+                channel: targetCh,
+                value: item.on ? 1 : 0,
+                onExecute: function() {
+                    if (activeConfigChannel === targetCh && activeConfigTab === 'aux') {
+                        var btnOn = document.getElementById('aux_on_' + item.aux);
+                        if (btnOn) {
+                            if (item.on) {
+                                btnOn.classList.add('on-active');
+                            } else {
+                                btnOn.classList.remove('on-active');
+                            }
                         }
                     }
                 }
-
-                socket.emit('control', { type: 'kInputAUX/kAUX' + item.aux + 'Level', channel: targetCh, value: item.level });
-                socket.emit('control', { type: 'kInputAUX/kAUX' + item.aux + 'On', channel: targetCh, value: item.on ? 1 : 0 });
-
-                if (index === items.length - 1 && typeof OverlayInfo !== 'undefined') {
-                    OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted('AUX DE ' + targetName));
-                }
-            }, index * 15);
+            });
         });
+
+        dispatchThrottledCommands(commands, function() {
+            if (typeof OverlayInfo !== 'undefined') {
+                OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted('AUX DE ' + targetName));
+            }
+        }, 20);
     });
 }
 
@@ -270,82 +322,78 @@ function executePasteDynamics(targetCh) {
         // Gate (apenas canais de entrada 0..31)
         if (targetCh <= 31 && window.contextClipboard.data.gate) {
             state.gate = JSON.parse(JSON.stringify(window.contextClipboard.data.gate));
-            commands.push({ type: 'kInputGate/kGateOn', value: state.gate.on ? 1 : 0 });
-            commands.push({ type: 'kInputGate/kGateThreshold', value: state.gate.thresh });
-            commands.push({ type: 'kInputGate/kGateRange', value: state.gate.range });
-            commands.push({ type: 'kInputGate/kGateAttack', value: state.gate.attack });
-            commands.push({ type: 'kInputGate/kGateHold', value: state.gate.hold });
-            commands.push({ type: 'kInputGate/kGateDecay', value: state.gate.decay });
+            commands.push({ type: 'kInputGate/kGateOn', channel: targetCh, value: state.gate.on ? 1 : 0 });
+            commands.push({ type: 'kInputGate/kGateThreshold', channel: targetCh, value: state.gate.thresh });
+            commands.push({ type: 'kInputGate/kGateRange', channel: targetCh, value: state.gate.range });
+            commands.push({ type: 'kInputGate/kGateAttack', channel: targetCh, value: state.gate.attack });
+            commands.push({ type: 'kInputGate/kGateHold', channel: targetCh, value: state.gate.hold });
+            commands.push({ type: 'kInputGate/kGateDecay', channel: targetCh, value: state.gate.decay });
         }
 
         // Compressor
         if (window.contextClipboard.data.comp) {
             state.comp = JSON.parse(JSON.stringify(window.contextClipboard.data.comp));
             var prefix = getChannelParamPrefix(targetCh);
-            commands.push({ type: prefix + 'Comp/kCompOn', value: state.comp.on ? 1 : 0 });
-            commands.push({ type: prefix + 'Comp/kCompThreshold', value: state.comp.thresh });
-            commands.push({ type: prefix + 'Comp/kCompRatio', value: state.comp.ratio });
-            commands.push({ type: prefix + 'Comp/kCompAttack', value: state.comp.attack });
-            commands.push({ type: prefix + 'Comp/kCompRelease', value: state.comp.release });
-            commands.push({ type: prefix + 'Comp/kCompGain', value: state.comp.gain });
-            commands.push({ type: prefix + 'Comp/kCompKnee', value: state.comp.knee });
+            commands.push({ type: prefix + 'Comp/kCompOn', channel: targetCh, value: state.comp.on ? 1 : 0 });
+            commands.push({ type: prefix + 'Comp/kCompThreshold', channel: targetCh, value: state.comp.thresh });
+            commands.push({ type: prefix + 'Comp/kCompRatio', channel: targetCh, value: state.comp.ratio });
+            commands.push({ type: prefix + 'Comp/kCompAttack', channel: targetCh, value: state.comp.attack });
+            commands.push({ type: prefix + 'Comp/kCompRelease', channel: targetCh, value: state.comp.release });
+            commands.push({ type: prefix + 'Comp/kCompGain', channel: targetCh, value: state.comp.gain });
+            commands.push({ type: prefix + 'Comp/kCompKnee', channel: targetCh, value: state.comp.knee });
         }
 
-        commands.forEach(function(cmd, index) {
-            setTimeout(function() {
-                socket.emit('control', { type: cmd.type, channel: targetCh, value: cmd.value });
+        var updateUI = function() {
+            if (activeConfigChannel === targetCh && activeConfigTab === 'dyn') {
+                if (targetCh <= 31 && state.gate) {
+                    var gateOnBtn = document.getElementById('gateOn');
+                    if (gateOnBtn) gateOnBtn.classList.toggle('active', !!state.gate.on);
 
-                // Atualização visual em tempo real se a aba DYN estiver ativa no canal destino
-                if (activeConfigChannel === targetCh && activeConfigTab === 'dyn') {
-                    // Gate UI
-                    if (targetCh <= 31 && state.gate) {
-                        var gateOnBtn = document.getElementById('gateOn');
-                        if (gateOnBtn) gateOnBtn.classList.toggle('active', !!state.gate.on);
-
-                        var gateSliders = {
-                            'gateThreshSl': state.gate.thresh,
-                            'gateRangeSl': state.gate.range,
-                            'gateAttackSl': state.gate.attack,
-                            'gateHoldSl': state.gate.hold,
-                            'gateDecaySl': state.gate.decay
-                        };
-                        Object.keys(gateSliders).forEach(function(id) {
-                            var sl = document.getElementById(id);
-                            if (sl) {
-                                sl.value = gateSliders[id];
-                                sl.dispatchEvent(new Event('input'));
-                            }
-                        });
-                    }
-
-                    // Compressor UI
-                    if (state.comp) {
-                        var compOnBtn = document.getElementById('compOn');
-                        if (compOnBtn) compOnBtn.classList.toggle('active', !!state.comp.on);
-
-                        var compSliders = {
-                            'compThreshSl': state.comp.thresh,
-                            'compRatioSl': state.comp.ratio,
-                            'compAttackSl': state.comp.attack,
-                            'compReleaseSl': state.comp.release,
-                            'compGainSl': state.comp.gain,
-                            'compKneeSl': state.comp.knee
-                        };
-                        Object.keys(compSliders).forEach(function(id) {
-                            var sl = document.getElementById(id);
-                            if (sl) {
-                                sl.value = compSliders[id];
-                                sl.dispatchEvent(new Event('input'));
-                            }
-                        });
-                    }
+                    var gateSliders = {
+                        'gateThreshSl': state.gate.thresh,
+                        'gateRangeSl': state.gate.range,
+                        'gateAttackSl': state.gate.attack,
+                        'gateHoldSl': state.gate.hold,
+                        'gateDecaySl': state.gate.decay
+                    };
+                    Object.keys(gateSliders).forEach(function(id) {
+                        var sl = document.getElementById(id);
+                        if (sl) {
+                            sl.value = gateSliders[id];
+                            sl.dispatchEvent(new Event('input'));
+                        }
+                    });
                 }
 
-                if (index === commands.length - 1 && typeof OverlayInfo !== 'undefined') {
-                    OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted('DYNAMICS DE ' + targetName));
+                if (state.comp) {
+                    var compOnBtn = document.getElementById('compOn');
+                    if (compOnBtn) compOnBtn.classList.toggle('active', !!state.comp.on);
+
+                    var compSliders = {
+                        'compThreshSl': state.comp.thresh,
+                        'compRatioSl': state.comp.ratio,
+                        'compAttackSl': state.comp.attack,
+                        'compReleaseSl': state.comp.release,
+                        'compGainSl': state.comp.gain,
+                        'compKneeSl': state.comp.knee
+                    };
+                    Object.keys(compSliders).forEach(function(id) {
+                        var sl = document.getElementById(id);
+                        if (sl) {
+                            sl.value = compSliders[id];
+                            sl.dispatchEvent(new Event('input'));
+                        }
+                    });
                 }
-            }, index * 15);
-        });
+            }
+        };
+
+        dispatchThrottledCommands(commands, function() {
+            updateUI();
+            if (typeof OverlayInfo !== 'undefined') {
+                OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted('DYNAMICS DE ' + targetName));
+            }
+        }, 20);
     });
 }
 
