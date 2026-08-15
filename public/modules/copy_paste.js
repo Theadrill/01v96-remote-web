@@ -397,6 +397,159 @@ function executePasteDynamics(targetCh) {
     });
 }
 
+// --- HANDLER ESPECÍFICO: ROUTING / ETC ---
+
+function copyRouting(ch) {
+    var state = getChannelStateById(ch);
+    if (ch >= 44 && ch <= 51) {
+        state = (typeof busesState !== 'undefined' && busesState[ch - 44]) ? busesState[ch - 44] : state;
+    }
+    if (!state) return;
+
+    var sourceName = getChannelDisplayName(ch);
+
+    var hasInsertOut = false;
+    if (window.globalOutPatches) {
+        var targetSrcNormal = ch + 31;
+        var targetSrcFx = ch + 13;
+
+        for (var p = 0; p < 4; p++) {
+            if (window.globalOutPatches.omni && window.globalOutPatches.omni[p] === targetSrcNormal) { hasInsertOut = true; break; }
+        }
+        if (!hasInsertOut) {
+            for (var p = 0; p < 8; p++) {
+                if (window.globalOutPatches.adat && window.globalOutPatches.adat[p] === targetSrcNormal) { hasInsertOut = true; break; }
+            }
+        }
+        if (!hasInsertOut) {
+            for (var p = 0; p < 16; p++) {
+                if (window.globalOutPatches.slot && window.globalOutPatches.slot[p] === targetSrcNormal) { hasInsertOut = true; break; }
+            }
+        }
+        if (!hasInsertOut) {
+            for (var p = 0; p < 2; p++) {
+                if (window.globalOutPatches['2tr'] && window.globalOutPatches['2tr'][p] === targetSrcNormal) { hasInsertOut = true; break; }
+            }
+        }
+        if (!hasInsertOut) {
+            for (var p = 0; p < 8; p++) {
+                if (window.globalOutPatches.fx && window.globalOutPatches.fx[p] === targetSrcFx) { hasInsertOut = true; break; }
+            }
+        }
+    }
+
+    window.contextClipboard = {
+        type: 'routing',
+        sourceId: ch,
+        sourceName: sourceName,
+        expectedScreen: 'ROUTING / ETC',
+        data: {
+            patch: (state && state.patch !== undefined ? state.patch : null),
+            pan: (state && state.pan !== undefined ? state.pan : 0),
+            buses: (state && state.buses ? [...state.buses] : new Array(8).fill(false)),
+            stereo: (state && state.stereo !== undefined ? !!state.stereo : true),
+            insert: (state && state.insert ? JSON.parse(JSON.stringify(state.insert)) : null)
+        },
+        validateTarget: function() {
+            return (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null && ((activeConfigChannel >= 0 && activeConfigChannel <= 31) || (activeConfigChannel >= 44 && activeConfigChannel <= 51) || (activeConfigChannel >= 60 && activeConfigChannel <= 67)));
+        },
+        pasteHandler: function(targetCh) { executePasteRouting(targetCh); }
+    };
+
+    if (hasInsertOut) {
+        ConfirmModal.show({
+            title: 'Aviso de Cópia',
+            message: 'ROUTING de <b>' + sourceName + '</b> copiado!<br><br><small style="color:#aaa;">Nota: O <b>Insert Out</b> não foi copiado pois depende de uma porta de saída física única na mesa.</small>',
+            type: 'info',
+            confirmText: 'OK',
+            showCancel: false
+        });
+    } else {
+        if (typeof OverlayInfo !== 'undefined') {
+            OverlayInfo.show('copied', CLIPBOARD_MESSAGES.copied('ROUTING DE ' + sourceName));
+        }
+    }
+    window.updateCopyPasteUIState();
+}
+
+function executePasteRouting(targetCh) {
+    var sourceName = window.contextClipboard.sourceName;
+    var targetName = getChannelDisplayName(targetCh);
+
+    ConfirmModal.show({
+        title: 'Colar Definições de Routing',
+        message: 'Deseja colar as definições de Routing de <b>' + sourceName + '</b> em <b>' + targetName + '</b>?<br><br><small style="color:#aaa;">Patch, Pan, Buses, Stereo e Configuração de Insert serão aplicados.</small>',
+        type: 'primary',
+        confirmText: 'SIM, COLAR',
+        cancelText: 'CANCELAR'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
+
+        var data = window.contextClipboard.data;
+        var commands = [];
+
+        if ((targetCh >= 0 && targetCh <= 31) || (targetCh >= 60 && targetCh <= 67)) {
+            var state = getChannelStateById(targetCh);
+
+            if (data.patch !== null && data.patch !== undefined) {
+                state.patch = data.patch;
+                commands.push({ type: 'kChannelInput/kChannelIn', channel: targetCh, value: data.patch });
+            }
+            if (data.pan !== undefined) {
+                state.pan = data.pan;
+                commands.push({ type: 'kPan', channel: targetCh, value: data.pan });
+            }
+            if (data.buses) {
+                state.buses = [...data.buses];
+                for (var i = 0; i < 8; i++) {
+                    commands.push({ type: 'kInputBus/kBus' + (i + 1), channel: targetCh, value: data.buses[i] ? 1 : 0 });
+                }
+            }
+            if (data.stereo !== undefined) {
+                state.stereo = !!data.stereo;
+                commands.push({ type: 'kInputBus/kStereo', channel: targetCh, value: data.stereo ? 1 : 0 });
+            }
+            if (targetCh <= 31 && data.insert) {
+                if (!state.insert) state.insert = {};
+                state.insert.on = !!data.insert.on;
+                state.insert.position = data.insert.position || 0;
+                state.insert.patch_in = data.insert.patch_in || 0;
+                commands.push({ type: 'kInputInsert/kInsertOn', channel: targetCh, value: data.insert.on ? 1 : 0 });
+                commands.push({ type: 'kInputInsert/kInsertLocInsert', channel: targetCh, value: data.insert.position || 0 });
+                commands.push({ type: 'kChannelInsertIn/kInsertIn', channel: targetCh, value: data.insert.patch_in || 0 });
+            }
+        }
+
+        if (targetCh >= 44 && targetCh <= 51) {
+            var busIdx = targetCh - 44;
+            var busState = (typeof busesState !== 'undefined' && busesState[busIdx]) ? busesState[busIdx] : getChannelStateById(targetCh);
+
+            if (data.stereo !== undefined) {
+                busState.stereo = !!data.stereo;
+                commands.push({ type: 'kBusToStereo/kBusToStereoOn', channel: targetCh, value: data.stereo ? 1 : 0 });
+            }
+            if (data.insert) {
+                if (!busState.insert) busState.insert = {};
+                busState.insert.on = !!data.insert.on;
+                busState.insert.position = data.insert.position || 0;
+                busState.insert.patch_in = data.insert.patch_in || 0;
+                commands.push({ type: 'kBusInsert/kInsertOn', channel: targetCh, value: data.insert.on ? 1 : 0 });
+                commands.push({ type: 'kBusInsert/kInsertLocInsert', channel: targetCh, value: data.insert.position || 0 });
+                commands.push({ type: 'kChannelInsertIn/kInsertIn', channel: targetCh, value: data.insert.patch_in || 0 });
+            }
+        }
+
+        dispatchThrottledCommands(commands, function() {
+            if (activeConfigChannel === targetCh && activeConfigTab === 'etc' && typeof renderRouting === 'function') {
+                renderRouting(targetCh);
+            }
+            if (typeof OverlayInfo !== 'undefined') {
+                OverlayInfo.show('success', CLIPBOARD_MESSAGES.pasted('ROUTING DE ' + targetName));
+            }
+        }, 20);
+    });
+}
+
 // --- DESPACHANTES GLOBAIS ---
 
 window.copyActiveContext = function() {
@@ -414,6 +567,10 @@ window.copyActiveContext = function() {
     }
     if (activeConfigChannel !== null && (activeConfigChannel <= 31 || (activeConfigChannel >= 36 && activeConfigChannel <= 52)) && activeConfigTab === 'dyn') {
         copyDynamics(activeConfigChannel);
+        return;
+    }
+    if (activeConfigChannel !== null && ((activeConfigChannel >= 0 && activeConfigChannel <= 31) || (activeConfigChannel >= 44 && activeConfigChannel <= 51) || (activeConfigChannel >= 60 && activeConfigChannel <= 67)) && activeConfigTab === 'etc') {
+        copyRouting(activeConfigChannel);
         return;
     }
     if (typeof OverlayInfo !== 'undefined') {
@@ -442,6 +599,8 @@ window.pasteActiveContext = function() {
     if (typeof window.contextClipboard.pasteHandler === 'function') {
         var targetMix;
         if (window.contextClipboard.type === 'dynamics') {
+            window.contextClipboard.pasteHandler(activeConfigChannel);
+        } else if (window.contextClipboard.type === 'routing') {
             window.contextClipboard.pasteHandler(activeConfigChannel);
         } else if (window.contextClipboard.type === 'input_channel_aux_sends') {
             window.contextClipboard.pasteHandler(activeConfigChannel);
