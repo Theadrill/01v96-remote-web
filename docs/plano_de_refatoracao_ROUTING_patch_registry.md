@@ -116,25 +116,35 @@ graph TD
 
 ---
 
-### Fase 1.3: Refatoração dos Módulos Consumidores Existentes
-Após a validação bem-sucedida pelo usuário:
-1. **`efeitos.js`**:
-   - Substituição das funções privadas de decodificação por chamadas diretas a `window.PatchRegistry.getFxInfo(slot)`.
-2. **`inserts.js`**:
-   - Substituição das rotinas de cálculo numérico ad-hoc pelas consultas do `PatchRegistry`.
-3. **`routing.js`**:
-   - Remoção de tabelas duplicadas locais.
+### Fase 1.3: Refatoração Modular Gradual com Checkpoints Críticos
+
+Para segurança operacional máxima no ambiente ao vivo, a refatoração dos 3 módulos existentes será executada em **sub-etapas estritamente isoladas**, com pausa e validação do usuário ao final de cada uma:
+
+#### 🔹 Fase 1.3a: Refatoração de `public/modules/FXS/efeitos.js`
+- **Alvo**: Substituir decodificadores privados locais (`fxInputLabel`, `fxOutputSlotLabel`, etc.) por consultas centralizadas a `window.PatchRegistry.getFxInfo(slot)`.
+- **Escopo**: Apenas `efeitos.js`.
+- **🛑 CHECKPOINT CRÍTICO 1.3a**: O usuário abre a tela principal de Efeitos (FX 1 a FX 4) e confirma que todas as máquinas exibem fielmente suas entradas, saídas, bypass e parâmetros. Aguarda comando explícito para avançar.
+
+#### 🔹 Fase 1.3b: Refatoração de `public/modules/inserts.js`
+- **Alvo**: Substituir rotinas de cálculo numérico ad-hoc de decodificação de patch (ex: `currentOut >= 60`, bases numéricas) pelas consultas centralizadas do `window.PatchRegistry.getInsertInfo(ch)`.
+- **Escopo**: Apenas `inserts.js`.
+- **🛑 CHECKPOINT CRÍTICO 1.3b**: O usuário abre a modal de configuração de Inserts nos canais/buses e confirma que o status ON/OFF, posições (PRE EQ / PRE / POST) e patches IN/OUT continuam exibidos e chaveados corretamente. Aguarda comando explícito para avançar.
+
+#### 🔹 Fase 1.3c: Refatoração de `public/modules/routing.js`
+- **Alvo**: Remover tabela privada duplicada `getPatchName(val)` e unificar o consumo em `window.PatchRegistry.getChannelInput(ch)`.
+- **Escopo**: Apenas `routing.js`.
+- **🛑 CHECKPOINT CRÍTICO 1.3c**: O usuário abre a aba Routing/ETC de canais de entrada e barramentos, altera um patch se desejar, e confirma que a exibição e seleção de canais continuam 100% funcionais. Aguarda comando explícito para finalizar a ETAPA 1.
 
 ---
 
 ## 4. Plano de Verificação da Etapa 1
 
-### 4.1 Verificação da Fase 1.1 e 1.2 (Pré-Checkpoint)
-- Executar `cargo check` para garantir build 100% limpo do Rust.
-- Na **tela principal**: verificar botão `ROTEAMENTO` na Sidebar (Desktop/Landscape) e item `ROTEAMENTO GERAL` no `MENU` (Portrait).
-- Em **outros modos** (`channelConfig`, `outsMode`, `techMix`): confirmar que o botão **NÃO** aparece.
-- Validar se todas as 5 seções do painel exibem dados consistentes com a mesa física.
+### 4.1 Verificação da Fase 1.1 e 1.2 (Concluídas)
+- `cargo check` garantido limpo.
+- Botão `ROTEAMENTO` visível exclusivamente na tela principal (`mode === 'main'`).
+- Painel de Visão Geral validado pelo usuário em tempo real.
 
-### 4.2 Verificação Pós-Checkpoint (Fase 1.3)
-- Testar alteração de patch em tempo real no console e verificar atualização simultânea na tela de roteamento, faders e tela de efeitos.
-- Comprovar que `efeitos.js`, `inserts.js` e `routing.js` operam perfeitamente sem funções duplicadas.
+### 4.2 Verificação Passo a Passo das Fases 1.3a, 1.3b e 1.3c
+- Validação com `node --check <arquivo.js>` e `cargo check` antes de qualquer entrega.
+- Execução sequencial e isolada de cada arquivo com pausa obrigatória para aprovação do usuário.
+- Garantia de transição suave e zero regressões para a ETAPA 2 (Desktop Headers).
