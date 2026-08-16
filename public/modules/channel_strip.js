@@ -198,12 +198,6 @@ function createDesktopStrip(config) {
                     </svg>
                 </div>` : ''}
             </div>
-            
-            ${!isMaster ? `
-            <div class="desk-patch-zone" id="${patchId}" onclick="${configAction}">
-                <span class="desk-patch-name" id="${patchValId}">${patchText || '--'}</span>
-            </div>
-            ` : ''}
 
             ${hasSolo ?
             `<button id="${soloId}" class="btn-cue ${solo ? 'solo-active' : ''}" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">SOLO</button>` :
@@ -302,6 +296,12 @@ function createDesktopStrip(config) {
                 </div>
                 <span class="desk-pan-r">R</span>` : ''}
             </div>
+
+            ${!isMaster ? `
+            <div class="desk-patch-zone" id="${patchId}" onclick="${configAction}">
+                <span class="desk-patch-name" id="${patchValId}">${patchText || '--'}</span>
+            </div>
+            ` : ''}
         </div>
     `;
 }

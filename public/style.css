@@ -1830,7 +1830,7 @@ body.layout-desktop .sidebar-macros {
     height: 24px;
     margin: 0;
     border: none;
-    border-bottom: 1px solid #111;
+    border-top: 1px solid #111;
     border-radius: 0;
     display: flex;
     align-items: center;
