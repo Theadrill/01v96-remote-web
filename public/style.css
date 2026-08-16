@@ -1856,37 +1856,37 @@ body.layout-desktop .sidebar-macros {
     letter-spacing: -0.2px;
 }
 
-/* Preenchimento Sólido por Grupo de Canais */
+/* Preenchimento Sólido por Grupo de Canais (Tons 30% mais escuros) */
 .fader-group-1 .desk-patch-zone {
-    background: #003a5e;
+    background: #002842;
 }
 .fader-group-1 .desk-patch-name {
     color: #00adef;
 }
 
 .fader-group-2 .desk-patch-zone {
-    background: #004a30;
+    background: #003322;
 }
 .fader-group-2 .desk-patch-name {
     color: #00ff88;
 }
 
 .fader-group-st .desk-patch-zone {
-    background: #14283d;
+    background: #0e1c2b;
 }
 .fader-group-st .desk-patch-name {
     color: #5cacee;
 }
 
 .fader-group-mix .desk-patch-zone {
-    background: #332800;
+    background: #241c00;
 }
 .fader-group-mix .desk-patch-name {
     color: #d4a017;
 }
 
 .fader-group-bus .desk-patch-zone {
-    background: #002e27;
+    background: #00201b;
 }
 .fader-group-bus .desk-patch-name {
     color: #00b396;
