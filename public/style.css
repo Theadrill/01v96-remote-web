@@ -322,7 +322,7 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 .fader-group-1 .desk-label.label-on {
     background: #00568a !important;
     /* Azul um pouco mais denso para ON */
-    color: #fff !important;
+    color: #00adef !important;
     font-weight: 900;
 }
 
@@ -335,43 +335,43 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 .fader-group-2 .desk-label.label-on {
     background: #006b41 !important;
     /* Verde um pouco mais denso para ON */
-    color: #fff !important;
+    color: #00ff88 !important;
     font-weight: 900;
 }
 
 .fader-group-mix .desk-label {
     background: #332800 !important;
     /* Dourado sóbrio para OFF */
-    color: #a67c12 !important;
+    color: #ffcc00 !important;
 }
 
 .fader-group-mix .desk-label.label-on {
     background: #4d3c00 !important;
-    color: #fff !important;
+    color: #ffcc00 !important;
     font-weight: 900;
 }
 
 .fader-group-bus .desk-label {
     background: #002e27 !important;
     /* Ciano sóbrio para OFF */
-    color: #008a74 !important;
+    color: #00ffcc !important;
 }
 
 .fader-group-bus .desk-label.label-on {
     background: #00453a !important;
-    color: #fff !important;
+    color: #00ffcc !important;
     font-weight: 900;
 }
 
 .fader-group-st .desk-label {
     background: #14283d !important;
     /* Azul Claro sóbrio para OFF */
-    color: #437fae !important;
+    color: #5cacee !important;
 }
 
 .fader-group-st .desk-label.label-on {
     background: #1d3c5c !important;
-    color: #fff !important;
+    color: #5cacee !important;
     font-weight: 900;
 }
 
@@ -1829,6 +1829,7 @@ body.layout-desktop .sidebar-macros {
 .desk-patch-zone {
     height: 24px;
     margin: 0;
+    padding: 0 4px;
     border: none;
     border-top: 1px solid #111;
     border-radius: 0;
@@ -1837,6 +1838,8 @@ body.layout-desktop .sidebar-macros {
     justify-content: center;
     cursor: pointer;
     overflow: hidden;
+    position: relative;
+    white-space: nowrap;
     transition: filter 0.15s ease, background 0.15s ease;
 }
 
@@ -1846,14 +1849,31 @@ body.layout-desktop .sidebar-macros {
 
 .desk-patch-name {
     font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     text-align: center;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: inline-block;
     text-transform: uppercase;
     letter-spacing: -0.2px;
+    will-change: transform;
+}
+
+/* Marquee suave, lento e elegante com pausa nas pontas */
+.desk-patch-name.desk-patch-marquee {
+    animation: deskPatchMarquee 10s ease-in-out infinite;
+}
+
+@keyframes deskPatchMarquee {
+    0%, 25% {
+        transform: translateX(0);
+    }
+    50%, 75% {
+        transform: translateX(var(--marquee-dist, -25px));
+    }
+    100% {
+        transform: translateX(0);
+    }
 }
 
 /* Preenchimento Sólido por Grupo de Canais (Tons mais escuros e sóbrios) */

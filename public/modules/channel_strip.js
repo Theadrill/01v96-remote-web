@@ -343,6 +343,27 @@ function updatePanIndicator(channel, panValue) {
 function updateDesktopPatchBadges() {
     if (layoutMode !== 'desktop' || !window.PatchRegistry) return;
 
+    function applyTextAndMarquee(el, txt) {
+        if (!el) return;
+        const val = txt || '--';
+        el.innerText = val;
+        el.title = val;
+
+        // Se o texto for maior que o container, ativa marquee lento e suave
+        requestAnimationFrame(() => {
+            const parent = el.parentElement;
+            if (!parent) return;
+            const diff = el.scrollWidth - parent.clientWidth;
+            if (diff > 2) {
+                el.style.setProperty('--marquee-dist', `-${diff + 8}px`);
+                el.classList.add('desk-patch-marquee');
+            } else {
+                el.classList.remove('desk-patch-marquee');
+                el.style.removeProperty('--marquee-dist');
+            }
+        });
+    }
+
     // Canais 0-31
     for (let i = 0; i < 32; i++) {
         const el = document.getElementById(`patch-val-${i}`);
@@ -351,7 +372,7 @@ function updateDesktopPatchBadges() {
             const txt = (s && s.paired && s.pairedWith !== null)
                 ? window.PatchRegistry.getPairedChannelInput(i, s.pairedWith)
                 : window.PatchRegistry.getChannelInput(i);
-            el.innerText = txt || '--';
+            applyTextAndMarquee(el, txt);
         }
     }
 
@@ -360,7 +381,7 @@ function updateDesktopPatchBadges() {
         const el = document.getElementById(`patch-val-st${i}`);
         if (el) {
             const ch = 32 + (i * 2);
-            el.innerText = window.PatchRegistry.getPairedChannelInput(ch, ch + 1) || '--';
+            applyTextAndMarquee(el, window.PatchRegistry.getPairedChannelInput(ch, ch + 1));
         }
     }
 
@@ -368,11 +389,25 @@ function updateDesktopPatchBadges() {
     for (let i = 0; i < 8; i++) {
         const elMix = document.getElementById(`patch-val-m${i}`);
         if (elMix) {
-            elMix.innerText = window.PatchRegistry.getMixOutput(i) || '--';
+            const s = (window.mixesState && window.mixesState[i]);
+            let txt = window.PatchRegistry.getMixOutput(i);
+            if (s && s.paired && i % 2 === 0) {
+                const out1 = window.PatchRegistry.getMixOutput(i);
+                const out2 = window.PatchRegistry.getMixOutput(i + 1);
+                txt = (out1 === out2) ? out1 : `${out1} | ${out2}`;
+            }
+            applyTextAndMarquee(elMix, txt);
         }
         const elBus = document.getElementById(`patch-val-b${i}`);
         if (elBus) {
-            elBus.innerText = window.PatchRegistry.getBusOutput(i) || '--';
+            const s = (window.busesState && window.busesState[i]);
+            let txt = window.PatchRegistry.getBusOutput(i);
+            if (s && s.paired && i % 2 === 0) {
+                const out1 = window.PatchRegistry.getBusOutput(i);
+                const out2 = window.PatchRegistry.getBusOutput(i + 1);
+                txt = (out1 === out2) ? out1 : `${out1} | ${out2}`;
+            }
+            applyTextAndMarquee(elBus, txt);
         }
     }
 }
@@ -630,9 +665,21 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         if (type === 'stIn') {
             patchText = window.PatchRegistry.getPairedChannelInput(ch, ch + 1);
         } else if (type === 'mix') {
-            patchText = window.PatchRegistry.getMixOutput(i);
+            if (stateRef && stateRef.paired && i % 2 === 0) {
+                const out1 = window.PatchRegistry.getMixOutput(i);
+                const out2 = window.PatchRegistry.getMixOutput(i + 1);
+                patchText = (out1 === out2) ? out1 : `${out1} | ${out2}`;
+            } else {
+                patchText = window.PatchRegistry.getMixOutput(i);
+            }
         } else if (type === 'bus') {
-            patchText = window.PatchRegistry.getBusOutput(i);
+            if (stateRef && stateRef.paired && i % 2 === 0) {
+                const out1 = window.PatchRegistry.getBusOutput(i);
+                const out2 = window.PatchRegistry.getBusOutput(i + 1);
+                patchText = (out1 === out2) ? out1 : `${out1} | ${out2}`;
+            } else {
+                patchText = window.PatchRegistry.getBusOutput(i);
+            }
         }
     }
 

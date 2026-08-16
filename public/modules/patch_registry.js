@@ -386,28 +386,82 @@
     }
 
     /**
+     * Procura TODAS as portas de saída físicas para uma dada fonte interna (1-para-Muitos).
+     * Retorna array de strings: ['OMNI 1', 'ADAT 1'] ou [] se nenhuma.
+     */
+    function findAllPhysicalOutputsForSource(targetSrcNormal, targetSrcFx) {
+        var gop = window.globalOutPatches;
+        if (!gop) return [];
+        var ports = [];
+
+        // Procura em OMNI
+        if (gop.omni) {
+            for (var p = 0; p < 4; p++) {
+                if (Math.round(gop.omni[p] || 0) === targetSrcNormal) {
+                    ports.push('OMNI ' + (p + 1));
+                }
+            }
+        }
+        // Procura em ADAT
+        if (gop.adat) {
+            for (var p = 0; p < 8; p++) {
+                if (Math.round(gop.adat[p] || 0) === targetSrcNormal) {
+                    ports.push('ADAT ' + (p + 1));
+                }
+            }
+        }
+        // Procura em SLOT
+        if (gop.slot) {
+            for (var p = 0; p < 16; p++) {
+                if (Math.round(gop.slot[p] || 0) === targetSrcNormal) {
+                    ports.push('S1-' + (p + 1));
+                }
+            }
+        }
+        // Procura em 2TR
+        if (gop['2tr']) {
+            for (var p = 0; p < 2; p++) {
+                if (Math.round(gop['2tr'][p] || 0) === targetSrcNormal) {
+                    ports.push('2TD ' + (p === 0 ? 'L' : 'R'));
+                }
+            }
+        }
+        // Procura em FX (source value diferente)
+        if (gop.fx) {
+            for (var p = 0; p < 8; p++) {
+                if (Math.round(gop.fx[p] || 0) === targetSrcFx) {
+                    var fxNum = Math.floor(p / 2) + 1;
+                    var fxSide = (p % 2 === 0) ? '1' : '2';
+                    ports.push('FX ' + fxNum + '-' + fxSide);
+                }
+            }
+        }
+        return ports;
+    }
+
+    /**
      * Sincroniza as saídas dos MIX e BUS, verificando quais portas físicas
-     * estão atribuídas a cada um deles.
+     * estão atribuídas a cada um deles. Suporta saídas múltiplas (1-para-Muitos).
      */
     function syncMixBusOutputs() {
         var gop = window.globalOutPatches;
         if (!gop) return;
 
-        // Para cada MIX (globalId 36-43) e BUS (globalId 44-51), encontra a porta física
+        // Para cada MIX (globalId 36-43) e BUS (globalId 44-51), encontra todas as portas físicas
         for (var i = 0; i < 8; i++) {
             // MIX i+1 = globalId 36+i
             var mixGlobalId = 36 + i;
             var mixSrcNormal = getNormalSourceValue(mixGlobalId);
             var mixSrcFx = getFxSourceValue(mixGlobalId);
-            var mixResult = findPhysicalOutputForSource(mixSrcNormal, mixSrcFx);
-            mixOutputs[i] = mixResult ? mixResult.portName : '--';
+            var mixPorts = findAllPhysicalOutputsForSource(mixSrcNormal, mixSrcFx);
+            mixOutputs[i] = mixPorts.length > 0 ? mixPorts.join(' + ') : '--';
 
             // BUS i+1 = globalId 44+i
             var busGlobalId = 44 + i;
             var busSrcNormal = getNormalSourceValue(busGlobalId);
             var busSrcFx = getFxSourceValue(busGlobalId);
-            var busResult = findPhysicalOutputForSource(busSrcNormal, busSrcFx);
-            busOutputs[i] = busResult ? busResult.portName : '--';
+            var busPorts = findAllPhysicalOutputsForSource(busSrcNormal, busSrcFx);
+            busOutputs[i] = busPorts.length > 0 ? busPorts.join(' + ') : '--';
         }
     }
 
