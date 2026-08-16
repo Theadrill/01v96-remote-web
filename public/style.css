@@ -3053,6 +3053,13 @@ body.layout-desktop .ch-modal-overlay {
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
 }
 
+.dock-tab-etc.active-tab {
+    background: #dc3545 !important;
+    border-color: #ff4d4d !important;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.4) !important;
+    color: white !important;
+}
+
 /* Estilo EspecÃƒÂ­fico para as Strips dos Auxiliares no Modal (Respeitando padrÃƒÂµes) */
 .aux-card {
     min-width: 90px !important;

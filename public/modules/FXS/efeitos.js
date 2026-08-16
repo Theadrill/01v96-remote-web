@@ -1,10 +1,13 @@
 // efeitos.js — Módulo de Máquinas de Efeitos da Yamaha 01V96
 // Renderiza a tela de overview dos 4 processadores de efeitos (FX1–FX4)
+// Estado de roteamento (inputs/outputs) é lido exclusivamente de PatchRegistry.
+// Estado local: apenas fxSlots (nome do efeito, bypass, mix).
 
 (function () {
     'use strict';
 
-    // ── Estado dos 4 slots (preenchido pelo servidor) ──────────────────
+    // ── Estado local: apenas metadados dos 4 slots ────────────────────
+    // Roteamento (inputs/outputs) é consultado via PatchRegistry.getFxInfo().
     const fxSlots = [
         { id: 1, effectName: 'Reverb Hall', bypass: false, mix: 100 },
         { id: 2, effectName: 'Reverb Room', bypass: false, mix: 100 },
@@ -12,140 +15,13 @@
         { id: 4, effectName: 'Reverb Plate', bypass: false, mix: 100 },
     ];
 
-    // FX inputs: [slot][lr] → source id
-    const fxInputs = [
-        [0, 0], // FX1 L/R
-        [0, 0], // FX2 L/R
-        [0, 0], // FX3 L/R
-        [0, 0], // FX4 L/R
-    ];
+    // ── Helpers ───────────────────────────────────────────────────────
 
-    // FX outputs: maps destination key (element*100+channel) → FX slot value
-    let fxOutputs = {};
-
-    // ── Decoder FX Input Source → label ───────────────────────────────
-    function fxInputLabel(val) {
-        val = Math.round(val);
-        if (val === 0) return 'OFF';
-        if (val >= 1 && val <= 8) return 'AUX' + val;
-        if (val >= 13 && val <= 44) return 'INS CH' + (val - 12);
-        if (val === 109) return 'INS BUS1';
-        if (val === 110) return 'INS BUS2';
-        if (val === 111) return 'INS BUS3';
-        if (val === 112) return 'INS BUS4';
-        if (val === 113) return 'INS BUS5';
-        if (val === 114) return 'INS BUS6';
-        if (val === 115) return 'INS BUS7';
-        if (val === 116) return 'INS BUS8';
-        if (val >= 117 && val <= 124) return 'INS AUX' + (val - 116);
-        if (val === 137) return 'INS ST-L';
-        if (val === 138) return 'INS ST-R';
-        return '???(' + val + ')';
+    function hasPatchRegistry() {
+        return typeof window.PatchRegistry !== 'undefined' && window.PatchRegistry !== null;
     }
 
-    function fxInputPatchClass(val) {
-        return Math.round(val) === 0 ? 'fx-patch-off' : 'fx-patch-active';
-    }
-
-    // ── Decoder FX Output Slot ID → label ───────────────────────────────
-    function fxOutputSlotLabel(slotVal) {
-        slotVal = Math.round(slotVal);
-        if (slotVal === 0) return 'OFF';
-        if (slotVal >= 1 && slotVal <= 8) return 'BUS' + slotVal;
-        if (slotVal === 9) return 'ST L';
-        if (slotVal === 10) return 'ST R';
-        if (slotVal >= 11 && slotVal <= 18) return 'MATRIX' + (slotVal - 10);
-        if (slotVal >= 117 && slotVal <= 124) return 'INS AUX' + (slotVal - 116);
-        if (slotVal === 121) return 'FX1 Out1';
-        if (slotVal === 122) return 'FX1 Out2';
-        if (slotVal === 129) return 'FX2 Out1';
-        if (slotVal === 130) return 'FX2 Out2';
-        if (slotVal === 137) return 'FX3 Out1';
-        if (slotVal === 138) return 'FX3 Out2';
-        if (slotVal === 139) return 'FX4 Out1';
-        if (slotVal === 140) return 'FX4 Out2';
-        return '???(' + slotVal + ')';
-    }
-
-    function fxOutputSlotClass(slotVal) {
-        return Math.round(slotVal) === 0 ? 'fx-patch-off' : 'fx-patch-active';
-    }
-
-    // Decode a destination key (element*100+channel) into a human-readable label
-    function fxOutputDestLabel(destKey) {
-        const element = Math.floor(destKey / 100);
-        const channel = destKey % 100;
-        if (element === 1) {
-            if (channel <= 31) return 'CH' + (channel + 1);
-            const stereoIdx = channel - 32;
-            const stinNum = Math.floor(stereoIdx / 2) + 1;
-            const lr = stereoIdx % 2 === 0 ? 'L' : 'R';
-            return 'STIN' + stinNum + lr;
-        }
-        if (element === 2) return 'INS CH' + (channel + 1);
-        if (element === 7) return 'INS BUS' + (channel + 1);
-        if (element === 8) return 'INS AUX' + (channel + 1);
-        if (element === 10) return channel === 0 ? 'MASTER L' : 'MASTER R';
-        return '?el' + element + 'ch' + channel;
-    }
-
-    // Given an FX output slot value (121-140), find the destination key where it's routed
-    function findFxOutputDest(slotVal) {
-        slotVal = Math.round(slotVal);
-        for (const [key, val] of Object.entries(fxOutputs)) {
-            const v = Math.round(val);
-            if (v === slotVal) {
-                return parseInt(key);
-            }
-        }
-        return null;
-    }
-
-    // Find ALL destinations matching a given FX slot value (debug helper)
-    function findAllFxOutputDests(slotVal) {
-        slotVal = Math.round(slotVal);
-        const results = [];
-        for (const [key, val] of Object.entries(fxOutputs)) {
-            const v = Math.round(val);
-            if (v === slotVal) {
-                results.push(parseInt(key));
-            }
-        }
-        return results;
-    }
-
-    function logFxOutputMapping() {
-        // Verbose debug log removed
-    }
-
-    function applyFxOutputs(data) {
-        const newData = data || {};
-        
-        // Sync local insert input patch values
-        for (const [keyStr, val] of Object.entries(newData)) {
-            const key = parseInt(keyStr, 10);
-            const element = Math.floor(key / 100);
-            const channel = key % 100;
-            if (element === 2) {
-                if (window.channelStates && window.channelStates[channel] && window.channelStates[channel].insert) {
-                    window.channelStates[channel].insert.patch_in = val;
-                }
-            } else if (element === 7) {
-                if (window.busesState && window.busesState[channel] && window.busesState[channel].insert) {
-                    window.busesState[channel].insert.patch_in = val;
-                }
-            } else if (element === 8) {
-                if (window.mixesState && window.mixesState[channel] && window.mixesState[channel].insert) {
-                    window.mixesState[channel].insert.patch_in = val;
-                }
-            }
-        }
-
-        fxOutputs = newData;
-        logFxOutputMapping();
-        rerenderIfOpen();
-    }
-
+    // ── Atualização de metadados (fxTypesUpdate) ─────────────────────
     function applyFxTypes(data) {
         for (let i = 0; i < 4; i++) {
             const d = data[i] || data[String(i)];
@@ -158,32 +34,8 @@
         rerenderIfOpen();
     }
 
-    function applyFxInputs(data) {
-        for (const [key, val] of Object.entries(data)) {
-            const i = parseInt(key, 10);
-            if (isNaN(i) || i < 0 || i > 7) continue;
-            const slot = Math.floor(i / 2);
-            const lr = i % 2;
-            fxInputs[slot][lr] = val;
-        }
-        rerenderIfOpen();
-    }
-
-    function rerenderIfOpen() {
-        const modal = document.getElementById('efeitosModal');
-        const isOpen = modal && modal.style.display === 'flex';
-        if (isOpen) {
-            renderEffectsScreen();
-        }
-    }
-
     // ── Estado de sincronização global ────────────────────────────────
-    // Rastreado via evento syncStatus vindo do servidor.
-    // true enquanto o SyncManager está rodando (sync inicial ou manual).
     let isSyncing = false;
-
-    // true quando o modal foi aberto durante um sync ativo.
-    // Indica que a lógica de FX deve ser disparada assim que o sync terminar.
     let pendingFxLoad = false;
 
     // ── Overlay de bloqueio de sync ───────────────────────────────────
@@ -204,31 +56,24 @@
     }
 
     // ── Lógica de request dos dados FX da mesa ────────────────────────
-    // Separada em função para poder ser chamada tanto na abertura normal
-    // quanto quando o sync termina com o modal já aberto.
     function dispatchFxRequests() {
         if (typeof socket === 'undefined') return;
-
-        // IMPORTANTE: requestFxInputs e requestFxOutputs NÃO podem ser emitidos
-        // simultaneamente. O servidor usa a flag global OUTPUT_PATCH_ACTIVE para
-        // distinguir respostas de input-patch de output-patch (ambas usam o mesmo
-        // endereço MIDI).
-        // Requerimento das rotas/tipos foi movido para o socket.js (on 'connect')
-        // para garantir que seja solicitado de forma síncrona com o estado da rede.
         socket.emit('requestFxTypes');
-        socket.emit('requestFxInputs');
-        socket.emit('requestFxOutputs');
     }
 
     // ── Socket listeners ──────────────────────────────────────────────
     let isSyncingFxs = false;
 
     if (typeof socket !== 'undefined') {
+        // fxTypesUpdate: atualiza metadados locais (nome, bypass, mix)
         socket.on('fxTypesUpdate', applyFxTypes);
-        socket.on('fxInputsUpdate', applyFxInputs);
-        socket.on('fxOutputsUpdate', applyFxOutputs);
 
-        socket.on('fxParamUpdate', function(data) {
+        // fxInputsUpdate / fxOutputsUpdate: PATCHREGISTRY já trata atualização
+        // do cache. Apenas re-renderizamos a UI se o modal estiver aberto.
+        socket.on('fxInputsUpdate', function () { rerenderIfOpen(); });
+        socket.on('fxOutputsUpdate', function () { rerenderIfOpen(); });
+
+        socket.on('fxParamUpdate', function (data) {
             if (!data || data.slot === undefined || data.slot < 0 || data.slot > 3) return;
             const slot = data.slot;
             if (data.param === 52) {
@@ -248,38 +93,31 @@
 
             if (active && isOpen) {
                 showSyncOverlay("CARREGANDO EFEITOS DA MESA...");
-            } else if (!active && isOpen) {                hideSyncOverlay();
+            } else if (!active && isOpen) {
+                hideSyncOverlay();
                 renderEffectsScreen();
             }
         });
 
-        // Monitora o estado de sincronização para controlar o overlay e
-        // para disparar a lógica de FX quando o sync terminar com o modal aberto.
         socket.on('syncStatus', (data) => {
-            const wasActive = isSyncing;
             isSyncing = (typeof data === 'object') ? !!data.active : !!data;
-
             const modal = document.getElementById('efeitosModal');
             const isOpen = modal && modal.style.display === 'flex';
 
             if (isSyncing) {
-                // Sync ativo: se o modal estiver aberto, bloqueia com overlay
                 if (isOpen) {
                     showSyncOverlay("AGUARDANDO FINALIZAR SINCRONIZAÇÃO COM A MESA");
                     pendingFxLoad = true;
                 }
             } else {
-                // Sync terminou
                 if (isOpen) {
                     hideSyncOverlay();
                     if (pendingFxLoad) {
-                        // Modal estava esperando o sync terminar — dispara agora
                         pendingFxLoad = false;
                         renderEffectsScreen();
                         dispatchFxRequests();
                     }
                 } else {
-                    // Modal fechado: limpa o estado pendente
                     pendingFxLoad = false;
                 }
             }
@@ -320,25 +158,19 @@
     function renderSlot(slot, idx) {
         const bypassCls = slot.bypass ? 'fx-bypass-on' : '';
         const bypassIcon = slot.bypass ? '||' : '>';
-        const inL = fxInputs[idx][0];
-        const inR = fxInputs[idx][1];
-        const lblL = fxInputLabel(inL);
-        const lblR = fxInputLabel(inR);
-        const clsL = fxInputPatchClass(inL);
-        const clsR = fxInputPatchClass(inR);
 
-        // FX output: find destinations for this slot's Out1 and Out2
-        const outSlotVals = [
-            idx === 3 ? 139 : 121 + idx * 8,  // Out1 (FX4 uses 139/140 instead of +8 rule)
-            idx === 3 ? 140 : 122 + idx * 8,  // Out2
-        ];
-        // O valor do FX4 é 139/140, não bate com a matemática acima, por isso o ternário
-        const outDestL = findFxOutputDest(outSlotVals[0]);
-        const outDestR = findFxOutputDest(outSlotVals[1]);
-        const lblOutL = outDestL != null ? fxOutputDestLabel(outDestL) : 'OFF';
-        const lblOutR = outDestR != null ? fxOutputDestLabel(outDestR) : 'OFF';
-        const clsOutL = outDestL != null ? 'fx-patch-active' : 'fx-patch-off';
-        const clsOutR = outDestR != null ? 'fx-patch-active' : 'fx-patch-off';
+        // Lê roteamento exclusivamente do PatchRegistry
+        const info = hasPatchRegistry() ? window.PatchRegistry.getFxInfo(idx) : null;
+
+        const lblL = info ? info.inLabelL : 'OFF';
+        const lblR = info ? info.inLabelR : 'OFF';
+        const clsL = (info && info.inL) ? 'fx-patch-active' : 'fx-patch-off';
+        const clsR = (info && info.inR) ? 'fx-patch-active' : 'fx-patch-off';
+
+        const lblOutL = info ? info.outLabelL : 'OFF';
+        const lblOutR = info ? info.outLabelR : 'OFF';
+        const clsOutL = (info && info.outL != null) ? 'fx-patch-active' : 'fx-patch-off';
+        const clsOutR = (info && info.outR != null) ? 'fx-patch-active' : 'fx-patch-off';
 
         return `
         <div class="fx-slot">
@@ -405,16 +237,13 @@
         modal.style.display = 'flex';
 
         if (isSyncing) {
-            // Mesa está sincronizando canais: bloqueia o modal
             showSyncOverlay("AGUARDANDO FINALIZAR SINCRONIZAÇÃO COM A MESA");
             pendingFxLoad = true;
             renderEffectsScreen();
         } else if (isSyncingFxs) {
-            // Mesa está sincronizando especificamente os Efeitos (background task do Rust)
             showSyncOverlay("CARREGANDO EFEITOS DA MESA...");
             renderEffectsScreen();
         } else {
-            // Sync já concluído: dispara normalmente
             hideSyncOverlay();
             pendingFxLoad = false;
             renderEffectsScreen();
@@ -427,7 +256,6 @@
         const modal = document.getElementById('efeitosModal');
         if (!modal) return;
         modal.style.display = 'none';
-        // Cancela qualquer pending load pendente — modal foi fechado antes do sync terminar
         pendingFxLoad = false;
         hideSyncOverlay();
     }
@@ -452,27 +280,24 @@
     }
     window.openFxEditor = openFxEditor;
 
-    // ── rerenderIfOpen (usado pelos listeners de fxTypesUpdate etc.) ───
+    // ── rerenderIfOpen ──────────────────────────────────────────────
     function rerenderIfOpen() {
         const modal = document.getElementById('efeitosModal');
         const isOpen = modal && modal.style.display === 'flex';
         if (isOpen && !isSyncing && !isSyncingFxs) {
-            // Só re-renderiza se não estiver em sync ou carregando FX
             renderEffectsScreen();
         }
     }
 
-    // ── Getters públicos para fx_routing.js ───────────────────────────
-    // Permitem que o seletor de patch leia o estado atual e marque
-    // o botão ativo ao abrir o modal.
+    // ── Getters públicos (delegam ao PatchRegistry) ───────────────────
     window.getFxInputs = function () {
-        // Retorna cópia do array fxInputs: [[L,R],[L,R],[L,R],[L,R]]
-        return fxInputs.map(pair => [...pair]);
+        if (hasPatchRegistry()) return window.PatchRegistry.getFxInputs();
+        return [[0, 0], [0, 0], [0, 0], [0, 0]];
     };
 
     window.getFxOutputs = function () {
-        // Retorna cópia do objeto fxOutputs: { destKey: slotVal, ... }
-        return Object.assign({}, fxOutputs);
+        if (hasPatchRegistry()) return window.PatchRegistry.getFxOutputs();
+        return {};
     };
 
 })();

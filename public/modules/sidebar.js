@@ -1018,7 +1018,7 @@ function renderDock(mode) {
             buttons = tabs.map(tab => ({
                 label: tab.toUpperCase(),
                 action: `switchTab('${tab}')`,
-                cls: 'dock-tab' + (tab === activeConfigTab ? ' active-tab' : '')
+                cls: 'dock-tab' + (tab === 'etc' ? ' dock-tab-etc' : '') + (tab === activeConfigTab ? ' active-tab' : '')
             }));
             const isValidEtc = (activeConfigChannel >= 0 && activeConfigChannel <= 31) || (activeConfigChannel >= 44 && activeConfigChannel <= 51) || (activeConfigChannel >= 60 && activeConfigChannel <= 67);
             const showCopyPaste = (

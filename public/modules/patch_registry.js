@@ -54,6 +54,10 @@
     // { on, position, patch_in, patch_out, inLabel, outLabel, posLabel }
     const inserts = {};
 
+    // FX raw data caches (source of truth for getFxInputs/getFxOutputs)
+    const rawFxInputs = [[0, 0], [0, 0], [0, 0], [0, 0]];
+    const rawFxOutputs = {};
+
     // ═══════════════════════════════════════════════════════════════════
     // DECODIFICADORES DE VALORES → LABELS
     // ═══════════════════════════════════════════════════════════════════
@@ -456,50 +460,65 @@
      * Sincroniza os slots de FX (inputs e outputs).
      */
     function syncFxSlots() {
-        // FX Inputs — vêm de fxInputs[4][2] (preenchido por efeitos.js)
-        var fxIn = null;
-        if (typeof window.getFxInputs === 'function') {
-            fxIn = window.getFxInputs();
-        }
-        if (fxIn) {
-            for (var s = 0; s < 4; s++) {
-                var inL = fxIn[s] ? Math.round(fxIn[s][0] || 0) : 0;
-                var inR = fxIn[s] ? Math.round(fxIn[s][1] || 0) : 0;
-                fxSlots[s].inL = inL;
-                fxSlots[s].inR = inR;
-                fxSlots[s].inLabelL = decodeFxInputLabel(inL);
-                fxSlots[s].inLabelR = decodeFxInputLabel(inR);
-            }
+        // FX Inputs — lê diretamente do cache raw
+        for (var s = 0; s < 4; s++) {
+            var inL = Math.round(rawFxInputs[s][0] || 0);
+            var inR = Math.round(rawFxInputs[s][1] || 0);
+            fxSlots[s].inL = inL;
+            fxSlots[s].inR = inR;
+            fxSlots[s].inLabelL = decodeFxInputLabel(inL);
+            fxSlots[s].inLabelR = decodeFxInputLabel(inR);
         }
 
-        // FX Outputs — vêm de fxOutputs (preenchido por efeitos.js)
-        var fxOut = null;
-        if (typeof window.getFxOutputs === 'function') {
-            fxOut = window.getFxOutputs();
-        }
-        if (fxOut) {
-            // Valores de slot: FX1=121/122, FX2=129/130, FX3=137/138, FX4=139/140
-            var slotVals = [
-                [121, 122],
-                [129, 130],
-                [137, 138],
-                [139, 140]
-            ];
-            for (var s = 0; s < 4; s++) {
-                var outL = null;
-                var outR = null;
-                for (var key in fxOut) {
-                    if (Math.round(fxOut[key]) === slotVals[s][0]) {
-                        outL = parseInt(key, 10);
-                    }
-                    if (Math.round(fxOut[key]) === slotVals[s][1]) {
-                        outR = parseInt(key, 10);
-                    }
+        // FX Outputs — lê diretamente do cache raw
+        var slotVals = [
+            [121, 122],
+            [129, 130],
+            [137, 138],
+            [139, 140]
+        ];
+        for (var s = 0; s < 4; s++) {
+            var outL = null;
+            var outR = null;
+            for (var key in rawFxOutputs) {
+                if (Math.round(rawFxOutputs[key]) === slotVals[s][0]) {
+                    outL = parseInt(key, 10);
                 }
-                fxSlots[s].outL = outL;
-                fxSlots[s].outR = outR;
-                fxSlots[s].outLabelL = outL != null ? decodeFxOutputDest(outL) : 'OFF';
-                fxSlots[s].outLabelR = outR != null ? decodeFxOutputDest(outR) : 'OFF';
+                if (Math.round(rawFxOutputs[key]) === slotVals[s][1]) {
+                    outR = parseInt(key, 10);
+                }
+            }
+            fxSlots[s].outL = outL;
+            fxSlots[s].outR = outR;
+            fxSlots[s].outLabelL = outL != null ? decodeFxOutputDest(outL) : 'OFF';
+            fxSlots[s].outLabelR = outR != null ? decodeFxOutputDest(outR) : 'OFF';
+        }
+    }
+
+    /**
+     * Sincroniza os patch_in de inserts (channelStates/busesState/mixesState)
+     * a partir dos FX outputs. Quando um canal tem insert com patch_in apontando
+     * para uma porta FX, o valor do insert patch_in é derivado da rotação de FX output.
+     * Esta lógica era feita em efeitos.js (applyFxOutputs) e agora é centralizada aqui.
+     */
+    function syncInsertPatchesFromFxOutputs() {
+        for (var keyStr in rawFxOutputs) {
+            var key = parseInt(keyStr, 10);
+            var val = rawFxOutputs[keyStr];
+            var element = Math.floor(key / 100);
+            var channel = key % 100;
+            if (element === 2) {
+                if (window.channelStates && window.channelStates[channel] && window.channelStates[channel].insert) {
+                    window.channelStates[channel].insert.patch_in = val;
+                }
+            } else if (element === 7) {
+                if (window.busesState && window.busesState[channel] && window.busesState[channel].insert) {
+                    window.busesState[channel].insert.patch_in = val;
+                }
+            } else if (element === 8) {
+                if (window.mixesState && window.mixesState[channel] && window.mixesState[channel].insert) {
+                    window.mixesState[channel].insert.patch_in = val;
+                }
             }
         }
     }
@@ -607,6 +626,7 @@
     function setFxInput(slot, lr, val) {
         if (slot >= 0 && slot < 4 && lr >= 0 && lr < 2) {
             var v = Math.round(val);
+            rawFxInputs[slot][lr] = v;
             if (lr === 0) {
                 fxSlots[slot].inL = v;
                 fxSlots[slot].inLabelL = decodeFxInputLabel(v);
@@ -621,10 +641,11 @@
      * Atualiza o cache de saída FX.
      */
     function setFxOutput(destKey, slotVal) {
-        var element = Math.floor(destKey / 100);
-        var channel = destKey % 100;
-        var destLabel = decodeFxOutputDest(destKey);
         var sv = Math.round(slotVal);
+        // Store raw output (destKey → slotVal)
+        rawFxOutputs[destKey] = sv;
+
+        var destLabel = decodeFxOutputDest(destKey);
 
         // Mapeia slotVal para o slot correto
         var slotValMap = { 121: [0, 0], 122: [0, 1], 129: [1, 0], 130: [1, 1], 137: [2, 0], 138: [2, 1], 139: [3, 0], 140: [3, 1] };
@@ -720,6 +741,28 @@
     function getFxInfo(slot) {
         if (slot >= 0 && slot < 4) return Object.assign({}, fxSlots[slot]);
         return null;
+    }
+
+    /**
+     * Retorna os inputs FX brutos: [[inL, inR], [inL, inR], [inL, inR], [inL, inR]]
+     * Compatível com window.getFxInputs() do efeitos.js original.
+     */
+    function getFxInputs() {
+        return rawFxInputs.map(function (pair) { return [pair[0], pair[1]]; });
+    }
+
+    /**
+     * Retorna os outputs FX brutos: { destKey: slotVal, ... }
+     * Compatível com window.getFxOutputs() do efeitos.js original.
+     */
+    function getFxOutputs() {
+        var copy = {};
+        for (var k in rawFxOutputs) {
+            if (rawFxOutputs.hasOwnProperty(k)) {
+                copy[k] = rawFxOutputs[k];
+            }
+        }
+        return copy;
     }
 
     /**
@@ -820,7 +863,7 @@
             }
         });
 
-        // FX Inputs update (vem de efeitos.js -> socket)
+        // FX Inputs update
         socket.on('fxInputsUpdate', function (data) {
             if (!data || typeof data !== 'object') return;
             for (var key in data) {
@@ -832,12 +875,14 @@
             }
         });
 
-        // FX Outputs update (vem de efeitos.js -> socket)
+        // FX Outputs update
         socket.on('fxOutputsUpdate', function (data) {
             if (!data || typeof data !== 'object') return;
             for (var key in data) {
                 setFxOutput(parseInt(key, 10), data[key]);
             }
+            // Sincroniza patch_in de inserts (channelStates/busesState/mixesState)
+            syncInsertPatchesFromFxOutputs();
         });
 
         // Sync completo: resync tudo
@@ -879,6 +924,8 @@
         getBusOutput: getBusOutput,
         getStereoOutput: getStereoOutput,
         getFxInfo: getFxInfo,
+        getFxInputs: getFxInputs,
+        getFxOutputs: getFxOutputs,
         getInsertInfo: getInsertInfo,
         getAllData: getAllData,
 

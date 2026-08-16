@@ -116,35 +116,24 @@ graph TD
 
 ---
 
-### Fase 1.3: Refatoração Modular Gradual com Checkpoints Críticos
+### Fase 1.3: Refatoração Modular dos Consumidores (Inserts & Routing)
 
-Para segurança operacional máxima no ambiente ao vivo, a refatoração dos 3 módulos existentes será executada em **sub-etapas estritamente isoladas**, com pausa e validação do usuário ao final de cada uma:
-
-#### 🔹 Fase 1.3a: Refatoração de `public/modules/FXS/efeitos.js`
-- **Alvo**: Substituir decodificadores privados locais (`fxInputLabel`, `fxOutputSlotLabel`, etc.) por consultas centralizadas a `window.PatchRegistry.getFxInfo(slot)`.
-- **Escopo**: Apenas `efeitos.js`.
-- **🛑 CHECKPOINT CRÍTICO 1.3a**: O usuário abre a tela principal de Efeitos (FX 1 a FX 4) e confirma que todas as máquinas exibem fielmente suas entradas, saídas, bypass e parâmetros. Aguarda comando explícito para avançar.
-
-#### 🔹 Fase 1.3b: Refatoração de `public/modules/inserts.js`
-- **Alvo**: Substituir rotinas de cálculo numérico ad-hoc de decodificação de patch (ex: `currentOut >= 60`, bases numéricas) pelas consultas centralizadas do `window.PatchRegistry.getInsertInfo(ch)`.
-- **Escopo**: Apenas `inserts.js`.
-- **🛑 CHECKPOINT CRÍTICO 1.3b**: O usuário abre a modal de configuração de Inserts nos canais/buses e confirma que o status ON/OFF, posições (PRE EQ / PRE / POST) e patches IN/OUT continuam exibidos e chaveados corretamente. Aguarda comando explícito para avançar.
-
-#### 🔹 Fase 1.3c: Refatoração de `public/modules/routing.js`
-- **Alvo**: Remover tabela privada duplicada `getPatchName(val)` e unificar o consumo em `window.PatchRegistry.getChannelInput(ch)`.
-- **Escopo**: Apenas `routing.js`.
-- **🛑 CHECKPOINT CRÍTICO 1.3c**: O usuário abre a aba Routing/ETC de canais de entrada e barramentos, altera um patch se desejar, e confirma que a exibição e seleção de canais continuam 100% funcionais. Aguarda comando explícito para finalizar a ETAPA 1.
+- **Fase 1.3a (`efeitos.js`)**: ✅ **CONCLUÍDA E VALIDADA** (tela de efeitos 100% migrada para o `PatchRegistry`).
+- **Fase 1.3b (`inserts.js`) + 1.3c (`routing.js`)**: Execução unificada direta.
+  * **`public/modules/inserts.js`**: Substituir rotinas manuais de cálculo numérico pelas consultas centralizadas de `window.PatchRegistry.getInsertInfo(ch)`.
+  * **`public/modules/routing.js`**: Remover tabela privada duplicada `getPatchName(val)` e unificar no `window.PatchRegistry.getChannelInput(ch)`. Atualizar `selectPatch` para sincronizar reativamente com `PatchRegistry.setInputPatch()`.
+- **🛑 CHECKPOINT FINAL DA ETAPA 1**: Validação completa do usuário (Efeitos, Inserts, Routing e Painel Geral) antes de liberar a ETAPA 2 (Desktop Headers).
 
 ---
 
 ## 4. Plano de Verificação da Etapa 1
 
-### 4.1 Verificação da Fase 1.1 e 1.2 (Concluídas)
+### 4.1 Verificação da Fase 1.1, 1.2 e 1.3a (Concluídas)
 - `cargo check` garantido limpo.
-- Botão `ROTEAMENTO` visível exclusivamente na tela principal (`mode === 'main'`).
-- Painel de Visão Geral validado pelo usuário em tempo real.
+- `PatchRegistry` e Tela de Roteamento Geral em produção.
+- `efeitos.js` consumindo 100% do registro sem redundâncias locais.
 
-### 4.2 Verificação Passo a Passo das Fases 1.3a, 1.3b e 1.3c
-- Validação com `node --check <arquivo.js>` e `cargo check` antes de qualquer entrega.
-- Execução sequencial e isolada de cada arquivo com pausa obrigatória para aprovação do usuário.
-- Garantia de transição suave e zero regressões para a ETAPA 2 (Desktop Headers).
+### 4.2 Verificação Final da Fase 1.3b e 1.3c
+- Validação com `node --check` e `cargo check`.
+- Verificação do modal de Inserts e da aba Routing/ETC dos canais.
+- Teste de troca de patch em tempo real com atualização bidirecional imediata.
