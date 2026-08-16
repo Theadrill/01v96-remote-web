@@ -323,7 +323,7 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
     background: #00568a !important;
     /* Azul um pouco mais denso para ON */
     color: #fff !important;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    font-weight: 900;
 }
 
 .fader-group-2 .desk-label {
@@ -349,7 +349,6 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
     background: #4d3c00 !important;
     color: #fff !important;
     font-weight: 900;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .fader-group-bus .desk-label {
@@ -362,7 +361,6 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
     background: #00453a !important;
     color: #fff !important;
     font-weight: 900;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .fader-group-st .desk-label {
@@ -375,7 +373,6 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
     background: #1d3c5c !important;
     color: #fff !important;
     font-weight: 900;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 body.layout-horizontal .master-card {
