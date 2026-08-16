@@ -342,37 +342,40 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 .fader-group-mix .desk-label {
     background: #332800 !important;
     /* Dourado sóbrio para OFF */
-    color: #d4a017 !important;
+    color: #a67c12 !important;
 }
 
 .fader-group-mix .desk-label.label-on {
     background: #4d3c00 !important;
     color: #fff !important;
     font-weight: 900;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .fader-group-bus .desk-label {
     background: #002e27 !important;
     /* Ciano sóbrio para OFF */
-    color: #00b396 !important;
+    color: #008a74 !important;
 }
 
 .fader-group-bus .desk-label.label-on {
     background: #00453a !important;
     color: #fff !important;
     font-weight: 900;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .fader-group-st .desk-label {
     background: #14283d !important;
     /* Azul Claro sóbrio para OFF */
-    color: #5cacee !important;
+    color: #437fae !important;
 }
 
 .fader-group-st .desk-label.label-on {
     background: #1d3c5c !important;
     color: #fff !important;
     font-weight: 900;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 body.layout-horizontal .master-card {
