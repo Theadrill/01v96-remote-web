@@ -278,7 +278,6 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
     box-shadow: none;
 }
 
-/* VersÃƒÂ£o Desktop (Glow mais horizontal no pÃƒÂ© ou topo) */
 .fader-card-desktop.fader-group-1 {
     border-top: 2px solid #00adef !important;
     border-bottom: 3px solid #00adef !important;
@@ -287,6 +286,21 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 .fader-card-desktop.fader-group-2 {
     border-top: 2px solid #00ff88 !important;
     border-bottom: 3px solid #00ff88 !important;
+}
+
+.fader-card-desktop.fader-group-mix {
+    border-top: 2px solid #ffcc00 !important;
+    border-bottom: 3px solid #ffcc00 !important;
+}
+
+.fader-card-desktop.fader-group-bus {
+    border-top: 2px solid #00ffcc !important;
+    border-bottom: 3px solid #00ffcc !important;
+}
+
+.fader-card-desktop.fader-group-st {
+    border-top: 2px solid #5cacee !important;
+    border-bottom: 3px solid #5cacee !important;
 }
 
 /* Dynamic Label Coloring (Desktop) */
@@ -312,6 +326,42 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 .fader-group-2 .desk-label.label-on {
     background: #006b41 !important;
     /* Verde um pouco mais denso para ON */
+    color: #fff !important;
+    font-weight: 900;
+}
+
+.fader-group-mix .desk-label {
+    background: #423800 !important;
+    /* Amarelo escuro sutil para OFF */
+    color: #ffcc00 !important;
+}
+
+.fader-group-mix .desk-label.label-on {
+    background: #665700 !important;
+    color: #fff !important;
+    font-weight: 900;
+}
+
+.fader-group-bus .desk-label {
+    background: #003d36 !important;
+    /* Ciano escuro sutil para OFF */
+    color: #00ffcc !important;
+}
+
+.fader-group-bus .desk-label.label-on {
+    background: #005c52 !important;
+    color: #fff !important;
+    font-weight: 900;
+}
+
+.fader-group-st .desk-label {
+    background: #14283d !important;
+    /* Azul Claro escuro sutil para OFF */
+    color: #5cacee !important;
+}
+
+.fader-group-st .desk-label.label-on {
+    background: #1d3c5c !important;
     color: #fff !important;
     font-weight: 900;
 }
@@ -1800,38 +1850,63 @@ body.layout-desktop .sidebar-macros {
 }
 
 /* Cores por Grupo de Canais */
+.fader-group-1 .desk-patch-zone {
+    background: #001f33;
+    border-color: #003a5e;
+}
 .fader-group-1 .desk-patch-name {
     color: #00adef;
 }
 .fader-group-1 .desk-patch-zone:hover {
+    background: #002b47;
     border-color: #00adef;
 }
 
+.fader-group-2 .desk-patch-zone {
+    background: #002619;
+    border-color: #004a30;
+}
 .fader-group-2 .desk-patch-name {
     color: #00ff88;
 }
 .fader-group-2 .desk-patch-zone:hover {
+    background: #003624;
     border-color: #00ff88;
 }
 
+.fader-group-st .desk-patch-zone {
+    background: #0d1e2e;
+    border-color: #1a3a5c;
+}
 .fader-group-st .desk-patch-name {
     color: #5cacee;
 }
 .fader-group-st .desk-patch-zone:hover {
+    background: #142a40;
     border-color: #5cacee;
 }
 
+.fader-group-mix .desk-patch-zone {
+    background: #241e00;
+    border-color: #4a3e00;
+}
 .fader-group-mix .desk-patch-name {
     color: #ffcc00;
 }
 .fader-group-mix .desk-patch-zone:hover {
+    background: #332b00;
     border-color: #ffcc00;
 }
 
+.fader-group-bus .desk-patch-zone {
+    background: #00241f;
+    border-color: #00453d;
+}
 .fader-group-bus .desk-patch-name {
     color: #00ffcc;
 }
 .fader-group-bus .desk-patch-zone:hover {
+    background: #00332c;
     border-color: #00ffcc;
 }
 
