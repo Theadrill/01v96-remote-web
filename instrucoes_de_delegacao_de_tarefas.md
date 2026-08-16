@@ -16,6 +16,7 @@ O objetivo central de delegar para o **OpenCode** via Orca ou CLI é economizar 
    - Validar sintaxe/compilação (`node --check`, `cargo check`) e inspecionar superficialmente o diff (`git status`, `git diff`).
    - Apresentar o resumo ao usuário e solicitar o próximo passo.
    - *Tratamento de Falhas:* Se o resultado da validação falhar ou divergir do esperado, aí sim o Antigravity assume o papel analítico para investigar o problema pontual, diagnosticar a causa raiz e repassar ao OpenCode a solução/orientação de ajuste precisa.
+4. **Compaction Obrigatória Entre Etapas**: Sempre que uma etapa, passo ou fase termina e formos iniciar outra no OpenCode, o orquestrador **DEVE** enviar o comando `/compact` para o terminal do OpenCode (e aguardar ficar ocioso via `tui-idle`) antes de despachar a nova tarefa, evitando acúmulo desnecessário de tokens de contexto na sessão do coder.
 
 ---
 
@@ -40,8 +41,12 @@ Sempre que o usuário solicitar a delegação de uma tarefa (ex: *"use as instru
    ```powershell
    orca orchestration run-create --objective "Descrição objetiva da tarefa" --json
    ```
-2. **Verificar ou Iniciar Terminal do OpenCode**:
-   * Se já houver terminal ativo do OpenCode ocioso, reutilize seu `<handle>`.
+2. **Verificar ou Iniciar Terminal do OpenCode & Aplicar `/compact`**:
+   * Se já houver terminal ativo do OpenCode ocioso, reutilize seu `<handle>` e envie `/compact` para limpar o contexto acumulado:
+     ```powershell
+     orca terminal send --terminal <handle> --text "/compact" --enter --json
+     orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 20000 --json
+     ```
    * Caso contrário, crie um novo terminal e aguarde ficar pronto:
      ```powershell
      orca terminal create --worktree active --title "opencode-worker" --command "opencode" --json
