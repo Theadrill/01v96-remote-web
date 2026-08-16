@@ -1,11 +1,11 @@
 # Plano de Refatoração Arquitetural: Routing & Patch Registry Centralizado
 
 > **Ordem de Execução**: **ETAPA 1 (PRÉ-REQUISITO OBRIGATÓRIO)**  
-> **Status**: **Fase 1.1 e 1.2 CONCLUÍDAS e VALIDADAS PELO USUÁRIO (Checkpoint Aprovado)** | Próxima: Fase 1.3  
-> **Dependência**: Nenhuma. Deve ser executado e validado **antes** de qualquer alteração visual no channel strip desktop.  
+> **Status**: ✅ **100% CONCLUÍDA E VALIDADA COM HARDWARE REAL (Fases 1.1, 1.2, 1.3a, 1.3b e 1.3c)**  
+> **Próxima Etapa**: **ETAPA 2 (Desktop Patch Header — `plano_de_implementacao_desktop_patch_header.md`)**  
 > **Novos Módulos**: `public/modules/patch_registry.js`, `public/modules/routing_overview.js`  
-> **Módulos Afetados**: `public/index.html`, `public/modules/sidebar.js`, `public/modules/socket.js`, `public/modules/FXS/efeitos.js`, `public/modules/inserts.js`, `public/modules/routing.js`  
-> **Objetivo**: Implementar o **Registro Reativo Centralizado (`window.PatchRegistry`)** e a **Tela de Roteamento Geral (Read-Only)** como etapa de validação segura antes de qualquer refatoração nos módulos existentes.
+> **Módulos Refatorados**: `public/index.html`, `public/modules/globals.js`, `public/modules/sidebar.js`, `public/modules/socket.js`, `public/modules/FXS/efeitos.js`, `public/modules/inserts.js`, `public/modules/routing.js`, `server_rust/src/state.rs`  
+> **Objetivo**: Implementar o **Registro Reativo Centralizado (`window.PatchRegistry`)**, a **Tela de Roteamento Geral (Read-Only)** e migrar 100% dos módulos de roteamento, efeitos e inserts para a arquitetura unificada reativa.
 
 ---
 

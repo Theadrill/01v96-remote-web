@@ -187,21 +187,23 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [x] Modo "Sends on Faders" para Mixes
 - [x] Ninja Sync (Auto-Git push/pull)
 - [x] MIDI Bridge over Network
-- [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician).
+- [ ] Suporte a múltiplos usuários com controle de permissão (Admin/Musician)
 - [x] Fazer o meter do master funcionar
 - [x] Sistema de cenas de nomes customizados
 - [x] Atribuição de nome ao servidor/mesa
 - [x] Patch de INSERTS nos canais
-- [x] **Tela de EFEITOS** (Em construção — Telas disponíveis: Efeitos, Reverb e Multiband Compressor).
+- [x] Tela de EFEITOS
 - [x] Sistema de Lock (Proteção) de Canais
 - [x] Refatoração da Arquitetura de Macros
-- [ ] **Macro Smart Channel Toggler**: defina um ou mais canais "guardiões" (locked) que nunca devem ser desligados. Ao ativar a macro, todos os demais canais são desligados instantaneamente, preservando apenas os canais escolhidos. O sistema memoriza quais canais foram desligados e, ao acionar novamente, religa exatamente os mesmos canais no estado anterior.
-- [x] **Extensão do Módulo de Copiar e Colar Contextual**: sistema modular e inteligente de cópia e colagem implementado e ativo em todas as telas contextuais da mesa: barramentos de mix/fone (Sends on Faders), abas individuais de canal (AUX, DYNAMICS, ROUTING / ETC e EQUALIZADOR com suporte a "Apenas EQ" e "Canal Inteiro"), com despachante sequencial global de 20ms para proteção de hardware.
-- [x] **Refatorar Módulo copy_paste.js**: limpeza e refatoração completa com remoção de 100% do código legado e unificação na nova arquitetura contextual modular.
-- [ ] **Fallback para Navegadores Antigos (Legacy Browser Compatibility)**: adicionar fallbacks de CSS para unidades de viewport dinâmicas (`dvh`, `svh`, `lvh` — linha 7749 do `style.css`) e espaçamento `gap` em Flexbox.
-- [ ] **Botão de Delay**: adicionar controle e botão de delay em todos os canais aplicáveis.
-- [ ] **Posição e Ponto de Inserção nos Auxiliares**: adicionar botão para setar posição dos canais nos auxiliares (PRE EQ / PRE / POST) e ponto de montagem (PRE / POST).
-- [ ] **Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)**: implementar flags granulares de prontidão no `PatchRegistry` (ex: `isReady`, `isFxReady`, `isInsertsReady`) com bloqueio interno visual nos modais (Efeitos, Inserts, Roteamento Geral) para exibir estado de carregamento elegante caso sejam abertos durante o sync inicial ou reconexão.
+- [ ] Macro Smart Channel Toggler
+- [x] Extensão do Módulo de Copiar e Colar Contextual
+- [x] Refatorar Módulo copy_paste.js
+- [x] Refatoração do Roteamento e Centralização no PatchRegistry (Etapa 1)
+- [ ] Área de Patch nos Channel Strips Desktop (Etapa 2)
+- [ ] Fallback para Navegadores Antigos (Legacy Browser Compatibility)
+- [ ] Botão de Delay
+- [ ] Posição e Ponto de Inserção nos Auxiliares
+- [ ] Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)
 
 
 ---
