@@ -68,6 +68,19 @@ window.MixerAPI = {
             if (window.resetMacroDynamicSlot) {
                 window.resetMacroDynamicSlot(slotIndex);
             }
+        },
+        confirm: async (options) => {
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.show) {
+                return await ConfirmModal.show(options);
+            }
+            return window.confirm(typeof options === 'string' ? options : (options?.message || options?.title || 'Confirmar?'));
+        },
+        alert: async (options) => {
+            const opt = (typeof options === 'string') ? { title: 'Aviso', message: options, type: 'info' } : (options || {});
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.show) {
+                return await ConfirmModal.show(opt);
+            }
+            window.alert(opt.message || opt.title || '');
         }
     },
 
