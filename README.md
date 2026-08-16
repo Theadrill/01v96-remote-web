@@ -201,6 +201,7 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [ ] **Fallback para Navegadores Antigos (Legacy Browser Compatibility)**: adicionar fallbacks de CSS para unidades de viewport dinâmicas (`dvh`, `svh`, `lvh` — linha 7749 do `style.css`) e espaçamento `gap` em Flexbox.
 - [ ] **Botão de Delay**: adicionar controle e botão de delay em todos os canais aplicáveis.
 - [ ] **Posição e Ponto de Inserção nos Auxiliares**: adicionar botão para setar posição dos canais nos auxiliares (PRE EQ / PRE / POST) e ponto de montagem (PRE / POST).
+- [ ] **Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)**: implementar flags granulares de prontidão no `PatchRegistry` (ex: `isReady`, `isFxReady`, `isInsertsReady`) com bloqueio interno visual nos modais (Efeitos, Inserts, Roteamento Geral) para exibir estado de carregamento elegante caso sejam abertos durante o sync inicial ou reconexão.
 
 
 ---
