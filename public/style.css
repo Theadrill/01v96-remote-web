@@ -289,18 +289,27 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 }
 
 .fader-card-desktop.fader-group-mix {
-    border-top: 2px solid #ffcc00 !important;
-    border-bottom: 3px solid #ffcc00 !important;
+    border-top: 2px solid #d4a017 !important;
+    border-bottom: 3px solid #d4a017 !important;
+    border-left: 1px solid #111 !important;
+    border-right: 1px solid #111 !important;
+    box-shadow: none !important;
 }
 
 .fader-card-desktop.fader-group-bus {
-    border-top: 2px solid #00ffcc !important;
-    border-bottom: 3px solid #00ffcc !important;
+    border-top: 2px solid #00b396 !important;
+    border-bottom: 3px solid #00b396 !important;
+    border-left: 1px solid #111 !important;
+    border-right: 1px solid #111 !important;
+    box-shadow: none !important;
 }
 
 .fader-card-desktop.fader-group-st {
-    border-top: 2px solid #5cacee !important;
-    border-bottom: 3px solid #5cacee !important;
+    border-top: 2px solid #4a90e2 !important;
+    border-bottom: 3px solid #4a90e2 !important;
+    border-left: 1px solid #111 !important;
+    border-right: 1px solid #111 !important;
+    box-shadow: none !important;
 }
 
 /* Dynamic Label Coloring (Desktop) */
@@ -331,32 +340,32 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 }
 
 .fader-group-mix .desk-label {
-    background: #423800 !important;
-    /* Amarelo escuro sutil para OFF */
-    color: #ffcc00 !important;
+    background: #332800 !important;
+    /* Dourado sóbrio para OFF */
+    color: #d4a017 !important;
 }
 
 .fader-group-mix .desk-label.label-on {
-    background: #665700 !important;
+    background: #4d3c00 !important;
     color: #fff !important;
     font-weight: 900;
 }
 
 .fader-group-bus .desk-label {
-    background: #003d36 !important;
-    /* Ciano escuro sutil para OFF */
-    color: #00ffcc !important;
+    background: #002e27 !important;
+    /* Ciano sóbrio para OFF */
+    color: #00b396 !important;
 }
 
 .fader-group-bus .desk-label.label-on {
-    background: #005c52 !important;
+    background: #00453a !important;
     color: #fff !important;
     font-weight: 900;
 }
 
 .fader-group-st .desk-label {
     background: #14283d !important;
-    /* Azul Claro escuro sutil para OFF */
+    /* Azul Claro sóbrio para OFF */
     color: #5cacee !important;
 }
 
@@ -1190,13 +1199,13 @@ html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
 }
 
 .fader-group-mix {
-    border-color: rgba(255, 204, 0, 0.5) !important;
-    box-shadow: 0 0 15px rgba(255, 204, 0, 0.15) inset;
+    border-top: 3px solid #d4a017 !important;
+    box-shadow: none !important;
 }
 
 .fader-group-bus {
-    border-color: rgba(0, 255, 204, 0.5) !important;
-    box-shadow: 0 0 15px rgba(0, 255, 204, 0.15) inset;
+    border-top: 3px solid #00b396 !important;
+    box-shadow: none !important;
 }
 
 
@@ -1875,39 +1884,39 @@ body.layout-desktop .sidebar-macros {
 }
 
 .fader-group-st .desk-patch-zone {
-    background: #0d1e2e;
-    border-color: #1a3a5c;
+    background: #0a1520;
+    border-color: #14283d;
 }
 .fader-group-st .desk-patch-name {
     color: #5cacee;
 }
 .fader-group-st .desk-patch-zone:hover {
-    background: #142a40;
+    background: #102030;
     border-color: #5cacee;
 }
 
 .fader-group-mix .desk-patch-zone {
-    background: #241e00;
-    border-color: #4a3e00;
+    background: #171200;
+    border-color: #332800;
 }
 .fader-group-mix .desk-patch-name {
-    color: #ffcc00;
+    color: #e5b324;
 }
 .fader-group-mix .desk-patch-zone:hover {
-    background: #332b00;
-    border-color: #ffcc00;
+    background: #241c00;
+    border-color: #d4a017;
 }
 
 .fader-group-bus .desk-patch-zone {
-    background: #00241f;
-    border-color: #00453d;
+    background: #001713;
+    border-color: #002e27;
 }
 .fader-group-bus .desk-patch-name {
-    color: #00ffcc;
+    color: #00cca8;
 }
 .fader-group-bus .desk-patch-zone:hover {
-    background: #00332c;
-    border-color: #00ffcc;
+    background: #00241e;
+    border-color: #00b396;
 }
 
 /* Botão SOLO nos canais normais: 38px -> 28px (-25%) */
