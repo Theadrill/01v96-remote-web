@@ -1,80 +1,52 @@
-// Lógica de configuração de Inserts (IN / OUT / POSITION)
+function updateInsertModalDOM(chIdx) {
+    if (chIdx === undefined || chIdx === null) return;
+    const chData = (typeof getChannelStateById === 'function') ? getChannelStateById(chIdx) : (window.channelStates && window.channelStates[chIdx]);
+    if (!chData) return;
+    const insInfo = (window.PatchRegistry && window.PatchRegistry.getInsertInfo)
+        ? window.PatchRegistry.getInsertInfo(chIdx)
+        : { on: !!(chData.insert && chData.insert.on), position: (chData.insert || {}).position || 0, patch_in: (chData.insert || {}).patch_in || 0, inLabel: 'NONE', outLabel: '--', posLabel: 'PRE EQ' };
+
+    const onBtn = document.getElementById('insModalOnBtn');
+    if (onBtn) {
+        onBtn.innerText = `INSERT IS ${insInfo.on ? 'ON' : 'OFF'}`;
+        onBtn.style.border = `1px solid ${insInfo.on ? '#5cacee' : '#444'}`;
+        onBtn.style.background = insInfo.on ? '#1a334d' : '#222';
+        onBtn.style.color = insInfo.on ? '#5cacee' : '#aaa';
+    }
+    const posVal = document.getElementById('insModalPosVal');
+    if (posVal) posVal.innerText = insInfo.posLabel;
+
+    const outVal = document.getElementById('insModalOutVal');
+    if (outVal) outVal.innerText = insInfo.outLabel === '--' ? 'NONE' : insInfo.outLabel;
+
+    const inVal = document.getElementById('insModalInVal');
+    if (inVal) inVal.innerText = insInfo.inLabel;
+}
+
+window.rerenderOpenInsertModal = function(chIdx) {
+    const overlay = document.getElementById('insertModalOverlay');
+    if (!overlay || overlay.style.display !== 'flex') return;
+    const openCh = window._insertModalChannel;
+    if (openCh !== undefined && openCh !== null && (chIdx === undefined || chIdx === null || chIdx === openCh)) {
+        updateInsertModalDOM(openCh);
+    }
+};
 
 window.openInsertModal = function(chIdx) {
     if (!appReady) return;
     window._insertModalChannel = chIdx;
-    const chData = getChannelStateById(chIdx) || {};
+    const chData = (typeof getChannelStateById === 'function') ? getChannelStateById(chIdx) : (window.channelStates && window.channelStates[chIdx]);
+    if (!chData) return;
     if (!chData.insert) chData.insert = { on: false, position: 0, patch_in: 0 };
     
-    // Obter patch_out se existir, buscando em globalOutPatches
-    let currentOut = 0; // 0 = None
-    if (window.globalOutPatches) {
-        let targetSrcNormal = 0;
-        let targetSrcFx = 0;
-        if (chIdx >= 0 && chIdx <= 31) {
-            targetSrcNormal = chIdx + 31;
-            targetSrcFx = chIdx + 13;
-        } else if (chIdx >= 44 && chIdx <= 51) {
-            targetSrcNormal = (chIdx - 44) + 127;
-            targetSrcFx = (chIdx - 44) + 109;
-        } else if (chIdx >= 36 && chIdx <= 43) {
-            targetSrcNormal = (chIdx - 36) + 9;
-            targetSrcFx = (chIdx - 36) + 117;
-        }
-        
-        for (let p = 0; p < 4; p++) {
-            if (window.globalOutPatches.omni && window.globalOutPatches.omni[p] === targetSrcNormal) { currentOut = p + 60; break; }
-        }
-        if (!currentOut) {
-            for (let p = 0; p < 8; p++) {
-                if (window.globalOutPatches.adat && window.globalOutPatches.adat[p] === targetSrcNormal) { currentOut = p + 40; break; }
-            }
-        }
-        if (!currentOut) {
-            for (let p = 0; p < 16; p++) {
-                if (window.globalOutPatches.slot && window.globalOutPatches.slot[p] === targetSrcNormal) { currentOut = p + 90; break; }
-            }
-        }
-        if (!currentOut) {
-            for (let p = 0; p < 2; p++) {
-                if (window.globalOutPatches['2tr'] && window.globalOutPatches['2tr'][p] === targetSrcNormal) { currentOut = p + 110; break; }
-            }
-        }
-        if (!currentOut) {
-            for (let p = 0; p < 8; p++) {
-                if (window.globalOutPatches.fx && window.globalOutPatches.fx[p] === targetSrcFx) { currentOut = p + 70; break; }
-            }
-        }
-    }
+    // Consulta centralizada via PatchRegistry
+    const insInfo = (window.PatchRegistry && window.PatchRegistry.getInsertInfo)
+        ? window.PatchRegistry.getInsertInfo(chIdx)
+        : { on: !!chData.insert.on, position: chData.insert.position || 0, patch_in: chData.insert.patch_in || 0, inLabel: 'NONE', outLabel: '--', posLabel: 'PRE EQ' };
 
-    const positionName = chData.insert.position === 1 ? 'PRE FADER' : (chData.insert.position === 2 ? 'POST FADER' : 'PRE EQ');
-    
-    let outName = "NONE";
-    if (currentOut >= 60 && currentOut <= 63) outName = `OMNI ${currentOut - 59}`;
-    else if (currentOut >= 40 && currentOut <= 47) outName = `ADAT ${currentOut - 39}`;
-    else if (currentOut >= 90 && currentOut <= 105) outName = `S1-${currentOut - 89}`;
-    else if (currentOut >= 110 && currentOut <= 111) outName = `2TD ${currentOut === 110 ? 'L' : 'R'}`;
-    else if (currentOut >= 70 && currentOut <= 77) {
-        const fxNum = Math.floor((currentOut - 70) / 2) + 1;
-        const fxSide = (currentOut - 70) % 2 === 0 ? '1' : '2';
-        outName = `FX ${fxNum}-${fxSide}`;
-    }
-
-    // Identificar nome do Insert IN a partir do valor (0-150+)
-    let inName = "NONE";
-    if (chData.insert.patch_in >= 1 && chData.insert.patch_in <= 16) inName = `AD ${chData.insert.patch_in}`;
-    else if (chData.insert.patch_in >= 25 && chData.insert.patch_in <= 40) inName = `S1-${chData.insert.patch_in - 24}`;
-    else if (chData.insert.patch_in >= 41 && chData.insert.patch_in <= 48) inName = `ADAT ${chData.insert.patch_in - 40}`;
-    else if (chData.insert.patch_in >= 120) {
-        // Encontrar FX pelo valor (121, 122, 129, 130...)
-        for (let i = 1; i <= 4; i++) {
-            const base = 121 + (i-1)*8;
-            if (chData.insert.patch_in === base) inName = `FX ${i}-1`;
-            if (chData.insert.patch_in === base + 1) inName = `FX ${i}-2`;
-        }
-        if (chData.insert.patch_in === 149) inName = '2TD L';
-        if (chData.insert.patch_in === 150) inName = '2TD R';
-    }
+    const positionName = insInfo.posLabel;
+    const outName = insInfo.outLabel === '--' ? 'NONE' : insInfo.outLabel;
+    const inName = insInfo.inLabel;
 
     let titleName = `CH ${chIdx + 1}`;
     if (chIdx >= 44 && chIdx <= 51) titleName = `BUS ${chIdx - 43}`;
@@ -86,7 +58,7 @@ window.openInsertModal = function(chIdx) {
             
             <div style="display:flex; flex-direction:column; gap:15px;">
                 <!-- INSERT ON/OFF -->
-                <button onclick="toggleInsertOn(${chIdx})" 
+                <button id="insModalOnBtn" onclick="toggleInsertOn(${chIdx})" 
                     style="height:60px; font-size:18px; font-weight:bold; border-radius:10px; border:1px solid ${chData.insert.on ? '#5cacee' : '#444'}; background: ${chData.insert.on ? '#1a334d' : '#222'}; color: ${chData.insert.on ? '#5cacee' : '#aaa'}; cursor:pointer;">
                     INSERT IS ${chData.insert.on ? 'ON' : 'OFF'}
                 </button>
@@ -94,19 +66,19 @@ window.openInsertModal = function(chIdx) {
                 <!-- POSITION -->
                 <div style="background:#222; border:1px solid #444; border-radius:10px; padding:15px; cursor:pointer;" onclick="openInsertPositionSelector(${chIdx})">
                     <div style="font-size:11px; color:#888; margin-bottom:5px;">POSITION</div>
-                    <div style="font-size:18px; font-weight:bold; color:#fff;">${positionName}</div>
+                    <div id="insModalPosVal" style="font-size:18px; font-weight:bold; color:#fff;">${positionName}</div>
                 </div>
 
                 <!-- OUT PATCH -->
-                <div style="background:#222; border:1px solid #444; border-radius:10px; padding:15px; cursor:pointer;" onclick="openInsertOutSelector(${chIdx}, ${currentOut})">
+                <div style="background:#222; border:1px solid #444; border-radius:10px; padding:15px; cursor:pointer;" onclick="openInsertOutSelector(${chIdx})">
                     <div style="font-size:11px; color:#888; margin-bottom:5px;">INSERT OUT</div>
-                    <div style="font-size:18px; font-weight:bold; color:#ff9800;">${outName}</div>
+                    <div id="insModalOutVal" style="font-size:18px; font-weight:bold; color:#ff9800;">${outName}</div>
                 </div>
 
                 <!-- IN PATCH -->
                 <div style="background:#222; border:1px solid #444; border-radius:10px; padding:15px; cursor:pointer;" onclick="openInsertInSelector(${chIdx}, ${chData.insert.patch_in})">
                     <div style="font-size:11px; color:#888; margin-bottom:5px;">INSERT IN</div>
-                    <div style="font-size:18px; font-weight:bold; color:#4caf50;">${inName}</div>
+                    <div id="insModalInVal" style="font-size:18px; font-weight:bold; color:#4caf50;">${inName}</div>
                 </div>
             </div>
 
@@ -135,7 +107,10 @@ window.toggleInsertOn = function(chIdx) {
     });
     
     if(chData.insert) chData.insert.on = newState;
-    window.openInsertModal(chIdx); // Re-render
+    if (window.PatchRegistry && typeof window.PatchRegistry.setInsertInfo === 'function') {
+        window.PatchRegistry.setInsertInfo(chIdx, chData.insert);
+    }
+    updateInsertModalDOM(chIdx);
     if (typeof renderRouting === 'function') renderRouting(chIdx);
 };
 
@@ -214,7 +189,7 @@ function createInsertPosModalOverlay() {
 }
 
 // === OUT SELECTOR ===
-window.openInsertOutSelector = function(chIdx, currentOut) {
+window.openInsertOutSelector = function(chIdx) {
     // Exibir opções: NONE, OMNI 1-4, ADAT 1-8, FX 1-4 (1-2)
     const overlay = document.getElementById('insertOutModalOverlay') || createInsertOutModalOverlay();
     const modal = document.getElementById('insertOutModalContent');
@@ -392,6 +367,11 @@ window.clearPreviousInsertOut = function(chIdx) {
 
 
 function getOutSourceName(val, type) {
+    if (window.PatchRegistry) {
+        return type === 'fx'
+            ? window.PatchRegistry.decodeFxSource(val)
+            : window.PatchRegistry.decodeNormalSource(val);
+    }
     if (type === 'fx') {
         if (val >= 13 && val <= 44) return `INSERT CH ${val - 12}`;
         if (val >= 109 && val <= 116) return `BUS ${val - 108}`;
@@ -409,6 +389,7 @@ function getOutSourceName(val, type) {
 }
 
 function getOutPortName(type, portIdx) {
+    if (window.PatchRegistry) return window.PatchRegistry.decodeOutputPortName(type, portIdx);
     if (type === 'omni') return `OMNI ${portIdx + 1}`;
     if (type === 'adat') return `ADAT ${portIdx + 1}`;
     if (type === 'slot') return `S1-${portIdx + 1}`;
@@ -538,8 +519,11 @@ window.setInsertIn = function(chIdx, srcValue) {
     });
     
     // Atualizacao otimista
-    const chData = getChannelStateById(chIdx);
-    if(chData.insert) chData.insert.patch_in = srcValue;
+    const chData = (typeof getChannelStateById === 'function') ? getChannelStateById(chIdx) : (window.channelStates && window.channelStates[chIdx]);
+    if (chData && chData.insert) chData.insert.patch_in = srcValue;
+    if (window.PatchRegistry && typeof window.PatchRegistry.setInsertInfo === 'function') {
+        window.PatchRegistry.setInsertInfo(chIdx, (chData && chData.insert) || { patch_in: srcValue });
+    }
     closeInsertInModal();
     window.openInsertModal(chIdx);
 };

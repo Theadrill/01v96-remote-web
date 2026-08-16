@@ -262,35 +262,43 @@ socket.on('update', (d) => {
         if (d.type === 'kChannelInput/kChannelIn') {
             const state = getChannelStateById(d.channel);
             if (state) state.patch = d.value;
-            if (activeConfigChannel === d.channel) {
-                const nameEl = document.getElementById('currentPatchName');
-                if (nameEl && typeof window.getPatchName === 'function') {
-                    nameEl.innerText = window.getPatchName(d.value);
-                }
+            if (window.PatchRegistry) window.PatchRegistry.setInputPatch(d.channel, d.value);
+            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+                renderRouting(d.channel);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
         }
 
         // Suporte a Insert (ETC)
         if (d.type === 'kInputInsert/kInsertOn') {
             const state = getChannelStateById(d.channel);
             if (state && state.insert) state.insert.on = !!d.value;
+            if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(d.channel, state.insert);
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(d.channel);
         }
         if (d.type === 'kInputInsert/kInsertLocInsert') {
             const state = getChannelStateById(d.channel);
             if (state && state.insert) state.insert.position = d.value;
+            if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(d.channel, state.insert);
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(d.channel);
         }
         if (d.type === 'kChannelInsertIn/kInsertIn') {
             const state = getChannelStateById(d.channel);
             if (state && state.insert) state.insert.patch_in = d.value;
+            if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(d.channel, state.insert);
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(d.channel);
         }
 
         // Suporte a Bus Insert / Stereo (ETC)
@@ -298,19 +306,25 @@ socket.on('update', (d) => {
             const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
             const globalCh = 44 + busIdx;
             const state = busesState[busIdx];
-            if (state) state.insert.on = !!d.value;
+            if (state && state.insert) state.insert.on = !!d.value;
+            if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(globalCh, state.insert);
             if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
                 renderRouting(globalCh);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(globalCh);
         }
         if (d.type === 'kBusInsert/kInsertLocInsert') {
             const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
             const globalCh = 44 + busIdx;
             const state = busesState[busIdx];
-            if (state) state.insert.position = d.value;
+            if (state && state.insert) state.insert.position = d.value;
+            if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(globalCh, state.insert);
             if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
                 renderRouting(globalCh);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(globalCh);
         }
         if (d.type === 'kBusToStereo/kBusToStereoOn') {
             const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
@@ -320,6 +334,7 @@ socket.on('update', (d) => {
             if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
                 renderRouting(globalCh);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
         }
 
         // Suporte a BUS / STEREO (ETC)
@@ -338,6 +353,7 @@ socket.on('update', (d) => {
             if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
         }
     } // FIM DO BLOCO DE INPUTS (0-31)
 
@@ -365,10 +381,16 @@ socket.on('update', (d) => {
         if (d.type === 'kOutputPatch/kSlot') window.globalOutPatches.slot[port] = src;
         if (d.type === 'kOutputPatch/k2tr') window.globalOutPatches['2tr'][port] = src;
 
+        if (window.PatchRegistry && typeof window.PatchRegistry.setOutputPatch === 'function') {
+            window.PatchRegistry.setOutputPatch(d.type, port, src);
+        }
+
         // Se a tela de config do insert estiver aberta, re-renderizar para atualizar o patch selecionado
         if (activeConfigTab === 'etc' && typeof renderRouting === 'function') {
             renderRouting(activeConfigChannel);
         }
+        if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal();
+        if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
     }
 
     // Suporte Universal a EQ
@@ -723,6 +745,9 @@ socket.on('sync', (s) => {
         // 🔑 NÃO chamamos requestGlobalNames() aqui — os globals já estão em memória
         // (foram carregados no connect). Recarregar a cada sync causava o flash de nomes.
     }
+
+    if (window.PatchRegistry && typeof window.PatchRegistry.syncFromGlobalState === 'function') window.PatchRegistry.syncFromGlobalState();
+    if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
 });
 
 socket.on('scenesUpdated', (data) => {
@@ -817,6 +842,8 @@ socket.on('resolvedNamesUpdated', (data) => {
     if (typeof window.updateBusRoutingLabels === 'function' && activeConfigTab === 'etc' && activeConfigChannel !== null) {
         window.updateBusRoutingLabels();
     }
+
+    if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
 });
 
 // Stubs de compatibilidade — mantidos para não errar caso outros paths

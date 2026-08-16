@@ -317,9 +317,10 @@
      */
     function syncFromGlobalState() {
         // 1. Entradas dos canais (CH 1-32 e ST IN 1-4 L/R)
-        if (typeof channelStates !== 'undefined') {
+        var cs = window.channelStates || (typeof channelStates !== 'undefined' ? channelStates : null);
+        if (cs) {
             for (var i = 0; i < 40; i++) {
-                var ch = channelStates[i];
+                var ch = cs[i];
                 if (!ch) continue;
                 var patchVal = (ch.patch !== undefined) ? ch.patch : 0;
                 inputs[i] = decodeInputPatch(patchVal);
@@ -527,22 +528,22 @@
      * Sincroniza os inserts de todos os canais/buses/aux que possuem insert.
      */
     function syncInserts() {
-        // Canais 0-31
-        if (typeof channelStates !== 'undefined') {
+        var cs = window.channelStates || (typeof channelStates !== 'undefined' ? channelStates : null);
+        if (cs) {
             for (var i = 0; i < 32; i++) {
-                syncSingleInsert(i, channelStates[i]);
+                syncSingleInsert(i, cs[i]);
             }
         }
-        // BUS 44-51
-        if (typeof busesState !== 'undefined') {
+        var bs = window.busesState || (typeof busesState !== 'undefined' ? busesState : null);
+        if (bs) {
             for (var i = 0; i < 8; i++) {
-                syncSingleInsert(44 + i, busesState[i]);
+                syncSingleInsert(44 + i, bs[i]);
             }
         }
-        // AUX 36-43
-        if (typeof mixesState !== 'undefined') {
+        var ms = window.mixesState || (typeof mixesState !== 'undefined' ? mixesState : null);
+        if (ms) {
             for (var i = 0; i < 8; i++) {
-                syncSingleInsert(36 + i, mixesState[i]);
+                syncSingleInsert(36 + i, ms[i]);
             }
         }
     }
@@ -600,6 +601,7 @@
     function setInputPatch(ch, val) {
         if (ch >= 0 && ch < 40) {
             inputs[ch] = decodeInputPatch(val);
+            if (window.channelStates && window.channelStates[ch]) window.channelStates[ch].patch = val;
         }
     }
 
@@ -607,16 +609,48 @@
      * Atualiza o cache de uma porta de saída física.
      */
     function setOutputPatch(portType, portIdx, src) {
-        if (portType === 'omni' && portIdx >= 0 && portIdx < 4) {
+        if (!portType) return;
+        var pType = String(portType).toLowerCase();
+        if (pType.indexOf('koutputpatch/') !== -1) {
+            pType = pType.replace('koutputpatch/', '');
+        }
+        if (pType === 'twotrack') pType = '2tr';
+
+        src = Math.round(src);
+
+        // Atualiza o objeto globalOutPatches em window
+        if (!window.globalOutPatches) {
+            window.globalOutPatches = { omni: {}, adat: {}, fx: {}, slot: {}, '2tr': {} };
+        }
+        if (!window.globalOutPatches[pType]) {
+            window.globalOutPatches[pType] = {};
+        }
+        window.globalOutPatches[pType][portIdx] = src;
+
+        // Atualiza o cache interno de physicalOutputs
+        if (pType === 'omni' && portIdx >= 0 && portIdx < 4) {
             physicalOutputs.omni[portIdx] = decodeNormalSource(src);
-        } else if (portType === 'adat' && portIdx >= 0 && portIdx < 8) {
+        } else if (pType === 'adat' && portIdx >= 0 && portIdx < 8) {
             physicalOutputs.adat[portIdx] = decodeNormalSource(src);
-        } else if (portType === 'slot' && portIdx >= 0 && portIdx < 16) {
+        } else if (pType === 'slot' && portIdx >= 0 && portIdx < 16) {
             physicalOutputs.slot[portIdx] = decodeNormalSource(src);
-        } else if (portType === '2tr' && portIdx >= 0 && portIdx < 2) {
+        } else if (pType === '2tr' && portIdx >= 0 && portIdx < 2) {
             physicalOutputs.twoTrack[portIdx] = decodeNormalSource(src);
-        } else if (portType === 'fx' && portIdx >= 0 && portIdx < 8) {
+        } else if (pType === 'fx' && portIdx >= 0 && portIdx < 8) {
             physicalOutputs.fx[portIdx] = decodeFxSource(src);
+        }
+
+        // Recalcula as saídas MIX/BUS, Stereo e os Inserts que apontam para esta porta física
+        syncMixBusOutputs();
+        syncStereoOutputs();
+        syncInserts();
+
+        // Notifica as telas abertas
+        if (typeof window.rerenderOpenInsertModal === 'function') {
+            window.rerenderOpenInsertModal(window._insertModalChannel);
+        }
+        if (typeof window.renderRoutingOverview === 'function') {
+            window.renderRoutingOverview();
         }
     }
 
@@ -645,28 +679,67 @@
         // Store raw output (destKey → slotVal)
         rawFxOutputs[destKey] = sv;
 
-        var destLabel = decodeFxOutputDest(destKey);
+        var element = Math.floor(destKey / 100);
+        var channel = destKey % 100;
 
-        // Mapeia slotVal para o slot correto
-        var slotValMap = { 121: [0, 0], 122: [0, 1], 129: [1, 0], 130: [1, 1], 137: [2, 0], 138: [2, 1], 139: [3, 0], 140: [3, 1] };
-        if (slotValMap[sv]) {
-            var s = slotValMap[sv][0];
-            var lr = slotValMap[sv][1];
-            if (lr === 0) {
-                fxSlots[s].outL = destKey;
-                fxSlots[s].outLabelL = destLabel;
-            } else {
-                fxSlots[s].outR = destKey;
-                fxSlots[s].outLabelR = destLabel;
+        // element 1: Channel In (0..39)
+        if (element === 1 && channel >= 0 && channel < 40) {
+            setInputPatch(channel, sv);
+            if (typeof activeConfigChannel !== 'undefined' && activeConfigChannel === channel && typeof window.renderRouting === 'function') {
+                window.renderRouting(channel);
             }
         }
+        // element 2: Insert CH (0..31)
+        else if (element === 2 && channel >= 0 && channel < 32) {
+            var chData = typeof getChannelStateById === 'function' ? getChannelStateById(channel) : (window.channelStates && window.channelStates[channel]);
+            if (chData && chData.insert) {
+                chData.insert.patch_in = sv;
+                syncSingleInsert(channel, chData);
+            } else {
+                syncSingleInsert(channel, { insert: { on: false, position: 0, patch_in: sv } });
+            }
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(channel);
+        }
+        // element 7: Insert BUS (0..7)
+        else if (element === 7 && channel >= 0 && channel < 8) {
+            var busGlobalId = 44 + channel;
+            var busData = window.busesState && window.busesState[channel];
+            if (busData && busData.insert) {
+                busData.insert.patch_in = sv;
+                syncSingleInsert(busGlobalId, busData);
+            } else {
+                syncSingleInsert(busGlobalId, { insert: { on: false, position: 0, patch_in: sv } });
+            }
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(busGlobalId);
+        }
+        // element 8: Insert AUX (0..7)
+        else if (element === 8 && channel >= 0 && channel < 8) {
+            var auxGlobalId = 36 + channel;
+            var auxData = window.mixesState && window.mixesState[channel];
+            if (auxData && auxData.insert) {
+                auxData.insert.patch_in = sv;
+                syncSingleInsert(auxGlobalId, auxData);
+            } else {
+                syncSingleInsert(auxGlobalId, { insert: { on: false, position: 0, patch_in: sv } });
+            }
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(auxGlobalId);
+        }
+
+        // Recalcula os slots de FX (garante que unassign/OFF atualize instantaneamente)
+        syncFxSlots();
+
+        // Update routing overview if open
+        if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
     }
 
     /**
      * Atualiza o cache de insert de um canal.
      */
     function setInsertInfo(ch, data) {
-        syncSingleInsert(ch, { insert: data });
+        var stateObj = (data && data.insert) ? data : { insert: data };
+        syncSingleInsert(ch, stateObj);
+        if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(ch);
+        if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -873,6 +946,8 @@
                 var lr = port % 2;
                 setFxInput(slot, lr, data[key]);
             }
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(window._insertModalChannel);
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
         });
 
         // FX Outputs update
@@ -883,6 +958,8 @@
             }
             // Sincroniza patch_in de inserts (channelStates/busesState/mixesState)
             syncInsertPatchesFromFxOutputs();
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(window._insertModalChannel);
+            if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
         });
 
         // Sync completo: resync tudo

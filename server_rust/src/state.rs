@@ -893,9 +893,21 @@ impl GlobalState {
             } => {
                 let key = element * 100 + channel;
                 self.fx_outputs.insert(key, *value);
-                if *element == 7 {
+                if *element == 1 {
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.patch = *value;
+                    }
+                } else if *element == 2 {
+                    if let Some(ch) = self.channels.get_mut(channel) {
+                        ch.insert.patch_in = *value;
+                    }
+                } else if *element == 7 {
                     if let Some(bus) = self.buses.get_mut(channel) {
                         bus.insert.patch_in = *value;
+                    }
+                } else if *element == 8 {
+                    if let Some(aux) = self.mixes.get_mut(channel) {
+                        aux.insert.patch_in = *value;
                     }
                 }
             }

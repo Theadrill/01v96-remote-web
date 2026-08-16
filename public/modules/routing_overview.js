@@ -7,7 +7,6 @@
     'use strict';
 
     var modalEl = null;
-    var refreshInterval = null;
 
     // ═══════════════════════════════════════════════════════════════════
     // UTILIDADES DE RENDERIZAÇÃO
@@ -39,19 +38,21 @@
         return '<div class="ro-section-header">' + escapeHtml(title) + '</div>';
     }
 
-    function makeRow(label, value) {
+    function makeRow(label, value, id) {
         var valClass = (value === '--' || value === 'NONE' || value === 'OFF') ? 'ro-val-empty' : 'ro-val-active';
+        var idAttr = id ? ' id="' + escapeHtml(id) + '"' : '';
         return '<div class="ro-row">' +
             '<span class="ro-label">' + escapeHtml(label) + '</span>' +
-            '<span class="ro-value ' + valClass + '">' + escapeHtml(value) + '</span>' +
+            '<span' + idAttr + ' class="ro-value ' + valClass + '">' + escapeHtml(value) + '</span>' +
             '</div>';
     }
 
-    function makeCompactRow(label, value) {
+    function makeCompactRow(label, value, id) {
         var valClass = (value === '--' || value === 'NONE' || value === 'OFF') ? 'ro-val-empty' : 'ro-val-active';
+        var idAttr = id ? ' id="' + escapeHtml(id) + '"' : '';
         return '<div class="ro-row ro-row-compact">' +
             '<span class="ro-label">' + escapeHtml(label) + '</span>' +
-            '<span class="ro-value ' + valClass + '">' + escapeHtml(value) + '</span>' +
+            '<span' + idAttr + ' class="ro-value ' + valClass + '">' + escapeHtml(value) + '</span>' +
             '</div>';
     }
 
@@ -70,7 +71,7 @@
             var displayLabel = label + (name ? ' <span class="ro-ch-name">' + escapeHtml(name) + '</span>' : '');
             html += '<div class="ro-row">' +
                 '<span class="ro-label">' + displayLabel + '</span>' +
-                '<span class="ro-value ' + (patch === '--' || patch === 'NONE' ? 'ro-val-empty' : 'ro-val-active') + '">' + escapeHtml(patch) + '</span>' +
+                '<span id="ro-val-input-' + i + '" class="ro-value ' + (patch === '--' || patch === 'NONE' ? 'ro-val-empty' : 'ro-val-active') + '">' + escapeHtml(patch) + '</span>' +
                 '</div>';
         }
 
@@ -79,7 +80,7 @@
         var stLabels = ['ST IN 1 L', 'ST IN 1 R', 'ST IN 2 L', 'ST IN 2 R', 'ST IN 3 L', 'ST IN 3 R', 'ST IN 4 L', 'ST IN 4 R'];
         for (var j = 0; j < 8; j++) {
             var patch = data.inputs[32 + j] || '--';
-            html += makeRow(stLabels[j], patch);
+            html += makeRow(stLabels[j], patch, 'ro-val-input-' + (32 + j));
         }
 
         return html;
@@ -339,24 +340,9 @@
         createModal();
         renderModalContent();
         modalEl.style.display = 'flex';
-
-        // Auto-refresh every 2 seconds while open
-        if (refreshInterval) clearInterval(refreshInterval);
-        refreshInterval = setInterval(function () {
-            if (modalEl && modalEl.style.display === 'flex') {
-                renderModalContent();
-            } else {
-                clearInterval(refreshInterval);
-                refreshInterval = null;
-            }
-        }, 2000);
     }
 
     function closeRoutingOverviewModal() {
-        if (refreshInterval) {
-            clearInterval(refreshInterval);
-            refreshInterval = null;
-        }
         if (modalEl) {
             modalEl.style.display = 'none';
         }
@@ -365,5 +351,10 @@
     // Expose globally
     window.openRoutingOverviewModal = openRoutingOverviewModal;
     window.closeRoutingOverviewModal = closeRoutingOverviewModal;
+    window.renderRoutingOverview = function () {
+        if (modalEl && modalEl.style.display === 'flex') {
+            renderModalContent();
+        }
+    };
 
 })();

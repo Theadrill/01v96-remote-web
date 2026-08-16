@@ -159,7 +159,7 @@ window.renderRouting = function(chIdx) {
                         <div class="patch-display-box" onclick="openPatchSelector(${primaryLogicCh}, ${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
                             <div style="display: flex; flex-direction: column; flex: 1;">
                                 <span style="font-size: 10px; color: #888;">${primaryName}</span>
-                                <span id="currentPatchName" style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[primaryLogicCh].patch || 0)}</span>
+                                <span id="currentPatchName" style="font-size: 18px; font-weight: bold; color: #5cacee;">${window.PatchRegistry ? window.PatchRegistry.getChannelInput(primaryLogicCh) : getPatchName(channelStates[primaryLogicCh].patch || 0)}</span>
                             </div>
                             <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa; flex-shrink: 0;">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -171,7 +171,7 @@ window.renderRouting = function(chIdx) {
                         <div class="patch-display-box" onclick="openPatchSelector(${partnerLogicCh}, ${chIdx})" style="background: #222; border: 1px solid #444; border-radius: 10px; padding: 15px 20px; flex: 1; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
                             <div style="display: flex; flex-direction: column;">
                                 <span style="font-size: 10px; color: #888;">${partnerName}</span>
-                                <span style="font-size: 18px; font-weight: bold; color: #5cacee;">${getPatchName(channelStates[partnerLogicCh].patch || 0)}</span>
+                                <span style="font-size: 18px; font-weight: bold; color: #5cacee;">${window.PatchRegistry ? window.PatchRegistry.getChannelInput(partnerLogicCh) : getPatchName(channelStates[partnerLogicCh].patch || 0)}</span>
                             </div>
                             <div style="background: #333; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #aaa;">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -332,13 +332,12 @@ window.toggleBusAssignment = function(chIdx, busIdx) {
 };
 
 function getPatchName(val) {
+    if (window.PatchRegistry) return window.PatchRegistry.decodeInputPatch(val);
     if (val === 0) return "NONE";
     if (val >= 1 && val <= 16) return `AD ${val}`;
     if (val >= 17 && val <= 24) return `GAP ${val}`;
     if (val >= 25 && val <= 40) return `S1-${val - 24}`;
     if (val >= 41 && val <= 48) return `ADAT ${val - 40}`;
-    
-    // Mapeamento específico de efeitos conforme log
     const fxMap = {
         121: "FX1-1", 122: "FX1-2",
         129: "FX2-1", 130: "FX2-2",
@@ -346,10 +345,8 @@ function getPatchName(val) {
         139: "FX4-1", 140: "FX4-2"
     };
     if (fxMap[val]) return fxMap[val];
-    
     if (val === 149) return "2TD-L";
     if (val === 150) return "2TD-R";
-    
     return `ID ${val}`;
 }
 
@@ -444,6 +441,7 @@ function selectPatch(logicChIdx, patchId, uiChIdx) {
     });
     
     channelStates[logicChIdx].patch = patchId;
+    if (window.PatchRegistry) window.PatchRegistry.setInputPatch(logicChIdx, patchId);
     document.getElementById('patchSelectorModal').style.display = 'none';
     
     // IMPORTANTE: Se o canal for parte de um par, precisamos re-renderizar a aba
@@ -640,3 +638,5 @@ window.updateBusRoutingLabels = function () {
         btn.innerText = getBusButtonLabel(i);
     });
 };
+
+window.getPatchName = getPatchName;

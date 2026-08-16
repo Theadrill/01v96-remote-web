@@ -9737,8 +9737,8 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
 .ro-modal-card {
     background: #1a1a1a;
     border-radius: 12px;
-    width: 92%;
-    max-width: 520px;
+    width: 90%;
+    max-width: 340px;
     max-height: 88vh;
     display: flex;
     flex-direction: column;
@@ -9840,13 +9840,22 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 3px 0;
+    padding: 4px 8px;
     font-size: 12px;
+    border-radius: 4px;
+}
+
+.ro-row:nth-of-type(odd) {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.ro-row:nth-of-type(even) {
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .ro-row-compact {
     font-size: 11px;
-    padding: 2px 0;
+    padding: 2px 8px;
 }
 
 .ro-label {
@@ -9948,6 +9957,6 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
 /* Desktop adjustments */
 @media (min-width: 769px) {
     .ro-modal-card {
-        max-width: 600px;
+        max-width: 340px;
     }
 }
