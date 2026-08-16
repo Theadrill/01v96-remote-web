@@ -1,9 +1,8 @@
 # Plano de Implementação: Redimensionamento e Exibição de Patch no Channel Strip Desktop
 
 > **Ordem de Execução**: **ETAPA 2 (CONDICIONADA À ETAPA 1)**  
-> **Status**: Aguardando Conclusão da Etapa 1  
-> **Dependência Obrigatória**: [plano_de_refatoracao_ROUTING_patch_registry.md](file:///C:/PROJETOS/01v96-remote-web/docs/plano_de_refatoracao_ROUTING_patch_registry.md) **deve estar 100% implementado e validado pelo usuário antes de iniciar este plano.**  
-> **Módulos Afetados**: `public/style.css`, `public/modules/channel_strip.js`  
+> **Status**: ✅ **100% IMPLEMENTADA E INTEGRADA AO PATCHREGISTRY**  
+> **Módulos Afetados**: `public/style.css`, `public/modules/channel_strip.js`, `public/modules/patch_registry.js`  
 > **Objetivo**: Redimensionar verticalmente os cabeçalhos e botões dos canais não-Master no modo desktop e adicionar o badge de patch consumindo os dados diretamente de `window.PatchRegistry`.
 
 ---

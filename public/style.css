@@ -1747,6 +1747,86 @@ body.layout-desktop .sidebar-macros {
     text-transform: uppercase;
 }
 
+/* Cabeçalho superior nos canais normais: 35px -> 26px (-25%) */
+.fader-card-desktop:not(.master-card-desktop) .desk-label {
+    height: 26px;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #111;
+}
+
+.fader-card-desktop:not(.master-card-desktop) .desk-label-wrapper {
+    height: 26px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #111;
+}
+
+/* Nova Área de Patch: 20px de altura com 2px de margem = total 24px */
+.desk-patch-zone {
+    height: 20px;
+    margin: 2px 4px;
+    background: #14171c;
+    border: 1px solid #282e3a;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.desk-patch-zone:hover {
+    background: #1c222c;
+    border-color: #5cacee;
+}
+
+.desk-patch-name {
+    color: #5cacee;
+    font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    letter-spacing: -0.2px;
+}
+
+/* Botão SOLO nos canais normais: 38px -> 28px (-25%) */
+.fader-card-desktop:not(.master-card-desktop) .btn-cue,
+.fader-card-desktop:not(.master-card-desktop) .btn-cue-placeholder {
+    height: 28px;
+    margin: 2px 4px;
+    font-size: 10px;
+    line-height: 26px;
+}
+
+/* Botão ON nos canais normais: 48px -> 43px (-10%) */
+.fader-card-desktop:not(.master-card-desktop) .btn-on-desk {
+    height: 43px;
+    margin: 3px 4px;
+    font-size: 11px;
+}
+
+/* MASTER CARD Permanece Inalterado */
+.master-card-desktop .desk-label-wrapper,
+.master-card-desktop .desk-label {
+    height: 35px;
+}
+.master-card-desktop .btn-cue {
+    height: 38px;
+}
+.master-card-desktop .btn-on-desk {
+    height: 48px;
+}
+
 .btn-cue.solo-active {
     background: #ffc107;
     color: #000;

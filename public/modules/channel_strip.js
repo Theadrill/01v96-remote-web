@@ -180,6 +180,9 @@ function createDesktopStrip(config) {
     const mId = ids.m || `${pfx}m${id}`;
     const nameId = ids.name || `${pfx}name${id}`;
     const labelId = ids.label || `${pfx}label${id}`;
+    const patchId = ids.patch || `${pfx}patch-zone-${id}`;
+    const patchValId = ids.patchVal || `${pfx}patch-val-${id}`;
+    const patchText = config.patchText || '';
 
     const wheelCall = `${onWheelAction}(event, ${evtCh})`;
     const inputCall = `${onInputAction}(event, ${evtCh})`;
@@ -196,6 +199,12 @@ function createDesktopStrip(config) {
                 </div>` : ''}
             </div>
             
+            ${!isMaster ? `
+            <div class="desk-patch-zone" id="${patchId}" onclick="${configAction}">
+                <span class="desk-patch-name" id="${patchValId}">${patchText || '--'}</span>
+            </div>
+            ` : ''}
+
             ${hasSolo ?
             `<button id="${soloId}" class="btn-cue ${solo ? 'solo-active' : ''}" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">SOLO</button>` :
             isMaster ?
@@ -328,6 +337,47 @@ function updatePanIndicator(channel, panValue) {
     });
 }
 
+/**
+ * Atualiza dinamicamente os badges de patch no layout desktop.
+ */
+function updateDesktopPatchBadges() {
+    if (layoutMode !== 'desktop' || !window.PatchRegistry) return;
+
+    // Canais 0-31
+    for (let i = 0; i < 32; i++) {
+        const el = document.getElementById(`patch-val-${i}`);
+        if (el) {
+            const s = (typeof getChannelStateById === 'function') ? getChannelStateById(i) : (window.channelStates && window.channelStates[i]);
+            const txt = (s && s.paired && s.pairedWith !== null)
+                ? window.PatchRegistry.getPairedChannelInput(i, s.pairedWith)
+                : window.PatchRegistry.getChannelInput(i);
+            el.innerText = txt || '--';
+        }
+    }
+
+    // ST IN 0-3 (st0..st3)
+    for (let i = 0; i < 4; i++) {
+        const el = document.getElementById(`patch-val-st${i}`);
+        if (el) {
+            const ch = 32 + (i * 2);
+            el.innerText = window.PatchRegistry.getPairedChannelInput(ch, ch + 1) || '--';
+        }
+    }
+
+    // MIX 0-7 (m0..m7) & BUS 0-7 (b0..b7)
+    for (let i = 0; i < 8; i++) {
+        const elMix = document.getElementById(`patch-val-m${i}`);
+        if (elMix) {
+            elMix.innerText = window.PatchRegistry.getMixOutput(i) || '--';
+        }
+        const elBus = document.getElementById(`patch-val-b${i}`);
+        if (elBus) {
+            elBus.innerText = window.PatchRegistry.getBusOutput(i) || '--';
+        }
+    }
+}
+window.updateDesktopPatchBadges = updateDesktopPatchBadges;
+
 function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
     const s = isMaster ? masterState : channelStates[i];
     let title = isMaster ? "MASTER" : `${i + 1}`;
@@ -366,6 +416,13 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         onAction = `toggleState('kInputAUX/kAUX${activeMix}On', ${i})`;
     }
 
+    let patchText = '--';
+    if (!isMaster && window.PatchRegistry) {
+        patchText = s.paired && s.pairedWith !== null
+            ? window.PatchRegistry.getPairedChannelInput(i, s.pairedWith)
+            : window.PatchRegistry.getChannelInput(i);
+    }
+
     return createDesktopStrip({
         id: isMaster ? 'master' : i,
         evtCh: isMaster ? "'master'" : i,
@@ -384,7 +441,8 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
         type: "main",
         isPaired: isMaster || (!isMaster && s.paired),
         partnerId: !isMaster && s.paired ? s.pairedWith : (isMaster ? 'master-r' : null),
-        dataCh: isMaster ? "master" : i
+        dataCh: isMaster ? "master" : i,
+        patchText
     });
 }
 
@@ -567,6 +625,17 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
     }
     const actionCh = type === 'stIn' ? configId : ch;
 
+    let patchText = '--';
+    if (window.PatchRegistry) {
+        if (type === 'stIn') {
+            patchText = window.PatchRegistry.getPairedChannelInput(ch, ch + 1);
+        } else if (type === 'mix') {
+            patchText = window.PatchRegistry.getMixOutput(i);
+        } else if (type === 'bus') {
+            patchText = window.PatchRegistry.getBusOutput(i);
+        }
+    }
+
     return createDesktopStrip({
         id: prefix + i,
         evtCh: actionCh,
@@ -582,7 +651,8 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         isPaired: type === 'stIn',
         partnerId: type === 'stIn' ? configId + 1 : null,
         hasPan: type === 'stIn', // Apenas ST IN tem Pan nas saídas
-        dataCh: configId
+        dataCh: configId,
+        patchText
     });
 }
 

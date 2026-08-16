@@ -378,6 +378,11 @@
 
         // 6. Inserts
         syncInserts();
+
+        // 7. Atualiza badges de patch no layout desktop
+        if (typeof window.updateDesktopPatchBadges === 'function') {
+            window.updateDesktopPatchBadges();
+        }
     }
 
     /**
@@ -602,6 +607,9 @@
         if (ch >= 0 && ch < 40) {
             inputs[ch] = decodeInputPatch(val);
             if (window.channelStates && window.channelStates[ch]) window.channelStates[ch].patch = val;
+            if (typeof window.updateDesktopPatchBadges === 'function') {
+                window.updateDesktopPatchBadges();
+            }
         }
     }
 
@@ -645,7 +653,10 @@
         syncStereoOutputs();
         syncInserts();
 
-        // Notifica as telas abertas
+        // Notifica as telas abertas e os badges desktop
+        if (typeof window.updateDesktopPatchBadges === 'function') {
+            window.updateDesktopPatchBadges();
+        }
         if (typeof window.rerenderOpenInsertModal === 'function') {
             window.rerenderOpenInsertModal(window._insertModalChannel);
         }

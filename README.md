@@ -199,7 +199,7 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [x] Extensão do Módulo de Copiar e Colar Contextual
 - [x] Refatorar Módulo copy_paste.js
 - [x] Refatoração do Roteamento e Centralização no PatchRegistry (Etapa 1)
-- [ ] Área de Patch nos Channel Strips Desktop (Etapa 2)
+- [x] Área de Patch nos Channel Strips Desktop (Etapa 2)
 - [ ] Fallback para Navegadores Antigos (Legacy Browser Compatibility)
 - [ ] Botão de Delay
 - [ ] Posição e Ponto de Inserção nos Auxiliares
