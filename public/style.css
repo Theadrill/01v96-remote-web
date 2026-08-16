@@ -1825,31 +1825,29 @@ body.layout-desktop .sidebar-macros {
     border-bottom: 1px solid #111;
 }
 
-/* Nova Área de Patch: 20px de altura com 2px de margem = total 24px */
+/* Nova Área de Patch: Bloco sólido contínuo (24px de altura) */
 .desk-patch-zone {
-    height: 20px;
-    margin: 2px 4px;
-    background: #14171c;
-    border: 1px solid #282e3a;
-    border-radius: 3px;
+    height: 24px;
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid #111;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     overflow: hidden;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: filter 0.15s ease, background 0.15s ease;
 }
 
 .desk-patch-zone:hover {
-    background: #1c222c;
-    border-color: #5cacee;
+    filter: brightness(1.25);
 }
 
 .desk-patch-name {
-    color: #5cacee;
     font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
@@ -1858,65 +1856,40 @@ body.layout-desktop .sidebar-macros {
     letter-spacing: -0.2px;
 }
 
-/* Cores por Grupo de Canais */
+/* Preenchimento Sólido por Grupo de Canais */
 .fader-group-1 .desk-patch-zone {
-    background: #001f33;
-    border-color: #003a5e;
+    background: #003a5e;
 }
 .fader-group-1 .desk-patch-name {
     color: #00adef;
 }
-.fader-group-1 .desk-patch-zone:hover {
-    background: #002b47;
-    border-color: #00adef;
-}
 
 .fader-group-2 .desk-patch-zone {
-    background: #002619;
-    border-color: #004a30;
+    background: #004a30;
 }
 .fader-group-2 .desk-patch-name {
     color: #00ff88;
 }
-.fader-group-2 .desk-patch-zone:hover {
-    background: #003624;
-    border-color: #00ff88;
-}
 
 .fader-group-st .desk-patch-zone {
-    background: #0a1520;
-    border-color: #14283d;
+    background: #14283d;
 }
 .fader-group-st .desk-patch-name {
     color: #5cacee;
 }
-.fader-group-st .desk-patch-zone:hover {
-    background: #102030;
-    border-color: #5cacee;
-}
 
 .fader-group-mix .desk-patch-zone {
-    background: #171200;
-    border-color: #332800;
+    background: #332800;
 }
 .fader-group-mix .desk-patch-name {
-    color: #e5b324;
-}
-.fader-group-mix .desk-patch-zone:hover {
-    background: #241c00;
-    border-color: #d4a017;
+    color: #d4a017;
 }
 
 .fader-group-bus .desk-patch-zone {
-    background: #001713;
-    border-color: #002e27;
+    background: #002e27;
 }
 .fader-group-bus .desk-patch-name {
-    color: #00cca8;
-}
-.fader-group-bus .desk-patch-zone:hover {
-    background: #00241e;
-    border-color: #00b396;
+    color: #00b396;
 }
 
 /* Botão SOLO nos canais normais: 38px -> 28px (-25%) */
