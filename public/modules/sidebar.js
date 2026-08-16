@@ -536,7 +536,9 @@ updateViewportInfo();
 window.addEventListener('click', (e) => {
     let closedAny = false;
     if (e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'assignSceneModal' && typeof closeAssignSceneModal === 'function') {
+        if (e.target.id === 'routingOverviewModal' && typeof closeRoutingOverviewModal === 'function') {
+            closeRoutingOverviewModal();
+        } else if (e.target.id === 'assignSceneModal' && typeof closeAssignSceneModal === 'function') {
             closeAssignSceneModal();
         } else {
             e.target.style.display = 'none';
@@ -588,6 +590,10 @@ window.addEventListener('click', (e) => {
     }
 
     function closeTopmostModal(topmost) {
+        if (topmost.id === 'routingOverviewModal' && typeof closeRoutingOverviewModal === 'function') {
+            closeRoutingOverviewModal();
+            return;
+        }
         if (topmost.classList.contains('ch-modal-overlay')) {
             if (topmost.id === 'efeitosModal' && typeof closeEffectsModal === 'function') {
                 closeEffectsModal();
@@ -993,6 +999,7 @@ function renderDock(mode) {
             buttons.push({ label: isOutsOn ? 'SAIR' : 'MIX/BUS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
             buttons.push({ label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' });
             buttons.push({ label: 'EFEITOS', action: 'openEffectsModal()', cls: 'dock-efeitos' });
+            buttons.push({ label: 'ROTEAMENTO', action: 'openRoutingOverviewModal()', cls: 'dock-routing' });
             buttons.push({ label: 'MEDIDORES', action: "if(typeof openMeterConfigModal==='function') openMeterConfigModal('master')", cls: 'dock-meter-config' });
             if (typeof layerNavEnabled !== 'undefined' && layerNavEnabled) {
                 buttons.push({ label: '1-16', action: 'setLayer(0)', cls: 'dock-layer' + (activeLayerStart === 0 ? ' active-tab' : '') });
@@ -1368,6 +1375,7 @@ function renderMobileMenu(mode) {
             }
             buttonsConfig.push({ label: 'MIX / BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" });
             buttonsConfig.push({ label: 'EFEITOS', cls: 'menu-btn-solid-purple', action: "if(typeof openEffectsModal === 'function') { openEffectsModal(); }" });
+            buttonsConfig.push({ label: 'ROTEAMENTO GERAL', cls: 'menu-btn-solid-blue', action: "if(typeof openRoutingOverviewModal === 'function') { openRoutingOverviewModal(); }" });
             buttonsConfig.push({ label: 'MEDIDORES', cls: 'menu-btn-solid-blue', action: "if(typeof openMeterConfigModal === 'function') { openMeterConfigModal('master'); }" });
             break;
 

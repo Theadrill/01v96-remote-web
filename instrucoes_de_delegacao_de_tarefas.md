@@ -4,6 +4,21 @@ Este documento especifica o procedimento padronizado para delegação sob demand
 
 ---
 
+## 🧠 Papel do Orquestrador (Economia Crítica de Tokens)
+
+O objetivo central de delegar para o **OpenCode** via Orca ou CLI é economizar os tokens de contexto e de saída do Antigravity:
+
+1. **Delegação Enxuta**: O Antigravity **NÃO DEVE** ler arquivos de código inteiros nem fazer varreduras exploratórias no codebase antes de despachar. Toda a investigação aprofundada e o "trabalho duro" de codificação pertencem ao **OpenCode**.
+2. **Leitura Restrita ao Plano**: O Antigravity deve ler unicamente o plano/especificação da etapa a ser executada e montar uma especificação técnica objetiva no prompt da tarefa.
+3. **Foco em Coordenação e Revisão**: A atuação do Antigravity resume-se a:
+   - Despachar a tarefa com regras claras e contexto essencial.
+   - Aguardar a conclusão via `worker_done`.
+   - Validar sintaxe/compilação (`node --check`, `cargo check`) e inspecionar superficialmente o diff (`git status`, `git diff`).
+   - Apresentar o resumo ao usuário e solicitar o próximo passo.
+   - *Tratamento de Falhas:* Se o resultado da validação falhar ou divergir do esperado, aí sim o Antigravity assume o papel analítico para investigar o problema pontual, diagnosticar a causa raiz e repassar ao OpenCode a solução/orientação de ajuste precisa.
+
+---
+
 ## 📌 Passo 1: Seleção da Estratégia de Execução
 
 Sempre que o usuário solicitar a delegação de uma tarefa (ex: *"use as instruções de delegação para implementar X"*), o **Antigravity** deve verificar se o usuário já especificou a via de execução. Caso não tenha especificado, deve **perguntar ao usuário** qual estratégia prefere utilizar:
