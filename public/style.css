@@ -1856,40 +1856,40 @@ body.layout-desktop .sidebar-macros {
     letter-spacing: -0.2px;
 }
 
-/* Preenchimento Sólido por Grupo de Canais (Tons 30% mais escuros) */
+/* Preenchimento Sólido por Grupo de Canais (Tons mais escuros e sóbrios) */
 .fader-group-1 .desk-patch-zone {
-    background: #002842;
+    background: #001c2e;
 }
 .fader-group-1 .desk-patch-name {
-    color: #00adef;
+    color: #0088bd;
 }
 
 .fader-group-2 .desk-patch-zone {
-    background: #003322;
+    background: #002417;
 }
 .fader-group-2 .desk-patch-name {
-    color: #00ff88;
+    color: #00b862;
 }
 
 .fader-group-st .desk-patch-zone {
-    background: #0e1c2b;
+    background: #0a141f;
 }
 .fader-group-st .desk-patch-name {
-    color: #5cacee;
+    color: #437fae;
 }
 
 .fader-group-mix .desk-patch-zone {
-    background: #241c00;
+    background: #181300;
 }
 .fader-group-mix .desk-patch-name {
-    color: #d4a017;
+    color: #a67c12;
 }
 
 .fader-group-bus .desk-patch-zone {
-    background: #00201b;
+    background: #001713;
 }
 .fader-group-bus .desk-patch-name {
-    color: #00b396;
+    color: #008a74;
 }
 
 /* Botão SOLO nos canais normais: 38px -> 28px (-25%) */
