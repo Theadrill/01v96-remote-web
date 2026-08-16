@@ -199,6 +199,8 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [x] **Extensão do Módulo de Copiar e Colar Contextual**: sistema modular e inteligente de cópia e colagem implementado e ativo em todas as telas contextuais da mesa: barramentos de mix/fone (Sends on Faders), abas individuais de canal (AUX, DYNAMICS, ROUTING / ETC e EQUALIZADOR com suporte a "Apenas EQ" e "Canal Inteiro"), com despachante sequencial global de 20ms para proteção de hardware.
 - [x] **Refatorar Módulo copy_paste.js**: limpeza e refatoração completa com remoção de 100% do código legado e unificação na nova arquitetura contextual modular.
 - [ ] **Fallback para Navegadores Antigos (Legacy Browser Compatibility)**: adicionar fallbacks de CSS para unidades de viewport dinâmicas (`dvh`, `svh`, `lvh` — linha 7749 do `style.css`) e espaçamento `gap` em Flexbox.
+- [ ] **Botão de Delay**: adicionar controle e botão de delay em todos os canais aplicáveis.
+- [ ] **Posição e Ponto de Inserção nos Auxiliares**: adicionar botão para setar posição dos canais nos auxiliares (PRE EQ / PRE / POST) e ponto de montagem (PRE / POST).
 
 
 ---
