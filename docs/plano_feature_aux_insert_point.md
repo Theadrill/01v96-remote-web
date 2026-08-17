@@ -1,210 +1,170 @@
-# Feature: Posição e Ponto de Inserção nos Auxiliares
+# Feature: Posição e Ponto de Inserção nos Auxiliares (Yamaha 01V96)
 
-Controle de **insert point** (PRE/POST) para canais individuais e configuração de
-**posição e modo** de inserção nos buses auxiliares, replicando a funcionalidade
-disponível na tela física da Yamaha 01V96.
+Controle de **insert point** (PRE/POST) para envios de canais individuais e configuração de **posição e modo** (FIXED/VARIABLE, PRE-POINT, GLOBAL e ALL NOMINAL) nos barramentos auxiliares, replicando a funcionalidade disponível na Yamaha 01V96 com fidelidade visual e operacional.
 
 ---
 
-## 1. Visão Geral e Objetivo
+## 1. Visão Geral e Escopo
 
-A tela de Auxiliar da 01V96 permite definir, para cada canal enviado a um bus auxiliar,
-se o sinal é capturado **antes** (PRE) ou **depois** (POST) do fader de canal, além de
-configurar o modo de inserção (FIXED/VARIABLE) e o ponto de inserção global e pré-point
-do próprio bus auxiliar.
+A implementação abrange duas camadas principais de controle na interface web:
 
-O objetivo é implementar essas duas camadas de controle na interface web:
-
-1. **Insert Point por canal** — Um botão toggle no channel strip de cada canal dentro
-   da tela de auxiliar, alternando entre PRE e POST.
-2. **Configuração de inserção do bus auxiliar** — Painel de controle no mini fader do
-   auxiliar (entre o macro fader e a sidebar), com as categorias **Global** e **Pre-Point**.
+1. **Insert Point por canal (Aux Send PRE/POST)** — Botão toggle em cada channel strip da tela de auxiliar (tanto no Modo 1: Mixer do Barramento, quanto no Modo 2: Envios do Canal), alternando entre envio pré-fader (**PRE**) e pós-fader (**POST**).
+2. **Configuração e Posição do Barramento Auxiliar** — Painel indicador no mini fader do auxiliar (seção POSIÇÃO, idêntico ao padrão da seção MEDIDORES do Master) que ao clicar abre um modal com os controles de **MODE** (FIXED / VARIABLE), **GLOBAL** (PRE / POST), **PRE-POINT** (PRE ON / POST ON) e **ALL NOMINAL** (ação de reset para PRE).
+3. **Integração com Sistema de Copiar/Colar** — O estado PRE/POST de cada envio é incluído no buffer do clipboard de auxiliares (`copy_paste.js`), preservando as configurações entre mixes.
 
 ---
 
-## 2. Conceitos
+## 2. Conceitos e Comportamentos
 
-### 2.1 Insert Point (PRE / POST)
+### 2.1 Aux Send PRE / POST (Por Canal)
 
-| Estado | Significado | Comportamento |
-|--------|-------------|---------------|
-| **PRE** (default) | Sinal capturado **antes** do fader | O envio ao auxiliar não é afetado pelo volume do fader do canal |
-| **POST** | Sinal capturado **depois** do fader | O envio ao auxiliar é proporcional ao volume do fader do canal |
+| Estado | Significado | Comportamento | Visual do Botão |
+|---|---|---|---|
+| **PRE** (default) | Sinal capturado **antes** do fader | Envio independente do fader de canal | Neutro / Cinza escuro (Inativo) |
+| **POST** | Sinal capturado **depois** do fader | Envio proporcional ao fader de canal | **Azul** (Ativo/Colorido) |
 
-- **Default do canal:** PRE (estado DISABLED no botão)
-- **Comportamento do toggle:** Clique alterna entre PRE e POST.
-- **Persistência:** Estado salvo por canal, por auxiliar.
+- **Localização:** No channel strip, posicionado entre o cabeçalho/número do canal e o nome do canal.
+- **Padrão Visual:** Mesma base estrutural e tipográfica dos botões `.btn-on-desk` / `.btn-state`.
+- **Modos de Visualização:**
+  - **Modo 1 (Mixer do Barramento - MIX 1..8):** Exibido em cada um dos 32 canais de entrada enviados ao auxiliar ativo.
+  - **Modo 2 (Envios do Canal - CH 1..32):** Exibido em cada um dos 8 strips de auxiliares para o canal selecionado.
 
-### 2.2 Configuração de Inserção do Bus Auxiliar
+### 2.2 Modo do Barramento (FIXED vs VARIABLE)
 
-| Categoria | Campo | Estado DISABLED | Estado ATIVADO |
-|-----------|-------|-----------------|----------------|
-| **GLOBAL** | Insert Point | PRE | POST |
-| **PRE-POINT** | Insert On/Off | PRE ON | POST ON |
+| Modo | Comportamento na 01V96 | Comportamento na Interface Web |
+|---|---|---|
+| **VARIABLE** (default) | Cada canal possui fader de envio independente | Faders ajustáveis normalmente (0 a 1023) |
+| **FIXED** | Níveis de envio fixos em nível nominal (0 dB) | Faders travados/desabilitados visualmente em 0 dB com badge `FIXED`, permitindo apenas ON/OFF e PRE/POST |
 
-### 2.3 Modo de Inserção
+### 2.3 Posição e Inserção do Barramento Auxiliar
 
-| Campo | Estado DISABLED | Estado ATIVADO |
-|-------|-----------------|----------------|
-| **MODE** | FIXED | VARIABLE |
-
-### 2.4 All Nominal
-
-| Campo | Comportamento |
-|-------|---------------|
-| **ALL NOMINAL** | Toggle on/off — quando ativado, todos os canais voltam ao ponto nominal (PRE) |
+| Campo | Opção Inativa / Default | Opção Ativa / Alternativa | Descrição |
+|---|---|---|---|
+| **GLOBAL** | `PRE` | `POST` | Ponto de inserção global do barramento auxiliar |
+| **PRE-POINT** | `PRE ON` | `POST ON` | Ponto de captura do sinal pré-fader no canal |
+| **ALL NOMINAL** | *Botão de Ação* | *One-shot Trigger* | Reseta instantaneamente o ponto de envio de todos os 32 canais para **PRE** naquele auxiliar (sem alterar os volumes) |
 
 ---
 
 ## 3. Elementos da Interface
 
-### 3.1 Botão Insert Point no Channel Strip (Tela de Auxiliar)
-
-**Localização:** Espaço entre o cabeçalho (número do canal) e o nome do canal no strip.
+### 3.1 Botão PRE/POST no Channel Strip
 
 ```
 ┌─────────────┐
-│     01      │  ← cabeçalho (número do canal)
-│   [PRE]     │  ← botão insert point (novo)
-│   VOZ      │  ← nome do canal
-│             │
-│   [fader]   │
+│     01      │  ← Cabeçalho / Número do Canal
+│   [ PRE ]   │  ← Botão Toggle PRE/POST (Azul quando POST, Neutro quando PRE)
+│   VOZ 1     │  ← Nome do Canal
+│    [ON]     │  ← Botão ON
+│   [fader]   │  ← Fader de envio
 └─────────────┘
 ```
 
-**Comportamento visual:**
+### 3.2 Indicador de Posição no Mini Fader do Auxiliar
 
-| Estado | Aparência | Texto |
-|--------|-----------|-------|
-| PRE (default) | Botão DISABLED (cinza/ neutro) | `PRE` |
-| POST | Botão COLORIDO (ativo) | `POST` |
-
-**Ações:**
-- Clique alterna o estado entre PRE e POST.
-- Estado refletido imediatamente no backend via MIDI.
-
-### 3.2 Indicador de Configuração no Mini Fader do Auxiliar
-
-**Localização:** Nova área no mini fader do auxiliar, entre o macro fader de volume geral
-e a sidebar. Funciona como um **botão clicável** que exibe o estado atual e, ao clicar,
-abre um modal/overlay com as configurações.
-
-**Layout:** Segue o padrão visual da `master-meter-section` (título centralizado + linhas
-com label:valor).
+Localizado diretamente dentro do Mini Fader Strip do Auxiliar (no mesmo espaço vertical onde o Master Fader exibe a seção MEDIDORES):
 
 ```
-┌──────────────────┬─────────┐
-│   MINI FADER     │         │
-│                  │         │
-│  ┌────────────┐  │ SIDEBAR │
-│  │  POSIÇÃO   │  │         │
-│  │ GLOBAL:PRE │  │         │
-│  │ PRE-POINT: │  │         │
-│  │     POST   │  │         │
-│  └────────────┘  │         │
-│                  │         │
-└──────────────────┴─────────┘
+┌────────────────────────┐
+│      MINI FADER        │
+│        AUX 1           │
+│ ┌────────────────────┐ │
+│ │      POSIÇÃO       │ │  ← Título centralizado
+│ │  GLOBAL:    PRE    │ │  ← Badge de status
+│ │  PRE-POINT: PRE ON │ │  ← Badge de status
+│ └────────────────────┘ │
+│         [ON]           │
+│       [Fader]          │
+└────────────────────────┘
 ```
 
-**Comportamento:**
-- A área exibe apenas os **estados atuais** de GLOBAL e PRE-POINT (somente leitura visual).
-- Ao clicar na área, abre um **modal** com todos os controles de configuração.
+### 3.3 Modal de Configuração do Auxiliar
 
-### 3.3 Modal de Configuração de Inserção do Auxiliar
-
-Aberto ao clicar no indicador do mini fader. Contém:
+Aberto ao clicar no indicador de POSIÇÃO:
 
 ```
-┌─────────────────────────────────┐
-│     CONFIGURAÇÃO DE INSERÇÃO    │
-│                                 │
-│  ALL NOMINAL          [toggle]  │  ← toggle on/off
-│                                 │
-│  ─────────────────────────────  │
-│                                 │
-│  MODE                          │
-│  [FIXED / VARIABLE]  (toggle)  │
-│                                 │
-│  GLOBAL                        │
-│  [PRE / POST]        (toggle)  │
-│                                 │
-│  PRE-POINT                     │
-│  [PRE ON / POST ON]  (toggle)  │
-│                                 │
-│         [Fechar]                │
-└─────────────────────────────────┘
+┌────────────────────────────────────────┐
+│     CONFIGURAÇÃO DO AUXILIAR 1         │
+│                                        │
+│  ALL NOMINAL                 [RESET]   │  ← Botão de ação (One-shot)
+│  ────────────────────────────────────  │
+│  MODE                                  │
+│  [ FIXED ]   [ VARIABLE ]              │  ← Seletor de Modo
+│                                        │
+│  GLOBAL                                │
+│  [ PRE ]     [ POST ]                  │  ← Toggle Global Insert
+│                                        │
+│  PRE-POINT                             │
+│  [ PRE ON ]  [ POST ON ]               │  ← Toggle Pre-Point
+│                                        │
+│               [ FECHAR ]               │
+└────────────────────────────────────────┘
 ```
-
-**Campos e comportamento:**
-
-| Campo | Tipo | Estado DISABLED | Estado ATIVADO |
-|-------|------|-----------------|----------------|
-| ALL NOMINAL | Toggle on/off | Desligado | Reseta todos os canais para PRE |
-| MODE | Botão toggle | FIXED | VARIABLE |
-| GLOBAL | Botão toggle | PRE | POST |
-| PRE-POINT | Botão toggle | PRE ON | POST ON |
 
 ---
 
-## 4. Estrutura de Dados (Proposta)
+## 4. Estrutura de Dados e Protocolo MIDI
 
-### 4.1 Estado de Insert Point por Canal
+### 4.1 Backend Rust (`server_rust`)
 
-```json
-{
-  "auxInsertPoints": {
-    "aux1": {
-      "1": "POST",
-      "2": "PRE",
-      "3": "POST",
-      "4": "PRE"
-    },
-    "aux2": {
-      "1": "PRE",
-      "2": "PRE"
-    }
-  }
+#### 4.1.1 `ChannelState` (`server_rust/src/state.rs`)
+Adição dos campos de PRE/POST por canal:
+```rust
+pub struct ChannelState {
+    // ...
+    #[serde(rename = "aux1Pre")]
+    pub aux1_pre: bool, // false = PRE, true = POST (ou mapeado conforme mesa)
+    #[serde(rename = "aux2Pre")]
+    pub aux2_pre: bool,
+    // ... até aux8_pre
 }
 ```
 
-### 4.2 Configuração de Inserção do Bus Auxiliar
-
-```json
-{
-  "auxInsertConfig": {
-    "aux1": {
-      "mode": "FIXED",
-      "global": "PRE",
-      "prePoint": "PRE ON",
-      "allNominal": false
-    },
-    "aux2": {
-      "mode": "VARIABLE",
-      "global": "POST",
-      "prePoint": "POST ON",
-      "allNominal": true
-    }
-  }
+#### 4.1.2 `MixBusState` (`server_rust/src/state.rs`)
+Adição das propriedades de configuração do Auxiliar:
+```rust
+pub struct MixBusState {
+    // ...
+    pub mode: u8,       // 0 = FIXED, 1 = VARIABLE (kAUXType/kAUXTypeIndex)
+    pub global: u8,     // 0 = PRE, 1 = POST
+    pub pre_point: u8,  // 0 = PRE ON, 1 = POST ON (kAuxSendPrePoint/kPrePoint)
 }
 ```
 
----
+#### 4.1.3 Mapeamento de Comandos MIDI (`dictionary.json` & `protocol.rs`)
+- `kInputAUX/kAUX{1..8}Pre` (Elemento 35, Sub 1, 4, 7, 10, 13, 16, 19, 22)
+- `kAUXType/kAUXTypeIndex` (Elemento 55, Sub 0, Channel 0..7 para Aux 1..8)
+- `kAuxSendPrePoint/kPrePoint` (Elemento 96, Sub 0)
+- `kAUXInsert/kInsertLocInsert` (Elemento 53, Sub 2)
 
-## 5. Mapeamento MIDI (Referência)
-
-> **Nota:** Os comandos MIDI exatos para insert point na 01V96 serão confirmados
-> durante a implementação. A estrutura abaixo segue o padrão SysEx da mesa.
-
-| Ação | Direção | Descrição |
-|------|---------|-----------|
-| Consulta insert point | TX → RX | Pergunta o estado PRE/POST de um canal em um aux |
-| Resposta insert point | RX → TX | Retorna o estado atual do canal no aux |
-| Set insert point | TX → RX | Altera o estado PRE/POST de um canal em um aux |
-| Consulta config aux | TX → RX | Pergunta modo, global, pre-point de um aux |
-| Set config aux | TX → RX | Define modo, global, pre-point de um aux |
+#### 4.1.4 Sincronização Inicial (`sync_manager.rs`)
+- Consulta automática de `kInputAUX/kAUX{1..8}Pre` para canais 0..31 e 60..67.
+- Consulta de `kAUXType/kAUXTypeIndex` para mixes 0..7.
+- Consulta de `kAuxSendPrePoint/kPrePoint`.
 
 ---
 
-## PLANO DE IMPLEMENTAÇÃO
+## 5. Plano de Implementação
 
-*A ser definido na fase de revisão.*
+### Fase 1: Backend Rust (`server_rust`)
+1. Atualizar structs `ChannelState` e `MixBusState` em `state.rs`.
+2. Adicionar handlers de mensagens MIDI em `state.rs` para `kInputAUX/kAUX*Pre`, `kAUXType/kAUXTypeIndex` e `kAuxSendPrePoint`.
+3. Adicionar requisições na fila de sincronização em `sync_manager.rs`.
+4. Verificar compilação com `cargo check`.
+
+### Fase 2: Frontend - Camada de Dados e Eventos
+1. Atualizar `auxs_sends.js` para manipular `aux{N}Pre` e emitir comandos de socket (`kInputAUX/kAUX{N}Pre`).
+2. Implementar função de `toggleAuxPre(ch, auxIdx)` e sincronização reativa.
+3. Atualizar `copy_paste.js` para copiar e colar o campo `pre` em `copySendsOnFaders` e `copyChannelAuxSends`.
+
+### Fase 3: Frontend - Interface Visual e Componentes
+1. Atualizar `channel_strip.js` (`createDesktopStrip` e `createMobileStrip`) e `auxs_sends.js` com o botão PRE/POST estilizado com azul quando POST.
+2. Adicionar bloco de POSIÇÃO (GLOBAL / PRE-POINT) dentro do Mini Fader Strip do Auxiliar.
+3. Implementar o Modal de Configuração do Auxiliar (`openAuxConfigModal` / `auxConfigModal`).
+4. Implementar a lógica de travamento de faders quando o auxiliar estiver em modo `FIXED`.
+5. Implementar a ação `ALL NOMINAL` com envio sequencial throttled.
+
+### Fase 4: Estilização e Validação
+1. Adicionar classes CSS em `style.css` para `.btn-aux-pre`, `.btn-aux-post`, `.aux-config-section`, badges e modal.
+2. Testar responsividade desktop e mobile.
+3. Validar consistência de sincronização em tempo real via WebSocket e MIDI.
