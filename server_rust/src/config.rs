@@ -310,6 +310,17 @@ impl AppConfig {
             info!("✅ steps.json carregado.");
         }
 
+        // Overrides via argumentos de linha de comando (CLI flags)
+        let args: Vec<String> = std::env::args().collect();
+        if args.iter().any(|arg| arg == "--demo" || arg == "--demo-mode") {
+            config.demo_mode = true;
+            info!("🧪 [CONFIG] Modo DEMO ativado via linha de comando (--demo).");
+        }
+        if args.iter().any(|arg| arg == "--loopmidi" || arg == "--loopmidi-monitor") {
+            config.loopmidi_monitor = true;
+            info!("🔍 [CONFIG] Monitor loopMIDI ativado via linha de comando (--loopmidi).");
+        }
+
         config
     }
 
