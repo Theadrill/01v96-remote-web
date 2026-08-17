@@ -1,5 +1,8 @@
 {
-  "guardians": [],
+  "guardians": [
+    17,
+    22
+  ],
   "snapshot": {
     "active": false,
     "channels_to_restore": [],
