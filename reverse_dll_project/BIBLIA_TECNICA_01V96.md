@@ -1,4 +1,14 @@
-# 📖 BÍBLIA TÉCNICA — Yamaha 01V96 Studio Manager Protocol
+> # ⚠️ AVISO IMPORTANTE ⚠️
+>
+> **ESSE DOCUMENTO FOI FEITO NO COMEÇO DO PROJETO E NECESSITA DE ATUALIZAÇÃO!**
+>
+> O conteúdo abaixo reflete o estado inicial da engenharia reversa.
+> Muitas informações podem estar desatualizadas, incompletas ou incorretas.
+> **Antes de utilizar qualquer informação deste documento, verifique se ela ainda está válida!**
+>
+> ---
+>
+> # 📖 BÍBLIA TÉCNICA — Yamaha 01V96 Studio Manager Protocol
 > Engenharia Reversa das DLLs `01V96.dll` e `SM2DLL.dll`  
 > Gerado em: 2026-04-13 | Passes: 1 ao 7 | Status: **Completo**
 
