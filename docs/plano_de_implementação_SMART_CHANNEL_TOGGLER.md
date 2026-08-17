@@ -173,13 +173,13 @@ Cada botão representa 3 dimensões simultâneas de estado com altura mínima de
 
 ## 7. Plano de Execução Passo a Passo
 
-- [ ] **Etapa 1 (Primeiro Passo): Integração do `ConfirmModal` no `core.js` (`MixerAPI.ui.confirm` / `MixerAPI.ui.alert`)**
+- [x] **Etapa 1 (Primeiro Passo): Integração do `ConfirmModal` no `core.js` (`MixerAPI.ui.confirm` / `MixerAPI.ui.alert`)**
   * Expandir o objeto `MixerAPI.ui` em `public/modules/macros/core.js` adicionando `confirm(options)` e `alert(options)` que invocam de forma segura `ConfirmModal.show(options)`.
-- [ ] **Etapa 2: Criação do Pacote `smart_channel_toggler`**
+- [x] **Etapa 2: Criação do Pacote `smart_channel_toggler`**
   * Criar pasta `public/modules/macros/smart_channel_toggler/`.
   * Criar `manifest.json` com `singleSlot: true`, metadados e configuração de estilo.
   * Criar `style.css` com estilos encapsulados para o modal responsivo, badges de pareamento e banner de status.
   * Criar `main.js` implementando ciclo de vida (`onInit`, `execute`, `onConfigure`, `onSave`, `onClear`, `onDelete`), algoritmo de corte/restauração, snapshot e modal de 32 canais.
-- [ ] **Etapa 3: Validação de UI/UX, Acessibilidade e Responsividade**
+- [x] **Etapa 3: Validação de UI/UX, Acessibilidade e Responsividade**
   * Validar funcionamento em desktop e simulação de iPhone SE 3 landscape.
   * Testar cenários de borda: corte sem guardiões (com modal de confirmação), clique rápido concorrente, troca de cena e limpeza manual de memória.

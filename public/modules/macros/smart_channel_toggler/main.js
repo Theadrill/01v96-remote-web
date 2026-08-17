@@ -48,7 +48,7 @@
                 const name = getChannelName(ch);
                 return name;
             });
-            const statusText = guardianNames.length > 0 ? `G: ${guardianNames.join(', ')}` : 'G: Nenhum';
+            const statusText = guardianNames.length > 0 ? `🛡️ ${guardianNames.join(', ')}` : '🛡️ Nenhum';
             MixerAPI.ui.setSlotStatus(slotIndex, statusText);
         }
     }
@@ -116,7 +116,7 @@
                     // Pede confirmação
                     const confirmed = await MixerAPI.ui.confirm({
                         title: 'Atenção',
-                        message: 'Mutar todos os canais?\n(Você pode configurar os canais que não serão mutados na engrenagem de configuração)',
+                        message: 'Mutar todos os canais?\n(Você pode selecionar os canais que ficarão protegidos na engrenagem de configuração)',
                         type: 'warning'
                     });
                     if (!confirmed) {
@@ -232,32 +232,52 @@
 
         // Banner de status de memória
         const banner = document.createElement('div');
-        banner.className = 'macro-status-banner';
+        banner.style.gridColumn = '1 / -1';
+        banner.style.width = '100%';
+        banner.style.display = 'flex';
+        banner.style.justifyContent = 'space-between';
+        banner.style.alignItems = 'center';
+        banner.style.background = '#222';
+        banner.style.border = '1px solid #444';
+        banner.style.borderRadius = '8px';
+        banner.style.padding = '10px 14px';
+        banner.style.marginBottom = '8px';
+        banner.style.boxSizing = 'border-box';
         
         const statusInfo = document.createElement('div');
-        statusInfo.className = 'status-info';
         
         const statusTitle = document.createElement('div');
-        statusTitle.className = 'status-title';
-        statusTitle.textContent = 'Memória de Toggle';
+        statusTitle.style.fontSize = '11px';
+        statusTitle.style.fontWeight = '600';
         
         const statusDetails = document.createElement('div');
-        statusDetails.className = 'status-details';
+        statusDetails.style.fontSize = '10px';
+        statusDetails.style.color = '#aaa';
         
         if (modData.snapshot.active) {
             const mutedCount = modData.snapshot.channels_to_restore.length;
-            const timestamp = new Date(modData.snapshot.timestamp).toLocaleString();
-            statusDetails.textContent = `Ativo: ${mutedCount} canais mutados desde ${timestamp}`;
+            statusTitle.textContent = '🔴 CORTE ATIVO';
+            statusTitle.style.color = '#d32f2f';
+            statusDetails.textContent = `${mutedCount} canais mutados na memória`;
         } else {
-            statusDetails.textContent = 'Nenhum toggle ativo';
+            statusTitle.textContent = '⚪ EM REPOUSO';
+            statusTitle.style.color = '#888';
+            statusDetails.textContent = 'Nenhum canal mutado pela macro';
         }
         
         statusInfo.appendChild(statusTitle);
         statusInfo.appendChild(statusDetails);
         
         const resetBtn = document.createElement('button');
-        resetBtn.className = 'btn-reset-memory';
+        resetBtn.className = 'btn-connect';
         resetBtn.textContent = '↺ Limpar Memória do Toggle';
+        resetBtn.style.background = 'transparent';
+        resetBtn.style.border = '1px solid #f59e0b';
+        resetBtn.style.color = '#f59e0b';
+        resetBtn.style.fontSize = '10px';
+        resetBtn.style.padding = '6px 10px';
+        resetBtn.style.borderRadius = '6px';
+        resetBtn.style.cursor = 'pointer';
         resetBtn.onclick = async () => {
             modData.snapshot = createDefaultModData().snapshot;
             try {
@@ -265,9 +285,9 @@
             } catch (e) {
                 console.error(`[${MOD_ID}] Erro ao limpar memória:`, e);
             }
-            // Atualiza banner
-            statusDetails.textContent = 'Nenhum toggle ativo';
-            // Atualiza visual do pad
+            statusTitle.textContent = '⚪ EM REPOUSO';
+            statusTitle.style.color = '#888';
+            statusDetails.textContent = 'Nenhum canal mutado pela macro';
             updatePadVisual(slotIndex, modData);
         };
         
@@ -278,7 +298,7 @@
         // Título da seção de guardiões
         const guardiansTitle = document.createElement('div');
         guardiansTitle.className = 'section-title';
-        guardiansTitle.textContent = 'Canais Guardiões (não serão mutados)';
+        guardiansTitle.textContent = 'Canais Protegidos (não serão mutados)';
         guardiansTitle.style.gridColumn = '1 / -1';
         grid.appendChild(guardiansTitle);
 
@@ -291,61 +311,82 @@
             const isPaired = window.MixerAPI.state.isPaired(i);
             
             const btn = document.createElement('button');
-            btn.className = 'channel-btn guardian-btn';
-            if (isGuardian) btn.classList.add('is-guardian');
-            if (isOnMixer) btn.classList.add('is-mixer-on');
-            if (isMuted) btn.classList.add('is-muted-by-macro');
+            btn.className = 'btn-connect';
+            btn.style.height = '50px';
+            btn.style.margin = '0';
+            btn.style.fontSize = '10px';
+            btn.style.textTransform = 'uppercase';
+            btn.style.borderRadius = '8px';
+            btn.style.position = 'relative';
             
-            const label = document.createElement('span');
-            label.className = 'ch-label';
-            label.textContent = i + 1;
+            if (isGuardian) {
+                btn.style.background = '#2e7d32';
+                btn.style.color = '#fff';
+                btn.style.border = '1px solid #4caf50';
+            } else {
+                btn.style.background = '#333';
+                btn.style.color = isOnMixer ? '#fff' : '#888';
+                btn.style.border = '1px solid #444';
+            }
             
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'ch-name';
-            nameSpan.textContent = chName;
+            if (isOnMixer) {
+                btn.style.border = '2px solid #ffcc00';
+                btn.style.boxShadow = 'inset 0 0 5px rgba(255, 204, 0, 0.5)';
+            }
             
-            btn.appendChild(label);
-            btn.appendChild(nameSpan);
+            btn.innerHTML = `<span style="display:block; font-size:8px; opacity:0.5;">${i+1}</span> ${chName}`;
             
-            // Badge de par estéreo
             if (isPaired) {
                 const pairBadge = document.createElement('span');
-                pairBadge.className = 'pair-badge';
-                pairBadge.textContent = '🔗 L/R';
+                pairBadge.style.position = 'absolute';
+                pairBadge.style.top = '2px';
+                pairBadge.style.right = '4px';
+                pairBadge.style.fontSize = '8px';
+                pairBadge.style.color = '#ffcc00';
+                pairBadge.textContent = '🔗';
                 btn.appendChild(pairBadge);
             }
             
+            const updateButtonVisual = (buttonEl, chIdx) => {
+                if (!buttonEl) return;
+                const isG = modData.guardians.includes(chIdx);
+                const isOn = (typeof channelStates !== 'undefined' && channelStates[chIdx] && channelStates[chIdx].on === true);
+                buttonEl.style.background = isG ? '#2e7d32' : '#333';
+                buttonEl.style.color = isG ? '#fff' : (isOn ? '#fff' : '#888');
+                if (isOn) {
+                    buttonEl.style.border = '2px solid #ffcc00';
+                    buttonEl.style.boxShadow = 'inset 0 0 5px rgba(255, 204, 0, 0.5)';
+                } else {
+                    buttonEl.style.border = isG ? '1px solid #4caf50' : '1px solid #444';
+                    buttonEl.style.boxShadow = 'none';
+                }
+            };
+
             btn.onclick = () => {
-                // Lógica de seleção de guardião
                 const idx = modData.guardians.indexOf(i);
                 if (idx === -1) {
-                    // Adiciona como guardião
                     modData.guardians.push(i);
-                    btn.classList.add('is-guardian');
+                    updateButtonVisual(btn, i);
                     
-                    // Se pareado, adiciona parceiro também
                     if (isPaired) {
                         const partner = window.MixerAPI.state.getPairPartner(i);
                         if (!modData.guardians.includes(partner)) {
                             modData.guardians.push(partner);
-                            // Atualiza visual do parceiro (encontra o botão correspondente)
                             const partnerBtn = grid.querySelector(`button[data-channel="${partner}"]`);
-                            if (partnerBtn) partnerBtn.classList.add('is-guardian');
+                            updateButtonVisual(partnerBtn, partner);
                         }
                     }
                 } else {
-                    // Remove guardião
                     modData.guardians.splice(idx, 1);
-                    btn.classList.remove('is-guardian');
+                    updateButtonVisual(btn, i);
                     
-                    // Se pareado, remove parceiro também
                     if (isPaired) {
                         const partner = window.MixerAPI.state.getPairPartner(i);
                         const partnerIdx = modData.guardians.indexOf(partner);
                         if (partnerIdx !== -1) {
                             modData.guardians.splice(partnerIdx, 1);
                             const partnerBtn = grid.querySelector(`button[data-channel="${partner}"]`);
-                            if (partnerBtn) partnerBtn.classList.remove('is-guardian');
+                            updateButtonVisual(partnerBtn, partner);
                         }
                     }
                 }
@@ -358,7 +399,7 @@
         // Texto informativo
         const info = document.createElement('div');
         info.className = 'info-text';
-        info.textContent = 'Canais amarelos estão ligados na mesa. Guardiões não serão mutados. Canais pareados são selecionados automaticamente.';
+        info.textContent = 'Canais verdes estão protegidos contra o corte. Canais com borda amarela estão ligados na mesa física. Canais estéreo são vinculados automaticamente.';
         info.style.gridColumn = '1 / -1';
         grid.appendChild(info);
     }
@@ -403,7 +444,7 @@
     // Registra macro
     MixerAPI.registerMacro(MOD_ID, {
         name: 'Smart Toggler',
-        color: '#6a1b9a',
+        color: '#1976d2',
         onInit,
         execute,
         onConfigure,

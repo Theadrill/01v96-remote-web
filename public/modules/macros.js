@@ -643,6 +643,16 @@ function renderMacros() {
 
         grid.appendChild(slot);
     }
+
+    for (let i = 0; i < TOTAL_SLOTS; i++) {
+        const slotData = assignedMacros[i];
+        if (slotData && macroDatabase[slotData.scriptId]) {
+            const mod = macroDatabase[slotData.scriptId];
+            if (typeof mod.onInit === 'function') {
+                mod.onInit(i, slotData.config || {});
+            }
+        }
+    }
 }
 
 // ============================================================
