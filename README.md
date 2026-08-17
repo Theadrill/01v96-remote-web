@@ -203,6 +203,8 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [ ] Fallback para Navegadores Antigos (Legacy Browser Compatibility)
 - [ ] Botão de Delay
 - [ ] Posição e Ponto de Inserção nos Auxiliares
+  - [ ] Fazer faders congelarem quando mode = FIXED
+  - [ ] Emitir confirm modal quando alternar de VARIABLE <-> FIXED
 - [ ] Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)
 
 
