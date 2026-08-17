@@ -18,10 +18,15 @@ A implementação abrange duas camadas principais de controle na interface web:
 
 ### 2.1 Aux Send PRE / POST (Por Canal)
 
-| Estado | Significado | Comportamento | Visual do Botão |
-|---|---|---|---|
-| **PRE** (default) | Sinal capturado **antes** do fader | Envio independente do fader de canal | Neutro / Cinza escuro (Inativo) |
-| **POST** | Sinal capturado **depois** do fader | Envio proporcional ao fader de canal | **Azul** (Ativo/Colorido) |
+| Estado | Valor MIDI 01V96 | Significado | Comportamento | Visual do Botão |
+|---|---|---|---|---|
+| **PRE** (default) | `0x01` (`1`) | Sinal capturado **antes** do fader | Envio independente do fader de canal | Neutro / Cinza escuro (Inativo) |
+| **POST** | `0x00` (`0`) | Sinal capturado **depois** do fader | Envio proporcional ao fader de canal | **Azul** (Ativo/Colorido) |
+
+> 🔬 **Validação de Hardware (01V96 ao vivo):**
+> O mapeamento de valores foi confirmado via engenharia reversa com a mesa física:
+> - Ao ativar **PRE** no console: SysEx `F0 43 10 3E 7F 01 23 [Param] [Ch] 00 00 00 01 F7` (Valor = `1`).
+> - Ao ativar **POST** no console: SysEx `F0 43 10 3E 7F 01 23 [Param] [Ch] 00 00 00 00 F7` (Valor = `0`).
 
 - **Localização:** No channel strip, posicionado entre o cabeçalho/número do canal e o nome do canal.
 - **Padrão Visual:** Mesma base estrutural e tipográfica dos botões `.btn-on-desk` / `.btn-state`.
@@ -31,18 +36,18 @@ A implementação abrange duas camadas principais de controle na interface web:
 
 ### 2.2 Modo do Barramento (FIXED vs VARIABLE)
 
-| Modo | Comportamento na 01V96 | Comportamento na Interface Web |
-|---|---|---|
-| **VARIABLE** (default) | Cada canal possui fader de envio independente | Faders ajustáveis normalmente (0 a 1023) |
-| **FIXED** | Níveis de envio fixos em nível nominal (0 dB) | Faders travados/desabilitados visualmente em 0 dB com badge `FIXED`, permitindo apenas ON/OFF e PRE/POST |
+| Modo | Valor MIDI | Comportamento na 01V96 | Comportamento na Interface Web |
+|---|---|---|---|
+| **VARIABLE** (default) | `0x01` | Cada canal possui fader de envio independente | Faders ajustáveis normalmente (0 a 1023) |
+| **FIXED** | `0x00` | Níveis de envio fixos em nível nominal (0 dB) | Faders travados/desabilitados visualmente em 0 dB com badge `FIXED`, permitindo apenas ON/OFF e PRE/POST |
 
 ### 2.3 Posição e Inserção do Barramento Auxiliar
 
 | Campo | Opção Inativa / Default | Opção Ativa / Alternativa | Descrição |
 |---|---|---|---|
-| **GLOBAL** | `PRE` | `POST` | Ponto de inserção global do barramento auxiliar |
-| **PRE-POINT** | `PRE ON` | `POST ON` | Ponto de captura do sinal pré-fader no canal |
-| **ALL NOMINAL** | *Botão de Ação* | *One-shot Trigger* | Reseta instantaneamente o ponto de envio de todos os 32 canais para **PRE** naquele auxiliar (sem alterar os volumes) |
+| **GLOBAL** | `PRE` (`1`) | `POST` (`0`) | Ponto de inserção global do barramento auxiliar. Na mesa física, disparar essa chave altera em lote os 40 canais |
+| **PRE-POINT** | `PRE ON` (`0`) | `POST ON` (`1`) | Ponto de captura do sinal pré-fader no canal (Elemento 96 / 0x60) |
+| **ALL NOMINAL** | *Botão de Ação* | *One-shot Trigger* | Reseta instantaneamente o ponto de envio de todos os 32 canais para **PRE** (`1`) naquele auxiliar (sem alterar os volumes) |
 
 ---
 
@@ -103,68 +108,99 @@ Aberto ao clicar no indicador de POSIÇÃO:
 
 ---
 
-## 4. Estrutura de Dados e Protocolo MIDI
+## 4. Engenharia Reversa e Protocolo MIDI (Validado em Hardware)
 
-### 4.1 Backend Rust (`server_rust`)
+### 4.1 Estrutura do Elemento 35 (`0x23` - `kInputAUX`)
+Na Yamaha 01V96, cada canal possui uma matriz contínua de **tripletos** (3 parâmetros por auxiliar):
+- **Fórmula de Parâmetro:** $\text{Param} = (\text{AuxIdx} - 1) \times 3 + \text{Offset}$
+  - $\text{Offset } 0$: `Send ON/OFF` ($0 = \text{OFF}, 1 = \text{ON}$)
+  - $\text{Offset } 1$: `Send PRE/POST` (**$1 = \text{PRE}, 0 = \text{POST}$**)
+  - $\text{Offset } 2$: `Send Level` ($0 \dots 1023$, Fader de 10 bits)
 
-#### 4.1.1 `ChannelState` (`server_rust/src/state.rs`)
+#### Tabela de Endereçamento dos 8 Auxiliares:
+| Auxiliar | Offset 0 (ON/OFF) | Offset 1 (PRE/POST) | Offset 2 (LEVEL) |
+|---|---|---|---|
+| **AUX 1** | `0x00` (0) | `0x01` (1) | `0x02` (2) |
+| **AUX 2** | `0x03` (3) | `0x04` (4) | `0x05` (5) |
+| **AUX 3** | `0x06` (6) | `0x07` (7) | `0x08` (8) |
+| **AUX 4** | `0x09` (9) | `0x0A` (10) | `0x0B` (11) |
+| **AUX 5** | `0x0C` (12) | `0x0D` (13) | `0x0E` (14) |
+| **AUX 6** | `0x0F` (15) | `0x10` (16) | `0x11` (17) |
+| **AUX 7** | `0x12` (18) | `0x13` (19) | `0x14` (20) |
+| **AUX 8** | `0x15` (21) | `0x16` (22) | `0x17` (23) |
+
+#### Mapeamento de Canais de Entrada (40 canais no total):
+- `0x00` a `0x1F` ($0 \dots 31$): Entradas Mono **CH 01** a **CH 32**.
+- `0x20` a `0x27` ($32 \dots 39$): Entradas Estéreo **ST IN 1L, 1R, 2L, 2R, 3L, 3R, 4L, 4R** (mapeadas como canais 60..67 no app).
+
+### 4.2 Módulos Auxiliares de Barramento (Elementos 52 a 57)
+- **Elemento 52** (`0x34`): `kAUXPair` (Stereo Pair dos Auxiliares)
+- **Elemento 53** (`0x35`): `kAUXInsert` (Insert do Auxiliar: On, LocFirst, Loc)
+- **Elemento 54** (`0x36`): `kAUXChannelOn` (Master ON do Auxiliar)
+- **Elemento 55** (`0x37`): `kAUXType` (Modo: `0 = FIXED`, `1 = VARIABLE`)
+- **Elemento 56** (`0x38`): `kAUXBalance` (Pan/Balance do Auxiliar)
+- **Elemento 57** (`0x39`): `kAUXFader` (Fader Master do Auxiliar)
+- **Elemento 96** (`0x60`): `kAuxSendPrePoint/kPrePoint` (Console Pre-Point: `0 = PRE ON`, `1 = POST ON`)
+
+### 4.3 Ferramenta de Sondagem Criada
+O script [`aux_position_probe.js`](file:///C:/PROJETOS/01v96-remote-web/aux_position_probe.js) está disponível no root para testes de leitura não-destrutivos (**100% READ ONLY**, apenas `0x30` requests, com filtro para descartar stream contínuo de meters `0D 21`).
+
+---
+
+## 5. Estrutura de Dados no Backend Rust (`server_rust`)
+
+### 5.1 `ChannelState` (`server_rust/src/state.rs`)
 Adição dos campos de PRE/POST por canal:
 ```rust
 pub struct ChannelState {
     // ...
     #[serde(rename = "aux1Pre")]
-    pub aux1_pre: bool, // false = PRE, true = POST (ou mapeado conforme mesa)
+    pub aux1_pre: bool, // true = PRE (1), false = POST (0)
     #[serde(rename = "aux2Pre")]
     pub aux2_pre: bool,
     // ... até aux8_pre
 }
 ```
 
-#### 4.1.2 `MixBusState` (`server_rust/src/state.rs`)
+### 5.2 `MixBusState` (`server_rust/src/state.rs`)
 Adição das propriedades de configuração do Auxiliar:
 ```rust
 pub struct MixBusState {
     // ...
     pub mode: u8,       // 0 = FIXED, 1 = VARIABLE (kAUXType/kAUXTypeIndex)
-    pub global: u8,     // 0 = PRE, 1 = POST
+    pub global: u8,     // 1 = PRE, 0 = POST
     pub pre_point: u8,  // 0 = PRE ON, 1 = POST ON (kAuxSendPrePoint/kPrePoint)
 }
 ```
 
-#### 4.1.3 Mapeamento de Comandos MIDI (`dictionary.json` & `protocol.rs`)
-- `kInputAUX/kAUX{1..8}Pre` (Elemento 35, Sub 1, 4, 7, 10, 13, 16, 19, 22)
-- `kAUXType/kAUXTypeIndex` (Elemento 55, Sub 0, Channel 0..7 para Aux 1..8)
-- `kAuxSendPrePoint/kPrePoint` (Elemento 96, Sub 0)
-- `kAUXInsert/kInsertLocInsert` (Elemento 53, Sub 2)
-
-#### 4.1.4 Sincronização Inicial (`sync_manager.rs`)
-- Consulta automática de `kInputAUX/kAUX{1..8}Pre` para canais 0..31 e 60..67.
-- Consulta de `kAUXType/kAUXTypeIndex` para mixes 0..7.
+### 5.3 Sincronização Inicial (`sync_manager.rs`)
+- Consulta de `kInputAUX/kAUX{1..8}Pre` para canais 0..31 e 32..39 (ST IN).
+- Consulta de `kAUXType/kAUXTypeIndex` para barramentos 0..7.
 - Consulta de `kAuxSendPrePoint/kPrePoint`.
 
 ---
 
-## 5. Plano de Implementação
+## 6. Plano de Implementação (Próximos Passos)
 
 ### Fase 1: Backend Rust (`server_rust`)
 1. Atualizar structs `ChannelState` e `MixBusState` em `state.rs`.
-2. Adicionar handlers de mensagens MIDI em `state.rs` para `kInputAUX/kAUX*Pre`, `kAUXType/kAUXTypeIndex` e `kAuxSendPrePoint`.
-3. Adicionar requisições na fila de sincronização em `sync_manager.rs`.
-4. Verificar compilação com `cargo check`.
+2. Adicionar tratamento de `offset == 1` em `protocol.rs` (`kInputAUX/kAUX*Pre`), respeitando `1 = PRE` e `0 = POST`.
+3. Adicionar handlers para `kAUXType/kAUXTypeIndex` e `kAuxSendPrePoint/kPrePoint` em `state.rs`.
+4. Incluir as requisições no `sync_manager.rs`.
+5. Validar compilação com `cargo check`.
 
 ### Fase 2: Frontend - Camada de Dados e Eventos
 1. Atualizar `auxs_sends.js` para manipular `aux{N}Pre` e emitir comandos de socket (`kInputAUX/kAUX{N}Pre`).
-2. Implementar função de `toggleAuxPre(ch, auxIdx)` e sincronização reativa.
-3. Atualizar `copy_paste.js` para copiar e colar o campo `pre` em `copySendsOnFaders` e `copyChannelAuxSends`.
+2. Implementar função `toggleAuxPre(ch, auxIdx)` e sincronização reativa.
+3. Atualizar `copy_paste.js` para incluir o campo `pre` no clipboard de auxiliares.
 
 ### Fase 3: Frontend - Interface Visual e Componentes
-1. Atualizar `channel_strip.js` (`createDesktopStrip` e `createMobileStrip`) e `auxs_sends.js` com o botão PRE/POST estilizado com azul quando POST.
-2. Adicionar bloco de POSIÇÃO (GLOBAL / PRE-POINT) dentro do Mini Fader Strip do Auxiliar.
-3. Implementar o Modal de Configuração do Auxiliar (`openAuxConfigModal` / `auxConfigModal`).
-4. Implementar a lógica de travamento de faders quando o auxiliar estiver em modo `FIXED`.
-5. Implementar a ação `ALL NOMINAL` com envio sequencial throttled.
+1. Atualizar `channel_strip.js` (`createDesktopStrip` e `createMobileStrip`) e `auxs_sends.js` com o botão PRE/POST (Azul quando POST, Neutro quando PRE).
+2. Adicionar o bloco de `POSIÇÃO` dentro do Mini Fader Strip do Auxiliar.
+3. Implementar o Modal de Configuração do Auxiliar (`aux_config.js`).
+4. Implementar o travamento visual de faders em 0 dB quando o auxiliar estiver em modo `FIXED`.
+5. Implementar a ação `ALL NOMINAL` (disparo de 32 comandos com throttling).
 
-### Fase 4: Estilização e Validação
-1. Adicionar classes CSS em `style.css` para `.btn-aux-pre`, `.btn-aux-post`, `.aux-config-section`, badges e modal.
-2. Testar responsividade desktop e mobile.
-3. Validar consistência de sincronização em tempo real via WebSocket e MIDI.
+### Fase 4: Estilização e Validação Final
+1. Adicionar estilos CSS em `style.css`.
+2. Validar bidirecionalmente com a mesa 01V96 física.
