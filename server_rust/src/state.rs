@@ -106,6 +106,22 @@ pub struct ChannelState {
     pub aux8: f64,
     #[serde(rename = "aux8On")]
     pub aux8_on: bool,
+    #[serde(rename = "aux1Pre")]
+    pub aux1_pre: bool,
+    #[serde(rename = "aux2Pre")]
+    pub aux2_pre: bool,
+    #[serde(rename = "aux3Pre")]
+    pub aux3_pre: bool,
+    #[serde(rename = "aux4Pre")]
+    pub aux4_pre: bool,
+    #[serde(rename = "aux5Pre")]
+    pub aux5_pre: bool,
+    #[serde(rename = "aux6Pre")]
+    pub aux6_pre: bool,
+    #[serde(rename = "aux7Pre")]
+    pub aux7_pre: bool,
+    #[serde(rename = "aux8Pre")]
+    pub aux8_pre: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -125,6 +141,12 @@ pub struct MixBusState {
     pub pair_source: Option<usize>,
     pub insert: InsertState,
     pub stereo: bool,
+    #[serde(rename = "auxTypeMode")]
+    pub mode: u8,
+    #[serde(rename = "auxGlobal")]
+    pub global: u8,
+    #[serde(rename = "auxSendPrePoint")]
+    pub pre_point: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -288,6 +310,14 @@ impl GlobalState {
                     aux7_on: false,
                     aux8: 0.0,
                     aux8_on: false,
+                    aux1_pre: true,
+                    aux2_pre: true,
+                    aux3_pre: true,
+                    aux4_pre: true,
+                    aux5_pre: true,
+                    aux6_pre: true,
+                    aux7_pre: true,
+                    aux8_pre: true,
                 },
             );
         }
@@ -347,6 +377,9 @@ impl GlobalState {
                 pair_source: None,
                 insert: InsertState { on: false, position: 0.0, patch_in: 0.0 },
                 stereo: false,
+                mode: 1,
+                global: 1,
+                pre_point: 0,
             };
             mixes.insert(i, mix_bus_state.clone());
             let mut bus_state = mix_bus_state.clone();
@@ -619,6 +652,16 @@ impl GlobalState {
                     if let Some(bus) = self.buses.get_mut(&local) {
                         bus.insert.patch_in = v;
                     }
+                } else if mt == "kAUXType/kAUXTypeIndex" {
+                    if let Some(mix) = self.mixes.get_mut(channel) {
+                        mix.mode = v as u8;
+                    }
+                } else if mt == "kAuxSendPrePoint/kPrePoint" {
+                    for i in 0..8 {
+                        if let Some(mix) = self.mixes.get_mut(&i) {
+                            mix.pre_point = v as u8;
+                        }
+                    }
                 } else if mt == "kOutputPatch/kOmni" {
                     self.out_patches_omni.insert(*channel, v);
                 } else if mt == "kOutputPatch/kAdat" {
@@ -752,6 +795,8 @@ impl GlobalState {
                         Some(*channel)
                     } else if (60..=67).contains(channel) {
                         Some(32 + (channel - 60))
+                    } else if (32..=39).contains(channel) {
+                        Some(*channel)
                     } else {
                         None
                     };
@@ -791,6 +836,23 @@ impl GlobalState {
                                 6 => ch.aux6_on = cv,
                                 7 => ch.aux7_on = cv,
                                 8 => ch.aux8_on = cv,
+                                _ => {}
+                            }
+                        } else if mt.ends_with("Pre")
+                            && let Some(aux_num_str) = mt
+                                .strip_prefix("kInputAUX/kAUX")
+                                .and_then(|s| s.strip_suffix("Pre"))
+                            && let Ok(aux_num) = aux_num_str.parse::<usize>()
+                        {
+                            match aux_num {
+                                1 => ch.aux1_pre = v > 0.5,
+                                2 => ch.aux2_pre = v > 0.5,
+                                3 => ch.aux3_pre = v > 0.5,
+                                4 => ch.aux4_pre = v > 0.5,
+                                5 => ch.aux5_pre = v > 0.5,
+                                6 => ch.aux6_pre = v > 0.5,
+                                7 => ch.aux7_pre = v > 0.5,
+                                8 => ch.aux8_pre = v > 0.5,
                                 _ => {}
                             }
                         }

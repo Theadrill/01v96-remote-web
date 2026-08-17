@@ -953,6 +953,24 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             );
         }
 
+        // AUX Type (element 55)
+        if element == 55 {
+            return cc(
+                "kAUXType/kAUXTypeIndex",
+                channel,
+                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+            );
+        }
+
+        // AUX Send Pre Point (element 96)
+        if element == 96 {
+            return cc(
+                "kAuxSendPrePoint/kPrePoint",
+                channel,
+                if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+            );
+        }
+
         // Matrix Attenuator
         if element == 70 {
             return cc(
@@ -1022,6 +1040,13 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             if offset == 0 {
                 return cc(
                     &format!("kInputAUX/kAUX{}On", aux_idx),
+                    channel,
+                    if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
+                );
+            }
+            if offset == 1 {
+                return cc(
+                    &format!("kInputAUX/kAUX{}Pre", aux_idx),
                     channel,
                     if bytes_to_on(data_bytes) { 1.0 } else { 0.0 },
                 );

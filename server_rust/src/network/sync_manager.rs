@@ -529,6 +529,7 @@ async fn queue_all_params_inner(
         for a in 1..=8 {
             push_req(&mut requests, &format!("kInputAUX/kAUX{}Level", a), i);
             push_req(&mut requests, &format!("kInputAUX/kAUX{}On", a), i);
+            push_req(&mut requests, &format!("kInputAUX/kAUX{}Pre", a), i);
         }
         for p in &[
             "kGateOn",
@@ -582,7 +583,12 @@ async fn queue_all_params_inner(
             push_req(&mut requests, &format!("kInputEQ/kEQ{}G", band), i);
             push_req(&mut requests, &format!("kInputEQ/kEQ{}Q", band), i);
         }
+        for a in 1..=8 {
+            push_req(&mut requests, &format!("kInputAUX/kAUX{}Pre", a), i);
+        }
     }
+
+    push_req(&mut requests, "kAuxSendPrePoint/kPrePoint", 0);
 
     for i in 0u8..8 {
         push_req(&mut requests, "kAUXFader/kFader", i);
@@ -610,6 +616,7 @@ async fn queue_all_params_inner(
         if i % 2 == 0 {
             push_req(&mut requests, "kAUXPair/kPair", i);
         }
+        push_req(&mut requests, "kAUXType/kAUXTypeIndex", i);
         push_req(&mut requests, "kBusFader/kFader", i);
         push_req(&mut requests, "kBusChannelOn/kChannelOn", i);
         push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", 48 + i);
