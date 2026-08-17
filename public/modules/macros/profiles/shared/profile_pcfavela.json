@@ -99,6 +99,11 @@
     "name": "PALCO",
     "scriptId": "lumikit"
   },
+  "9": {
+    "color": "#1976d2",
+    "name": "Smart Toggler",
+    "scriptId": "smart_channel_toggler"
+  },
   "globalConfig": {
     "lumikit": {
       "ip": "pcfavela",
