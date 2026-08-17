@@ -1,1 +1,14 @@
-null
+{
+  "guardians": [
+    0,
+    1,
+    2
+  ],
+  "snapshot": {
+    "active": false,
+    "channels_to_restore": [],
+    "desk_name": null,
+    "scene_id": null,
+    "timestamp": null
+  }
+}
