@@ -203,7 +203,9 @@ function createDesktopStrip(config) {
             `<button id="${soloId}" class="btn-cue ${solo ? 'solo-active' : ''}" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">SOLO</button>` :
             isMaster ?
                 `<button id="master-solo-btn" class="btn-cue" disabled onclick="clearAllSolos()">SOLO</button>` :
-                `<div class="btn-cue-placeholder"></div>`}    
+                config.topExtraHtml !== undefined ?
+                    config.topExtraHtml :
+                    `<div class="btn-cue-placeholder"></div>`}    
             <div class="desk-ch-name-zone" onclick="${pfx && pfx === 'mini-' && config.type === 'main' ? 'openNameEditor()' : configAction}">
                 <div id="${nameId}" class="desk-ch-name">${name}</div>
             </div>
@@ -535,7 +537,7 @@ function createMobileStrip(config) {
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
             
-            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : ''}
+            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : config.topExtraHtml !== undefined ? config.topExtraHtml : ''}
             ${!onTop ? onBtn : ''}
             ${isMaster ? `
             <button class="btn-state mobile-master-medidores-btn" onclick="openMeterConfigModal('master')">MEDIDORES</button>

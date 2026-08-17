@@ -1,5 +1,90 @@
+function renderAuxPrePostBtn(ch, auxIdx, isPre) {
+    const cls = isPre ? 'btn-aux-pre active' : 'btn-aux-pre';
+    return `<button id="aux_pre_${ch}_${auxIdx}" class="${cls}" onclick="handleAuxPreToggle(event, ${ch}, ${auxIdx})" title="${isPre ? 'PRE (Pre-Fader)' : 'POST (Post-Fader)'}">${isPre ? 'PRE' : 'POST'}</button>`;
+}
+
+function handleAuxPreToggle(e, ch, auxIdx) {
+    if (e) e.stopPropagation();
+    const newVal = toggleAuxPre(ch, auxIdx);
+    const btnPre = document.getElementById(`aux_pre_${ch}_${auxIdx}`);
+    if (btnPre) {
+        btnPre.classList.toggle('active', newVal);
+        btnPre.textContent = newVal ? 'PRE' : 'POST';
+        btnPre.title = newVal ? 'PRE (Pre-Fader)' : 'POST (Post-Fader)';
+    }
+}
+
+function renderAuxMixBusConfig(ch) {
+    if (ch < 36 || ch > 43) return '';
+    const mixIdx = ch - 36;
+    const mode = getMixBusMode(mixIdx);
+    const globalVal = getMixBusGlobal(mixIdx);
+    const prePoint = getMixBusPrePoint(mixIdx);
+
+    const isVariable = (mode === 0);
+    const isGlobalPre = (globalVal === 1);
+    const isPreOn = (prePoint === 1);
+
+    return `
+        <div class="aux-mixbus-topbar">
+            <div class="aux-mixbus-topbar-title">MIX ${mixIdx + 1} CONFIG</div>
+            <div class="aux-mixbus-config-row">
+                <span class="aux-mixbus-config-label">MODE:</span>
+                <div class="aux-mixbus-config-btns">
+                    <button class="aux-mixbus-btn ${isVariable ? 'active' : ''}" onclick="handleMixBusMode(${mixIdx}, 0)">VARIABLE</button>
+                    <button class="aux-mixbus-btn ${!isVariable ? 'active' : ''}" onclick="handleMixBusMode(${mixIdx}, 1)">FIXED</button>
+                </div>
+            </div>
+            <div class="aux-mixbus-config-row">
+                <span class="aux-mixbus-config-label">GLOBAL:</span>
+                <div class="aux-mixbus-config-btns">
+                    <button class="aux-mixbus-btn ${isGlobalPre ? 'global-active' : ''}" onclick="handleMixBusGlobal(${mixIdx}, 1)">PRE</button>
+                    <button class="aux-mixbus-btn ${!isGlobalPre ? 'global-active' : ''}" onclick="handleMixBusGlobal(${mixIdx}, 0)">POST</button>
+                </div>
+            </div>
+            <div class="aux-mixbus-config-row">
+                <span class="aux-mixbus-config-label">PRE-POINT:</span>
+                <div class="aux-mixbus-config-btns">
+                    <button class="aux-mixbus-btn ${isPreOn ? 'prepoint-active' : ''}" onclick="handleMixBusPrePoint(${mixIdx}, 1)">PRE ON</button>
+                    <button class="aux-mixbus-btn ${!isPreOn ? 'prepoint-active' : ''}" onclick="handleMixBusPrePoint(${mixIdx}, 0)">POST ON</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function handleMixBusMode(mixIdx, val) {
+    setMixBusMode(mixIdx, val);
+    const ch = 36 + mixIdx;
+    if (activeConfigChannel === ch) {
+        renderAuxs(ch);
+    }
+}
+
+function handleMixBusGlobal(mixIdx, val) {
+    setMixBusGlobal(mixIdx, val);
+    const auxIdx = mixIdx + 1;
+    const isPre = (val === 1);
+    for (let i = 0; i < 32; i++) {
+        setAuxPre(i, auxIdx, isPre);
+    }
+    const ch = 36 + mixIdx;
+    if (activeConfigChannel === ch) {
+        renderAuxs(ch);
+    }
+}
+
+function handleMixBusPrePoint(mixIdx, val) {
+    setMixBusPrePoint(mixIdx, val);
+    const ch = 36 + mixIdx;
+    if (activeConfigChannel === ch) {
+        renderAuxs(ch);
+    }
+}
+
 function renderAuxs(ch) {
     const body = document.querySelector('.ch-modal-body');
+    if (!body) return;
     
     // 01V96: Buses (44-51) e Master (52) realmente não possuem envios.
     if (ch >= 44) {
@@ -21,6 +106,7 @@ function renderAuxs(ch) {
             if (state && state.paired && i % 2 !== 0) continue;
             const currentVal = (state && state[`aux${auxIdx}`]) || 0;
             const isOn = (state && state[`aux${auxIdx}On`]) || false;
+            const isPre = getAuxPre(i, auxIdx);
             let baseTitle = `CH ${i+1}`;
             if (state && state.paired) {
                 baseTitle = `CH ${i+1} + ${i+2}`;
@@ -31,6 +117,13 @@ function renderAuxs(ch) {
                 chName = window.resolvedNames[i].name;
             } else if (state && state.name && state.name.trim() !== "") {
                 chName = state.name;
+            }
+
+            let patchText = '--';
+            if (window.PatchRegistry) {
+                patchText = (state && state.paired && state.pairedWith !== null)
+                    ? window.PatchRegistry.getPairedChannelInput(i, state.pairedWith)
+                    : window.PatchRegistry.getChannelInput(i);
             }
 
             const config = {
@@ -46,7 +139,9 @@ function renderAuxs(ch) {
                 dbLabel: rawToDb(currentVal),
                 isOn: isOn,
                 evtCh: `${i}, ${auxIdx}`,
-                ids: { f: `aux_f_ch_${i}`, v: `aux_v_ch_${i}`, on: `aux_on_ch_${i}`, name: `aux_name_ch_${i}` }
+                patchText: patchText,
+                ids: { f: `aux_f_ch_${i}`, v: `aux_v_ch_${i}`, on: `aux_on_ch_${i}`, name: `aux_name_ch_${i}`, patchVal: `patch-val-${i}` },
+                topExtraHtml: renderAuxPrePostBtn(i, auxIdx, isPre)
             };
             html += (layoutMode === 'desktop') ? createDesktopStrip(config) : createMobileStrip(config);
         }
@@ -57,12 +152,18 @@ function renderAuxs(ch) {
         for (let i = 1; i <= 8; i++) {
             const currentVal = (state && state[`aux${i}`]) || 0;
             const isOn = (state && state[`aux${i}On`]) || false;
+            const isPre = getAuxPre(ch, i);
             
             let baseTitle = `AUX ${i}`;
             let auxName = baseTitle;
             let globalMixId = 35 + i;
             if (window.resolvedNames && window.resolvedNames[globalMixId]) {
                 auxName = window.resolvedNames[globalMixId].name;
+            }
+
+            let patchText = '--';
+            if (window.PatchRegistry) {
+                patchText = window.PatchRegistry.getMixOutput(i - 1);
             }
 
             const config = {
@@ -78,20 +179,29 @@ function renderAuxs(ch) {
                 dbLabel: rawToDb(currentVal),
                 isOn: isOn,
                 evtCh: `${ch}, ${i}`,
-                ids: { f: `aux_f_${i}`, v: `aux_v_${i}`, on: `aux_on_${i}`, name: `aux_name_display_${i}` },
-                onTop: layoutMode !== 'desktop' // Botão ON no topo apenas no modo mobile
+                patchText: patchText,
+                ids: { f: `aux_f_${i}`, v: `aux_v_${i}`, on: `aux_on_${i}`, name: `aux_name_display_${i}`, patchVal: `patch-val-m${i-1}` },
+                onTop: layoutMode !== 'desktop',
+                topExtraHtml: renderAuxPrePostBtn(ch, i, isPre)
             };
             html += (layoutMode === 'desktop') ? createDesktopStrip(config) : createMobileStrip(config);
         }
     }
 
+    const topBarHtml = (ch >= 36 && ch <= 43) ? renderAuxMixBusConfig(ch) : '';
+
     body.style.flexDirection = 'column';
     body.style.alignItems = 'stretch';
     body.innerHTML = `
+        ${topBarHtml}
         <div class="aux-sends-area drag-scroll-area" style="display:flex; overflow-x:auto; flex:1; padding:0; gap:0; align-items:stretch;">
             ${html}
         </div>
     `;
+
+    if (typeof window.updateDesktopPatchBadges === 'function') {
+        window.updateDesktopPatchBadges();
+    }
 
     if (ch >= 36 && ch <= 43 && typeof getMixVolumeGeralHtml === 'function') {
         const container = document.getElementById('miniFaderContainer');
@@ -235,7 +345,12 @@ function updateAuxFromSocket(ch, type, value) {
     } else if (subType === 'Pre') {
         const isTrue = (value === 1 || value === true);
         state[`aux${auxIdx}Pre`] = isTrue;
-        console.log(`[Sync/Update] Canal ${ch} - AUX ${auxIdx} Pre atualizado para: ${isTrue ? 'PRE' : 'POST'}`);
+        const btnPre = document.getElementById(`aux_pre_${ch}_${auxIdx}`);
+        if (btnPre) {
+            btnPre.classList.toggle('active', isTrue);
+            btnPre.textContent = isTrue ? 'PRE' : 'POST';
+            btnPre.title = isTrue ? 'PRE (Pre-Fader)' : 'POST (Post-Fader)';
+        }
     }
 }
 
@@ -303,3 +418,7 @@ window.getMixBusGlobal = getMixBusGlobal;
 window.setMixBusGlobal = setMixBusGlobal;
 window.getMixBusPrePoint = getMixBusPrePoint;
 window.setMixBusPrePoint = setMixBusPrePoint;
+window.handleAuxPreToggle = handleAuxPreToggle;
+window.handleMixBusMode = handleMixBusMode;
+window.handleMixBusGlobal = handleMixBusGlobal;
+window.handleMixBusPrePoint = handleMixBusPrePoint;

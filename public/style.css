@@ -10153,3 +10153,135 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
         max-width: 340px;
     }
 }
+
+/* ── AUX Send PRE/POST Button (Posicionado no topo, entre Label e Nome) ── */
+.btn-aux-pre {
+    height: 28px;
+    margin: 2px 4px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #25252b;
+    color: #777;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.btn-aux-pre.active {
+    background: #7b2ff2;
+    color: #ffffff;
+    border-color: #9d5cff;
+    font-weight: 900;
+    box-shadow: 0 0 6px rgba(123, 47, 242, 0.4);
+}
+
+.btn-aux-pre:hover {
+    filter: brightness(1.2);
+}
+
+/* Mobile: ajusta no lugar do solo */
+body:not(.layout-desktop) .btn-aux-pre {
+    height: 32px;
+    margin: 2px 0;
+    font-size: 11px;
+    border-radius: 4px;
+}
+
+/* ── Mix Bus Topbar Config (Mode / Pre-Point) ───────────────────────── */
+.aux-mixbus-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 6px 14px;
+    background: #12121c;
+    border-bottom: 1px solid #28283a;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.aux-mixbus-topbar-title {
+    font-size: 11px;
+    font-weight: 900;
+    color: #ff9800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding-right: 8px;
+    border-right: 1px solid #333;
+}
+
+.aux-mixbus-config-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.aux-mixbus-config-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.aux-mixbus-config-btns {
+    display: inline-flex;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #333;
+    background: #1e1e28;
+}
+
+.aux-mixbus-btn {
+    padding: 3px 10px;
+    font-size: 9px;
+    font-weight: 700;
+    border: none;
+    border-right: 1px solid #333;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+}
+
+.aux-mixbus-btn:last-child {
+    border-right: none;
+}
+
+.aux-mixbus-btn.active {
+    background: #00897b;
+    color: #ffffff;
+    font-weight: 900;
+}
+
+.aux-mixbus-btn.global-active {
+    background: #e65100;
+    color: #ffffff;
+    font-weight: 900;
+}
+
+.aux-mixbus-btn.prepoint-active {
+    background: #7b2ff2;
+    color: #ffffff;
+    font-weight: 900;
+}
+
+.aux-mixbus-btn:hover:not(.active):not(.global-active):not(.prepoint-active) {
+    background: #2a2a38;
+    color: #aaa;
+}
+
+body:not(.layout-desktop) .aux-mixbus-topbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 10px;
+}
