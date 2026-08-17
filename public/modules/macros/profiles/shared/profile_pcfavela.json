@@ -23,6 +23,17 @@
     "name": "CAV/VIOL",
     "scriptId": "channel_toggler"
   },
+  "10": {
+    "color": "#34495e",
+    "config": {
+      "extras": [],
+      "scenes": [
+        "0:15"
+      ]
+    },
+    "name": "Lumikit DMX",
+    "scriptId": "lumikit"
+  },
   "2": {
     "config": [
       30
