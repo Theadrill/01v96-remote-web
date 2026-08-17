@@ -91,7 +91,8 @@ function copySendsOnFaders(auxIdx) {
         const state = getChannelStateById(i);
         const level = (state && state['aux' + auxIdx] !== undefined) ? state['aux' + auxIdx] : 0;
         const on = (state && state['aux' + auxIdx + 'On'] !== undefined) ? !!state['aux' + auxIdx + 'On'] : false;
-        channelsData.push({ ch: i, level, on });
+        const pre = (state && state['aux' + auxIdx + 'Pre'] !== undefined) ? !!state['aux' + auxIdx + 'Pre'] : true;
+        channelsData.push({ ch: i, level, on, pre });
     }
 
     const sourceName = getMixDisplayName(auxIdx);
@@ -138,6 +139,7 @@ function executePasteSendsOnFaders(targetMix) {
             if (state) {
                 state['aux' + targetMix] = item.level;
                 state['aux' + targetMix + 'On'] = item.on;
+                state['aux' + targetMix + 'Pre'] = item.pre;
             }
 
             commands.push({
@@ -167,6 +169,12 @@ function executePasteSendsOnFaders(targetMix) {
                     }
                 }
             });
+
+            commands.push({
+                type: 'kInputAUX/kAUX' + targetMix + 'Pre',
+                channel: ch,
+                value: item.pre ? 1 : 0
+            });
         });
 
         dispatchThrottledCommands(commands, function() {
@@ -187,7 +195,8 @@ function copyInputChannelAuxSends(ch) {
     for (let i = 1; i <= 8; i++) {
         const currentVal = (state['aux' + i] !== undefined) ? state['aux' + i] : 0;
         const isOn = (state['aux' + i + 'On'] !== undefined) ? !!state['aux' + i + 'On'] : false;
-        channelsData.push({ aux: i, level: currentVal, on: isOn });
+        const isPre = (state['aux' + i + 'Pre'] !== undefined) ? !!state['aux' + i + 'Pre'] : true;
+        channelsData.push({ aux: i, level: currentVal, on: isOn, pre: isPre });
     }
 
     const sourceName = getChannelDisplayName(ch);
@@ -231,6 +240,7 @@ function executePasteInputChannelAuxSends(targetCh) {
             if (state) {
                 state['aux' + item.aux] = item.level;
                 state['aux' + item.aux + 'On'] = item.on;
+                state['aux' + item.aux + 'Pre'] = item.pre;
             }
 
             commands.push({
@@ -263,6 +273,12 @@ function executePasteInputChannelAuxSends(targetCh) {
                         }
                     }
                 }
+            });
+
+            commands.push({
+                type: 'kInputAUX/kAUX' + item.aux + 'Pre',
+                channel: targetCh,
+                value: item.pre ? 1 : 0
             });
         });
 
@@ -731,7 +747,8 @@ window.executeCopyFullChannel = function(ch) {
                 return {
                     aux: i + 1,
                     level: state && state['aux' + (i + 1)] !== undefined ? state['aux' + (i + 1)] : 0,
-                    on: state && state['aux' + (i + 1) + 'On'] !== undefined ? !!state['aux' + (i + 1) + 'On'] : false
+                    on: state && state['aux' + (i + 1) + 'On'] !== undefined ? !!state['aux' + (i + 1) + 'On'] : false,
+                    pre: state && state['aux' + (i + 1) + 'Pre'] !== undefined ? !!state['aux' + (i + 1) + 'Pre'] : true
                 };
             }),
             patch: state && state.patch !== undefined ? state.patch : null,
@@ -932,8 +949,10 @@ function executePasteFullChannel(targetCh) {
             data.auxSends.forEach(function(s) {
                 state['aux' + s.aux] = s.level;
                 state['aux' + s.aux + 'On'] = s.on;
+                state['aux' + s.aux + 'Pre'] = s.pre;
                 commands.push({ type: prefix + 'AUX/kAUX' + s.aux + 'Level', channel: targetCh, value: s.level });
                 commands.push({ type: prefix + 'AUX/kAUX' + s.aux + 'On', channel: targetCh, value: s.on ? 1 : 0 });
+                commands.push({ type: prefix + 'AUX/kAUX' + s.aux + 'Pre', channel: targetCh, value: s.pre ? 1 : 0 });
             });
         }
 

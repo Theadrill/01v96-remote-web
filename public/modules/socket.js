@@ -189,6 +189,24 @@ socket.on('update', (d) => {
         return;
     }
 
+    // --- MixBus: Mode, PrePoint ---
+    if (d.type === 'kAUXType/kAUXTypeIndex') {
+        if (typeof mixesState !== 'undefined' && mixesState[d.channel]) {
+            mixesState[d.channel].auxTypeMode = d.value;
+            console.log(`[Sync/Update] MIX ${d.channel + 1} - Mode atualizado para: ${d.value === 1 ? 'Variable' : 'Fixed'} (${d.value})`);
+        }
+        return;
+    }
+    if (d.type === 'kAuxSendPrePoint/kPrePoint') {
+        for (let i = 0; i < 8; i++) {
+            if (typeof mixesState !== 'undefined' && mixesState[i]) {
+                mixesState[i].auxSendPrePoint = d.value;
+            }
+        }
+        console.log(`[Sync/Update] GLOBAL PRE POINT atualizado para todos os Mixes: ${d.value === 1 ? 'Pre-Fader' : 'Pre-EQ'} (${d.value})`);
+        return;
+    }
+
     // Handler para EQ de canais Out (Bus/AUX: channel IDs 36-51)
     // Estes ficam FORA da guarda `d.channel < NUM_CHANNELS` abaixo.
     if (typeof d.channel === 'number' && d.channel >= 36 && d.type.includes('EQ/kEQ')) {

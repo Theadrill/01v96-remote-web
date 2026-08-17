@@ -18,7 +18,15 @@ for (let i = 0; i < 40; i++) {
         eq: { on: false },
         paired: false,      // bool: este canal está em pair?
         pairedWith: null,   // number|null: índice 0-based do canal parceiro
-        pairSource: null    // number|null: qual canal foi a fonte na última operação de pair
+        pairSource: null,   // number|null: qual canal foi a fonte na última operação de pair
+        aux1Pre: true,      // bool: PRE/POST do envio AUX 1 (true=PRE)
+        aux2Pre: true,
+        aux3Pre: true,
+        aux4Pre: true,
+        aux5Pre: true,
+        aux6Pre: true,
+        aux7Pre: true,
+        aux8Pre: true
     });
 }
 const DEFAULT_OUT_EQ = () => ({
@@ -31,8 +39,8 @@ const DEFAULT_OUT_EQ = () => ({
 let mixesState = [];
 let busesState = [];
 for (let i = 0; i < 8; i++) {
-    mixesState.push({ value: 0, on: false, solo: false, name: `MIX ${i + 1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null });
-    busesState.push({ value: 0, on: false, solo: false, name: `BUS ${i + 1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null, insert: { on: false, position: 0, patch_in: 0 }, stereo: false });
+    mixesState.push({ value: 0, on: false, solo: false, name: `MIX ${i + 1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null, auxTypeMode: 1, auxGlobal: 1, auxSendPrePoint: 0 });
+    busesState.push({ value: 0, on: false, solo: false, name: `BUS ${i + 1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null, insert: { on: false, position: 0, patch_in: 0 }, stereo: false, auxTypeMode: 1, auxGlobal: 1, auxSendPrePoint: 0 });
 }
 
 let masterState = { value: 0, pan: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };

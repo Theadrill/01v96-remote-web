@@ -201,7 +201,7 @@ function toggleAuxOn(ch, auxIdx) {
 function updateAuxFromSocket(ch, type, value) {
     const state = getChannelStateById(ch);
     if (!state) return;
-    const match = type.match(/kInputAUX\/kAUX(\d+)(Level|On)/);
+    const match = type.match(/kInputAUX\/kAUX(\d+)(Level|On|Pre)/);
     if (!match) return;
 
     const auxIdx = parseInt(match[1]);
@@ -232,5 +232,74 @@ function updateAuxFromSocket(ch, type, value) {
             const targetOnCh = document.getElementById(`aux_on_${auxIdx}`);
             if (targetOnCh) targetOnCh.classList.toggle('on-active', isTrue);
         }
+    } else if (subType === 'Pre') {
+        const isTrue = (value === 1 || value === true);
+        state[`aux${auxIdx}Pre`] = isTrue;
+        console.log(`[Sync/Update] Canal ${ch} - AUX ${auxIdx} Pre atualizado para: ${isTrue ? 'PRE' : 'POST'}`);
     }
 }
+
+function getAuxPre(ch, auxIdx) {
+    const state = getChannelStateById(ch);
+    if (!state) return true;
+    return state[`aux${auxIdx}Pre`] !== undefined ? state[`aux${auxIdx}Pre`] : true;
+}
+
+function setAuxPre(ch, auxIdx, val) {
+    const state = getChannelStateById(ch);
+    if (!state) return;
+    state[`aux${auxIdx}Pre`] = !!val;
+    socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Pre`, channel: ch, value: val ? 1 : 0 });
+}
+
+function toggleAuxPre(ch, auxIdx) {
+    const current = getAuxPre(ch, auxIdx);
+    setAuxPre(ch, auxIdx, !current);
+    return !current;
+}
+
+function getMixBusMode(mixIdx) {
+    if (typeof mixesState === 'undefined' || !mixesState[mixIdx]) return 1;
+    return mixesState[mixIdx].auxTypeMode !== undefined ? mixesState[mixIdx].auxTypeMode : 1;
+}
+
+function setMixBusMode(mixIdx, val) {
+    if (typeof mixesState !== 'undefined' && mixesState[mixIdx]) {
+        mixesState[mixIdx].auxTypeMode = val;
+    }
+    socket.emit('control', { type: 'kAUXType/kAUXTypeIndex', channel: mixIdx, value: val });
+}
+
+function getMixBusGlobal(mixIdx) {
+    if (typeof mixesState === 'undefined' || !mixesState[mixIdx]) return 1;
+    return mixesState[mixIdx].auxGlobal !== undefined ? mixesState[mixIdx].auxGlobal : 1;
+}
+
+function setMixBusGlobal(mixIdx, val) {
+    if (typeof mixesState !== 'undefined' && mixesState[mixIdx]) {
+        mixesState[mixIdx].auxGlobal = val;
+    }
+    socket.emit('control', { type: 'kAuxSendGlobal/kGlobal', channel: mixIdx, value: val });
+}
+
+function getMixBusPrePoint(mixIdx) {
+    if (typeof mixesState === 'undefined' || !mixesState[mixIdx]) return 0;
+    return mixesState[mixIdx].auxSendPrePoint !== undefined ? mixesState[mixIdx].auxSendPrePoint : 0;
+}
+
+function setMixBusPrePoint(mixIdx, val) {
+    if (typeof mixesState !== 'undefined' && mixesState[mixIdx]) {
+        mixesState[mixIdx].auxSendPrePoint = val;
+    }
+    socket.emit('control', { type: 'kAuxSendPrePoint/kPrePoint', channel: mixIdx, value: val });
+}
+
+window.getAuxPre = getAuxPre;
+window.setAuxPre = setAuxPre;
+window.toggleAuxPre = toggleAuxPre;
+window.getMixBusMode = getMixBusMode;
+window.setMixBusMode = setMixBusMode;
+window.getMixBusGlobal = getMixBusGlobal;
+window.setMixBusGlobal = setMixBusGlobal;
+window.getMixBusPrePoint = getMixBusPrePoint;
+window.setMixBusPrePoint = setMixBusPrePoint;

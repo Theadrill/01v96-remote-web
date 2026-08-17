@@ -41,13 +41,17 @@ Sempre que o usuário solicitar a delegação de uma tarefa (ex: *"use as instru
    ```powershell
    orca orchestration run-create --objective "Descrição objetiva da tarefa" --json
    ```
-2. **Verificar ou Iniciar Terminal do OpenCode & Aplicar `/compact`**:
-   * Se já houver terminal ativo do OpenCode ocioso, reutilize seu `<handle>` e envie `/compact` para limpar o contexto acumulado:
+2. **Obter, Verificar ou Iniciar Terminal do OpenCode & Aplicar `/compact`**:
+   * O orquestrador **DEVE SEMPRE** tentar reaproveitar um terminal existente. Liste os terminais ativos primeiro:
+     ```powershell
+     orca terminal list --json
+     ```
+   * Se houver algum terminal ativo do OpenCode listado (mesmo que o usuário o tenha fechado na interface visual), recupere o seu `<handle>`, reutilize-o e envie `/compact` para limpar o contexto:
      ```powershell
      orca terminal send --terminal <handle> --text "/compact" --enter --json
      orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 20000 --json
      ```
-   * Caso contrário, crie um novo terminal e aguarde ficar pronto:
+   * APENAS se a lista não retornar terminais aplicáveis, crie um novo terminal e aguarde:
      ```powershell
      orca terminal create --worktree active --title "opencode-worker" --command "opencode" --json
      orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 30000 --json
