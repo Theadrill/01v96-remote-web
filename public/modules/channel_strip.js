@@ -224,6 +224,8 @@ function createDesktopStrip(config) {
             </div>
             ` : ''}
 
+            ${config.auxSectionHtml || ''}
+
             <button id="${onId}" class="btn-on-desk ${isOn ? 'on-active' : ''}" onclick="${onAction}">ON</button>
 
             <div class="nudge-zone-desk" onpointerdown="${onNudgeStartAction}(${evtCh}, 1)" onpointerup="${onNudgeStopAction}()" onpointerleave="${onNudgeStopAction}()" onpointercancel="${onNudgeStopAction}()" onclick="event.stopPropagation()">
@@ -699,9 +701,22 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
         solo: stateRef.solo,
         isPaired: type === 'stIn',
         partnerId: type === 'stIn' ? configId + 1 : null,
-        hasPan: type === 'stIn', // Apenas ST IN tem Pan nas saídas
+        hasPan: type === 'stIn',
         dataCh: configId,
-        patchText
+        patchText,
+        auxSectionHtml: (type === 'mix' && idPrefix === 'mini-') ? `
+            <div class="master-meter-section aux-position-section" onclick="openAuxConfigModal(${i})">
+                <div class="master-meter-divider">POSIÇÃO</div>
+                <div class="master-meter-group">
+                    <span class="master-meter-label">GLOBAL:</span>
+                    <span id="aux-global-badge-${i}" class="master-meter-badge">${window.getMixBusGlobalLabel ? window.getMixBusGlobalLabel(i) : 'PRE'}</span>
+                </div>
+                <div class="master-meter-group">
+                    <span class="master-meter-label">PRE-P:</span>
+                    <span id="aux-prepoint-badge-${i}" class="master-meter-badge">${window.getMixBusPrePointLabel ? window.getMixBusPrePointLabel(i) : 'POST ON'}</span>
+                </div>
+            </div>
+        ` : ''
     });
 }
 
@@ -763,6 +778,7 @@ function createOutputStrip(i, type, idPrefix = "") {
             
             <button id="${pfx}solo${prefix}${i}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${actionCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${actionCh})`}">Solo</button>
             <button id="${pfx}on${prefix}${i}" class="btn-state" onclick="toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})">On</button>
+            ${type === 'mix' && idPrefix === 'mini-' ? `<button class="btn-state mobile-master-medidores-btn" onclick="openAuxConfigModal(${i})">POSIÇÃO</button>` : ''}
 
             <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">
                 <button class="btn-nudge pointer-none">+</button>

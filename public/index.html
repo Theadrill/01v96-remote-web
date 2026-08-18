@@ -1185,6 +1185,42 @@
             <button onclick="document.getElementById('meterConfigModal').style.display='none'" class="meter-config-close">FECHAR</button>
         </div>
     </div>
+    <!-- Modal de Configuração do Auxiliar (MIX 1..8) -->
+    <div class="modal-overlay styled-meterConfigModal styled-auxConfigModal" id="auxConfigModal">
+        <div class="modal-content meter-config-content aux-config-content">
+            <div class="meter-config-row">
+                <span class="meter-config-title" id="auxConfigTitle">CONFIGURAÇÃO - MIX 1</span>
+            </div>
+            <div class="meter-config-section">
+                <span class="meter-config-section-title">MODE</span>
+                <div class="meter-config-btn-group" id="auxConfigModeGroup">
+                    <button class="meter-config-pos-btn" data-mode="variable" onclick="handleMixBusMode(_auxConfigMixIdx, 0);">VARIABLE</button>
+                    <button class="meter-config-pos-btn" data-mode="fixed" onclick="handleMixBusMode(_auxConfigMixIdx, 1);">FIXED</button>
+                </div>
+            </div>
+            <div class="meter-config-section">
+                <span class="meter-config-section-title">GLOBAL INSERT</span>
+                <div class="meter-config-btn-group" id="auxConfigGlobalGroup">
+                    <button class="meter-config-pos-btn" data-mode="pre" onclick="handleMixBusGlobal(_auxConfigMixIdx, 1); updateAuxConfigModalUI(_auxConfigMixIdx); updateAuxPositionBadgeUI(_auxConfigMixIdx);">PRE</button>
+                    <button class="meter-config-pos-btn" data-mode="post" onclick="handleMixBusGlobal(_auxConfigMixIdx, 0); updateAuxConfigModalUI(_auxConfigMixIdx); updateAuxPositionBadgeUI(_auxConfigMixIdx);">POST</button>
+                </div>
+            </div>
+            <div class="meter-config-section">
+                <span class="meter-config-section-title">PRE-POINT</span>
+                <div class="meter-config-btn-group" id="auxConfigPrePointGroup">
+                    <button class="meter-config-pos-btn" data-mode="pre_on" onclick="handleMixBusPrePoint(_auxConfigMixIdx, 1); updateAuxConfigModalUI(_auxConfigMixIdx); updateAuxPositionBadgeUI(_auxConfigMixIdx);">PRE ON</button>
+                    <button class="meter-config-pos-btn" data-mode="post_on" onclick="handleMixBusPrePoint(_auxConfigMixIdx, 0); updateAuxConfigModalUI(_auxConfigMixIdx); updateAuxPositionBadgeUI(_auxConfigMixIdx);">POST ON</button>
+                </div>
+            </div>
+            <div class="meter-config-section">
+                <span class="meter-config-section-title">AÇÕES</span>
+                <div class="meter-config-btn-group">
+                    <button class="meter-config-pos-btn" style="flex:1;" onclick="handleAllNominal(_auxConfigMixIdx);">ALL NOMINAL (RESET PRE)</button>
+                </div>
+            </div>
+            <button onclick="closeAuxConfigModal()" class="meter-config-close">FECHAR</button>
+        </div>
+    </div>
     <!-- Overlay Info (gerenciado por overlay_info.js) -->
     <div class="overlay-info styled-blockingOverlay" id="overlayInfo"></div>
     <script src="modules/globals.js?v=4"></script>

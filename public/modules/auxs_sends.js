@@ -14,47 +14,34 @@ function handleAuxPreToggle(e, ch, auxIdx) {
     }
 }
 
-function renderAuxMixBusConfig(ch) {
-    if (ch < 36 || ch > 43) return '';
-    const mixIdx = ch - 36;
-    const mode = getMixBusMode(mixIdx);
-    const globalVal = getMixBusGlobal(mixIdx);
-    const prePoint = getMixBusPrePoint(mixIdx);
-
-    const isVariable = (mode === 0);
-    const isGlobalPre = (globalVal === 1);
-    const isPreOn = (prePoint === 1);
-
-    return `
-        <div class="aux-mixbus-topbar">
-            <div class="aux-mixbus-topbar-title">MIX ${mixIdx + 1} CONFIG</div>
-            <div class="aux-mixbus-config-row">
-                <span class="aux-mixbus-config-label">MODE:</span>
-                <div class="aux-mixbus-config-btns">
-                    <button class="aux-mixbus-btn ${isVariable ? 'active' : ''}" onclick="handleMixBusMode(${mixIdx}, 0)">VARIABLE</button>
-                    <button class="aux-mixbus-btn ${!isVariable ? 'active' : ''}" onclick="handleMixBusMode(${mixIdx}, 1)">FIXED</button>
-                </div>
-            </div>
-            <div class="aux-mixbus-config-row">
-                <span class="aux-mixbus-config-label">GLOBAL:</span>
-                <div class="aux-mixbus-config-btns">
-                    <button class="aux-mixbus-btn ${isGlobalPre ? 'global-active' : ''}" onclick="handleMixBusGlobal(${mixIdx}, 1)">PRE</button>
-                    <button class="aux-mixbus-btn ${!isGlobalPre ? 'global-active' : ''}" onclick="handleMixBusGlobal(${mixIdx}, 0)">POST</button>
-                </div>
-            </div>
-            <div class="aux-mixbus-config-row">
-                <span class="aux-mixbus-config-label">PRE-POINT:</span>
-                <div class="aux-mixbus-config-btns">
-                    <button class="aux-mixbus-btn ${isPreOn ? 'prepoint-active' : ''}" onclick="handleMixBusPrePoint(${mixIdx}, 1)">PRE ON</button>
-                    <button class="aux-mixbus-btn ${!isPreOn ? 'prepoint-active' : ''}" onclick="handleMixBusPrePoint(${mixIdx}, 0)">POST ON</button>
-                </div>
-            </div>
-        </div>
-    `;
+function getMixBusGlobalLabel(mixIdx) {
+    return getMixBusGlobal(mixIdx) === 1 ? 'PRE' : 'POST';
 }
 
-function handleMixBusMode(mixIdx, val) {
+function getMixBusPrePointLabel(mixIdx) {
+    return getMixBusPrePoint(mixIdx) === 1 ? 'PRE ON' : 'POST ON';
+}
+
+async function handleMixBusMode(mixIdx, val) {
+    const currentVal = getMixBusMode(mixIdx);
+    if (currentVal === val) return;
+    
+    const currentModeName = currentVal === 0 ? 'VARIABLE' : 'FIXED';
+    const targetModeName = val === 0 ? 'VARIABLE' : 'FIXED';
+    const mixName = `MIX ${mixIdx + 1}`;
+    
+    const confirmed = await ConfirmModal.show({
+        title: 'ALTERAR MODO DO AUXILIAR',
+        message: `Deseja realmente alterar o modo de <b>${mixName}</b> de <b>${currentModeName}</b> para <b>${targetModeName}</b>?<br><br><small style="color:#aaa;">No modo FIXED, o nível de envio dos canais é travado em valor nominal.</small>`,
+        type: 'warning',
+        confirmText: 'ALTERAR',
+        cancelText: 'CANCELAR'
+    });
+    
+    if (!confirmed) return;
+    
     setMixBusMode(mixIdx, val);
+    updateAuxConfigModalUI(mixIdx);
     const ch = 36 + mixIdx;
     if (activeConfigChannel === ch) {
         renderAuxs(ch);
@@ -188,12 +175,9 @@ function renderAuxs(ch) {
         }
     }
 
-    const topBarHtml = (ch >= 36 && ch <= 43) ? renderAuxMixBusConfig(ch) : '';
-
     body.style.flexDirection = 'column';
     body.style.alignItems = 'stretch';
     body.innerHTML = `
-        ${topBarHtml}
         <div class="aux-sends-area drag-scroll-area" style="display:flex; overflow-x:auto; flex:1; padding:0; gap:0; align-items:stretch;">
             ${html}
         </div>
@@ -422,3 +406,77 @@ window.handleAuxPreToggle = handleAuxPreToggle;
 window.handleMixBusMode = handleMixBusMode;
 window.handleMixBusGlobal = handleMixBusGlobal;
 window.handleMixBusPrePoint = handleMixBusPrePoint;
+
+window._auxConfigMixIdx = 0;
+
+window.openAuxConfigModal = function(mixIdx) {
+    window._auxConfigMixIdx = mixIdx;
+    const modal = document.getElementById('auxConfigModal');
+    if (!modal) return;
+    const title = document.getElementById('auxConfigTitle');
+    if (title) title.textContent = `CONFIGURAÇÃO - MIX ${mixIdx + 1}`;
+    updateAuxConfigModalUI(mixIdx);
+    modal.style.display = 'flex';
+};
+
+window.closeAuxConfigModal = function() {
+    const modal = document.getElementById('auxConfigModal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.updateAuxConfigModalUI = function(mixIdx) {
+    const mode = getMixBusMode(mixIdx);
+    const globalVal = getMixBusGlobal(mixIdx);
+    const prePoint = getMixBusPrePoint(mixIdx);
+
+    const modeGroup = document.getElementById('auxConfigModeGroup');
+    if (modeGroup) {
+        modeGroup.querySelectorAll('.meter-config-pos-btn').forEach(function(btn) {
+            const bm = btn.dataset.mode;
+            if (bm === 'variable') btn.classList.toggle('active', mode === 0);
+            else if (bm === 'fixed') btn.classList.toggle('active', mode === 1);
+        });
+    }
+
+    const globalGroup = document.getElementById('auxConfigGlobalGroup');
+    if (globalGroup) {
+        globalGroup.querySelectorAll('.meter-config-pos-btn').forEach(function(btn) {
+            const bm = btn.dataset.mode;
+            if (bm === 'pre') btn.classList.toggle('active', globalVal === 1);
+            else if (bm === 'post') btn.classList.toggle('active', globalVal === 0);
+        });
+    }
+
+    const prePointGroup = document.getElementById('auxConfigPrePointGroup');
+    if (prePointGroup) {
+        prePointGroup.querySelectorAll('.meter-config-pos-btn').forEach(function(btn) {
+            const bm = btn.dataset.mode;
+            if (bm === 'pre_on') btn.classList.toggle('active', prePoint === 1);
+            else if (bm === 'post_on') btn.classList.toggle('active', prePoint === 0);
+        });
+    }
+};
+
+window.updateAuxPositionBadgeUI = function(mixIdx) {
+    var globalBadge = document.getElementById('aux-global-badge-' + mixIdx);
+    var prepointBadge = document.getElementById('aux-prepoint-badge-' + mixIdx);
+    if (globalBadge) globalBadge.textContent = getMixBusGlobalLabel(mixIdx);
+    if (prepointBadge) prepointBadge.textContent = getMixBusPrePointLabel(mixIdx);
+};
+
+window.handleAllNominal = function(mixIdx) {
+    var auxIdx = mixIdx + 1;
+    setMixBusGlobal(mixIdx, 1);
+    setMixBusPrePoint(mixIdx, 1);
+    for (var i = 0; i < 32; i++) {
+        setAuxPre(i, auxIdx, true);
+    }
+    updateAuxConfigModalUI(mixIdx);
+    updateAuxPositionBadgeUI(mixIdx);
+    if (activeConfigChannel === (36 + mixIdx)) {
+        renderAuxs(36 + mixIdx);
+    }
+};
+
+window.getMixBusGlobalLabel = getMixBusGlobalLabel;
+window.getMixBusPrePointLabel = getMixBusPrePointLabel;

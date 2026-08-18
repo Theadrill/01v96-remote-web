@@ -190,11 +190,22 @@ socket.on('update', (d) => {
     }
 
     // --- MixBus: Mode, PrePoint ---
+    if (d.type === 'kAuxSendGlobal/kGlobal') {
+        if (typeof mixesState !== 'undefined' && mixesState[d.channel]) {
+            mixesState[d.channel].auxGlobal = d.value;
+            console.log(`[Sync/Update] MIX ${d.channel + 1} - Global atualizado para: ${d.value === 1 ? 'PRE' : 'POST'} (${d.value})`);
+        }
+        if (typeof window.updateAuxPositionBadgeUI === 'function') window.updateAuxPositionBadgeUI(d.channel);
+        if (typeof window.updateAuxConfigModalUI === 'function') window.updateAuxConfigModalUI(d.channel);
+        return;
+    }
     if (d.type === 'kAUXType/kAUXTypeIndex') {
         if (typeof mixesState !== 'undefined' && mixesState[d.channel]) {
             mixesState[d.channel].auxTypeMode = d.value;
             console.log(`[Sync/Update] MIX ${d.channel + 1} - Mode atualizado para: ${d.value === 1 ? 'Variable' : 'Fixed'} (${d.value})`);
         }
+        if (typeof window.updateAuxPositionBadgeUI === 'function') window.updateAuxPositionBadgeUI(d.channel);
+        if (typeof window.updateAuxConfigModalUI === 'function') window.updateAuxConfigModalUI(d.channel);
         return;
     }
     if (d.type === 'kAuxSendPrePoint/kPrePoint') {
@@ -203,6 +214,10 @@ socket.on('update', (d) => {
                 mixesState[i].auxSendPrePoint = d.value;
             }
         }
+        for (let j = 0; j < 8; j++) {
+            if (typeof window.updateAuxPositionBadgeUI === 'function') window.updateAuxPositionBadgeUI(j);
+        }
+        if (typeof window.updateAuxConfigModalUI === 'function') window.updateAuxConfigModalUI(window._auxConfigMixIdx || 0);
         console.log(`[Sync/Update] GLOBAL PRE POINT atualizado para todos os Mixes: ${d.value === 1 ? 'Pre-Fader' : 'Pre-EQ'} (${d.value})`);
         return;
     }

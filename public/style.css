@@ -10195,93 +10195,25 @@ body:not(.layout-desktop) .btn-aux-pre {
     border-radius: 4px;
 }
 
-/* ── Mix Bus Topbar Config (Mode / Pre-Point) ───────────────────────── */
-.aux-mixbus-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 16px;
-    padding: 6px 14px;
-    background: #12121c;
-    border-bottom: 1px solid #28283a;
-    flex-shrink: 0;
-    z-index: 10;
+/* ── Aux Config Modal & Position Section ─────────────────────────────── */
+.styled-auxConfigModal {
+    z-index: 2500 !important;
 }
 
-.aux-mixbus-topbar-title {
-    font-size: 11px;
-    font-weight: 900;
-    color: #ff9800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding-right: 8px;
-    border-right: 1px solid #333;
+.aux-config-content {
+    width: 90%;
+    max-width: 380px;
 }
 
-.aux-mixbus-config-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.aux-position-section {
+    border-color: #d4a017 !important;
 }
 
-.aux-mixbus-config-label {
-    font-size: 10px;
-    font-weight: 800;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.aux-position-section:hover {
+    filter: brightness(1.15);
+    background: rgba(212, 160, 23, 0.06);
 }
 
-.aux-mixbus-config-btns {
-    display: inline-flex;
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid #333;
-    background: #1e1e28;
-}
-
-.aux-mixbus-btn {
-    padding: 3px 10px;
-    font-size: 9px;
-    font-weight: 700;
-    border: none;
-    border-right: 1px solid #333;
-    background: transparent;
-    color: #666;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.15s ease;
-}
-
-.aux-mixbus-btn:last-child {
-    border-right: none;
-}
-
-.aux-mixbus-btn.active {
-    background: #00897b;
-    color: #ffffff;
-    font-weight: 900;
-}
-
-.aux-mixbus-btn.global-active {
-    background: #e65100;
-    color: #ffffff;
-    font-weight: 900;
-}
-
-.aux-mixbus-btn.prepoint-active {
-    background: #7b2ff2;
-    color: #ffffff;
-    font-weight: 900;
-}
-
-.aux-mixbus-btn:hover:not(.active):not(.global-active):not(.prepoint-active) {
-    background: #2a2a38;
-    color: #aaa;
-}
-
-body:not(.layout-desktop) .aux-mixbus-topbar {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 6px 10px;
+body:not(.layout-desktop) .aux-position-section {
+    display: none;
 }
