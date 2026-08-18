@@ -202,8 +202,8 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 - [x] Área de Patch nos Channel Strips Desktop (Etapa 2)
 - [ ] Fallback para Navegadores Antigos (Legacy Browser Compatibility)
 - [ ] Botão de Delay
-- [ ] Posição e Ponto de Inserção nos Auxiliares
-  - [ ] Fazer faders congelarem quando mode = FIXED
+- [x] Posição e Ponto de Inserção nos Auxiliares
+  - [x] Fazer faders congelarem quando mode = FIXED
   - [x] Emitir confirm modal quando alternar de VARIABLE <-> FIXED
 - [ ] Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)
 

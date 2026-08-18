@@ -466,7 +466,19 @@ window.updateAuxPositionBadgeUI = function(mixIdx) {
     if (prepointBadge) prepointBadge.textContent = getMixBusPrePointLabel(mixIdx);
 };
 
-window.handleAllNominal = function(mixIdx) {
+window.handleAllNominal = async function(mixIdx) {
+    const mixName = `MIX ${mixIdx + 1}`;
+    
+    const confirmed = await ConfirmModal.show({
+        title: 'RESETAR TODOS OS CANAIS PARA PRE',
+        message: `Deseja realmente resetar <b>todos os 32 canais</b> de <b>${mixName}</b> para a posição <b>PRE</b>?<br><br><small style="color:#aaa;">Esta operação irá configurar:<br>• GLOBAL INSERT → PRE<br>• PRE-POINT → PRE ON<br>• Todos os envios individuais → PRE</small>`,
+        type: 'warning',
+        confirmText: 'RESETAR',
+        cancelText: 'CANCELAR'
+    });
+    
+    if (!confirmed) return;
+    
     var auxIdx = mixIdx + 1;
     setMixBusGlobal(mixIdx, 1);
     setMixBusPrePoint(mixIdx, 1);
