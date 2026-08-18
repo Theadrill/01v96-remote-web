@@ -17,7 +17,7 @@ git add target/release/server_rust.exe target/release/remote_midi_server.exe
 git status
 
 # 4. Commit com mensagem padrão
-git commit -m "build: atualiza binários compilados do servidor (release)"
+git commit -m "build: atualização dos binários compilados do servidor (release)"
 
 # 5. Push
 git push
@@ -29,3 +29,4 @@ git push
 - O `iniciar_server_rust.bat` executa `target\release\server_rust.exe` diretamente.
 - Não crie GitHub release — o padrão é baixar o repositório e rodar o `.bat` localmente.
 - Se apenas o `server_rust.exe` mudou, o `git add` do `remote_midi_server.exe` será ignorado silenciosamente.
+
