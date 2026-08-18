@@ -206,6 +206,10 @@ socket.on('update', (d) => {
         }
         if (typeof window.updateAuxPositionBadgeUI === 'function') window.updateAuxPositionBadgeUI(d.channel);
         if (typeof window.updateAuxConfigModalUI === 'function') window.updateAuxConfigModalUI(d.channel);
+        const ch = 36 + d.channel;
+        if (activeConfigChannel === ch && typeof renderAuxs === 'function') {
+            renderAuxs(ch);
+        }
         return;
     }
     if (d.type === 'kAuxSendPrePoint/kPrePoint') {

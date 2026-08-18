@@ -946,6 +946,42 @@ html.legacy-ios .fader-card input[type=range]::-moz-range-thumb {
     border-color: #4a008a;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   Modo FIXED dos Auxiliares (Sends travados)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.aux-mode-fixed {
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+    filter: grayscale(100%);
+    cursor: not-allowed !important;
+}
+
+.aux-mode-fixed input[type=range] {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+.aux-mode-fixed .btn-state,
+.aux-mode-fixed .btn-nudge-desk,
+.aux-mode-fixed .btn-nudge,
+.aux-mode-fixed .btn-aux-pre,
+.aux-mode-fixed .btn-on-desk {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+}
+
+.aux-mode-fixed .desk-db-val,
+.aux-mode-fixed .fader-val {
+    opacity: 0.5 !important;
+    color: #666 !important;
+}
+
+.aux-mode-fixed .desk-ch-name,
+.aux-mode-fixed .ch-name {
+    opacity: 0.7 !important;
+}
+
 /* Sidebar e botÃƒÂµes globais */
 /* Sidebar e botÃƒÂµes globais */
 .sidebar {

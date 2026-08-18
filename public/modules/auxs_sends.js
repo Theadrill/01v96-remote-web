@@ -88,6 +88,8 @@ function renderAuxs(ch) {
     // --- MODO 1: MIXER DO BARRAMENTO (Se clicou em MIX 1-8, mostra os 32 canais enviando para ele) ---
     if (ch >= 36 && ch <= 43) {
         const auxIdx = ch - 35; // Mix 1 (36) vira Aux 1
+        const mixIdx = ch - 36;
+        const isMixFixed = (getMixBusMode(mixIdx) === 1);
         for (let i = 0; i < 32; i++) {
             const state = getChannelStateById(i);
             if (state && state.paired && i % 2 !== 0) continue;
@@ -117,7 +119,7 @@ function renderAuxs(ch) {
                 id: i,
                 title: baseTitle,
                 name: chName,
-                customClass: "fader-group-aux-send",
+                customClass: `fader-group-aux-send${isMixFixed ? ' aux-mode-fixed' : ''}`,
                 onAction: `toggleAuxOn(${i}, ${auxIdx})`,
                 onInputAction: "auxLevelInput",
                 onNudgeStartAction: "startAuxNudge",
