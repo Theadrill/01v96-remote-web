@@ -74,12 +74,6 @@
       "file": "custom_names_scene-ANDRE RIC 360-mesa-maria.json"
     },
     {
-      "custom_name": "SOMALIA 360",
-      "physical_scene": "SOMALIA 360",
-      "physical_id": 34,
-      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
-    },
-    {
       "custom_name": "LIVRE P SONHAR 3",
       "physical_scene": "LIVRE P SONHAR 3",
       "physical_id": 37,
@@ -114,6 +108,12 @@
       "physical_scene": "O PGD DE VCS 3",
       "physical_id": 28,
       "file": "custom_names_scene-O PGD DE VCS 3-mesa-maria.json"
+    },
+    {
+      "custom_name": "SOMALIA 360",
+      "physical_scene": "SOMALIA 360",
+      "physical_id": 34,
+      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
     }
   ]
 }
