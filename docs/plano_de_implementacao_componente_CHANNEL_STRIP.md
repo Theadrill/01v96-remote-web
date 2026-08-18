@@ -30,10 +30,10 @@ Com este plano, todos os canais surgirão de uma mesma fonte padronizada (`Chann
 - Cada fase tem **PARADA EXPLÍCITA** — aguardar aprovação do usuário.
 - Ao completar uma fase, marcar como `[X]` no checklist abaixo.
 - **NÃO** prosseguir para a próxima fase sem autorização expressa.
-- A ordem das fases foi definida para que o conhecimento acumulado em cada etapa alimente a próxima (temas vêm depois do piloto para não serem reescritos):
+- A ordem de execução prioriza o piloto antes dos temas (evita reescrever variáveis CSS antes de ter código real para mapear):
   - [ ] **FASE 1** — Arquitetura da Classe Base `ChannelStrip` e Presets
-  - [ ] **FASE 3** — Migração Piloto: Tela de Auxiliares e Sends (`auxs_sends.js`)
-  - [ ] **FASE 2** — Integração com Sistema de Temas YAML e `ThemeEditor`
+  - [ ] **FASE 2** — Migração Piloto: Tela de Auxiliares e Sends (`auxs_sends.js`)
+  - [ ] **FASE 3** — Integração com Sistema de Temas YAML e `ThemeEditor`
   - [ ] **FASE 4** — Migração da Tela Principal Desktop (Inputs 1-32, ST IN, Mix, Bus e Master)
   - [ ] **FASE 5** — Migração dos Mini-Faders em Modais (EQ, Dynamics, FX, Routing)
   - [ ] **FASE 6** — Suporte ao Modo Mobile & Validação de Sincronização
@@ -69,6 +69,8 @@ Cada Channel Strip é renderizado a partir de **7 Zonas Modulares**:
 ---
 
 ## Tabela de Recursos por Tela / Contexto (Feature Matrix)
+
+> ⚠️ **Atenção aos modos globais:** Os modos `musicianMode` e `technicianMixMode` alteram o comportamento dos canais da tela principal — quando ativos, o fader e o botão ON passam a controlar o **send do aux ativo** (`aux{N}` / `aux{N}On`) em vez do canal em si. O preset `mainInput` precisa receber o modo de operação atual para gerar as ações corretas.
 
 | Contexto / Tela | Header | Lock | Top Slot | Name | Middle Slot | ON | Nudges | Fader & Scale | Meter & Peak | Panpot | Patch |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -219,7 +221,7 @@ channel_strip:
 ## FASE 1 — Arquitetura da Classe Base `ChannelStrip` e Presets
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 2.
 
-- [ ] 1.1 Criar a estrutura da classe base universal `ChannelStrip` em `public/modules/channel_strip_component.js` (ou módulo dedicado compatível com ES5/ES6).
+- [ ] 1.1 Criar a estrutura da classe base universal `ChannelStrip` em `public/modules/channel_strip_component.js` (ES6+, alinhado com o padrão já usado no projeto).
 - [ ] 1.2 Implementar o resolvedor de opções e gerador das 7 zonas modulares (Header, Top Slot, Name, Middle Slot, ON, Fader/Meters, Pan/Patch).
 - [ ] 1.3 Implementar a fábrica de Presets declarativos:
   - `presets.mainInput(chIndex, options)`
@@ -233,31 +235,32 @@ channel_strip:
 
 ---
 
-## FASE 2 — Integração com Sistema de Temas YAML e `ThemeEditor`
+## FASE 2 — Migração Piloto: Tela de Auxiliares e Sends (`auxs_sends.js`)
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 3.
 
-- [ ] 2.1 Adicionar a seção `channel_strip:` em `public/themes/default.yaml` com comentários explicativos para cada chave.
-- [ ] 2.2 Replicar as propriedades da nova seção nos temas de teste (`teste_copia.yaml`, etc.).
-- [ ] 2.3 Mapear o carregamento das variáveis CSS (`--strip-*`) no método `loadTheme` e injetar dinamicamente no `:root`.
-- [ ] 2.4 Atualizar `public/modules/theme-editor.js` para categorizar e permitir edição visual em tempo real da seção `channel_strip`.
-- [ ] 2.5 Atualizar o arquivo de estilos `public/style.css` para consumir as variáveis CSS do tema.
+- [ ] 2.1 Refatorar a renderização dos 8 sends individuais de um canal (`renderAuxs` Modo 2) para utilizar `ChannelStrip.presets.auxSend()`.
+- [ ] 2.2 Refatorar a renderização dos 32 canais enviando para uma Mix (`renderAuxs` Modo 1) para utilizar `ChannelStrip.presets.mixMatrix()`.
+- [ ] 2.3 Garantir que a classe `aux-mode-fixed` seja aplicada ao card quando o mix estiver em modo FIXED — comportamento crítico que desabilita interação do fader.
+- [ ] 2.4 Validar comportamento dos botões PRE/POST, nível do fader, botão ON e atualização via socket.
+- [ ] 2.5 Verificar se os badges de patch e nomes customizados continuam sendo refletidos dinamicamente.
 
 ---
 
-## FASE 3 — Migração Piloto: Tela de Auxiliares e Sends (`auxs_sends.js`)
+## FASE 3 — Integração com Sistema de Temas YAML e `ThemeEditor`
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 4.
 
-- [ ] 3.1 Refatorar a renderização dos 8 sends individuais de um canal (`renderAuxs` Modo 2) para utilizar `ChannelStrip.presets.auxSend()`.
-- [ ] 3.2 Refatorar a renderização dos 32 canais enviando para uma Mix (`renderAuxs` Modo 1) para utilizar `ChannelStrip.presets.mixMatrix()`.
-- [ ] 3.3 Validar comportamento dos botões PRE/POST, nível do fader, botão ON, estado de canal travado (FIXED) e atualização via socket.
-- [ ] 3.4 Verificar se os badges de patch e nomes customizados continuam sendo refletidos dinamicamente.
+- [ ] 3.1 Adicionar a seção `channel_strip:` em `public/themes/default.yaml` com comentários explicativos para cada chave (executar após Fase 2 para mapear variáveis reais usadas pelo componente).
+- [ ] 3.2 Replicar as propriedades da nova seção nos temas de teste (`teste_copia.yaml`, etc.).
+- [ ] 3.3 Mapear o carregamento das variáveis CSS (`--strip-*`) no método `loadTheme` e injetar dinamicamente no `:root`.
+- [ ] 3.4 Atualizar `public/modules/theme-editor.js` para categorizar e permitir edição visual em tempo real da seção `channel_strip`.
+- [ ] 3.5 Atualizar o arquivo de estilos `public/style.css` para consumir as variáveis CSS do tema.
 
 ---
 
 ## FASE 4 — Migração da Tela Principal Desktop (Inputs 1-32, ST IN, Mix, Bus e Master)
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 5.
 
-- [ ] 4.1 Migrar a renderização dos Canais 1 a 32 na tela principal desktop para `ChannelStrip.presets.mainInput()`.
+- [ ] 4.1 Migrar a renderização dos Canais 1 a 32 na tela principal desktop para `ChannelStrip.presets.mainInput()`, garantindo que o preset receba o modo de operação atual (`musicianMode`, `technicianMixMode`) para gerar as ações corretas (canal vs. send do aux ativo).
 - [ ] 4.2 Migrar a renderização das saídas (MIX 1-8, BUS 1-8, ST IN 1-4) para `ChannelStrip.presets.output()`.
 - [ ] 4.3 Migrar o canal MASTER da tela principal desktop para `ChannelStrip.presets.master()`.
 - [ ] 4.4 Validar emparelhamento estéreo (Canais com largura dupla, faders linkados, panpot estéreo duplo).
