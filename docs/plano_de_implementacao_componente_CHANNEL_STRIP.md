@@ -30,7 +30,8 @@ Com este plano, todos os canais surgirão de uma mesma fonte padronizada (`Chann
 - Cada fase tem **PARADA EXPLÍCITA** — aguardar aprovação do usuário.
 - Ao completar uma fase, marcar como `[X]` no checklist abaixo.
 - **NÃO** prosseguir para a próxima fase sem autorização expressa.
-- A ordem de execução prioriza o piloto antes dos temas (evita reescrever variáveis CSS antes de ter código real para mapear):
+- A ordem de execução segue o princípio **dependências antes de implementação**: renomear e estabilizar o módulo existente → criar o novo orquestrador → criar o componente visual:
+  - [ ] **FASE -1** — Renomear `copy_paste.js` → `contextual_copy_paste.js` e atualizar todas as referências
   - [ ] **FASE 0** — Criação do Módulo `channel_operations.js` (dependência dos demais)
   - [ ] **FASE 1** — Arquitetura da Classe Base `ChannelStrip` e Presets
   - [ ] **FASE 2** — Migração Piloto: Tela de Auxiliares e Sends (`auxs_sends.js`)
@@ -240,17 +241,103 @@ channel_strip:
 
 ---
 
+## FASE -1 — Renomear `copy_paste.js` → `contextual_copy_paste.js`
+> ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 0.
+
+> ℹ️ **Por que renomear antes de tudo:** o nome `copy_paste.js` descreve o mecanismo, não o propósito. O módulo faz **cópia contextual de parâmetros da tela ativa** (EQ, Dynamics, AUX, Routing) — um sistema completamente diferente do `channel_operations.js` que fará cópia e troca **atômica entre dois canais completos**. O padrão adotado é **Intention-Revealing Names**: o nome do arquivo revela o que ele faz, não como. Isso também inclui renomear as variáveis globais que vazam o nome antigo para o resto do sistema (Opção B consciente — feito agora para evitar inconsistência acumulada).
+
+### Impacto mapeado — todos os arquivos que referenciam `copy_paste`:
+
+| Arquivo | Tipo de referência | O que muda |
+| :--- | :--- | :--- |
+| `public/index.html` | `<script src="modules/copy_paste.js">` | Atualizar para `contextual_copy_paste.js` |
+| `public/modules/copy_paste.js` | O arquivo em si | Renomear para `contextual_copy_paste.js` |
+| `public/modules/copy_paste.js` | `window.COPY_PASTE_BLACKLIST` | → `window.CONTEXTUAL_CLIPBOARD_BLACKLIST` |
+| `public/modules/copy_paste.js` | `window.isCopyPasteAllowedForView` | → `window.isContextualClipboardAllowed` |
+| `public/modules/sidebar.js` | Chama `copyActiveContext()` e `pasteActiveContext()` | Nomes públicos **não mudam** — são semânticos e corretos |
+| `docs/plano_feature_aux_insert_point.md` | Menciona `copy_paste.js` | Atualizar referências textuais |
+| `docs/plano_de_implementacao_componente_MODAL.md` | Menciona `copy_paste.js` | Atualizar referências textuais |
+| `docs/plano_de_implementação_COPYPASTE_*.md` | Vários — histórico de feature | Atualizar referências textuais (são docs históricos, baixa prioridade) |
+| `README.md` | `- [x] Refatorar Módulo copy_paste.js` | Atualizar para `contextual_copy_paste.js` |
+
+> ℹ️ **O que NÃO muda:** as funções públicas `window.copyActiveContext()`, `window.pasteActiveContext()`, `window.copyEQ()`, `window.contextClipboard`, `window.updateCopyPasteUIState()` e `window.pasteClipboard()` mantêm seus nomes — são semânticos e corretos. Apenas as variáveis que contêm `COPY_PASTE` no nome e que descrevem o mecanismo interno (blacklist, guard de view) serão renomeadas.
+
+### Checklist FASE -1:
+- [ ] -1.1 Renomear `public/modules/copy_paste.js` → `public/modules/contextual_copy_paste.js`
+- [ ] -1.2 Dentro do arquivo renomeado: `COPY_PASTE_BLACKLIST` → `CONTEXTUAL_CLIPBOARD_BLACKLIST` (2 ocorrências)
+- [ ] -1.3 Dentro do arquivo renomeado: `isCopyPasteAllowedForView` → `isContextualClipboardAllowed` (2 ocorrências — definição e uso interno)
+- [ ] -1.4 Atualizar `public/index.html`: `<script src="modules/copy_paste.js">` → `contextual_copy_paste.js`
+- [ ] -1.5 Buscar e atualizar qualquer chamada a `window.isCopyPasteAllowedForView` ou `window.COPY_PASTE_BLACKLIST` no restante do projeto (verificar `sidebar.js` e demais módulos)
+- [ ] -1.6 Atualizar referências textuais nos docs (`README.md`, `plano_feature_aux_insert_point.md`, `plano_de_implementacao_componente_MODAL.md`)
+- [ ] -1.7 Verificar no browser que os botões COPIAR/COLAR continuam funcionando normalmente após o renome
+
+---
+
 ## FASE 0 — Criação do Módulo `channel_operations.js` (Dependência dos Demais)
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 1.
 
 > ℹ️ O `channel_operations.js` é criado **antes** do `ChannelStrip` pois o componente vai chamar `window.openChannelOperations(ch)` — essa dependência precisa existir antes para evitar erros no console desde os primeiros testes na `test_strip.html`.
 
-- [ ] 0.1 Criar `public/modules/channel_operations.js` com o **stub completo** da API pública:
-  - `window.openChannelOperations(ch)` — Orquestra o Wizard de 3 modais (Ação → Grid → Confirmação).
-  - `window.channelOperationsSwap(chA, chB)` — Stub da lógica de troca (log amigável por enquanto).
-  - `window.channelOperationsCopy(chSrc, chDst)` — Stub da lógica de cópia (log amigável por enquanto).
-- [ ] 0.2 Documentar no `channel_operations.js` que a implementação real do motor de troca/cópia será detalhada no `plano_de_implementacao_troca_copia_canais.md`.
-- [ ] 0.3 Incluir `channel_operations.js` no carregamento do `index.html` (antes do `channel_strip_component.js`).
+### Decisões Arquiteturais Consolidadas (resultado do processo de design review)
+
+#### 1. Separação de responsabilidades (Event-Driven Architecture / SRP)
+
+O Long Press hoje vive incorretamente dentro do `channel_lock.js`. A arquitetura correta distribui as responsabilidades assim:
+
+| Módulo | Responsabilidade única |
+| :--- | :--- |
+| `ChannelStrip` (componente) | Detecta o gesto long press (timer ~500ms) e dispara `CustomEvent('ch:longpress', { bubbles: true, detail: { ch, element } })` — só se `hasLongPress: true` no preset |
+| `channel_operations.js` | Escuta `'ch:longpress'` no `document`, consulta estado do canal, monta e exibe o menu contextual dinamicamente |
+| `channel_lock.js` | **Responsabilidade única:** aplicar/remover lock e overlay. Expõe `applyLock(ch)`, `removeLock(ch)`, `isLocked(ch)`. Não detecta gesto, não abre modais |
+
+> ℹ️ **Por que `CustomEvent` e não callback?** Com callback `onLongPress(ch)` no preset, o strip conhece quem vai receber. Com `CustomEvent`, o strip não sabe — e não precisa saber. Qualquer módulo pode escutar `ch:longpress` sem mudar o strip. É testável isoladamente: basta disparar `document.dispatchEvent(new CustomEvent('ch:longpress', { detail: { ch: 0 } }))`. É extensível: analytics, logging, outros módulos se conectam sem tocar no strip.
+
+#### 2. Estado do Wizard — `_session` interna
+
+O `channel_operations.js` gerencia a navegação entre os 3 modais via uma variável de sessão interna ao módulo (escopo de closure/IIFE):
+
+```javascript
+// Variável de sessão — nasce quando o wizard abre, morre quando fecha ou cancela
+let _session = null; // null = nenhum wizard ativo
+
+// Abre quando o usuário clica em ⇄ (desktop) ou aciona via long press (mobile)
+function openChannelOperations(ch) {
+    _session = { sourceCh: ch, operation: null, targetCh: null };
+    _showModal1(); // Modal 1: TROCAR / COPIAR / CANCELAR
+}
+```
+
+Só um wizard pode estar ativo por vez — coerente com o uso em um mixer físico. A navegação de volta (Modal 3 → Modal 2) funciona chamando `ConfirmModal.show()` com o conteúdo anterior — o ConfirmModal fecha o atual e abre o novo automaticamente.
+
+#### 3. ConfirmModal — sem alterações na API
+
+O `ConfirmModal` já suporta `opts.buttons` com array `{ label, type, action }` que resolve a Promise com o `action` string. O Modal 1 (TROCAR / COPIAR / CANCELAR) já funciona com a API atual. **Zero impacto em chamadas existentes.**
+
+#### 4. Relação com `contextual_copy_paste.js` — sistemas independentes
+
+| | `contextual_copy_paste.js` | `channel_operations.js` |
+| :--- | :--- | :--- |
+| **O que opera** | Parâmetros da tela ativa (EQ, Dynamics, AUX, Routing) | Canal completo (todos os parâmetros) |
+| **Gatilho** | Botão COPIAR/COLAR contextual na dock/sidebar | Ícone `⇄` no header do strip ou Long Press |
+| **Destino** | A tela aberta no momento do paste | Canal escolhido no Grid (Modal 2) |
+| **Paradigma** | Clipboard — copia agora, cola depois | Operação atômica — fonte e destino definidos antes de executar |
+
+O `channel_operations.js` **reutiliza** a função `dispatchThrottledCommands` e a estrutura de snapshot de `executeCopyFullChannel` para a lógica de cópia direta (sem passar pelo clipboard). Para o **swap**, implementa lógica nova: snapshot A → snapshot B → aplica B em A → aplica A em B, tudo sequenciado via `dispatchThrottledCommands`.
+
+#### 5. Throttle do swap — risco com a 01V96
+
+Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFullChannel`. Por precaução com o processador da 01V96, o swap usa **`2× intervalMs`** do valor padrão do `dispatchThrottledCommands` — se o padrão é 20ms, o swap usa 40ms. Sem hardcode: o `channel_operations.js` lê o valor padrão e dobra na chamada. A cópia direta (copy) mantém o intervalo padrão pois gera a mesma quantidade de comandos que um `executePasteFullChannel` já existente.
+
+### Checklist FASE 0:
+- [ ] 0.1 Criar `public/modules/channel_operations.js` como IIFE com o **stub completo** da API pública:
+  - `window.openChannelOperations(ch)` — Orquestra o Wizard de 3 modais (Ação → Grid → Confirmação). No stub: `console.log('[ChannelOps] openChannelOperations:', ch)` + abre ConfirmModal com os 3 botões para validar o fluxo visual.
+  - `window.channelOperationsSwap(chA, chB)` — Stub: `console.log('[ChannelOps] SWAP:', chA, '↔', chB)`.
+  - `window.channelOperationsCopy(chSrc, chDst)` — Stub: `console.log('[ChannelOps] COPY:', chSrc, '→', chDst)`.
+  - Listener interno: `document.addEventListener('ch:longpress', _handleLongPress)` — monta o menu contextual dinâmico (COPIAR / TROCAR / TRAVAR ou DESTRAVAR / RENOMEAR) consultando `channel_lock.isLocked(ch)`.
+- [ ] 0.2 Refatorar `channel_lock.js` para remover a lógica de long press — expor apenas `applyLock(ch)`, `removeLock(ch)`, `isLocked(ch)`. A detecção de gesto migra para o `ChannelStrip` (FASE 1).
+- [ ] 0.3 Documentar no cabeçalho do `channel_operations.js` que a implementação real do motor de troca/cópia será detalhada no `plano_de_implementacao_troca_copia_canais.md`.
+- [ ] 0.4 Incluir `channel_operations.js` no `index.html` **após** `contextual_copy_paste.js` e **antes** de `channel_strip_component.js`.
+- [ ] 0.5 Verificar no browser que não há erros de console e que o listener de long press existente (ainda no `channel_lock.js` temporariamente) não entra em conflito.
 
 ---
 
@@ -259,21 +346,29 @@ channel_strip:
 
 - [ ] 1.1 Criar a estrutura da classe base universal `ChannelStrip` em `public/modules/channel_strip_component.js` (ES6+, alinhado com o padrão já usado no projeto).
 - [ ] 1.2 Implementar o resolvedor de opções e gerador das 7 zonas modulares (Header com suporte a sub-slots de Swap/Copy e Lock, Top Slot, Name, Middle Slot, ON, Fader/Meters, Pan/Patch).
-- [ ] 1.3 Implementar a fábrica de Presets declarativos:
-  - `presets.mainInput(chIndex, options)`
-  - `presets.master(options)`
-  - `presets.output(index, type, options)` (Mix / Bus / ST IN)
-  - `presets.auxSend({ ch, auxIdx, isPre, options })`
-  - `presets.mixMatrix({ ch, mixIdx, isFixed, isPre, options })`
-  - `presets.mini(chIndex, options)`
-- [ ] 1.4 Garantir compatibilidade total dos identificadores gerados (`ids`, `data-ch`, `data-pan-ch`, etc.) com as rotinas de sincronização existentes (`updateUI`, `socket.js`, `meter_canvas`/meters).
-- [ ] 1.5 **Critério de aceitação manual:** Montar um canal de cada preset em uma página de teste isolada (`public/test_strip.html`) e verificar visually no browser — antes de qualquer integração nas telas reais. A página deve cobrir:
+- [ ] 1.3 Implementar a feature flag `hasLongPress: true/false` no preset — quando `true`, o componente registra um timer de ~500ms no elemento do card e, ao expirar sem cancelamento, dispara:
+  ```javascript
+  element.dispatchEvent(new CustomEvent('ch:longpress', {
+      bubbles: true,
+      detail: { ch: config.ch, element }
+  }));
+  ```
+  O `channel_operations.js` (já carregado) escuta este evento no `document` e orquestra o menu contextual.
+- [ ] 1.4 Implementar a fábrica de Presets declarativos:
+  - `presets.mainInput(chIndex, options)` — `hasSwapCopy: true`, `hasLock: true`, `hasLongPress: true`
+  - `presets.master(options)` — `hasSwapCopy: false`, `hasLock: false`, `hasLongPress: false`
+  - `presets.output(index, type, options)` (Mix / Bus / ST IN) — `hasSwapCopy: true`, `hasLock: true`, `hasLongPress: true`
+  - `presets.auxSend({ ch, auxIdx, isPre, options })` — `hasSwapCopy: false`, `hasLock: false`, `hasLongPress: false`
+  - `presets.mixMatrix({ ch, mixIdx, isFixed, isPre, options })` — `hasSwapCopy: false`, `hasLock: false`, `hasLongPress: false`
+  - `presets.mini(chIndex, options)` — `hasSwapCopy: false`, `hasLock: false`, `hasLongPress: false`
+- [ ] 1.5 Garantir compatibilidade total dos identificadores gerados (`ids`, `data-ch`, `data-pan-ch`, etc.) com as rotinas de sincronização existentes (`updateUI`, `socket.js`, `meter_canvas`/meters).
+- [ ] 1.6 **Critério de aceitação manual:** Montar um canal de cada preset em uma página de teste isolada (`public/test_strip.html`) e verificar visualmente no browser — antes de qualquer integração nas telas reais. A página deve cobrir:
   - Canal input padrão (desbloqueado, solo, com ícone `⇄` e cadeado visíveis)
   - Canal input travado (lock ativo — ícones cobertos pelo overlay, comportamento esperado)
   - Canal estéreo emparelhado (largura dupla, sem ícone `⇄` individual ou com restrição de paridade documentada)
   - Canal Master
   - Canal Aux Send (sem ícones de operação — validar que feature flags desabilitam corretamente)
-- [ ] 1.6 Confirmar no `test_strip.html` que chamar `window.openChannelOperations(ch)` ao clicar em `⇄` não gera erros de console (stub da Fase 0 deve responder corretamente).
+- [ ] 1.7 Confirmar no `test_strip.html` que clicar em `⇄` dispara `window.openChannelOperations(ch)` sem erros de console (stub da Fase 0 deve responder corretamente) e que o long press no card dispara o `CustomEvent` capturado pelo `channel_operations.js`.
 
 ---
 
@@ -332,7 +427,84 @@ channel_strip:
 - [ ] 6.1 Implementar o renderer mobile (`renderMobile(config)`) como função separada, cobrindo as 5 zonas do mobile sem `if/else` cruzado com o desktop.
 - [ ] 6.2 Integrar `renderMobile` nos presets existentes via `ChannelStrip.render(config, 'mobile')`.
 - [ ] 6.3 Validar transição fluida entre modo Desktop e modo Mobile (troca de `layoutMode`).
-- [ ] 6.4 Validar o comportamento de Long Press no Mobile (`channel_lock.js` / `channel_operations.js`), garantindo que o menu contextual exiba dinamicamente `[TRAVAR CANAL]` ou `[DESTRAVAR CANAL]` conforme o estado atual do canal, além dos botões `[COPIAR/COLAR]`, `[TROCAR]` e `[RENOMEAR]`.
+- [ ] 6.4 Validar o comportamento de Long Press no Mobile (`channel_operations.js`), confirmando que:
+  - O `ChannelStrip` dispara corretamente o `CustomEvent('ch:longpress')` após ~500ms de toque
+  - O `channel_operations.js` monta o menu contextual com as opções corretas para o estado atual do canal
+  - O estado dinâmico `[TRAVAR CANAL]` / `[DESTRAVAR CANAL]` reflete corretamente `channel_lock.isLocked(ch)`
+  - As opções `[COPIAR/COLAR]`, `[TROCAR]` e `[RENOMEAR]` disparam os fluxos corretos
+  - O `channel_lock.js` neste ponto já **não contém mais nenhuma lógica de long press** — só `applyLock`, `removeLock`, `isLocked`
 - [ ] 6.5 Validar sincronização de VU Meters em Canvas e WebSockets sob alta carga (60 FPS).
 - [ ] 6.6 Limpeza de código legado obsoleto em `channel_strip.js` (remoção das funções `createDesktopStrip`, `createMobileStrip`, `createDesktopOutputStrip` e similares).
 - [ ] 6.7 Teste completo fim-a-fim em todos os navegadores/resoluções suportados.
+
+---
+
+## 🔴 Questões em Aberto — Aguardando Resposta do Usuário
+
+> Estas decisões foram identificadas durante o processo de design review (grill-me) e bloqueiam ou influenciam a implementação do `channel_operations.js`. Responder antes de iniciar a FASE 0.
+
+---
+
+### ❓ Branch 6 — Grid de Destino como Componente
+
+**Contexto:** O Modal 2 do wizard exibe um grid de canais filtrados pelo contexto do canal de origem (inputs → inputs, mix → mix, etc.). Um grid similar já existe no projeto — o `channel_toggler` monta uma grade de 32 botões com nomes customizados, estado visual ON/OFF e seleção por clique.
+
+**Questão:** O Grid do Modal 2 vai ser:
+
+- **A) Componente novo e genérico** criado dentro do `channel_operations.js` — monta o grid dinamicamente com os canais do contexto, sem reutilizar nada do toggler. Mais controle, mais código.
+- **B) Reutilização do mecanismo do `channel_toggler`** — extrai a lógica de renderização do grid para um helper compartilhado que tanto o toggler quanto o `channel_operations` usam. Menos duplicação, requer refatoração do toggler antes.
+- **C) Grid inline no ConfirmModal** — passa o HTML do grid como `message` do ConfirmModal com seleção via evento delegado. Mais simples, menos flexível para estilos futuros.
+
+**Impacto:** A opção B exige uma refatoração adicional (extrair o grid do toggler) que vira uma FASE -2 no plano. As opções A e C podem ser feitas dentro da própria FASE 0.
+
+---
+
+### ❓ Branch 7 — Renomear no Canal: o `RENOMEAR` usa o ConfirmModal com input existente?
+
+**Contexto:** O menu de Long Press inclui a opção `[RENOMEAR]`. O `ConfirmModal` já suporta `opts.input` com campo de texto e teclado virtual (`VirtualKeyboard`). O sistema de nomes já existe (`/api/names`, `resolvedNames`).
+
+**Questão:** A ação `RENOMEAR` do menu de Long Press vai:
+
+- **A) Chamar o modal de renomeação existente** (seja ele um modal separado que já existe no projeto, ou a abertura direta do ConfirmModal com `input:`) — sem código novo relevante.
+- **B) Ser implementada do zero** dentro do `channel_operations.js` usando `ConfirmModal` com `opts.input` + `VirtualKeyboard` + chamada à API de nomes.
+
+**Impacto:** Se já existe um modal de renomeação no projeto (ligado ao clique no nome do canal), a opção A é trivial — só chamar a função existente. Preciso saber se existe antes de planejar.
+
+---
+
+### ❓ Branch 8 — O throttle de 2× se aplica também à CÓPIA ou só ao SWAP?
+
+**Contexto:** Decidimos que o swap usa `2× intervalMs` (40ms se padrão for 20ms) por gerar o dobro de comandos. A cópia de canal completo (`channelOperationsCopy`) gera a mesma quantidade de comandos que um `executePasteFullChannel` — já existe no projeto com 20ms.
+
+**Questão:** A cópia de canal completo usa o mesmo 20ms padrão do `contextual_copy_paste.js`, ou também dobra por precaução? Não há razão técnica para dobrar (mesma quantidade de comandos), mas pode ser uma escolha de consistência.
+
+---
+
+---
+
+## 🛠️ Ferramentas de Design Review
+
+Para continuar o processo de perguntas e respostas sobre este plano, instale e execute o **grill-me**:
+
+```bash
+npx skillfish add vechain/vechain-ai-skills grill-me
+```
+
+Após instalar, no Claude Code use o comando:
+```
+/grill-me
+```
+
+---
+
+### ❓ Branch 9 — Feedback visual durante a execução do swap/cópia
+
+**Contexto:** Um swap completo com 40ms entre comandos e ~30-40 parâmetros por canal pode levar **2-3 segundos** para completar. Durante esse tempo, o operador não tem feedback de que algo está acontecendo.
+
+**Questão:** Durante a execução do swap/cópia, o sistema deve:
+
+- **A) Bloquear o modal com um estado de loading** (spinner no botão EXECUTAR, botão desabilitado) até o `onComplete` do `dispatchThrottledCommands`.
+- **B) Fechar o modal imediatamente** e mostrar um `OverlayInfo` de progresso (já existe no projeto — `OverlayInfo.show()`).
+- **C) Fechar o modal imediatamente** sem feedback intermediário — só mostrar o resultado final no `onComplete`.
+
+**Impacto:** A opção A é mais segura (impede duplo clique), a opção B é mais consistente com o padrão visual já usado no `contextual_copy_paste.js`, a opção C é mais simples mas pode confundir o operador se a mesa demorar.
