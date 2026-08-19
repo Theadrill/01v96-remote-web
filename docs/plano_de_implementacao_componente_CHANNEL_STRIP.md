@@ -46,7 +46,7 @@ Cada Channel Strip é renderizado a partir de **7 Zonas Modulares**:
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│ 1. HEADER / IDENTIFICAÇÃO (Rótulo CH 1, Badge Lock)    │
+│ 1. HEADER ZONE (Left Slot: Swap/Copy | Label | Lock)   │
 ├────────────────────────────────────────────────────────┤
 │ 2. TOP ACTION ZONE (Slot: SOLO | PRE/POST | Nada)      │
 ├────────────────────────────────────────────────────────┤
@@ -66,21 +66,35 @@ Cada Channel Strip é renderizado a partir de **7 Zonas Modulares**:
 └────────────────────────────────────────────────────────┘
 ```
 
+### Detalhamento da Zona 1 — Header Zone & Slots de Operação
+O cabeçalho do card possui uma estrutura flexível de 3 colunas:
+1. **Left Action Slot (Troca / Cópia):** Ícone de ação rápida (ex: `⇄` ou `swap`). No modo **Desktop**, abre o fluxo de operações de canal (orquestrado via `channel_operations.js`). No modo **Mobile**, **NÃO há ícones no cabeçalho** para manter a tela limpa e economizar espaço — no mobile, as opções de gerenciamento são disparadas via **Long Press** no cabeçalho do canal (`channel_lock.js`), exibindo o menu contextual dinâmico `[COPIAR/COLAR]` / `[TROCAR]` / `[TRAVAR CANAL ou DESTRAVAR CANAL]` (onde o botão de trava reflete dinamicamente o estado atual do canal) / `[RENOMEAR]`.
+2. **Center Label:** Rótulo do canal (`CH 1`, `MIX 1`, etc.), cujo clique rápido abre o modal de configuração/equalizador do canal.
+3. **Right Action Slot (Lock):** Cadeado de proteção contra alterações acidentais (`channel_lock.js`). No Desktop, exibe o ícone SVG; no Mobile, gerenciado via Long Press.
+
+> ℹ️ **Nota de Escopo Arquitetural:** O componente `ChannelStrip` é responsável apenas por **renderizar os slots/ícones e disparar os eventos** de clique correspondentes. A inteligência das operações, orquestração dos modais via `ConfirmModal`, cópia profunda de parâmetros, comunicação MIDI/WASM e inversão de canais ficarão centralizadas no módulo dedicado `public/modules/channel_operations.js`, que será **detalhado em um plano de implementação próprio** (`plano_de_implementacao_troca_copia_canais.md`).
+
+#### UX do Fluxo de Troca / Cópia (Wizard Linear de 3 Modais com Stack Navigation)
+Pensado para máxima acessibilidade e simplicidade para operadores de qualquer nível de conhecimento:
+- **Modal 1 (Escolha da Ação):** Pergunta simples: `[ 🔄 1. TROCAR CANAIS DE LUGAR ]` ou `[ 📋 2. COPIAR E COLAR NESTE CANAL ]` + `[ ❌ Cancelar / Fechar ]` (retorna para a tela principal). No mobile, esse fluxo já inicia direto a partir do clique na opção escolhida no menu de Long Press (`COPIAR` ou `TROCAR`).
+- **Modal 2 (Seleção do Destino no Grid):** Exibe o grid com todos os canais (1-32, Mixes, etc.) com números e nomes customizados. O canal de origem aparece destacado/desabilitado. Botão `[ ⬅️ Voltar ]` retorna para o Modal 1 (ou menu anterior); botão `[ ❌ Fechar ]` encerra e volta para a tela principal.
+- **Modal 3 (Confirmação Visual / ConfirmModal):** Exibe exatamente o que acontecerá (ex: *"CH 1 (Voz) trocará de posição com CH 5 (Baixo)"*). Botão `[ ⬅️ Cancelar ]` volta para o Grid (Modal 2); botão `[ ✅ EXECUTAR ]` aplica a operação e encerra.
+
 ---
 
 ## Tabela de Recursos por Tela / Contexto (Feature Matrix)
 
 > ⚠️ **Atenção aos modos globais:** Os modos `musicianMode` e `technicianMixMode` alteram o comportamento dos canais da tela principal — quando ativos, o fader e o botão ON passam a controlar o **send do aux ativo** (`aux{N}` / `aux{N}On`) em vez do canal em si. O preset `mainInput` precisa receber o modo de operação atual para gerar as ações corretas.
 
-| Contexto / Tela | Header | Lock | Top Slot | Name | Middle Slot | ON | Nudges | Fader & Scale | Meter & Peak | Panpot | Patch |
+| Contexto / Tela | Header Label | Swap/Copy (Left) | Lock (Right) | Top Slot | Name | Middle Slot | ON | Nudges | Fader & Scale | Meter & Peak | Panpot | Patch |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Main Input (1-32)** | Sim | Sim | SOLO | Sim | — | Sim | Sim | Sim (+10dB a -∞) | Sim | Sim | Sim |
-| **Main Master** | Sim | Opcional | Clear All Solos | Sim | Painel Medidores | Sim (Confirmação) | Sim | Sim (0dB a -∞) | Sim (Stereo) | Sim (Balance) | — |
-| **Main Mix / Bus** | Sim | Sim | SOLO | Sim | — | Sim | Sim | Sim (+10dB a -∞) | Sim | — | Sim (Out) |
-| **Main ST IN (1-4)** | Sim | Sim | SOLO | Sim | — | Sim | Sim | Sim (+10dB a -∞) | Sim (Stereo) | Sim | Sim |
-| **Aux Send (no canal)** | Sim | — | PRE / POST | Sim | — | Sim | Sim | Sim (+10dB a -∞) | — | — | — |
-| **Mix Matrix (quem envia)**| Sim | — | PRE / POST | Sim | — | Sim | Sim | Sim (+10dB a -∞) | — | — | Sim |
-| **Mini-Fader (Modais)** | Sim | — | SoloReplace | Sim (Editor) | Opcional (Aux Pos) | Sim | Sim | Sim | Sim | — | — |
+| **Main Input (1-32)** | Sim | Sim | Sim | SOLO | Sim | — | Sim | Sim | Sim (+10dB a -∞) | Sim | Sim | Sim |
+| **Main Master** | Sim | — | Opcional | Clear All Solos | Sim | Painel Medidores | Sim (Confirmação) | Sim | Sim (0dB a -∞) | Sim (Stereo) | Sim (Balance) | — |
+| **Main Mix / Bus** | Sim | Sim | Sim | SOLO | Sim | — | Sim | Sim | Sim (+10dB a -∞) | Sim | — | Sim (Out) |
+| **Main ST IN (1-4)** | Sim | Sim | Sim | SOLO | Sim | — | Sim | Sim | Sim (+10dB a -∞) | Sim (Stereo) | Sim | Sim |
+| **Aux Send (no canal)** | Sim | — | — | PRE / POST | Sim | — | Sim | Sim | Sim (+10dB a -∞) | — | — | — |
+| **Mix Matrix (quem envia)**| Sim | — | — | PRE / POST | Sim | — | Sim | Sim | Sim (+10dB a -∞) | — | — | Sim |
+| **Mini-Fader (Modais)** | Sim | — | — | SoloReplace | Sim (Editor) | Opcional (Aux Pos) | Sim | Sim | Sim | Sim | — | — |
 
 ---
 
@@ -109,7 +123,8 @@ Cada Channel Strip é renderizado a partir de **7 Zonas Modulares**:
 | **Panpot** | `desk-pan-indicator` — barra horizontal com thumb L/R | **Não existe** no mobile |
 | **Patch badge** | `desk-patch-zone` com efeito marquee — rodapé do card | **Não existe** no mobile |
 | **Header / Rótulo** | Zona própria `desk-label-wrapper` + cadeado SVG embutido | Dentro de `ch-clickable-zone top > h2.card-title` (sem zona separada) |
-| **Lock (cadeado)** | SVG explícito dentro do header do strip | Não existe no markup; `channel_lock.js` age via overlay externo |
+| **Lock (cadeado)** | SVG explícito dentro do header do strip | Não existe no markup; `channel_lock.js` age via overlay externo / long press |
+| **Troca / Cópia (Swap/Copy)** | Ícone explícito à esquerda do rótulo no header | Não existe no markup; acionado via menu de long press |
 | **Posição do botão ON** | Sempre no meio do card | Sobe para o **topo** quando em `musicianMode` via `onTop: true` |
 | **Container do fader** | `desk-fader-container` com `onwheel` para scroll | `fader-rotated-container` sem `onwheel`, orientação via CSS |
 | **Middle Slot Master** | Painel visual completo (`master-meter-section`) | Botão `btn-state` simples com label `MEDIDORES` |
@@ -222,7 +237,7 @@ channel_strip:
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 2.
 
 - [ ] 1.1 Criar a estrutura da classe base universal `ChannelStrip` em `public/modules/channel_strip_component.js` (ES6+, alinhado com o padrão já usado no projeto).
-- [ ] 1.2 Implementar o resolvedor de opções e gerador das 7 zonas modulares (Header, Top Slot, Name, Middle Slot, ON, Fader/Meters, Pan/Patch).
+- [ ] 1.2 Implementar o resolvedor de opções e gerador das 7 zonas modulares (Header com suporte a sub-slots de Swap/Copy e Lock, Top Slot, Name, Middle Slot, ON, Fader/Meters, Pan/Patch).
 - [ ] 1.3 Implementar a fábrica de Presets declarativos:
   - `presets.mainInput(chIndex, options)`
   - `presets.master(options)`
@@ -264,7 +279,8 @@ channel_strip:
 - [ ] 4.2 Migrar a renderização das saídas (MIX 1-8, BUS 1-8, ST IN 1-4) para `ChannelStrip.presets.output()`.
 - [ ] 4.3 Migrar o canal MASTER da tela principal desktop para `ChannelStrip.presets.master()`.
 - [ ] 4.4 Validar emparelhamento estéreo (Canais com largura dupla, faders linkados, panpot estéreo duplo).
-- [ ] 4.5 Validar suporte ao sistema de Lock de canal (`channel_lock.js`) e menu de contexto/configurações.
+- [ ] 4.5 Validar suporte ao sistema de Lock de canal (`channel_lock.js`), slot de troca/cópia de canal e menu de contexto/configurações.
+- [ ] 4.6 Atualizar o menu de contexto/ações (`channel_lock.js` / `channel_operations.js`) para suportar o estado dinâmico `[TRAVAR CANAL / DESTRAVAR CANAL]` e os novos gatilhos `[COPIAR/COLAR]` e `[TROCAR]`.
 
 ---
 
@@ -287,6 +303,7 @@ channel_strip:
 - [ ] 6.1 Implementar o renderer mobile (`renderMobile(config)`) como função separada, cobrindo as 5 zonas do mobile sem `if/else` cruzado com o desktop.
 - [ ] 6.2 Integrar `renderMobile` nos presets existentes via `ChannelStrip.render(config, 'mobile')`.
 - [ ] 6.3 Validar transição fluida entre modo Desktop e modo Mobile (troca de `layoutMode`).
-- [ ] 6.4 Validar sincronização de VU Meters em Canvas e WebSockets sob alta carga (60 FPS).
-- [ ] 6.5 Limpeza de código legado obsoleto em `channel_strip.js` (remoção das funções `createDesktopStrip`, `createMobileStrip`, `createDesktopOutputStrip` e similares).
-- [ ] 6.6 Teste completo fim-a-fim em todos os navegadores/resoluções suportados.
+- [ ] 6.4 Validar o comportamento de Long Press no Mobile (`channel_lock.js` / `channel_operations.js`), garantindo que o menu contextual exiba dinamicamente `[TRAVAR CANAL]` ou `[DESTRAVAR CANAL]` conforme o estado atual do canal, além dos botões `[COPIAR/COLAR]`, `[TROCAR]` e `[RENOMEAR]`.
+- [ ] 6.5 Validar sincronização de VU Meters em Canvas e WebSockets sob alta carga (60 FPS).
+- [ ] 6.6 Limpeza de código legado obsoleto em `channel_strip.js` (remoção das funções `createDesktopStrip`, `createMobileStrip`, `createDesktopOutputStrip` e similares).
+- [ ] 6.7 Teste completo fim-a-fim em todos os navegadores/resoluções suportados.

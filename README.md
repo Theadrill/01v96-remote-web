@@ -206,6 +206,7 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
   - [x] Fazer faders congelarem quando mode = FIXED
   - [x] Emitir confirm modal quando alternar de VARIABLE <-> FIXED
 - [ ] Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)
+- [ ] Troca de Canais (faz cópia de dois canais e cola um no outro para realizar uma troca)
 
 
 ---
