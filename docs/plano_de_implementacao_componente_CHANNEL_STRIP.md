@@ -1,6 +1,7 @@
 # Plano de Implementação — Componente ChannelStrip Universal + Integração com Temas
 
 ## Visão Geral
+
 Centralizar a criação, renderização e ciclo de vida de todos os **Channel Strips** do sistema em uma arquitetura única, declarativa e modular (Classe / Factory com Presets e Feature Flags).
 
 Atualmente, cada tela (Principal Desktop, Master, Saídas Mix/Bus/ST IN, Tela de Aux/Sends, Matriz de Mix, Modais com Mini-Faders e Mobile) constrói seus faders através de funções separadas ou blocos de strings HTML concatenados com dezenas de `if/else`, dificultando a manutenção, duplicação de regras e personalização visual.
@@ -12,21 +13,25 @@ Com este plano, todos os canais surgirão de uma mesma fonte padronizada (`Chann
 ## REGRAS EXPLÍCITAS
 
 ### 1. Commits
+
 - **NÃO FAZER COMMIT** sem pedido explícito do usuário.
 - Se continuar a conversa após push, **NÃO** repetir push a cada alteração — aguardar novo pedido.
 
 ### 2. Linters e Qualidade
+
 - Verificar console/erros após cada alteração de código.
 - Garantir retrocompatibilidade com o motor de sincronização WebAssembly/Socket/MIDI existente.
 - Corrigir warnings/erros antes de prosseguir.
 
 ### 3. Coexistência de Código Durante a Migração
+
 - O arquivo `channel_strip.js` original será **mantido intacto e em paralelo** durante toda a migração.
 - O novo componente viverá em arquivo próprio (`channel_strip_component.js`).
 - As funções antigas (`createDesktopStrip`, `createMobileStrip`, etc.) só serão removidas na **Fase 6**, após validação completa.
 - Isso evita bugs de ID duplicado e permite rollback seguro a qualquer momento.
 
 ### 4. Fases e Paradas
+
 - Cada fase tem **PARADA EXPLÍCITA** — aguardar aprovação do usuário.
 - Ao completar uma fase, marcar como `[X]` no checklist abaixo.
 - **NÃO** prosseguir para a próxima fase sem autorização expressa.
@@ -38,7 +43,7 @@ Com este plano, todos os canais surgirão de uma mesma fonte padronizada (`Chann
   - [ ] **FASE 3** — Integração com Sistema de Temas YAML e `ThemeEditor`
   - [ ] **FASE 4** — Migração da Tela Principal Desktop (Inputs 1-32, ST IN, Mix, Bus e Master)
   - [ ] **FASE 5** — Migração dos Mini-Faders em Modais (EQ, Dynamics, FX, Routing)
-  - [ ] **FASE 6** — Suporte ao Modo Mobile & Validação de Sincronização
+  - [ ] **FASE 6** — Suporte ao Modo Mobile &amp; Validação de Sincronização
 
 ---
 
@@ -68,8 +73,10 @@ Cada Channel Strip é renderizado a partir de **7 Zonas Modulares**:
 └────────────────────────────────────────────────────────┘
 ```
 
-### Detalhamento da Zona 1 — Header Zone & Slots de Operação
+### Detalhamento da Zona 1 — Header Zone &amp; Slots de Operação
+
 O cabeçalho do card possui uma estrutura flexível de 3 colunas:
+
 1. **Left Action Slot (Troca / Cópia):** Ícone de ação rápida (ex: `⇄` ou `swap`). No modo **Desktop**, abre o fluxo de operações de canal (orquestrado via `channel_operations.js`). No modo **Mobile**, **NÃO há ícones no cabeçalho** para manter a tela limpa e economizar espaço — no mobile, as opções de gerenciamento são disparadas via **Long Press** no cabeçalho do canal (`channel_lock.js`), exibindo o menu contextual dinâmico `[COPIAR/COLAR]` / `[TROCAR]` / `[TRAVAR CANAL ou DESTRAVAR CANAL]` (onde o botão de trava reflete dinamicamente o estado atual do canal) / `[RENOMEAR]`.
 2. **Center Label:** Rótulo do canal (`CH 1`, `MIX 1`, etc.), cujo clique rápido abre o modal de configuração/equalizador do canal.
 3. **Right Action Slot (Lock):** Cadeado de proteção contra alterações acidentais (`channel_lock.js`). No Desktop, exibe o ícone SVG; no Mobile, gerenciado via Long Press.
@@ -77,7 +84,9 @@ O cabeçalho do card possui uma estrutura flexível de 3 colunas:
 > ℹ️ **Nota de Escopo Arquitetural:** O componente `ChannelStrip` é responsável apenas por **renderizar os slots/ícones e disparar os eventos** de clique correspondentes. A inteligência das operações, orquestração dos modais via `ConfirmModal`, cópia profunda de parâmetros, comunicação MIDI/WASM e inversão de canais ficarão centralizadas no módulo dedicado `public/modules/channel_operations.js`, que será **detalhado em um plano de implementação próprio** (`plano_de_implementacao_troca_copia_canais.md`).
 
 #### UX do Fluxo de Troca / Cópia (Wizard Linear de 3 Modais com Stack Navigation)
+
 Pensado para máxima acessibilidade e simplicidade para operadores de qualquer nível de conhecimento:
+
 - **Modal 1 (Escolha da Ação):** Pergunta simples: `[ 🔄 1. TROCAR CANAIS DE LUGAR ]` ou `[ 📋 2. COPIAR E COLAR NESTE CANAL ]` + `[ ❌ Cancelar / Fechar ]` (retorna para a tela principal). No mobile, esse fluxo já inicia direto a partir do clique na opção escolhida no menu de Long Press (`COPIAR` ou `TROCAR`).
 - **Modal 2 (Seleção do Destino no Grid):** Exibe o grid com todos os canais (1-32, Mixes, etc.) com números e nomes customizados. O canal de origem aparece destacado/desabilitado. Botão `[ ⬅️ Voltar ]` retorna para o Modal 1 (ou menu anterior); botão `[ ❌ Fechar ]` encerra e volta para a tela principal.
 - **Modal 3 (Confirmação Visual / ConfirmModal):** Exibe exatamente o que acontecerá (ex: *"CH 1 (Voz) trocará de posição com CH 5 (Baixo)"*). Botão `[ ⬅️ Cancelar ]` volta para o Grid (Modal 2); botão `[ ✅ EXECUTAR ]` aplica a operação e encerra.
@@ -88,7 +97,7 @@ Pensado para máxima acessibilidade e simplicidade para operadores de qualquer n
 
 > ⚠️ **Atenção aos modos globais:** Os modos `musicianMode` e `technicianMixMode` alteram o comportamento dos canais da tela principal — quando ativos, o fader e o botão ON passam a controlar o **send do aux ativo** (`aux{N}` / `aux{N}On`) em vez do canal em si. O preset `mainInput` precisa receber o modo de operação atual para gerar as ações corretas.
 
-| Contexto / Tela | Header Label | Swap/Copy (Left) | Lock (Right) | Top Slot | Name | Middle Slot | ON | Nudges | Fader & Scale | Meter & Peak | Panpot | Patch |
+| Contexto / Tela | Header Label | Swap/Copy (Left) | Lock (Right) | Top Slot | Name | Middle Slot | ON | Nudges | Fader &amp; Scale | Meter &amp; Peak | Panpot | Patch |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Main Input (1-32)** | Sim | Sim | Sim | SOLO | Sim | — | Sim | Sim | Sim (+10dB a -∞) | Sim | Sim | Sim |
 | **Main Master** | Sim | — | Opcional | Clear All Solos | Sim | Painel Medidores | Sim (Confirmação) | Sim | Sim (0dB a -∞) | Sim (Stereo) | Sim (Balance) | — |
@@ -103,59 +112,67 @@ Pensado para máxima acessibilidade e simplicidade para operadores de qualquer n
 ## Análise Comparativa: Desktop vs. Mobile
 
 ### Elementos idênticos em ambos os layouts
-| Elemento | Detalhe |
-| :--- | :--- |
-| IDs gerados (`f0`, `v0`, `on0`, `solo0`, `name0`, `card0`) | Mesma convenção de nomenclatura |
-| `data-ch` e `data-partner-ch` | Mesmos atributos para sincronização |
-| Botão SOLO (com `soloReplace` no mini) | Mesma lógica, classe CSS diferente |
-| Botão ON | Mesma lógica, classe CSS diferente |
-| Fader `<input type="range">` | Idêntico |
-| Nudges `+` e `-` | Mesma lógica |
-| Slot Top (PRE/POST, etc.) via `topExtraHtml` | Mesmo mecanismo de injeção |
-| Middle Slot (Medidores/Posição) | Existe em ambos, estrutura visual diferente |
+
+
+| Elemento                                                   | Detalhe                                     |
+| :---------------------------------------------------------- | :------------------------------------------- |
+| IDs gerados (`f0`, `v0`, `on0`, `solo0`, `name0`, `card0`) | Mesma convenção de nomenclatura             |
+| `data-ch` e `data-partner-ch`                              | Mesmos atributos para sincronização         |
+| Botão SOLO (com `soloReplace` no mini)                     | Mesma lógica, classe CSS diferente          |
+| Botão ON                                                   | Mesma lógica, classe CSS diferente          |
+| Fader `<input type="range">`                               | Idêntico                                    |
+| Nudges `+` e `-`                                           | Mesma lógica                                |
+| Slot Top (PRE/POST, etc.) via `topExtraHtml`               | Mesmo mecanismo de injeção                  |
+| Middle Slot (Medidores/Posição)                            | Existe em ambos, estrutura visual diferente |
+
 
 ### Diferenças estruturais entre layouts
-| Elemento | Desktop | Mobile |
-| :--- | :--- | :--- |
-| **Classe do card raiz** | `fader-card-desktop` | `fader-card` |
-| **VU Meter** | `desk-meter-curtain` dentro do container do fader, ao lado do track | `mobile-meter-bg / mobile-meter-curtain` como **fundo absoluto** do card inteiro |
-| **Peak LED** | `desk-peak-led` (elemento separado, `id="p0"`) | **Não existe** no mobile |
-| **Escala dB** | `desk-db-scale` — lista completa de marks (+10dB a -∞) | `mobile-db-scale-overlay` — apenas 3 marks (0, -10, -30) |
-| **Valor dB textual** | `desk-db-val > span` — acima do fader, fora do nudge | Dentro do nudge de baixo, ao lado do botão `-` |
-| **Panpot** | `desk-pan-indicator` — barra horizontal com thumb L/R | **Não existe** no mobile |
-| **Patch badge** | `desk-patch-zone` com efeito marquee — rodapé do card | **Não existe** no mobile |
-| **Header / Rótulo** | Zona própria `desk-label-wrapper` + cadeado SVG embutido | Dentro de `ch-clickable-zone top > h2.card-title` (sem zona separada) |
-| **Lock (cadeado)** | SVG explícito dentro do header do strip | Não existe no markup; `channel_lock.js` age via overlay externo / long press |
-| **Troca / Cópia (Swap/Copy)** | Ícone explícito à esquerda do rótulo no header | Não existe no markup; acionado via menu de long press |
-| **Posição do botão ON** | Sempre no meio do card | Sobe para o **topo** quando em `musicianMode` via `onTop: true` |
-| **Container do fader** | `desk-fader-container` com `onwheel` para scroll | `fader-rotated-container` sem `onwheel`, orientação via CSS |
-| **Middle Slot Master** | Painel visual completo (`master-meter-section`) | Botão `btn-state` simples com label `MEDIDORES` |
+
+
+| Elemento                      | Desktop                                                             | Mobile                                                                           |
+| :----------------------------- | :------------------------------------------------------------------- | :-------------------------------------------------------------------------------- |
+| **Classe do card raiz**       | `fader-card-desktop`                                                | `fader-card`                                                                     |
+| **VU Meter**                  | `desk-meter-curtain` dentro do container do fader, ao lado do track | `mobile-meter-bg / mobile-meter-curtain` como **fundo absoluto** do card inteiro |
+| **Peak LED**                  | `desk-peak-led` (elemento separado, `id="p0"`)                      | **Não existe** no mobile                                                         |
+| **Escala dB**                 | `desk-db-scale` — lista completa de marks (+10dB a -∞)              | `mobile-db-scale-overlay` — apenas 3 marks (0, -10, -30)                         |
+| **Valor dB textual**          | `desk-db-val > span` — acima do fader, fora do nudge                | Dentro do nudge de baixo, ao lado do botão `-`                                   |
+| **Panpot**                    | `desk-pan-indicator` — barra horizontal com thumb L/R               | **Não existe** no mobile                                                         |
+| **Patch badge**               | `desk-patch-zone` com efeito marquee — rodapé do card               | **Não existe** no mobile                                                         |
+| **Header / Rótulo**           | Zona própria `desk-label-wrapper` + cadeado SVG embutido            | Dentro de `ch-clickable-zone top > h2.card-title` (sem zona separada)            |
+| **Lock (cadeado)**            | SVG explícito dentro do header do strip                             | Não existe no markup; `channel_lock.js` age via overlay externo / long press     |
+| **Troca / Cópia (Swap/Copy)** | Ícone explícito à esquerda do rótulo no header                      | Não existe no markup; acionado via menu de long press                            |
+| **Posição do botão ON**       | Sempre no meio do card                                              | Sobe para o **topo** quando em `musicianMode` via `onTop: true`                  |
+| **Container do fader**        | `desk-fader-container` com `onwheel` para scroll                    | `fader-rotated-container` sem `onwheel`, orientação via CSS                      |
+| **Middle Slot Master**        | Painel visual completo (`master-meter-section`)                     | Botão `btn-state` simples com label `MEDIDORES`                                  |
+
 
 ### Como os VU Meters funcionam (pipeline de calibração)
+
 Os meters **não são simples barras de porcentagem** — eles dependem de um pipeline de calibração manual que deve ser respeitado pelo componente:
 
-1. **`steps.json`** (`public/steps.json`): Arquivo de calibração manual que mapeia cada **step bruto da mesa (0–32)** para um valor em **dB** real. Há duas tabelas: `inputs` (canais 1-32, Mix, Bus, ST IN) e `master`. Esse mapeamento foi ajustado empiricamente para alinhar o visual com a curva real da mesa 01V96.
-
-2. **`steps.js`** (`public/modules/steps.js`): Carrega o `steps.json` via fetch e o expõe como `window.meterCalibration`. Disponibiliza `window.calibrateStep(step, isMaster)` — converte step bruto → porcentagem de preenchimento visual, passando pelo `dbToRaw()` para alinhar com a curva do fader.
-
-3. **`socket.js`** (motor WASM): Ao inicializar, chama `tryLoadWasmCalibration()` que injeta as tabelas calibradas no motor WebAssembly (`wasmMeterEngine.set_calibration_tables(inputsArray, masterArray)`). O WASM processa os packets de meter em tempo real e fornece os níveis suavizados.
-
+1. `**steps.json**` (`public/steps.json`): Arquivo de calibração manual que mapeia cada **step bruto da mesa (0–32)** para um valor em **dB** real. Há duas tabelas: `inputs` (canais 1-32, Mix, Bus, ST IN) e `master`. Esse mapeamento foi ajustado empiricamente para alinhar o visual com a curva real da mesa 01V96.
+2. `**steps.js**` (`public/modules/steps.js`): Carrega o `steps.json` via fetch e o expõe como `window.meterCalibration`. Disponibiliza `window.calibrateStep(step, isMaster)` — converte step bruto → porcentagem de preenchimento visual, passando pelo `dbToRaw()` para alinhar com a curva do fader.
+3. `**socket.js**` (motor WASM): Ao inicializar, chama `tryLoadWasmCalibration()` que injeta as tabelas calibradas no motor WebAssembly (`wasmMeterEngine.set_calibration_tables(inputsArray, masterArray)`). O WASM processa os packets de meter em tempo real e fornece os níveis suavizados.
 4. **Render dos curtains**: O motor de meters busca os elementos `.desk-meter-curtain` e `.mobile-meter-curtain` dentro de cada card (por `data-ch`) e atualiza via `scaleY(1 - percent/100)`. O Peak LED (`.desk-peak-led`) é acionado quando `percent >= 98`.
 
 **Implicação para o componente:** O `ChannelStrip` deve gerar os elementos de meter com as classes e estrutura exatas que o motor de `socket.js` espera encontrar. Mudar nomes de classes ou estrutura dos curtains **quebra os meters em tempo real**. Os IDs dos curtains no desktop seguem o padrão `m{id}` (ex: `mm0`, `mm-master`) e os do peak LED seguem `p{id}` — ambos são buscados pelo motor de sincronização e devem ser preservados.
 
 ### Mapa de zonas: Desktop (7) vs. Mobile (5)
-| Zona | Desktop | Mobile | Status |
-| :--- | :--- | :--- | :--- |
-| 1. Header/Label | `desk-label-wrapper` | Dentro de `ch-clickable-zone top` | Conteúdo equivalente, estrutura diferente |
-| 2. Top Slot (SOLO/PRE) | `btn-cue` ou slot customizado | `btn-state` ou slot customizado | Classe CSS diferente, lógica igual |
-| 3. Name Display | `desk-ch-name-zone` separado | Compartilha com a zona do header | Desktop separa, Mobile unifica |
-| 4. Middle Slot | Painel visual rico | Botão simples | Simplificado no mobile |
-| 5. Botão ON | `btn-on-desk` (posição fixa) | `btn-state` (posição muda no modo músico) | Posição condicional no mobile |
-| 6. Fader Core | Template complexo com escala completa, meter e peak LED | Fader simples, escala mínima, meter como fundo | Muito diferente |
-| 7. Pan + Patch | Presentes | **Ausentes** | Exclusivos do desktop |
+
+
+| Zona                   | Desktop                                                 | Mobile                                         | Status                                    |
+| :---------------------- | :------------------------------------------------------- | :---------------------------------------------- | :----------------------------------------- |
+| 1. Header/Label        | `desk-label-wrapper`                                    | Dentro de `ch-clickable-zone top`              | Conteúdo equivalente, estrutura diferente |
+| 2. Top Slot (SOLO/PRE) | `btn-cue` ou slot customizado                           | `btn-state` ou slot customizado                | Classe CSS diferente, lógica igual        |
+| 3. Name Display        | `desk-ch-name-zone` separado                            | Compartilha com a zona do header               | Desktop separa, Mobile unifica            |
+| 4. Middle Slot         | Painel visual rico                                      | Botão simples                                  | Simplificado no mobile                    |
+| 5. Botão ON            | `btn-on-desk` (posição fixa)                            | `btn-state` (posição muda no modo músico)      | Posição condicional no mobile             |
+| 6. Fader Core          | Template complexo com escala completa, meter e peak LED | Fader simples, escala mínima, meter como fundo | Muito diferente                           |
+| 7. Pan + Patch         | Presentes                                               | **Ausentes**                                   | Exclusivos do desktop                     |
+
 
 ### Decisão Arquitetural: um Preset, dois Renderers
+
 Desktop e mobile compartilham lógica de **dados, IDs e estados**, mas diferem estruturalmente demais no HTML para viver num único template com `if/else` — isso recriaria o problema que estamos resolvendo.
 
 **A solução é separar dados de apresentação:**
@@ -189,6 +206,7 @@ const stripMini = ChannelStrip.create(ChannelStrip.presets.mini(chIndex, { auxPo
 ## Integração com Sistema de Temas YAML
 
 ### Nova seção em `public/themes/default.yaml`:
+
 ```yaml
 # ─── CHANNEL STRIP ────────────────────────────────────────────
 # Estilização visual unificada de todos os faders/strips do sistema
@@ -242,27 +260,31 @@ channel_strip:
 ---
 
 ## FASE -1 — Renomear `copy_paste.js` → `contextual_copy_paste.js`
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 0.
 
 > ℹ️ **Por que renomear antes de tudo:** o nome `copy_paste.js` descreve o mecanismo, não o propósito. O módulo faz **cópia contextual de parâmetros da tela ativa** (EQ, Dynamics, AUX, Routing) — um sistema completamente diferente do `channel_operations.js` que fará cópia e troca **atômica entre dois canais completos**. O padrão adotado é **Intention-Revealing Names**: o nome do arquivo revela o que ele faz, não como. Isso também inclui renomear as variáveis globais que vazam o nome antigo para o resto do sistema (Opção B consciente — feito agora para evitar inconsistência acumulada).
 
 ### Impacto mapeado — todos os arquivos que referenciam `copy_paste`:
 
-| Arquivo | Tipo de referência | O que muda |
-| :--- | :--- | :--- |
-| `public/index.html` | `<script src="modules/copy_paste.js">` | Atualizar para `contextual_copy_paste.js` |
-| `public/modules/copy_paste.js` | O arquivo em si | Renomear para `contextual_copy_paste.js` |
-| `public/modules/copy_paste.js` | `window.COPY_PASTE_BLACKLIST` | → `window.CONTEXTUAL_CLIPBOARD_BLACKLIST` |
-| `public/modules/copy_paste.js` | `window.isCopyPasteAllowedForView` | → `window.isContextualClipboardAllowed` |
-| `public/modules/sidebar.js` | Chama `copyActiveContext()` e `pasteActiveContext()` | Nomes públicos **não mudam** — são semânticos e corretos |
-| `docs/plano_feature_aux_insert_point.md` | Menciona `copy_paste.js` | Atualizar referências textuais |
-| `docs/plano_de_implementacao_componente_MODAL.md` | Menciona `copy_paste.js` | Atualizar referências textuais |
-| `docs/plano_de_implementação_COPYPASTE_*.md` | Vários — histórico de feature | Atualizar referências textuais (são docs históricos, baixa prioridade) |
-| `README.md` | `- [x] Refatorar Módulo copy_paste.js` | Atualizar para `contextual_copy_paste.js` |
+
+| Arquivo                                           | Tipo de referência                                   | O que muda                                                             |
+| :------------------------------------------------- | :---------------------------------------------------- | :---------------------------------------------------------------------- |
+| `public/index.html`                               | `<script src="modules/copy_paste.js">`               | Atualizar para `contextual_copy_paste.js`                              |
+| `public/modules/copy_paste.js`                    | O arquivo em si                                      | Renomear para `contextual_copy_paste.js`                               |
+| `public/modules/copy_paste.js`                    | `window.COPY_PASTE_BLACKLIST`                        | → `window.CONTEXTUAL_CLIPBOARD_BLACKLIST`                              |
+| `public/modules/copy_paste.js`                    | `window.isCopyPasteAllowedForView`                   | → `window.isContextualClipboardAllowed`                                |
+| `public/modules/sidebar.js`                       | Chama `copyActiveContext()` e `pasteActiveContext()` | Nomes públicos **não mudam** — são semânticos e corretos               |
+| `docs/plano_feature_aux_insert_point.md`          | Menciona `copy_paste.js`                             | Atualizar referências textuais                                         |
+| `docs/plano_de_implementacao_componente_MODAL.md` | Menciona `copy_paste.js`                             | Atualizar referências textuais                                         |
+| `docs/plano_de_implementação_COPYPASTE_*.md`      | Vários — histórico de feature                        | Atualizar referências textuais (são docs históricos, baixa prioridade) |
+| `README.md`                                       | `- [x] Refatorar Módulo copy_paste.js`               | Atualizar para `contextual_copy_paste.js`                              |
+
 
 > ℹ️ **O que NÃO muda:** as funções públicas `window.copyActiveContext()`, `window.pasteActiveContext()`, `window.copyEQ()`, `window.contextClipboard`, `window.updateCopyPasteUIState()` e `window.pasteClipboard()` mantêm seus nomes — são semânticos e corretos. Apenas as variáveis que contêm `COPY_PASTE` no nome e que descrevem o mecanismo interno (blacklist, guard de view) serão renomeadas.
 
 ### Checklist FASE -1:
+
 - [ ] -1.1 Renomear `public/modules/copy_paste.js` → `public/modules/contextual_copy_paste.js`
 - [ ] -1.2 Dentro do arquivo renomeado: `COPY_PASTE_BLACKLIST` → `CONTEXTUAL_CLIPBOARD_BLACKLIST` (2 ocorrências)
 - [ ] -1.3 Dentro do arquivo renomeado: `isCopyPasteAllowedForView` → `isContextualClipboardAllowed` (2 ocorrências — definição e uso interno)
@@ -274,6 +296,7 @@ channel_strip:
 ---
 
 ## FASE 0 — Criação do Módulo `channel_operations.js` (Dependência dos Demais)
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 1.
 
 > ℹ️ O `channel_operations.js` é criado **antes** do `ChannelStrip` pois o componente vai chamar `window.openChannelOperations(ch)` — essa dependência precisa existir antes para evitar erros no console desde os primeiros testes na `test_strip.html`.
@@ -284,11 +307,13 @@ channel_strip:
 
 O Long Press hoje vive incorretamente dentro do `channel_lock.js`. A arquitetura correta distribui as responsabilidades assim:
 
-| Módulo | Responsabilidade única |
-| :--- | :--- |
+
+| Módulo                      | Responsabilidade única                                                                                                                                               |
+| :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ChannelStrip` (componente) | Detecta o gesto long press (timer ~500ms) e dispara `CustomEvent('ch:longpress', { bubbles: true, detail: { ch, element } })` — só se `hasLongPress: true` no preset |
-| `channel_operations.js` | Escuta `'ch:longpress'` no `document`, consulta estado do canal, monta e exibe o menu contextual dinamicamente |
-| `channel_lock.js` | **Responsabilidade única:** aplicar/remover lock e overlay. Expõe `applyLock(ch)`, `removeLock(ch)`, `isLocked(ch)`. Não detecta gesto, não abre modais |
+| `channel_operations.js`     | Escuta `'ch:longpress'` no `document`, consulta estado do canal, monta e exibe o menu contextual dinamicamente                                                       |
+| `channel_lock.js`           | **Responsabilidade única:** aplicar/remover lock e overlay. Expõe `applyLock(ch)`, `removeLock(ch)`, `isLocked(ch)`. Não detecta gesto, não abre modais              |
+
 
 > ℹ️ **Por que `CustomEvent` e não callback?** Com callback `onLongPress(ch)` no preset, o strip conhece quem vai receber. Com `CustomEvent`, o strip não sabe — e não precisa saber. Qualquer módulo pode escutar `ch:longpress` sem mudar o strip. É testável isoladamente: basta disparar `document.dispatchEvent(new CustomEvent('ch:longpress', { detail: { ch: 0 } }))`. É extensível: analytics, logging, outros módulos se conectam sem tocar no strip.
 
@@ -315,20 +340,23 @@ O `ConfirmModal` já suporta `opts.buttons` com array `{ label, type, action }` 
 
 #### 4. Relação com `contextual_copy_paste.js` — sistemas independentes
 
-| | `contextual_copy_paste.js` | `channel_operations.js` |
-| :--- | :--- | :--- |
-| **O que opera** | Parâmetros da tela ativa (EQ, Dynamics, AUX, Routing) | Canal completo (todos os parâmetros) |
-| **Gatilho** | Botão COPIAR/COLAR contextual na dock/sidebar | Ícone `⇄` no header do strip ou Long Press |
-| **Destino** | A tela aberta no momento do paste | Canal escolhido no Grid (Modal 2) |
-| **Paradigma** | Clipboard — copia agora, cola depois | Operação atômica — fonte e destino definidos antes de executar |
+
+|                 | `contextual_copy_paste.js`                            | `channel_operations.js`                                        |
+| :--------------- | :----------------------------------------------------- | :-------------------------------------------------------------- |
+| **O que opera** | Parâmetros da tela ativa (EQ, Dynamics, AUX, Routing) | Canal completo (todos os parâmetros)                           |
+| **Gatilho**     | Botão COPIAR/COLAR contextual na dock/sidebar         | Ícone `⇄` no header do strip ou Long Press                     |
+| **Destino**     | A tela aberta no momento do paste                     | Canal escolhido no Grid (Modal 2)                              |
+| **Paradigma**   | Clipboard — copia agora, cola depois                  | Operação atômica — fonte e destino definidos antes de executar |
+
 
 O `channel_operations.js` **reutiliza** a função `dispatchThrottledCommands` e a estrutura de snapshot de `executeCopyFullChannel` para a lógica de cópia direta (sem passar pelo clipboard). Para o **swap**, implementa lógica nova: snapshot A → snapshot B → aplica B em A → aplica A em B, tudo sequenciado via `dispatchThrottledCommands`.
 
 #### 5. Throttle do swap — risco com a 01V96
 
-Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFullChannel`. Por precaução com o processador da 01V96, o swap usa **`2× intervalMs`** do valor padrão do `dispatchThrottledCommands` — se o padrão é 20ms, o swap usa 40ms. Sem hardcode: o `channel_operations.js` lê o valor padrão e dobra na chamada. A cópia direta (copy) mantém o intervalo padrão pois gera a mesma quantidade de comandos que um `executePasteFullChannel` já existente.
+Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFullChannel`. Por precaução com o processador da 01V96, o swap usa `**2× intervalMs**` do valor padrão do `dispatchThrottledCommands` — se o padrão é 20ms, o swap usa 40ms. Sem hardcode: o `channel_operations.js` lê o valor padrão e dobra na chamada. A cópia direta (copy) mantém o intervalo padrão pois gera a mesma quantidade de comandos que um `executePasteFullChannel` já existente.
 
 ### Checklist FASE 0:
+
 - [ ] 0.1 Criar `public/modules/channel_operations.js` como IIFE com o **stub completo** da API pública:
   - `window.openChannelOperations(ch)` — Orquestra o Wizard de 3 modais (Ação → Grid → Confirmação). No stub: `console.log('[ChannelOps] openChannelOperations:', ch)` + abre ConfirmModal com os 3 botões para validar o fluxo visual.
   - `window.channelOperationsSwap(chA, chB)` — Stub: `console.log('[ChannelOps] SWAP:', chA, '↔', chB)`.
@@ -342,6 +370,7 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
 ---
 
 ## FASE 1 — Arquitetura da Classe Base `ChannelStrip` e Presets
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 2.
 
 - [ ] 1.1 Criar a estrutura da classe base universal `ChannelStrip` em `public/modules/channel_strip_component.js` (ES6+, alinhado com o padrão já usado no projeto).
@@ -353,6 +382,7 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
       detail: { ch: config.ch, element }
   }));
   ```
+
   O `channel_operations.js` (já carregado) escuta este evento no `document` e orquestra o menu contextual.
 - [ ] 1.4 Implementar a fábrica de Presets declarativos:
   - `presets.mainInput(chIndex, options)` — `hasSwapCopy: true`, `hasLock: true`, `hasLongPress: true`
@@ -373,6 +403,7 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
 ---
 
 ## FASE 2 — Migração Piloto: Tela de Auxiliares e Sends (`auxs_sends.js`)
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 3.
 
 - [ ] 2.1 Refatorar a renderização dos 8 sends individuais de um canal (`renderAuxs` Modo 2) para utilizar `ChannelStrip.presets.auxSend()`.
@@ -385,6 +416,7 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
 ---
 
 ## FASE 3 — Integração com Sistema de Temas YAML e `ThemeEditor`
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 4.
 
 - [ ] 3.1 Adicionar a seção `channel_strip:` em `public/themes/default.yaml` com comentários explicativos para cada chave (executar após Fase 2 para mapear variáveis reais usadas pelo componente).
@@ -396,6 +428,7 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
 ---
 
 ## FASE 4 — Migração da Tela Principal Desktop (Inputs 1-32, ST IN, Mix, Bus e Master)
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 5.
 
 - [ ] 4.1 Migrar a renderização dos Canais 1 a 32 na tela principal desktop para `ChannelStrip.presets.mainInput()`, garantindo que o preset receba o modo de operação atual (`musicianMode`, `technicianMixMode`) para gerar as ações corretas (canal vs. send do aux ativo).
@@ -409,6 +442,7 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
 ---
 
 ## FASE 5 — Migração dos Mini-Faders em Modais (EQ, Dynamics, FX, Routing)
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 6.
 
 - [ ] 5.1 Substituir a montagem do mini-fader no modal de EQ (`eq.js`) por `ChannelStrip.presets.mini()`.
@@ -419,7 +453,8 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
 
 ---
 
-## FASE 6 — Suporte ao Modo Mobile & Validação de Sincronização
+## FASE 6 — Suporte ao Modo Mobile &amp; Validação de Sincronização
+
 > ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de finalizar.
 
 > ℹ️ A análise comparativa desktop/mobile foi realizada antecipadamente e seus resultados estão documentados na seção **"Análise Comparativa: Desktop vs. Mobile"** acima. A decisão arquitetural já está tomada: **um preset, dois renderers separados** (`renderDesktop` e `renderMobile`). O item 6.0 de análise foi incorporado ao plano desde o início e não precisa ser revisitado.
@@ -439,72 +474,38 @@ Um swap completo entre dois canais gera ~2× os comandos de um `executePasteFull
 
 ---
 
-## 🔴 Questões em Aberto — Aguardando Resposta do Usuário
+## Decisões de Design Review Consolidadas (Fechamento dos Pontos em Aberto)
 
-> Estas decisões foram identificadas durante o processo de design review (grill-me) e bloqueiam ou influenciam a implementação do `channel_operations.js`. Responder antes de iniciar a FASE 0.
+Todas as questões levantadas durante o design review foram analisadas e respondidas, definindo a arquitetura definitiva das operações de canal:
 
----
+### 1. Grid de Destino do Wizard (Branch 6)
+- **Decisão:** **Componente Novo e Genérico** encapsulado para operações de canal (`ChannelGridSelector`), sem qualquer dependência ou acoplamento com macros ou `channel_toggler`.
+- **Justificativa:** O `channel_toggler` é estritamente uma macro do sistema. O seletor de canais para swap/cópia pertence ao domínio de engenharia do Channel Strip e deve ser limpo, modular e reutilizável pelo `channel_operations.js`.
 
-### ❓ Branch 6 — Grid de Destino como Componente
+### 2. Padronização Arquitetural das Operações de Canal (Branch 7)
+- **Decisão:** **Fachada Única com Absorção Total do Lock (`channel_operations.js`)**.
+- **Estrutura:**
+  - O componente `ChannelStrip` é **100% Camada de Apresentação (View)**: não conhece regras de negócio, MIDI, WASM ou Sockets. Apenas renderiza os slots e emite eventos DOM/CustomEvents (`ch:longpress`, clique no botão de troca `⇄`, lock, etc.).
+  - O `channel_lock.js` é **completamente absorvido e descontinuado**, integrando toda a lógica de trava, overlays e sincronização de lock diretamente no `channel_operations.js`.
+  - O `channel_operations.js` atua como a **Fachada Centralizadora de Ações do Canal (Single Point of Entry)**, expondo a interface pública `window.ChannelOperations`:
+    - `ChannelOperations.openChannelMenu(ch)`: Abre o menu contextual de ações (Mobile long press ou acionamento direto).
+    - `ChannelOperations.rename(ch)`: Centraliza a renomeação de canal usando o padrão universal do sistema (`ConfirmModal` com `opts.input` + `VirtualKeyboard` + sincronização via Socket/API `/api/names`).
+    - `ChannelOperations.toggleLock(ch)` e `ChannelOperations.isLocked(ch)`: Gerencia o sistema de trava de canais e overlays visuais.
+    - `ChannelOperations.startSwap(sourceCh)`: Inicia o wizard de 3 etapas de troca de canais.
+    - `ChannelOperations.startCopy(sourceCh)`: Inicia o fluxo de cópia direta de canal completo.
+  - **Filtragem Estrita de Compatibilidade no Modal 2:** O seletor `ChannelGridSelector` renderiza **apenas os canais compatíveis** com o canal de origem (se origem for mono, só lista monos; se linkado estéreo, só lista linkados; se mix/aux, só lista mixes), mitigando erros operacionais e otimizando a usabilidade ao vivo.
+  - **Confirmação Visual no Modal 3:** Exibe os cards lado a lado (A ↔ B) com dados comparativos e botão `[ ✅ CONFIRMAR ]`.
 
-**Contexto:** O Modal 2 do wizard exibe um grid de canais filtrados pelo contexto do canal de origem (inputs → inputs, mix → mix, etc.). Um grid similar já existe no projeto — o `channel_toggler` monta uma grade de 32 botões com nomes customizados, estado visual ON/OFF e seleção por clique.
+### 3. Throttle e Intervalo de Comandos (Branch 8)
+- **Decisão:** 
+  - **Cópia de canal completo (`copy`):** Constante fixa hardcoded de **20ms** (`const COPY_INTERVAL_MS = 20;`).
+  - **Troca de canais (`swap`):** O intervalo **NÃO é hardcoded** — é calculado como o dobro da cópia (`const SWAP_INTERVAL_MS = COPY_INTERVAL_MS * 2;` = 40ms), garantindo escalabilidade proporcional.
 
-**Questão:** O Grid do Modal 2 vai ser:
-
-- **A) Componente novo e genérico** criado dentro do `channel_operations.js` — monta o grid dinamicamente com os canais do contexto, sem reutilizar nada do toggler. Mais controle, mais código.
-- **B) Reutilização do mecanismo do `channel_toggler`** — extrai a lógica de renderização do grid para um helper compartilhado que tanto o toggler quanto o `channel_operations` usam. Menos duplicação, requer refatoração do toggler antes.
-- **C) Grid inline no ConfirmModal** — passa o HTML do grid como `message` do ConfirmModal com seleção via evento delegado. Mais simples, menos flexível para estilos futuros.
-
-**Impacto:** A opção B exige uma refatoração adicional (extrair o grid do toggler) que vira uma FASE -2 no plano. As opções A e C podem ser feitas dentro da própria FASE 0.
-
----
-
-### ❓ Branch 7 — Renomear no Canal: o `RENOMEAR` usa o ConfirmModal com input existente?
-
-**Contexto:** O menu de Long Press inclui a opção `[RENOMEAR]`. O `ConfirmModal` já suporta `opts.input` com campo de texto e teclado virtual (`VirtualKeyboard`). O sistema de nomes já existe (`/api/names`, `resolvedNames`).
-
-**Questão:** A ação `RENOMEAR` do menu de Long Press vai:
-
-- **A) Chamar o modal de renomeação existente** (seja ele um modal separado que já existe no projeto, ou a abertura direta do ConfirmModal com `input:`) — sem código novo relevante.
-- **B) Ser implementada do zero** dentro do `channel_operations.js` usando `ConfirmModal` com `opts.input` + `VirtualKeyboard` + chamada à API de nomes.
-
-**Impacto:** Se já existe um modal de renomeação no projeto (ligado ao clique no nome do canal), a opção A é trivial — só chamar a função existente. Preciso saber se existe antes de planejar.
-
----
-
-### ❓ Branch 8 — O throttle de 2× se aplica também à CÓPIA ou só ao SWAP?
-
-**Contexto:** Decidimos que o swap usa `2× intervalMs` (40ms se padrão for 20ms) por gerar o dobro de comandos. A cópia de canal completo (`channelOperationsCopy`) gera a mesma quantidade de comandos que um `executePasteFullChannel` — já existe no projeto com 20ms.
-
-**Questão:** A cópia de canal completo usa o mesmo 20ms padrão do `contextual_copy_paste.js`, ou também dobra por precaução? Não há razão técnica para dobrar (mesma quantidade de comandos), mas pode ser uma escolha de consistência.
+### 4. Feedback Visual durante Operações Assíncronas (Branch 9)
+- **Decisão:** **Feedback via `OverlayInfo` (`public/modules/overlay_info.js`)**.
+- **Fluxo:** Ao clicar em `[ CONFIRMAR ]` no Modal 3:
+  1. O modal de confirmação fecha imediatamente.
+  2. Um `OverlayInfo.show()` é exibido informando o progresso da operação em tempo real (ex: *"Trocando CH 1 ↔ CH 5... (34/68)"*).
+  3. Ao concluir (`onComplete` do `dispatchThrottledCommands`), o `OverlayInfo` é atualizado para sucesso e desaparece suavemente.
 
 ---
-
----
-
-## 🛠️ Ferramentas de Design Review
-
-Para continuar o processo de perguntas e respostas sobre este plano, instale e execute o **grill-me**:
-
-```bash
-npx skillfish add vechain/vechain-ai-skills grill-me
-```
-
-Após instalar, no Claude Code use o comando:
-```
-/grill-me
-```
-
----
-
-### ❓ Branch 9 — Feedback visual durante a execução do swap/cópia
-
-**Contexto:** Um swap completo com 40ms entre comandos e ~30-40 parâmetros por canal pode levar **2-3 segundos** para completar. Durante esse tempo, o operador não tem feedback de que algo está acontecendo.
-
-**Questão:** Durante a execução do swap/cópia, o sistema deve:
-
-- **A) Bloquear o modal com um estado de loading** (spinner no botão EXECUTAR, botão desabilitado) até o `onComplete` do `dispatchThrottledCommands`.
-- **B) Fechar o modal imediatamente** e mostrar um `OverlayInfo` de progresso (já existe no projeto — `OverlayInfo.show()`).
-- **C) Fechar o modal imediatamente** sem feedback intermediário — só mostrar o resultado final no `onComplete`.
-
-**Impacto:** A opção A é mais segura (impede duplo clique), a opção B é mais consistente com o padrão visual já usado no `contextual_copy_paste.js`, a opção C é mais simples mas pode confundir o operador se a mesa demorar.
