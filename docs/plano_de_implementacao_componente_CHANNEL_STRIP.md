@@ -31,6 +31,7 @@ Com este plano, todos os canais surgirão de uma mesma fonte padronizada (`Chann
 - Ao completar uma fase, marcar como `[X]` no checklist abaixo.
 - **NÃO** prosseguir para a próxima fase sem autorização expressa.
 - A ordem de execução prioriza o piloto antes dos temas (evita reescrever variáveis CSS antes de ter código real para mapear):
+  - [ ] **FASE 0** — Criação do Módulo `channel_operations.js` (dependência dos demais)
   - [ ] **FASE 1** — Arquitetura da Classe Base `ChannelStrip` e Presets
   - [ ] **FASE 2** — Migração Piloto: Tela de Auxiliares e Sends (`auxs_sends.js`)
   - [ ] **FASE 3** — Integração com Sistema de Temas YAML e `ThemeEditor`
@@ -226,10 +227,30 @@ channel_strip:
   meter_curtain_color: "#00ff00"
   peak_led_color: "#ff0000"
 
+  # Ícones do Header (Swap/Copy e Lock)
+  header_icon_color: "#666666"          # Cor padrão dos ícones no header
+  header_icon_hover: "#ffffff"          # Cor dos ícones ao hover
+  header_icon_lock_active: "#ff3b30"    # Cadeado quando canal está travado
+  header_icon_swap_color: "#aaaaaa"     # Ícone de troca/cópia (canal desbloqueado)
+
   # Patch Zone
   patch_bg: "#141414"
   patch_text_color: "#888888"
 ```
+
+---
+
+## FASE 0 — Criação do Módulo `channel_operations.js` (Dependência dos Demais)
+> ⚠️ **PARADA EXPLÍCITA** — Aguardar aprovação do usuário antes de prosseguir para a Fase 1.
+
+> ℹ️ O `channel_operations.js` é criado **antes** do `ChannelStrip` pois o componente vai chamar `window.openChannelOperations(ch)` — essa dependência precisa existir antes para evitar erros no console desde os primeiros testes na `test_strip.html`.
+
+- [ ] 0.1 Criar `public/modules/channel_operations.js` com o **stub completo** da API pública:
+  - `window.openChannelOperations(ch)` — Orquestra o Wizard de 3 modais (Ação → Grid → Confirmação).
+  - `window.channelOperationsSwap(chA, chB)` — Stub da lógica de troca (log amigável por enquanto).
+  - `window.channelOperationsCopy(chSrc, chDst)` — Stub da lógica de cópia (log amigável por enquanto).
+- [ ] 0.2 Documentar no `channel_operations.js` que a implementação real do motor de troca/cópia será detalhada no `plano_de_implementacao_troca_copia_canais.md`.
+- [ ] 0.3 Incluir `channel_operations.js` no carregamento do `index.html` (antes do `channel_strip_component.js`).
 
 ---
 
@@ -246,7 +267,13 @@ channel_strip:
   - `presets.mixMatrix({ ch, mixIdx, isFixed, isPre, options })`
   - `presets.mini(chIndex, options)`
 - [ ] 1.4 Garantir compatibilidade total dos identificadores gerados (`ids`, `data-ch`, `data-pan-ch`, etc.) com as rotinas de sincronização existentes (`updateUI`, `socket.js`, `meter_canvas`/meters).
-- [ ] 1.5 **Critério de aceitação manual:** Montar um canal de cada preset em uma página de teste isolada (`public/test_strip.html`) e verificar visualmente no browser se a estrutura HTML/DOM, IDs e atributos estão corretos — antes de qualquer integração nas telas reais.
+- [ ] 1.5 **Critério de aceitação manual:** Montar um canal de cada preset em uma página de teste isolada (`public/test_strip.html`) e verificar visually no browser — antes de qualquer integração nas telas reais. A página deve cobrir:
+  - Canal input padrão (desbloqueado, solo, com ícone `⇄` e cadeado visíveis)
+  - Canal input travado (lock ativo — ícones cobertos pelo overlay, comportamento esperado)
+  - Canal estéreo emparelhado (largura dupla, sem ícone `⇄` individual ou com restrição de paridade documentada)
+  - Canal Master
+  - Canal Aux Send (sem ícones de operação — validar que feature flags desabilitam corretamente)
+- [ ] 1.6 Confirmar no `test_strip.html` que chamar `window.openChannelOperations(ch)` ao clicar em `⇄` não gera erros de console (stub da Fase 0 deve responder corretamente).
 
 ---
 
@@ -258,6 +285,7 @@ channel_strip:
 - [ ] 2.3 Garantir que a classe `aux-mode-fixed` seja aplicada ao card quando o mix estiver em modo FIXED — comportamento crítico que desabilita interação do fader.
 - [ ] 2.4 Validar comportamento dos botões PRE/POST, nível do fader, botão ON e atualização via socket.
 - [ ] 2.5 Verificar se os badges de patch e nomes customizados continuam sendo refletidos dinamicamente.
+- [ ] 2.6 Confirmar que as feature flags `hasSwapCopy: false` e `hasLock: false` estão ativas nos presets `auxSend` e `mixMatrix` — os ícones de operação **não devem aparecer** nesses contextos.
 
 ---
 
@@ -281,6 +309,7 @@ channel_strip:
 - [ ] 4.4 Validar emparelhamento estéreo (Canais com largura dupla, faders linkados, panpot estéreo duplo).
 - [ ] 4.5 Validar suporte ao sistema de Lock de canal (`channel_lock.js`), slot de troca/cópia de canal e menu de contexto/configurações.
 - [ ] 4.6 Atualizar o menu de contexto/ações (`channel_lock.js` / `channel_operations.js`) para suportar o estado dinâmico `[TRAVAR CANAL / DESTRAVAR CANAL]` e os novos gatilhos `[COPIAR/COLAR]` e `[TROCAR]`.
+  - **Regra de paridade de links (obrigatória):** No Modal 2 (Grid de Destino), canais emparelhados/linkados em estéreo só podem ser trocados ou copiados com outro canal igualmente emparelhado/linkado. Canais solo só podem operar com canais solo. O grid deve desabilitar visualmente os destinos incompatíveis, exibindo um estado `disabled` com tooltip explicativo.
 
 ---
 
