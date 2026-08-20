@@ -5,6 +5,20 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 ![Tech Stack](https://img.shields.io/badge/Stack-Rust%20|%20Node.js%20|%20Socket.io-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active%20Development-success?style=for-the-badge)
 
+---
+
+## 📱 Requisitos Mínimos de Dispositivo (Frontend)
+
+| Dispositivo | Versão Mínima | Equivalente em Hardware |
+|---|---|---|
+| **iPhone** | iOS 10.3+ | iPhone 5 (2012) ou superior |
+| **iPad** | iPadOS 10.3+ | iPad 4ª geração (2012) ou superior |
+| **iPad mini** | iPadOS 10.3+ | iPad mini 2 (2013) ou superior |
+| **Android** | Chrome atualizado (qualquer Android 5.0+) | — |
+| **Desktop** | Chrome 73+ / Firefox 63+ / Safari 10.1+ | — |
+
+> ℹ️ O limite mínimo é definido pelo suporte a **Shadow DOM** e **ES Modules** nativos — tecnologias base da arquitetura do `public_new/` (v2). O `public/` (v1) continua funcionando em dispositivos mais antigos.
+
 > [!IMPORTANT]
 > **Aviso de Migração**: O core do servidor foi migrado para a linguagem **Rust** (`server_rust`), que agora é o foco principal do desenvolvimento visando performance máxima, estabilidade e baixíssima latência. O servidor legado em **Node.js** continua funcional, porém possui menos features e em breve será considerado obsoleto. O frontendcontinua em Vanilla JS.
 
@@ -207,6 +221,22 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
   - [x] Emitir confirm modal quando alternar de VARIABLE <-> FIXED
 - [ ] Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)
 - [ ] Troca de Canais (faz cópia de dois canais e cola um no outro para realizar uma troca)
+
+### 🏗️ Refatoração Arquitetural — v2 (`public_new/`)
+
+- [ ] Criar `MeterBus` como módulo ES (`import/export`) — pub/sub central de níveis de áudio por frame
+- [ ] Refatorar `socket.js`: substituir `querySelector` global + `buildMeterCache` por `MeterBus.frame()`
+- [ ] Criar `<channel-strip>` Web Component com Shadow DOM
+- [ ] Implementar sistema de CSS 100% via Custom Properties (`--strip-*`) no Shadow DOM
+- [ ] Migrar sistema de temas YAML para injeção via `:root` + `host.style.setProperty()` por faixa de canal
+- [ ] Migrar todos os scripts para ES Modules nativos (`type="module"`, zero globals implícitas)
+- [ ] Implementar presets declarativos: `mainInput`, `master`, `output`, `auxSend`, `mixMatrix`, `mini`
+- [ ] Migrar tela de Auxiliares e Sends (`auxs_sends.js`) para Web Components (piloto)
+- [ ] Migrar tela Principal Desktop (Inputs 1-32, ST IN, Mix, Bus, Master)
+- [ ] Migrar Mini-Faders nos Modais (EQ, Dynamics, FX, Routing)
+- [ ] Implementar renderer Mobile (`renderMobile`) — 5 zonas, sem `if/else` cruzado com desktop
+- [ ] Validar `/new` em produção com técnico de confiança antes de promover a padrão
+- [ ] Promover `public_new/` a padrão (`/`) e arquivar `public/` como legado
 
 
 ---

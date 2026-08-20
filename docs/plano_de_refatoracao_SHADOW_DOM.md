@@ -6,6 +6,21 @@
 
 ---
 
+## Princípio Fundamental — Sem Anti-Patterns
+
+> **Esta regra se sobrepõe a qualquer decisão de conveniência ou velocidade.**
+>
+> O `public_new/` é uma reescrita profissional. Toda decisão técnica deve seguir o padrão adotado por empresas como Google, Microsoft, Adobe, Yamaha e Allen & Heath em seus sistemas de design e interfaces de controle de áudio profissional. Se a escolha correta exige mais trabalho, reescrita de arquivos existentes ou mudança de infraestrutura — fazemos. Facilidade de implementação **nunca** é critério de decisão arquitetural.
+>
+> Anti-patterns explicitamente proibidos neste projeto:
+> - `window.algo` — globals implícitas. Usar módulos ES com `import/export`.
+> - `querySelector` global para sincronização de estado — usar pub/sub (MeterBus).
+> - CSS com seletores que dependem de estrutura interna de componentes — usar CSS Custom Properties.
+> - Lógica de negócio dentro de componentes visuais — separar camadas View / Logic / Data.
+> - `if/else` cruzando contextos diferentes num mesmo componente — usar presets declarativos.
+
+---
+
 ## Contexto e Motivação
 
 O sistema atual (`public/`) usa DOM aberto com `querySelector` global para sincronização de VU Meters e faders via `socket.js`. Isso funciona, mas cria acoplamento estrutural entre o motor de sincronização e a estrutura HTML dos componentes — qualquer refatoração visual exige atenção ao `socket.js`.
