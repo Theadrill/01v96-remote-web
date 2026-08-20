@@ -14,105 +14,128 @@ html {
     --scrollbar-border-color: #0f141c;
 
     /* ─── CHANNEL STRIP (Tema YAML) ─── */
-    --strip-width-desktop: 72px;
-    --strip-min-width-desktop: 65px;
-    --strip-border-radius: 6px;
-    --strip-border-color: #333333;
+    --strip-width-desktop: 86px;
+    --strip-min-width-desktop: 86px;
+    --strip-max-width-desktop: 86px;
+    --strip-border-radius: 0px;
+    --strip-border-color: #111111;
     --strip-border-width: 1px;
-    --strip-card-bg: #1e1e24;
-    --strip-card-bg-on: rgba(255, 235, 59, 0.04);
-    --strip-padding: 6px;
-    --strip-gap: 4px;
+    --strip-card-bg: #222222;
+    --strip-card-bg-on-g1: #1a2633;
+    --strip-card-bg-on-g2: #1a2b22;
+    --strip-card-bg-on: #1a2633;
+    --strip-card-bg-master: #3d1a1a;
+    --strip-card-bg-master-on: #5d1a1a;
+    --strip-card-bg-master-mobile: rgba(100, 0, 0, 0.9);
+    --strip-border-master-mobile: #880000;
+    --strip-padding: 0px;
+    --strip-gap: 0px;
 
     /* Header / Label */
     --strip-header-font-size: 11px;
-    --strip-header-font-weight: bold;
-    --strip-header-height: 22px;
-    --strip-header-radius: 4px;
-    --strip-header-text-color: #ffffff;
-    --strip-header-bg-input: #2a2a32;
-    --strip-header-bg-st-in: #1b3a4b;
-    --strip-header-bg-aux: #3d2645;
-    --strip-header-bg-bus: #1e3d2f;
-    --strip-header-bg-master: #4a1c1c;
+    --strip-header-font-weight: 800;
+    --strip-header-height: 26px;
+    --strip-header-radius: 0px;
+    --strip-header-text-color: #00adef;
+    --strip-header-bg-input: #003a5e;
+    --strip-header-bg-st-in: #14283d;
+    --strip-header-bg-aux: #332800;
+    --strip-header-bg-bus: #002e27;
+    --strip-header-bg-master: #2b2b2b;
+    --strip-header-text-master: #888888;
+    --strip-header-bg-master-on: #4a1c1c;
+    --strip-header-text-master-on: #ff8080;
 
     /* Visor LCD de Nome */
-    --strip-name-display-bg: #0d1b0d;
-    --strip-name-display-border: #1b3a1b;
-    --strip-name-display-text-color: #00e676;
-    --strip-name-display-font-size: 12px;
+    --strip-name-display-bg: #000000;
+    --strip-name-display-border: #333333;
+    --strip-name-display-text-color: #00ff00;
+    --strip-name-display-font-size: 11px;
+    --strip-name-display-font-weight: bold;
     --strip-name-display-font-family: monospace;
-    --strip-name-display-height: 24px;
+    --strip-name-display-height: 32px;
     --strip-name-display-radius: 4px;
 
     /* Botão SOLO */
-    --strip-btn-solo-bg: #2b2b2b;
+    --strip-btn-solo-bg: #333333;
     --strip-btn-solo-text-color: #888888;
     --strip-btn-solo-border: #444444;
-    --strip-btn-solo-active-bg: #ff9800;
+    --strip-btn-solo-active-bg: #ffc107;
     --strip-btn-solo-active-text-color: #000000;
-    --strip-btn-solo-height: 24px;
+    --strip-btn-solo-active-border: #ffffff;
+    --strip-btn-solo-height: 28px;
     --strip-btn-solo-radius: 4px;
-    --strip-btn-solo-font-size: 11px;
+    --strip-btn-solo-font-size: 10px;
     --strip-btn-solo-font-weight: bold;
 
+    /* Botão PRE / POST (Sends / Auxiliares) */
+    --strip-btn-pre-post-bg: #333333;
+    --strip-btn-pre-post-text-color: #888888;
+    --strip-btn-pre-post-border: #444444;
+    --strip-btn-pre-post-active-bg: #8e24aa;
+    --strip-btn-pre-post-active-text-color: #ffffff;
+    --strip-btn-pre-post-active-border: #ba68c8;
+    --strip-btn-pre-post-active-glow: 0 0 10px rgba(142, 36, 170, 0.5);
+
     /* Botão ON */
-    --strip-btn-on-bg: #2b2b2b;
+    --strip-btn-on-bg: #333333;
     --strip-btn-on-text-color: #888888;
     --strip-btn-on-border: #444444;
-    --strip-btn-on-active-bg: #ffeb3b;
-    --strip-btn-on-active-text-color: #000000;
-    --strip-btn-on-active-glow: 0 0 10px rgba(255, 235, 59, 0.5);
-    --strip-btn-on-height: 28px;
+    --strip-btn-on-active-bg: #ff4500;
+    --strip-btn-on-active-text-color: #ffffff;
+    --strip-btn-on-active-border: #ffaa80;
+    --strip-btn-on-active-glow: 0 0 15px rgba(255, 69, 0, 0.4);
+    --strip-btn-on-height: 43px;
     --strip-btn-on-radius: 4px;
-    --strip-btn-on-font-size: 12px;
-    --strip-btn-on-font-weight: 900;
+    --strip-btn-on-font-size: 11px;
+    --strip-btn-on-font-weight: 800;
 
     /* Botões Nudge (+ / -) */
-    --strip-btn-nudge-bg: #25252b;
+    --strip-btn-nudge-bg: #333333;
     --strip-btn-nudge-text-color: #cccccc;
-    --strip-btn-nudge-border: #3a3a44;
-    --strip-btn-nudge-hover-bg: #32323c;
-    --strip-btn-nudge-height: 20px;
-    --strip-btn-nudge-radius: 3px;
+    --strip-btn-nudge-border: #444444;
+    --strip-btn-nudge-hover-bg: #555555;
+    --strip-btn-nudge-height: 28px;
+    --strip-btn-nudge-width: 28px;
+    --strip-btn-nudge-radius: 50%;
+    --strip-btn-nudge-font-size: 16px;
 
     /* Display dB */
-    --strip-db-display-text-color: #00e676;
-    --strip-db-display-font-size: 11px;
+    --strip-db-display-text-color: #5cacee;
+    --strip-db-display-font-size: 13px;
     --strip-db-display-font-weight: bold;
-    --strip-db-display-font-family: monospace;
+    --strip-db-display-font-family: 'Arial Narrow', sans-serif;
+    --strip-db-display-height: 30px;
 
     /* Fader Track & Knob */
     --strip-fader-track-width: 6px;
     --strip-fader-track-bg: #101012;
     --strip-fader-track-border: #2a2a30;
     --strip-fader-track-radius: 3px;
-    --strip-fader-knob-width: 42px;
-    --strip-fader-knob-height: 28px;
-    --strip-fader-knob-bg: #e1e1e6;
+    --strip-fader-knob-width: 40px;
+    --strip-fader-knob-height: 40px;
+    --strip-fader-knob-bg: #eeeeee;
     --strip-fader-knob-line-color: #000000;
-    --strip-fader-knob-border: #8d8d99;
-    --strip-fader-knob-radius: 3px;
-    --strip-fader-knob-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    --strip-fader-knob-border: 2px solid #000000;
+    --strip-fader-knob-radius: 6px;
+    --strip-fader-knob-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), 0 0 5px rgba(255, 255, 255, 0.2) inset;
 
     /* Meter & Peak */
-    --strip-meter-track-width: 4px;
-    --strip-meter-gradient-low: #00e676;
-    --strip-meter-gradient-mid: #ffeb3b;
-    --strip-meter-gradient-peak: #ff1744;
-    --strip-peak-led-off: #3a1515;
-    --strip-peak-led-on: #ff1744;
-    --strip-peak-led-glow: 0 0 8px #ff1744;
+    --strip-meter-track-width: 5px;
+    --strip-meter-gradient: linear-gradient(to top, #28a745 0%, #28a745 40%, #ffc107 50%, #dc3545 80%, #ff0000 100%);
+    --strip-peak-led-off: #252525;
+    --strip-peak-led-on: #ff0000;
+    --strip-peak-led-glow: 0 0 8px #ff4444;
 
     /* Escala dB */
-    --strip-scale-tick-color: #444444;
-    --strip-scale-tick-small-color: #333333;
-    --strip-scale-text-color: #888888;
+    --strip-scale-tick-color: #555555;
+    --strip-scale-tick-small-color: #444444;
+    --strip-scale-text-color: #999999;
     --strip-scale-font-size: 8px;
     --strip-scale-font-family: 'Arial Narrow', sans-serif;
 
     /* Pan Indicator */
-    --strip-pan-height: 24px;
+    --strip-pan-height: 25px;
     --strip-pan-bg: #0d0d0d;
     --strip-pan-border-top: 1px solid #1a1a1a;
     --strip-pan-track-bg: #222222;
@@ -120,27 +143,27 @@ html {
     --strip-pan-track-radius: 2px;
     --strip-pan-tick-color: #333333;
     --strip-pan-center-tick-color: #3a3a3a;
-    --strip-pan-label-color: #444444;
+    --strip-pan-label-color: #333333;
     --strip-pan-label-font-size: 7px;
     --strip-pan-thumb-center-color: #4a4a5a;
     --strip-pan-thumb-active-color: #a855f7;
-    --strip-pan-thumb-glow: 0 0 6px rgba(168, 85, 247, 0.6);
+    --strip-pan-thumb-glow: 0 0 4px rgba(168, 85, 247, 0.5);
 
     /* Patch Zone Footer */
     --strip-patch-height: 24px;
     --strip-patch-bg-input-1: #001c2e;
     --strip-patch-text-input-1: #0088bd;
-    --strip-patch-bg-input-2: #1c1400;
-    --strip-patch-text-input-2: #bd8800;
-    --strip-patch-bg-st-in: #001a1c;
-    --strip-patch-text-st-in: #00a0b0;
-    --strip-patch-bg-mix: #180026;
-    --strip-patch-text-mix: #9630d9;
-    --strip-patch-bg-bus: #00240d;
-    --strip-patch-text-bus: #00b341;
+    --strip-patch-bg-input-2: #002417;
+    --strip-patch-text-input-2: #00b862;
+    --strip-patch-bg-st-in: #0a141f;
+    --strip-patch-text-st-in: #437fae;
+    --strip-patch-bg-mix: #181300;
+    --strip-patch-text-mix: #a67c12;
+    --strip-patch-bg-bus: #001713;
+    --strip-patch-text-bus: #008a74;
     --strip-patch-font-size: 10px;
     --strip-patch-font-weight: 800;
-    --strip-patch-font-family: 'Consolas', 'Menlo', monospace;
+    --strip-patch-font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
 
     /* Special States */
     --strip-disabled-opacity: 0.45;
@@ -200,7 +223,8 @@ body.layout-horizontal {
 }
 
 /* Área dos faders com rolagem lateral fluida */
-.faders-area {
+.faders-area,
+.strips-row {
     flex: 1;
     display: flex;
     padding: 10px 20px;
@@ -214,6 +238,13 @@ body.layout-horizontal {
     min-width: 0;
     touch-action: pan-x;
     contain: layout style;
+}
+
+body.layout-desktop-mode .strips-row,
+body.layout-desktop .faders-area {
+    gap: 0;
+    padding: 20px;
+    background: #0f0f11;
 }
 
 body:not(.layout-desktop) .faders-area {
@@ -234,8 +265,37 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 }
 
 /* Agrupamento de 8 em 8 faders na tela principal */
-.faders-area>.fader-card:nth-child(8n) {
+.faders-area>.fader-card:nth-child(8n),
+.faders-area>channel-strip:nth-child(8n),
+.strips-row>channel-strip:nth-child(8n) {
     margin-right: 55px;
+}
+
+/* ── Elemento Customizado <channel-strip> ── */
+channel-strip {
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+body.layout-desktop-mode channel-strip,
+body.layout-desktop channel-strip,
+channel-strip[layout="desktop"] {
+    display: inline-block;
+    height: 520px;
+    margin: 0;
+    padding: 0;
+}
+
+body.layout-mobile-mode channel-strip,
+body:not(.layout-desktop):not(.layout-desktop-mode) channel-strip,
+channel-strip[layout="mobile"] {
+    display: flex;
+    height: 100%;
+    min-height: 480px;
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
+    flex-shrink: 0;
 }
 
 .fader-card {
@@ -506,6 +566,137 @@ body:not(.layout-desktop) .faders-area::-webkit-scrollbar {
 .fader-group-st .desk-label.label-on {
     background: #1d3c5c !important;
     color: #5cacee !important;
+    font-weight: 900;
+}
+
+/* ── Estado Disabled (ex: Aux em modo FIXED / Canal Desabilitado) ── */
+/* Afeta todo o channel strip exceto o botão ON */
+.fader-card.strip-disabled > *:not(.btn-on-desk):not(.channel-lock-overlay),
+.fader-card-desktop.strip-disabled > *:not(.btn-on-desk):not(.channel-lock-overlay),
+.fader-card.strip-disabled .fader-input,
+.fader-card-desktop.strip-disabled .fader-input,
+.fader-card.strip-disabled .btn-cue,
+.fader-card-desktop.strip-disabled .btn-cue,
+.fader-card.strip-disabled .btn-pre-post,
+.fader-card-desktop.strip-disabled .btn-pre-post,
+.fader-card.strip-disabled .btn-nudge,
+.fader-card-desktop.strip-disabled .btn-nudge-desk,
+.fader-card.strip-disabled .desk-pan-indicator,
+.fader-card-desktop.strip-disabled .desk-pan-indicator {
+    opacity: var(--strip-disabled-opacity, 0.45) !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+}
+
+.fader-card.strip-disabled .btn-on-desk,
+.fader-card-desktop.strip-disabled .btn-on-desk {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Master Card (Desktop & Mobile) */
+.fader-card.master-card,
+.fader-card.fader-group-master,
+.master-card {
+    --card-bg: var(--strip-card-bg-master-mobile, rgba(100, 0, 0, 0.9));
+    background: var(--card-bg) !important;
+    border-color: var(--strip-border-master-mobile, #880000) !important;
+    border-top: 3px solid #ff4444 !important;
+}
+
+.fader-card.master-card.on-active-card,
+.fader-card.fader-group-master.on-active-card,
+.master-card.on-active-card {
+    background: var(--strip-card-bg-master-mobile, rgba(100, 0, 0, 0.9)) !important;
+}
+
+.fader-card-desktop.master-card-desktop,
+.fader-card-desktop.fader-group-master,
+.master-card-desktop {
+    background: var(--strip-card-bg-master, #3d1a1a) !important;
+    border-top: 2px solid #ff4444 !important;
+    border-bottom: 3px solid #ff4444 !important;
+    border-left: 1px solid #111 !important;
+    border-right: 1px solid #111 !important;
+}
+
+.fader-card-desktop.master-card-desktop.desk-on-bg,
+.fader-card-desktop.fader-group-master.desk-on-bg,
+.master-card-desktop.desk-on-bg {
+    background: var(--strip-card-bg-master-on, #5d1a1a) !important;
+}
+
+.master-card-desktop .desk-label,
+.fader-group-master .desk-label {
+    background: var(--strip-header-bg-master, #2b2b2b) !important;
+    color: var(--strip-header-text-master, #888888) !important;
+    height: 35px !important;
+}
+
+.master-card-desktop .desk-label.label-on,
+.fader-group-master .desk-label.label-on {
+    background: var(--strip-header-bg-master-on, #4a1c1c) !important;
+    color: var(--strip-header-text-master-on, #ff8080) !important;
+    font-weight: 900;
+}
+
+.master-card .card-title {
+    color: #ff8080 !important;
+}
+
+/* Botão PRE / POST dos Sends */
+.btn-pre-post {
+    background: var(--strip-btn-pre-post-bg, #333333);
+    color: var(--strip-btn-pre-post-text-color, #888888);
+    border: 1px solid var(--strip-btn-pre-post-border, #444444);
+    height: var(--strip-btn-solo-height, 28px);
+    border-radius: var(--strip-btn-solo-radius, 4px);
+    font-size: var(--strip-btn-solo-font-size, 10px);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 8px;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-pre-post.pre-active {
+    background: var(--strip-btn-pre-post-active-bg, #8e24aa) !important;
+    color: var(--strip-btn-pre-post-active-text-color, #ffffff) !important;
+    border: 1px solid var(--strip-btn-pre-post-active-border, #ba68c8) !important;
+    box-shadow: var(--strip-btn-pre-post-active-glow, 0 0 10px rgba(142, 36, 170, 0.5));
+}
+
+.fader-card .btn-pre-post {
+    height: 40px;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.fader-card.fader-group-aux-send {
+    border-top: 3px solid #9d00ff !important;
+}
+
+.fader-card-desktop.fader-group-aux-send {
+    border-top: 2px solid #9d00ff !important;
+    border-bottom: 3px solid #9d00ff !important;
+    border-left: 1px solid #111 !important;
+    border-right: 1px solid #111 !important;
+}
+
+.fader-group-aux-send .desk-label {
+    background: #2a163d !important;
+    color: #d199ff !important;
+}
+
+.fader-group-aux-send .desk-label.label-on {
+    background: #441d66 !important;
+    color: #ffffff !important;
     font-weight: 900;
 }
 
@@ -2303,6 +2494,22 @@ body.layout-desktop .sidebar-macros {
     box-shadow: 0 0 8px #ff4444;
 }
 
+.desk-meter-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 2px;
+    height: 100%;
+}
+
+.desk-meter-tracks-wrap {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+    width: 100%;
+    justify-content: center;
+}
+
 .desk-meter-wrap {
     width: 5px;
     height: 92%;
@@ -2317,6 +2524,22 @@ body.layout-desktop .sidebar-macros {
     border-radius: 1px;
     margin-top: -10px;
     position: relative;
+}
+
+.desk-meter-track {
+    width: var(--strip-meter-track-width, 5px);
+    height: 92%;
+    background: var(--strip-meter-gradient, linear-gradient(to top,
+            #28a745 0%,
+            #28a745 40%,
+            #ffc107 50%,
+            #dc3545 80%,
+            #ff0000 100%));
+    border: 1px solid #111111;
+    border-radius: 1px;
+    margin-top: -10px;
+    position: relative;
+    overflow: hidden;
 }
 
 .desk-meter-curtain {
