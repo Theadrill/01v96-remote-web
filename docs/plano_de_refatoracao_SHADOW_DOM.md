@@ -1,6 +1,6 @@
 # Plano de Refatoração — Migração para Web Components com Shadow DOM
 
-> ⚠️ **Este plano é para a v2 do sistema (public_new).** Não modificar nada no `public/` original sem decisão explícita.
+> ⚠️ **Este plano é para a v2 do sistema (`public_new/`).** Não modificar nada no `public/` original sem decisão explícita.
 >
 > 📎 **Referência:** Este plano foi originado durante o grill-me do `plano_de_implementacao_componente_CHANNEL_STRIP.md` — retomar os branches em aberto documentados no final daquele arquivo após a estabilização da v1.
 
@@ -18,6 +18,7 @@
 > - CSS com seletores que dependem de estrutura interna de componentes — usar CSS Custom Properties.
 > - Lógica de negócio dentro de componentes visuais — separar camadas View / Logic / Data.
 > - `if/else` cruzando contextos diferentes num mesmo componente — usar presets declarativos.
+> - Sufixos `_v2` em arquivos dentro do `public_new/` — o contexto já é a v2. Usar o nome correto.
 
 ---
 
@@ -29,105 +30,180 @@ A v2 (`public_new/`) resolve isso com:
 
 1. **Web Components com Shadow DOM** — encapsulamento real de estilo e estrutura
 2. **MeterBus pub/sub central** — o motor de meters deixa de varrer o DOM e passa a publicar dados por canal
-3. **CSS 100% via Custom Properties** — temas funcionam atravessando o Shadow boundary sem `adoptedStyleSheets` complexos
-4. **Strangler Fig Pattern** — `/new` coexiste com `/` até validação completa, depois o novo vira padrão
+3. **CSS 100% via Custom Properties** — temas funcionam atravessando o Shadow boundary sem `adoptedStyleSheets`
+4. **ES Modules nativos** — zero globals implícitas, dependências explícitas via `import/export`
+5. **Strangler Fig Pattern** — `/new` coexiste com `/` até validação completa, depois o novo vira padrão
 
 ---
 
 ## Estratégia de Coexistência
 
 - `public/` — sistema atual, intocado, continua sendo a URL padrão (`/`)
-- `public_new/` — cópia completa do `public/`, ponto de partida da v2, exposta em `/new`
+- `public_new/` — ponto de partida da v2, exposta em `/new` (já configurado no servidor Rust)
 - Bugfixes críticos no `public/` são aplicados em ambos até a migração estar completa
-- O servidor roteia `/new` para `public_new/` — configurar desde o início (ver seção de Servidor abaixo)
 - Quando `public_new/` for validado em produção: `/new` vira `/`, `public/` vira legado
 
 ---
 
-## Decisões Arquiteturais a Tomar (Pré-Implementação)
+## Requisitos Mínimos de Dispositivo
 
-Estas questões precisam ser respondidas **antes** de começar a escrever código no `public_new/`. São as perguntas que, se ignoradas, criam o mesmo problema que estamos resolvendo.
+O piso é definido pelo **Shadow DOM** e **ES Modules nativos**:
 
-### 1. MeterBus — contrato da API
-
-O `socket.js` hoje faz:
-```javascript
-document.querySelectorAll('.desk-meter-curtain')
-document.querySelector(`[data-ch="${ch}"] .desk-meter-curtain`)
-```
-
-Na v2, precisa fazer:
-```javascript
-MeterBus.publish(ch, { level: 0.72, peak: false })
-```
-
-**Decisões abertas:**
-- [ ] `MeterBus` é um singleton global (`window.MeterBus`) ou um módulo ES importado?
-- [ ] O contrato de dados é `{ level, peak }` ou precisamos de mais campos (GR meter, stereo L/R)?
-- [ ] Como o `MeterBus` lida com canais que ainda não foram montados (strip não está no DOM)?
-
-### 2. Web Component — API pública do `<channel-strip>`
-
-**Decisões abertas:**
-- [ ] Atributos HTML vs. propriedades JS: `<channel-strip data-ch="1" data-type="input">` ou `strip.config = { ch: 1, type: 'input' }`?
-- [ ] Como o preset é passado para o componente? Via atributo serializado, via propriedade JS, ou via elemento filho?
-- [ ] O componente suporta `update()` parcial (só muda o que mudou) ou re-renderiza tudo?
-
-### 3. CSS Custom Properties — cobertura total
-
-Para que o Shadow DOM seja transparente para o sistema de temas, **100% das variações visuais** precisam ser expressas como CSS Custom Properties no `:root`. Zero seletores de classe de strips no CSS global.
-
-**Decisões abertas:**
-- [ ] Auditar o `style.css` atual e mapear todos os seletores que afetam elementos internos dos strips
-- [ ] Definir o namespace completo das variáveis (`--strip-*`) antes de escrever o primeiro componente
-- [ ] O ThemeEditor injeta variáveis no `:root` ou usa `adoptedStyleSheets`? (recomendado: `:root`, mais simples)
-
-### 4. Ciclo de vida e destruição
-
-**Decisões abertas:**
-- [ ] Quem gerencia o array de instâncias ativas por tela?
-- [ ] `disconnectedCallback()` do Web Component é suficiente para limpar listeners do MeterBus, ou precisa de um `destroy()` explícito?
-- [ ] Como lidar com strips que são removidos e re-adicionados ao DOM (ex: troca de tela)?
-
-### 5. Compatibilidade com socket.js / WASM
-
-O `socket.js` tem calibração empírica acumulada (`steps.json`, `wasmMeterEngine`). Na v2:
-
-**Decisões abertas:**
-- [ ] O `socket.js` é copiado intacto para `public_new/` e só a camada de DOM update é refatorada?
-- [ ] Ou criamos um `socket_v2.js` que separa explicitamente: protocolo MIDI | calibração | publicação no MeterBus?
-- [ ] Como garantir que a calibração empírica não se perde na migração?
+| Dispositivo | Versão Mínima | Hardware equivalente |
+|---|---|---|
+| iPhone | iOS 10.3+ | iPhone 5 (2012) ou superior |
+| iPad | iPadOS 10.3+ | iPad 4ª geração (2012) ou superior |
+| iPad mini | iPadOS 10.3+ | iPad mini 2 (2013) ou superior |
+| Android | Chrome atualizado (Android 5.0+) | — |
+| Desktop | Chrome 73+ / Firefox 63+ / Safari 10.1+ | — |
 
 ---
 
-## Servidor — Roteamento `/new`
+## Arquitetura Definida — Decisões Consolidadas
 
-> 🔴 **Configurar antes de qualquer desenvolvimento no `public_new/`.**
+### 1. MeterBus — módulo ES, pub/sub por frame
 
-- [ ] Identificar onde o servidor (Rust/Axum ou equivalente) define a pasta estática servida
-- [ ] Adicionar rota `/new` apontando para `public_new/`
-- [ ] Garantir que assets compartilhados (se houver) não criam conflito de path
+**Decisão:** Módulo ES com `import/export`. Singleton exportado, sem `window.MeterBus`.
+
+**Contrato de dados:** o `socket.js` chama `MeterBus.frame(wasmMeterView, now)` uma vez por frame no `wasmRenderLoop`. O `wasmMeterView` é o `Float32Array(80)` zero-copy direto da memória WASM — sem cópia, sem alocação. Cada strip registrado recebe o array inteiro e lê seu próprio índice.
+
+```javascript
+// meter-bus.js
+export const MeterBus = {
+    _subscribers: new Map(),
+
+    register(ch, callback) {
+        this._subscribers.set(String(ch), callback);
+    },
+
+    unregister(ch) {
+        this._subscribers.delete(String(ch));
+    },
+
+    frame(levels, now) {
+        this._subscribers.forEach(cb => cb(levels, now));
+    }
+};
+```
+
+Strip não montado = sem entry no Map = descarte silencioso no próximo frame. Sem fila, sem buffer, sem checagem especial.
 
 ---
 
-## Sequência de Implementação (rascunho — detalhar após fechar as decisões acima)
+### 2. Web Component `<channel-strip>` — API pública
+
+**Atributos HTML** para o que o browser precisa nativamente (CSS, IntersectionObserver):
+```html
+<channel-strip data-ch="1" data-type="input"></channel-strip>
+```
+
+**Propriedade JS** para o preset completo (objeto rico, não serializado em atributo):
+```javascript
+strip.config = ChannelStrip.presets.mainInput(0);
+```
+
+**Setters de runtime** para o que muda em alta frequência — sem re-render do template:
+```javascript
+strip.name = 'Voz';          // atualiza só .ch-name no shadowRoot
+strip.on = true;             // atualiza só .btn-on no shadowRoot
+strip.faderValue = 0.85;     // atualiza só o input range no shadowRoot
+```
+
+Re-render total do template apenas quando `config` muda (troca de tela/preset).
+
+---
+
+### 3. CSS Custom Properties — sistema de temas
+
+**Decisão:** `:root` para valores globais + `host.style.setProperty()` para variações por faixa de canal. Zero `adoptedStyleSheets` — compatibilidade total com iOS 9.3+.
+
+```javascript
+// theme-manager.js — injeta valores globais
+document.documentElement.style.setProperty('--strip-card-bg', '#1e1e1e');
+document.documentElement.style.setProperty('--strip-header-color-input-1', '#ffffff');
+document.documentElement.style.setProperty('--strip-header-color-input-2', '#00d2ff');
+
+// connectedCallback do strip — define variação por faixa
+const ch = parseInt(this.dataset.ch);
+if (ch >= 0 && ch <= 15) {
+    this.style.setProperty('--strip-header-color', 'var(--strip-header-color-input-1)');
+} else if (ch >= 16 && ch <= 31) {
+    this.style.setProperty('--strip-header-color', 'var(--strip-header-color-input-2)');
+}
+```
+
+CSS interno do shadow consome apenas variáveis — zero seletores dependentes de estrutura externa:
+```css
+:host { background: var(--strip-card-bg); }
+.desk-label-wrapper { color: var(--strip-header-color); }
+```
+
+---
+
+### 4. Ciclo de vida — destruição automática via `disconnectedCallback`
+
+O browser chama `disconnectedCallback()` automaticamente quando o strip é removido do DOM. O strip se destrói:
+
+```javascript
+disconnectedCallback() {
+    MeterBus.unregister(this.dataset.ch);
+    // remove event listeners internos
+}
+```
+
+Sem gerenciador externo de instâncias. Sem array de strips para iterar manualmente.
+
+---
+
+### 5. `socket.js` — refatoração cirúrgica, mesmo nome
+
+O `socket.js` é copiado do `public/` para `public_new/` e refatorado em 3 pontos cirúrgicos:
+
+| O que muda | Por quê |
+|---|---|
+| Remove `faderCardsCache = document.querySelectorAll(...)` | Strips se registram no MeterBus automaticamente |
+| Remove `buildMeterCache()` | Substituído pelo registro no `connectedCallback` |
+| Substitui `applyMetersToDOM(wasmMeterView, now)` por `MeterBus.frame(wasmMeterView, now)` | MeterBus distribui para cada strip registrado |
+
+**Intocados:** protocolo MIDI, calibração WASM, `MidiDispatcher`, throttle, `wasmRenderLoop`, todos os `socket.on(...)`, `steps.json`.
+
+---
+
+### 6. ES Modules — infraestrutura
+
+Todos os scripts do `public_new/` usam `type="module"`. Dependências explícitas via `import`. Zero `window.algo` como canal de comunicação entre módulos.
+
+```html
+<!-- index.html -->
+<script type="module" src="modules/socket.js"></script>
+```
+
+```javascript
+// socket.js
+import { MeterBus } from './meter-bus.js';
+```
+
+---
+
+## Sequência de Implementação
 
 ```
-[ ] 0. Criar public_new/ (cópia completa de public/)
-[ ] 0. Configurar rota /new no servidor
+✅ 0. Criar public_new/ (cópia completa de public/)
+✅ 0. Configurar rota /new no servidor Rust
 [ ] 0. Validar que /new funciona identicamente a / antes de qualquer mudança
 
-[ ] 1. Criar MeterBus (módulo, API, testes manuais)
-[ ] 2. Refatorar socket.js para publicar no MeterBus em vez de querySelector
+[ ] 1. Criar meter-bus.js (módulo ES, API conforme contrato acima)
+[ ] 2. Refatorar socket.js — 3 pontos cirúrgicos + migrar para ES Module
 [ ] 3. Validar meters em /new com MeterBus (60 FPS, calibração intacta)
 
 [ ] 4. Criar <channel-strip> Web Component (Shadow DOM, CSS Variables)
-[ ] 5. Criar sistema de temas 100% via Custom Properties
+[ ] 5. Migrar theme-manager.js para CSS Custom Properties + host.style.setProperty()
 [ ] 6. Montar test_strip.html com Web Components e validar visualmente
 
-[ ] 7. Migrar telas uma a uma (Aux/Sends → Principal → Mobile)
-[ ] 8. Validar /new em produção com técnico de confiança
-[ ] 9. /new vira /, public/ vira legado
+[ ] 7. Migrar todos os scripts para ES Modules (remover globals implícitas)
+[ ] 8. Migrar telas uma a uma (Aux/Sends → Principal → Mobile)
+[ ] 9. Validar /new em produção com técnico de confiança
+[ ] 10. /new vira /, public/ vira legado
 ```
 
 ---
@@ -139,14 +215,17 @@ O `socket.js` tem calibração empírica acumulada (`steps.json`, `wasmMeterEngi
 - [ ] Todos os meters funcionam em 60 FPS com a mesma calibração da v1
 - [ ] Todos os presets de Channel Strip renderizam corretamente (input, master, aux, mini, mix, mobile)
 - [ ] O ThemeEditor aplica temas em tempo real sem re-renderizar os strips
+- [ ] Cor por faixa de canal funciona corretamente (canais 1-16 vs 17-32 vs ST IN vs Mix vs Bus)
 - [ ] Long press, swap, copy, lock, rename funcionam conforme especificado no `plano_de_implementacao_componente_CHANNEL_STRIP.md`
+- [ ] Interface funcional em iPad 4ª geração (iOS 10.3+) e iPhone 5 (iOS 10.3+)
 - [ ] Zero regressões identificadas em sessão de uso real com a 01V96
+- [ ] Zero globals implícitas (`window.algo`) no código do `public_new/`
 
 ---
 
 ## Referências
 
 - `docs/plano_de_implementacao_componente_CHANNEL_STRIP.md` — branches em aberto documentados no final do arquivo
-- `public/modules/socket.js` — motor de sincronização a ser refatorado
-- `public/steps.json` — calibração empírica a ser preservada
+- `public_new/modules/socket.js` — motor de sincronização a ser refatorado (3 pontos cirúrgicos)
+- `public_new/steps.json` — calibração empírica a ser preservada intacta
 - `docs/PLANO_MIGRACAO_RUST.md` — precedente do padrão Strangler Fig usado neste projeto
