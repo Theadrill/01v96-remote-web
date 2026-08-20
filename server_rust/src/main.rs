@@ -223,11 +223,13 @@ async fn async_main(
     );
 
     let canvas_dir = public_dir.parent().unwrap().join("canvas_frontend").join("public");
+    let public_new_dir = public_dir.parent().unwrap().join("public_new");
 
     // --- SERVIDOR HTTP SOBE PRIMEIRO (antes de conectar MIDI) ---
     let app = Router::new()
         .nest("/api", api::router(global_state_api.clone(), custom_scene_manager.clone(), io.clone()))
         .nest_service("/canvas", tower_http::services::ServeDir::new(canvas_dir))
+        .nest_service("/new", tower_http::services::ServeDir::new(public_new_dir))
         .fallback_service(
             ServiceBuilder::new()
                 .layer(middleware::from_fn(no_cache_css_mw))

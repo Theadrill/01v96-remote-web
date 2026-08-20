@@ -1,0 +1,13 @@
+{
+  "name": "client_wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "client_wasm_bg.wasm",
+    "client_wasm.js"
+  ],
+  "main": "client_wasm.js",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

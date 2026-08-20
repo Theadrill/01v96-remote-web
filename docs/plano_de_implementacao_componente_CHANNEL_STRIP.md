@@ -509,3 +509,32 @@ Todas as questões levantadas durante o design review foram analisadas e respond
   3. Ao concluir (`onComplete` do `dispatchThrottledCommands`), o `OverlayInfo` é atualizado para sucesso e desaparece suavemente.
 
 ---
+
+## ⏸️ Questões Não Respondidas — Retomar Posteriormente (sessão grill-me 2026-08-19)
+
+Branches identificados durante o grill-me que ficaram em aberto para retomada:
+
+| Branch | Tópico | Status |
+|---|---|---|
+| **B1** | Arquitetura do ChannelStrip: **Classe instanciada** com `mount/update/destroy`. Presets são factories de config pura. | ✅ Fechado |
+| **B2** | Ciclo de vida: quem chama `strip.destroy()` quando a tela troca? Risco de vazamento de event listeners com 32+ strips | 🔴 Aberto |
+| **B3** | Event-driven: `CustomEvent` vs. callbacks — cobertura e testabilidade | 🔴 Aberto |
+| **B4** | Absorção do `channel_lock.js` em `channel_operations.js` — risco de rollback se Fase 0 falhar | 🔴 Aberto |
+| **B5** | VU Meter pipeline — contrato de classes CSS com `socket.js`: quem garante que o novo renderer não quebra os seletores? | 🔴 Aberto |
+| **B6** | UX do Wizard — timing e contexto ao vivo: 3 modais é rápido o suficiente para um operador de som ao vivo? | 🔴 Aberto |
+| **B7** | Throttle do swap — 40ms é seguro para o processador da 01V96 sob carga máxima? Testado empiricamente? | 🔴 Aberto |
+| **B8** | Temas YAML — quando as variáveis CSS são injetadas: antes ou depois do `mount()` dos strips? Race condition possível? | 🔴 Aberto |
+| **B9** | Mobile renderer — quem decide `'desktop'` vs `'mobile'`? Parâmetro do `mount()`, variável global ou detecção automática? | 🔴 Aberto |
+| **B10** | Fase -1 antes Fase 0 — renomear `copy_paste.js` é baixo risco, mas bloqueia o resto: e se quebrar algo no browser? | 🔴 Aberto |
+
+---
+
+> 📄 **Plano criado:** `docs/plano_de_refatoracao_SHADOW_DOM.md` — retomar após estabilização da v1.
+
+> 🧠 **Discussão pausada — Shadow DOM vs. classe JS vanilla**
+>
+> Questão levantada durante o grill-me: a v2 do sistema deveria migrar para **Web Components com Shadow DOM** e um `MeterBus` central pub/sub, eliminando a dependência de `querySelector` global no `socket.js`?
+>
+> **Decisão para v1:** Classe JS vanilla com DOM aberto. O motor `socket.js` continua funcionando sem alterações.
+>
+> **Direção para v2:** Arquitetura pub/sub (cada strip se registra em um `MeterBus`) + Shadow DOM. O motor de meters distribui dados por `data-ch` sem varrer o DOM global. Conversão em andamento — retomar quando v1 estiver estável.

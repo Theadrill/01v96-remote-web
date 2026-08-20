@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Status">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Status do Servidor</title>
+    <link rel="stylesheet" href="style.css?v=52">
+    <script src="/vendor/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="status-root">
+        <header class="status-header">
+            <h1 class="status-title" id="status-title">Status do Servidor</h1>
+            <p class="status-subtitle">01V96 Live Safe</p>
+            <p class="connection-status" id="connection-status"></p>
+        </header>
+
+        <main class="status-content">
+            <div class="status-modal">
+                <div class="status-modal-header">
+                    <h2 class="status-modal-title">Log do Servidor</h2>
+                </div>
+
+                <div class="status-log-container">
+                    <pre id="log-view" class="loading">Carregando logs...</pre>
+                </div>
+
+                <footer class="status-modal-footer">
+                    <button id="restart-btn" class="btn-outs">Reiniciar Servidor</button>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const logView = document.getElementById('log-view');
+        const restartBtn = document.getElementById('restart-btn');
+        const statusTitle = document.getElementById('status-title');
+        const connectionStatus = document.getElementById('connection-status');
+
+        let isLoading = false;
+        let socket = null;
+
+        // Initialize socket.io connection
+        function initSocket() {
+            socket = io();
+
+            socket.on('connect', () => {
+                console.log('[Status] Socket conectado');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('[Status] Socket desconectado');
+                updateConnectionStatus(false, false);
+            });
+
+            socket.on('connectionState', (state) => {
+                console.log('[Status] Connection state:', state);
+                updateConnectionStatus(state.connected, state.demo_mode);
+            });
+        }
+
+        function updateConnectionStatus(connected, demoMode) {
+            connectionStatus.classList.remove('connected', 'disconnected', 'demo');
+            if (connected) {
+                connectionStatus.textContent = 'Status do Servidor: CONECTADO';
+                connectionStatus.classList.add('connected');
+            } else if (demoMode) {
+                connectionStatus.textContent = 'Status do Servidor: MODO DEMO';
+                connectionStatus.classList.add('demo');
+            } else {
+                connectionStatus.textContent = 'Status do Servidor: DESCONECTADO';
+                connectionStatus.classList.add('disconnected');
+            }
+        }
+
+        // Function to fetch and display logs
+        async function loadLogs() {
+            if (isLoading) return;
+            isLoading = true;
+
+            try {
+                const response = await fetch('/api/log');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const text = await response.text();
+                logView.textContent = text;
+                logView.classList.remove('loading');
+
+                // Scroll to bottom
+                logView.scrollTop = logView.scrollHeight;
+            } catch (error) {
+                logView.textContent = 'Erro ao carregar logs: ' + error.message;
+                logView.classList.remove('loading');
+                console.error('Error loading logs:', error);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Load logs every 2 seconds
+        setInterval(loadLogs, 2000);
+        // Load immediately on page load
+        loadLogs();
+
+        // Initialize socket
+        initSocket();
+
+        // Restart button handler
+        restartBtn.addEventListener('click', async () => {
+            restartBtn.disabled = true;
+            restartBtn.textContent = 'Reiniciando...';
+
+            try {
+                const response = await fetch('/api/restart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                alert(data.message || 'Servidor reiniciado com sucesso!');
+            } catch (error) {
+                alert('Erro ao reiniciar servidor: ' + error.message);
+                console.error('Error restarting server:', error);
+            } finally {
+                restartBtn.disabled = false;
+                restartBtn.textContent = 'Reiniciar Servidor';
+            }
+        });
+
+        // Prevent double-tap zoom on iOS
+        document.addEventListener('dblclick', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>

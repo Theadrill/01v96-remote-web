@@ -1,0 +1,20 @@
+/* Smart Channel Toggler - Macro Styles */
+
+/* Section Titles */
+.section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin: 12px 0 6px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 4px;
+}
+
+/* Info Text */
+.info-text {
+    font-size: 11px;
+    color: #999;
+    margin-top: 8px;
+    font-style: italic;
+}
