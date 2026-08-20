@@ -74,7 +74,7 @@ try { layerNavEnabled = localStorage.getItem('01v96_layer_nav') === 'true'; } ca
 window.globalNames = null;
 window.lockedChannels = [];
 window.themeChannelLockConfig = {
-    hold_duration_ms: 1500,
+    hold_duration_ms: 450,
     icon_class: 'fas fa-lock',
     z_index: 100
 };

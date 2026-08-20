@@ -131,7 +131,7 @@ export const uiState = {
     resolvedNames: {},
     lockedChannels: [],
     themeChannelLockConfig: {
-        hold_duration_ms: 1500,
+        hold_duration_ms: 450,
         icon_class: 'fas fa-lock',
         z_index: 100
     }

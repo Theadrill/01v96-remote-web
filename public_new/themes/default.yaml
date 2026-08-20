@@ -123,7 +123,7 @@ bubble_modal:
 # ─── CHANNEL LOCK ─────────────────────────────────────────────
 # Overlay visual e comportamento de bloqueio de canal (channel_lock.js)
 channel_lock:
-  hold_duration_ms: 750      # Tempo em milissegundos pressionado para abrir o modal de lock (reduzido para UX mais ágil)
+  hold_duration_ms: 450      # Tempo em milissegundos pressionado para abrir o modal de lock (reduzido para UX mais ágil)
   z_index: 100                 # Camada de profundidade da sobreposição do lock
   icon_class: "fas fa-lock"     # Classe do ícone FontAwesome
   overlay_bg: "rgba(0, 0, 0, 0.30)"
@@ -203,6 +203,10 @@ channel_strip:
   btn_solo_active_bg: "#ffc107"              # Amarelo (#ffc107) com texto preto (#000) e borda branca (#fff)
   btn_solo_active_text_color: "#000000"
   btn_solo_active_border: "#ffffff"
+  btn_solo_alert_bg: "#c0000a"               # Vermelho Yamaha pulsante quando há solos ativos
+  btn_solo_alert_text_color: "#ffffff"
+  btn_solo_alert_border: "#ff2233"
+  btn_solo_alert_glow: "0 0 10px rgba(220, 0, 10, 0.8)"
   btn_solo_height: "28px"
   btn_solo_radius: "4px"
   btn_solo_font_size: "10px"

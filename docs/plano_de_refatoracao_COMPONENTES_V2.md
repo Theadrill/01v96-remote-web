@@ -130,27 +130,31 @@ O arquivo monolítico `globals.js` é decomposto em módulos de responsabilidade
 ── FASE 3: Componente Base <channel-strip> ──────────────────────────────────
 ✅ 3.1 Criar public_new/modules/channel_strip_component.js com Custom Elements (Light DOM)
 ✅ 3.2 Implementar ciclo de vida (IntersectionObserver próprio + MeterBus register/unregister)
-✅ 3.3 Implementar sistema de Presets (mainInput, master, output, auxSend, mixMatrix, mini)
+✅ 3.3 Implementar sistema de Presets (mainInput, master, output, auxSend, mixMatrix, mini, macro, volumeGeral, auxVolumeGeral)
 ✅ 3.4 Criar public_new/test_strip.html para teste visual isolado com switcher Desktop / Mobile
-🔄 3.5 Refinar fidelidade visual e interativa Desktop (em andamento):
+✅ 3.5 Refinar fidelidade visual e interativa Desktop e Mobile:
       - Escala de dB lateral precisa (+10 até -inf dB via dbToRaw) [OK]
-      - Barra interativa de Pan (L / Centro / R) com duplo clique e drag [OK]
+      - Barra interativa de Pan independente para canais estéreo pareados (L e R com tracks separadas, duplo clique e drag) [OK]
       - Rodapé de Patch colorido por grupo (AD 1-16, AD 17-32, ST IN, MIX, BUS) [OK]
-      - Estados representados: Ativo, Mute, Pareado Estéreo (21+22), Disabled, Locked, Master [OK]
+      - Proteção contra tap no trilho do fader (estilo console físico, apenas arrasto no knob) [OK]
+      - Estados representados: Ativo, Mute, Pareado Estéreo (21+22), Disabled (mantendo botão ON ativo), Locked, Master [OK]
       - Layout Desktop contínuo (gap: 0, bordas de grupo contínuas no topo e base) [OK]
-      - Ajustes finos de proporções, botões e estética visual geral conforme layout físico 01v96 [EM ANDAMENTO]
+      - Botão SOLO do Master com alerta visual piscante (Solo Blinking) e ação de "UNSOLO ALL" ao clicar [OK]
+      - Botões de Nudge (+ e -) com passos de dB contextuais (0.05 dB principal, 0.10 dB mix/out, 0.25 dB sends on faders, 0.50 dB aux individual) e Auto-Repeat contínuo ao segurar [OK]
+      - Sistema de Channel Lock com clique único no mobile abrindo menu de 3 opções (TRAVAR/DESTRAVAR, RENOMEAR, CANCELAR) e tempo ágil de 450ms [OK]
+      - Macro Fader e Volume Geral unificados no Custom Element com versão normal e compacta (68px), display de delta dB com reset de 5s, botão ZERAR e modal de canais protegidos no Modo Músico [OK]
 
 ── FASE 4: Integração com Sistema de Temas YAML ──────────────────────────────
-✅ 4.1 Integrar seção channel_strip no default.yaml (cores, gaps, tipografia, patch, pan)
+✅ 4.1 Integrar seção channel_strip no default.yaml (cores, gaps, tipografia, patch, pan, master solo alert)
 ✅ 4.2 Mapear variáveis CSS no style.css
-🔄 4.3 Validar sincronização completa de temas em runtime no test_strip.html
+✅ 4.3 Validar sincronização completa de temas em runtime no test_strip.html
 
 ── FASE 5: Migração de Telas do Sistema ──────────────────────────────────────
 [ ] 5.1 Migrar tela de Auxiliares e Sends (public_new/modules/auxs_sends.js) — Piloto
 [ ] 5.2 Migrar tela Principal Desktop (canais 1-32, ST IN, Mix, Bus, Master)
 [ ] 5.3 Migrar Mini-Faders dos Modais (EQ, Dynamics, FX, Routing)
 [ ] 5.4 Implementar renderização Mobile (<channel-strip> layout mobile)
-[ ] 5.5 Remover channel_strip.js legado em public_new/modules/
+[ ] 5.5 Remover channel_strip.js e módulos legados em public_new/modules/ e aposentar globals.js
 
 ── FASE 6: Validação Final e Promoção a Padrão ───────────────────────────────
 [ ] 6.1 Teste de estresse com a mesa física em tempo real
@@ -163,24 +167,33 @@ O arquivo monolítico `globals.js` é decomposto em módulos de responsabilidade
 ## 📌 Guia de Continuação da Sessão (Hand-off para Próxima IA)
 
 ### Onde paramos exatamente:
-1. **Fases 1 e 2:** 100% concluídas e testadas (`test_validation.html`).
-2. **Fase 3 & 4:** `<channel-strip>` (`public_new/modules/channel_strip_component.js`), `public_new/test_strip.html`, `public_new/style.css` e `public_new/themes/default.yaml` implementados.
-   - O switcher Desktop / Mobile está funcionando no `test_strip.html`.
-   - No modo Desktop, os canais estão colados (`gap: 0`), sem bordas arredondadas individuais, com faixa superior e inferior contínua por grupo de faders (`fader-group-1` Azul, `fader-group-2` Verde, `fader-group-st` Ciano, `fader-group-mix` Dourado, `fader-group-bus` Verde-escuro, `master` Vermelho).
-   - Estão demonstrados os estados:
-     - Canal 6 (Ativo ON)
-     - Canal 7 (Mute OFF)
-     - Canais 21 + 22 (Pareado estéreo com 2 VUs e header `21 + 22`)
-     - Canal 18 (Disabled)
-     - Canal 19 (Locked com overlay de cadeado)
-     - ST IN 1
-     - MIX 1
-     - BUS 1
-     - MASTER (com botão `SOLO` para lógica de SOLO CLEAR)
+1. **Fases 1, 2, 3 e 4:** 100% concluídas, testadas e integradas no `public_new/test_strip.html`.
+2. **Funcionalidades Consolidadas no Custom Element `<channel-strip>`:**
+   - **Pan Independente Pareado:** Em canais vinculados (ex: CH 21 + 22), as faixas verticais superior e inferior controlam independentemente os canais `_ch` e `_partnerCh`, emitindo os parâmetros corretos.
+   - **Isolamento de Estado Disabled:** Em canais inativos ou auxiliares no modo FIXED, faders, nudges, cues e pans são desabilitados visualmente (`opacity: 0.45`, `pointer-events: none`), mas o botão **ON** permanece 100% ativo e clicável (`opacity: 1`, `pointer-events: auto`).
+   - **Master SOLO Alert & Unsolo All:** Se qualquer canal estiver com SOLO ativo, o botão SOLO do Master passa a pulsar em vermelho. Clicar no botão SOLO do Master desmarca o solo de todos os canais de uma vez só (`UNSOLO ALL`).
+   - **Botões Nudge (+ / -) com Auto-Repeat e Resolução Contextual:**
+     - Tela Principal (Inputs / Faders normais): `0.05 dB`.
+     - Mix / Out (Mixes 1-8 e Buses 1-8): `0.10 dB`.
+     - Sends on Faders (8 auxiliares): `0.25 dB`.
+     - Aux dos Canais Individuais (aba interna): `0.50 dB`.
+     - Ao segurar o botão (+350ms), inicia repetição automática a cada 60ms.
+   - **Channel Lock Aprimorado:**
+     - Toque simples no topo do card no mobile abre o modal de 3 opções (`[TRAVAR CANAL / DESTRAVAR CANAL]`, `[RENOMEAR CANAL]`, `[CANCELAR]`) sem o prefixo "SIM, ".
+     - Tempo de long press reduzido para `450ms` (configurado em `default.yaml`, `state.js`, `globals.js` e `channel_lock.js`).
+     - Clique no cadeado no desktop mantém a confirmação direta.
+   - **Macro Faders & Volume Geral Unificados:**
+     - Presets `preset="macro"`, `preset="volumeGeral"`, `preset="auxVolumeGeral"` e `preset="mixVolumeGeral"`.
+     - Versão padrão para tela principal e versão `compact` (68px) para abas de aux.
+     - Display de delta dB com `--` em repouso e valor ativo acumulado que reseta em 5s.
+     - Botão ZERAR integrado.
+     - Botão de Configuração presente no Macro Fader da tela principal e no Volume Geral quando em Modo Músico (`macro_locked_channels`).
+3. **Plano de Desacoplamento do `globals.js`:**
+   - O `globals.js` é temporário para a fase de transição. Na Fase 5.5, todos os arquivos passarão a ser ES Modules com `import/export` diretos, removendo as pontes globais e eliminando o `globals.js`.
 
 ### Próximos Passos Imediatos:
-1. Ajustar qualquer detalhe fino estético do layout Desktop no `test_strip.html` conforme feedback do usuário.
-2. Iniciar a **Fase 5.1:** Migração de `public_new/modules/auxs_sends.js` para usar o novo `<channel-strip>`.
+1. Iniciar a **Fase 5.1:** Migração de `public_new/modules/auxs_sends.js` para renderizar instâncias do novo Custom Element `<channel-strip>` com os presets de auxSend e volume geral compacto.
+2. Migrar a tela principal (`index.html`) para utilizar os componentes `<channel-strip>` de forma declarativa e reativa via `MeterBus`.
 
 ---
 

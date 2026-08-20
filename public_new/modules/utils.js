@@ -77,26 +77,32 @@ export function dbToRaw(db) {
  * @param {number} currentRaw Valor RAW atual (0-1023)
  * @param {number} dir Direção (+1 para aumentar, -1 para diminuir)
  * @param {number} stepDb Tamanho do passo em dB (default 0.5)
+ * @param {boolean} isMaster Se é canal Master (limite em 0dB / offset de escala)
  * @returns {number} Próximo valor RAW
  */
-export function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
+export function getSteppedRaw(currentRaw, dir, stepDb = 0.5, isMaster = false) {
     const magnitude = Math.abs(dir);
     const isUp = dir > 0;
-    const currentDbStr = rawToDb(currentRaw, false);
+    const currentDbStr = rawToDb(currentRaw, false, isMaster);
     const currentDb = currentDbStr === "-∞" ? -138 : parseFloat(currentDbStr);
+
+    const maxDb = isMaster ? 0 : 10;
 
     // Se estiver no infinito e subir, começa do fundo da curva (-138)
     if (currentRaw === 0 && isUp) {
-        return dbToRaw(-138 + (stepDb * magnitude));
+        const startDb = -138 + (stepDb * magnitude);
+        return dbToRaw(isMaster ? startDb + 10 : startDb);
     }
 
     let nextDb = isUp ? (currentDb + (stepDb * magnitude)) : (currentDb - (stepDb * magnitude));
+    // Arredondamento decimal preciso para evitar resíduos IEEE-754 (ex: 0.15000000000000002)
+    nextDb = Math.round(nextDb * 1000) / 1000;
 
     // Proteções de limites
-    if (nextDb > 10) nextDb = 10;
+    if (nextDb > maxDb) nextDb = maxDb;
     if (nextDb < -138) return 0;
 
-    let nRaw = dbToRaw(nextDb);
+    let nRaw = dbToRaw(isMaster ? nextDb + 10 : nextDb);
 
     // Garante avanço de pelo menos 1 unidade raw em áreas de baixa resolução
     if (nRaw === currentRaw) {
@@ -105,6 +111,22 @@ export function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
     }
 
     return nRaw;
+}
+
+/**
+ * Retorna o ID padronizado de trava para o canal
+ * @param {number|string} dataCh
+ * @returns {string|null}
+ */
+export function getLockIdForDataCh(dataCh) {
+    if (dataCh === 'master' || dataCh === '52' || dataCh === 52) return 'MASTER';
+    const val = parseInt(dataCh, 10);
+    if (isNaN(val)) return null;
+    if (val >= 0 && val <= 31) return 'CH' + (val + 1);
+    if (val >= 36 && val <= 43) return 'MIX' + (val - 35);
+    if (val >= 44 && val <= 51) return 'BUS' + (val - 43);
+    if (val >= 60 && val <= 67) return 'ST' + (val - 59);
+    return null;
 }
 
 /**

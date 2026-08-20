@@ -241,9 +241,9 @@ function startAuxNudge(ch, auxIdx, dir) {
 
     auxNudgeTimeout = setTimeout(() => {
         auxNudgeInterval = setInterval(() => {
-            nudgeAuxLevel(ch, auxIdx, dir * 3);
-        }, 80);
-    }, 500);
+            nudgeAuxLevel(ch, auxIdx, dir);
+        }, 60);
+    }, 350);
 }
 
 function stopAuxNudge() {
@@ -256,7 +256,11 @@ function stopAuxNudge() {
 function nudgeAuxLevel(ch, auxIdx, dir) {
     const state = getChannelStateById(ch);
     const currentRaw = (state && state[`aux${auxIdx}`]) || 0;
-    const nRaw = getSteppedRaw(currentRaw, dir, 0.5);
+    // Se ch >= 36 e ch <= 43, estamos na visão Sends on Fader do Mix -> 0.25 dB.
+    // Se ch < 36, estamos na aba interna dos 8 envios do canal individual -> 0.50 dB.
+    const isMixSendsOnFader = (ch >= 36 && ch <= 43);
+    const stepDb = isMixSendsOnFader ? 0.25 : 0.50;
+    const nRaw = getSteppedRaw(currentRaw, dir, stepDb);
 
     updateAuxManual(ch, auxIdx, nRaw);
     socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });

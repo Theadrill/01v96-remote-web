@@ -63,6 +63,10 @@ html {
     --strip-btn-solo-active-bg: #ffc107;
     --strip-btn-solo-active-text-color: #000000;
     --strip-btn-solo-active-border: #ffffff;
+    --strip-btn-solo-alert-bg: #c0000a;
+    --strip-btn-solo-alert-text-color: #ffffff;
+    --strip-btn-solo-alert-border: #ff2233;
+    --strip-btn-solo-alert-glow: 0 0 10px rgba(220, 0, 10, 0.8);
     --strip-btn-solo-height: 28px;
     --strip-btn-solo-radius: 4px;
     --strip-btn-solo-font-size: 10px;
@@ -2410,8 +2414,7 @@ body.layout-desktop .sidebar-macros {
     align-items: center;
     transition: 0.1s;
     user-select: none;
-    pointer-events: none;
-    /* Deixa o zone tratar o evento */
+    pointer-events: auto;
 }
 
 .nudge-zone-desk:active .btn-nudge-desk {
@@ -5069,6 +5072,27 @@ body.is-portrait .dyn-box {
     transform: translateY(4px);
 }
 
+/* --- Macro Fader Compact Mode (para uso em subabas e containers auxiliares) --- */
+.macro-fader-card.macro-fader-compact,
+channel-strip[compact] .macro-fader-card {
+    width: 68px !important;
+    min-width: 68px !important;
+    max-width: 68px !important;
+}
+
+.macro-fader-card.macro-fader-compact .btn-nudge-macro-big,
+channel-strip[compact] .macro-fader-card .btn-nudge-macro-big {
+    font-size: 26px;
+    border-radius: 8px;
+}
+
+.macro-fader-card.macro-fader-compact .macro-db-display,
+channel-strip[compact] .macro-fader-card .macro-db-display {
+    font-size: 11px;
+    padding: 3px 2px;
+    min-height: 22px;
+}
+
 /* Ajuste no modo horizontal */
 body.layout-horizontal .macro-fader-card {
     height: 120px !important;
@@ -5208,24 +5232,24 @@ input:checked+.slider:before {
 /* === Master Solo Clear Button === */
 @keyframes master-solo-pulse {
     0% {
-        background: #333;
-        color: #555;
+        background: var(--strip-btn-solo-bg, #333);
+        color: var(--strip-btn-solo-text-color, #555);
         box-shadow: none;
-        border-color: #444;
+        border-color: var(--strip-btn-solo-border, #444);
     }
 
     50% {
-        background: #c0000a;
-        color: #fff;
-        box-shadow: 0 0 10px rgba(220, 0, 10, 0.8);
-        border-color: #ff2233;
+        background: var(--strip-btn-solo-alert-bg, #c0000a);
+        color: var(--strip-btn-solo-alert-text-color, #fff);
+        box-shadow: var(--strip-btn-solo-alert-glow, 0 0 10px rgba(220, 0, 10, 0.8));
+        border-color: var(--strip-btn-solo-alert-border, #ff2233);
     }
 
     100% {
-        background: #333;
-        color: #555;
+        background: var(--strip-btn-solo-bg, #333);
+        color: var(--strip-btn-solo-text-color, #555);
         box-shadow: none;
-        border-color: #444;
+        border-color: var(--strip-btn-solo-border, #444);
     }
 }
 
@@ -5237,22 +5261,22 @@ input:checked+.slider:before {
 /* Mobile variant */
 @keyframes master-solo-pulse-mobile {
     0% {
-        background: #333;
-        color: #555;
-        border-color: #444;
+        background: var(--strip-btn-solo-bg, #333);
+        color: var(--strip-btn-solo-text-color, #555);
+        border-color: var(--strip-btn-solo-border, #444);
     }
 
     50% {
-        background: #c0000a;
-        color: #fff;
-        border-color: #ff2233;
-        box-shadow: 0 0 8px rgba(220, 0, 10, 0.7);
+        background: var(--strip-btn-solo-alert-bg, #c0000a);
+        color: var(--strip-btn-solo-alert-text-color, #fff);
+        border-color: var(--strip-btn-solo-alert-border, #ff2233);
+        box-shadow: var(--strip-btn-solo-alert-glow, 0 0 8px rgba(220, 0, 10, 0.7));
     }
 
     100% {
-        background: #333;
-        color: #555;
-        border-color: #444;
+        background: var(--strip-btn-solo-bg, #333);
+        color: var(--strip-btn-solo-text-color, #555);
+        border-color: var(--strip-btn-solo-border, #444);
     }
 }
 

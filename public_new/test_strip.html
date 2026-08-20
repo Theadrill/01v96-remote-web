@@ -114,13 +114,50 @@
 
         <!-- 11. MASTER Estéreo (CH 52 - Fundo avermelhado e Header cinza padrão) -->
         <channel-strip id="strip9" data-ch="52" preset="master" data-partner-ch="53" layout="desktop"></channel-strip>
+
+        <!-- 12. MACRO FADER Padrão (com botão CONFIG e Delta dB) -->
+        <channel-strip id="stripMacro1" preset="macro" show-config layout="desktop"></channel-strip>
+
+        <!-- 13. VOLUME GERAL Padrão -->
+        <channel-strip id="stripVG1" preset="volumeGeral" layout="desktop"></channel-strip>
+
+        <!-- 14. AUX GERAL Compacto (Subaba / Envio individual com ZERAR) -->
+        <channel-strip id="stripAuxVG" preset="auxVolumeGeral" data-ch="5" compact layout="desktop"></channel-strip>
     </div>
 
     <!-- Módulo de Simulação e Controle do Teste -->
     <script src="modules/bubble-modal.js"></script>
+    <script src="modules/confirm-modal.js"></script>
+    <script src="modules/channel_lock.js"></script>
     <script type="module">
         import './modules/channel_strip_component.js';
         import { MeterBus } from './modules/meter-bus.js';
+
+        // Simulação do array global de canais travados no teste
+        window.lockedChannels = ['CH19'];
+
+        // Mock de socket para testar eventos de lock e controle sem servidor
+        if (!window.socket) {
+            window.socket = {
+                connected: true,
+                emit: (evt, data) => {
+                    console.log(`[Socket Mock emit] ${evt}:`, data);
+                    if (evt === 'toggle_channel_lock' && data && data.channel) {
+                        const idx = window.lockedChannels.indexOf(data.channel);
+                        if (idx >= 0) {
+                            window.lockedChannels.splice(idx, 1);
+                        } else {
+                            window.lockedChannels.push(data.channel);
+                        }
+                        if (typeof window.updateLockedChannelsUI === 'function') {
+                            window.updateLockedChannelsUI();
+                        }
+                    }
+                },
+                on: () => {},
+                off: () => {}
+            };
+        }
 
         // Alternância de Layout Desktop / Mobile
         window.switchLayout = function(mode) {

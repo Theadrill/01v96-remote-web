@@ -10,20 +10,179 @@
  */
 
 import { MeterBus } from './meter-bus.js';
-import { rawToDb, dbToRaw, getSteppedRaw, getChannelStateById, getChannelLabel } from './utils.js';
-import { uiState } from './state.js';
+import { rawToDb, dbToRaw, getSteppedRaw, getChannelStateById, getChannelLabel, getLockIdForDataCh } from './utils.js';
+import { uiState, channelStates } from './state.js';
 import { emit } from './socket-client.js';
+
+// ==========================================
+// Macro Configuration Modal & State Management
+// ==========================================
+export function getMacroSelectedChannels() {
+    try {
+        return JSON.parse(localStorage.getItem('macro_selected_channels')) || [];
+    } catch (_) {
+        return [];
+    }
+}
+
+export function setMacroSelectedChannels(channels) {
+    localStorage.setItem('macro_selected_channels', JSON.stringify(channels));
+}
+
+export function getMacroLockedChannels() {
+    try {
+        return JSON.parse(localStorage.getItem('macro_locked_channels')) || [];
+    } catch (_) {
+        return [];
+    }
+}
+
+export function setMacroLockedChannels(channels) {
+    localStorage.setItem('macro_locked_channels', JSON.stringify(channels));
+}
+
+let tempMacroChannels = [];
+
+export function openMacroConfigModal() {
+    let modal = document.getElementById('macroSettingsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'macroSettingsModal';
+        modal.className = 'macro-settings-modal-overlay';
+        modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100000; display:flex; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;';
+        modal.innerHTML = `
+            <div id="macroSettingsModalContent" class="macro-settings-modal-content" style="background:#18181b; border:2px solid #00ffcc; border-radius:12px; max-width:680px; width:100%; max-height:90vh; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; box-shadow:0 10px 40px rgba(0,0,0,0.8);" onclick="event.stopPropagation()">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #27272a; padding-bottom:10px;">
+                    <div>
+                        <h2 id="settingsMacroTitle" style="margin:0; font-size:16px; font-weight:bold; color:#00ffcc;">CONFIGURAÇÃO MACRO FADER</h2>
+                        <p id="settingsMacroSubtitle" style="margin:4px 0 0 0; font-size:12px; color:#888;">Selecione os canais desejados abaixo:</p>
+                    </div>
+                    <button id="macroModalCloseBtn" style="background:transparent; border:none; color:#aaa; font-size:22px; cursor:pointer; padding:4px 8px;">&times;</button>
+                </div>
+                <div id="macroSettingsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(65px, 1fr)); gap:6px; overflow-y:auto; flex:1; padding:4px 0; margin-bottom:16px;"></div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button id="macroModalCancelBtn" style="padding:10px 18px; background:#27272a; color:#fff; border:1px solid #3f3f46; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">CANCELAR</button>
+                    <button id="macroModalSaveBtn" style="padding:10px 22px; background:#00ffcc; color:#000; border:none; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">SALVAR</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', () => closeMacroConfigModal());
+        modal.querySelector('#macroModalCloseBtn').addEventListener('click', () => closeMacroConfigModal());
+        modal.querySelector('#macroModalCancelBtn').addEventListener('click', () => closeMacroConfigModal());
+        modal.querySelector('#macroModalSaveBtn').addEventListener('click', () => {
+            if (uiState.musicianMode) {
+                setMacroLockedChannels(tempMacroChannels);
+            } else {
+                setMacroSelectedChannels(tempMacroChannels);
+            }
+            closeMacroConfigModal();
+        });
+    }
+
+    const title = modal.querySelector('#settingsMacroTitle');
+    const subtitle = modal.querySelector('#settingsMacroSubtitle');
+    const content = modal.querySelector('#macroSettingsModalContent');
+
+    if (uiState.musicianMode) {
+        title.innerText = 'CANAIS PROTEGIDOS';
+        title.style.color = '#ff4444';
+        content.style.borderColor = '#ff4444';
+        if (subtitle) subtitle.innerText = 'Toque nos canais que NÃO quer mexer:';
+        tempMacroChannels = [...getMacroLockedChannels()];
+    } else {
+        title.innerText = 'CONFIGURAÇÃO MACRO FADER';
+        title.style.color = '#00ffcc';
+        content.style.borderColor = '#00ffcc';
+        if (subtitle) subtitle.innerText = 'Selecione os canais desejados abaixo:';
+        tempMacroChannels = [...getMacroSelectedChannels()];
+    }
+
+    renderMacroConfigGrid();
+    modal.style.display = 'flex';
+}
+
+export function closeMacroConfigModal() {
+    const modal = document.getElementById('macroSettingsModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function renderMacroConfigGrid() {
+    const grid = document.getElementById('macroSettingsGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const isLockMode = uiState.musicianMode;
+
+    for (let i = 0; i < 32; i++) {
+        const isSelected = tempMacroChannels.includes(i);
+        const state = (channelStates && channelStates[i]) ? channelStates[i] : {};
+        const isOnMixer = state.on === true;
+        const resolved = (window.resolvedNames && window.resolvedNames[i]) ? window.resolvedNames[i].name : (state.name || `CH ${i + 1}`);
+
+        const btn = document.createElement('button');
+        btn.className = `btn-macro-chan-select ${isSelected ? (isLockMode ? 'macro-ch-locked' : 'macro-ch-selected') : ''}`;
+        btn.style.cssText = 'height:46px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.15s ease; user-select:none; border:1px solid #333;';
+
+        const isPhysicallyLocked = (window.lockedChannels && window.lockedChannels.includes('CH' + (i + 1))) || (uiState.lockedChannels && uiState.lockedChannels.includes('CH' + (i + 1)));
+
+        if (isPhysicallyLocked) {
+            btn.style.background = 'rgba(255, 68, 68, 0.15)';
+            btn.style.color = '#888';
+            btn.style.borderColor = '#ff4444';
+            btn.style.borderStyle = 'dashed';
+            btn.style.cursor = 'not-allowed';
+            btn.style.pointerEvents = 'none';
+        } else if (isLockMode && isSelected) {
+            btn.style.background = '#cc3333';
+            btn.style.color = '#fff';
+            btn.style.borderColor = '#ff4444';
+        } else if (isSelected) {
+            btn.style.background = '#ffcc00';
+            btn.style.color = '#000';
+            btn.style.borderColor = '#ffcc00';
+        } else {
+            btn.style.background = '#27272a';
+            btn.style.color = '#fff';
+            btn.style.borderColor = isOnMixer ? '#ffcc00' : '#3f3f46';
+        }
+
+        btn.innerHTML = `<span style="font-size:10px; opacity:0.8;">CH ${i + 1}</span><span style="font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90%;">${resolved}</span>`;
+
+        if (!isPhysicallyLocked) {
+            btn.addEventListener('click', () => {
+                const idx = tempMacroChannels.indexOf(i);
+                if (idx > -1) {
+                    tempMacroChannels.splice(idx, 1);
+                } else {
+                    tempMacroChannels.push(i);
+                }
+                renderMacroConfigGrid();
+            });
+        }
+
+        grid.appendChild(btn);
+    }
+}
+
+// Expõe globalmente para compatibilidade
+if (typeof window !== 'undefined') {
+    window.openMacroConfigModal = openMacroConfigModal;
+    window.closeMacroConfigModal = closeMacroConfigModal;
+    window.openMacroConfig = openMacroConfigModal;
+}
 
 export class ChannelStripComponent extends HTMLElement {
     static get observedAttributes() {
-        return ['data-ch', 'preset', 'layout', 'data-partner-ch', 'disabled', 'patch', 'pan', 'partner-pan', 'locked', 'pre-post', 'data-aux-idx'];
+        return ['data-ch', 'preset', 'layout', 'data-partner-ch', 'disabled', 'patch', 'pan', 'partner-pan', 'locked', 'pre-post', 'data-aux-idx', 'compact', 'show-config', 'nudge-step'];
     }
 
     constructor() {
         super();
         this._ch = 0;
         this._auxIdx = 1;
-        this._preset = 'input'; // 'input' | 'master' | 'output' | 'auxSend' | 'mini'
+        this._preset = 'input'; // 'input' | 'master' | 'output' | 'auxSend' | 'mini' | 'macro' | 'volumeGeral' | 'auxVolumeGeral' | 'mixVolumeGeral'
         this._layout = 'desktop'; // 'desktop' | 'mobile'
         this._partnerCh = null;
         this._value = 0;
@@ -36,13 +195,28 @@ export class ChannelStripComponent extends HTMLElement {
         this._patch = '';
         this._disabled = false;
         this._locked = false;
+        this._compact = false;
+        this._showConfig = false;
+        this._nudgeStep = null; // Step em dB personalizado (opcional)
         this._isVisible = true;
+
+        // Auto-Repeat / Long Press para Botões de Nudge (+ e -)
+        this._channelNudgeTimeout = null;
+        this._channelNudgeInterval = null;
+
+        // Estado para Presets de Macro / Volume Geral
+        this._deltaSteps = 0;
+        this._dbResetTimer = null;
+        this._nudgeTimeout = null;
+        this._nudgeInterval = null;
+        this._nudgeMaxDurationTimer = null;
 
         // Referências locais de DOM
         this._dom = {
             card: null,
             fader: null,
             dbVal: null,
+            macroDbVal: null,
             btnOn: null,
             btnSolo: null,
             btnPrePost: null,
@@ -57,7 +231,11 @@ export class ChannelStripComponent extends HTMLElement {
             partnerPanTrack: null,
             partnerPanThumb: null,
             patchName: null,
-            patchZone: null
+            patchZone: null,
+            btnNudgePlus: null,
+            btnNudgeMinus: null,
+            btnConfig: null,
+            btnZerar: null
         };
 
         this._observer = null;
@@ -68,11 +246,20 @@ export class ChannelStripComponent extends HTMLElement {
         this._parseAttributes();
         this._render();
         this._bindEvents();
-        this._setupObserver();
-        this._registerMeterBus();
+        if (!this._isMacroPreset()) {
+            this._setupObserver();
+            this._registerMeterBus();
+        }
+        ChannelStripComponent.checkMasterSolo();
     }
 
     disconnectedCallback() {
+        this._stopNudge();
+        this._stopChannelNudge();
+        if (this._dbResetTimer) {
+            clearTimeout(this._dbResetTimer);
+            this._dbResetTimer = null;
+        }
         this._unregisterMeterBus();
         if (this._observer) {
             this._observer.disconnect();
@@ -86,8 +273,14 @@ export class ChannelStripComponent extends HTMLElement {
             this._parseAttributes();
             this._render();
             this._bindEvents();
-            this._registerMeterBus();
+            if (!this._isMacroPreset()) {
+                this._registerMeterBus();
+            }
         }
+    }
+
+    _isMacroPreset() {
+        return ['macro', 'volumeGeral', 'auxVolumeGeral', 'mixVolumeGeral'].includes(this._preset);
     }
 
     _parseAttributes() {
@@ -100,7 +293,15 @@ export class ChannelStripComponent extends HTMLElement {
         this._partnerCh = rawPartner !== null ? parseInt(rawPartner, 10) : null;
         this._disabled = this.hasAttribute('disabled');
         this._locked = this.hasAttribute('locked');
+        this._compact = this.hasAttribute('compact');
+        this._showConfig = this.hasAttribute('show-config') || this._preset === 'macro';
         this._prePost = (this.getAttribute('pre-post') || 'post').toLowerCase();
+        if (this.hasAttribute('nudge-step')) {
+            const parsedStep = parseFloat(this.getAttribute('nudge-step'));
+            this._nudgeStep = isNaN(parsedStep) ? null : parsedStep;
+        } else {
+            this._nudgeStep = null;
+        }
         if (this.hasAttribute('patch')) this._patch = this.getAttribute('patch') || '';
         if (this.hasAttribute('pan')) this._pan = parseInt(this.getAttribute('pan') || '0', 10);
         if (this.hasAttribute('partner-pan')) this._partnerPan = parseInt(this.getAttribute('partner-pan') || '0', 10);
@@ -138,6 +339,7 @@ export class ChannelStripComponent extends HTMLElement {
         if (this._dom.btnSolo) {
             this._dom.btnSolo.classList.toggle('solo-active', this._solo);
         }
+        ChannelStripComponent.checkMasterSolo();
     }
 
     get prePost() { return this._prePost; }
@@ -184,10 +386,36 @@ export class ChannelStripComponent extends HTMLElement {
         this._locked = Boolean(val);
         if (this._locked) {
             this.setAttribute('locked', '');
-            if (this._dom.card) this._dom.card.classList.add('channel-locked');
+            if (this._dom.card) {
+                this._dom.card.classList.add('channel-locked');
+                let overlay = this._dom.card.querySelector('.channel-lock-overlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.className = 'channel-lock-overlay';
+                    overlay.innerHTML = `
+                        <div class="channel-lock-badge" data-lock-id="${getLockIdForDataCh(this._ch)}">
+                            <svg class="channel-lock-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                    `;
+                    const eventsToBlock = ['selectstart', 'dragstart'];
+                    eventsToBlock.forEach(evt => {
+                        overlay.addEventListener(evt, (e) => e.preventDefault());
+                    });
+                    this._dom.card.appendChild(overlay);
+                }
+            }
+            if (this._dom.fader) this._dom.fader.disabled = true;
         } else {
             this.removeAttribute('locked');
-            if (this._dom.card) this._dom.card.classList.remove('channel-locked');
+            if (this._dom.card) {
+                this._dom.card.classList.remove('channel-locked');
+                const overlay = this._dom.card.querySelector('.channel-lock-overlay');
+                if (overlay) overlay.remove();
+            }
+            if (this._dom.fader && !this._disabled) this._dom.fader.disabled = false;
         }
     }
 
@@ -203,6 +431,51 @@ export class ChannelStripComponent extends HTMLElement {
             if (this._dom.card) this._dom.card.classList.remove('strip-disabled');
             if (this._dom.fader) this._dom.fader.disabled = false;
         }
+    }
+
+    get nudgeStep() { return this._nudgeStep; }
+    set nudgeStep(val) {
+        const parsed = parseFloat(val);
+        this._nudgeStep = isNaN(parsed) ? null : parsed;
+        if (this._nudgeStep !== null) {
+            this.setAttribute('nudge-step', this._nudgeStep);
+        } else {
+            this.removeAttribute('nudge-step');
+        }
+    }
+
+    /**
+     * Resolve o step em dB apropriado para o contexto do canal / tela:
+     * - Atributo explícito `nudge-step`: tem prioridade máxima.
+     * - Presets 'auxSend' ou 'auxSendIndividual' (aba interna de envios do canal): 0.50 dB.
+     * - Presets 'sendsOnFader' / 'sendsOnFaderAux' (faders de envio para um aux específico): 0.25 dB.
+     * - Presets 'output' ou canais Mix 1-8 (36-43) e Bus 1-8 (44-51): 0.10 dB.
+     * - Tela Principal / Inputs normais (0-31, ST IN 60-67, Master 52): 0.05 dB.
+     * @returns {number} Step em dB (0.05, 0.10, 0.25 ou 0.50)
+     */
+    _resolveNudgeStep() {
+        if (this._nudgeStep !== null && this._nudgeStep !== undefined && !isNaN(this._nudgeStep)) {
+            return this._nudgeStep;
+        }
+
+        // Contexto de aba interna com envios auxiliares do canal selecionado
+        if (this._preset === 'auxSend' || this._preset === 'auxSendIndividual') {
+            return 0.50;
+        }
+
+        // Contexto de Sends on Fader (faders representam o envio dos 32 canais para um aux)
+        if (this._preset === 'sendsOnFader' || this._preset === 'sendsOnFaderAux') {
+            return 0.25;
+        }
+
+        // Mix 1-8 (36-43), Bus 1-8 (44-51) ou preset output
+        const isMixOrBus = (typeof this._ch === 'number' && this._ch >= 36 && this._ch <= 51);
+        if (this._preset === 'output' || isMixOrBus) {
+            return 0.10;
+        }
+
+        // Tela Principal (Inputs normais 0-31, ST IN 60-67, Master 52 / Stereo)
+        return 0.05;
     }
 
     _updatePanUI() {
@@ -334,9 +607,119 @@ export class ChannelStripComponent extends HTMLElement {
     }
 
     // ==========================================
+    // Renderização dos Presets Macro / Volume Geral
+    // ==========================================
+    _renderMacroPreset() {
+        const isMobile = this._layout === 'mobile';
+        const isCompact = this._compact;
+
+        let title = 'MACRO';
+        let titleLong = 'MACRO FADER';
+        let isZerar = false;
+        let isAuxVG = this._preset === 'auxVolumeGeral';
+        let isMixVG = this._preset === 'mixVolumeGeral';
+
+        if (this._preset === 'volumeGeral') {
+            title = 'GERAL';
+            titleLong = 'VOLUME GERAL';
+        } else if (isAuxVG) {
+            title = 'AUX';
+            titleLong = 'AUX GERAL';
+            isZerar = true;
+        } else if (isMixVG) {
+            title = 'MIX';
+            titleLong = 'VOLUME GERAL';
+            isZerar = true;
+        }
+
+        // Config button exibido no Macro Fader ou Volume Geral em Musician Mode
+        const showConfig = this._showConfig || (this._preset === 'volumeGeral' && uiState.musicianMode);
+
+        const configBtnDesktop = showConfig ? `
+            <div class="macro-fader-config-wrap">
+                <button class="side-btn btn-config macro-fader-config-btn">CONFIG</button>
+            </div>
+        ` : '';
+
+        const configBtnMobile = showConfig ? `
+            <button class="btn-state macro-fader-config-btn-mobile">CONFIG</button>
+        ` : '';
+
+        const zerarBtnDesktop = isZerar ? `
+            <div class="macro-fader-config-wrap">
+                <button class="macro-fader-zerar-btn">ZERAR</button>
+            </div>
+        ` : '';
+
+        const zerarBtnMobile = isZerar ? `
+            <button class="macro-fader-zerar-btn-mobile">ZERAR</button>
+        ` : '';
+
+        const deltaText = this._deltaSteps === 0 ? '--' : this._deltaToDB(this._deltaSteps);
+        const activeClass = this._deltaSteps !== 0 ? 'macro-db-active' : '';
+
+        if (isMobile) {
+            this.innerHTML = `
+                <div class="fader-card macro-fader-card ${isCompact ? 'macro-fader-compact' : ''}">
+                    <h2 class="card-title">${title}</h2>
+                    <div class="ch-clickable-zone macro-ch-clickable-zone">
+                        <div class="ch-name">${titleLong}</div>
+                    </div>
+                    ${configBtnMobile}
+                    <div class="macro-db-display ${activeClass}">${deltaText}</div>
+                    <div class="macro-fader-nudge-wrap">
+                        <div class="macro-nudge-btn-container nudge-plus-container">
+                            <button class="btn-nudge-macro-big btn-nudge-plus">+</button>
+                        </div>
+                        <div class="macro-nudge-btn-container nudge-minus-container">
+                            <button class="btn-nudge-macro-big btn-nudge-minus">-</button>
+                        </div>
+                    </div>
+                    ${zerarBtnMobile}
+                </div>
+            `;
+        } else {
+            this.innerHTML = `
+                <div class="fader-card-desktop macro-fader-card ${isCompact ? 'macro-fader-compact' : ''}">
+                    <div class="desk-label">${title}</div>
+                    <div class="btn-cue-placeholder"></div>
+                    <div class="desk-ch-name-zone macro-ch-name-zone">
+                        <div class="desk-ch-name">${titleLong}</div>
+                    </div>
+                    ${configBtnDesktop}
+                    <div class="macro-db-display ${activeClass}">${deltaText}</div>
+                    <div class="macro-fader-nudge-wrap">
+                        <div class="macro-nudge-btn-container nudge-plus-container">
+                            <button class="btn-nudge-macro-big btn-nudge-plus">+</button>
+                        </div>
+                        <div class="macro-nudge-btn-container nudge-minus-container">
+                            <button class="btn-nudge-macro-big btn-nudge-minus">-</button>
+                        </div>
+                    </div>
+                    ${zerarBtnDesktop}
+                    <div class="desk-footer-label">${title}</div>
+                </div>
+            `;
+        }
+
+        // Coleta de referências locais
+        this._dom.card = this.querySelector('.fader-card-desktop') || this.querySelector('.fader-card');
+        this._dom.macroDbVal = this.querySelector('.macro-db-display');
+        this._dom.btnNudgePlus = this.querySelector('.btn-nudge-plus');
+        this._dom.btnNudgeMinus = this.querySelector('.btn-nudge-minus');
+        this._dom.btnConfig = this.querySelector('.macro-fader-config-btn, .macro-fader-config-btn-mobile');
+        this._dom.btnZerar = this.querySelector('.macro-fader-zerar-btn, .macro-fader-zerar-btn-mobile');
+    }
+
+    // ==========================================
     // Renderização do Template Light DOM
     // ==========================================
     _render() {
+        if (this._isMacroPreset()) {
+            this._renderMacroPreset();
+            return;
+        }
+
         const isMaster = this._ch === 52 || this._preset === 'master';
         const isAuxSend = this._preset === 'auxSend';
         const isPaired = this._partnerCh !== null;
@@ -406,13 +789,13 @@ export class ChannelStripComponent extends HTMLElement {
                     ${isAuxSend ? `
                     <button class="btn-pre-post ${isPre ? 'pre-active' : ''}" title="${isPre ? 'PRE (Pre-Fader)' : 'POST (Post-Fader)'}">${isPre ? 'PRE' : 'POST'}</button>
                     ` : `
-                    <button class="btn-state btn-cue ${this._solo ? 'solo-active' : ''}" ${isMaster ? 'disabled' : ''}>SOLO</button>
+                    <button class="btn-state btn-cue ${this._solo ? 'solo-active' : ''}" ${isMaster ? 'id="master-solo-btn-mobile" data-master-solo="true"' : ''}>SOLO</button>
                     `}
 
                     <button class="btn-state btn-on-desk ${this._on ? 'on-active' : ''}">ON</button>
 
                     <div class="nudge-zone">
-                        <button class="btn-nudge btn-nudge-plus pointer-none">+</button>
+                        <button class="btn-nudge btn-nudge-plus">+</button>
                     </div>
 
                     <div class="fader-rotated-container">
@@ -421,17 +804,19 @@ export class ChannelStripComponent extends HTMLElement {
 
                     <div class="ch-clickable-zone bottom mt-auto">
                         <div class="nudge-zone">
-                            <button class="btn-nudge btn-nudge-minus pointer-none">-</button>
+                            <button class="btn-nudge btn-nudge-minus">-</button>
                             <h1 class="fader-val db-val-text">${dbText}</h1>
                         </div>
                     </div>
 
                     ${this._locked ? `
                     <div class="channel-lock-overlay">
-                        <svg class="lock-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
+                        <div class="channel-lock-badge" data-lock-id="${getLockIdForDataCh(this._ch)}">
+                            <svg class="channel-lock-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
                     </div>
                     ` : ''}
                 </div>
@@ -444,7 +829,7 @@ export class ChannelStripComponent extends HTMLElement {
                     <div class="desk-label-wrapper">
                         <div class="desk-label ${this._on ? 'label-on' : ''}">${labelText}</div>
                         ${!isMaster && !isAuxSend ? `
-                        <div class="desk-label-lock" title="Travar/Destravar canal">
+                        <div class="desk-label-lock" data-ch="${this._ch}" title="Travar/Destravar canal">
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -457,7 +842,7 @@ export class ChannelStripComponent extends HTMLElement {
                     ${isAuxSend ? `
                     <button class="btn-pre-post ${isPre ? 'pre-active' : ''}" title="${isPre ? 'PRE (Pre-Fader)' : 'POST (Post-Fader)'}">${isPre ? 'PRE' : 'POST'}</button>
                     ` : `
-                    <button class="btn-cue ${this._solo ? 'solo-active' : ''}" ${isMaster ? 'id="master-solo-btn" disabled' : ''}>SOLO</button>
+                    <button class="btn-cue ${this._solo ? 'solo-active' : ''}" ${isMaster ? 'id="master-solo-btn" data-master-solo="true"' : ''}>SOLO</button>
                     `}
 
                     <!-- Visor LCD de Nome -->
@@ -533,10 +918,12 @@ export class ChannelStripComponent extends HTMLElement {
 
                     ${this._locked ? `
                     <div class="channel-lock-overlay">
-                        <svg class="lock-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
+                        <div class="channel-lock-badge" data-lock-id="${getLockIdForDataCh(this._ch)}">
+                            <svg class="channel-lock-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
                     </div>
                     ` : ''}
                 </div>
@@ -572,7 +959,321 @@ export class ChannelStripComponent extends HTMLElement {
     // ==========================================
     // Eventos e Interações
     // ==========================================
+    // ==========================================
+    // Lógica e Métodos do Macro / Volume Geral
+    // ==========================================
+    _deltaToDB(steps) {
+        if (this._preset === 'auxVolumeGeral' || this._preset === 'mixVolumeGeral') {
+            const db = steps * 0.05;
+            const sign = db >= 0 ? '+' : '';
+            return `${sign}${db.toFixed(2)} dB`;
+        }
+        const db = uiState.musicianMode ? steps * 1.0 : steps * 0.05;
+        const sign = db >= 0 ? '+' : '';
+        return uiState.musicianMode ? `${sign}${db.toFixed(0)} dB` : `${sign}${db.toFixed(2)} dB`;
+    }
+
+    _updateMacroDbDisplay() {
+        if (!this._dom.macroDbVal) return;
+        if (this._deltaSteps === 0) {
+            this._dom.macroDbVal.textContent = '--';
+            this._dom.macroDbVal.classList.remove('macro-db-active');
+        } else {
+            this._dom.macroDbVal.textContent = this._deltaToDB(this._deltaSteps);
+            this._dom.macroDbVal.classList.add('macro-db-active');
+        }
+    }
+
+    _resetMacroDbDisplay() {
+        if (this._dbResetTimer) clearTimeout(this._dbResetTimer);
+        this._dbResetTimer = setTimeout(() => {
+            this._deltaSteps = 0;
+            this._updateMacroDbDisplay();
+            this._dbResetTimer = null;
+        }, 5000);
+    }
+
+    _getTargetChannels() {
+        const isChanLocked = (i) => {
+            return (window.lockedChannels && window.lockedChannels.includes('CH' + (i + 1))) ||
+                (uiState.lockedChannels && uiState.lockedChannels.includes('CH' + (i + 1)));
+        };
+
+        if (this._preset === 'volumeGeral') {
+            if (uiState.musicianMode) {
+                const locked = getMacroLockedChannels();
+                return Array.from({ length: 32 }, (_, i) => i).filter(i => !locked.includes(i) && !isChanLocked(i));
+            }
+            return Array.from({ length: 32 }, (_, i) => i).filter(i => !isChanLocked(i));
+        }
+
+        // Preset 'macro'
+        if (uiState.musicianMode) {
+            const locked = getMacroLockedChannels();
+            return Array.from({ length: 32 }, (_, i) => i).filter(i => !locked.includes(i) && !isChanLocked(i));
+        }
+        const selected = getMacroSelectedChannels();
+        return selected.filter(i => !isChanLocked(i));
+    }
+
+    _nudgeMacro(dir) {
+        if (this._preset === 'auxVolumeGeral') {
+            this._nudgeAuxVolumeGeral(dir);
+            return;
+        }
+        if (this._preset === 'mixVolumeGeral') {
+            this._nudgeMixVolumeGeral(dir);
+            return;
+        }
+
+        const channels = this._getTargetChannels();
+        if (!channels.length) return;
+
+        const isMusician = uiState.musicianMode;
+        const isTechMix = uiState.technicianMixMode;
+        const activeMix = uiState.activeMix || 1;
+        const step = isMusician ? dir * 20 : dir;
+        let anyChanged = false;
+
+        channels.forEach(chIdx => {
+            const s = (channelStates && channelStates[chIdx]) ? channelStates[chIdx] : getChannelStateById(chIdx);
+            if (!s) return;
+
+            const currentVal = (isMusician || isTechMix) ? (s[`aux${activeMix}`] || 0) : (s.value !== undefined ? s.value : 0);
+            if (isMusician && currentVal <= 0) return;
+
+            let nRaw = currentVal + step;
+            if (nRaw < 0) nRaw = 0;
+            if (nRaw > 1023) nRaw = 1023;
+
+            if (nRaw === currentVal) return;
+
+            anyChanged = true;
+            if (isMusician || isTechMix) {
+                s[`aux${activeMix}`] = nRaw;
+                emit('control', { type: `kInputAUX/kAUX${activeMix}Level`, channel: chIdx, value: nRaw });
+            } else {
+                s.value = nRaw;
+                emit('control', { type: 'kInputFader/kFader', channel: chIdx, value: nRaw });
+            }
+
+            // Atualiza strip correspondente se presente no DOM
+            const targetStrip = document.querySelector(`channel-strip[data-ch="${chIdx}"]`);
+            if (targetStrip && targetStrip !== this) {
+                targetStrip.value = nRaw;
+            }
+        });
+
+        if (!anyChanged) return;
+        this._deltaSteps += dir;
+        this._updateMacroDbDisplay();
+        this._resetMacroDbDisplay();
+    }
+
+    _nudgeAuxVolumeGeral(dir) {
+        const ch = (this._ch !== undefined && this._ch !== null) ? this._ch : uiState.activeConfigChannel;
+        if (ch === null || ch === undefined || ch > 31) return;
+        const s = (channelStates && channelStates[ch]) ? channelStates[ch] : getChannelStateById(ch);
+        if (!s) return;
+
+        const step = dir;
+        let anyChanged = false;
+
+        for (let auxIdx = 1; auxIdx <= 8; auxIdx++) {
+            const currentVal = s[`aux${auxIdx}`] || 0;
+            if (currentVal <= 0) continue;
+            let nRaw = currentVal + step;
+            if (nRaw < 0) nRaw = 0;
+            if (nRaw > 1023) nRaw = 1023;
+            if (nRaw === currentVal) continue;
+
+            anyChanged = true;
+            s[`aux${auxIdx}`] = nRaw;
+            emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });
+
+            const auxStrip = document.querySelector(`channel-strip[preset="auxSend"][data-aux-idx="${auxIdx}"]`);
+            if (auxStrip) {
+                auxStrip.value = nRaw;
+            }
+        }
+
+        if (!anyChanged) return;
+        this._deltaSteps += dir;
+        this._updateMacroDbDisplay();
+        this._resetMacroDbDisplay();
+    }
+
+    _nudgeMixVolumeGeral(dir) {
+        const ch = (this._ch !== undefined && this._ch !== null) ? this._ch : uiState.activeConfigChannel;
+        if (ch === null || ch === undefined || ch < 36 || ch > 43) return;
+        const mixIdx = ch - 35; // MIX 1 (36) -> auxIdx 1
+        const step = dir;
+        let anyChanged = false;
+
+        for (let i = 0; i < 32; i++) {
+            const s = (channelStates && channelStates[i]) ? channelStates[i] : getChannelStateById(i);
+            if (!s) continue;
+            const currentVal = s[`aux${mixIdx}`] || 0;
+            if (currentVal <= 0) continue;
+            let nRaw = currentVal + step;
+            if (nRaw < 0) nRaw = 0;
+            if (nRaw > 1023) nRaw = 1023;
+            if (nRaw === currentVal) continue;
+
+            anyChanged = true;
+            s[`aux${mixIdx}`] = nRaw;
+            emit('control', { type: `kInputAUX/kAUX${mixIdx}Level`, channel: i, value: nRaw });
+        }
+
+        if (!anyChanged) return;
+        this._deltaSteps += dir;
+        this._updateMacroDbDisplay();
+        this._resetMacroDbDisplay();
+    }
+
+    _startNudge(dir) {
+        this._stopNudge();
+        this._nudgeMacro(dir);
+
+        const isMusician = uiState.musicianMode;
+        const repeatMs = isMusician ? 160 : 80;
+        const holdMs = isMusician ? 200 : 500;
+
+        this._nudgeTimeout = setTimeout(() => {
+            this._nudgeInterval = setInterval(() => {
+                this._nudgeMacro(dir * 3);
+            }, repeatMs);
+        }, holdMs);
+
+        this._nudgeMaxDurationTimer = setTimeout(() => {
+            this._stopNudge();
+        }, 10000);
+    }
+
+    _stopNudge() {
+        if (this._nudgeTimeout) clearTimeout(this._nudgeTimeout);
+        if (this._nudgeInterval) clearInterval(this._nudgeInterval);
+        if (this._nudgeMaxDurationTimer) clearTimeout(this._nudgeMaxDurationTimer);
+        this._nudgeTimeout = null;
+        this._nudgeInterval = null;
+        this._nudgeMaxDurationTimer = null;
+    }
+
+    _zeroAuxVolumeGeral() {
+        const ch = (this._ch !== undefined && this._ch !== null) ? this._ch : uiState.activeConfigChannel;
+        if (ch === null || ch === undefined || ch > 31) return;
+        const s = (channelStates && channelStates[ch]) ? channelStates[ch] : getChannelStateById(ch);
+        if (!s) return;
+
+        for (let auxIdx = 1; auxIdx <= 8; auxIdx++) {
+            const currentVal = s[`aux${auxIdx}`] || 0;
+            if (currentVal <= 0) continue;
+            s[`aux${auxIdx}`] = 0;
+            emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: 0 });
+
+            const auxStrip = document.querySelector(`channel-strip[preset="auxSend"][data-aux-idx="${auxIdx}"]`);
+            if (auxStrip) {
+                auxStrip.value = 0;
+            }
+        }
+
+        this._deltaSteps = 0;
+        this._updateMacroDbDisplay();
+    }
+
+    _zeroMixVolumeGeral() {
+        const ch = (this._ch !== undefined && this._ch !== null) ? this._ch : uiState.activeConfigChannel;
+        if (ch === null || ch === undefined || ch < 36 || ch > 43) return;
+        const mixIdx = ch - 35;
+
+        for (let i = 0; i < 32; i++) {
+            const s = (channelStates && channelStates[i]) ? channelStates[i] : getChannelStateById(i);
+            if (!s) continue;
+            const currentVal = s[`aux${mixIdx}`] || 0;
+            if (currentVal <= 0) continue;
+            s[`aux${mixIdx}`] = 0;
+            emit('control', { type: `kInputAUX/kAUX${mixIdx}Level`, channel: i, value: 0 });
+        }
+
+        this._deltaSteps = 0;
+        this._updateMacroDbDisplay();
+    }
+
+    // ==========================================
+    // Lógica de Nudge / Auto-Repeat para Canais
+    // ==========================================
+    _applyChannelNudge(dir) {
+        if (this._locked || this._disabled) return;
+        const isMaster = this._ch === 52 || this._preset === 'master';
+        const stepDb = this._resolveNudgeStep();
+        const nextRaw = getSteppedRaw(this._value, dir, stepDb, isMaster);
+
+        if (nextRaw === this._value) return;
+
+        this.value = nextRaw;
+        if (this._preset === 'auxSend' || this._preset === 'auxSendIndividual') {
+            emit('control', {
+                type: `kInputAUX/kAUX${this._auxIdx}Level`,
+                channel: this._ch,
+                value: nextRaw
+            });
+        } else if (this._preset === 'sendsOnFader' || this._preset === 'sendsOnFaderAux') {
+            emit('control', {
+                type: `kInputAUX/kAUX${this._auxIdx}Level`,
+                channel: this._ch,
+                value: nextRaw
+            });
+        } else if (this._preset === 'output' || (typeof this._ch === 'number' && this._ch >= 36 && this._ch <= 43)) {
+            emit('control', {
+                type: 'kAUXFader/kFader',
+                channel: typeof this._ch === 'number' && this._ch >= 36 ? this._ch - 36 : this._ch,
+                value: nextRaw
+            });
+        } else if (typeof this._ch === 'number' && this._ch >= 44 && this._ch <= 51) {
+            emit('control', {
+                type: 'kBusFader/kFader',
+                channel: this._ch - 44,
+                value: nextRaw
+            });
+        } else {
+            emit('control', {
+                type: isMaster ? 'kStereoFader/kFader' : 'kInputFader/kFader',
+                channel: this._ch,
+                value: nextRaw
+            });
+        }
+    }
+
+    _startChannelNudge(dir) {
+        this._stopChannelNudge();
+        this._applyChannelNudge(dir);
+
+        // Timeout inicial de 350ms antes de começar o auto-repeat
+        this._channelNudgeTimeout = setTimeout(() => {
+            // Repetição contínua a cada 60ms enquanto o botão estiver pressionado
+            this._channelNudgeInterval = setInterval(() => {
+                this._applyChannelNudge(dir);
+            }, 60);
+        }, 350);
+    }
+
+    _stopChannelNudge() {
+        if (this._channelNudgeTimeout) {
+            clearTimeout(this._channelNudgeTimeout);
+            this._channelNudgeTimeout = null;
+        }
+        if (this._channelNudgeInterval) {
+            clearInterval(this._channelNudgeInterval);
+            this._channelNudgeInterval = null;
+        }
+    }
+
     _bindEvents() {
+        if (this._isMacroPreset()) {
+            this._bindMacroEvents();
+            return;
+        }
+
         if (this._dom.fader) {
             // Proteção estilo mesa física: impede salto do fader ao clicar no trilho
             const restrictSliderTrackTap = (e) => {
@@ -641,7 +1342,9 @@ export class ChannelStripComponent extends HTMLElement {
         }
 
         if (this._dom.btnOn) {
-            this._dom.btnOn.addEventListener('click', () => {
+            this._dom.btnOn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this._locked || this._disabled) return;
                 const nextOn = !this._on;
                 this.on = nextOn;
                 if (this._preset === 'auxSend') {
@@ -663,6 +1366,7 @@ export class ChannelStripComponent extends HTMLElement {
         if (this._dom.btnPrePost) {
             this._dom.btnPrePost.addEventListener('click', (e) => {
                 e.stopPropagation();
+                if (this._locked || this._disabled) return;
                 const nextPre = this._prePost !== 'pre';
                 this.prePost = nextPre;
                 emit('control', {
@@ -673,58 +1377,58 @@ export class ChannelStripComponent extends HTMLElement {
             });
         }
 
-        if (this._dom.btnSolo && this._ch !== 52) {
-            this._dom.btnSolo.addEventListener('click', () => {
-                const nextSolo = !this._solo;
-                this.solo = nextSolo;
-                emit('control', {
-                    type: 'kSetupSoloChOn/kSoloChOn',
-                    channel: this._ch,
-                    value: nextSolo ? 1 : 0
+        if (this._dom.btnSolo) {
+            if (this._ch !== 52 && this._preset !== 'master') {
+                this._dom.btnSolo.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this._locked || this._disabled) return;
+                    const nextSolo = !this._solo;
+                    this.solo = nextSolo;
+                    emit('control', {
+                        type: 'kSetupSoloChOn/kSoloChOn',
+                        channel: this._ch,
+                        value: nextSolo ? 1 : 0
+                    });
                 });
-            });
+            } else {
+                // Master Strip: Botão SOLO atua como "UNSOLO ALL" (Clear all solos) quando está em alerta piscando
+                this._dom.btnSolo.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this._dom.btnSolo.classList.contains('master-solo-alert')) {
+                        ChannelStripComponent.clearAllSolos();
+                    }
+                });
+            }
         }
 
         const btnPlus = this.querySelector('.btn-nudge-plus');
         if (btnPlus) {
-            btnPlus.addEventListener('click', () => {
-                const nextRaw = getSteppedRaw(this._value, 1, 0.5);
-                this.value = nextRaw;
-                if (this._preset === 'auxSend') {
-                    emit('control', {
-                        type: `kInputAUX/kAUX${this._auxIdx}Level`,
-                        channel: this._ch,
-                        value: nextRaw
-                    });
-                } else {
-                    emit('control', {
-                        type: this._ch === 52 ? 'kStereoFader/kFader' : 'kInputFader/kFader',
-                        channel: this._ch,
-                        value: nextRaw
-                    });
-                }
+            btnPlus.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+                if (e.button !== undefined && e.button !== 0) return;
+                this._startChannelNudge(1);
             });
+            btnPlus.addEventListener('pointerup', () => this._stopChannelNudge());
+            btnPlus.addEventListener('pointercancel', () => this._stopChannelNudge());
+            btnPlus.addEventListener('pointerleave', () => this._stopChannelNudge());
+
+            // Previne context menu e drag indesejado em touch/longpress
+            btnPlus.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
         const btnMinus = this.querySelector('.btn-nudge-minus');
         if (btnMinus) {
-            btnMinus.addEventListener('click', () => {
-                const nextRaw = getSteppedRaw(this._value, -1, 0.5);
-                this.value = nextRaw;
-                if (this._preset === 'auxSend') {
-                    emit('control', {
-                        type: `kInputAUX/kAUX${this._auxIdx}Level`,
-                        channel: this._ch,
-                        value: nextRaw
-                    });
-                } else {
-                    emit('control', {
-                        type: this._ch === 52 ? 'kStereoFader/kFader' : 'kInputFader/kFader',
-                        channel: this._ch,
-                        value: nextRaw
-                    });
-                }
+            btnMinus.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+                if (e.button !== undefined && e.button !== 0) return;
+                this._startChannelNudge(-1);
             });
+            btnMinus.addEventListener('pointerup', () => this._stopChannelNudge());
+            btnMinus.addEventListener('pointercancel', () => this._stopChannelNudge());
+            btnMinus.addEventListener('pointerleave', () => this._stopChannelNudge());
+
+            // Previne context menu e drag indesejado em touch/longpress
+            btnMinus.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
         const panIndicator = this.querySelector('.desk-pan-indicator');
@@ -873,6 +1577,52 @@ export class ChannelStripComponent extends HTMLElement {
             }, { passive: false });
         }
     }
+
+    _bindMacroEvents() {
+        if (this._dom.btnConfig) {
+            this._dom.btnConfig.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openMacroConfigModal();
+            });
+        }
+
+        if (this._dom.btnZerar) {
+            this._dom.btnZerar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this._preset === 'auxVolumeGeral') {
+                    this._zeroAuxVolumeGeral();
+                } else if (this._preset === 'mixVolumeGeral') {
+                    if (typeof window.showMixZeroConfirm === 'function') {
+                        window.showMixZeroConfirm();
+                    } else {
+                        this._zeroMixVolumeGeral();
+                    }
+                }
+            });
+        }
+
+        const plusContainer = this.querySelector('.nudge-plus-container') || this._dom.btnNudgePlus;
+        if (plusContainer) {
+            plusContainer.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                this._startNudge(1);
+            });
+            plusContainer.addEventListener('pointerup', () => this._stopNudge());
+            plusContainer.addEventListener('pointerleave', () => this._stopNudge());
+            plusContainer.addEventListener('pointercancel', () => this._stopNudge());
+        }
+
+        const minusContainer = this.querySelector('.nudge-minus-container') || this._dom.btnNudgeMinus;
+        if (minusContainer) {
+            minusContainer.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                this._startNudge(-1);
+            });
+            minusContainer.addEventListener('pointerup', () => this._stopNudge());
+            minusContainer.addEventListener('pointerleave', () => this._stopNudge());
+            minusContainer.addEventListener('pointercancel', () => this._stopNudge());
+        }
+    }
 }
 
 // Registro oficial do Custom Element
@@ -910,5 +1660,134 @@ ChannelStripComponent.presets = {
         el.setAttribute('data-ch', ch);
         el.setAttribute('preset', 'mini');
         return el;
+    },
+    macro: (options = {}) => {
+        const el = document.createElement('channel-strip');
+        el.setAttribute('preset', 'macro');
+        if (options.compact) el.setAttribute('compact', '');
+        if (options.showConfig) el.setAttribute('show-config', '');
+        return el;
+    },
+    volumeGeral: (options = {}) => {
+        const el = document.createElement('channel-strip');
+        el.setAttribute('preset', 'volumeGeral');
+        if (options.compact) el.setAttribute('compact', '');
+        if (options.showConfig) el.setAttribute('show-config', '');
+        return el;
+    },
+    auxVolumeGeral: (ch, options = {}) => {
+        const el = document.createElement('channel-strip');
+        el.setAttribute('preset', 'auxVolumeGeral');
+        if (ch !== undefined && ch !== null) el.setAttribute('data-ch', ch);
+        if (options.compact) el.setAttribute('compact', '');
+        return el;
+    },
+    mixVolumeGeral: (ch, options = {}) => {
+        const el = document.createElement('channel-strip');
+        el.setAttribute('preset', 'mixVolumeGeral');
+        if (ch !== undefined && ch !== null) el.setAttribute('data-ch', ch);
+        if (options.compact) el.setAttribute('compact', '');
+        return el;
     }
 };
+
+/**
+ * Lógica Global de Monitoramento do Master Solo (01v96)
+ * Se qualquer canal no mixer / DOM estiver com solo ativo, os botões SOLO do MASTER
+ * (desktop e mobile) entram em alerta pulsante. Clicar no botão aciona "UNSOLO ALL".
+ */
+ChannelStripComponent.checkMasterSolo = function () {
+    const strips = Array.from(document.querySelectorAll('channel-strip'));
+    const hasAnySolo = strips.some(strip => {
+        const isMaster = strip.getAttribute('data-ch') === '52' ||
+            strip.getAttribute('data-ch') === 'master' ||
+            strip.getAttribute('preset') === 'master';
+        if (isMaster) return false;
+        return strip.solo === true;
+    }) || (typeof channelStates !== 'undefined' && Array.isArray(channelStates) && channelStates.some(s => s && s.solo === true));
+
+    const masterStrips = strips.filter(strip => {
+        return strip.getAttribute('data-ch') === '52' ||
+            strip.getAttribute('data-ch') === 'master' ||
+            strip.getAttribute('preset') === 'master';
+    });
+
+    masterStrips.forEach(masterStrip => {
+        const soloBtns = masterStrip.querySelectorAll('.btn-cue, .btn-state.btn-cue');
+        soloBtns.forEach(btn => {
+            if (hasAnySolo) {
+                btn.classList.add('master-solo-alert');
+                btn.removeAttribute('disabled');
+                btn.title = 'Limpar todos os solos ativos (UNSOLO ALL)';
+            } else {
+                btn.classList.remove('master-solo-alert');
+                btn.removeAttribute('title');
+            }
+        });
+    });
+
+    const standaloneMasterBtns = document.querySelectorAll('#master-solo-btn, #master-solo-btn-mobile');
+    standaloneMasterBtns.forEach(btn => {
+        if (hasAnySolo) {
+            btn.classList.add('master-solo-alert');
+            btn.removeAttribute('disabled');
+            btn.title = 'Limpar todos os solos ativos (UNSOLO ALL)';
+        } else {
+            btn.classList.remove('master-solo-alert');
+            btn.removeAttribute('title');
+        }
+    });
+};
+
+/**
+ * Desmarca o solo de todos os canais ativos (UNSOLO ALL),
+ * enviando os comandos OSC/Socket correspondentes e atualizando a interface.
+ */
+ChannelStripComponent.clearAllSolos = async function () {
+    const strips = Array.from(document.querySelectorAll('channel-strip'));
+    const soloedStrips = strips.filter(strip => {
+        const isMaster = strip.getAttribute('data-ch') === '52' ||
+            strip.getAttribute('data-ch') === 'master' ||
+            strip.getAttribute('preset') === 'master';
+        return !isMaster && strip.solo === true;
+    });
+
+    // Remove alerta imediatamente dos botões de Master
+    const masterBtns = document.querySelectorAll('.master-solo-alert');
+    masterBtns.forEach(btn => btn.classList.remove('master-solo-alert'));
+
+    // Desativa strips no DOM
+    for (const strip of soloedStrips) {
+        strip.solo = false;
+        const ch = strip._ch !== undefined ? strip._ch : parseInt(strip.getAttribute('data-ch') || '0', 10);
+        emit('control', {
+            type: 'kSetupSoloChOn/kSoloChOn',
+            channel: ch,
+            value: 0
+        });
+        await new Promise(r => setTimeout(r, 30));
+    }
+
+    // Se houver channelStates em memória (modo app completo)
+    if (typeof channelStates !== 'undefined' && Array.isArray(channelStates)) {
+        channelStates.forEach((s, idx) => {
+            if (s && s.solo) {
+                s.solo = false;
+                emit('control', {
+                    type: 'kSetupSoloChOn/kSoloChOn',
+                    channel: idx,
+                    value: 0
+                });
+            }
+        });
+    }
+
+    ChannelStripComponent.checkMasterSolo();
+};
+
+if (typeof window !== 'undefined') {
+    window.ChannelStripComponent = ChannelStripComponent;
+    window.checkMasterSoloIndicator = ChannelStripComponent.checkMasterSolo;
+    window.clearAllSolos = ChannelStripComponent.clearAllSolos;
+}
+

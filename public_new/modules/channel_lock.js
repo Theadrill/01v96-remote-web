@@ -2,10 +2,9 @@
  * MÓDULO: Sistema de Lock Manual e Sincronizado de Canais
  * public/modules/channel_lock.js
  *
- * Mobile (.ch-clickable-zone.top e .channel-lock-badge):
- *   - Tap rápido: abre a configuração normal do canal.
- *   - Arrasto (> 10px): cancela o long press e permite o scroll.
- *   - Long press: abre modal com [TRAVAR/DESTRAVAR] [RENOMEAR] [CANCELAR].
+ * Mobile (.ch-clickable-zone.top e .channel-lock-badge / canal travado):
+ *   - Tap simples / Long press: abre modal com [TRAVAR CANAL / DESTRAVAR CANAL] [RENOMEAR CANAL] [CANCELAR].
+ *   - Arrasto (> 10px): cancela a ação e permite o scroll.
  *
  * Desktop: apenas click no cadeado (cabeçalho abre config).
  */
@@ -17,10 +16,6 @@
     let startY = 0;
     let suppressClick = false;
 
-    let lastTapTime = 0;
-    let lastTapLockId = null;
-    const DOUBLE_TAP_DELAY = 350;
-
     function getLockIdForDataCh(dataCh) {
         if (dataCh === 'master' || dataCh === '52' || dataCh === 52) return 'MASTER';
         const val = parseInt(dataCh, 10);
@@ -28,6 +23,7 @@
         if (val >= 0 && val <= 31) return 'CH' + (val + 1);
         if (val >= 36 && val <= 43) return 'MIX' + (val - 35);
         if (val >= 44 && val <= 51) return 'BUS' + (val - 43);
+        if (val >= 60 && val <= 67) return 'ST' + (val - 59);
         return null;
     }
 
@@ -37,6 +33,11 @@
         if (!el) return null;
         const badge = el.closest('.channel-lock-badge');
         if (badge) return badge.getAttribute('data-lock-id') || null;
+        const strip = el.closest('channel-strip');
+        if (strip) {
+            const dataCh = strip.getAttribute('data-ch');
+            if (dataCh) return getLockIdForDataCh(dataCh);
+        }
         const card = el.closest('.fader-card, .fader-card-desktop');
         if (!card) return null;
         return getLockIdForDataCh(card.getAttribute('data-ch'));
@@ -57,6 +58,10 @@
             const n = parseInt(lockId.substring(3), 10);
             return (!isNaN(n) && n >= 1 && n <= 8) ? 43 + n : null;
         }
+        if (lockId.startsWith('ST')) {
+            const n = parseInt(lockId.substring(2), 10);
+            return (!isNaN(n) && n >= 1 && n <= 8) ? 59 + n : null;
+        }
         return null;
     }
 
@@ -65,11 +70,11 @@
     }
 
     // No mobile:
-    // - Se o canal estiver travado (locked), qualquer área do overlay/card responde ao long press.
-    // - Se estiver destravado, apenas a zona clicável superior (.ch-clickable-zone.top) responde.
-    function isMobileLongPressZone(el) {
+    // - Se o canal estiver travado (locked), qualquer área do overlay/card responde.
+    // - Se estiver destravado, a zona clicável superior (.ch-clickable-zone.top) responde.
+    function isMobileActionZone(el) {
         if (!el) return false;
-        if (el.closest('.channel-lock-overlay, .channel-locked')) return true;
+        if (el.closest('.channel-lock-overlay, .channel-locked, channel-strip[locked]')) return true;
         return !!el.closest('.ch-clickable-zone.top');
     }
 
@@ -78,10 +83,10 @@
     }
 
     function getHoldDuration() {
-        return (window.themeChannelLockConfig && window.themeChannelLockConfig.hold_duration_ms) || 1500;
+        return (window.themeChannelLockConfig && window.themeChannelLockConfig.hold_duration_ms) || 450;
     }
 
-    // ── Confirmação de toggle ──────────────────────────────────
+    // ── Confirmação de toggle direta (usada no Desktop ao clicar no cadeado) ──
     window.confirmToggleChannelLock = function (lockId) {
         if (!lockId) return;
         const isLocked = window.lockedChannels && window.lockedChannels.includes(lockId);
@@ -90,13 +95,13 @@
             title: `DESTRAVAR CANAL ${lockId}`,
             message: `Deseja DESTRAVAR as interações do canal ${lockId}?`,
             type: 'info',
-            confirmText: 'SIM, DESTRAVAR',
+            confirmText: 'DESTRAVAR CANAL',
             cancelText: 'CANCELAR'
         } : {
             title: `TRAVAR CANAL ${lockId}`,
             message: `Deseja TRAVAR as interações do canal ${lockId}? Isso impedirá movimentos acidentais de fader, mute ou solo.`,
             type: 'warning',
-            confirmText: 'SIM, TRAVAR',
+            confirmText: 'TRAVAR CANAL',
             cancelText: 'CANCELAR'
         };
 
@@ -128,7 +133,7 @@
         longPressTimeout = setTimeout(() => {
             const target = longPressLockId;
             cancelLongPress();
-            suppressClick = true; // evita que o click subsequente abra a config
+            suppressClick = true; // evita que o click subsequente reabra o modal
             window.openChannelActionsModal(target);
         }, getHoldDuration());
     }
@@ -136,7 +141,7 @@
     function onPointerDown(e) {
         if (isDesktop()) return;
         if (e.button && e.button !== 0) return;
-        if (!isMobileLongPressZone(e.target)) return;
+        if (!isMobileActionZone(e.target)) return;
 
         const lockId = getLockIdFromElement(e.target);
         if (!lockId) return;
@@ -172,7 +177,7 @@
                 : `O canal ${lockId} está destravado. Escolha uma ação:`,
             type: isLocked ? 'warning' : 'info',
             buttons: [
-                { label: isLocked ? 'SIM, DESTRAVAR' : 'SIM, TRAVAR', type: isLocked ? 'info' : 'warning', action: 'toggle' },
+                { label: isLocked ? 'DESTRAVAR CANAL' : 'TRAVAR CANAL', type: isLocked ? 'info' : 'warning', action: 'toggle' },
                 { label: 'RENOMEAR CANAL', type: 'primary', action: 'rename' },
                 { label: 'CANCELAR', type: 'secondary', action: 'cancel' }
             ]
@@ -212,6 +217,24 @@
         }
     }
 
+    // ── Clique único no Mobile (abre modal de 3 opções) ──────────
+    function onMobileClick(e) {
+        if (isDesktop()) return;
+        if (suppressClick) {
+            suppressClick = false;
+            return;
+        }
+
+        if (!isMobileActionZone(e.target)) return;
+
+        const lockId = getLockIdFromElement(e.target);
+        if (!lockId) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        window.openChannelActionsModal(lockId);
+    }
+
     // Impede que o click seguinte ao long press / arrasto abra a config por engano
     function onDocumentClickCapture(e) {
         if (isDesktop()) return;
@@ -219,7 +242,7 @@
         suppressClick = false;
         const zone = e.target && e.target.closest && e.target.closest('.ch-clickable-zone.top, .channel-lock-badge, .channel-lock-overlay');
         if (!zone) return;
-        if (zone.closest('#faders-container, #master-container')) {
+        if (zone.closest('#faders-container, #master-container, #stripsContainer, .strips-row, main')) {
             e.preventDefault();
             e.stopPropagation();
         }
@@ -230,36 +253,13 @@
         if (isDesktop()) return;
         if (longPressLockId === null && !suppressClick) return;
         const zone = e.target && e.target.closest && e.target.closest('.ch-clickable-zone.top, .channel-lock-badge, .channel-lock-overlay');
-        if (zone && zone.closest('#faders-container, #master-container')) {
+        if (zone && zone.closest('#faders-container, #master-container, #stripsContainer, .strips-row, main')) {
             e.preventDefault();
             e.stopPropagation();
         }
     }
 
-    // ── Double-tap ─────────────────────────────────────────────
-    function onTap(e) {
-        if (isDesktop()) return;
-        if (!isLockZone(e.target)) return;
-
-        const lockId = getLockIdFromElement(e.target);
-        if (!lockId) return;
-
-        if (!window.lockedChannels || !window.lockedChannels.includes(lockId)) return;
-
-        const now = Date.now();
-        if (lastTapLockId === lockId && (now - lastTapTime) < DOUBLE_TAP_DELAY) {
-            lastTapTime = 0;
-            lastTapLockId = null;
-            e.preventDefault();
-            e.stopPropagation();
-            window.confirmToggleChannelLock(lockId);
-        } else {
-            lastTapTime = now;
-            lastTapLockId = lockId;
-        }
-    }
-
-    // ── Click no badge (todas as plataformas) ──────────────────
+    // ── Click no badge (Desktop abre confirmação direta; Mobile é capturado por onMobileClick) ──
     function onBadgeClick(e) {
         const badge = e.target.closest('.channel-lock-badge');
         if (!badge) return;
@@ -269,7 +269,12 @@
 
         e.preventDefault();
         e.stopPropagation();
-        window.confirmToggleChannelLock(lockId);
+
+        if (isDesktop()) {
+            window.confirmToggleChannelLock(lockId);
+        } else {
+            window.openChannelActionsModal(lockId);
+        }
     }
 
     // ── Click no cadeado do header (desktop) ───────────────────
@@ -280,7 +285,7 @@
         e.preventDefault();
         e.stopPropagation();
 
-        const dataCh = lockIcon.getAttribute('data-ch');
+        const dataCh = lockIcon.getAttribute('data-ch') || (lockIcon.closest('channel-strip') && lockIcon.closest('channel-strip').getAttribute('data-ch')) || (lockIcon.closest('.fader-card-desktop') && lockIcon.closest('.fader-card-desktop').getAttribute('data-ch'));
         if (!dataCh) return;
         const lockId = getLockIdForDataCh(dataCh);
         if (!lockId) return;
@@ -296,9 +301,10 @@
         delegationInitialized = true;
 
         document.addEventListener('click', onDocumentClickCapture, true);
+        document.addEventListener('click', onMobileClick);
         document.addEventListener('contextmenu', onContextMenu, true);
 
-        const containers = ['#faders-container', '#master-container'];
+        const containers = ['#faders-container', '#master-container', '#stripsContainer', '.strips-row', 'main'];
         containers.forEach(selector => {
             const el = document.querySelector(selector);
             if (!el) return;
@@ -308,19 +314,36 @@
             el.addEventListener('pointerup', onPointerUp);
             el.addEventListener('pointercancel', onPointerUp);
 
-            el.addEventListener('pointerup', onTap, true);
-
             el.addEventListener('click', onBadgeClick, true);
             el.addEventListener('click', onHeaderLockClick);
         });
+
+        // Delegação global em document para garantir suporte a qualquer Custom Element <channel-strip>
+        document.addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+        document.addEventListener('pointercancel', onPointerUp);
+        document.addEventListener('click', onBadgeClick, true);
+        document.addEventListener('click', onHeaderLockClick);
     }
 
     // ── Renderização do overlay ────────────────────────────────
     window.updateLockedChannelsUI = function () {
         const lockedList = window.lockedChannels || [];
-        const cards = document.querySelectorAll('.fader-card, .fader-card-desktop');
 
+        // 1. Atualiza Custom Elements <channel-strip>
+        const strips = document.querySelectorAll('channel-strip');
+        strips.forEach(strip => {
+            const dataCh = strip.getAttribute('data-ch');
+            const lockId = getLockIdForDataCh(dataCh);
+            const isLocked = Boolean(lockId && lockedList.includes(lockId));
+            strip.locked = isLocked;
+        });
+
+        // 2. Atualiza cards clássicos se existirem
+        const cards = document.querySelectorAll('.fader-card, .fader-card-desktop');
         cards.forEach(card => {
+            if (card.closest('channel-strip')) return; // Já tratado pelo Custom Element
             const dataCh = card.getAttribute('data-ch');
             const lockId = getLockIdForDataCh(dataCh);
             let overlay = card.querySelector('.channel-lock-overlay');
@@ -338,7 +361,7 @@
                         </div>
                     `;
                     // Bloqueia seleções e arrastos nativos no overlay, permitindo
-                    // que PointerEvents borbulhem para os listeners de long press e double-tap
+                    // que PointerEvents borbulhem para os listeners de long press e tap
                     const eventsToBlock = ['selectstart', 'dragstart'];
                     eventsToBlock.forEach(evt => {
                         overlay.addEventListener(evt, (e) => {
