@@ -529,9 +529,7 @@ Branches identificados durante o grill-me que ficaram em aberto para retomada:
 
 ---
 
-> 📄 **Plano criado:** `docs/plano_de_refatoracao_SHADOW_DOM.md` — retomar após estabilização da v1.
-
-> 🧠 **Discussão pausada — Shadow DOM vs. classe JS vanilla**
+> 📄 **Plano da v2:** `docs/plano_de_refatoracao_COMPONENTES_V2.md` — centraliza a reescrita estrutural no `public_new/`.
 >
 > Questão levantada durante o grill-me: a v2 do sistema deveria migrar para **Web Components com Shadow DOM** e um `MeterBus` central pub/sub, eliminando a dependência de `querySelector` global no `socket.js`?
 >

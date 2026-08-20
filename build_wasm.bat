@@ -16,6 +16,10 @@ if %errorlevel% neq 0 (
     echo ✅ WASM compilado com sucesso!
     echo.
     if exist "..\public\wasm\.gitignore" del /Q "..\public\wasm\.gitignore"
+    if exist "..\public_new\wasm" (
+        echo 🔄 Sincronizando WASM com public_new/wasm...
+        xcopy /Y /Q "..\public\wasm\*" "..\public_new\wasm\"
+    )
 )
 
 cd ..

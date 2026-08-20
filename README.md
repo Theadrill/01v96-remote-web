@@ -17,7 +17,7 @@ Uma interface web ultra-responsiva, de baixa latência e rica em recursos para c
 | **Android** | Chrome atualizado (qualquer Android 5.0+) | — |
 | **Desktop** | Chrome 73+ / Firefox 63+ / Safari 10.1+ | — |
 
-> ℹ️ O limite mínimo é definido pelo suporte a **Shadow DOM** e **ES Modules** nativos — tecnologias base da arquitetura do `public_new/` (v2). O `public/` (v1) continua funcionando em dispositivos mais antigos.
+> ℹ️ O limite mínimo é definido pelo suporte a **Custom Elements** e **ES Modules** nativos — tecnologias base da arquitetura do `public_new/` (v2). O `public/` (v1) continua funcionando em dispositivos mais antigos.
 
 > [!IMPORTANT]
 > **Aviso de Migração**: O core do servidor foi migrado para a linguagem **Rust** (`server_rust`), que agora é o foco principal do desenvolvimento visando performance máxima, estabilidade e baixíssima latência. O servidor legado em **Node.js** continua funcional, porém possui menos features e em breve será considerado obsoleto. O frontendcontinua em Vanilla JS.
@@ -226,15 +226,14 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
 
 - [ ] Criar `MeterBus` como módulo ES (`import/export`) — pub/sub central de níveis de áudio por frame
 - [ ] Refatorar `socket.js`: substituir `querySelector` global + `buildMeterCache` por `MeterBus.frame()`
-- [ ] Criar `<channel-strip>` Web Component com Shadow DOM
-- [ ] Implementar sistema de CSS 100% via Custom Properties (`--strip-*`) no Shadow DOM
-- [ ] Migrar sistema de temas YAML para injeção via `:root` + `host.style.setProperty()` por faixa de canal
+- [ ] Criar `<channel-strip>` Custom Element (Light DOM de alta performance)
+- [ ] Implementar sistema de Temas YAML via CSS Custom Properties no `:root`
 - [ ] Migrar todos os scripts para ES Modules nativos (`type="module"`, zero globals implícitas)
 - [ ] Implementar presets declarativos: `mainInput`, `master`, `output`, `auxSend`, `mixMatrix`, `mini`
-- [ ] Migrar tela de Auxiliares e Sends (`auxs_sends.js`) para Web Components (piloto)
+- [ ] Migrar tela de Auxiliares e Sends (`auxs_sends.js`) para Custom Elements (piloto)
 - [ ] Migrar tela Principal Desktop (Inputs 1-32, ST IN, Mix, Bus, Master)
 - [ ] Migrar Mini-Faders nos Modais (EQ, Dynamics, FX, Routing)
-- [ ] Implementar renderer Mobile (`renderMobile`) — 5 zonas, sem `if/else` cruzado com desktop
+- [ ] Implementar renderer Mobile (`<channel-strip>` layout mobile)
 - [ ] Validar `/new` em produção com técnico de confiança antes de promover a padrão
 - [ ] Promover `public_new/` a padrão (`/`) e arquivar `public/` como legado
 
