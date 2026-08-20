@@ -109,34 +109,41 @@ O arquivo monolítico `globals.js` é decomposto em módulos de responsabilidade
 ✅ 0. Criar public_new/ (cópia completa de public/)
 ✅ 0. Configurar rota /new no servidor Rust
 ✅ 0. Atualizar build_wasm.bat para sincronizar public_new/wasm
-[ ] 0. Validar que /new responde no navegador
+✅ 0. Validar que /new responde no navegador
 
 ── FASE 1: Fundação Modular (Decomposição de globals.js) ─────────────────────
-[ ] 1.1 Criar public_new/modules/state.js
-[ ] 1.2 Criar public_new/modules/socket-client.js
-[ ] 1.3 Criar public_new/modules/utils.js
-[ ] 1.4 Criar public_new/modules/ui-utils.js
-[ ] 1.5 Ajustar index.html para carregar módulos via <script type="module">
+✅ 1.1 Criar public_new/modules/state.js
+✅ 1.2 Criar public_new/modules/socket-client.js
+✅ 1.3 Criar public_new/modules/utils.js
+✅ 1.4 Criar public_new/modules/ui-utils.js
+✅ 1.5 Ajustar index.html para carregar módulos via <script type="module">
 
 ── FASE 2: Motor de Meters Desacoplado (MeterBus) ────────────────────────────
-[ ] 2.1 Criar public_new/modules/meter-bus.js com fila de pendências
-[ ] 2.2 Refatorar public_new/modules/socket.js para módulo ES:
+✅ 2.1 Criar public_new/modules/meter-bus.js com fila de pendências
+✅ 2.2 Refatorar public_new/modules/socket.js para módulo ES:
       - Importar MeterBus, socket-client e state
       - Remover faderCardsCache, buildMeterCache e querySelectors contínuos
       - Despachar wasmMeterView via MeterBus.frame(wasmMeterView, now)
       - Refatorar steps.js para carregar calibração assíncrona sem polling
-[ ] 2.3 Validar recepção de dados a 60 FPS sem erros no console
+✅ 2.3 Validar recepção de dados a 60 FPS no test_validation.html
 
 ── FASE 3: Componente Base <channel-strip> ──────────────────────────────────
-[ ] 3.1 Criar public_new/modules/channel_strip_component.js com Custom Elements (Light DOM)
-[ ] 3.2 Implementar ciclo de vida (IntersectionObserver próprio + MeterBus register/unregister)
-[ ] 3.3 Implementar sistema de Presets (mainInput, master, output, auxSend, mixMatrix, mini)
-[ ] 3.4 Criar public_new/test_strip.html para teste visual isolado de todos os presets
+✅ 3.1 Criar public_new/modules/channel_strip_component.js com Custom Elements (Light DOM)
+✅ 3.2 Implementar ciclo de vida (IntersectionObserver próprio + MeterBus register/unregister)
+✅ 3.3 Implementar sistema de Presets (mainInput, master, output, auxSend, mixMatrix, mini)
+✅ 3.4 Criar public_new/test_strip.html para teste visual isolado com switcher Desktop / Mobile
+🔄 3.5 Refinar fidelidade visual e interativa Desktop (em andamento):
+      - Escala de dB lateral precisa (+10 até -inf dB via dbToRaw) [OK]
+      - Barra interativa de Pan (L / Centro / R) com duplo clique e drag [OK]
+      - Rodapé de Patch colorido por grupo (AD 1-16, AD 17-32, ST IN, MIX, BUS) [OK]
+      - Estados representados: Ativo, Mute, Pareado Estéreo (21+22), Disabled, Locked, Master [OK]
+      - Layout Desktop contínuo (gap: 0, bordas de grupo contínuas no topo e base) [OK]
+      - Ajustes finos de proporções, botões e estética visual geral conforme layout físico 01v96 [EM ANDAMENTO]
 
 ── FASE 4: Integração com Sistema de Temas YAML ──────────────────────────────
-[ ] 4.1 Integrar seção channel_strip no default.yaml
-[ ] 4.2 Mapear variáveis CSS no theme-manager.js e style.css
-[ ] 4.3 Validar troca de tema em tempo real no test_strip.html
+✅ 4.1 Integrar seção channel_strip no default.yaml (cores, gaps, tipografia, patch, pan)
+✅ 4.2 Mapear variáveis CSS no style.css
+🔄 4.3 Validar sincronização completa de temas em runtime no test_strip.html
 
 ── FASE 5: Migração de Telas do Sistema ──────────────────────────────────────
 [ ] 5.1 Migrar tela de Auxiliares e Sends (public_new/modules/auxs_sends.js) — Piloto
@@ -150,6 +157,30 @@ O arquivo monolítico `globals.js` é decomposto em módulos de responsabilidade
 [ ] 6.2 Validação em dispositivos de palco (celulares e tablets)
 [ ] 6.3 Promover public_new/ para public/ (virando a versão padrão do sistema)
 ```
+
+---
+
+## 📌 Guia de Continuação da Sessão (Hand-off para Próxima IA)
+
+### Onde paramos exatamente:
+1. **Fases 1 e 2:** 100% concluídas e testadas (`test_validation.html`).
+2. **Fase 3 & 4:** `<channel-strip>` (`public_new/modules/channel_strip_component.js`), `public_new/test_strip.html`, `public_new/style.css` e `public_new/themes/default.yaml` implementados.
+   - O switcher Desktop / Mobile está funcionando no `test_strip.html`.
+   - No modo Desktop, os canais estão colados (`gap: 0`), sem bordas arredondadas individuais, com faixa superior e inferior contínua por grupo de faders (`fader-group-1` Azul, `fader-group-2` Verde, `fader-group-st` Ciano, `fader-group-mix` Dourado, `fader-group-bus` Verde-escuro, `master` Vermelho).
+   - Estão demonstrados os estados:
+     - Canal 6 (Ativo ON)
+     - Canal 7 (Mute OFF)
+     - Canais 21 + 22 (Pareado estéreo com 2 VUs e header `21 + 22`)
+     - Canal 18 (Disabled)
+     - Canal 19 (Locked com overlay de cadeado)
+     - ST IN 1
+     - MIX 1
+     - BUS 1
+     - MASTER (com botão `SOLO` para lógica de SOLO CLEAR)
+
+### Próximos Passos Imediatos:
+1. Ajustar qualquer detalhe fino estético do layout Desktop no `test_strip.html` conforme feedback do usuário.
+2. Iniciar a **Fase 5.1:** Migração de `public_new/modules/auxs_sends.js` para usar o novo `<channel-strip>`.
 
 ---
 

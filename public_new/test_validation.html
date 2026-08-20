@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Validação - MeterBus & ES Modules (v2)</title>
+    <style>
+        body {
+            background-color: #121214;
+            color: #e1e1e6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            padding: 24px;
+        }
+        h1 { color: #00e676; font-size: 20px; }
+        .test-box {
+            background: #202024;
+            border: 1px solid #323238;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .log-item {
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px solid #29292e;
+        }
+        .log-item.pass { color: #00e676; }
+        .log-item.fail { color: #ff5252; }
+        .meter-preview {
+            width: 100%;
+            height: 20px;
+            background: #121214;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+            position: relative;
+        }
+        .meter-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00e676 0%, #ffeb3b 70%, #ff5252 100%);
+            transition: width 0.05s linear;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Validação de Módulos v2 (Fase 1 & 2)</h1>
+
+    <div class="test-box">
+        <h3>1. Status dos Testes</h3>
+        <div id="testLogs"></div>
+    </div>
+
+    <div class="test-box">
+        <h3>2. Simulação de Despacho MeterBus (CH 1 @ 60 FPS)</h3>
+        <div class="meter-preview">
+            <div id="meterBar1" class="meter-bar"></div>
+        </div>
+        <p id="meterText" style="font-size: 12px; color: #8d8d99; margin-top: 6px;">Aguardando frames...</p>
+    </div>
+
+    <script type="module">
+        import { NUM_INPUT_CHANNELS, NUM_ST_IN_CHANNELS, NUM_MIX_CHANNELS, NUM_BUS_CHANNELS, MASTER_CHANNEL_ID, channelStates } from './modules/state.js';
+        import { rawToDb, dbToRaw, getSteppedRaw, getChannelStateById, getChannelLabel } from './modules/utils.js';
+        import { updateNameUI, mapDynDbToPercent } from './modules/ui-utils.js';
+        import { MeterBus } from './modules/meter-bus.js';
+        import { calibrateStep } from './modules/steps.js';
+
+        const logs = document.getElementById('testLogs');
+        function log(name, condition) {
+            const el = document.createElement('div');
+            el.className = `log-item ${condition ? 'pass' : 'fail'}`;
+            el.textContent = `${condition ? '✅ PASS' : '❌ FAIL'}: ${name}`;
+            logs.appendChild(el);
+        }
+
+        // Testes Unitários de Estado
+        log('state.js: Constantes semânticas corretas', NUM_INPUT_CHANNELS === 32 && NUM_MIX_CHANNELS === 8 && MASTER_CHANNEL_ID === 52);
+        log('state.js: channelStates inicializado com 40 canais + Master', channelStates.length >= 53 && channelStates[0].patch === 1);
+
+        // Testes Unitários de Utilitários
+        log('utils.js: rawToDb(0) retorna -∞ dB', rawToDb(0) === '-∞ dB');
+        log('utils.js: rawToDb(823) retorna 0.00 dB', rawToDb(823) === '0.00 dB');
+        log('utils.js: dbToRaw(0) retorna 823', dbToRaw(0) === 823);
+        log('utils.js: getChannelLabel(0) retorna "CH 1"', getChannelLabel(0) === 'CH 1');
+        log('utils.js: getChannelLabel(52) retorna "MASTER"', getChannelLabel(52) === 'MASTER');
+        log('utils.js: getChannelStateById(52) retorna masterState', getChannelStateById(52) === channelStates[52]);
+
+        // Testes de UI Utils
+        log('ui-utils.js: mapDynDbToPercent(-540, "gate") retorna 0%', mapDynDbToPercent(-540, 'gate') === 0);
+        log('ui-utils.js: mapDynDbToPercent(0, "comp") retorna 100%', mapDynDbToPercent(0, 'comp') === 100);
+
+        // Testes do MeterBus
+        let frameCount = 0;
+        const meterBar = document.getElementById('meterBar1');
+        const meterText = document.getElementById('meterText');
+
+        // Registro de listener no CH 0 (CH 1)
+        MeterBus.register(0, (level, now) => {
+            frameCount++;
+            meterBar.style.width = `${level}%`;
+            meterText.textContent = `Nível: ${level.toFixed(1)}% | Frame: #${frameCount} | Timestamp: ${now.toFixed(0)}ms`;
+        });
+
+        log('meter-bus.js: Registro de assinante bem-sucedido', MeterBus.subscriberCount(0) === 1);
+
+        // Simulação de loop a 60 FPS
+        const fakeWasmMemory = new Float32Array(80);
+        let phase = 0;
+
+        function simulateLoop() {
+            phase += 0.05;
+            // Gera onda senoidal simulando áudio entre 0% e 95%
+            const fakeLevel = Math.max(0, (Math.sin(phase) + 1) * 45);
+            fakeWasmMemory[0] = fakeLevel;
+
+            MeterBus.frame(fakeWasmMemory, performance.now());
+            requestAnimationFrame(simulateLoop);
+        }
+
+        requestAnimationFrame(simulateLoop);
+    </script>
+</body>
+</html>

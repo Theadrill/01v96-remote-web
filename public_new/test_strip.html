@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Visual - ChannelStripComponent (Custom Element v2)</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #121214;
+            color: #e1e1e6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #18181b;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #27272a;
+        }
+
+        .header-title {
+            color: #00e676;
+            margin: 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-switcher {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .switch-btn {
+            background: #27272a;
+            color: #a1a1aa;
+            border: 1px solid #3f3f46;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .switch-btn.active {
+            background: #00e676;
+            color: #000000;
+            border-color: #00e676;
+        }
+
+        .section-desc {
+            font-size: 13px;
+            color: #8d8d99;
+            margin: 0;
+        }
+
+        .strips-row {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        /* ── Modo Desktop ── */
+        .layout-desktop-mode .strips-row {
+            gap: 0;
+            padding: 20px;
+            background: #0f0f11;
+            align-items: stretch;
+        }
+
+        .layout-desktop-mode channel-strip {
+            display: inline-block;
+            height: 520px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .layout-desktop-mode .fader-card-desktop {
+            width: var(--strip-width-desktop, 72px);
+            min-width: var(--strip-min-width-desktop, 65px);
+            background: #1e1e24;
+            border: none;
+            border-left: 1px solid #2d2d35;
+            border-right: 1px solid #141418;
+            border-radius: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .layout-desktop-mode channel-strip:first-child .fader-card-desktop {
+            border-left: 1px solid #33333d;
+        }
+
+        .layout-desktop-mode channel-strip:last-child .fader-card-desktop {
+            border-right: 1px solid #33333d;
+        }
+
+        /* Linhas Contínuas de Grupo Topo e Rodapé */
+        .layout-desktop-mode .fader-card-desktop.fader-group-1 {
+            border-top: 3px solid #00adef !important;
+            border-bottom: 3px solid #00adef !important;
+        }
+
+        .layout-desktop-mode .fader-card-desktop.fader-group-2 {
+            border-top: 3px solid #00ff88 !important;
+            border-bottom: 3px solid #00ff88 !important;
+        }
+
+        .layout-desktop-mode .fader-card-desktop.fader-group-st {
+            border-top: 3px solid #4a90e2 !important;
+            border-bottom: 3px solid #4a90e2 !important;
+        }
+
+        .layout-desktop-mode .fader-card-desktop.fader-group-mix {
+            border-top: 3px solid #d4a017 !important;
+            border-bottom: 3px solid #d4a017 !important;
+        }
+
+        .layout-desktop-mode .fader-card-desktop.fader-group-bus {
+            border-top: 3px solid #00b396 !important;
+            border-bottom: 3px solid #00b396 !important;
+        }
+
+        .layout-desktop-mode .fader-card-desktop.master-card-desktop {
+            border-top: 3px solid #ff4444 !important;
+            border-bottom: 3px solid #ff4444 !important;
+            margin-left: 20px;
+        }
+
+        .layout-desktop-mode .fader-card-desktop.desk-on-bg {
+            background: var(--strip-card-bg-on, rgba(255, 235, 59, 0.04));
+        }
+
+        .layout-desktop-mode .fader-card-desktop.strip-disabled {
+            opacity: var(--strip-disabled-opacity, 0.45);
+            pointer-events: none;
+            filter: grayscale(0.5);
+        }
+
+        /* Overlay do Canal Bloqueado (Locked) */
+        .channel-lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(1.5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .desk-label-lock {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            color: #888;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .channel-locked .desk-label-lock {
+            color: #ff4444;
+        }
+
+        /* Headers Desktop Colados de Borda a Borda */
+        .desk-label-wrapper {
+            width: 100%;
+            text-align: center;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+
+        .desk-label {
+            font-size: var(--strip-header-font-size, 11px);
+            font-weight: var(--strip-header-font-weight, bold);
+            height: var(--strip-header-height, 22px);
+            border-radius: 0;
+            background: var(--strip-header-bg-input, #2a2a32);
+            color: var(--strip-header-text-color, #ffffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            border-bottom: 1px solid #111;
+        }
+
+        .fader-group-1 .desk-label { background: #003a5e; color: #00adef; }
+        .fader-group-2 .desk-label { background: #004a30; color: #00ff88; }
+        .fader-group-st .desk-label { background: #14283d; color: #5cacee; }
+        .fader-group-mix .desk-label { background: #332800; color: #ffcc00; }
+        .fader-group-bus .desk-label { background: #002e27; color: #00ffcc; }
+        .master-card-desktop .desk-label { background: #4a1c1c; color: #ff8080; }
+
+        /* Botão SOLO Desktop */
+        .layout-desktop-mode .btn-cue {
+            width: calc(100% - 8px);
+            margin: 4px 4px 2px 4px;
+            height: var(--strip-btn-solo-height, 24px);
+            background: var(--strip-btn-solo-bg, #2b2b2b);
+            color: var(--strip-btn-solo-text-color, #888888);
+            border: 1px solid var(--strip-btn-solo-border, #444444);
+            border-radius: var(--strip-btn-solo-radius, 4px);
+            font-size: var(--strip-btn-solo-font-size, 11px);
+            font-weight: var(--strip-btn-solo-font-weight, bold);
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .layout-desktop-mode .btn-cue.solo-active {
+            background: var(--strip-btn-solo-active-bg, #ff9800);
+            color: var(--strip-btn-solo-active-text-color, #000000);
+        }
+
+        /* Visor LCD de Nome Desktop */
+        .desk-ch-name-zone {
+            width: calc(100% - 8px);
+            margin: 2px 4px;
+            height: var(--strip-name-display-height, 24px);
+            background: var(--strip-name-display-bg, #0d1b0d);
+            border: 1px solid var(--strip-name-display-border, #1b3a1b);
+            border-radius: var(--strip-name-display-radius, 4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .desk-ch-name {
+            color: var(--strip-name-display-text-color, #00e676);
+            font-size: var(--strip-name-display-font-size, 12px);
+            font-family: var(--strip-name-display-font-family, monospace);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Botão ON Desktop */
+        .layout-desktop-mode .btn-on-desk {
+            width: calc(100% - 8px);
+            margin: 2px 4px;
+            height: var(--strip-btn-on-height, 28px);
+            background: var(--strip-btn-on-bg, #2b2b2b);
+            color: var(--strip-btn-on-text-color, #888888);
+            border: 1px solid var(--strip-btn-on-border, #444444);
+            border-radius: var(--strip-btn-on-radius, 4px);
+            font-size: var(--strip-btn-on-font-size, 12px);
+            font-weight: var(--strip-btn-on-font-weight, 900);
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .layout-desktop-mode .btn-on-desk.on-active {
+            background: var(--strip-btn-on-active-bg, #ffeb3b);
+            color: var(--strip-btn-on-active-text-color, #000000);
+            box-shadow: var(--strip-btn-on-active-glow, 0 0 10px rgba(255, 235, 59, 0.5));
+        }
+
+        /* Botão Nudge Desktop */
+        .nudge-zone-desk {
+            margin: 2px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-nudge-desk {
+            width: 28px;
+            height: var(--strip-btn-nudge-height, 20px);
+            background: var(--strip-btn-nudge-bg, #25252b);
+            color: var(--strip-btn-nudge-text-color, #cccccc);
+            border: 1px solid var(--strip-btn-nudge-border, #3a3a44);
+            border-radius: var(--strip-btn-nudge-radius, 3px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Display dB Desktop */
+        .desk-db-val {
+            font-size: var(--strip-db-display-font-size, 11px);
+            font-weight: var(--strip-db-display-font-weight, bold);
+            font-family: var(--strip-db-display-font-family, monospace);
+            color: var(--strip-db-display-text-color, #00e676);
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Fader & Escala Desktop */
+        .desk-fader-container {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 0;
+        }
+
+        .desk-db-scale {
+            position: absolute;
+            left: 2px;
+            top: 2.5%;
+            width: 24px;
+            height: 95%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .desk-db-item {
+            position: absolute;
+            right: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            transform: translateY(50%);
+        }
+
+        .desk-db-item span {
+            font-size: var(--strip-scale-font-size, 8px);
+            color: var(--strip-scale-text-color, #888888);
+            font-family: var(--strip-scale-font-family, 'Arial Narrow', sans-serif);
+            margin-right: 3px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .desk-db-item .tick {
+            width: 6px;
+            height: 1px;
+            background: var(--strip-scale-tick-color, #444444);
+        }
+
+        .desk-db-item .tick-small {
+            width: 3px;
+            background: var(--strip-scale-tick-small-color, #333333);
+        }
+
+        .fader-input {
+            -webkit-appearance: slider-vertical;
+            appearance: slider-vertical;
+            width: 32px;
+            height: 95%;
+            cursor: pointer;
+            background: transparent;
+            z-index: 2;
+        }
+
+        .desk-meter-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 95%;
+            margin-left: 2px;
+            z-index: 1;
+        }
+
+        .desk-meter-wrap {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .desk-meter-track {
+            width: 5px;
+            height: 100%;
+            background: #0d0d0d;
+            border: 1px solid #111;
+            border-radius: 1px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .desk-meter-curtain {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #28a745 0%, #28a745 40%, #ffc107 50%, #dc3545 80%, #ff0000 100%);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transform-origin: bottom;
+            transform: scaleY(0);
+            will-change: transform;
+        }
+
+        .desk-peak-led {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--strip-peak-led-off, #3a1515);
+            border: 1px solid #111;
+            margin-bottom: 3px;
+        }
+
+        .desk-peak-led.active {
+            background: var(--strip-peak-led-on, #ff1744);
+            box-shadow: var(--strip-peak-led-glow, 0 0 8px #ff1744);
+        }
+
+        /* Barra de Pan Desktop */
+        .desk-pan-indicator {
+            width: 100%;
+            height: var(--strip-pan-height, 24px);
+            background: var(--strip-pan-bg, #0d0d0d);
+            border-top: var(--strip-pan-border-top, 1px solid #1a1a1a);
+            display: flex;
+            align-items: center;
+            padding: 2px 4px;
+            box-sizing: border-box;
+            position: relative;
+            user-select: none;
+        }
+
+        .desk-pan-l, .desk-pan-r {
+            font-size: var(--strip-pan-label-font-size, 7px);
+            font-weight: bold;
+            color: var(--strip-pan-label-color, #444444);
+        }
+
+        .desk-pan-tracks-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            justify-content: center;
+            margin: 0 4px;
+        }
+
+        .desk-pan-track {
+            position: relative;
+            width: 100%;
+            height: var(--strip-pan-track-height, 4px);
+            background: var(--strip-pan-track-bg, #222222);
+            border-radius: var(--strip-pan-track-radius, 2px);
+            cursor: pointer;
+        }
+
+        .desk-pan-center-tick {
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            width: 1px;
+            height: 8px;
+            background: var(--strip-pan-center-tick-color, #3a3a3a);
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .desk-pan-thumb {
+            position: absolute;
+            top: 50%;
+            width: 3px;
+            height: 10px;
+            background: var(--strip-pan-thumb-active-color, #a855f7);
+            border-radius: 1px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            box-shadow: var(--strip-pan-thumb-glow, 0 0 6px rgba(168, 85, 247, 0.6));
+        }
+
+        .desk-pan-thumb.pan-center {
+            background: var(--strip-pan-thumb-center-color, #4a4a5a);
+            box-shadow: none;
+        }
+
+        /* Rodapé de Patch Desktop Colado */
+        .desk-patch-zone {
+            width: 100%;
+            height: var(--strip-patch-height, 24px);
+            margin: 0;
+            border-top: 1px solid #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 0;
+            box-sizing: border-box;
+        }
+
+        .desk-patch-name {
+            font-family: var(--strip-patch-font-family, 'Consolas', 'Menlo', monospace);
+            font-size: var(--strip-patch-font-size, 10px);
+            font-weight: var(--strip-patch-font-weight, 800);
+            text-transform: uppercase;
+        }
+
+        .fader-group-1 .desk-patch-zone { background: var(--strip-patch-bg-input-1, #001c2e); }
+        .fader-group-1 .desk-patch-name { color: var(--strip-patch-text-input-1, #0088bd); }
+
+        .fader-group-2 .desk-patch-zone { background: var(--strip-patch-bg-input-2, #1c1400); }
+        .fader-group-2 .desk-patch-name { color: var(--strip-patch-text-input-2, #bd8800); }
+
+        .fader-group-st .desk-patch-zone { background: var(--strip-patch-bg-st-in, #001a1c); }
+        .fader-group-st .desk-patch-name { color: var(--strip-patch-text-st-in, #00a0b0); }
+
+        .fader-group-mix .desk-patch-zone { background: var(--strip-patch-bg-mix, #180026); }
+        .fader-group-mix .desk-patch-name { color: var(--strip-patch-text-mix, #9630d9); }
+
+        .fader-group-bus .desk-patch-zone { background: var(--strip-patch-bg-bus, #00240d); }
+        .fader-group-bus .desk-patch-name { color: var(--strip-patch-text-bus, #00b341); }
+
+        /* ── Modo Mobile ── */
+        .layout-mobile-mode .strips-row {
+            gap: 8px;
+        }
+        .layout-mobile-mode channel-strip {
+            display: inline-block;
+            height: 480px;
+            width: 90px;
+        }
+
+        .layout-mobile-mode .fader-card {
+            width: 100%;
+            height: 100%;
+            background: #18181b;
+            border: 1px solid #333;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            padding: 8px 4px;
+            box-sizing: border-box;
+        }
+
+        .mobile-meter-bg {
+            position: absolute !important;
+            top: 0;
+            bottom: 0;
+            width: 100% !important;
+            height: 100% !important;
+            background-image: linear-gradient(to top, rgba(0, 255, 0, 0.4) 0%, rgba(100, 255, 0, 0.4) 40%, rgba(255, 221, 0, 0.5) 50%, rgba(255, 0, 0, 0.55) 80%, rgba(255, 0, 0, 0.55) 100%);
+            background-repeat: no-repeat;
+            background-position: bottom;
+            background-size: cover;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .mobile-meter-bg.left { width: 50% !important; left: 0; }
+        .mobile-meter-bg.right { width: 50% !important; right: 0; }
+
+        .mobile-meter-curtain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #18181b;
+            transform-origin: top;
+            transform: scaleY(1);
+            will-change: transform;
+        }
+
+        .layout-mobile-mode .ch-clickable-zone {
+            z-index: 2;
+            text-align: center;
+        }
+
+        .layout-mobile-mode .card-title {
+            margin: 0;
+            font-size: 12px;
+            color: #00e676;
+        }
+
+        .layout-mobile-mode .fader-rotated-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .layout-mobile-mode .btn-state {
+            z-index: 2;
+            width: 80%;
+            height: 28px;
+            background: #27272a;
+            color: #a1a1aa;
+            border: 1px solid #3f3f46;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 2px 0;
+        }
+
+        .layout-mobile-mode .btn-state.on-active {
+            background: #ffeb3b;
+            color: #000;
+        }
+
+        .layout-mobile-mode .fader-val {
+            margin: 0;
+            font-size: 12px;
+            color: #00e676;
+        }
+    </style>
+</head>
+<body class="layout-desktop-mode">
+    <div class="header-bar">
+        <div>
+            <h1 class="header-title">🎛️ Teste Visual de Estados e Presets do &lt;channel-strip&gt; (v2)</h1>
+            <p class="section-desc">Validação completa: Escala de dB lateral, VU meters estéreo, indicador e arraste de Pan, rodapé de Patch colorido e chaveamento Desktop / Mobile.</p>
+        </div>
+        <div class="view-switcher">
+            <button id="btnViewDesktop" class="switch-btn active" onclick="switchLayout('desktop')">🖥️ DESKTOP</button>
+            <button id="btnViewMobile" class="switch-btn" onclick="switchLayout('mobile')">📱 MOBILE</button>
+        </div>
+    </div>
+
+    <div class="strips-row" id="stripsContainer">
+        <!-- 1. Canal Normal Ativado (CH 6 - CAVACO) -->
+        <channel-strip id="strip1" data-ch="5" preset="input" patch="AD 6" pan="-20" layout="desktop"></channel-strip>
+
+        <!-- 2. Canal Desativado / Mute (ON = false) (CH 7) -->
+        <channel-strip id="strip2" data-ch="6" preset="input" patch="AD 7" pan="0" layout="desktop"></channel-strip>
+
+        <!-- 3. Canal Estéreo Pareado (CH 21 + 22 - LR) -->
+        <channel-strip id="strip3" data-ch="20" preset="input" data-partner-ch="21" patch="ADAT 7" pan="0" layout="desktop"></channel-strip>
+
+        <!-- 4. Canal Disabled (CH 18 - Grupo 2) -->
+        <channel-strip id="strip4" data-ch="17" preset="input" patch="AD 18" pan="15" disabled layout="desktop"></channel-strip>
+
+        <!-- 5. Canal Locked / Travado (CH 19 - Grupo 2) -->
+        <channel-strip id="strip5" data-ch="18" preset="input" patch="AD 19" pan="0" locked layout="desktop"></channel-strip>
+
+        <!-- 6. ST IN Estéreo (CH 60/61) -->
+        <channel-strip id="strip6" data-ch="60" preset="input" data-partner-ch="61" patch="ST IN 1" pan="0" layout="desktop"></channel-strip>
+
+        <!-- 7. AUX / MIX (CH 36) -->
+        <channel-strip id="strip7" data-ch="36" preset="output" patch="MIX 1" pan="0" layout="desktop"></channel-strip>
+
+        <!-- 8. BUS Output (CH 44) -->
+        <channel-strip id="strip8" data-ch="44" preset="output" patch="BUS 1" pan="0" layout="desktop"></channel-strip>
+
+        <!-- 9. MASTER Estéreo (CH 52) -->
+        <channel-strip id="strip9" data-ch="52" preset="master" data-partner-ch="53" layout="desktop"></channel-strip>
+    </div>
+
+    <!-- Módulo de Simulação e Controle do Teste -->
+    <script type="module">
+        import './modules/channel_strip_component.js';
+        import { MeterBus } from './modules/meter-bus.js';
+
+        // Alternância de Layout Desktop / Mobile
+        window.switchLayout = function(mode) {
+            document.body.className = mode === 'desktop' ? 'layout-desktop-mode' : 'layout-mobile-mode';
+            document.getElementById('btnViewDesktop').classList.toggle('active', mode === 'desktop');
+            document.getElementById('btnViewMobile').classList.toggle('active', mode === 'mobile');
+
+            document.querySelectorAll('channel-strip').forEach(strip => {
+                strip.setAttribute('layout', mode);
+            });
+        };
+
+        // Inicialização de canais do teste
+        const strip1 = document.getElementById('strip1');
+        if (strip1) {
+            strip1.name = 'CAVACO';
+            strip1.on = true;
+            strip1.value = 0; // -inf dB
+        }
+
+        const strip2 = document.getElementById('strip2');
+        if (strip2) {
+            strip2.name = 'VIOLAO';
+            strip2.on = false; // Mute
+            strip2.value = 750; // -5 dB
+        }
+
+        const strip3 = document.getElementById('strip3');
+        if (strip3) {
+            strip3.name = 'LR';
+            strip3.on = true;
+            strip3.value = 890; // +5.5 dB
+        }
+
+        const strip4 = document.getElementById('strip4');
+        if (strip4) {
+            strip4.name = 'BUMBO';
+            strip4.on = true;
+            strip4.value = 600;
+        }
+
+        const strip5 = document.getElementById('strip5');
+        if (strip5) {
+            strip5.name = 'CAIXA';
+            strip5.on = true;
+            strip5.value = 823; // 0 dB
+        }
+
+        const strip9 = document.getElementById('strip9');
+        if (strip9) {
+            strip9.name = 'STEREO';
+            strip9.on = true;
+            strip9.value = 823;
+        }
+
+        // Simulação de Níveis a 60 FPS via MeterBus
+        const wasmMem = new Float32Array(80);
+        let phase = 0;
+
+        function simulate() {
+            phase += 0.04;
+
+            // Simula níveis para os canais
+            wasmMem[5] = Math.max(0, (Math.sin(phase) + 1) * 45);        // CH 6 (CAVACO)
+            wasmMem[6] = Math.max(0, (Math.cos(phase * 0.8) + 1) * 30);  // CH 7 (VIOLAO)
+            wasmMem[20] = Math.max(0, (Math.sin(phase * 1.2) + 1) * 48); // CH 21 L (LR)
+            wasmMem[21] = Math.max(0, (Math.cos(phase * 1.1) + 1) * 46); // CH 22 R (LR)
+            wasmMem[17] = Math.max(0, (Math.sin(phase * 0.5) + 1) * 20); // CH 18 (Disabled)
+            wasmMem[18] = Math.max(0, (Math.sin(phase * 0.6) + 1) * 35); // CH 19 (Locked)
+            wasmMem[60] = Math.max(0, (Math.sin(phase * 1.3) + 1) * 42); // ST IN 1L
+            wasmMem[61] = Math.max(0, (Math.cos(phase * 1.4) + 1) * 44); // ST IN 1R
+            wasmMem[36] = Math.max(0, (Math.sin(phase * 0.7) + 1) * 35); // MIX 1
+            wasmMem[44] = Math.max(0, (Math.cos(phase * 0.9) + 1) * 38); // BUS 1
+            wasmMem[52] = Math.max(0, (Math.sin(phase * 1.5) + 1) * 49); // MASTER L
+            wasmMem[53] = Math.max(0, (Math.cos(phase * 1.5) + 1) * 48); // MASTER R
+
+            MeterBus.frame(wasmMem, performance.now());
+            requestAnimationFrame(simulate);
+        }
+
+        requestAnimationFrame(simulate);
+    </script>
+</body>
+</html>

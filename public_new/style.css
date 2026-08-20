@@ -12,6 +12,140 @@ html {
     --scrollbar-thumb-bg: #3b82f6;
     --scrollbar-thumb-hover-bg: #60a5fa;
     --scrollbar-border-color: #0f141c;
+
+    /* ─── CHANNEL STRIP (Tema YAML) ─── */
+    --strip-width-desktop: 72px;
+    --strip-min-width-desktop: 65px;
+    --strip-border-radius: 6px;
+    --strip-border-color: #333333;
+    --strip-border-width: 1px;
+    --strip-card-bg: #1e1e24;
+    --strip-card-bg-on: rgba(255, 235, 59, 0.04);
+    --strip-padding: 6px;
+    --strip-gap: 4px;
+
+    /* Header / Label */
+    --strip-header-font-size: 11px;
+    --strip-header-font-weight: bold;
+    --strip-header-height: 22px;
+    --strip-header-radius: 4px;
+    --strip-header-text-color: #ffffff;
+    --strip-header-bg-input: #2a2a32;
+    --strip-header-bg-st-in: #1b3a4b;
+    --strip-header-bg-aux: #3d2645;
+    --strip-header-bg-bus: #1e3d2f;
+    --strip-header-bg-master: #4a1c1c;
+
+    /* Visor LCD de Nome */
+    --strip-name-display-bg: #0d1b0d;
+    --strip-name-display-border: #1b3a1b;
+    --strip-name-display-text-color: #00e676;
+    --strip-name-display-font-size: 12px;
+    --strip-name-display-font-family: monospace;
+    --strip-name-display-height: 24px;
+    --strip-name-display-radius: 4px;
+
+    /* Botão SOLO */
+    --strip-btn-solo-bg: #2b2b2b;
+    --strip-btn-solo-text-color: #888888;
+    --strip-btn-solo-border: #444444;
+    --strip-btn-solo-active-bg: #ff9800;
+    --strip-btn-solo-active-text-color: #000000;
+    --strip-btn-solo-height: 24px;
+    --strip-btn-solo-radius: 4px;
+    --strip-btn-solo-font-size: 11px;
+    --strip-btn-solo-font-weight: bold;
+
+    /* Botão ON */
+    --strip-btn-on-bg: #2b2b2b;
+    --strip-btn-on-text-color: #888888;
+    --strip-btn-on-border: #444444;
+    --strip-btn-on-active-bg: #ffeb3b;
+    --strip-btn-on-active-text-color: #000000;
+    --strip-btn-on-active-glow: 0 0 10px rgba(255, 235, 59, 0.5);
+    --strip-btn-on-height: 28px;
+    --strip-btn-on-radius: 4px;
+    --strip-btn-on-font-size: 12px;
+    --strip-btn-on-font-weight: 900;
+
+    /* Botões Nudge (+ / -) */
+    --strip-btn-nudge-bg: #25252b;
+    --strip-btn-nudge-text-color: #cccccc;
+    --strip-btn-nudge-border: #3a3a44;
+    --strip-btn-nudge-hover-bg: #32323c;
+    --strip-btn-nudge-height: 20px;
+    --strip-btn-nudge-radius: 3px;
+
+    /* Display dB */
+    --strip-db-display-text-color: #00e676;
+    --strip-db-display-font-size: 11px;
+    --strip-db-display-font-weight: bold;
+    --strip-db-display-font-family: monospace;
+
+    /* Fader Track & Knob */
+    --strip-fader-track-width: 6px;
+    --strip-fader-track-bg: #101012;
+    --strip-fader-track-border: #2a2a30;
+    --strip-fader-track-radius: 3px;
+    --strip-fader-knob-width: 42px;
+    --strip-fader-knob-height: 28px;
+    --strip-fader-knob-bg: #e1e1e6;
+    --strip-fader-knob-line-color: #000000;
+    --strip-fader-knob-border: #8d8d99;
+    --strip-fader-knob-radius: 3px;
+    --strip-fader-knob-shadow: 0 4px 8px rgba(0,0,0,0.5);
+
+    /* Meter & Peak */
+    --strip-meter-track-width: 4px;
+    --strip-meter-gradient-low: #00e676;
+    --strip-meter-gradient-mid: #ffeb3b;
+    --strip-meter-gradient-peak: #ff1744;
+    --strip-peak-led-off: #3a1515;
+    --strip-peak-led-on: #ff1744;
+    --strip-peak-led-glow: 0 0 8px #ff1744;
+
+    /* Escala dB */
+    --strip-scale-tick-color: #444444;
+    --strip-scale-tick-small-color: #333333;
+    --strip-scale-text-color: #888888;
+    --strip-scale-font-size: 8px;
+    --strip-scale-font-family: 'Arial Narrow', sans-serif;
+
+    /* Pan Indicator */
+    --strip-pan-height: 24px;
+    --strip-pan-bg: #0d0d0d;
+    --strip-pan-border-top: 1px solid #1a1a1a;
+    --strip-pan-track-bg: #222222;
+    --strip-pan-track-height: 4px;
+    --strip-pan-track-radius: 2px;
+    --strip-pan-tick-color: #333333;
+    --strip-pan-center-tick-color: #3a3a3a;
+    --strip-pan-label-color: #444444;
+    --strip-pan-label-font-size: 7px;
+    --strip-pan-thumb-center-color: #4a4a5a;
+    --strip-pan-thumb-active-color: #a855f7;
+    --strip-pan-thumb-glow: 0 0 6px rgba(168, 85, 247, 0.6);
+
+    /* Patch Zone Footer */
+    --strip-patch-height: 24px;
+    --strip-patch-bg-input-1: #001c2e;
+    --strip-patch-text-input-1: #0088bd;
+    --strip-patch-bg-input-2: #1c1400;
+    --strip-patch-text-input-2: #bd8800;
+    --strip-patch-bg-st-in: #001a1c;
+    --strip-patch-text-st-in: #00a0b0;
+    --strip-patch-bg-mix: #180026;
+    --strip-patch-text-mix: #9630d9;
+    --strip-patch-bg-bus: #00240d;
+    --strip-patch-text-bus: #00b341;
+    --strip-patch-font-size: 10px;
+    --strip-patch-font-weight: 800;
+    --strip-patch-font-family: 'Consolas', 'Menlo', monospace;
+
+    /* Special States */
+    --strip-disabled-opacity: 0.45;
+    --strip-linked-badge-bg: #1976d2;
+    --strip-linked-badge-color: #ffffff;
 }
 
 /* Suporte Global Firefox */

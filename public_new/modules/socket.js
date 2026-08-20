@@ -1586,7 +1586,7 @@ function wasmRenderLoop(now) {
         }
     }
 
-    if (isCanvasMode || !meterElementsCache || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
+    if (isCanvasMode || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
         return;
     }
 
@@ -1605,8 +1605,11 @@ function wasmRenderLoop(now) {
     // Executa a balística in-place no WASM (void, sem alocação)
     wasmMeterEngine.render_frame(deltaMs);
 
-    // Lê diretamente da memória do WASM — sem cópia, sem GC
-    applyMetersToDOM(wasmMeterView, now);
+    // 🚀 [V2 METERBUS ZERO-COPY DISPATCH]
+    // Despacha diretamente da memória WASM para todos os componentes inscritos
+    if (window.MeterBus && typeof window.MeterBus.frame === 'function') {
+        window.MeterBus.frame(wasmMeterView, now);
+    }
 }
 
 socket.on('meterDataRaw', (rawBytes) => {

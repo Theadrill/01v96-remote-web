@@ -135,3 +135,141 @@ channel_lock:
   badge_bg: "#ff4444"
   badge_text_color: "#ffffff"
 
+# ─── CHANNEL STRIP (Faders / Cards) ───────────────────────────
+# Custom Element <channel-strip> (Light DOM v2)
+channel_strip:
+  # Dimensões e Estrutura do Card
+  width_desktop: "72px"
+  min_width_desktop: "65px"
+  border_radius: "6px"
+  border_color: "#333333"
+  border_width: "1px"
+  card_bg: "#1e1e24"
+  card_bg_on: "rgba(255, 235, 59, 0.04)"     # Fundo sutil quando o canal está ON
+  padding: "6px"
+  gap: "4px"
+
+  # Header / Label (Número do Canal no topo)
+  header_font_size: "11px"
+  header_font_weight: "bold"
+  header_height: "22px"
+  header_radius: "4px"
+  header_text_color: "#ffffff"
+  header_bg_input: "#2a2a32"                 # Inputs 1-32
+  header_bg_st_in: "#1b3a4b"                 # ST IN
+  header_bg_aux: "#3d2645"                   # AUX / MIX
+  header_bg_bus: "#1e3d2f"                   # BUS
+  header_bg_master: "#4a1c1c"                # MASTER
+
+  # Visor LCD de Nome (Display verde/customizado)
+  name_display_bg: "#0d1b0d"
+  name_display_border: "#1b3a1b"
+  name_display_text_color: "#00e676"         # Verde fluorescente Yamaha
+  name_display_font_size: "12px"
+  name_display_font_family: "monospace"
+  name_display_height: "24px"
+  name_display_radius: "4px"
+
+  # Botão SOLO (CUE)
+  btn_solo_bg: "#2b2b2b"
+  btn_solo_text_color: "#888888"
+  btn_solo_border: "#444444"
+  btn_solo_active_bg: "#ff9800"              # Laranja / Âmbar quando ativo
+  btn_solo_active_text_color: "#000000"
+  btn_solo_height: "24px"
+  btn_solo_radius: "4px"
+  btn_solo_font_size: "11px"
+  btn_solo_font_weight: "bold"
+
+  # Botão ON (Mute / Unmute)
+  btn_on_bg: "#2b2b2b"
+  btn_on_text_color: "#888888"
+  btn_on_border: "#444444"
+  btn_on_active_bg: "#ffeb3b"                # Amarelo brilhante clássico Yamaha
+  btn_on_active_text_color: "#000000"
+  btn_on_active_glow: "0 0 10px rgba(255, 235, 59, 0.5)"
+  btn_on_height: "28px"
+  btn_on_radius: "4px"
+  btn_on_font_size: "12px"
+  btn_on_font_weight: "900"
+
+  # Botões Nudge (+ / -)
+  btn_nudge_bg: "#25252b"
+  btn_nudge_text_color: "#cccccc"
+  btn_nudge_border: "#3a3a44"
+  btn_nudge_hover_bg: "#32323c"
+  btn_nudge_height: "20px"
+  btn_nudge_radius: "3px"
+
+  # Display de Valor em dB
+  db_display_text_color: "#00e676"
+  db_display_font_size: "11px"
+  db_display_font_weight: "bold"
+  db_display_font_family: "monospace"
+
+  # Trilho e Knob do Fader
+  fader_track_width: "6px"
+  fader_track_bg: "#101012"
+  fader_track_border: "#2a2a30"
+  fader_track_radius: "3px"
+  fader_knob_width: "42px"
+  fader_knob_height: "28px"
+  fader_knob_bg: "#e1e1e6"                  # Alumínio escovado / cinza claro
+  fader_knob_line_color: "#000000"          # Linha central indicadora
+  fader_knob_border: "#8d8d99"
+  fader_knob_radius: "3px"
+  fader_knob_shadow: "0 4px 8px rgba(0,0,0,0.5)"
+
+  # VU Meter (Gradiente e LEDs de Pico)
+  meter_track_width: "4px"
+  meter_gradient_low: "#00e676"             # Verde (-inf a -18dB)
+  meter_gradient_mid: "#ffeb3b"             # Amarelo (-18dB a -3dB)
+  meter_gradient_peak: "#ff1744"            # Vermelho (Clip / 0dB)
+  peak_led_off: "#3a1515"
+  peak_led_on: "#ff1744"
+  peak_led_glow: "0 0 8px #ff1744"
+
+  # Escala de dB (Traços laterais e marcas)
+  scale_tick_color: "#444444"
+  scale_tick_small_color: "#333333"
+  scale_text_color: "#888888"
+  scale_font_size: "8px"
+  scale_font_family: "'Arial Narrow', sans-serif"
+
+  # Barra / Indicador de Pan
+  pan_height: "24px"
+  pan_bg: "#0d0d0d"
+  pan_border_top: "1px solid #1a1a1a"
+  pan_track_bg: "#222222"
+  pan_track_height: "4px"
+  pan_track_radius: "2px"
+  pan_tick_color: "#333333"
+  pan_center_tick_color: "#3a3a3a"
+  pan_label_color: "#444444"
+  pan_label_font_size: "7px"
+  pan_thumb_center_color: "#4a4a5a"
+  pan_thumb_active_color: "#a855f7"
+  pan_thumb_glow: "0 0 6px rgba(168, 85, 247, 0.6)"
+
+  # Rodapé de Patch (Área inferior do canal)
+  patch_height: "24px"
+  patch_bg_input_1: "#001c2e"
+  patch_text_input_1: "#0088bd"
+  patch_bg_input_2: "#1c1400"
+  patch_text_input_2: "#bd8800"
+  patch_bg_st_in: "#001a1c"
+  patch_text_st_in: "#00a0b0"
+  patch_bg_mix: "#180026"
+  patch_text_mix: "#9630d9"
+  patch_bg_bus: "#00240d"
+  patch_text_bus: "#00b341"
+  patch_font_size: "10px"
+  patch_font_weight: "800"
+  patch_font_family: "'Consolas', 'Menlo', monospace"
+
+  # Estados Especiais (Disabled, Linked / Estéreo)
+  disabled_opacity: "0.45"
+  linked_badge_bg: "#1976d2"
+  linked_badge_color: "#ffffff"
+
+
