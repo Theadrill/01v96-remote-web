@@ -6,10 +6,14 @@ Este documento é o **Plano Mestre de Refatoração do Frontend** do projeto `01
 
 O objetivo geral é transformar a base de código do frontend em uma **Arquitetura Modular Limpa**, organizada por camadas claras de responsabilidade (**Componentes**, **Telas**, **Serviços**, **Núcleo de Estado** e **Utilitários**). Isso elimina acoplamentos históricos, código duplicado e arquivos monolíticos, criando uma base sólida, extensível e profissional para as próximas evoluções do sistema.
 
-### Princípios da Refatoração:
-1. **Ambiente Isolado (`public_new/`):** Todo o trabalho de refatoração ocorre exclusivamente dentro de `public_new/`, acessível pela rota `/new`. A pasta `public/` original permanece 100% intacta como ambiente funcional de produção e fallback.
-2. **Separação Estrita de Responsabilidades:** Componentes visuais (`components/`) não sabem detalhes de rede; Telas (`screens/`) orquestram a visão sem reimplementar física de controles; Serviços (`services/`) operam em background sem desenhar interface.
-3. **Evolução Gradual por Épicos:** Começamos pelo núcleo visual mais crítico (o **Channel Strip Universal** e suas telas consumidoras) e, à medida que avançamos para outros subsistemas (Channel Setup, Routing, Cenas, etc.), novas fases e detalhamentos serão incorporados a este mesmo plano.
+### Princípios da Refatoração (Estratégia de Passos Seguros):
+1. **Refatoração Segura em Pequenos Passos Verificáveis (*"Make the change easy, then make the easy change"*):**
+   - **Passo 1 (Organização Física Zero-Risk):** Primeiro organizamos todos os arquivos legados existentes em suas respectivas pastas (`core/`, `services/`, `components/`, `screens/`, `utils/`) e atualizamos as referências de `<script>` em `public_new/index.html` **sem alterar a lógica interna de nenhum arquivo**. Isso estabelece uma "Linha de Base Verde", garantindo que a rota `/new` continue 100% funcional e sem erros 404 antes de refatorar código.
+   - **Passo 2 (Refatoração Granular Arquivo por Arquivo):** Após a organização física validada, iniciamos a refatoração arquivo por arquivo (começando pela classe `ChannelStrip` modular no Épico 1), testando cada módulo isoladamente para garantir contexto total e zero suposições.
+2. **Ambiente Isolado (`public_new/`):** Todo o trabalho de refatoração ocorre exclusivamente dentro de `public_new/`, acessível pela rota `/new`. A pasta `public/` original permanece 100% intacta como ambiente funcional de produção e fallback.
+3. **Separação Estrita de Responsabilidades:** Componentes visuais (`components/`) não sabem detalhes de rede; Telas (`screens/`) orquestram a visão sem reimplementar física de controles; Serviços (`services/`) operam em background sem desenhar interface.
+4. **Controle Estrito de Versionamento:** Nenhum commit é realizado sem solicitação explícita.
+5. **Evolução Gradual por Épicos:** Começamos pelo núcleo visual mais crítico (o **Channel Strip Universal** e suas telas consumidoras) e, à medida que avançamos para outros subsistemas (Channel Setup, Routing, Cenas, etc.), novas fases e detalhamentos serão incorporados a este mesmo plano.
 
 ---
 
