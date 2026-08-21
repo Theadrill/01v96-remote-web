@@ -9098,7 +9098,9 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     white-space: nowrap;
 }
 
-.badge-lan {
+.badge-lan,
+.badge-lan_ethernet,
+.badge-lan_wifi {
     background: rgba(46, 204, 113, 0.2);
     color: #2ecc71;
     border: 1px solid rgba(46, 204, 113, 0.4);

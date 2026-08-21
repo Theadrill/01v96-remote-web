@@ -27,6 +27,28 @@ fn is_lan_ipv4(ip: std::net::Ipv4Addr) -> bool {
     }
 }
 
+fn classify_lan_interface(iface_name: &str) -> (String, &'static str) {
+    let lower = iface_name.to_lowercase();
+    if lower.contains("wi-fi")
+        || lower.contains("wifi")
+        || lower.contains("wireless")
+        || lower.contains("wlan")
+        || lower.starts_with("wl")
+    {
+        ("Rede Local (Wi-Fi)".to_string(), "lan_wifi")
+    } else if lower.contains("ethernet")
+        || lower.contains("cabo")
+        || lower.contains("eth")
+        || lower.starts_with("enp")
+        || lower.starts_with("eno")
+        || lower.starts_with("ens")
+    {
+        ("Rede Local (Cabo)".to_string(), "lan_ethernet")
+    } else {
+        ("Rede Local".to_string(), "lan")
+    }
+}
+
 async fn get_network_info(
     State(state): State<Arc<RwLock<crate::state::GlobalState>>>,
 ) -> Json<Value> {
@@ -34,7 +56,8 @@ async fn get_network_info(
     let port = crate::config::AppConfig::load().port;
 
     let mut interfaces = Vec::new();
-    let mut lan_ipv4: Option<String> = None;
+    let mut lan_ips: Vec<(String, String, &'static str)> = Vec::new();
+    let mut seen_ips = std::collections::HashSet::new();
 
     if let Ok(ifas) = local_ip_address::list_afinet_netifas() {
         for (iface, ip) in ifas {
@@ -52,12 +75,27 @@ async fn get_network_info(
             }));
 
             if let std::net::IpAddr::V4(v4) = ip {
-                if !is_loopback && is_lan_ipv4(v4) && lan_ipv4.is_none() {
-                    lan_ipv4 = Some(ip_str.clone());
+                if !is_loopback && is_lan_ipv4(v4) && seen_ips.insert(ip_str.clone()) {
+                    let (label, category) = classify_lan_interface(&iface);
+                    lan_ips.push((ip_str, label, category));
                 }
             }
         }
     }
+
+    // Se houver múltiplas interfaces do mesmo tipo (ex: dois cabos ou dois wifis), podemos numerá-las se necessário,
+    // mas se tiver exatamente cabo e wifi, lan_ips já conterá ambos devidamente rotulados.
+    // Ordena para que Cabo venha antes de Wi-Fi, ou mantenha a ordem estável
+    lan_ips.sort_by(|a, b| {
+        let rank = |cat: &str| match cat {
+            "lan_ethernet" => 0,
+            "lan_wifi" => 1,
+            _ => 2,
+        };
+        rank(a.2).cmp(&rank(b.2))
+    });
+
+    let lan_ipv4 = lan_ips.first().map(|(ip, _, _)| ip.clone());
 
     let mut ts_hostname: Option<String> = None;
     let mut ts_ip: Option<String> = None;
@@ -103,11 +141,11 @@ async fn get_network_info(
     let tailscale_url = state.read().await.tailscale_url.clone();
 
     let mut urls = Vec::new();
-    if let Some(ip) = &lan_ipv4 {
+    for (ip, label, category) in &lan_ips {
         urls.push(json!({
-            "label": "Rede Local (Wi-Fi/Ethernet)",
+            "label": label,
             "url": format!("http://{}:{}", ip, port),
-            "category": "lan",
+            "category": category,
         }));
     }
     if let Some(ts_host) = &ts_hostname {
