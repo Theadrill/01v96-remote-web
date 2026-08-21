@@ -1,0 +1,14 @@
+/**
+ * =========================================================================================
+ * SCREEN STYLES: Outputs & Bus Masters View (outs_view.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos de Telas / Visões
+ *
+ * Responsabilidade:
+ * - Layout da tela de Barramentos de Saída (MIX 1-8 Masters e BUS 1-8 Masters).
+ * - Cores temáticas para identificação rápida (amarelo para MIX, ciano para BUS, magenta para ST IN).
+ * - Suporte a pares estéreo de saídas e visualização de medidores dedicados.
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras de layout da tela de saídas */

@@ -1,0 +1,15 @@
+/**
+ * =========================================================================================
+ * SCREEN STYLES: Channel Setup Dynamics Tab Layout (channel_setup_dynamics.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos de Telas / Visões
+ *
+ * Responsabilidade:
+ * - Layout em duas colunas/painéis da Aba de Dinâmica (Gate à esquerda, Compressor à direita).
+ * - Estilos dos botões de ativação individual (GATE ON, COMP ON).
+ * - Disposição dos knobs de parâmetros (Threshold, Range, Ratio, Attack, Release, Knee, Gain).
+ * - Seletor de modo de dinâmica e chave de roteamento de Sidechain / Key-In.
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras CSS serão migradas na Fase 7 */

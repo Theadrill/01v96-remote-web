@@ -1,0 +1,14 @@
+/**
+ * =========================================================================================
+ * SCREEN STYLES: Auxiliaries & Sends View (auxs_sends.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos de Telas / Visões
+ *
+ * Responsabilidade:
+ * - Layout da tela de Envios Auxiliares (Sends on Faders e Visão Matriz de Mixes).
+ * - Modos de visualização: MODO MIX (canais enviando para um AUX) e MODO CANAL (todos os AUX de um canal).
+ * - Indicadores visuais de ponto de envio (PRE / POST / FIXED) e cabeçalhos contextuais.
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras de layout da tela de auxiliares */

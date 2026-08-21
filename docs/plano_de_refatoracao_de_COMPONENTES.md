@@ -25,9 +25,48 @@ O objetivo geral é transformar a base de código do frontend em uma **Arquitetu
 ```text
 public_new/
 ├── index.html
-├── style.css
+├── style.css                  <-- CSS Legado Monolítico (será migrado e encolhido gradualmente)
 ├── app.js
 ├── steps.json
+│
+├── styles/                    <-- [ARQUITETURA MODULAR DE ESTILOS CSS]
+│   ├── base/                  <-- Estilos Base e Globais
+│   │   ├── base.css           <-- Reset global, touch-action, scrollbars e fontes
+│   │   ├── layout.css         <-- Estrutura principal, viewport, sidebar e dock
+│   │   └── splash_screen.css  <-- Tela de carregamento e inicialização
+│   │
+│   ├── components/            <-- Estilos dos Componentes Visuais Puros
+│   │   ├── channel_strip.css  <-- Fader Universal (Desktop/Mobile, Nudges, VU 60FPS)
+│   │   ├── eq.css             <-- Curva Biquad 4 Bandas, nós de arrasto e balão de Q
+│   │   ├── rta.css            <-- Espectro do analisador em tempo real (RTA)
+│   │   ├── dynamics.css       <-- Curvas Gate/Comp e medidores de redução de ganho (GR)
+│   │   ├── inserts.css        <-- Grid de pontos de inserção e patches
+│   │   ├── routing.css        <-- Matriz de barramentos BUS 1-8, Direct Out e Pan
+│   │   ├── sidebar.css        <-- Barra de navegação lateral e dock de ferramentas
+│   │   ├── search.css         <-- Barra de busca e filtro rápido de canais
+│   │   ├── theme-editor.css   <-- Editor visual de temas em tempo real
+│   │   ├── overlay_info.css   <-- Tooltips e popovers informativos
+│   │   └── modals/            <-- Estilos de Modais e Diálogos
+│   │       ├── confirm-modal.css    <-- Diálogos de confirmação e alertas
+│   │       ├── bubble-modal.css     <-- Modais tipo balão contextual
+│   │       ├── virtual-keyboard.css <-- Teclado virtual na tela
+│   │       └── color-picker.css     <-- Seletor visual de cores
+│   │
+│   └── screens/               <-- Estilos de Layout de Telas / Visões
+│       ├── main_view.css              <-- Layout da Tela Principal (32 CHs, Master PA, Macro)
+│       ├── auxs_sends.css             <-- Layout da Tela de Auxiliares (Sends on Faders)
+│       ├── outs_view.css              <-- Layout da Tela de Saídas (MIX 1-8 e BUS 1-8)
+│       ├── musician_view.css          <-- Layout da Tela do Músico (Envios + Lock)
+│       ├── routing_overview.css       <-- Layout da Matriz Geral de Roteamento
+│       ├── scenes_view.css            <-- Layout do Grid de Cenas e Presets
+│       │
+│       └── channel_setup/     <-- Estilos do Subsistema de Edição do Canal
+│           ├── channel_setup_core.css     <-- Shell do Modal: Abas, ◀ ▶ e Dock do Mini-Fader
+│           ├── channel_setup_eq.css       <-- Layout da Aba EQ (knobs de 4 bandas + HPF + RTA)
+│           ├── channel_setup_dynamics.css <-- Layout da Aba Dinâmica (Gate + Comp)
+│           ├── channel_setup_aux.css      <-- Layout da Aba AUX (Grid 8 envios + Vol. Geral)
+│           ├── channel_setup_inserts.css  <-- Layout da Aba Inserts
+│           └── channel_setup_routing.css  <-- Layout da Aba Roteamento / Pan / Pair
 │
 ├── themes/                    <-- Definições de Temas YAML (default.yaml)
 │   └── default.yaml
@@ -166,34 +205,62 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
 - [x] Atualizar tags `<script>` em `public_new/index.html`.
 - [x] Validar ausência de erros 404 em `/new`.
 
-### FASE 3 — Construção da Classe `ChannelStrip` Universal
-- [ ] Criar classe `ChannelStrip` modular em `public_new/modules/components/channel_strip.js`.
+### FASE 3 — Estrutura Modular de CSS & Placeholders de Estilos (CONCLUÍDA ✅)
+- [x] Criar a pasta `public_new/styles/` com suas subpastas (`base/`, `components/`, `components/modals/`, `screens/`, `screens/channel_setup/`).
+- [x] Criar arquivos esqueleto (placeholders comentados) de estilos:
+  - `styles/base/base.css` (Reset global, scrollbars e fontes)
+  - `styles/base/layout.css` (Estrutura principal, viewport, sidebar e dock)
+  - `styles/components/channel_strip.css` (Fader Universal e medidores)
+  - `styles/components/eq.css` (Canvas biquad, nós de arrasto e balão de Q)
+  - `styles/components/dynamics.css` (Curvas de dinâmica e medidores GR)
+  - `styles/components/inserts.css` (Grid de inserts e patches)
+  - `styles/components/routing.css` (Matriz BUS 1-8 e Pan)
+  - `styles/components/modals/confirm-modal.css` (Modal de confirmação)
+  - `styles/screens/main_view.css` (Layout da Tela Principal do Mixer)
+  - `styles/screens/auxs_sends.css` (Layout da Tela de Envios Auxiliares)
+  - `styles/screens/outs_view.css` (Layout da Tela de Barramentos de Saída)
+  - `styles/screens/musician_view.css` (Layout da Tela do Músico)
+  - `styles/screens/routing_overview.css` (Layout da Visão Geral de Roteamento)
+  - `styles/screens/scenes_view.css` (Layout do Grid de Cenas e Presets)
+  - `styles/screens/channel_setup/channel_setup_core.css` (Shell do modal, abas e mini-fader)
+  - `styles/screens/channel_setup/channel_setup_eq.css` (Layout da aba EQ)
+  - `styles/screens/channel_setup/channel_setup_dynamics.css` (Layout da aba Dinâmica)
+  - `styles/screens/channel_setup/channel_setup_aux.css` (Layout da aba AUX)
+  - `styles/screens/channel_setup/channel_setup_inserts.css` (Layout da aba Inserts)
+  - `styles/screens/channel_setup/channel_setup_routing.css` (Layout da aba Roteamento)
+- [x] Linkar os novos módulos CSS em `public_new/index.html` em ordem hierárquica logo após `style.css`.
+- [x] Validar que o app `/new` continua 100% íntegro e sem erros 404.
+
+### FASE 4 — Construção da Classe e Estilos do `ChannelStrip` Universal
+- [ ] Implementar `public_new/styles/components/channel_strip.css` isolando os estilos dos faders desktop/mobile, medidores WASM, nudges e macros.
+- [ ] Construir a classe `ChannelStrip` modular em `public_new/modules/components/channel_strip.js` (mantendo as pontes legadas para zero impacto).
 - [ ] Implementar as 7 zonas modulares (`Header`, `TopAction`, `Display`, `MiddleFeature`, `PrimaryButton`, `FaderCore`, `FooterRouting`).
 - [ ] Implementar suporte nativo a `mode: 'channel'` e `mode: 'macro'` (Big Nudges, Delta dB, botões CONFIG e ZERAR).
 - [ ] Implementar cache $O(1)$ de nós DOM em `this.elements`.
 - [ ] Implementar física de fader, retenção e auto-repeat acelerado em nudges.
 - [ ] Integrar conexão direta com `MeterBus` / WASM.
 
-### FASE 4 — Migração Piloto: Tela de Auxiliares (`screens/auxs_sends.js`)
+### FASE 5 — Migração Piloto: Tela de Auxiliares (`screens/auxs_sends.js`)
 - [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip` com `type: 'aux_send'`.
 - [ ] Remover do arquivo as funções legadas de faders e strings HTML duplicadas.
 - [ ] Validar modos MIX e CANAL com Pre/Post e modo FIXED.
 
-### FASE 5 — Criação do Host de Edição `channel_setup_core.js`
-- [ ] Criar `public_new/modules/screens/channel_setup/channel_setup_core.js` para gerenciar abas (`EQ`, `DYN`, `AUX`, `INSERTS`, `ROUTING`), navegação ◀ / ▶ e Mini-Fader lateral com Solo Replace.
+### FASE 6 — Criação do Host de Edição `channel_setup_core.js` & Estilos
+- [ ] Criar `public_new/modules/screens/channel_setup/channel_setup_core.js` e seu respectivo `styles/screens/channel_setup/channel_setup_core.css` para gerenciar abas (`EQ`, `DYN`, `AUX`, `INSERTS`, `ROUTING`), navegação ◀ / ▶ e Mini-Fader lateral com Solo Replace.
 - [ ] Integrar e acionar as sub-telas (`channel_setup_*.js`).
 
-### FASE 6 — Migração das Telas Restantes (`main_view.js`, `outs_view.js`, `musician_view.js`)
+### FASE 7 — Migração das Telas Restantes (`main_view.js`, `outs_view.js`, `musician_view.js`)
 - [ ] Migrar Tela Principal (`screens/main_view.js`) para instanciar 32 inputs, Master e Macro Fader via `ChannelStrip`.
 - [ ] Migrar Tela de Saídas (`screens/outs_view.js`) para MIX 1-8 e BUS 1-8.
 - [ ] Migrar Modo Músico (`screens/musician_view.js`) para faders de envio e Volume Geral.
 
-### FASE 7 — Construção dos Componentes Puros de Áudio
-- [ ] Implementar `components/eq.js` (Canvas puro com BiquadFilter desacoplado de IDs globais).
-- [ ] Implementar `components/gate.js` e `components/compressor.js` (Widgets puros de dinâmica).
-- [ ] Implementar `components/inserts.js` e `components/routing.js`.
+### FASE 8 — Construção dos Componentes Puros de Áudio & Estilos
+- [ ] Implementar `components/eq.js` e `styles/components/eq.css` (Canvas puro com BiquadFilter desacoplado de IDs globais).
+- [ ] Implementar `components/gate.js`, `components/compressor.js` e `styles/components/dynamics.css` (Widgets puros de dinâmica).
+- [ ] Implementar `components/inserts.js`, `components/routing.js` e seus respectivos CSS.
 - [ ] Conectar os novos componentes aos controladores em `screens/channel_setup/`.
 
-### FASE 8 — Integração com Sistema de Temas YAML & Validação Final
+### FASE 9 — Integração com Sistema de Temas YAML & Validação Final
 - [ ] Mapear variáveis CSS `--strip-*` nos estilos e validar com `ThemeEditor` e `default.yaml`.
+- [ ] Limpar o `style.css` original removendo todo código legado migrado.
 - [ ] Realizar bateria completa de testes de regressão no endpoint `/new`.

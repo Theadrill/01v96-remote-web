@@ -135,3 +135,59 @@ channel_lock:
   badge_bg: "#ff4444"
   badge_text_color: "#ffffff"
 
+# ─── CHANNEL STRIP (FADERS & CANAIS) ──────────────────────────
+# Faixas de canal, faders universais, botões ON/SOLO, grupos e medidores
+channel_strip:
+  # Estrutura do Card
+  card_bg: "#181818"                 # Fundo do card desktop
+  card_border: "#222222"             # Borda do card
+  card_radius: "6px"                 # Arredondamento do card
+  card_on_bg: "rgba(255, 69, 0, 0.08)" # Fundo sutil de destaque quando o canal está ON
+
+  # Cores de Grupos / Barramentos
+  group_1_color: "#00adef"           # Azul - Canais 1-16
+  group_2_color: "#00ff88"           # Verde - Canais 17-32
+  group_st_color: "#4a90e2"          # Azul suave - Entradas Estéreo (ST IN)
+  group_mix_color: "#d4a017"         # Amarelo/Dourado - MIX 1-8 Masters
+  group_bus_color: "#00b396"         # Ciano/Teal - BUS 1-8 Masters
+  master_color: "#dc3545"            # Vermelho - Master Stereo PA
+
+  # Botão ON / MUTE
+  btn_on_bg: "#333333"               # Fundo do botão ON desligado
+  btn_on_text: "#888888"             # Texto do botão ON desligado
+  btn_on_active_bg: "#ff4500"        # Fundo do botão ON ligado (ativo)
+  btn_on_active_text: "#ffffff"      # Texto do botão ON ligado
+  btn_on_active_glow: "rgba(255, 69, 0, 0.45)" # Brilho/Glow do botão ON ligado
+  btn_on_radius: "4px"               # Arredondamento do botão ON
+
+  # Botão SOLO / CUE
+  btn_solo_bg: "#333333"             # Fundo do botão SOLO desligado
+  btn_solo_text: "#888888"           # Texto do botão SOLO desligado
+  btn_solo_active_bg: "#ffc107"      # Fundo do botão SOLO ligado (amarelo)
+  btn_solo_active_text: "#000000"    # Texto do botão SOLO ligado
+  btn_solo_radius: "4px"             # Arredondamento do botão SOLO
+
+  # Botões de Nudge (+ / -)
+  btn_nudge_bg: "#333333"            # Fundo dos botões de Nudge
+  btn_nudge_text: "#cccccc"          # Cor do símbolo (+/-)
+  btn_nudge_radius: "50%"            # Arredondamento (50% = circular)
+
+  # Visores e Tipografia
+  name_display_bg: "#000000"         # Fundo da caixa de identificação do canal
+  name_display_color: "#00ff00"      # Cor do nome do canal (verde display)
+  name_display_radius: "4px"         # Arredondamento da caixa de nome
+  db_val_color: "#5cacee"            # Cor do valor numérico de dB
+
+  # Fader e Escala
+  fader_track_color: "#555555"       # Cor da linha central do trilho do fader
+  scale_text_color: "#999999"        # Cor dos números da escala em dB
+
+  # Indicador de Panpot (L-C-R)
+  pan_track_bg: "#222222"            # Fundo da trilha horizontal do Pan
+  pan_thumb_color: "#a855f7"         # Cor do cursor de Panpot (roxo)
+  pan_center_color: "#4a4a5a"        # Cor do cursor quando centralizado (C)
+
+  # Medidores e LED de Pico
+  peak_led_color: "#ff0000"          # Cor do LED de Peak aceso
+  peak_led_glow: "#ff4444"           # Brilho do LED de Peak aceso
+

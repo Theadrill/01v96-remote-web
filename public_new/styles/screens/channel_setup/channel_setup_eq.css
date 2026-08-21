@@ -1,0 +1,15 @@
+/**
+ * =========================================================================================
+ * SCREEN STYLES: Channel Setup EQ Tab Layout (channel_setup_eq.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos de Telas / Visões
+ *
+ * Responsabilidade:
+ * - Layout responsivo dos painéis de controle da Aba de Equalização.
+ * - Posicionamento dos controles de 4 bandas (Low, Low-Mid, High-Mid, High) e filtro HPF.
+ * - Botão mestre de ligar/desligar EQ (EQ ON) e botão de reset de curva.
+ * - Painel de integração do Analisador de Espectro em Tempo Real (RTA Overlay).
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras CSS serão migradas na Fase 7 */

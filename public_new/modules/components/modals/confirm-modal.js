@@ -348,6 +348,44 @@ var ConfirmModal = (function () {
         if (cl.border_color) root.style.setProperty('--channel-lock-border-color', cl.border_color);
         if (cl.badge_bg) root.style.setProperty('--channel-lock-badge-bg', cl.badge_bg);
         if (cl.badge_text_color) root.style.setProperty('--channel-lock-badge-text-color', cl.badge_text_color);
+
+        // Channel Strip & Faders (Injeção de Variáveis CSS)
+        var cs = theme.channel_strip || {};
+        if (cs.card_bg)             root.style.setProperty('--strip-card-bg', cs.card_bg);
+        if (cs.card_border)         root.style.setProperty('--strip-card-border', cs.card_border);
+        if (cs.card_radius)         root.style.setProperty('--strip-card-radius', cs.card_radius);
+        if (cs.card_on_bg)          root.style.setProperty('--strip-card-on-bg', cs.card_on_bg);
+        if (cs.group_1_color)       root.style.setProperty('--strip-group-1-color', cs.group_1_color);
+        if (cs.group_2_color)       root.style.setProperty('--strip-group-2-color', cs.group_2_color);
+        if (cs.group_st_color)      root.style.setProperty('--strip-group-st-color', cs.group_st_color);
+        if (cs.group_mix_color)     root.style.setProperty('--strip-group-mix-color', cs.group_mix_color);
+        if (cs.group_bus_color)     root.style.setProperty('--strip-group-bus-color', cs.group_bus_color);
+        if (cs.master_color)        root.style.setProperty('--strip-master-color', cs.master_color);
+        if (cs.btn_on_bg)           root.style.setProperty('--strip-btn-on-bg', cs.btn_on_bg);
+        if (cs.btn_on_text)         root.style.setProperty('--strip-btn-on-text', cs.btn_on_text);
+        if (cs.btn_on_active_bg)    root.style.setProperty('--strip-btn-on-active-bg', cs.btn_on_active_bg);
+        if (cs.btn_on_active_text)  root.style.setProperty('--strip-btn-on-active-text', cs.btn_on_active_text);
+        if (cs.btn_on_active_glow)  root.style.setProperty('--strip-btn-on-active-glow', cs.btn_on_active_glow);
+        if (cs.btn_on_radius)       root.style.setProperty('--strip-btn-on-radius', cs.btn_on_radius);
+        if (cs.btn_solo_bg)         root.style.setProperty('--strip-btn-solo-bg', cs.btn_solo_bg);
+        if (cs.btn_solo_text)       root.style.setProperty('--strip-btn-solo-text', cs.btn_solo_text);
+        if (cs.btn_solo_active_bg)  root.style.setProperty('--strip-btn-solo-active-bg', cs.btn_solo_active_bg);
+        if (cs.btn_solo_active_text) root.style.setProperty('--strip-btn-solo-active-text', cs.btn_solo_active_text);
+        if (cs.btn_solo_radius)     root.style.setProperty('--strip-btn-solo-radius', cs.btn_solo_radius);
+        if (cs.btn_nudge_bg)        root.style.setProperty('--strip-btn-nudge-bg', cs.btn_nudge_bg);
+        if (cs.btn_nudge_text)      root.style.setProperty('--strip-btn-nudge-text', cs.btn_nudge_text);
+        if (cs.btn_nudge_radius)    root.style.setProperty('--strip-btn-nudge-radius', cs.btn_nudge_radius);
+        if (cs.name_display_bg)     root.style.setProperty('--strip-name-display-bg', cs.name_display_bg);
+        if (cs.name_display_color)  root.style.setProperty('--strip-name-display-color', cs.name_display_color);
+        if (cs.name_display_radius) root.style.setProperty('--strip-name-display-radius', cs.name_display_radius);
+        if (cs.db_val_color)        root.style.setProperty('--strip-db-val-color', cs.db_val_color);
+        if (cs.fader_track_color)   root.style.setProperty('--strip-fader-track-color', cs.fader_track_color);
+        if (cs.scale_text_color)    root.style.setProperty('--strip-scale-text-color', cs.scale_text_color);
+        if (cs.pan_track_bg)        root.style.setProperty('--strip-pan-track-bg', cs.pan_track_bg);
+        if (cs.pan_thumb_color)     root.style.setProperty('--strip-pan-thumb-color', cs.pan_thumb_color);
+        if (cs.pan_center_color)    root.style.setProperty('--strip-pan-center-color', cs.pan_center_color);
+        if (cs.peak_led_color)      root.style.setProperty('--strip-peak-led-color', cs.peak_led_color);
+        if (cs.peak_led_glow)       root.style.setProperty('--strip-peak-led-glow', cs.peak_led_glow);
     }
 
     function _alert(message, title, type) {

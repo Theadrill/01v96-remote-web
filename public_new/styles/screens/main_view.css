@@ -1,0 +1,14 @@
+/**
+ * =========================================================================================
+ * SCREEN STYLES: Main Mixer View (main_view.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos de Telas / Visões
+ *
+ * Responsabilidade:
+ * - Layout da tela principal do Mixer (32 canais de entrada, ST IN e canal Master Stereo PA).
+ * - Espaçamento entre os faders, agrupamento visual (CH 1-16 e CH 17-32) e fader-card-desktop.
+ * - Posicionamento e visibilidade do Macro Fader diferencial na tela principal.
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras de layout da tela principal */

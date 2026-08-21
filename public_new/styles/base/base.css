@@ -1,0 +1,14 @@
+/**
+ * =========================================================================================
+ * BASE STYLES: Global Reset, Box-Sizing & Typography (base.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos Base
+ *
+ * Responsabilidade:
+ * - Reset global (* { box-sizing: border-box; }), toque touch-action e prevenção de zoom.
+ * - Estilização das barras de rolagem customizadas (Scrollbars Webkit & Firefox).
+ * - Definição das fontes padrão do sistema e variáveis de cores primitivas.
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras globais base */

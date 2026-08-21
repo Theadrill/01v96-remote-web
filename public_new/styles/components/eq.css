@@ -1,0 +1,15 @@
+/**
+ * =========================================================================================
+ * COMPONENT STYLES: Pure Visual EQ Widget (eq.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos Modulares de Componentes
+ *
+ * Responsabilidade:
+ * - Estilização do Canvas gráfico de curva biquad de 4 bandas + High-Pass Filter (HPF).
+ * - Estilos para os nós de arrasto interativos das frequências (pontos 1, 2, 3, 4 e HPF).
+ * - Balão flutuante contextual de ajuste do fator Q (largura de banda).
+ * - Grids de eixos de frequência (20 Hz a 20 kHz) e escala de ganho (-18 dB a +18 dB).
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras CSS serão migradas na Fase 7 */

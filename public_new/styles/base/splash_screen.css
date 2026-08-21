@@ -1,0 +1,14 @@
+/**
+ * =========================================================================================
+ * CORE STYLES: Application Startup Splash Screen (splash_screen.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos Core
+ *
+ * Responsabilidade:
+ * - Tela cheia de carregamento inicial (Splash Screen) e verificação de conexão com a mesa.
+ * - Barra de progresso de inicialização do WebAssembly (WASM Meter Engine) e sincronização MIDI.
+ * - Botão de tela cheia (Fullscreen) para dispositivos móveis no primeiro acesso.
+ * =========================================================================================
+ */
+
+/* Placeholder - Regras CSS da splash screen */

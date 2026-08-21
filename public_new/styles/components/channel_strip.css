@@ -1,0 +1,64 @@
+/**
+ * =========================================================================================
+ * COMPONENT STYLES: Channel Strip Universal (channel_strip.css)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Estilos Modulares de Componentes
+ *
+ * Responsabilidade:
+ * - Estilos estruturais e visuais do Fader Universal (Desktop e Mobile).
+ * - Layout das 7 zonas modulares (Header, TopAction, Display, MiddleFeature, PrimaryButton, FaderCore, FooterRouting).
+ * - Modos de operação: 'channel' (canais normais) e 'macro' (Macro Faders com Big Nudges e Delta dB).
+ * - Estilização do trilho do Fader, knob com física tátil e escala lateral em dB.
+ * - Medidores VU Meters 60 FPS com Peak LED e Glow integrados ao WASM.
+ * - Suporte a largura dupla para canais pareados em estéreo (PAIR).
+ * - Totalmente compatível com variáveis de temas YAML (--strip-*).
+ * =========================================================================================
+ */
+
+/* Mapeamento Base de Variáveis CSS com Fallbacks */
+:root {
+    --strip-card-bg: #181818;
+    --strip-card-border: #222222;
+    --strip-card-radius: 6px;
+    --strip-card-on-bg: rgba(255, 69, 0, 0.08);
+
+    --strip-group-1-color: #00adef;
+    --strip-group-2-color: #00ff88;
+    --strip-group-st-color: #4a90e2;
+    --strip-group-mix-color: #d4a017;
+    --strip-group-bus-color: #00b396;
+    --strip-master-color: #dc3545;
+
+    --strip-btn-on-bg: #333333;
+    --strip-btn-on-text: #888888;
+    --strip-btn-on-active-bg: #ff4500;
+    --strip-btn-on-active-text: #ffffff;
+    --strip-btn-on-active-glow: rgba(255, 69, 0, 0.45);
+    --strip-btn-on-radius: 4px;
+
+    --strip-btn-solo-bg: #333333;
+    --strip-btn-solo-text: #888888;
+    --strip-btn-solo-active-bg: #ffc107;
+    --strip-btn-solo-active-text: #000000;
+    --strip-btn-solo-radius: 4px;
+
+    --strip-btn-nudge-bg: #333333;
+    --strip-btn-nudge-text: #cccccc;
+    --strip-btn-nudge-radius: 50%;
+
+    --strip-name-display-bg: #000000;
+    --strip-name-display-color: #00ff00;
+    --strip-name-display-radius: 4px;
+    --strip-db-val-color: #5cacee;
+
+    --strip-fader-track-color: #555555;
+    --strip-scale-text-color: #999999;
+
+    --strip-pan-track-bg: #222222;
+    --strip-pan-thumb-color: #a855f7;
+    --strip-pan-center-color: #4a4a5a;
+
+    --strip-peak-led-color: #ff0000;
+    --strip-peak-led-glow: #ff4444;
+}
+
