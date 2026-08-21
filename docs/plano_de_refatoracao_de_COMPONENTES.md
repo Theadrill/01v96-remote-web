@@ -146,25 +146,25 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
 - [x] Ordenar scripts em camadas no final do `<body>` em `public_new/index.html`.
 - [x] Testar endpoint `/new` garantindo zero erros 404 e baseline funcional 100% preservada (Commit `b8f226e`).
 
-### FASE 2 — Organização Estrutural do Channel Setup & Placeholders de Componentes
-- [ ] Criar a pasta `public_new/modules/screens/channel_setup/`.
-- [ ] Mover os arquivos de controle da tela de edição para `screens/channel_setup/`:
+### FASE 2 — Organização Estrutural do Channel Setup & Placeholders de Componentes (CONCLUÍDA ✅)
+- [x] Criar a pasta `public_new/modules/screens/channel_setup/`.
+- [x] Mover os arquivos de controle da tela de edição para `screens/channel_setup/`:
   - `components/eq.js` → `screens/channel_setup/channel_setup_eq.js`
   - `components/dynamics.js` → `screens/channel_setup/channel_setup_dynamics.js`
   - `components/gate.js` → `screens/channel_setup/channel_setup_gate.js`
   - `components/compressor.js` → `screens/channel_setup/channel_setup_compressor.js`
   - `components/inserts.js` → `screens/channel_setup/channel_setup_inserts.js`
   - `components/routing.js` → `screens/channel_setup/channel_setup_routing.js`
-- [ ] Inserir em cada arquivo de `screens/channel_setup/` o cabeçalho descritivo com seu papel atual e transição futura.
-- [ ] Criar arquivos esqueleto (placeholders com documentação) em `public_new/modules/components/`:
+- [x] Inserir em cada arquivo de `screens/channel_setup/` o cabeçalho descritivo com seu papel atual e transição futura.
+- [x] Criar arquivos esqueleto (placeholders com documentação) em `public_new/modules/components/`:
   - `components/eq.js` (Componente visual puro)
   - `components/gate.js` (Componente visual puro)
   - `components/compressor.js` (Componente visual puro)
   - `components/dynamics.js` (Widget integrador)
   - `components/inserts.js` (Widget visual)
   - `components/routing.js` (Widget visual)
-- [ ] Atualizar tags `<script>` em `public_new/index.html`.
-- [ ] Validar ausência de erros 404 em `/new`.
+- [x] Atualizar tags `<script>` em `public_new/index.html`.
+- [x] Validar ausência de erros 404 em `/new`.
 
 ### FASE 3 — Construção da Classe `ChannelStrip` Universal
 - [ ] Criar classe `ChannelStrip` modular em `public_new/modules/components/channel_strip.js`.

@@ -1,107 +1,40 @@
-let dynNudgeInterval = null;
-let dynNudgeTimeout = null;
+/**
+ * =========================================================================================
+ * PURE VISUAL COMPONENT: Dynamics Integration Container Widget (dynamics.js)
+ * =========================================================================================
+ * Arquitetura Frontend V2 - Camada de Componentes Visuais Puros
+ *
+ * Responsabilidade Futura (Fase 7):
+ * - Widget integrador que compõe visualmente os blocos de Gate e Compressor em um layout coeso.
+ * - Gerencia espaçamento, grid responsivo e transições visuais da seção de dinâmica.
+ *
+ * Interface Prevista:
+ * @class DynamicsWidget
+ * @param {HTMLElement} container - Contêiner DOM onde a seção será montada
+ * @param {Object} props - Configuração inicial contendo dados de Gate e Compressor
+ * @method update(props) - Atualiza simultaneamente ambos os processadores de dinâmica
+ * =========================================================================================
+ */
 
-window.startDynNudge = function(sliderId, dir, ch, type) {
-    const doNudge = (step = dir) => {
-        const sl = document.getElementById(sliderId);
-        if (!sl) return;
-        
-        let val = parseInt(sl.value);
-        val += step;
-        
-        if (val < parseInt(sl.min)) val = parseInt(sl.min);
-        if (val > parseInt(sl.max)) val = parseInt(sl.max);
-        
-        sl.value = val;
-        // Dispara o oninput para atualizar o label local
-        sl.dispatchEvent(new Event('input'));
-        // Envia para a mesa
-        if (typeof socket !== 'undefined' && socket) {
-            socket.emit('control', { type, channel: ch, value: val });
-        }
-    };
-
-    stopDynNudge();
-    doNudge();
-
-    // Delay inicial de 500ms antes de começar a repetir
-    dynNudgeTimeout = setTimeout(() => {
-        dynNudgeInterval = setInterval(() => {
-            doNudge();
-        }, 100);
-    }, 500);
-};
-
-window.stopDynNudge = function() {
-    if (dynNudgeTimeout) {
-        clearTimeout(dynNudgeTimeout);
-        dynNudgeTimeout = null;
-    }
-    if (dynNudgeInterval) {
-        clearInterval(dynNudgeInterval);
-        dynNudgeInterval = null;
-    }
-};
-
-let grPollingInterval = null;
-
-window.startGrPolling = function(ch) {
-    window.stopGrPolling();
-    if (ch === null || ch === undefined) return;
-    const isMaster = ch === 'master' || ch === 52;
-    const isSupported = isMaster
-        || (typeof ch === 'number' && (ch <= 31 || (ch >= 36 && ch <= 51)));
-    if (!isSupported) return;
-
-    const request = () => {
-        if (typeof socket !== 'undefined' && socket) {
-            socket.emit('requestDynamics', { channel: ch });
-        }
-    };
-
-    request();
-
-    grPollingInterval = setInterval(() => {
-        if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'dyn' && activeConfigChannel === ch) {
-            request();
-        } else {
-            window.stopGrPolling();
-        }
-    }, 100);
-};
-
-window.stopGrPolling = function() {
-    if (grPollingInterval) {
-        clearInterval(grPollingInterval);
-        grPollingInterval = null;
-    }
-};
-
-function renderDynamics(ch) {
-    const body = document.querySelector('.ch-modal-body');
-    
-    // Configura o contêiner principal para Dynamics
-    body.style.flexDirection = 'column';
-    body.style.alignItems = 'stretch';
-    body.style.overflowY = 'auto';
-    
-    body.innerHTML = ''; // Limpa o corpo
-    
-    const container = document.createElement('div');
-    container.className = 'dyn-container';
-    body.appendChild(container);
-
-    // Chama os módulos específicos para renderizar dentro do contêiner
-    if (typeof renderGate === 'function') {
-        renderGate(container, ch);
+// Placeholder da Fase 2 - Implementação completa será construída na Fase 7
+class DynamicsWidget {
+    constructor(container, props = {}) {
+        this.container = container;
+        this.props = props;
+        this.gateWidget = null;
+        this.compWidget = null;
     }
 
-    if (typeof renderCompressor === 'function') {
-        renderCompressor(container, ch);
+    render() {
+        // Montagem do layout e instanciação de GateWidget e CompressorWidget
     }
-    
-    // Inicia o polling contínuo de dinâmicas/GR para o canal selecionado
-    if (typeof window.startGrPolling === 'function') {
-        window.startGrPolling(ch);
+
+    destroy() {
+        if (this.gateWidget && typeof this.gateWidget.destroy === 'function') this.gateWidget.destroy();
+        if (this.compWidget && typeof this.compWidget.destroy === 'function') this.compWidget.destroy();
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.DynamicsWidget = DynamicsWidget;
 }
