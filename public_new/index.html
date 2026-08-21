@@ -11,13 +11,14 @@
     <meta content="01V96 LIVE" name="apple-mobile-web-app-title" />
     <meta content="yes" name="mobile-web-app-capable" />
     <title>01V96 - LIVE SAFE</title>
+    <base href="/new/" />
     <link href="style.css?v=1.0.10" rel="stylesheet" />
     <link href="modules/FXS/fx.css?v=1.0.2" rel="stylesheet" />
     <link href="vendor/fontawesome/all.min.css" rel="stylesheet" />
     <!-- UI UPDATE: 2026-06-07 -->
-    <script src="/vendor/socket.io.min.js"></script>
-    <script src="/vendor/qrcode.min.js"></script>
-    <script src="/vendor/js-yaml/js-yaml.min.js"></script>
+    <script src="vendor/socket.io.min.js"></script>
+    <script src="vendor/qrcode.min.js"></script>
+    <script src="vendor/js-yaml/js-yaml.min.js"></script>
     <script>
         // Fix para sliders verticais em iOS 16 e Safari antigo (usa rotacao e ajusta o width)
         document.addEventListener('DOMContentLoaded', function () {
@@ -1223,123 +1224,10 @@
     </div>
     <!-- Overlay Info (gerenciado por overlay_info.js) -->
     <div class="overlay-info styled-blockingOverlay" id="overlayInfo"></div>
-    <script src="modules/globals.js?v=4"></script>
-    <script src="modules/patch_registry.js"></script>
-    <script src="modules/routing_overview.js"></script>
-    <script src="modules/macros/core.js"></script>
-    <script src="modules/macros.js?t=20260810"></script>
-    <script src="modules/channel_strip.js?v=24"></script>
-    <script src="modules/eq.js?v=7"></script>
-    <script src="modules/rta.js?v=1"></script>
-    <script src="modules/monitoring.js?v=1"></script>
-    <script src="modules/copy_paste.js"></script>
-    <script src="modules/gate.js"></script>
-    <script src="modules/compressor.js"></script>
-    <script src="modules/dynamics.js"></script>
-    <script src="modules/auxs_sends.js?v=2"></script>
-    <script src="modules/events.js?v=13"></script>
-    <script src="modules/steps.js"></script>
-    <script src="modules/macro_fader.js?v=1"></script>
-    <script src="modules/volume_geral.js?v=2"></script>
-    <script src="modules/overlay_info.js"></script>
-    <script src="modules/socket.js?v=8"></script>
-    <script src="modules/sidebar.js?v=14"></script>
-<script src="modules/FXS/fx_utils.js?v=1"></script>
-<script src="modules/FXS/fx_registry.js?v=3"></script>
-<script src="modules/FXS/fx_components.js?v=2"></script>
-<script src="modules/FXS/fx_core.js?v=2"></script>
-    <script src="modules/FXS/efeitos.js?v=1"></script>
-    <script src="modules/FXS/reverb.js?v=1"></script>
-    <script src="modules/FXS/multiband_compressor.js?v=1"></script>
-    <script src="modules/FXS/fx_routing.js?v=1"></script>
-    <script src="modules/routing.js?v=11"></script>
-    <script src="modules/inserts.js?v=1"></script>
-    <script src="modules/scroll.js"></script>
-    <script src="modules/setup.js?v=6"></script>
-    <script src="modules/splash_screen.js?v=7"></script>
-    <script src="modules/search.js?v=4"></script>
-    <script src="modules/scene_grid.js"></script>
-    <script src="modules/custom_scenes.js?v=4"></script>
-    <script src="modules/fps_meter.js"></script>
-    <script>
-        // Função para detectar se é um celular normal (telas pequenas)
-        function isPhoneSize() {
-            return window.innerWidth <= 767 || window.innerHeight <= 500;
-        }
 
-        // Prevenir teclado nativo no Android apenas se NÃO for celular normal
-        const renameInput = document.getElementById('sceneRenameInput');
-        if (renameInput) {
-            // Se não for celular, escondemos o nativo
-            if (!isPhoneSize()) {
-                renameInput.setAttribute('inputmode', 'none');
-            }
-
-            renameInput.addEventListener('touchstart', function (e) {
-                if (!isPhoneSize()) {
-                    e.preventDefault(); // Impede o teclado nativo em tablets/desktops
-                    this.focus();       // Força o foco para manter o cursor
-                }
-            }, { passive: false });
-        }
-
-        // Lógica do teclado virtual
-        function vkType(char, targetId = 'sceneRenameInput') {
-            const input = document.getElementById(targetId);
-            if (!input) return;
-            if (!input.maxLength || input.maxLength < 0 || input.value.length < input.maxLength) {
-                // Preserva o cursor
-                const start = input.selectionStart || input.value.length;
-                const end = input.selectionEnd || input.value.length;
-                input.value = input.value.substring(0, start) + char + input.value.substring(end);
-                input.selectionStart = input.selectionEnd = start + 1;
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-            input.focus();
-        }
-
-        function vkBackspace(targetId = 'sceneRenameInput') {
-            const input = document.getElementById(targetId);
-            if (!input) return;
-            const start = input.selectionStart || input.value.length;
-            const end = input.selectionEnd || input.value.length;
-            if (start === end && start > 0) {
-                input.value = input.value.substring(0, start - 1) + input.value.substring(end);
-                input.selectionStart = input.selectionEnd = start - 1;
-            } else if (start !== end) {
-                input.value = input.value.substring(0, start) + input.value.substring(end);
-                input.selectionStart = input.selectionEnd = start;
-            }
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.focus();
-        }
-
-        let vkBackspaceTimer = null;
-        let vkBackspaceInterval = null;
-
-        function startVkBackspace(targetId, e) {
-            if (e && e.type === 'touchstart') e.preventDefault(); // Evita conflito com mousedown
-            vkBackspace(targetId); // Apaga o primeiro char imediatamente (funciona como clique)
-            vkBackspaceTimer = setTimeout(() => {
-                vkBackspaceInterval = setInterval(() => {
-                    vkBackspace(targetId);
-                }, 80); // Velocidade de repetição (80ms)
-            }, 400); // Tempo segurando para iniciar a repetição (400ms)
-        }
-
-        function stopVkBackspace() {
-            clearTimeout(vkBackspaceTimer);
-            clearInterval(vkBackspaceInterval);
-        }
-    </script>
-    <script src="app.js"></script>
-    <script src="modules/confirm-modal.js"></script>
-    <script src="modules/virtual-keyboard.js"></script>
-    <script src="modules/color-picker.js"></script>
-    <script src="modules/theme-manager.js"></script>
-    <script src="modules/theme-editor.js"></script>
-<script src="modules/bubble-modal.js"></script>
-    <script src="modules/channel_lock.js"></script>
+    <!-- ================================================================= -->
+    <!-- MODAIS E DIÁLOGOS DE SISTEMA (Estrutura DOM antes dos scripts)   -->
+    <!-- ================================================================= -->
 
     <!-- Modal de Gerenciamento de Temas (Fase 3.3) -->
     <div class="modal-overlay" id="themeManagerModal" style="display: none; z-index: 14000;">
@@ -1434,6 +1322,143 @@
             </div>
         </div>
     </div>
+
+    <!-- ================================================================= -->
+    <!-- SCRIPTS MODULARES (Carregamento ordenado em camadas no body)      -->
+    <!-- ================================================================= -->
+
+    <!-- CAMADA 1: Core & Infraestrutura de Estado -->
+    <script src="modules/core/globals.js?v=4"></script>
+    <script src="modules/core/events.js?v=13"></script>
+    <script src="modules/core/steps.js"></script>
+    <script src="modules/core/setup.js?v=6"></script>
+    <script src="modules/core/splash_screen.js?v=7"></script>
+
+    <!-- CAMADA 2: Serviços & Rede -->
+    <script src="modules/services/socket.js?v=8"></script>
+    <script src="modules/services/monitoring.js?v=1"></script>
+    <script src="modules/services/patch_registry.js"></script>
+    <script src="modules/services/channel_lock.js"></script>
+    <script src="modules/services/copy_paste.js"></script>
+    <script src="modules/services/theme-manager.js"></script>
+
+    <!-- CAMADA 3: Componentes Visuais & Modais -->
+    <script src="modules/components/modals/confirm-modal.js"></script>
+    <script src="modules/components/modals/virtual-keyboard.js"></script>
+    <script src="modules/components/modals/bubble-modal.js"></script>
+    <script src="modules/components/modals/color-picker.js"></script>
+    <script src="modules/components/channel_strip.js?v=24"></script>
+    <script src="modules/components/macro_fader.js?v=1"></script>
+    <script src="modules/components/volume_geral.js?v=2"></script>
+    <script src="modules/components/eq.js?v=7"></script>
+    <script src="modules/components/rta.js?v=1"></script>
+    <script src="modules/components/gate.js"></script>
+    <script src="modules/components/compressor.js"></script>
+    <script src="modules/components/dynamics.js"></script>
+    <script src="modules/components/inserts.js?v=1"></script>
+    <script src="modules/components/routing.js?v=11"></script>
+    <script src="modules/components/sidebar.js?v=14"></script>
+    <script src="modules/components/search.js?v=4"></script>
+    <script src="modules/components/theme-editor.js"></script>
+    <script src="modules/components/overlay_info.js"></script>
+
+    <!-- CAMADA 3.1: Subsistema de Processadores FXS -->
+    <script src="modules/FXS/fx_utils.js?v=1"></script>
+    <script src="modules/FXS/fx_registry.js?v=3"></script>
+    <script src="modules/FXS/fx_components.js?v=2"></script>
+    <script src="modules/FXS/fx_core.js?v=2"></script>
+    <script src="modules/FXS/efeitos.js?v=1"></script>
+    <script src="modules/FXS/reverb.js?v=1"></script>
+    <script src="modules/FXS/multiband_compressor.js?v=1"></script>
+    <script src="modules/FXS/fx_routing.js?v=1"></script>
+
+    <!-- CAMADA 3.2: Subsistema de Macros & Automação -->
+    <script src="modules/macros/core.js"></script>
+    <script src="modules/macros/macros.js?t=20260810"></script>
+
+    <!-- CAMADA 4: Controladores de Telas / Visões -->
+    <script src="modules/screens/auxs_sends.js?v=2"></script>
+    <script src="modules/screens/routing_overview.js"></script>
+    <script src="modules/screens/scene_grid.js"></script>
+    <script src="modules/screens/custom_scenes.js?v=4"></script>
+
+    <!-- CAMADA 5: Utilitários Gerais -->
+    <script src="modules/utils/scroll.js"></script>
+    <script src="modules/utils/fps_meter.js"></script>
+
+    <!-- Helpers de Interface / Teclado Virtual de Cenas -->
+    <script>
+        // Função para detectar se é um celular normal (telas pequenas)
+        function isPhoneSize() {
+            return window.innerWidth <= 767 || window.innerHeight <= 500;
+        }
+
+        // Prevenir teclado nativo no Android apenas se NÃO for celular normal
+        const renameInput = document.getElementById('sceneRenameInput');
+        if (renameInput) {
+            if (!isPhoneSize()) {
+                renameInput.setAttribute('inputmode', 'none');
+            }
+
+            renameInput.addEventListener('touchstart', function (e) {
+                if (!isPhoneSize()) {
+                    e.preventDefault(); // Impede o teclado nativo em tablets/desktops
+                    this.focus();       // Força o foco para manter o cursor
+                }
+            }, { passive: false });
+        }
+
+        // Lógica de digitação via teclado virtual da grade de cenas
+        function vkType(char, targetId = 'sceneRenameInput') {
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            if (!input.maxLength || input.maxLength < 0 || input.value.length < input.maxLength) {
+                const start = input.selectionStart || input.value.length;
+                const end = input.selectionEnd || input.value.length;
+                input.value = input.value.substring(0, start) + char + input.value.substring(end);
+                input.selectionStart = input.selectionEnd = start + 1;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            input.focus();
+        }
+
+        function vkBackspace(targetId = 'sceneRenameInput') {
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            const start = input.selectionStart || input.value.length;
+            const end = input.selectionEnd || input.value.length;
+            if (start === end && start > 0) {
+                input.value = input.value.substring(0, start - 1) + input.value.substring(end);
+                input.selectionStart = input.selectionEnd = start - 1;
+            } else if (start !== end) {
+                input.value = input.value.substring(0, start) + input.value.substring(end);
+                input.selectionStart = input.selectionEnd = start;
+            }
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.focus();
+        }
+
+        let vkBackspaceTimer = null;
+        let vkBackspaceInterval = null;
+
+        function startVkBackspace(targetId, e) {
+            if (e && e.type === 'touchstart') e.preventDefault();
+            vkBackspace(targetId);
+            vkBackspaceTimer = setTimeout(() => {
+                vkBackspaceInterval = setInterval(() => {
+                    vkBackspace(targetId);
+                }, 80);
+            }, 400);
+        }
+
+        function stopVkBackspace() {
+            clearTimeout(vkBackspaceTimer);
+            clearInterval(vkBackspaceInterval);
+        }
+    </script>
+
+    <!-- CAMADA 6: Bootstrapper Principal da Aplicação -->
+    <script src="app.js"></script>
 
 </body>
 

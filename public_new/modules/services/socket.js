@@ -1326,7 +1326,7 @@ if (originalSocketEmit && typeof socket !== 'undefined') {
     };
 }
 
-import('../wasm/client_wasm.js').then(async (wasm) => {
+import('../../wasm/client_wasm.js').then(async (wasm) => {
     const wasmExports = await wasm.default();
     window.wasmExports = wasmExports; // Exporta as instâncias internas e a memória WASM
     window.wasm = wasm; // EXPOSING GLOBALLY FOR EQ.JS (As classes MeterEngine, etc)
