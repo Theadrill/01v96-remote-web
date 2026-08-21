@@ -1,0 +1,32 @@
+{
+  "0": {
+    "name": "MACRO 1",
+    "scriptId": "lumikit"
+  },
+  "1": {
+    "color": "#ffffff",
+    "name": "MACRO 2",
+    "scriptId": "channel_toggler"
+  },
+  "2": {
+    "color": "#ad1457",
+    "config": [
+      8,
+      20,
+      22,
+      31
+    ],
+    "name": "MACRO 3",
+    "scriptId": "channel_toggler"
+  },
+  "4": {
+    "name": "MACRO 5",
+    "scriptId": "lumikit"
+  },
+  "globalConfig": {
+    "lumikit": {
+      "ip": "pcteste",
+      "port": 4123
+    }
+  }
+}

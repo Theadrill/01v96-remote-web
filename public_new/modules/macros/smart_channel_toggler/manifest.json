@@ -1,0 +1,12 @@
+{
+  "id": "smart_channel_toggler",
+  "name": "Smart Toggler",
+  "version": "1.0.0",
+  "author": "Theadrill",
+  "description": "Corte inteligente de banda preservando canais guardiões e restauração com memória",
+  "entry": "main.js",
+  "color": "#1976d2",
+  "icon": "shield",
+  "style": "style.css",
+  "singleSlot": true
+}
