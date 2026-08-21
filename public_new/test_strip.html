@@ -121,7 +121,10 @@
         <!-- 13. VOLUME GERAL Padrão -->
         <channel-strip id="stripVG1" preset="volumeGeral" layout="desktop"></channel-strip>
 
-        <!-- 14. AUX GERAL Compacto (Subaba / Envio individual com ZERAR) -->
+        <!-- 14. VOLUME GERAL Modo Músico (com CONFIG de Canais Protegidos) -->
+        <channel-strip id="stripVGMusician" preset="volumeGeral" musician-mode layout="desktop"></channel-strip>
+
+        <!-- 15. AUX GERAL Compacto (Subaba / Envio individual com ZERAR) -->
         <channel-strip id="stripAuxVG" preset="auxVolumeGeral" data-ch="5" compact layout="desktop"></channel-strip>
     </div>
 
@@ -157,6 +160,51 @@
                 on: () => {},
                 off: () => {}
             };
+        }
+
+        // Mock de resolvedNames / uiState.resolvedNames com nomes reais de palco
+        const testChannelNames = {
+            0: { name: 'BUMBO', short: 'BUMBO' },
+            1: { name: 'CAIXA', short: 'CAIXA' },
+            2: { name: 'CHIMBAL', short: 'CHIMBAL' },
+            3: { name: 'TOM 1', short: 'TOM 1' },
+            4: { name: 'SURDO', short: 'SURDO' },
+            5: { name: 'CAVACO', short: 'CAVACO' },
+            6: { name: 'VIOLAO', short: 'VIOLAO' },
+            7: { name: 'GUITARRA', short: 'GUITAR' },
+            8: { name: 'BAIXO', short: 'BAIXO' },
+            9: { name: 'TECLADO L', short: 'TEC L' },
+            10: { name: 'TECLADO R', short: 'TEC R' },
+            11: { name: 'VOZ 1', short: 'VOZ 1' },
+            12: { name: 'VOZ 2', short: 'VOZ 2' },
+            13: { name: 'BACKING', short: 'BACK' },
+            14: { name: 'PERC 1', short: 'PERC 1' },
+            15: { name: 'PERC 2', short: 'PERC 2' },
+            16: { name: 'OVER L', short: 'OVR L' },
+            17: { name: 'OVER R', short: 'OVR R' },
+            18: { name: 'PAD L', short: 'PAD L' },
+            19: { name: 'PAD R', short: 'PAD R' },
+            20: { name: 'LR L', short: 'LR L' },
+            21: { name: 'LR R', short: 'LR R' },
+            22: { name: 'CH 23', short: 'CH 23' },
+            23: { name: 'CH 24', short: 'CH 24' },
+            24: { name: 'CH 25', short: 'CH 25' },
+            25: { name: 'CH 26', short: 'CH 26' },
+            26: { name: 'CH 27', short: 'CH 27' },
+            27: { name: 'CH 28', short: 'CH 28' },
+            28: { name: 'CH 29', short: 'CH 29' },
+            29: { name: 'CH 30', short: 'CH 30' },
+            30: { name: 'TALKBACK', short: 'TB' },
+            31: { name: 'PLAYBACK', short: 'PLAY' }
+        };
+
+        window.resolvedNames = Object.assign(window.resolvedNames || {}, testChannelNames);
+        if (typeof window.channelStates !== 'undefined') {
+            for (let i = 0; i < 32; i++) {
+                if (window.channelStates[i] && testChannelNames[i]) {
+                    window.channelStates[i].name = testChannelNames[i].name;
+                }
+            }
         }
 
         // Alternância de Layout Desktop / Mobile
@@ -234,19 +282,35 @@
         function simulate() {
             phase += 0.04;
 
-            // Simula níveis para os canais
-            wasmMem[5] = Math.max(0, (Math.sin(phase) + 1) * 45);        // CH 6 (CAVACO)
-            wasmMem[6] = Math.max(0, (Math.cos(phase * 0.8) + 1) * 30);  // CH 7 (VIOLAO)
-            wasmMem[20] = Math.max(0, (Math.sin(phase * 1.2) + 1) * 48); // CH 21 L (LR)
-            wasmMem[21] = Math.max(0, (Math.cos(phase * 1.1) + 1) * 46); // CH 22 R (LR)
+            // Simula níveis suaves (0 a 100%) para os canais
+            // CH 6 (CAVACO): oscila normalmente até ~90%, com pico real suave em 100% no topo da senoide
+            const cavacoWave = (Math.sin(phase) + 1) / 2; // 0.0 a 1.0
+            wasmMem[5] = cavacoWave > 0.96 ? 100 : (cavacoWave * 92);
+
+            wasmMem[6] = Math.max(0, (Math.cos(phase * 0.8) + 1) * 35);  // CH 7 (VIOLAO)
+
+            // CH 21 + 22 (LR Pareado): oscila com dinamismo estéreo e atinge pico suave alternado em L e R
+            const lrWaveL = (Math.sin(phase * 1.2) + 1) / 2;
+            const lrWaveR = (Math.cos(phase * 1.1) + 1) / 2;
+            wasmMem[20] = lrWaveL > 0.95 ? 100 : (lrWaveL * 92);
+            wasmMem[21] = lrWaveR > 0.95 ? 100 : (lrWaveR * 92);
+
             wasmMem[17] = Math.max(0, (Math.sin(phase * 0.5) + 1) * 20); // CH 18 (Disabled)
             wasmMem[18] = Math.max(0, (Math.sin(phase * 0.6) + 1) * 35); // CH 19 (Locked)
-            wasmMem[60] = Math.max(0, (Math.sin(phase * 1.3) + 1) * 42); // ST IN 1L
-            wasmMem[61] = Math.max(0, (Math.cos(phase * 1.4) + 1) * 44); // ST IN 1R
+            // ST IN 1 Estéreo (CH 60 / 61): oscila com dinamismo estéreo e pico alternado em L e R
+            const stWaveL = (Math.sin(phase * 1.3) + 1) / 2;
+            const stWaveR = (Math.cos(phase * 1.4) + 1) / 2;
+            wasmMem[60] = stWaveL > 0.95 ? 100 : (stWaveL * 92); // ST IN 1L
+            wasmMem[61] = stWaveR > 0.95 ? 100 : (stWaveR * 92); // ST IN 1R
+
             wasmMem[36] = Math.max(0, (Math.sin(phase * 0.7) + 1) * 35); // MIX 1
             wasmMem[44] = Math.max(0, (Math.cos(phase * 0.9) + 1) * 38); // BUS 1
-            wasmMem[52] = Math.max(0, (Math.sin(phase * 1.5) + 1) * 49); // MASTER L
-            wasmMem[53] = Math.max(0, (Math.cos(phase * 1.5) + 1) * 48); // MASTER R
+
+            // MASTER (CH 52 / 53 Estéreo): oscila com dinamismo estéreo e pico alternado em L e R
+            const masterWaveL = (Math.sin(phase * 1.5) + 1) / 2;
+            const masterWaveR = (Math.cos(phase * 1.6) + 1) / 2;
+            wasmMem[52] = masterWaveL > 0.95 ? 100 : (masterWaveL * 92); // MASTER L
+            wasmMem[53] = masterWaveR > 0.95 ? 100 : (masterWaveR * 92); // MASTER R
 
             MeterBus.frame(wasmMem, performance.now());
             requestAnimationFrame(simulate);

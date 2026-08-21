@@ -142,6 +142,9 @@ channel_strip:
   width_desktop: "86px"
   min_width_desktop: "86px"
   max_width_desktop: "86px"
+  width_desktop_paired: "110px"
+  min_width_desktop_paired: "110px"
+  max_width_desktop_paired: "110px"
   border_radius: "0px"
   border_color: "#111111"
   border_width: "1px"
@@ -153,6 +156,9 @@ channel_strip:
   card_bg_master_on: "#5d1a1a"              # Fundo ON do Master Desktop
   card_bg_master_mobile: "rgba(100, 0, 0, 0.9)" # Fundo do Master Mobile
   border_master_mobile: "#880000"           # Borda do Master Mobile
+  paired_border_color: "#00ff88"            # Borda verde do canal pareado (compatível com G2)
+  paired_mobile_border: "2px solid #00ff88"  # Borda mobile para canais pareados
+  paired_label_color: "#34c759"             # Cor do texto/número do canal pareado
   border_top_g1: "#00adef"                  # Borda superior e inferior do G1 (Inputs 1-16)
   border_top_g2: "#00ff88"                  # Borda superior e inferior do G2 (Inputs 17-32)
   border_top_st: "#4a90e2"                  # Borda ST IN

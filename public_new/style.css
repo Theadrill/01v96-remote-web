@@ -17,6 +17,12 @@ html {
     --strip-width-desktop: 86px;
     --strip-min-width-desktop: 86px;
     --strip-max-width-desktop: 86px;
+    --strip-width-desktop-paired: 110px;
+    --strip-min-width-desktop-paired: 110px;
+    --strip-max-width-desktop-paired: 110px;
+    --strip-paired-border-color: #34c759;
+    --strip-paired-bg-gradient: linear-gradient(180deg, #0a1f10 0%, #111111 100%);
+    --strip-paired-label-color: #34c759;
     --strip-border-radius: 0px;
     --strip-border-color: #111111;
     --strip-border-width: 1px;
@@ -286,8 +292,24 @@ body.layout-desktop channel-strip,
 channel-strip[layout="desktop"] {
     display: inline-block;
     height: 520px;
+    width: var(--strip-width-desktop, 86px);
+    min-width: var(--strip-min-width-desktop, 86px);
+    max-width: var(--strip-max-width-desktop, 86px);
+    flex: 0 0 var(--strip-width-desktop, 86px);
     margin: 0;
     padding: 0;
+}
+
+body.layout-desktop-mode channel-strip[paired],
+body.layout-desktop-mode channel-strip[data-partner-ch],
+body.layout-desktop channel-strip[paired],
+body.layout-desktop channel-strip[data-partner-ch],
+channel-strip[layout="desktop"][paired],
+channel-strip[layout="desktop"][data-partner-ch] {
+    width: var(--strip-width-desktop-paired, 110px) !important;
+    min-width: var(--strip-min-width-desktop-paired, 110px) !important;
+    max-width: var(--strip-max-width-desktop-paired, 110px) !important;
+    flex: 0 0 var(--strip-width-desktop-paired, 110px) !important;
 }
 
 body.layout-mobile-mode channel-strip,
@@ -378,23 +400,6 @@ channel-strip[layout="mobile"] {
     font-family: Arial, sans-serif !important;
     text-shadow: 1px 1px 1px #000 !important;
     z-index: 101 !important;
-}
-
-.mobile-peak-led {
-    position: absolute;
-    left: 8px;
-    top: 8px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    z-index: 10;
-    transition: background 0.05s;
-}
-
-.mobile-peak-led.active {
-    background: #ff0000;
-    box-shadow: 0 0 10px #ff0000;
 }
 
 .fader-card>*:not(.mobile-meter-bg):not(.btn-state):not(.mobile-db-scale-overlay):not(.channel-lock-overlay) {
@@ -1912,6 +1917,56 @@ body.layout-desktop .sidebar-macros {
     contain: layout style paint;
 }
 
+/* === FADER CARD PAREADO (Desktop) === */
+.fader-card-desktop.fader-card-paired {
+    flex: 0 0 var(--strip-width-desktop-paired, 110px) !important;
+    width: var(--strip-width-desktop-paired, 110px) !important;
+    min-width: var(--strip-min-width-desktop-paired, 110px) !important;
+    max-width: var(--strip-max-width-desktop-paired, 110px) !important;
+    border-left: 1px solid var(--strip-paired-border-color, #34c759) !important;
+    border-right: 1px solid var(--strip-paired-border-color, #34c759) !important;
+    background: var(--strip-paired-bg-gradient, linear-gradient(180deg, #0a1f10 0%, #111111 100%)) !important;
+    position: relative;
+}
+
+/* Ícone de link no card pareado */
+.fader-card-desktop.fader-card-paired::after {
+    content: '\1F517';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 9px;
+    opacity: 0.6;
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* Label e rodapé em verde no canal pareado */
+.fader-card-desktop.fader-card-paired .desk-label,
+.fader-card-desktop.fader-card-paired .desk-footer-label {
+    color: var(--strip-paired-label-color, #34c759) !important;
+    font-size: 9px;
+    letter-spacing: 0;
+}
+
+/* === FADER CARD PAREADO (Mobile) === */
+.fader-card.fader-card-paired {
+    min-width: 110px !important;
+    width: 110px !important;
+    border: 1px solid var(--strip-paired-border-color, #34c759) !important;
+    background: var(--strip-paired-bg-gradient, linear-gradient(180deg, #0a1f10 0%, #111111 100%)) !important;
+    position: relative;
+}
+
+/* Fundos de grupo quando o canal pareado está ON */
+.fader-card-desktop.fader-card-paired.fader-group-1.desk-on-bg {
+    background-color: #1a2633 !important;
+}
+
+.fader-card-desktop.fader-card-paired.fader-group-2.desk-on-bg {
+    background-color: #1a2b22 !important;
+}
+
 .fader-card-desktop.fader-group-1.desk-on-bg {
     background-color: #1a2633 !important;
     /* Azul escuro sutil para o corpo do canal ON */
@@ -2488,8 +2543,9 @@ body.layout-desktop .sidebar-macros {
     border-radius: 50%;
     background: #252525;
     border: 1px solid #111;
-    margin-bottom: 2px;
+    margin-bottom: 5px;
     transition: background 0.05s;
+    flex-shrink: 0;
 }
 
 .desk-peak-led.active {
@@ -2502,7 +2558,9 @@ body.layout-desktop .sidebar-macros {
     flex-direction: column;
     align-items: center;
     margin-left: 2px;
-    height: 100%;
+    height: 95%;
+    padding-top: 2px;
+    box-sizing: border-box;
 }
 
 .desk-meter-tracks-wrap {
@@ -2525,7 +2583,7 @@ body.layout-desktop .sidebar-macros {
     margin-left: 2px;
     border: 1px solid #111;
     border-radius: 1px;
-    margin-top: -10px;
+    margin-top: 2px;
     position: relative;
 }
 
@@ -2540,7 +2598,7 @@ body.layout-desktop .sidebar-macros {
             #ff0000 100%));
     border: 1px solid #111111;
     border-radius: 1px;
-    margin-top: -10px;
+    margin-top: 2px;
     position: relative;
     overflow: hidden;
 }
@@ -4980,6 +5038,22 @@ body.is-portrait .dyn-box {
     padding: 0 10px !important;
 }
 
+.btn-macro-chan-select {
+    position: relative;
+    height: 46px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    user-select: none;
+    border: 1px solid #333;
+}
+
 .macro-ch-selected {
     box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
     border: 1px solid #ffcc00 !important;
@@ -5073,6 +5147,17 @@ body.is-portrait .dyn-box {
 }
 
 /* --- Macro Fader Compact Mode (para uso em subabas e containers auxiliares) --- */
+body.layout-desktop-mode channel-strip[preset="volumeGeral"][musician-mode],
+body.layout-desktop channel-strip[preset="volumeGeral"][musician-mode],
+body.musician-mode channel-strip[preset="volumeGeral"],
+channel-strip[preset="volumeGeral"][musician-mode],
+channel-strip[compact] {
+    width: 68px !important;
+    min-width: 68px !important;
+    max-width: 68px !important;
+    flex: 0 0 68px !important;
+}
+
 .macro-fader-card.macro-fader-compact,
 channel-strip[compact] .macro-fader-card {
     width: 68px !important;
@@ -5091,6 +5176,17 @@ channel-strip[compact] .macro-fader-card .macro-db-display {
     font-size: 11px;
     padding: 3px 2px;
     min-height: 22px;
+}
+
+.macro-fader-card.macro-fader-compact .macro-fader-config-btn,
+channel-strip[compact] .macro-fader-card .macro-fader-config-btn {
+    font-size: 10px;
+    padding: 6px 2px;
+}
+
+.macro-fader-card.macro-fader-compact .macro-fader-config-wrap,
+channel-strip[compact] .macro-fader-card .macro-fader-config-wrap {
+    padding: 6px 2px;
 }
 
 /* Ajuste no modo horizontal */
@@ -5283,33 +5379,6 @@ input:checked+.slider:before {
 .btn-state.master-solo-alert {
     animation: master-solo-pulse-mobile 1s ease-in-out infinite !important;
     cursor: pointer !important;
-}
-
-/* === FADER CARD PAREADO === */
-.fader-card.fader-card-paired,
-.fader-card-desktop.fader-card-paired {
-    min-width: 110px !important;
-    width: 110px !important;
-    border: 1px solid #34c759 !important;
-    background: linear-gradient(180deg, #0a1f10 0%, #111 100%) !important;
-    position: relative;
-}
-
-.fader-card-desktop.fader-card-paired::after {
-    content: '🔗';
-    position: absolute;
-    top: 4px;
-    right: 6px;
-    font-size: 9px;
-    opacity: 0.6;
-}
-
-/* Nome no card pareado */
-.fader-card-desktop.fader-card-paired .desk-label,
-.fader-card-desktop.fader-card-paired .desk-footer-label {
-    color: #34c759 !important;
-    font-size: 9px;
-    letter-spacing: 0;
 }
 
 /* Estilos do Seletor de Patch (Responsivo) */

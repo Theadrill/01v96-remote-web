@@ -184,10 +184,19 @@ O arquivo monolítico `globals.js` é decomposto em módulos de responsabilidade
      - Clique no cadeado no desktop mantém a confirmação direta.
    - **Macro Faders & Volume Geral Unificados:**
      - Presets `preset="macro"`, `preset="volumeGeral"`, `preset="auxVolumeGeral"` e `preset="mixVolumeGeral"`.
-     - Versão padrão para tela principal e versão `compact` (68px) para abas de aux.
+     - Versão padrão para tela principal e versão `compact` (68px) para abas de aux e Volume Geral no Modo Músico (`channel-strip[preset="volumeGeral"][musician-mode]`).
      - Display de delta dB com `--` em repouso e valor ativo acumulado que reseta em 5s.
-     - Botão ZERAR integrado.
+     - Botão ZERAR com modal de confirmação padronizado (`ConfirmModal.show`) antes de zerar os envios do canal ou mix.
      - Botão de Configuração presente no Macro Fader da tela principal e no Volume Geral quando em Modo Músico (`macro_locked_channels`).
+     - Modal de configuração com exibição correta do número (`CH X`) no topo e nome resolvido na base respeitando a hierarquia (`resolvedNames` / `globalNames` > `customName` > `name` > `CH X`), além de ícone de cadeado de proteção visual no modo músico.
+   - **Fidelidade Visual de Canais Pareados (Estéreo):**
+     - **Desktop:** Card com largura proporcional (`110px`) perfeitamente integrado no grid contínuo, com fundo ON contextual por grupo (`#1a2633` para G1, `#1a2b22` para G2 e `#14283d` para ST IN).
+     - **Mobile:** Largura padrão de `110px` com borda verde Yamaha de destaque (`border: 2px solid #00ff88`).
+   - **Indicadores de Peak (Desktop & Mobile):**
+     - **Desktop:** LED de Peak dedicado (`.desk-peak-led`) posicionado com espaçamento elevado acima das trilhas do medidor, acendendo em vermelho com glow (`#ff0000`, `box-shadow: 0 0 8px #ff4444`) quando qualquer canal (L ou R) atinge $\ge 98\%$ (0 dBFS / passo 32), com hold time de 1000ms.
+     - **Mobile:** Indicação puramente por contorno perimetral do card (`.fader-card.peak-glow`), acendendo em vermelho com glow luminoso e sem elementos de LED redundantes no topo.
+   - **Controle de Faders e Macros pela Roda do Mouse (Desktop):**
+     - Rolar a roda do mouse sobre os faders (ou no corpo dos macro faders) ajusta o volume nos passos de dB contextuais (0.05 dB, 0.10 dB, 0.25 dB, 0.50 dB), bloqueando o scroll vertical indesejado da página e preservando total compatibilidade touch no Mobile.
 3. **Plano de Desacoplamento do `globals.js`:**
    - O `globals.js` é temporário para a fase de transição. Na Fase 5.5, todos os arquivos passarão a ser ES Modules com `import/export` diretos, removendo as pontes globais e eliminando o `globals.js`.
 

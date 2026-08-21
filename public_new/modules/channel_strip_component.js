@@ -43,8 +43,10 @@ export function setMacroLockedChannels(channels) {
 
 let tempMacroChannels = [];
 
-export function openMacroConfigModal() {
+export function openMacroConfigModal(options = {}) {
     let modal = document.getElementById('macroSettingsModal');
+    const isLockMode = Boolean(options.isMusicianMode ?? uiState.musicianMode);
+
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'macroSettingsModal';
@@ -71,35 +73,46 @@ export function openMacroConfigModal() {
         modal.addEventListener('click', () => closeMacroConfigModal());
         modal.querySelector('#macroModalCloseBtn').addEventListener('click', () => closeMacroConfigModal());
         modal.querySelector('#macroModalCancelBtn').addEventListener('click', () => closeMacroConfigModal());
-        modal.querySelector('#macroModalSaveBtn').addEventListener('click', () => {
-            if (uiState.musicianMode) {
-                setMacroLockedChannels(tempMacroChannels);
-            } else {
-                setMacroSelectedChannels(tempMacroChannels);
-            }
-            closeMacroConfigModal();
-        });
     }
+
+    modal._currentIsLockMode = isLockMode;
+
+    const saveBtn = modal.querySelector('#macroModalSaveBtn');
+    // Substitui handler de salvar para respeitar o modo atual
+    const newSaveBtn = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+    newSaveBtn.addEventListener('click', () => {
+        if (modal._currentIsLockMode) {
+            setMacroLockedChannels(tempMacroChannels);
+        } else {
+            setMacroSelectedChannels(tempMacroChannels);
+        }
+        closeMacroConfigModal();
+    });
 
     const title = modal.querySelector('#settingsMacroTitle');
     const subtitle = modal.querySelector('#settingsMacroSubtitle');
     const content = modal.querySelector('#macroSettingsModalContent');
 
-    if (uiState.musicianMode) {
+    if (isLockMode) {
         title.innerText = 'CANAIS PROTEGIDOS';
         title.style.color = '#ff4444';
         content.style.borderColor = '#ff4444';
+        newSaveBtn.style.background = '#ff4444';
+        newSaveBtn.style.color = '#fff';
         if (subtitle) subtitle.innerText = 'Toque nos canais que NÃO quer mexer:';
         tempMacroChannels = [...getMacroLockedChannels()];
     } else {
         title.innerText = 'CONFIGURAÇÃO MACRO FADER';
         title.style.color = '#00ffcc';
         content.style.borderColor = '#00ffcc';
+        newSaveBtn.style.background = '#00ffcc';
+        newSaveBtn.style.color = '#000';
         if (subtitle) subtitle.innerText = 'Selecione os canais desejados abaixo:';
         tempMacroChannels = [...getMacroSelectedChannels()];
     }
 
-    renderMacroConfigGrid();
+    renderMacroConfigGrid(isLockMode);
     modal.style.display = 'flex';
 }
 
@@ -108,25 +121,47 @@ export function closeMacroConfigModal() {
     if (modal) modal.style.display = 'none';
 }
 
-function renderMacroConfigGrid() {
+function renderMacroConfigGrid(isLockMode = uiState.musicianMode) {
     const grid = document.getElementById('macroSettingsGrid');
     if (!grid) return;
     grid.innerHTML = '';
-
-    const isLockMode = uiState.musicianMode;
 
     for (let i = 0; i < 32; i++) {
         const isSelected = tempMacroChannels.includes(i);
         const state = (channelStates && channelStates[i]) ? channelStates[i] : {};
         const isOnMixer = state.on === true;
-        const resolved = (window.resolvedNames && window.resolvedNames[i]) ? window.resolvedNames[i].name : (state.name || `CH ${i + 1}`);
+
+        // Resolução estrita de prioridade: resMap > globalMap > customName > channelState.name > DOM channel-strip name > fallback
+        const resMap = uiState.resolvedNames || (typeof window !== 'undefined' ? window.resolvedNames : null);
+        const globalMap = uiState.globalNames || (typeof window !== 'undefined' ? window.globalNames : null);
+        let resolved = '';
+
+        if (resMap && resMap[i]) {
+            resolved = typeof resMap[i] === 'object' ? (resMap[i].name || resMap[i].short || '') : resMap[i];
+        } else if (globalMap && globalMap[i]) {
+            resolved = typeof globalMap[i] === 'object' ? (globalMap[i].name || globalMap[i].short || '') : globalMap[i];
+        } else if (state.customName) {
+            resolved = state.customName;
+        } else if (state.name) {
+            resolved = state.name;
+        } else if (typeof document !== 'undefined') {
+            const domStrip = document.querySelector(`channel-strip[data-ch="${i}"]`);
+            if (domStrip) {
+                resolved = domStrip.name || domStrip._name || '';
+            }
+        }
+
+        if (!resolved) {
+            resolved = `CH ${i + 1}`;
+        }
 
         const btn = document.createElement('button');
         btn.className = `btn-macro-chan-select ${isSelected ? (isLockMode ? 'macro-ch-locked' : 'macro-ch-selected') : ''}`;
-        btn.style.cssText = 'height:46px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.15s ease; user-select:none; border:1px solid #333;';
+        btn.style.cssText = 'position:relative; height:46px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.15s ease; user-select:none; border:1px solid #333;';
 
         const isPhysicallyLocked = (window.lockedChannels && window.lockedChannels.includes('CH' + (i + 1))) || (uiState.lockedChannels && uiState.lockedChannels.includes('CH' + (i + 1)));
 
+        let lockBadgeHtml = '';
         if (isPhysicallyLocked) {
             btn.style.background = 'rgba(255, 68, 68, 0.15)';
             btn.style.color = '#888';
@@ -134,10 +169,28 @@ function renderMacroConfigGrid() {
             btn.style.borderStyle = 'dashed';
             btn.style.cursor = 'not-allowed';
             btn.style.pointerEvents = 'none';
+
+            lockBadgeHtml = `
+                <div style="position:absolute; top:3px; right:4px; color:#ff6666; opacity:0.85; display:flex; align-items:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+            `;
         } else if (isLockMode && isSelected) {
             btn.style.background = '#cc3333';
             btn.style.color = '#fff';
             btn.style.borderColor = '#ff4444';
+
+            lockBadgeHtml = `
+                <div style="position:absolute; top:3px; right:4px; color:#fff; display:flex; align-items:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+            `;
         } else if (isSelected) {
             btn.style.background = '#ffcc00';
             btn.style.color = '#000';
@@ -148,7 +201,7 @@ function renderMacroConfigGrid() {
             btn.style.borderColor = isOnMixer ? '#ffcc00' : '#3f3f46';
         }
 
-        btn.innerHTML = `<span style="font-size:10px; opacity:0.8;">CH ${i + 1}</span><span style="font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90%;">${resolved}</span>`;
+        btn.innerHTML = `${lockBadgeHtml}<span style="font-size:10px; opacity:0.8;">CH ${i + 1}</span><span style="font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90%;">${resolved}</span>`;
 
         if (!isPhysicallyLocked) {
             btn.addEventListener('click', () => {
@@ -158,7 +211,7 @@ function renderMacroConfigGrid() {
                 } else {
                     tempMacroChannels.push(i);
                 }
-                renderMacroConfigGrid();
+                renderMacroConfigGrid(isLockMode);
             });
         }
 
@@ -175,7 +228,7 @@ if (typeof window !== 'undefined') {
 
 export class ChannelStripComponent extends HTMLElement {
     static get observedAttributes() {
-        return ['data-ch', 'preset', 'layout', 'data-partner-ch', 'disabled', 'patch', 'pan', 'partner-pan', 'locked', 'pre-post', 'data-aux-idx', 'compact', 'show-config', 'nudge-step'];
+        return ['data-ch', 'preset', 'layout', 'data-partner-ch', 'disabled', 'patch', 'pan', 'partner-pan', 'locked', 'pre-post', 'data-aux-idx', 'compact', 'show-config', 'nudge-step', 'musician-mode'];
     }
 
     constructor() {
@@ -198,11 +251,19 @@ export class ChannelStripComponent extends HTMLElement {
         this._compact = false;
         this._showConfig = false;
         this._nudgeStep = null; // Step em dB personalizado (opcional)
+        this._musicianMode = null; // null: herda de uiState.musicianMode; boolean: override local via atributo
         this._isVisible = true;
 
         // Auto-Repeat / Long Press para Botões de Nudge (+ e -)
         this._channelNudgeTimeout = null;
         this._channelNudgeInterval = null;
+
+        // Estado do Peak LED e Peak Glow (Hold time de 1000ms)
+        this._lastPeakTime = 0;
+        this._isPeakActive = false;
+        this._levelL = 0;
+        this._levelR = 0;
+        this._peakHoldTimer = null;
 
         // Estado para Presets de Macro / Volume Geral
         this._deltaSteps = 0;
@@ -215,6 +276,7 @@ export class ChannelStripComponent extends HTMLElement {
         this._dom = {
             card: null,
             fader: null,
+            faderContainer: null,
             dbVal: null,
             macroDbVal: null,
             btnOn: null,
@@ -260,6 +322,10 @@ export class ChannelStripComponent extends HTMLElement {
             clearTimeout(this._dbResetTimer);
             this._dbResetTimer = null;
         }
+        if (this._peakHoldTimer) {
+            clearTimeout(this._peakHoldTimer);
+            this._peakHoldTimer = null;
+        }
         this._unregisterMeterBus();
         if (this._observer) {
             this._observer.disconnect();
@@ -291,10 +357,16 @@ export class ChannelStripComponent extends HTMLElement {
         this._layout = this.getAttribute('layout') || (document.body.classList.contains('layout-desktop-mode') ? 'desktop' : 'mobile');
         const rawPartner = this.getAttribute('data-partner-ch');
         this._partnerCh = rawPartner !== null ? parseInt(rawPartner, 10) : null;
+        if (this._partnerCh !== null) {
+            if (!this.hasAttribute('paired')) this.setAttribute('paired', '');
+        } else {
+            if (this.hasAttribute('paired')) this.removeAttribute('paired');
+        }
         this._disabled = this.hasAttribute('disabled');
         this._locked = this.hasAttribute('locked');
         this._compact = this.hasAttribute('compact');
-        this._showConfig = this.hasAttribute('show-config') || this._preset === 'macro';
+        this._musicianMode = this.hasAttribute('musician-mode') ? true : null;
+        this._showConfig = this.hasAttribute('show-config') || this._preset === 'macro' || (this._preset === 'volumeGeral' && this._isMusicianMode());
         this._prePost = (this.getAttribute('pre-post') || 'post').toLowerCase();
         if (this.hasAttribute('nudge-step')) {
             const parsedStep = parseFloat(this.getAttribute('nudge-step'));
@@ -358,6 +430,18 @@ export class ChannelStripComponent extends HTMLElement {
         this._name = str || '';
         if (this._dom.nameDisplay) {
             this._dom.nameDisplay.textContent = this._name;
+        }
+        if (this._ch !== null && this._ch !== undefined) {
+            const st = getChannelStateById(this._ch);
+            if (st) {
+                st.name = this._name;
+            }
+            if (uiState && uiState.resolvedNames) {
+                uiState.resolvedNames[this._ch] = { name: this._name, short: this._name };
+            }
+            if (typeof window !== 'undefined' && window.resolvedNames && window.resolvedNames !== uiState?.resolvedNames) {
+                window.resolvedNames[this._ch] = { name: this._name, short: this._name };
+            }
         }
     }
 
@@ -506,9 +590,11 @@ export class ChannelStripComponent extends HTMLElement {
         MeterBus.register(this._ch, this._onMeterUpdate);
         if (this._partnerCh !== null) {
             MeterBus.register(this._partnerCh, (level, now) => {
+                this._levelR = level;
                 if (this._dom.meterCurtainR && this._isVisible) {
                     this._dom.meterCurtainR.style.transform = `scaleY(${1 - (level / 100)})`;
                 }
+                this._evaluatePeak(now);
             });
         }
     }
@@ -520,20 +606,33 @@ export class ChannelStripComponent extends HTMLElement {
         }
     }
 
+    _evaluatePeak(now = performance.now()) {
+        const isPeaking = (this._levelL >= 98) || (this._partnerCh !== null && this._levelR >= 98);
+
+        if (isPeaking) {
+            this._lastPeakTime = now;
+            if (!this._isPeakActive) {
+                this._isPeakActive = true;
+                if (this._dom.peakLed) this._dom.peakLed.classList.add('active');
+                if (this._dom.card) this._dom.card.classList.add('peak-glow');
+            }
+        } else if (this._isPeakActive && (now - this._lastPeakTime > 1000)) {
+            this._isPeakActive = false;
+            if (this._dom.peakLed) this._dom.peakLed.classList.remove('active');
+            if (this._dom.card) this._dom.card.classList.remove('peak-glow');
+        }
+    }
+
     _handleMeterUpdate(level, now) {
         if (!this._isVisible) return;
+
+        this._levelL = level;
 
         if (this._dom.meterCurtainL) {
             this._dom.meterCurtainL.style.transform = `scaleY(${1 - (level / 100)})`;
         }
 
-        if (this._dom.peakLed) {
-            if (level >= 98) {
-                this._dom.peakLed.classList.add('active');
-            } else {
-                this._dom.peakLed.classList.remove('active');
-            }
-        }
+        this._evaluatePeak(now);
     }
 
     _setupObserver() {
@@ -611,13 +710,14 @@ export class ChannelStripComponent extends HTMLElement {
     // ==========================================
     _renderMacroPreset() {
         const isMobile = this._layout === 'mobile';
-        const isCompact = this._compact;
+        let isAuxVG = this._preset === 'auxVolumeGeral';
+        let isMixVG = this._preset === 'mixVolumeGeral';
+        const isMusician = this._isMusicianMode();
+        const isCompact = this._compact || isAuxVG || isMixVG || (this._preset === 'volumeGeral' && isMusician);
 
         let title = 'MACRO';
         let titleLong = 'MACRO FADER';
         let isZerar = false;
-        let isAuxVG = this._preset === 'auxVolumeGeral';
-        let isMixVG = this._preset === 'mixVolumeGeral';
 
         if (this._preset === 'volumeGeral') {
             title = 'GERAL';
@@ -633,7 +733,7 @@ export class ChannelStripComponent extends HTMLElement {
         }
 
         // Config button exibido no Macro Fader ou Volume Geral em Musician Mode
-        const showConfig = this._showConfig || (this._preset === 'volumeGeral' && uiState.musicianMode);
+        const showConfig = this._showConfig || (this._preset === 'volumeGeral' && isMusician);
 
         const configBtnDesktop = showConfig ? `
             <div class="macro-fader-config-wrap">
@@ -773,7 +873,7 @@ export class ChannelStripComponent extends HTMLElement {
         if (isMobile) {
             // Template Mobile (Full Card com VU de Fundo)
             this.innerHTML = `
-                <div class="fader-card ${groupClass} ${isMaster ? 'master-card' : ''} ${this._disabled ? 'strip-disabled' : ''} ${this._locked ? 'channel-locked' : ''} ${this._on ? 'on-active-card' : ''}" data-ch="${this._ch}">
+                <div class="fader-card ${groupClass} ${isPaired && !isMaster ? 'fader-card-paired' : ''} ${isMaster ? 'master-card' : ''} ${this._disabled ? 'strip-disabled' : ''} ${this._locked ? 'channel-locked' : ''} ${this._on ? 'on-active-card' : ''}" data-ch="${this._ch}">
                     ${isPaired ? `
                         <div class="mobile-meter-bg left"><div class="mobile-meter-curtain meter-curtain-l"></div></div>
                         <div class="mobile-meter-bg right"><div class="mobile-meter-curtain meter-curtain-r"></div></div>
@@ -824,7 +924,7 @@ export class ChannelStripComponent extends HTMLElement {
         } else {
             // Template Desktop (Fader Card de Mesa 01v96)
             this.innerHTML = `
-                <div class="fader-card-desktop ${groupClass} ${isMaster ? 'master-card-desktop' : ''} ${this._disabled ? 'strip-disabled' : ''} ${this._locked ? 'channel-locked' : ''} ${this._on ? 'desk-on-bg' : ''}" data-ch="${this._ch}">
+                <div class="fader-card-desktop ${groupClass} ${isPaired && !isMaster ? 'fader-card-paired' : ''} ${isMaster ? 'master-card-desktop' : ''} ${this._disabled ? 'strip-disabled' : ''} ${this._locked ? 'channel-locked' : ''} ${this._on ? 'desk-on-bg' : ''}" data-ch="${this._ch}">
                     <!-- Header / Label -->
                     <div class="desk-label-wrapper">
                         <div class="desk-label ${this._on ? 'label-on' : ''}">${labelText}</div>
@@ -933,6 +1033,7 @@ export class ChannelStripComponent extends HTMLElement {
         // Coleta de referências locais
         this._dom.card = this.querySelector('.fader-card-desktop') || this.querySelector('.fader-card');
         this._dom.fader = this.querySelector('.fader-input');
+        this._dom.faderContainer = this.querySelector('.desk-fader-container');
         this._dom.dbVal = this.querySelector('.db-val-text');
         this._dom.btnOn = this.querySelector('.btn-on-desk');
         this._dom.btnSolo = this.querySelector('.btn-cue');
@@ -956,6 +1057,10 @@ export class ChannelStripComponent extends HTMLElement {
         this._dom.patchZone = this.querySelector('.desk-patch-zone');
     }
 
+    _isMusicianMode() {
+        return this._musicianMode !== null ? this._musicianMode : Boolean(uiState.musicianMode);
+    }
+
     // ==========================================
     // Eventos e Interações
     // ==========================================
@@ -968,9 +1073,10 @@ export class ChannelStripComponent extends HTMLElement {
             const sign = db >= 0 ? '+' : '';
             return `${sign}${db.toFixed(2)} dB`;
         }
-        const db = uiState.musicianMode ? steps * 1.0 : steps * 0.05;
+        const isMusician = this._isMusicianMode();
+        const db = isMusician ? steps * 1.0 : steps * 0.05;
         const sign = db >= 0 ? '+' : '';
-        return uiState.musicianMode ? `${sign}${db.toFixed(0)} dB` : `${sign}${db.toFixed(2)} dB`;
+        return isMusician ? `${sign}${db.toFixed(0)} dB` : `${sign}${db.toFixed(2)} dB`;
     }
 
     _updateMacroDbDisplay() {
@@ -999,8 +1105,10 @@ export class ChannelStripComponent extends HTMLElement {
                 (uiState.lockedChannels && uiState.lockedChannels.includes('CH' + (i + 1)));
         };
 
+        const isMusician = this._isMusicianMode();
+
         if (this._preset === 'volumeGeral') {
-            if (uiState.musicianMode) {
+            if (isMusician) {
                 const locked = getMacroLockedChannels();
                 return Array.from({ length: 32 }, (_, i) => i).filter(i => !locked.includes(i) && !isChanLocked(i));
             }
@@ -1008,7 +1116,7 @@ export class ChannelStripComponent extends HTMLElement {
         }
 
         // Preset 'macro'
-        if (uiState.musicianMode) {
+        if (isMusician) {
             const locked = getMacroLockedChannels();
             return Array.from({ length: 32 }, (_, i) => i).filter(i => !locked.includes(i) && !isChanLocked(i));
         }
@@ -1029,7 +1137,7 @@ export class ChannelStripComponent extends HTMLElement {
         const channels = this._getTargetChannels();
         if (!channels.length) return;
 
-        const isMusician = uiState.musicianMode;
+        const isMusician = this._isMusicianMode();
         const isTechMix = uiState.technicianMixMode;
         const activeMix = uiState.activeMix || 1;
         const step = isMusician ? dir * 20 : dir;
@@ -1341,6 +1449,20 @@ export class ChannelStripComponent extends HTMLElement {
             });
         }
 
+        // Suporte a Mouse Wheel no Fader em modo Desktop
+        const faderWheelTarget = this._dom.faderContainer || this._dom.fader;
+        if (faderWheelTarget) {
+            faderWheelTarget.addEventListener('wheel', (e) => {
+                if (this._layout !== 'desktop') return;
+                if (this._locked || this._disabled) return;
+                e.preventDefault();
+                e.stopPropagation();
+
+                const dir = e.deltaY < 0 ? 1 : -1;
+                this._applyChannelNudge(dir);
+            }, { passive: false });
+        }
+
         if (this._dom.btnOn) {
             this._dom.btnOn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1582,21 +1704,52 @@ export class ChannelStripComponent extends HTMLElement {
         if (this._dom.btnConfig) {
             this._dom.btnConfig.addEventListener('click', (e) => {
                 e.stopPropagation();
-                openMacroConfigModal();
+                openMacroConfigModal({ isMusicianMode: this._isMusicianMode() });
             });
         }
 
         if (this._dom.btnZerar) {
-            this._dom.btnZerar.addEventListener('click', (e) => {
+            this._dom.btnZerar.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                if (this._preset === 'auxVolumeGeral') {
-                    this._zeroAuxVolumeGeral();
-                } else if (this._preset === 'mixVolumeGeral') {
-                    if (typeof window.showMixZeroConfirm === 'function') {
-                        window.showMixZeroConfirm();
-                    } else {
+
+                const triggerZero = () => {
+                    if (this._preset === 'auxVolumeGeral') {
+                        this._zeroAuxVolumeGeral();
+                    } else if (this._preset === 'mixVolumeGeral') {
                         this._zeroMixVolumeGeral();
+                    } else {
+                        this._deltaSteps = 0;
+                        this._updateMacroDbDisplay();
                     }
+                };
+
+                if (typeof ConfirmModal !== 'undefined' && ConfirmModal.show) {
+                    let title = 'CONFIRMAR ZERAR';
+                    let message = 'Deseja realmente zerar os envios?';
+
+                    if (this._preset === 'auxVolumeGeral') {
+                        title = 'ZERAR ENVIOS DE AUXILIAR';
+                        const chLabel = getChannelLabel(this._ch !== null && this._ch !== undefined ? this._ch : uiState.activeConfigChannel);
+                        message = `Deseja realmente zerar todos os envios de auxiliar do canal <b>${chLabel}</b>?`;
+                    } else if (this._preset === 'mixVolumeGeral') {
+                        title = 'ZERAR ENVIOS DO MIX';
+                        const mixNum = (this._ch !== null && this._ch !== undefined && this._ch >= 36) ? (this._ch - 35) : 1;
+                        message = `Deseja realmente zerar os envios do <b>MIX ${mixNum}</b> em todos os 32 canais?`;
+                    }
+
+                    const confirmed = await ConfirmModal.show({
+                        title: title,
+                        message: message,
+                        type: 'danger',
+                        confirmText: 'ZERAR',
+                        cancelText: 'CANCELAR'
+                    });
+
+                    if (confirmed) {
+                        triggerZero();
+                    }
+                } else {
+                    triggerZero();
                 }
             });
         }
@@ -1621,6 +1774,20 @@ export class ChannelStripComponent extends HTMLElement {
             minusContainer.addEventListener('pointerup', () => this._stopNudge());
             minusContainer.addEventListener('pointerleave', () => this._stopNudge());
             minusContainer.addEventListener('pointercancel', () => this._stopNudge());
+        }
+
+        // Suporte a Mouse Wheel em Macro Faders e Volume Geral no modo Desktop
+        const macroWheelTarget = this.querySelector('.macro-fader-nudge-wrap') || this._dom.card;
+        if (macroWheelTarget) {
+            macroWheelTarget.addEventListener('wheel', (e) => {
+                if (this._layout !== 'desktop') return;
+                if (this._locked || this._disabled) return;
+                e.preventDefault();
+                e.stopPropagation();
+
+                const dir = e.deltaY < 0 ? 1 : -1;
+                this._nudgeMacro(dir);
+            }, { passive: false });
         }
     }
 }
