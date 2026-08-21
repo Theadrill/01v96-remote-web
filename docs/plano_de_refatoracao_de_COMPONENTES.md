@@ -1,10 +1,15 @@
-# Plano de Refatoração de COMPONENTES (Channel Strip Universal & Telas)
+# Plano Geral de Refatoração de Arquitetura & Componentes (Frontend V2)
 
-## 1. Contexto e Ambiente de Trabalho
+## 1. Visão Geral e Objetivo Estratégico
 
-- **Diretório de Trabalho Isolado:** `public_new/` (cópia de trabalho servida na rota `/new`).
-- **Diretório Original:** `public/` permanece 100% intacto como referência funcional e fallback de segurança.
-- **Objetivo Central:** Unificar a criação e ciclo de vida de faders e channel strips em uma **Classe Única Modular (`ChannelStrip`)**, eliminando as 6 funções de concatenação de strings HTML legadas e dezenas de `if/else` espalhados, e organizar o frontend em uma arquitetura limpa com separação por **Componentes (`components/`)**, **Telas (`screens/`)**, **Serviços (`services/`)**, **Núcleo de Estado (`core/`)** e **Utilitários (`utils/`)**.
+Este documento é o **Plano Mestre de Refatoração do Frontend** do projeto `01v96-remote-web`.
+
+O objetivo geral é transformar a base de código do frontend em uma **Arquitetura Modular Limpa**, organizada por camadas claras de responsabilidade (**Componentes**, **Telas**, **Serviços**, **Núcleo de Estado** e **Utilitários**). Isso elimina acoplamentos históricos, código duplicado e arquivos monolíticos, criando uma base sólida, extensível e profissional para as próximas evoluções do sistema.
+
+### Princípios da Refatoração:
+1. **Ambiente Isolado (`public_new/`):** Todo o trabalho de refatoração ocorre exclusivamente dentro de `public_new/`, acessível pela rota `/new`. A pasta `public/` original permanece 100% intacta como ambiente funcional de produção e fallback.
+2. **Separação Estrita de Responsabilidades:** Componentes visuais (`components/`) não sabem detalhes de rede; Telas (`screens/`) orquestram a visão sem reimplementar física de controles; Serviços (`services/`) operam em background sem desenhar interface.
+3. **Evolução Gradual por Épicos:** Começamos pelo núcleo visual mais crítico (o **Channel Strip Universal** e suas telas consumidoras) e, à medida que avançamos para outros subsistemas (Channel Setup, Routing, Cenas, etc.), novas fases e detalhamentos serão incorporados a este mesmo plano.
 
 ---
 
@@ -101,84 +106,63 @@ public_new/
 
 ---
 
-## 3. Arquitetura da Classe Única Modular `ChannelStrip`
+## 3. ÉPICO 1: Refatoração do Channel Strip & Telas Consumidoras
 
-Em vez de dispersar heranças rígidas em múltiplos arquivos, o componente `ChannelStrip` (`public_new/modules/components/channel_strip.js`) opera como uma fábrica de alta performance orientada a eventos:
+O ponto de partida da refatoração é o componente mais utilizado em todo o mixer: o **Channel Strip**.
 
-```javascript
-export class ChannelStrip {
-    constructor(config = {}) {
-        this.config = config;           // ch, auxIdx, type, layoutMode, isMini, isPaired, etc.
-        this.state = { value: 0, on: false, solo: false, pan: 0, patchText: '--', ... };
-        this.elements = {};             // Cache de referências DOM para atualizações O(1)
-        this.container = null;
-        this.abortController = new AbortController();
-    }
+### 3.1 Arquitetura da Classe Única Modular `ChannelStrip`
+Em `public_new/modules/components/channel_strip.js`:
+- Centraliza a física completa do fader (range 0-1023), auto-repeat acelerado em nudges (+/-), conversão de decibéis e integração com `MeterBus` a 60 FPS via WebAssembly.
+- Monta o canal a partir de **7 Zonas Modulares** (`Header`, `TopAction`, `Display`, `MiddleFeature`, `PrimaryButton`, `FaderCore`, `FooterRouting`).
+- Emite `CustomEvents` nativos para desacoplar a apresentação da camada de rede.
 
-    // --- Ciclo de Vida ---
-    render() { /* Monta elemento raiz chamando os métodos das 7 zonas */ }
-    mount(parentEl, position = 'beforeend') { /* Insere no DOM, cacheia nós e liga listeners */ }
-    update(partialState) { /* Atualizações cirúrgicas sem recriar o DOM */ }
-    destroy() { /* Aborta listeners via AbortController, limpa timers e remove do DOM */ }
-
-    // --- Métodos Modulares das 7 Zonas ---
-    buildZone1_Header() { /* Rótulo, ícones de lock e ações rápidas */ }
-    buildZone2_TopAction() { /* Solo normal, Master Solo com alerta ou Botão PRE/POST */ }
-    buildZone3_Display() { /* Scribble strip / Nome verde resolvido */ }
-    buildZone4_MiddleFeature() { /* Medidores Master ou Badges de Posição Auxiliar */ }
-    buildZone5_PrimaryButton() { /* Botão ON / Mute iluminado */ }
-    buildZone6_FaderCore() { /* Fader vertical, Nudges com auto-repeat acelerado, dB, Cortina VU */ }
-    buildZone7_FooterRouting() { /* Panpot interativo com duplo thumb estéreo e Patch Marquee */ }
-
-    // --- Atualizações de Alta Performance (60 FPS) ---
-    updateFader(val) { ... }
-    updateMeter(levelPercent, isPeak) { ... }
-    updateOnState(isOn) { ... }
-    updateSoloState(isSolo) { ... }
-    updatePan(panValue) { ... }
-    updatePatch(text) { ... }
-}
-```
+### 3.2 Integração com as Telas (`screens/`)
+- **`screens/channel_setup.js`:** Host modular das abas (EQ, Comp, Gate, Routing) com o Mini-Fader de inspeção lateral (`isMini: true`) e Solo Replace.
+- **`screens/auxs_sends.js`:** Lógica de barramento (Fixed/Variable, Pre/Post global) consumindo `ChannelStrip` do tipo `aux_send`.
+- **`screens/main_view.js`:** Grade de 32 inputs e Master Stereo.
+- **`screens/outs_view.js`:** Barramentos MIX 1-8 e BUS 1-8.
+- **`screens/musician_view.js`:** Faders de envio do retorno e Volume Geral.
 
 ---
 
-## 4. Integração das Telas (`screens/`) com os Componentes (`components/`)
+## 4. Roteiro de Execução (Fases do Projeto)
 
-Cada tela mantém **100% de suas regras de negócio e telas de edição**, consumindo a classe `ChannelStrip` apenas quando precisa renderizar um fader:
+### FASE 1 — Organização Estrutural de Diretórios em `public_new/`
+- [ ] Criar pastas `components/`, `components/modals/`, `screens/`, `services/`, `core/` e `utils/`.
+- [ ] Distribuir os arquivos de `public_new/modules/` para suas respectivas pastas.
+- [ ] Atualizar todas as tags `<script>` em `public_new/index.html` para refletir os novos caminhos.
+- [ ] Testar no endpoint `/new` garantindo zero erros de carregamento 404 no console.
 
-1. **`screens/channel_setup.js` (Host do Setup do Canal):**
-   - Gerencia cabeçalho de navegação (◀ CH ANTERIOR / CH SEGUINTE ▶) e abas (`EQ`, `GATE`, `COMP`, `INSERTS`, `ROUTING`).
-   - Instancia na barra lateral o `ChannelStrip` compacto (`isMini: true`, com Solo Replace automático).
-   - Ao trocar de aba, apenas instancia o componente correspondente (`components/eq.js`, `components/compressor.js`, `components/gate.js`, `components/routing.js`) na área central sem reescrever o código desses gráficos.
+### FASE 2 — Construção da Classe `ChannelStrip` Universal
+- [ ] Criar `public_new/modules/components/channel_strip.js` com os métodos modulares das 7 zonas.
+- [ ] Implementar cache de nós DOM em `this.elements` para updates cirúrgicos $O(1)$.
+- [ ] Implementar bindings de eventos (Fader, Nudges acelerados, ON, SOLO, Panpot, Touch/Pointer).
+- [ ] Integrar conexão direta com `MeterBus` / WASM sem querySelectors globais repetitivos.
 
-2. **`screens/auxs_sends.js` (Tela de Auxiliares):**
-   - Gerencia modos `VARIABLE / FIXED`, chave global `PRE / POST` e ponto de envio `PRE ON / POST ON`.
-   - Renderiza a grade de canais instanciando `new ChannelStrip({ ch, auxIdx, type: 'aux_send' })`.
+### FASE 3 — Migração Piloto: Tela de Auxiliares (`screens/auxs_sends.js`)
+- [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip` com `type: 'aux_send'`.
+- [ ] Remover do arquivo as funções legadas de faders, nudges e strings HTML duplicadas.
+- [ ] Validar modos MIX (32 canais enviando) e CANAL (8 envios) com Pre/Post e modo FIXED.
 
-3. **`screens/main_view.js` (Tela Principal):**
-   - Gerencia Layers (1-16, 17-32, Master).
-   - Renderiza os 32 inputs e o Master Stereo fixo via `ChannelStrip`.
+### FASE 4 — Criação do Host de Edição `channel_setup.js`
+- [ ] Criar `public_new/modules/screens/channel_setup.js` para gerenciar abas (`EQ`, `GATE`, `COMP`, `INSERTS`, `ROUTING`) e navegação ◀ / ▶.
+- [ ] Integrar o Mini-Fader de contexto lateral com comportamento de `soloReplace`.
+- [ ] Chamar os componentes existentes (`eq.js`, `dynamics.js`, etc.) no painel central sem necessidade de reescrevê-los.
 
-4. **`screens/outs_view.js` (Tela de Saídas):**
-   - Renderiza os 8 MIX Masters e 8 BUS Masters via `ChannelStrip`.
+### FASE 5 — Migração das Telas Restantes (`main_view.js`, `outs_view.js`, `musician_view.js`)
+- [ ] Migrar Tela Principal (`screens/main_view.js`) para instanciar os 32 inputs e Master fixo via `ChannelStrip`.
+- [ ] Migrar Tela de Saídas (`screens/outs_view.js`) para MIX 1-8 e BUS 1-8.
+- [ ] Migrar Modo Músico (`screens/musician_view.js`) para faders de envio e Volume Geral.
 
-5. **`screens/musician_view.js` (Modo Músico):**
-   - Renderiza os canais do retorno do músico e posiciona o `components/volume_geral.js` no topo.
+### FASE 6 — Integração com Sistema de Temas YAML & Validação Final
+- [ ] Mapear variáveis CSS `--strip-*` nos estilos e validar com `ThemeEditor` e `default.yaml`.
+- [ ] Realizar bateria completa de testes de regressão no endpoint `/new`.
 
 ---
 
-## 5. Roteiro de Implementação em Fases
+## 5. Próximos Épicos (Expansões Futuras do Plano)
 
-- [ ] **FASE 1 — Estruturação de Diretórios em `public_new/`**
-  - Mover arquivos para `components/`, `screens/`, `services/`, `core/` e `utils/`.
-  - Atualizar os caminhos dos `<script>` em `public_new/index.html`.
-- [ ] **FASE 2 — Construção da Classe `ChannelStrip` Universal**
-  - Implementar métodos modulares das 7 zonas em `public_new/modules/components/channel_strip.js`.
-  - Implementar física do fader (0-1023), auto-repeat acelerado em nudges e integração com `MeterBus`/WASM a 60 FPS.
-- [ ] **FASE 3 — Migração Piloto: Tela de Auxiliares (`screens/auxs_sends.js`)**
-  - Adaptar tela de auxiliares para instanciar `ChannelStrip`.
-  - Eliminar código legado de geradores manuais de fader e nudges em `auxs_sends.js`.
-- [ ] **FASE 4 — Migração da Central de Setup do Canal (`screens/channel_setup.js`)**
-  - Criar `channel_setup.js` como host modular das abas (EQ, Comp, Gate, Routing) com o Mini-Fader de contexto lateral.
-- [ ] **FASE 5 — Migração da Tela Principal (`screens/main_view.js`), Saídas (`screens/outs_view.js`) e Modo Músico (`screens/musician_view.js`)**
-- [ ] **FASE 6 — Integração com Sistema de Temas YAML e Validação Fim-a-Fim no Endpoint `/new`**
+Conforme a refatoração do Épico 1 for concluída e validada, este plano receberá novas seções detalhadas para:
+- **ÉPICO 2:** Refatoração interna dos componentes de processamento de áudio (`eq.js`, `dynamics.js`, `inserts.js`).
+- **ÉPICO 3:** Refatoração do sistema matricial de roteamento (`routing_overview.js` e `routing.js`).
+- **ÉPICO 4:** Unificação e modernização do sistema de Cenas e Presets (`scenes_view.js`).
