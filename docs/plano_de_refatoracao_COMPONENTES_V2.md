@@ -150,7 +150,10 @@ O arquivo monolítico `globals.js` é decomposto em módulos de responsabilidade
 ✅ 4.3 Validar sincronização completa de temas em runtime no test_strip.html
 
 ── FASE 5: Migração de Telas do Sistema ──────────────────────────────────────
-[ ] 5.1 Migrar tela de Auxiliares e Sends (public_new/modules/auxs_sends.js) — Piloto
+[ ] 5.1 Migrar tela de Auxiliares e Sends (public_new/modules/auxs_sends.js) — Piloto:
+      - Modo 1 (Sends on Fader: MIX 1-8): canais 1-32 enviando para o Mix + Card de Volume Geral do Mix (compact 68px) + Mini-Fader de contexto do próprio MIX à direita
+      - Modo 2 (Envios do Canal: CH 1-32): 8 cards de AUX Send + Card de Volume Geral dos Auxiliares (compact 68px) + Mini-Fader de contexto do próprio Canal à direita
+      - Sincronização e controle reativo dos Mini-Faders via MeterBus
 [ ] 5.2 Migrar tela Principal Desktop (canais 1-32, ST IN, Mix, Bus, Master)
 [ ] 5.3 Migrar Mini-Faders dos Modais (EQ, Dynamics, FX, Routing)
 [ ] 5.4 Implementar renderização Mobile (<channel-strip> layout mobile)
@@ -201,7 +204,7 @@ O arquivo monolítico `globals.js` é decomposto em módulos de responsabilidade
    - O `globals.js` é temporário para a fase de transição. Na Fase 5.5, todos os arquivos passarão a ser ES Modules com `import/export` diretos, removendo as pontes globais e eliminando o `globals.js`.
 
 ### Próximos Passos Imediatos:
-1. Iniciar a **Fase 5.1:** Migração de `public_new/modules/auxs_sends.js` para renderizar instâncias do novo Custom Element `<channel-strip>` com os presets de auxSend e volume geral compacto.
+1. Iniciar a **Fase 5.1:** Migração de `public_new/modules/auxs_sends.js` para renderizar instâncias do Custom Element `<channel-strip>` com os presets de `auxSend`, `sendsOnFader`, `auxVolumeGeral`/`mixVolumeGeral` compactos e o Mini-Fader de contexto à direita (`#miniFaderContext`).
 2. Migrar a tela principal (`index.html`) para utilizar os componentes `<channel-strip>` de forma declarativa e reativa via `MeterBus`.
 
 ---
