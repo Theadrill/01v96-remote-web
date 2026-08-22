@@ -204,16 +204,16 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
    - Botão de **Nudge Superior (+)**: Micro-ajuste incremental de ganho com suporte a **toque/clique único (step específico por tipo)** e **Long Press / Segurar Pressionado (auto-repeat acelerado contínuo)**.
 6. **Zona 6 — Fader Core (Controle Central e Balística de Áudio):**
    - Canal Normal: Visor de dB, Régua lateral (+10 a -∞), Fader vertical de 10-bit (0–1023), VU Meter 60 FPS (WASM) com Peak LED e botão de **Nudge Inferior (-)** fino (mesmo step e física de longpress do Nudge Superior).
-   - **Tabela Canônica de Steps dos Nudges (+ e -):**
-     - **Canais de Input (Mono 1-32, Pareados 1-32 e ST IN 1-4):** Step de **`0.05 dB`** por toque.
-     - **Canais de Saída / Masters (MIX 1-8, BUS 1-8 e Master Stereo LR):** Step de **`0.10 dB`** por toque.
-     - **Sends on Faders e Tela de AUX Individual:** Step de **`0.50 dB`** por toque.
-     - **Macro Fader (Modo Técnico):** Step de **`0.05 dB`** por toque.
-     - **Macro Fader de Volume Geral (Sends on Faders / Tela AUX):** Step de **`0.10 dB`** por toque.
-     - **Macro Fader de Volume Geral (Modo Músico):** Step de **`0.25 dB`** por toque.
+   - **Tabela Canônica de Steps dos Nudges (+ e -) e Roda do Mouse (Desktop):**
+     - **Canais de Input (Mono 1-32, Pareados 1-32 e ST IN 1-4):** Step de **`0.10 dB`** por toque / entalhe do scroll wheel.
+     - **Canais de Saída / Masters (MIX 1-8, BUS 1-8 e Master Stereo LR):** Step de **`0.50 dB`** por toque / entalhe do scroll wheel.
+     - **Sends on Faders e Tela de AUX Individual:** Step de **`0.50 dB`** por toque / entalhe do scroll wheel.
+     - **Macro Fader (Modo Técnico):** Step de **`0.05 dB`** por toque nos Big Nudges (*sem suporte a roda do mouse*).
+     - **Macro Fader de Volume Geral (Sends on Faders / Tela AUX):** Step de **`0.10 dB`** por toque nos Big Nudges (*sem suporte a roda do mouse*).
+     - **Macro Fader de Volume Geral (Modo Músico):** Step de **`0.25 dB`** por toque nos Big Nudges (*sem suporte a roda do mouse*).
    - **Comportamento de Long Press (Desktop e Mobile):** Ao segurar pressionado qualquer botão de `(+)` ou `(-)` (no mouse ou touch screen), o valor inicia movimentação contínua automática (auto-repeat) acelerando progressivamente enquanto mantido pressionado.
    - **Fader Rail Físico (Sem Salto por Toque):** Em ambos os layouts (Mobile e Desktop), o trilho/calha do fader é desabilitado para cliques diretos (sem salto de volume ao tocar ou clicar no curso). O ajuste só ocorre arrastando o thumb/knob ou usando os botões de nudge (+/-), reproduzindo com fidelidade a segurança operacional de uma mesa física.
-   - **Roda do Mouse (Desktop Apenas):** No modo Desktop, o knob/thumb e o trilho respondem à roda do mouse (*scroll wheel*) para incrementar/decrementar volume com alta precisão.
+   - **Roda do Mouse (Desktop Apenas nos Faders Individuais):** No modo Desktop, o knob/thumb e o trilho dos canais de Input (`0.10 dB`), Saídas/Masters (`0.50 dB`) e Sends on Faders (`0.50 dB`) respondem à roda do mouse (*scroll wheel*) para incrementar/decrementar volume. Os canais em modo Macro (Técnico, AUX Geral e Músico) **não respondem à roda do mouse**.
    - Modo Mobile: Medidor VU implementado como **cortina de fundo total (`.has-meter` / `.mobile-meter-curtain`)** que preenche **100% da área útil do card do canal** de ponta a ponta:
      - **Gradiente Espectral Contínuo:** A cortina possui gradiente vertical que vai do **Verde puro** na base (sinal normal), passando por **Verde Claro / Amarelo** (atenção a partir de 60-85%), até culminar em **Vermelho vivo** no topo (98% a 100%).
      - **Preenchimento Integral:** Ocupa todo o espaço interior do canal (atrás dos botões, displays e fader), subindo fluidamente conforme a pressão sonora (Mono ou Estéreo Dividido L/R).
@@ -243,7 +243,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
   * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
   * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Toque:** Incremento/decremento fino de **`0.05 dB`** por toque.
+  * **Step por Toque:** Incremento/decremento de **`0.10 dB`** por toque.
   * **Long Press (Auto-Repeat):** Ao segurar pressionado o botão `(+)` ou `(-)`, o volume se move continuamente acelerando enquanto mantido.
 
 ```text
@@ -256,7 +256,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 ├──────────────────────────────────────────────┤  │
 │                     [ON]                     │  │ [MÉDIO - 60% a 85%]: VERDE CLARO
 ├──────────────────────────────────────────────┤  │
-│                     (+)                      │  │ <-- Nudge (+0.05 dB / Long Press)
+│                     (+)                      │  │ <-- Nudge (+0.10 dB / Long Press)
 │                      │                       │  │ CORTINA VU METER DE FUNDO INTEGRAL
 │    0 ───             │                       │  │ (Preenche 100% da área útil do card
 │                      │                       │  │ de ponta a ponta, por trás de todos
@@ -264,7 +264,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 │        ░░░░░░░░░░░░░░│░░░░░░░░░░░░░░         │  │ ⚠️ Trilho desabilitado p/ toque direto
 │  -30 ───▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │ ◄── Nível Atual do Sinal Subindo
 │        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │
-│                     (-)                      │  │ <-- Nudge (-0.05 dB / Long Press)
+│                     (-)                      │  │ <-- Nudge (-0.10 dB / Long Press)
 ├──────────────────────────────────────────────┤  ▼ [BASE - 0% a 60%]: VERDE PURO
 │                  -17.50 dB                   │  <-- Zona 6 (Leitura Numérica Neon)
 └──────────────────────────────────────────────┘  ═════════════════════════════════════════
@@ -277,7 +277,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
   * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
   * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Toque:** Incremento/decremento de **`0.05 dB`** por toque atuando em ambos os canais pareados.
+  * **Step por Toque:** Incremento/decremento de **`0.10 dB`** por toque atuando em ambos os canais pareados.
   * **Long Press (Auto-Repeat):** Ao segurar pressionado o botão `(+)` ou `(-)`, o volume se move continuamente acelerando enquanto mantido.
 
 ```text
@@ -291,14 +291,14 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 │                     [ON]                     │  │ CORTINA VU DUAL (DIVIDIDA L / R)
 ├──────────────────────────────────────────────┤  │ (Preenche 100% do fundo em 2 colunas:
 │                     (+)                      │  │  L = Canal Esquerdo, R = Canal Direito)
-│                      │                       │  │ <-- Nudge (+0.05 dB / Long Press)
+│                      │                       │  │ <-- Nudge (+0.10 dB / Long Press)
 │    0 ───             │                       │  │
 │                    [ █ ] ◄─ Arraste do Thumb │  │ ⚠️ Trilho desabilitado p/ toque direto
 │  -10 ───             │                       │  │
 │                      │                       │  │
 │  -30 ───             │                       │  │
 │        ▓▓▓▓▓▓▓▓▓▓ L  │  R ░░░░░░░░░░         │  │ ◄── L com sinal / R sem sinal
-│                     (-)                      │  │ <-- Nudge (-0.05 dB / Long Press)
+│                     (-)                      │  │ <-- Nudge (-0.10 dB / Long Press)
 ├──────────────────────────────────────────────┤  ▼ [BASE]: VERDE PURO
 │                   2.20 dB                    │  <-- Zona 6 (Leitura Numérica Neon)
 └──────────────────────────────────────────────┘  ═════════════════════════════════════════
@@ -311,7 +311,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
   * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
   * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Toque:** Incremento/decremento de **`0.10 dB`** por toque no Master.
+  * **Step por Toque:** Incremento/decremento de **`0.50 dB`** por toque no Master.
   * **Long Press (Auto-Repeat):** Ao segurar pressionado o botão `(+)` ou `(-)`, o volume se move continuamente acelerando enquanto mantido.
 
 ```text
@@ -326,13 +326,13 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 ├──────────────────────────────────────────────┤  │ (Preenche 100% do fundo do Master
 │                 [MEDIDORES]                  │  │ de baixo até em cima)
 ├──────────────────────────────────────────────┤  │
-│                     (+)                      │  │ <-- Nudge (+0.10 dB / Long Press)
+│                     (+)                      │  │ <-- Nudge (+0.50 dB / Long Press)
 │                      │                       │  │
 │    0 ───           [ █ ] ◄─ Arraste do Thumb │  │ ⚠️ Trilho desabilitado p/ toque direto
 │  -10 ───             │                       │  │
 │  -30 ───             │                       │  │
 │        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │ ◄── Nível Atual Subindo
-│                     (-)                      │  │ <-- Nudge (-0.10 dB / Long Press)
+│                     (-)                      │  │ <-- Nudge (-0.50 dB / Long Press)
 ├──────────────────────────────────────────────┤  ▼ [BASE - 0% a 60%]: VERDE PURO
 │                   0.00 dB                    │  <-- Zona 6 (Leitura Numérica Neon)
 └──────────────────────────────────────────────┘  ═════════════════════════════════════════
@@ -467,7 +467,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
   * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
   * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob (quando destravado) ou usando os nudges (+/-), igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
-  * **Quando Destravado:** Step de **`0.05 dB`** com Long Press acelerado.
+  * **Quando Destravado:** Step de **`0.10 dB`** com Long Press acelerado.
   * **Quando Travado:** Bloqueado contra toques acidentais.
 * **Visual Mobile:**
   * Borda perimetral sutil em **Vermelho** contornando todo o card (`border: 1px solid #ff4444`).
@@ -550,9 +550,9 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
   * **Canais 17 a 32:** Identidade visual com Header e acentos em **Tom Esverdeado** (`#00a86b`) para rápida distinção das camadas físicas.
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume ao clicar ao longo do curso da trilha).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir com alta precisão, exatamente como em uma mesa física de áudio.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir com step de **`0.10 dB`** por entalhe da roda, exatamente como em uma mesa física de áudio.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento fino de **`0.05 dB`** por clique.
+  * **Step por Clique:** Incremento/decremento fino de **`0.10 dB`** por clique.
   * **Long Press (Auto-Repeat):** Ao manter o botão do mouse pressionado sobre `(+)` ou `(-)`, o volume se move continuamente acelerando.
 * **Mecânica do LED de PEAK (`.desk-peak-led`):**
   * Localizado logo acima do VU meter (topo da calha).
@@ -569,7 +569,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 ├──────────────────────────────────────────────┤
 │                     [ON]                     │  <-- Zona 5 (Botão ON Amarelo Ativo)
 ├──────────────────────────────────────────────┤
-│                     (+)                      │  <-- Zona 5 (Nudge: +0.05 dB / Long Press)
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
 │                   -10.00                     │  <-- Zona 6 (Leitura Numérica em dB)
 │                                              │
 │  +10 ───          │  │                  (o)  │  <-- PEAK LED Circular (.desk-peak-led)
@@ -589,7 +589,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 │   50 ───          │  │                  ░│   │  ◄── Barra de VU Subindo
 │   -∞ ───          │  │                  ▓│   │
 │                                              │
-│                     (-)                      │  <-- Zona 6 (Nudge: -0.05 dB / Long Press)
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
 ├──────────────────────────────────────────────┤
 │  L ───────────────[ | ]─────────────────── R │  <-- Zona 7 (Panpot Analógico L-C-R)
 ├──────────────────────────────────────────────┤
@@ -606,9 +606,9 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 * **Zona 1:** Cabeçalho tripartite com ícone de cadeado 🔒 (`21 + 22 [🔒]`).
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.10 dB`** por entalhe para aumentar/diminuir, igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento de **`0.05 dB`** por clique atuando em ambos os canais pareados.
+  * **Step por Clique:** Incremento/decremento de **`0.10 dB`** por clique atuando em ambos os canais pareados.
   * **Long Press (Auto-Repeat):** Ao manter o botão do mouse pressionado sobre `(+)` ou `(-)`, o volume se move continuamente acelerando.
 * **Zona 6 (VU Meter Estéreo Duplo):** **Duas barras verticais de VU Meter paralelas (L e R)** com seus respectivos LEDs circulares de Peak.
 * **Zona 7 (Duplo Pan com 2 Trilhas Independentes & Marquee):** **Duas barras/trilhas físicas de Panpot empilhadas (L no topo e R embaixo)**, cada uma com seu próprio cursor deslizante, e Badge de Patch com efeito marquee caso o texto (`ADAT 7 / NONE`) exceda a largura.
@@ -623,7 +623,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 ├──────────────────────────────────────────────┤
 │                     [ON]                     │  <-- Zona 5 (Botão ON)
 ├──────────────────────────────────────────────┤
-│                     (+)                      │  <-- Zona 5 (Nudge: +0.05 dB / Long Press)
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
 │                    2.20                      │  <-- Zona 6 (Leitura dB)
 │                                              │
 │  +10 ───          │  │                 (o)(o)│  <-- Duplo PEAK LED Estéreo
@@ -640,7 +640,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 │   50 ───          │  │                 ░│ ░│ │  ◄── Nível L / R Independentes
 │   -∞ ───          │  │                 ▓│ ▓│ │
 │                                              │
-│                     (-)                      │  <-- Zona 6 (Nudge: -0.05 dB / Long Press)
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
 ├──────────────────────────────────────────────┤
 │  L ───────────────[ | ]─────────────────── R │  <-- Trilha Pan Canal Ímpar (L)
 │  L ───────────────[ | ]─────────────────── R │  <-- Trilha Pan Canal Par (R)
@@ -660,9 +660,9 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
   * `CANAIS: [ PREEQ ]` (Pre-EQ / Post-EQ / Pre-fader / Post-fader)
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume master só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume master só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.50 dB`** por entalhe para aumentar/diminuir, igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento de **`0.10 dB`** por clique no Master Stereo.
+  * **Step por Clique:** Incremento/decremento de **`0.50 dB`** por clique no Master Stereo.
   * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, o volume se move continuamente acelerando.
 * **Zona 6 (VU Meter Master L/R):** Duplo VU Meter estéreo com escala ampla e Peak LEDs independentes.
 
@@ -680,7 +680,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 ├──────────────────────────────────────────────┤
 │                     [ON]                     │  <-- Zona 5 (Botão ON Amarelo)
 ├──────────────────────────────────────────────┤
-│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.50 dB / Long Press)
 │                    0.00                      │  <-- Zona 6 (Leitura dB)
 │                                              │
 │    0 ───          │██│ ◄─ Arraste/Wheel(o)(o)│  <-- Duplo PEAK LED
@@ -696,7 +696,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 │   60 ───          │  │                 ▓│ ▓│ │
 │   -∞ ───          │  │                 ▓│ ▓│ │
 │                                              │
-│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.50 dB / Long Press)
 ├──────────────────────────────────────────────┤
 │  L ───────────────[ | ]─────────────────── R │  <-- Zona 7 (Panpot Master Central)
 └──────────────────────────────────────────────┘
@@ -710,7 +710,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 * **Identidade Visual:** Fundo Cinza Claro / Prateado metálico (`#e0e0e0`).
 * **Zona 4:** Botão roxo **`[ CONFIG ]`** (abre modal para selecionar canais controlados) + Visor OLED de **Delta dB** (`--` em repouso / `+2.00 dB` ao agir).
 * **Comportamento dos Big Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento coletivo de **`0.05 dB`** por clique nos canais selecionados.
+  * **Step por Clique:** Incremento/decremento coletivo de **`0.05 dB`** por clique nos canais selecionados (*sem suporte a roda do mouse*).
   * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, a variação delta dB corre continuamente acelerando.
 * **Zona 6 (Big Nudges):** Botões retangulares brancos de grande área útil `[ + ]` e `[ - ]` com auto-repeat acelerado para compensação de ganho em bloco.
 
@@ -747,9 +747,9 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 * **Identidade Visual:** Header em tom Amarelo Dourado / Âmbar (`#d4af37`).
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.50 dB`** por entalhe para aumentar/diminuir, igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento de **`0.10 dB`** por clique nas saídas MIX.
+  * **Step por Clique:** Incremento/decremento de **`0.50 dB`** por clique nas saídas MIX.
   * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, o volume se move continuamente acelerando.
 * **Zona 7 (Roteamento Físico Duplo OMNI + ADAT):**
   ![Mix Patch Outputs](imgs/desktop_mix_patch_outputs.png)
@@ -767,7 +767,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 ├──────────────────────────────────────────────┤
 │                     [ON]                     │  <-- Zona 5 (Botão ON)
 ├──────────────────────────────────────────────┤
-│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.50 dB / Long Press)
 │                    10.00                     │  <-- Zona 6 (Leitura dB)
 │                                              │
 │  +10 ───          │██│ ◄─ Arraste/Wheel (o)  │  <-- PEAK LED
@@ -782,7 +782,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 │   50 ───          │  │                  ▓│   │
 │   -∞ ───          │  │                  ▓│   │
 │                                              │
-│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.50 dB / Long Press)
 ├──────────────────────────────────────────────┤
 │               OMNI 2 + ADAT 2                │  <-- Zona 7 (Saída Dupla com Marquee)
 └──────────────────────────────────────────────┘
@@ -796,9 +796,9 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 * **Identidade Visual:** Header em tom Ciano / Verde-Azulado com ícone de cadeado 🔒 (`BUS 1 + 2 [🔒]`).
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.50 dB`** por entalhe para aumentar/diminuir, igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento de **`0.10 dB`** por clique no barramento BUS.
+  * **Step por Clique:** Incremento/decremento de **`0.50 dB`** por clique no barramento BUS.
   * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, o volume se move continuamente acelerando.
 * **Correção de Especificação de VU (Stereo Dual Bar):**
   * *Correção em relação ao legado:* No legado aparecia erroneamente com apenas 1 barra. Na nova arquitetura universal, **todo BUS pareado, Input pareado ou canal estéreo obrigatoriamente renderiza 2 barras de VU meter (L e R)** e duplo LED de Peak.
@@ -814,7 +814,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 ├──────────────────────────────────────────────┤
 │                     [ON]                     │  <-- Zona 5 (Botão ON)
 ├──────────────────────────────────────────────┤
-│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.50 dB / Long Press)
 │                    10.00                     │  <-- Zona 6 (Leitura dB)
 │                                              │
 │  +10 ───          │██│ ◄─ Arraste/Wheel(o)(o)│  <-- Duplo PEAK LED Estéreo
@@ -829,7 +829,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 │   50 ───          │  │                 ░│ ░│ │
 │   -∞ ───          │  │                 ▓│ ▓│ │
 │                                              │
-│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.50 dB / Long Press)
 ├──────────────────────────────────────────────┤
 │              FX 1-1 | FX 1-2                 │  <-- Zona 7 (Patch BUS Duplo)
 └──────────────────────────────────────────────┘
@@ -843,9 +843,9 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 * **Zona 1:** Header azul `ST IN 1`.
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.10 dB`** por entalhe para aumentar/diminuir, igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento fino de **`0.05 dB`** por clique.
+  * **Step por Clique:** Incremento/decremento fino de **`0.10 dB`** por clique.
   * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, o volume se move continuamente acelerando.
 * **Zona 6:** Fader estéreo com **duplo VU Meter L/R** e Peak LEDs.
 * **Zona 7 (Duplo Pan Estéreo com 2 Barras):** **Duas barras/trilhas físicas de Panpot independentes (uma sobre a outra)** — o cursor de cima para o canal Left (ex: roxo `[L]` na ponta esquerda) e o cursor de baixo para o canal Right (ex: roxo `[R]` na ponta direita) + Patch estéreo `FX2-1 / FX2-2`.
@@ -860,7 +860,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 ├──────────────────────────────────────────────┤
 │                     [ON]                     │  <-- Zona 5 (Botão ON)
 ├──────────────────────────────────────────────┤
-│                     (+)                      │  <-- Zona 5 (Nudge: +0.05 dB / Long Press)
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
 │                     -∞                       │  <-- Zona 6 (Leitura dB)
 │                                              │
 │  +10 ───          │  │                 (o)(o)│  <-- Duplo PEAK LED
@@ -874,7 +874,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 │   50 ───          │  │                  │  │ │
 │   -∞ ───          │██│ ◄─ Arraste/Wheel │  │ │  (Trilho desabilitado p/ clique direto)
 │                   │  │    (Thumb Fader) │  │ │
-│                     (-)                      │  <-- Zona 6 (Nudge: -0.05 dB / Long Press)
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
 ├──────────────────────────────────────────────┤
 │  L ───[ L ]───────────────────────────────── │  <-- Trilha Pan Canal Esquerdo (L)
 │  ─────────────────────────────────[ R ]─── R │  <-- Trilha Pan Canal Direito (R)
@@ -893,7 +893,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 * **Zona 3:** Nome do canal que está enviando (`AUX4`).
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume de envio só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume de envio só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.50 dB`** por entalhe para aumentar/diminuir, igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
   * **Step por Clique:** Incremento/decremento de envio de **`0.50 dB`** por clique.
   * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, o volume de envio corre continuamente acelerando.
@@ -943,7 +943,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
   * **Zona 3 (Display OLED):** `AUX GERAL` (ou `MIX GERAL`).
   * **Zona 4:** Visor OLED de Delta dB (`--`).
   * **Comportamento dos Big Nudges (+ e -):**
-    * **Step por Clique:** Incremento/decremento de envio geral de **`0.10 dB`** por clique para todos os canais.
+    * **Step por Clique:** Incremento/decremento de envio geral de **`0.10 dB`** por clique para todos os canais (*sem suporte a roda do mouse*).
     * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, a compensação coletiva corre continuamente acelerando.
   * **Zona 6 (Big Nudges):** Botões retangulares brancos `[ + ]` e `[ - ]` com auto-repeat acelerado para aumentar ou diminuir coletivamente o envio de todos os canais para aquele auxiliar.
   * **Zona 7 (Ação Crítica ZERAR):** Botão Vermelho de Destaque **`[ ZERAR ]`** (aciona modal de confirmação para zerar todos os envios de uma só vez) + Rodapé escuro `AUX` (ou `MIX`).
