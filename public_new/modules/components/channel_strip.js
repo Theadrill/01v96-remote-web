@@ -77,10 +77,12 @@ class ChannelStrip {
 
         const wrapper = document.createElement('div');
         wrapper.id = `strip_${cfg.id}`;
+        const isMaster = cfg.isMaster || cfg.type === 'master';
         wrapper.className = [
             'channel-strip-wrapper',
             isDesktop ? 'desk-strip' : 'mob-strip',
             cfg.isPaired ? 'paired-channel' : '',
+            isMaster ? 'is-master' : '',
             cfg.isLocked ? 'is-locked' : '',
             cfg.isDisabled ? 'is-disabled' : '',
             cfg.colorBand ? `band-${cfg.colorBand}` : '',
@@ -97,6 +99,8 @@ class ChannelStrip {
         this.element = wrapper;
         this._cacheElements();
         this._bindEvents();
+
+        requestAnimationFrame(() => this._checkMarquee());
 
         return wrapper;
     }
@@ -119,17 +123,17 @@ class ChannelStrip {
                 <div class="desk-ch-name-zone">
                     <span class="desk-ch-name">${cfg.name}</span>
                 </div>
-                <div class="desk-macro-feature-zone" style="padding: 4px; text-align: center;">
-                    <button class="macro-config-btn" style="background: #6b21a8; color:#fff; border:none; border-radius:4px; padding:3px 6px; font-size:10px; font-weight:bold; cursor:pointer;">[ CONFIG ]</button>
-                    <div class="macro-delta-display" style="background:#000; color:#00ff00; font-family:monospace; font-size:12px; margin-top:4px; padding:2px; border-radius:3px;">${cfg.deltaDb || '--'}</div>
+                <div class="desk-macro-feature-zone">
+                    <button class="macro-config-btn">[ CONFIG ]</button>
+                    <div class="macro-delta-display">${cfg.deltaDb || '--'}</div>
                 </div>
-                <div class="desk-fader-core macro-fader-core" style="padding: 10px 6px; display:flex; flex-direction:column; gap:8px; flex: 1; justify-content: center;">
-                    <button class="desk-big-nudge btn-nudge-plus" style="height: 60px; font-size: 20px; font-weight: bold; background:#fff; color:#000; border-radius:6px; cursor:pointer;">+</button>
-                    <button class="desk-big-nudge btn-nudge-minus" style="height: 60px; font-size: 20px; font-weight: bold; background:#fff; color:#000; border-radius:6px; cursor:pointer;">-</button>
+                <div class="desk-fader-core macro-fader-core">
+                    <button class="desk-big-nudge btn-nudge-plus">+</button>
+                    <button class="desk-big-nudge btn-nudge-minus">-</button>
                 </div>
                 ${cfg.hasResetBtn ? `
-                    <div style="padding: 4px; text-align: center;">
-                        <button class="btn-zerar-sends" style="background:#dc2626; color:#fff; border:none; border-radius:4px; padding:4px 8px; font-size:10px; font-weight:bold; cursor:pointer;">[ ZERAR ]</button>
+                    <div class="macro-reset-container">
+                        <button class="btn-zerar-sends">[ ZERAR ]</button>
                     </div>
                 ` : ''}
                 <div class="desk-footer-zone">
@@ -145,7 +149,7 @@ class ChannelStrip {
             <div class="desk-label-wrapper">
                 <span class="desk-slot-left"></span>
                 <span class="desk-ch-num">${cfg.chNumber}</span>
-                <span class="desk-slot-right" title="${cfg.isLocked ? 'Canal Travado' : 'Travar Canal'}">${cfg.isLocked ? '🔒' : ''}</span>
+                <span class="desk-slot-right" title="${cfg.isLocked ? 'Canal Travado' : 'Travar Canal'}">🔒</span>
             </div>
 
             <!-- ZONA 2: Top Action / Solo -->
@@ -164,7 +168,7 @@ class ChannelStrip {
 
             <!-- ZONA 4: Middle Feature -->
             ${isMaster ? `
-                <div class="desk-master-meters-toggle" style="font-size: 9px; text-align: center; padding: 2px; color: #888;">
+                <div class="desk-master-meters-toggle">
                     <div>MEDIDORES</div>
                     <div>POST / PREEQ</div>
                 </div>
@@ -179,7 +183,7 @@ class ChannelStrip {
 
             <!-- ZONA 6: Fader Core (Régua, Fader Rail, VU Meter & Peak LED, Nudge -) -->
             <div class="desk-fader-core">
-                <div class="desk-fader-track-area" style="position: relative; display: flex; flex: 1; width: 100%; min-height: 220px; align-items: stretch; justify-content: center; margin: 2px 0;">
+                <div class="desk-fader-track-area">
 
                     <!-- Régua de dB Analógica Completa -->
                     <div class="desk-db-ruler ${isMaster ? 'master-ruler' : ''}">
@@ -209,32 +213,32 @@ class ChannelStrip {
                     </div>
 
                     <!-- Trilho do Fader (Protegido contra saltos de clique) -->
-                    <div class="desk-fader-rail" style="width: 22px; position: relative; display: flex; justify-content: center;">
-                        <div class="desk-rail-groove" style="width: 4px; height: 100%; background: #0a0a0a; border: 1px solid #222; border-radius: 2px;"></div>
-                        <div class="desk-fader-thumb" style="bottom: calc((100% - 38px) * ${Math.max(0, Math.min(1, (cfg.faderValue || 0) / 1023))});">
+                    <div class="desk-fader-rail">
+                        <div class="desk-rail-groove"></div>
+                        <div class="desk-fader-thumb" style="--fader-pos: ${((cfg.faderValue || 0) / 1023).toFixed(4)};">
                             <div class="thumb-center-line"></div>
                         </div>
                     </div>
 
                     <!-- VU Meter 60FPS + Peak LED Circular -->
-                    <div class="desk-meter-column" style="width: ${isPaired ? '16px' : '8px'}; display: flex; flex-direction: column; align-items: center; gap: 3px; margin-left: 3px;">
+                    <div class="desk-meter-column">
                         <!-- Peak LED Circular -->
-                        <div class="desk-peak-led-group" style="display: flex; gap: 2px;">
-                            <div class="desk-peak-led peak-l" style="width: 7px; height: 7px; border-radius: 50%; background: #252525; border: 1px solid #111;"></div>
-                            ${isPaired ? `<div class="desk-peak-led peak-r" style="width: 7px; height: 7px; border-radius: 50%; background: #252525; border: 1px solid #111;"></div>` : ''}
+                        <div class="desk-peak-led-group">
+                            <div class="desk-peak-led peak-l"></div>
+                            ${(isPaired || isMaster) ? `<div class="desk-peak-led peak-r"></div>` : ''}
                         </div>
 
                         <!-- Barra de Medidor VU Gradiente Físico -->
-                        <div class="desk-meter-bar-track" style="flex: 1; width: 100%; background: #0c0c0c; border: 1px solid #222; border-radius: 2px; display: flex; gap: 2px; padding: 1px; box-sizing: border-box; overflow: hidden;">
-                            <div class="desk-vu-fill vu-l" style="flex: 1; background: linear-gradient(0deg, #10b981 0%, #22c55e 60%, #f59e0b 80%, #ef4444 100%); border-radius: 1px; height: 0%; margin-top: auto; transition: height 0.05s linear;"></div>
-                            ${isPaired ? `<div class="desk-vu-fill vu-r" style="flex: 1; background: linear-gradient(0deg, #10b981 0%, #22c55e 60%, #f59e0b 80%, #ef4444 100%); border-radius: 1px; height: 0%; margin-top: auto; transition: height 0.05s linear;"></div>` : ''}
+                        <div class="desk-meter-bar-track">
+                            <div class="desk-vu-fill vu-l"></div>
+                            ${(isPaired || isMaster) ? `<div class="desk-vu-fill vu-r"></div>` : ''}
                         </div>
                     </div>
 
                 </div>
 
                 <!-- Nudge Inferior (-) -->
-                <div style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 2px 0;">
+                <div class="desk-nudge-bottom-container">
                     <button class="desk-nudge-btn desk-nudge-minus" title="Nudge - (Clique ou segure)">-</button>
                 </div>
             </div>
@@ -242,19 +246,36 @@ class ChannelStrip {
             <!-- ZONA 7: Footer Routing & Panpot -->
             <div class="desk-footer-zone">
                 ${isPaired ? `
-                    <div class="desk-dual-pan" style="padding: 1px 2px 2px 2px; font-size: 8.5px; font-family: monospace; color: #ccc;">
-                        <div class="pan-line" style="display:flex; justify-content:space-between;"><span>L:</span><span style="color:#a855f7;">${cfg.panL || -32}</span></div>
-                        <div class="pan-line" style="display:flex; justify-content:space-between;"><span>R:</span><span style="color:#a855f7;">${cfg.panR || 32}</span></div>
+                    <!-- Duplo Panpot Analógico Real Empilhado (L / R) -->
+                    <div class="desk-dual-pan-container">
+                        <!-- Trilha Pan L (Canal Ímpar) -->
+                        <div class="desk-pan-row">
+                            <span class="pan-ch-label">L</span>
+                            <div class="desk-pan-track desk-dual-track">
+                                <div class="desk-pan-center-line"></div>
+                                <div class="desk-pan-thumb" style="--pan-val: ${cfg.panL !== null && cfg.panL !== undefined ? cfg.panL : -32};"></div>
+                            </div>
+                            <span class="pan-val-label">${cfg.panL !== null && cfg.panL !== undefined ? cfg.panL : -32}</span>
+                        </div>
+                        <!-- Trilha Pan R (Canal Par) -->
+                        <div class="desk-pan-row">
+                            <span class="pan-ch-label">R</span>
+                            <div class="desk-pan-track desk-dual-track">
+                                <div class="desk-pan-center-line"></div>
+                                <div class="desk-pan-thumb" style="--pan-val: ${cfg.panR !== null && cfg.panR !== undefined ? cfg.panR : 32};"></div>
+                            </div>
+                            <span class="pan-val-label">${cfg.panR !== null && cfg.panR !== undefined ? cfg.panR : 32}</span>
+                        </div>
                     </div>
                 ` : `
                     <!-- Panpot Analógico L-C-R com Linha Central -->
-                    <div class="desk-pan-container" style="padding: 2px 2px 3px 2px; display: flex; flex-direction: column; align-items: center; gap: 1px;">
-                        <div style="display: flex; justify-content: space-between; width: 100%; font-size: 7px; color: #666; font-weight: 700; padding: 0 2px; box-sizing: border-box;">
+                    <div class="desk-pan-container">
+                        <div class="desk-pan-labels">
                             <span>L</span><span>C</span><span>R</span>
                         </div>
-                        <div class="desk-pan-track" style="width: 100%; height: 6px; background: #1a1a1a; border: 1px solid #333; border-radius: 3px; position: relative; display: flex; align-items: center; justify-content: center;">
-                            <div style="width: 1px; height: 100%; background: #444; position: absolute;"></div>
-                            <div class="desk-pan-thumb" style="width: 8px; height: 8px; border-radius: 50%; background: #a855f7; border: 1px solid #fff; position: absolute; left: calc(50% + ${((cfg.panL || 0) / 32) * 40}% - 4px); box-shadow: 0 0 4px rgba(168,85,247,0.6);"></div>
+                        <div class="desk-pan-track">
+                            <div class="desk-pan-center-line"></div>
+                            <div class="desk-pan-thumb" style="--pan-val: ${cfg.panL || 0};"></div>
                         </div>
                     </div>
                 `}
@@ -265,8 +286,8 @@ class ChannelStrip {
 
             <!-- Overlay de Bloqueio se Travado (Locked) -->
             ${cfg.isLocked ? `
-                <div class="desk-lock-overlay" style="position: absolute; inset: 0; background: rgba(255, 0, 0, 0.18); border: 1px solid #ff4444; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 8px; z-index: 50; pointer-events: auto;">
-                    <div class="lock-badge-btn" style="background: #ff4444; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; box-shadow: 0 0 10px rgba(255,68,68,0.7);" title="Clique para destravar">🔒</div>
+                <div class="desk-lock-overlay">
+                    <div class="lock-badge-btn" title="Clique para destravar">🔒</div>
                 </div>
             ` : ''}
         `;
@@ -284,23 +305,23 @@ class ChannelStrip {
 
         if (isMacro) {
             return `
-                <div class="mob-card-header" style="text-align: center; font-weight: 800; font-size: 13px; color: #fff; padding: 6px;">
+                <div class="mob-card-header">
                     <span class="mob-ch-num">${cfg.chNumber}</span>
                 </div>
-                <div class="mob-display-name" style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 4px; text-align: center; color: #00ff00; font-weight: 700; font-size: 11px; margin: 0 6px;">
+                <div class="mob-display-name">
                     <span>${cfg.name}</span>
                 </div>
-                <div style="padding: 4px; text-align: center;">
-                    <button style="background:#6b21a8; color:#fff; border:none; border-radius:4px; padding:4px 8px; font-size:11px; font-weight:bold;">[ CONFIG ]</button>
-                    <div class="mob-macro-delta-display macro-delta-display" style="background:#000; color:#00ff00; font-family:monospace; font-size:14px; margin-top:6px; padding:4px; border-radius:4px;">${cfg.deltaDb || '--'}</div>
+                <div class="mob-macro-feature-zone">
+                    <button class="macro-config-btn">[ CONFIG ]</button>
+                    <div class="mob-macro-delta-display macro-delta-display">${cfg.deltaDb || '--'}</div>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px 6px; flex: 1; justify-content: center;">
-                    <button class="mob-big-nudge btn-nudge-plus" style="height: 70px; font-size: 24px; font-weight: bold; background: #fff; color: #000; border-radius: 8px; border: none; cursor: pointer;">+</button>
-                    <button class="mob-big-nudge btn-nudge-minus" style="height: 70px; font-size: 24px; font-weight: bold; background: #fff; color: #000; border-radius: 8px; border: none; cursor: pointer;">-</button>
+                <div class="mob-macro-fader-core">
+                    <button class="mob-big-nudge btn-nudge-plus">+</button>
+                    <button class="mob-big-nudge btn-nudge-minus">-</button>
                 </div>
                 ${cfg.hasResetBtn ? `
-                    <div style="padding: 6px; text-align: center;">
-                        <button style="background: #dc2626; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: bold;">[ ZERAR ]</button>
+                    <div class="mob-macro-reset-container">
+                        <button class="mob-btn-zerar">[ ZERAR ]</button>
                     </div>
                 ` : ''}
             `;
@@ -308,45 +329,45 @@ class ChannelStrip {
 
         return `
             <!-- Cortina de Medidor VU de Fundo Integral (100% da área do card) -->
-            <div class="mob-meter-curtain-container" style="position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; border-radius: 9px; display: flex;">
-                <div class="mob-meter-curtain vu-l" style="flex: 1; height: 0%; margin-top: auto; background: linear-gradient(180deg, #ff0000 0%, #ffbb00 25%, #22c55e 60%, #10b981 100%); opacity: 0.35; transition: height 0.05s linear;"></div>
-                ${isPaired ? `<div class="mob-meter-curtain vu-r" style="flex: 1; height: 0%; margin-top: auto; background: linear-gradient(180deg, #ff0000 0%, #ffbb00 25%, #22c55e 60%, #10b981 100%); opacity: 0.35; transition: height 0.05s linear; border-left: 1px solid rgba(255,255,255,0.1);"></div>` : ''}
+            <div class="mob-meter-curtain-container">
+                <div class="mob-meter-curtain vu-l"></div>
+                ${(isPaired || isMaster) ? `<div class="mob-meter-curtain vu-r"></div>` : ''}
             </div>
 
             <!-- Conteúdo dos Controles sobre a Cortina -->
-            <div class="mob-card-content" style="position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; justify-content: space-between; padding: 8px 4px; box-sizing: border-box;">
+            <div class="mob-card-content">
 
                 <!-- Zona 1: Header Centralizado -->
-                <div class="mob-card-header" style="text-align: center; font-weight: 800; font-size: 13px; color: #fff;">
+                <div class="mob-card-header">
                     ${cfg.chNumber}
                 </div>
 
                 <!-- Zona 3: Display do Canal -->
-                <div class="mob-display-name" style="background: #000; border: 1px solid #333; border-radius: 4px; padding: 4px; text-align: center; color: #00ff00; font-weight: 700; font-size: 11px;">
+                <div class="mob-display-name">
                     ${cfg.name}
                 </div>
 
                 <!-- Zona 2: Top Action / Solo / Pre -->
-                <div class="mob-top-action" style="text-align: center;">
+                <div class="mob-top-action">
                     ${cfg.prePost ? `
-                        <button class="mob-btn-pre" style="background: #6b21a8; color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: bold; width: 80%;">${cfg.prePost}</button>
+                        <button class="mob-btn-pre">${cfg.prePost}</button>
                     ` : `
-                        <button class="mob-btn-solo ${cfg.soloState ? 'active' : ''}" style="background: #222; color: #eab308; border: 1px solid #444; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: bold; width: 80%;">SOLO</button>
+                        <button class="mob-btn-solo ${cfg.soloState ? 'active' : ''}">SOLO</button>
                     `}
                 </div>
 
                 <!-- Zona 5: Botão ON (Mute) -->
-                <div class="mob-primary-action" style="text-align: center;">
-                    <button class="mob-btn-on ${cfg.onState ? 'active' : ''}" style="background: ${cfg.onState ? '#f59e0b' : '#333'}; color: #000; border: none; border-radius: 4px; padding: 6px 12px; font-size: 11px; font-weight: 800; width: 80%;">ON</button>
+                <div class="mob-primary-action">
+                    <button class="mob-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
                 </div>
 
                 <!-- Nudge Superior (+) -->
-                <div style="text-align: center; display: flex; justify-content: center; align-items: center; padding: 2px 0;">
+                <div class="mob-nudge-container">
                     <button class="mob-nudge-btn mob-nudge-plus" title="Nudge + (Toque ou segure)">+</button>
                 </div>
 
                 <!-- Fader Rail Central (Sem salto ao toque direto) -->
-                <div class="mob-fader-track-area" style="position: relative; height: 160px; display: flex; justify-content: center; align-items: stretch; margin: 4px 0;">
+                <div class="mob-fader-track-area">
                     <!-- Régua Simplificada Mobile (0, -10, -30) -->
                     <div class="mob-db-ruler ${isMaster ? 'master-ruler' : ''}">
                         <span class="mark-0">0 ───</span>
@@ -354,19 +375,19 @@ class ChannelStrip {
                         <span class="mark-m30">-30 ───</span>
                     </div>
 
-                    <div class="mob-fader-groove" style="width: 6px; height: 100%; background: #111; border-radius: 3px;"></div>
-                    <div class="mob-fader-thumb" style="bottom: calc((100% - 40px) * ${Math.max(0, Math.min(1, (cfg.faderValue || 0) / 1023))});">
+                    <div class="mob-fader-groove"></div>
+                    <div class="mob-fader-thumb" style="--fader-pos: ${((cfg.faderValue || 0) / 1023).toFixed(4)};">
                         <div class="thumb-center-line"></div>
                     </div>
                 </div>
 
                 <!-- Nudge Inferior (-) -->
-                <div style="text-align: center; display: flex; justify-content: center; align-items: center; padding: 2px 0;">
+                <div class="mob-nudge-container">
                     <button class="mob-nudge-btn mob-nudge-minus" title="Nudge - (Toque ou segure)">-</button>
                 </div>
 
                 <!-- Zona 6: Leitura Numérica Neon em dB -->
-                <div class="mob-db-readout" style="text-align: center; font-size: 12px; font-weight: 800; color: #00e5ff; font-family: monospace;">
+                <div class="mob-db-readout">
                     ${cfg.dbValue || '-17.50 dB'}
                 </div>
 
@@ -374,8 +395,8 @@ class ChannelStrip {
 
             <!-- Overlay de Travamento Mobile -->
             ${cfg.isLocked ? `
-                <div class="mob-lock-overlay" style="position: absolute; inset: 0; background: rgba(255, 0, 0, 0.18); border: 1px solid #ff4444; border-radius: 9px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 8px; z-index: 50;">
-                    <div class="lock-badge-btn" style="background: #ff4444; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; box-shadow: 0 0 10px rgba(255,68,68,0.7);" title="Toque para destravar">🔒</div>
+                <div class="mob-lock-overlay">
+                    <div class="lock-badge-btn" title="Toque para destravar">🔒</div>
                 </div>
             ` : ''}
         `;
@@ -403,6 +424,8 @@ class ChannelStrip {
             faderThumb: root.querySelector('.desk-fader-thumb, .mob-fader-thumb'),
             dbReadout: root.querySelector('.desk-db-readout, .mob-db-readout'),
             deltaDisplay: root.querySelector('.macro-delta-display'),
+            patchArea: root.querySelector('.desk-patch-area'),
+            patchText: root.querySelector('.desk-patch-area .marquee-text'),
             vuL: root.querySelector('.vu-l'),
             vuR: root.querySelector('.vu-r'),
             peakL: root.querySelector('.peak-l'),
@@ -656,9 +679,7 @@ class ChannelStrip {
         const normalized = Math.max(0, Math.min(1, val / 1023));
 
         if (this.elements.faderThumb) {
-            const isDesk = this.config.layout === 'desktop';
-            const thumbH = isDesk ? 38 : 40;
-            this.elements.faderThumb.style.bottom = `calc((100% - ${thumbH}px) * ${normalized})`;
+            this.elements.faderThumb.style.setProperty('--fader-pos', normalized.toFixed(4));
         }
 
         if (this.elements.dbReadout) {
@@ -673,6 +694,28 @@ class ChannelStrip {
     }
 
     /**
+     * Verifica e ativa animação de marquee caso o texto de patch extrapole a largura disponível
+     * @private
+     */
+    _checkMarquee() {
+        if (!this.elements.patchArea || !this.elements.patchText) return;
+        const area = this.elements.patchArea;
+        const text = this.elements.patchText;
+
+        text.classList.remove('is-overflowing');
+        text.style.removeProperty('--marquee-dist');
+
+        const scrollW = text.scrollWidth;
+        const clientW = area.clientWidth;
+
+        if (scrollW > clientW && clientW > 0) {
+            const overflowPx = scrollW - clientW + 8;
+            text.style.setProperty('--marquee-dist', `-${overflowPx}px`);
+            text.classList.add('is-overflowing');
+        }
+    }
+
+    /**
      * Define o estado do botão ON
      * @param {boolean} state
      */
@@ -681,9 +724,6 @@ class ChannelStrip {
         if (this.elements.onBtn) {
             this.elements.onBtn.classList.toggle('active', this.config.onState);
             this.elements.onBtn.classList.toggle('on-active', this.config.onState);
-            if (this.config.layout === 'mobile') {
-                this.elements.onBtn.style.background = this.config.onState ? '#f59e0b' : '#333';
-            }
         }
     }
 
@@ -700,6 +740,18 @@ class ChannelStrip {
     }
 
     /**
+     * Atualiza o texto do badge de Patch I/O e recalcula o marquee
+     * @param {string} patchText
+     */
+    setPatch(patchText) {
+        this.config.patch = patchText;
+        if (this.elements.patchText) {
+            this.elements.patchText.innerText = patchText || '';
+            this._checkMarquee();
+        }
+    }
+
+    /**
      * Atualiza níveis do medidor VU e dispara Peak Hold quando >= 98%
      * @param {number} levelL 0 a 100
      * @param {number} levelR 0 a 100
@@ -712,11 +764,9 @@ class ChannelStrip {
         if (this.config.layout === 'desktop') {
             if (this.elements.vuL) {
                 this.elements.vuL.style.height = `${pL}%`;
-                this.elements.vuL.style.background = pL > 85 ? '#ef4444' : (pL > 60 ? '#f59e0b' : '#10b981');
             }
             if (this.elements.vuR) {
                 this.elements.vuR.style.height = `${pR}%`;
-                this.elements.vuR.style.background = pR > 85 ? '#ef4444' : (pR > 60 ? '#f59e0b' : '#10b981');
             }
             if (isPeak) {
                 this._triggerDesktopPeak();
@@ -739,19 +789,13 @@ class ChannelStrip {
         const peakL = this.elements.peakL;
         const peakR = this.elements.peakR;
 
-        if (peakL) {
-            peakL.style.background = '#ff0000';
-            peakL.style.boxShadow = '0 0 8px #ff4444';
-        }
-        if (peakR) {
-            peakR.style.background = '#ff0000';
-            peakR.style.boxShadow = '0 0 8px #ff4444';
-        }
+        if (peakL) peakL.classList.add('active');
+        if (peakR) peakR.classList.add('active');
 
         if (this.peakHoldTimerL) clearTimeout(this.peakHoldTimerL);
         this.peakHoldTimerL = setTimeout(() => {
-            if (peakL) { peakL.style.background = '#252525'; peakL.style.boxShadow = 'none'; }
-            if (peakR) { peakR.style.background = '#252525'; peakR.style.boxShadow = 'none'; }
+            if (peakL) peakL.classList.remove('active');
+            if (peakR) peakR.classList.remove('active');
         }, 1000);
     }
 

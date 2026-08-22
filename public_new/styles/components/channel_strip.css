@@ -115,6 +115,8 @@
 .channel-strip-wrapper.desk-strip.paired-channel {
     width: 108px;
     min-width: 108px;
+    border: 1px solid #10b981;
+    box-shadow: inset 0 0 6px rgba(16, 185, 129, 0.15);
 }
 
 /* Identidades Cromáticas Desktop (Bordas de Destaque Superior/Inferior, Header Navy Escuro & Footer Patch Full Bleed) */
@@ -245,6 +247,18 @@
     border: 1px solid #10b981;
 }
 
+/* Master Mobile (Fundo Vinho / Vermelho Escuro) */
+.channel-strip-wrapper.mob-strip.is-master,
+.channel-strip-wrapper.mob-strip.band-wine {
+    background: #2a0a0f !important;
+    border-color: #5c0f1c;
+}
+
+.channel-strip-wrapper.mob-strip.is-master .mob-card-header,
+.channel-strip-wrapper.mob-strip.band-wine .mob-card-header {
+    color: #ff6b81;
+}
+
 /* Cortina de Medidor VU de Fundo Integral no Mobile */
 .mob-meter-curtain-container {
     position: absolute !important;
@@ -265,6 +279,10 @@
     background: linear-gradient(180deg, #ff0000 0%, #ffbb00 25%, #22c55e 60%, #10b981 100%);
     opacity: 0.35;
     transition: height 0.05s linear;
+}
+
+.mob-meter-curtain + .mob-meter-curtain {
+    border-left: 1px solid rgba(0, 0, 0, 0.45);
 }
 
 /* Peak Glow Mobile */
@@ -295,7 +313,15 @@
     border-top: 2.5px solid #00e5ff;
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
-.desk-slot-left,
+.desk-slot-left {
+    width: 14px;
+    min-width: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    user-select: none;
+}
 .desk-slot-right {
     width: 14px;
     min-width: 14px;
@@ -304,6 +330,13 @@
     justify-content: center;
     font-size: 10px;
     user-select: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.desk-label-wrapper:hover .desk-slot-right,
+.channel-strip-wrapper.is-locked .desk-slot-right {
+    opacity: 1;
 }
 .desk-ch-num {
     flex: 1;
@@ -568,7 +601,7 @@
     height: 38px !important;
     background: linear-gradient(180deg, #e8e8e8 0%, #c4c4c4 50%, #999999 100%) !important;
     border: 1.5px solid #111 !important;
-    border-radius: 4px !important;
+    border-radius: var(--strip-btn-on-radius, 4px) !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
     cursor: grab;
     touch-action: none;
@@ -577,6 +610,7 @@
     justify-content: center;
     position: absolute;
     box-sizing: border-box;
+    bottom: calc((100% - 38px) * var(--fader-pos, 0));
 }
 .desk-fader-thumb .thumb-center-line {
     width: 100%;
@@ -591,7 +625,7 @@
     height: 40px !important;
     background: linear-gradient(180deg, #e8e8e8 0%, #c4c4c4 50%, #999999 100%) !important;
     border: 2px solid #111 !important;
-    border-radius: 6px !important;
+    border-radius: var(--strip-card-radius, 6px) !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
     cursor: grab;
     touch-action: none;
@@ -600,6 +634,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    bottom: calc((100% - 40px) * var(--fader-pos, 0));
 }
 .mob-fader-thumb .thumb-center-line {
     width: 100%;
@@ -631,7 +666,7 @@
     font-size: 9px;
     font-weight: 700;
     font-family: var(--strip-patch-font-family, Consolas, Menlo, "Courier New", monospace);
-    padding: 3px 2px;
+    padding: 3px 4px;
     text-align: center;
     overflow: hidden;
     white-space: nowrap;
@@ -639,6 +674,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 .desk-patch-area .marquee-text {
     display: inline-block;
@@ -646,6 +682,26 @@
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+/* Efeito Marquee Deslizante Direto se Extrapolar a Largura */
+.desk-patch-area .marquee-text.is-overflowing {
+    overflow: visible;
+    width: auto;
+    max-width: none;
+    text-align: left;
+    animation: patch-marquee 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes patch-marquee {
+    0%, 20% {
+        transform: translateX(0);
+    }
+    80%, 100% {
+        transform: translateX(var(--marquee-dist, -35px));
+    }
 }
 
 /* =========================================================================
@@ -689,26 +745,429 @@
 }
 
 /* =========================================================================
-   6. CANAL DESABILITADO (FIXED / DISABLED)
+   7. CLASSES MODULARES ESPECÍFICAS PARA ZONAS, MACROS, VU, FADER & FOOTER
    ========================================================================= */
 
-.channel-strip-wrapper.is-disabled {
-    opacity: 0.75;
+/* Middle Feature & Macros */
+.desk-macro-feature-zone {
+    padding: 4px;
+    text-align: center;
 }
-.channel-strip-wrapper.is-disabled .desk-fader-thumb,
-.channel-strip-wrapper.is-disabled .mob-fader-thumb,
-.channel-strip-wrapper.is-disabled .desk-nudge-btn,
-.channel-strip-wrapper.is-disabled .mob-nudge-btn,
-.channel-strip-wrapper.is-disabled .desk-btn-solo,
-.channel-strip-wrapper.is-disabled .mob-btn-solo {
-    opacity: 0.35 !important;
-    pointer-events: none !important;
-    filter: grayscale(100%);
+.macro-config-btn {
+    background: #6b21a8;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s ease;
 }
-/* O botão ON permanece 100% funcional no modo disabled */
-.channel-strip-wrapper.is-disabled .desk-btn-on,
-.channel-strip-wrapper.is-disabled .mob-btn-on {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    filter: none !important;
+.macro-config-btn:hover {
+    background: #7e22ce;
 }
+.macro-delta-display {
+    background: #000;
+    color: #00ff00;
+    font-family: monospace;
+    font-size: 12px;
+    margin-top: 4px;
+    padding: 2px;
+    border-radius: 3px;
+    border: 1px solid #222;
+}
+.desk-fader-core.macro-fader-core {
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+}
+.desk-big-nudge {
+    height: 60px;
+    font-size: 20px;
+    font-weight: bold;
+    background: #fff;
+    color: #000;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.1s ease, transform 0.05s ease;
+}
+.desk-big-nudge:hover {
+    background: #e2e8f0;
+}
+.desk-big-nudge:active {
+    background: #cbd5e1;
+    transform: scale(0.98);
+}
+.macro-reset-container {
+    padding: 4px;
+    text-align: center;
+}
+.btn-zerar-sends {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.btn-zerar-sends:hover {
+    background: #ef4444;
+}
+
+/* Master Meters Indicator Zone */
+.desk-master-meters-toggle {
+    font-size: 9px;
+    text-align: center;
+    padding: 2px;
+    color: #888;
+    font-family: monospace;
+    font-weight: 700;
+}
+
+/* Fader Core & Track Area */
+.desk-fader-track-area {
+    position: relative;
+    display: flex;
+    flex: 1;
+    width: 100%;
+    min-height: 220px;
+    align-items: stretch;
+    justify-content: center;
+    margin: 2px 0;
+}
+.desk-fader-rail {
+    width: 22px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+.desk-rail-groove {
+    width: 4px;
+    height: 100%;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 2px;
+}
+
+/* Desktop VU Column & Peak LEDs */
+.desk-meter-column {
+    width: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-left: 3px;
+}
+.channel-strip-wrapper.paired-channel .desk-meter-column,
+.channel-strip-wrapper.is-master .desk-meter-column {
+    width: 16px;
+}
+.desk-peak-led-group {
+    display: flex;
+    gap: 2px;
+}
+.desk-peak-led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #252525;
+    border: 1px solid #111;
+    transition: background 0.1s ease, box-shadow 0.1s ease;
+}
+.desk-peak-led.active {
+    background: var(--strip-peak-led-color, #ff0000) !important;
+    box-shadow: 0 0 8px var(--strip-peak-led-glow, #ff4444) !important;
+}
+.desk-meter-bar-track {
+    flex: 1;
+    width: 100%;
+    background: #0c0c0c;
+    border: 1px solid #222;
+    border-radius: 2px;
+    display: flex;
+    gap: 2px;
+    padding: 1px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.desk-vu-fill {
+    flex: 1;
+    background: linear-gradient(0deg, #10b981 0%, #22c55e 60%, #f59e0b 80%, #ef4444 100%);
+    border-radius: 1px;
+    height: 0%;
+    margin-top: auto;
+    transition: height 0.05s linear;
+}
+.desk-nudge-bottom-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 2px 0;
+}
+
+/* Panpot Desktop */
+.desk-dual-pan-container {
+    padding: 2px 3px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.desk-pan-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+}
+.desk-pan-row .pan-ch-label {
+    font-size: 7px;
+    color: #888;
+    font-weight: 800;
+    width: 8px;
+    text-align: center;
+}
+.desk-pan-track.desk-dual-track {
+    flex: 1;
+    height: 5px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 2.5px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.desk-pan-track.desk-dual-track .desk-pan-center-line {
+    width: 1px;
+    height: 100%;
+    background: #444;
+    position: absolute;
+    left: 50%;
+}
+.desk-pan-track.desk-dual-track .desk-pan-thumb {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--strip-pan-thumb-color, #a855f7);
+    border: 1px solid #fff;
+    position: absolute;
+    box-shadow: 0 0 3px rgba(168,85,247,0.8);
+    left: calc(50% + (var(--pan-val, 0) / 32) * 42% - 3.5px);
+}
+.desk-pan-row .pan-val-label {
+    font-size: 7.5px;
+    color: var(--strip-pan-thumb-color, #a855f7);
+    font-family: monospace;
+    font-weight: 700;
+    width: 16px;
+    text-align: right;
+}
+
+.desk-pan-container {
+    padding: 2px 2px 3px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+.desk-pan-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 7px;
+    color: #666;
+    font-weight: 700;
+    padding: 0 2px;
+    box-sizing: border-box;
+}
+.desk-pan-track {
+    width: 100%;
+    height: 6px;
+    background: var(--strip-pan-track-bg, #1a1a1a);
+    border: 1px solid #333;
+    border-radius: 3px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.desk-pan-track .desk-pan-center-line {
+    width: 1px;
+    height: 100%;
+    background: var(--strip-pan-center-color, #444);
+    position: absolute;
+    left: 50%;
+}
+.desk-pan-track .desk-pan-thumb {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--strip-pan-thumb-color, #a855f7);
+    border: 1px solid #fff;
+    position: absolute;
+    box-shadow: 0 0 4px rgba(168,85,247,0.6);
+    left: calc(50% + (var(--pan-val, 0) / 32) * 40% - 4px);
+}
+
+/* =========================================================================
+   8. CLASSES MODULARES ESPECÍFICAS MOBILE
+   ========================================================================= */
+
+.mob-card-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    padding: 8px 4px;
+    box-sizing: border-box;
+}
+.mob-card-header {
+    text-align: center;
+    font-weight: 800;
+    font-size: 13px;
+    color: #fff;
+    padding: 2px 0;
+}
+.mob-display-name {
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 4px;
+    text-align: center;
+    color: #00ff00;
+    font-weight: 700;
+    font-size: 11px;
+    margin: 0 2px;
+}
+.mob-top-action {
+    text-align: center;
+}
+.mob-btn-pre {
+    background: #6b21a8;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 80%;
+    cursor: pointer;
+}
+.mob-primary-action {
+    text-align: center;
+}
+.mob-btn-on {
+    background: #333;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 800;
+    width: 80%;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.mob-btn-on.active,
+.mob-btn-on.on-active {
+    background: #f59e0b !important;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.45);
+}
+.mob-nudge-container {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 0;
+}
+.mob-fader-track-area {
+    position: relative;
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    margin: 4px 0;
+}
+.mob-fader-groove {
+    width: 6px;
+    height: 100%;
+    background: #111;
+    border-radius: 3px;
+    border: 1px solid #222;
+}
+.mob-db-readout {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: #00e5ff;
+    font-family: monospace;
+}
+
+/* Mobile Macro Variations */
+.mob-macro-feature-zone {
+    padding: 4px;
+    text-align: center;
+}
+.mob-macro-fader-core {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 6px;
+    flex: 1;
+    justify-content: center;
+}
+.mob-big-nudge {
+    height: 70px;
+    font-size: 24px;
+    font-weight: bold;
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.1s ease, transform 0.05s ease;
+}
+.mob-big-nudge:hover {
+    background: #e2e8f0;
+}
+.mob-big-nudge:active {
+    background: #cbd5e1;
+    transform: scale(0.98);
+}
+.mob-macro-reset-container {
+    padding: 6px;
+    text-align: center;
+}
+.mob-btn-zerar {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+}
+

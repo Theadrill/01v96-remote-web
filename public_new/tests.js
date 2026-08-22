@@ -259,8 +259,9 @@ const MOBILE_VARIATIONS = [
         id: 'mob_master',
         title: '3. Master LR Stereo',
         type: 'master',
-        chNumber: 'STEREO',
+        chNumber: 'MASTER',
         name: 'ST',
+        colorBand: 'wine',
         faderValue: 1023,
         dbValue: '0.00 dB',
         onState: true,
@@ -462,14 +463,26 @@ function applyMeterLevelsToAll(p) {
     // 1. Atualiza instâncias reais Desktop
     if (window.wbState.instances.desktop) {
         window.wbState.instances.desktop.forEach(strip => {
-            strip.setMeterLevel(p, p);
+            if (strip.config.isPaired || strip.config.isMaster || strip.config.type === 'master') {
+                // Em canais pareados ou Master Stereo, simula sinal estéreo ligeiramente diferenciado para demonstrar duplo VU
+                const pR = Math.max(0, Math.min(100, Math.round(p * 0.82)));
+                strip.setMeterLevel(p, pR);
+            } else {
+                strip.setMeterLevel(p, p);
+            }
         });
     }
 
     // 2. Atualiza instâncias reais Mobile
     if (window.wbState.instances.mobile) {
         window.wbState.instances.mobile.forEach(strip => {
-            strip.setMeterLevel(p, p);
+            if (strip.config.isPaired || strip.config.isMaster || strip.config.type === 'master') {
+                // Cortina dual mobile (L e R independentes)
+                const pR = Math.max(0, Math.min(100, Math.round(p * 0.82)));
+                strip.setMeterLevel(p, pR);
+            } else {
+                strip.setMeterLevel(p, p);
+            }
         });
     }
 }

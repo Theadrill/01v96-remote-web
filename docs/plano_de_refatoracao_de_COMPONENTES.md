@@ -278,7 +278,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 └──────────────────────────────────────────────┘  ═════════════════════════════════════════
 ```
 
-#### 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO`)
+#### 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO`) (CONCLUÍDO ✅)
 ![Canal Pareado](imgs/mobile_paired_channel.png)
 
 * **Controle de Volume e Fader Rail (Segurança Física):**
@@ -312,7 +312,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 └──────────────────────────────────────────────┘  ═════════════════════════════════════════
 ```
 
-#### 3. Master LR Stereo (`STEREO` / `ST`)
+#### 3. Master LR Stereo (`MASTER` / `ST`)
 ![Master Stereo](imgs/mobile_master_stereo.png)
 
 * **Controle de Volume e Fader Rail (Segurança Física):**
@@ -324,7 +324,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 
 ```text
 ┌──────────────────────────────────────────────┐  <-- Fundo Vinho / Vermelho Escuro
-│                    STEREO                    │  <-- Zona 1 (Header Centralizado)
+│                    MASTER                    │  <-- Zona 1 (Header Centralizado)
 ├──────────────────────────────────────────────┤  ═════════════════════════════════════════
 │                    [ ST ]                    │  ▲ [TOPO - 98% a 100%]: VERMELHO (PEAK)
 ├──────────────────────────────────────────────┤  │
@@ -609,7 +609,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 
 ---
 
-#### 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO`)
+#### 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO`) (CONCLUÍDO ✅)
 ![Input Pareado Desktop](imgs/desktop_input_paired.png)
 
 * **Moldura:** Contorno verde neon em todo o card duplo.
@@ -1146,7 +1146,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 > *Nota: A integração com variáveis de tema YAML (`--strip-*`) e o encolhimento progressivo do `style.css` legado ocorrem continuamente e em tempo real a cada variação implementada.*
 - [ ] **Variações Desktop (Validação no Workbench `tests.html`):**
   - [x] 1. Canal de Input Mono (`CH 1-16` Azul / `CH 17-32` Esverdeado) (CONCLUÍDO ✅)
-  - [ ] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde, duplo VU meter, duplo pan L/R empilhado, marquee)
+  - [x] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde, duplo VU meter, duplo pan L/R empilhado, marquee) (CONCLUÍDO ✅)
   - [ ] 3. Master Fader Stereo (`MASTER` / `ST` - fundo vinho, duplo VU amplo, painel exclusivo de medidores POST/PREEQ)
   - [ ] 4. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão roxo CONFIG, visor Delta dB, Big Nudges)
   - [ ] 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2` - header âmbar, saída física dupla OMNI + ADAT com marquee)
@@ -1158,8 +1158,8 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - [ ] 11. Canal Desktop DESABILITADO / DISABLED (`AUX 1` FIXED - acinzentado/desaturado, fader travado, botão ON 100% ativo e funcional)
 - [ ] **Variações Mobile (Validação no Workbench `tests.html`):**
   - [x] 1. Canal Mono Normal (`CH 13` / `SURDAO` - cortina espectral 100%, peak glow, gap e agrupamento 8 em 8) (CONCLUÍDO ✅)
-  - [ ] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde neon, cortina VU dual dividida L/R)
-  - [ ] 3. Master LR Stereo (`STEREO` / `ST` - fundo vinho/vermelho escuro, cortina integral)
+  - [x] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde neon, cortina VU dual dividida L/R) (CONCLUÍDO ✅)
+  - [ ] 3. Master LR Stereo (`MASTER` / `ST` - fundo vinho/vermelho escuro, cortina integral)
   - [ ] 4. Envio Auxiliar / Mix (`CH 5` / `BAIXO` - Sends on Faders, badge PRE/POST, cortina atenuada em -∞ dB)
   - [ ] 5. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão CONFIG, Delta dB, Big Nudges)
   - [ ] 6. Volume Geral de AUX (`AUX` / `AUX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR)
