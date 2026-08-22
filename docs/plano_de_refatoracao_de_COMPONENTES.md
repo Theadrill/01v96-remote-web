@@ -1132,37 +1132,83 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - **Seletor Dinâmico de Temas:** Validação instantânea de variáveis CSS de cores/temas.
   - **Console de Eventos em Tempo Real:** Painel de log para auditar eventos emitidos (bloqueio de clique no trilho, arraste de thumb, roda do mouse, mute ON, cadeado).
 
-### FASE 5 — Construção da Classe e Estilos do `ChannelStrip` Universal
-- [ ] Implementar `public_new/styles/components/channel_strip.css` isolando os estilos dos faders desktop/mobile, medidores WASM, nudges e macros.
-- [ ] Construir a classe `ChannelStrip` modular em `public_new/modules/components/channel_strip.js` (mantendo as pontes legadas para zero impacto).
-- [ ] Implementar as 7 zonas modulares (`Header`, `TopAction`, `Display`, `MiddleFeature`, `PrimaryButton`, `FaderCore`, `FooterRouting`).
-- [ ] Implementar suporte nativo a `mode: 'channel'` e `mode: 'macro'` (Big Nudges, Delta dB, botões CONFIG e ZERAR).
-- [ ] Implementar cache $O(1)$ de nós DOM em `this.elements`.
-- [ ] Implementar física de fader, retenção e auto-repeat acelerado em nudges.
-- [ ] Validar e ajustar cada variação visualmente em tempo real através do `public_new/tests.html`.
-- [ ] Integrar conexão direta com `MeterBus` / WASM.
+### FASE 5 — Construção da Classe e Estilos Base do `ChannelStrip` Universal (CONCLUÍDA ✅)
+- [x] Implementar `public_new/styles/components/channel_strip.css` isolando os estilos dos faders desktop/mobile, medidores WASM, nudges e macros.
+- [x] Construir a classe `ChannelStrip` modular em `public_new/modules/components/channel_strip.js` (mantendo as pontes legadas para zero impacto).
+- [x] Implementar as 7 zonas modulares (`Header`, `TopAction`, `Display`, `MiddleFeature`, `PrimaryButton`, `FaderCore`, `FooterRouting`).
+- [x] Implementar suporte nativo a `mode: 'channel'` e `mode: 'macro'` (Big Nudges, Delta dB, botões CONFIG e ZERAR).
+- [x] Implementar cache $O(1)$ de nós DOM em `this.elements`.
+- [x] Implementar física de fader, retenção e auto-repeat acelerado em nudges.
+- [x] Validar e ajustar cada variação visualmente em tempo real através do `public_new/tests.html`.
+- [x] Integrar conexão direta com `MeterBus` / WASM.
 
-### FASE 6 — Migração Piloto: Tela de Auxiliares (`screens/auxs_sends.js`)
-- [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip` com `type: 'aux_send'`.
-- [ ] Remover do arquivo as funções legadas de faders e strings HTML duplicadas.
-- [ ] Validar modos MIX e CANAL com Pre/Post e modo FIXED.
+### FASE 6 — Implementação e Validação Visual de Todas as Variações do Channel Strip (Desktop & Mobile)
+> *Nota: A integração com variáveis de tema YAML (`--strip-*`) e o encolhimento progressivo do `style.css` legado ocorrem continuamente e em tempo real a cada variação implementada.*
+- [ ] **Variações Desktop (Validação no Workbench `tests.html`):**
+  - [x] 1. Canal de Input Mono (`CH 1-16` Azul / `CH 17-32` Esverdeado) (CONCLUÍDO ✅)
+  - [ ] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde, duplo VU meter, duplo pan L/R empilhado, marquee)
+  - [ ] 3. Master Fader Stereo (`MASTER` / `ST` - fundo vinho, duplo VU amplo, painel exclusivo de medidores POST/PREEQ)
+  - [ ] 4. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão roxo CONFIG, visor Delta dB, Big Nudges)
+  - [ ] 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2` - header âmbar, saída física dupla OMNI + ADAT com marquee)
+  - [ ] 6. Barramento BUS Pareado (`BUS 1 + 2` / `VHIGH` - header ciano com cadeado, correção estéreo de duplo VU e duplo Peak)
+  - [ ] 7. Canais ST IN (`ST IN 1` / `REVERB VOZ` - header azul, duplo VU, duplo pan estéreo com 2 barras L e R independentes)
+  - [ ] 8. Canal em Modo Sends on Faders Individual (`AUX 4` / `AUX4` - botão roxo PRE/POST no lugar do Solo, leitura com sufixo dB)
+  - [ ] 9. Macro de Envio Geral (`AUX GERAL` / `MIX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR)
+  - [ ] 10. Canal Desktop TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - bordas laterais vermelhas, overlay de proteção, cadeado central grande)
+  - [ ] 11. Canal Desktop DESABILITADO / DISABLED (`AUX 1` FIXED - acinzentado/desaturado, fader travado, botão ON 100% ativo e funcional)
+- [ ] **Variações Mobile (Validação no Workbench `tests.html`):**
+  - [x] 1. Canal Mono Normal (`CH 13` / `SURDAO` - cortina espectral 100%, peak glow, gap e agrupamento 8 em 8) (CONCLUÍDO ✅)
+  - [ ] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde neon, cortina VU dual dividida L/R)
+  - [ ] 3. Master LR Stereo (`STEREO` / `ST` - fundo vinho/vermelho escuro, cortina integral)
+  - [ ] 4. Envio Auxiliar / Mix (`CH 5` / `BAIXO` - Sends on Faders, badge PRE/POST, cortina atenuada em -∞ dB)
+  - [ ] 5. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão CONFIG, Delta dB, Big Nudges)
+  - [ ] 6. Volume Geral de AUX (`AUX` / `AUX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR)
+  - [ ] 7. Volume Geral do Músico (`GERAL` / `VOLUME GERAL` - fundo prateado, botão CONFIG, Big Nudges +0.25 dB)
+  - [ ] 8. Canal Mobile TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - borda vermelha, badge circular 🔒 inferior, modais de destravar)
+  - [ ] 9. Canal Mobile DESABILITADO / DISABLED (`AUX 1` FIXED - visual desaturado, fader fixo, botão ON 100% ativo e colorido)
 
-### FASE 7 — Criação do Host de Edição `channel_setup_core.js` & Estilos
-- [ ] Criar `public_new/modules/screens/channel_setup/channel_setup_core.js` e seu respectivo `styles/screens/channel_setup/channel_setup_core.css` para gerenciar abas (`EQ`, `DYN`, `AUX`, `INSERTS`, `ROUTING`), navegação ◀ / ▶ e Mini-Fader lateral com Solo Replace.
-- [ ] Integrar e acionar as sub-telas (`channel_setup_*.js`).
+### FASE 7 — Migração Piloto: Tela Principal (`screens/main_view.js`)
+- [ ] Refatorar `main_view.js` para instanciar a classe modular `ChannelStrip`:
+  - 32 canais de entrada Mono e Pareados (`CH 1` a `32`).
+  - 4 retornos estéreo (`ST IN 1` a `4`).
+  - Master Stereo LR (`STEREO`).
+  - Macro Fader Técnico (`MACRO`).
+- [ ] Conectar bindings reativos de WebSocket/MIDI, Trava de Canal (`channel_lock`), VU Meters WASM e ThemeManager.
+- [ ] Remover templates HTML duplicados e código legado de renderização da Tela Principal.
 
-### FASE 8 — Migração das Telas Restantes (`main_view.js`, `outs_view.js`, `musician_view.js`)
-- [ ] Migrar Tela Principal (`screens/main_view.js`) para instanciar 32 inputs, Master e Macro Fader via `ChannelStrip`.
-- [ ] Migrar Tela de Saídas (`screens/outs_view.js`) para MIX 1-8 e BUS 1-8.
-- [ ] Migrar Modo Músico (`screens/musician_view.js`) para faders de envio e Volume Geral.
+### FASE 8 — Migração: Tela de Envios Auxiliares (`screens/auxs_sends.js`)
+- [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip`:
+  - Modo MIX (visão geral dos 32 canais enviando para um barramento com badges `[PRE]`/`[POST]`).
+  - Modo CANAL (visão dos 8 envios do canal selecionado).
+  - Macro `AUX GERAL` / `MIX GERAL` com Big Nudges e botão `[ZERAR]`.
+  - Tratamento do modo `FIXED` (canal acinzentado com botão `ON` ativo).
+- [ ] Limpeza de funções legadas de template em `auxs_sends.js`.
 
-### FASE 9 — Construção dos Componentes Puros de Áudio & Estilos
+### FASE 9 — Migração: Tela de Barramentos de Saída (`screens/outs_view.js`)
+- [ ] Refatorar `outs_view.js` para instanciar `ChannelStrip`:
+  - Barramentos de Saída `MIX 1-8` (com patch duplo OMNI + ADAT e efeito marquee).
+  - Barramentos `BUS 1-8` Mono e Pareados (com correção de duplo VU estéreo).
+- [ ] Conectar medidores WASM, mutes e nudges dedicados de saída (+/- 0.10 dB).
+
+### FASE 10 — Migração: Tela do Músico (`screens/musician_view.js`)
+- [ ] Refatorar `musician_view.js` para instanciar `ChannelStrip`:
+  - Faders de envio simplificados com proteção tátil de `channel_lock`.
+  - Macro Fader de `VOLUME GERAL` do fone do músico (step de 0.25 dB).
+- [ ] Conectar fluxo de travamento/destravamento e modais de confirmação.
+
+### FASE 11 — Host de Edição do Canal & Mini-Fader Lateral (`screens/channel_setup/channel_setup_core.js`)
+- [ ] Criar `channel_setup_core.js` e `channel_setup_core.css` gerenciando:
+  - Navegação entre abas (`EQ`, `DYN`, `AUX`, `INSERTS`, `ROUTING`).
+  - Navegação de canal ◀ / ▶.
+  - Mini-Fader lateral com modo `Solo Replace` e renomeação de canal in-place via `VirtualKeyboard`.
+
+### FASE 12 — Construção dos Componentes Puros de Áudio & Estilos
 - [ ] Implementar `components/eq.js` e `styles/components/eq.css` (Canvas puro com BiquadFilter desacoplado de IDs globais).
 - [ ] Implementar `components/gate.js`, `components/compressor.js` e `styles/components/dynamics.css` (Widgets puros de dinâmica).
 - [ ] Implementar `components/inserts.js`, `components/routing.js` e seus respectivos CSS.
 - [ ] Conectar os novos componentes aos controladores em `screens/channel_setup/`.
 
-### FASE 10 — Integração com Sistema de Temas YAML & Validação Final
-- [ ] Mapear variáveis CSS `--strip-*` nos estilos e validar com `ThemeEditor` e `default.yaml`.
-- [ ] Limpar o `style.css` original removendo todo código legado migrado.
-- [ ] Realizar bateria completa de testes de regressão no endpoint `/new`.
+### FASE 13 — Limpeza Final do `style.css` Legado e Testes de Regressão em `/new`
+- [ ] Auditar e remover definitivamente qualquer resquício de CSS legado no `style.css`.
+- [ ] Validar compatibilidade 100% dos temas YAML (`default.yaml`) em todas as telas e visões.
+- [ ] Executar bateria completa de testes funcionais e de performance 60 FPS na rota `/new`.
