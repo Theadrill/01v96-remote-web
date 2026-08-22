@@ -233,21 +233,41 @@
 }
 .desk-btn-solo {
     width: 100%;
-    background: var(--strip-btn-solo-bg);
-    color: var(--strip-btn-solo-text);
+    background: var(--strip-btn-solo-bg, #222222);
+    color: var(--strip-btn-solo-text, #888888);
     border: 1px solid #444;
-    border-radius: var(--strip-btn-solo-radius);
+    border-radius: var(--strip-btn-solo-radius, 4px);
     padding: 4px 0;
     font-size: 10px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.15s ease;
 }
-.desk-btn-solo.active {
-    background: var(--strip-btn-solo-active-bg);
-    color: var(--strip-btn-solo-active-text);
-    border-color: #ffb300;
-    box-shadow: 0 0 8px rgba(234, 179, 8, 0.4);
+.desk-btn-solo.active,
+.desk-btn-solo.solo-active {
+    background: var(--strip-btn-solo-active-bg, #eab308) !important;
+    color: var(--strip-btn-solo-active-text, #000000) !important;
+    border-color: #ffb300 !important;
+    box-shadow: 0 0 8px rgba(234, 179, 8, 0.4) !important;
+}
+.mob-btn-solo {
+    background: var(--strip-btn-solo-bg, #222222);
+    color: var(--strip-btn-solo-text, #888888);
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 800;
+    width: 80%;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.mob-btn-solo.active,
+.mob-btn-solo.solo-active {
+    background: var(--strip-btn-solo-active-bg, #eab308) !important;
+    color: var(--strip-btn-solo-active-text, #000000) !important;
+    border-color: #ffb300 !important;
+    box-shadow: 0 0 8px rgba(234, 179, 8, 0.4) !important;
 }
 .btn-pre-post {
     width: 100%;
