@@ -18,43 +18,43 @@
 /* Mapeamento Base de Variáveis CSS com Fallbacks */
 :root {
     --strip-card-bg: #181818;
-    --strip-card-border: #222222;
+    --strip-card-border: #2c2c2c;
     --strip-card-radius: 6px;
     --strip-card-on-bg: rgba(255, 69, 0, 0.08);
 
-    --strip-group-1-color: #00adef;
-    --strip-group-2-color: #00ff88;
-    --strip-group-st-color: #4a90e2;
-    --strip-group-mix-color: #d4a017;
+    --strip-group-1-color: #0088cc;
+    --strip-group-2-color: #00a86b;
+    --strip-group-st-color: #0088cc;
+    --strip-group-mix-color: #d4af37;
     --strip-group-bus-color: #00b396;
-    --strip-master-color: #dc3545;
+    --strip-master-color: #4a121a;
 
-    --strip-btn-on-bg: #333333;
+    --strip-btn-on-bg: #2b2b2b;
     --strip-btn-on-text: #888888;
-    --strip-btn-on-active-bg: #ff4500;
-    --strip-btn-on-active-text: #ffffff;
-    --strip-btn-on-active-glow: rgba(255, 69, 0, 0.45);
+    --strip-btn-on-active-bg: #f59e0b;
+    --strip-btn-on-active-text: #000000;
+    --strip-btn-on-active-glow: rgba(245, 158, 11, 0.45);
     --strip-btn-on-radius: 4px;
 
-    --strip-btn-solo-bg: #333333;
+    --strip-btn-solo-bg: #222222;
     --strip-btn-solo-text: #888888;
-    --strip-btn-solo-active-bg: #ffc107;
+    --strip-btn-solo-active-bg: #eab308;
     --strip-btn-solo-active-text: #000000;
     --strip-btn-solo-radius: 4px;
 
-    --strip-btn-nudge-bg: #333333;
+    --strip-btn-nudge-bg: #252a38;
     --strip-btn-nudge-text: #cccccc;
-    --strip-btn-nudge-radius: 50%;
+    --strip-btn-nudge-radius: 4px;
 
     --strip-name-display-bg: #000000;
     --strip-name-display-color: #00ff00;
     --strip-name-display-radius: 4px;
-    --strip-db-val-color: #5cacee;
+    --strip-db-val-color: #00e5ff;
 
-    --strip-fader-track-color: #555555;
-    --strip-scale-text-color: #999999;
+    --strip-fader-track-color: #111111;
+    --strip-scale-text-color: #888888;
 
-    --strip-pan-track-bg: #222222;
+    --strip-pan-track-bg: #1c1c1c;
     --strip-pan-thumb-color: #a855f7;
     --strip-pan-center-color: #4a4a5a;
 
@@ -62,3 +62,362 @@
     --strip-peak-led-glow: #ff4444;
 }
 
+/* =========================================================================
+   1. ESTRUTURA BASE DO CHANNEL STRIP (CONTAINER / CARD)
+   ========================================================================= */
+
+.channel-strip-wrapper {
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    background: var(--strip-card-bg);
+    border: 1px solid var(--strip-card-border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* =========================================================================
+   2. VARIAÇÕES DE LARGURA E FORMATO: DESKTOP (GAP ZERO)
+   ========================================================================= */
+
+.channel-strip-wrapper.desk-strip {
+    width: 68px;
+    min-width: 68px;
+    height: 480px;
+    border-radius: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: none;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    justify-content: space-between;
+}
+
+.channel-strip-wrapper.desk-strip:first-child {
+    border-left: 1px solid #333;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.channel-strip-wrapper.desk-strip:last-child {
+    border-right: 1px solid #333;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+/* Canal Pareado Desktop */
+.channel-strip-wrapper.desk-strip.paired-channel {
+    width: 104px;
+    min-width: 104px;
+    border-top: 2px solid #10b981;
+    border-bottom: 2px solid #10b981;
+}
+
+/* Identidades Cromáticas Desktop */
+.channel-strip-wrapper.desk-strip.band-blue .desk-label-wrapper {
+    background: #0088cc;
+    color: #fff;
+}
+.channel-strip-wrapper.desk-strip.band-green .desk-label-wrapper {
+    background: #00a86b;
+    color: #fff;
+}
+.channel-strip-wrapper.desk-strip.band-paired_green .desk-label-wrapper {
+    background: #059669;
+    color: #fff;
+}
+.channel-strip-wrapper.desk-strip.band-amber .desk-label-wrapper {
+    background: #d4af37;
+    color: #000;
+}
+.channel-strip-wrapper.desk-strip.band-cyan .desk-label-wrapper {
+    background: #00b396;
+    color: #fff;
+}
+.channel-strip-wrapper.desk-strip.band-wine {
+    background: #2a0a0f !important;
+}
+.channel-strip-wrapper.desk-strip.band-wine .desk-label-wrapper {
+    background: #800020;
+    color: #fff;
+}
+.channel-strip-wrapper.desk-strip.band-macro_silver {
+    background: #e2e8f0 !important;
+    color: #000 !important;
+}
+.channel-strip-wrapper.desk-strip.band-macro_silver .desk-label-wrapper {
+    background: #1e293b;
+    color: #fff;
+}
+
+/* =========================================================================
+   3. VARIAÇÕES DE LARGURA E FORMATO: MOBILE (COM GAP & GROUPING)
+   ========================================================================= */
+
+.channel-strip-wrapper.mob-strip {
+    width: 86px;
+    min-width: 86px;
+    height: 440px;
+    border-radius: 10px;
+    border: 1px solid #282828;
+    background: #14161d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
+}
+
+.channel-strip-wrapper.mob-strip.paired-channel {
+    width: 100px;
+    min-width: 100px;
+    border: 1px solid #10b981;
+}
+
+/* Cortina de Medidor VU de Fundo Integral no Mobile */
+.mob-meter-curtain-container {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    border-radius: 9px;
+    display: flex;
+}
+
+.mob-meter-curtain {
+    flex: 1;
+    height: 0%;
+    margin-top: auto;
+    background: linear-gradient(180deg, #ff0000 0%, #ffbb00 25%, #22c55e 60%, #10b981 100%);
+    opacity: 0.35;
+    transition: height 0.05s linear;
+}
+
+/* Peak Glow Mobile */
+.channel-strip-wrapper.mob-strip.peak-glow {
+    border-color: #ff0000 !important;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5) !important;
+}
+
+/* =========================================================================
+   4. DETALHAMENTO DAS 7 ZONAS MODULARES
+   ========================================================================= */
+
+/* ZONA 1: Header Tripartite */
+.desk-label-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 4px;
+    font-size: 11px;
+    font-weight: 800;
+    background: #252525;
+    color: #fff;
+    min-height: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+.desk-ch-num {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ZONA 2: Top Action / Solo / Pre */
+.desk-top-action-zone {
+    padding: 3px 4px;
+    text-align: center;
+}
+.desk-btn-solo {
+    width: 100%;
+    background: var(--strip-btn-solo-bg);
+    color: var(--strip-btn-solo-text);
+    border: 1px solid #444;
+    border-radius: var(--strip-btn-solo-radius);
+    padding: 4px 0;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.desk-btn-solo.active {
+    background: var(--strip-btn-solo-active-bg);
+    color: var(--strip-btn-solo-active-text);
+    border-color: #ffb300;
+    box-shadow: 0 0 8px rgba(234, 179, 8, 0.4);
+}
+.btn-pre-post {
+    width: 100%;
+    background: #6b21a8;
+    color: #fff;
+    border: 1px solid #9333ea;
+    border-radius: 4px;
+    padding: 4px 0;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* ZONA 3: Display OLED */
+.desk-ch-name-zone {
+    padding: 2px 4px;
+}
+.desk-ch-name {
+    display: block;
+    background: var(--strip-name-display-bg);
+    color: var(--strip-name-display-color);
+    border: 1px solid #333;
+    border-radius: var(--strip-name-display-radius);
+    padding: 3px 2px;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    font-family: monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ZONA 5: Primary Action (ON) & Nudge Superior */
+.desk-primary-action-zone {
+    padding: 2px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+}
+.desk-btn-on {
+    width: 100%;
+    background: var(--strip-btn-on-bg);
+    color: var(--strip-btn-on-text);
+    border: 1px solid #444;
+    border-radius: var(--strip-btn-on-radius);
+    padding: 5px 0;
+    font-size: 10px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.desk-btn-on.active {
+    background: var(--strip-btn-on-active-bg);
+    color: var(--strip-btn-on-active-text);
+    border-color: #f59e0b;
+    box-shadow: 0 0 8px var(--strip-btn-on-active-glow);
+}
+.desk-nudge-btn {
+    background: var(--strip-btn-nudge-bg);
+    color: var(--strip-btn-nudge-text);
+    border: 1px solid #444;
+    border-radius: var(--strip-btn-nudge-radius);
+    width: 32px;
+    height: 22px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s ease;
+}
+.desk-nudge-btn:hover {
+    background: #3b4254;
+    color: #fff;
+}
+.desk-nudge-btn:active {
+    background: #00e5ff;
+    color: #000;
+}
+
+/* ZONA 6: Fader Core */
+.desk-fader-core {
+    padding: 2px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    justify-content: space-between;
+}
+.desk-db-readout {
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--strip-db-val-color);
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+/* ZONA 7: Footer Routing & Panpot */
+.desk-footer-zone {
+    border-top: 1px solid #333;
+    background: #111;
+    padding: 3px 2px;
+    font-size: 9px;
+}
+
+/* =========================================================================
+   5. OVERLAY DE BLOQUEIO (LOCKED)
+   ========================================================================= */
+
+.desk-lock-overlay,
+.mob-lock-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(255, 0, 0, 0.18) !important;
+    border: 1px solid #ff4444 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding-bottom: 8px !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
+}
+
+.lock-badge-btn {
+    background: #ff4444;
+    color: #fff;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.7);
+    transition: transform 0.15s ease;
+}
+.lock-badge-btn:hover {
+    transform: scale(1.1);
+}
+
+/* =========================================================================
+   6. CANAL DESABILITADO (FIXED / DISABLED)
+   ========================================================================= */
+
+.channel-strip-wrapper.is-disabled {
+    opacity: 0.75;
+}
+.channel-strip-wrapper.is-disabled .desk-fader-thumb,
+.channel-strip-wrapper.is-disabled .mob-fader-thumb,
+.channel-strip-wrapper.is-disabled .desk-nudge-btn,
+.channel-strip-wrapper.is-disabled .mob-nudge-btn,
+.channel-strip-wrapper.is-disabled .desk-btn-solo,
+.channel-strip-wrapper.is-disabled .mob-btn-solo {
+    opacity: 0.35 !important;
+    pointer-events: none !important;
+    filter: grayscale(100%);
+}
+/* O botão ON permanece 100% funcional no modo disabled */
+.channel-strip-wrapper.is-disabled .desk-btn-on,
+.channel-strip-wrapper.is-disabled .mob-btn-on {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    filter: none !important;
+}

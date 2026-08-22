@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <title>01V96 V2 — Component Workbench & Testbed</title>
+    <base href="/new/" />
+
+    <!-- CSS Legado & Base -->
+    <link href="style.css?v=1.0.10" rel="stylesheet" />
+    <link href="styles/base/base.css" rel="stylesheet" />
+    <link href="styles/base/layout.css" rel="stylesheet" />
+    <link href="styles/base/splash_screen.css" rel="stylesheet" />
+
+    <!-- CSS Modulares de Componentes -->
+    <link href="styles/components/channel_strip.css" rel="stylesheet" />
+    <link href="styles/components/eq.css" rel="stylesheet" />
+    <link href="styles/components/rta.css" rel="stylesheet" />
+    <link href="styles/components/dynamics.css" rel="stylesheet" />
+    <link href="styles/components/inserts.css" rel="stylesheet" />
+    <link href="styles/components/routing.css" rel="stylesheet" />
+    <link href="styles/components/sidebar.css" rel="stylesheet" />
+    <link href="styles/components/search.css" rel="stylesheet" />
+    <link href="styles/components/theme-editor.css" rel="stylesheet" />
+    <link href="styles/components/overlay_info.css" rel="stylesheet" />
+    <link href="styles/components/modals/confirm-modal.css" rel="stylesheet" />
+    <link href="styles/components/modals/bubble-modal.css" rel="stylesheet" />
+    <link href="styles/components/modals/virtual-keyboard.css" rel="stylesheet" />
+    <link href="styles/components/modals/color-picker.css" rel="stylesheet" />
+
+    <!-- CSS Telas & Setup -->
+    <link href="styles/screens/main_view.css" rel="stylesheet" />
+    <link href="styles/screens/auxs_sends.css" rel="stylesheet" />
+    <link href="styles/screens/outs_view.css" rel="stylesheet" />
+    <link href="styles/screens/musician_view.css" rel="stylesheet" />
+    <link href="styles/screens/routing_overview.css" rel="stylesheet" />
+    <link href="styles/screens/scenes_view.css" rel="stylesheet" />
+    <link href="styles/screens/channel_setup/channel_setup_core.css" rel="stylesheet" />
+    <link href="styles/screens/channel_setup/channel_setup_eq.css" rel="stylesheet" />
+    <link href="styles/screens/channel_setup/channel_setup_dynamics.css" rel="stylesheet" />
+    <link href="styles/screens/channel_setup/channel_setup_aux.css" rel="stylesheet" />
+    <link href="styles/screens/channel_setup/channel_setup_inserts.css" rel="stylesheet" />
+    <link href="styles/screens/channel_setup/channel_setup_routing.css" rel="stylesheet" />
+
+    <link href="vendor/fontawesome/all.min.css" rel="stylesheet" />
+    <script src="vendor/js-yaml/js-yaml.min.js"></script>
+
+    <!-- Estilos Específicos do Workbench de Testes -->
+    <style>
+        :root {
+            --wb-bg: #0f1117;
+            --wb-surface: #1a1d26;
+            --wb-border: #2d3345;
+            --wb-accent: #00e5ff;
+            --wb-accent-glow: rgba(0, 229, 255, 0.25);
+            --wb-text: #e2e8f0;
+            --wb-text-dim: #94a3b8;
+            --wb-success: #10b981;
+            --wb-danger: #ef4444;
+            --wb-warning: #f59e0b;
+        }
+
+        body.workbench-body {
+            background-color: var(--wb-bg);
+            color: var(--wb-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Toolbar */
+        .wb-toolbar {
+            background-color: var(--wb-surface);
+            border-bottom: 1px solid var(--wb-border);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-shrink: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            flex-wrap: wrap;
+        }
+
+        .wb-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .wb-brand span.badge {
+            background: linear-gradient(135deg, #0088cc, #00e5ff);
+            color: #000;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .wb-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .wb-group-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--wb-text-dim);
+            margin-right: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .wb-btn-toggle {
+            background: #252a38;
+            color: var(--wb-text-dim);
+            border: 1px solid var(--wb-border);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wb-btn-toggle:hover {
+            background: #2e3547;
+            color: #fff;
+            border-color: #434c66;
+        }
+
+        .wb-btn-toggle.active {
+            background: var(--wb-accent);
+            color: #000;
+            border-color: var(--wb-accent);
+            box-shadow: 0 0 10px var(--wb-accent-glow);
+        }
+
+        .wb-meter-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wb-meter-slider {
+            -webkit-appearance: none;
+            width: 130px;
+            height: 6px;
+            border-radius: 3px;
+            background: #252a38;
+            outline: none;
+        }
+
+        .wb-meter-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--wb-accent);
+            cursor: pointer;
+            box-shadow: 0 0 6px var(--wb-accent-glow);
+        }
+
+        .wb-meter-val {
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--wb-accent);
+            min-width: 38px;
+        }
+
+        .wb-btn-action {
+            background: #252a38;
+            color: #fff;
+            border: 1px solid var(--wb-border);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .wb-btn-action.peak-trigger {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ff6b6b;
+        }
+
+        .wb-btn-action.peak-trigger:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+        }
+
+        .wb-btn-action.anim-trigger.active {
+            background: #10b981;
+            color: #000;
+            border-color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Área de Conteúdo / Workspace */
+        .wb-workspace {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .wb-catalog-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .wb-section {
+            background: var(--wb-surface);
+            border: 1px solid var(--wb-border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .wb-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--wb-border);
+        }
+
+        .wb-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wb-section-desc {
+            font-size: 12px;
+            color: var(--wb-text-dim);
+            margin-top: 2px;
+        }
+
+        /* Container Desktop (Gap: 0) */
+        .wb-desktop-deck {
+            display: inline-flex;
+            background: #000;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            overflow-x: auto;
+            max-width: 100%;
+            /* Desktop Strips colados uns aos outros (gap zero) */
+            gap: 0;
+            box-sizing: border-box;
+        }
+
+        /* Container Mobile (Com Gap e Agrupamento 8 em 8) */
+        .wb-mobile-deck {
+            display: flex;
+            background: #0a0c10;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #222;
+            overflow-x: auto;
+            max-width: 100%;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .wb-mobile-group-separator {
+            width: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .wb-mobile-group-separator::after {
+            content: "";
+            width: 2px;
+            height: 70%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1px;
+        }
+
+        /* Painel Lateral / Console de Eventos */
+        .wb-console-panel {
+            width: 340px;
+            background: #13161f;
+            border-left: 1px solid var(--wb-border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .wb-console-panel.collapsed {
+            display: none;
+        }
+
+        .wb-console-header {
+            padding: 12px 16px;
+            background: var(--wb-surface);
+            border-bottom: 1px solid var(--wb-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .wb-console-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--wb-text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wb-console-logs {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            font-family: "JetBrains Mono", Consolas, Menlo, monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .wb-log-entry {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid var(--wb-border);
+            padding: 4px 8px;
+            border-radius: 0 4px 4px 0;
+            word-break: break-all;
+        }
+
+        .wb-log-entry.log-fader {
+            border-left-color: var(--wb-accent);
+        }
+
+        .wb-log-entry.log-nudge {
+            border-left-color: #a855f7;
+        }
+
+        .wb-log-entry.log-mute {
+            border-left-color: var(--wb-warning);
+        }
+
+        .wb-log-entry.log-solo {
+            border-left-color: #eab308;
+        }
+
+        .wb-log-entry.log-lock {
+            border-left-color: var(--wb-danger);
+        }
+
+        .wb-log-time {
+            color: #64748b;
+            margin-right: 6px;
+            font-size: 10px;
+        }
+
+        .wb-empty-logs {
+            color: #64748b;
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body class="workbench-body">
+
+    <!-- Top Toolbar de Controle do Sandbox -->
+    <header class="wb-toolbar">
+        <div class="wb-brand">
+            <span>🔬 01V96 V2</span>
+            <span class="badge">Workbench</span>
+        </div>
+
+        <!-- Seletor de Viewport -->
+        <div class="wb-controls-group">
+            <span class="wb-group-title">Layout</span>
+            <button class="wb-btn-toggle active" id="btnViewBoth" onclick="setWbViewport('both')">
+                <i class="fas fa-columns"></i> Lado a Lado
+            </button>
+            <button class="wb-btn-toggle" id="btnViewDesktop" onclick="setWbViewport('desktop')">
+                <i class="fas fa-desktop"></i> Desktop (Gap 0)
+            </button>
+            <button class="wb-btn-toggle" id="btnViewMobile" onclick="setWbViewport('mobile')">
+                <i class="fas fa-mobile-alt"></i> Mobile
+            </button>
+        </div>
+
+        <!-- Simulador de Áudio & VU Meter -->
+        <div class="wb-controls-group">
+            <span class="wb-group-title">VU Simulator</span>
+            <div class="wb-meter-slider-container">
+                <input class="wb-meter-slider" id="wbMeterSlider" max="100" min="0" oninput="setSimulatorLevel(this.value)" type="range" value="0" />
+                <span class="wb-meter-val" id="wbMeterVal">0%</span>
+            </div>
+            <button class="wb-btn-action peak-trigger" onclick="triggerSimulatorPeak()" title="Injeta 100% de sinal para testar Peak Hold de 1s">
+                💥 PEAK (100%)
+            </button>
+            <button class="wb-btn-action anim-trigger" id="btnWbAnim" onclick="toggleSimulatorAnimation()">
+                🌊 Auto Wave
+            </button>
+        </div>
+
+        <!-- Seletor de Temas & Ferramentas -->
+        <div class="wb-controls-group">
+            <span class="wb-group-title">Aparência</span>
+            <select class="wb-btn-action" id="wbThemeSelector" onchange="changeWbTheme(this.value)" style="outline: none;">
+                <option value="default">Yamaha Dark (Padrão)</option>
+                <option value="high-contrast">Alto Contraste</option>
+                <option value="classic-analog">Classic Console</option>
+            </select>
+            <button class="wb-btn-toggle" id="btnToggleConsole" onclick="toggleWbConsole()" title="Exibir/Ocultar console de eventos">
+                <i class="fas fa-terminal"></i> Log
+            </button>
+        </div>
+    </header>
+
+    <!-- Área de Conteúdo Principal -->
+    <main class="wb-workspace">
+        <div class="wb-catalog-container" id="wbCatalogContainer">
+
+            <!-- SEÇÃO DESKTOP: 11 Variações Padronizadas -->
+            <section class="wb-section" id="sectionDesktop">
+                <div class="wb-section-header">
+                    <div>
+                        <div class="wb-section-title">
+                            <i class="fas fa-desktop" style="color: var(--wb-accent);"></i> Catálogo de Variações Desktop
+                        </div>
+                        <div class="wb-section-desc">
+                            Faixas coladas (gap zero), réguas analógicas completas, duplo pan estéreo, nudges dedicados, mouse wheel (0.10/0.50 dB) e LED Peak circular.
+                        </div>
+                    </div>
+                    <span style="font-size: 11px; background: rgba(0,229,255,0.1); color: var(--wb-accent); padding: 3px 8px; border-radius: 4px; font-weight: 600;">
+                        11 Variações Mapeadas
+                    </span>
+                </div>
+
+                <!-- Deck de Canais Desktop -->
+                <div class="wb-desktop-deck" id="desktopCatalogDeck">
+                    <!-- Injetado dinamicamente via tests.js -->
+                </div>
+            </section>
+
+            <!-- SEÇÃO MOBILE: 7+ Variações Padronizadas -->
+            <section class="wb-section" id="sectionMobile">
+                <div class="wb-section-header">
+                    <div>
+                        <div class="wb-section-title">
+                            <i class="fas fa-mobile-alt" style="color: #a855f7;"></i> Catálogo de Variações Mobile
+                        </div>
+                        <div class="wb-section-desc">
+                            Cards com espaçamento físico (gap/margem lateral), agrupamento de 8 em 8, cortina VU de fundo integral (100%), contorno Peak Glow e travas de segurança.
+                        </div>
+                    </div>
+                    <span style="font-size: 11px; background: rgba(168,85,247,0.1); color: #a855f7; padding: 3px 8px; border-radius: 4px; font-weight: 600;">
+                        7 Variações Canônicas
+                    </span>
+                </div>
+
+                <!-- Deck de Canais Mobile -->
+                <div class="wb-mobile-deck" id="mobileCatalogDeck">
+                    <!-- Injetado dinamicamente via tests.js -->
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Painel Lateral / Console de Auditoria de Eventos -->
+        <aside class="wb-console-panel" id="wbConsolePanel">
+            <div class="wb-console-header">
+                <div class="wb-console-title">
+                    <i class="fas fa-terminal" style="color: var(--wb-accent);"></i> Console de Eventos
+                </div>
+                <button class="wb-btn-action" onclick="clearWbLogs()" style="font-size: 10px; padding: 3px 8px;">
+                    Limpar
+                </button>
+            </div>
+            <div class="wb-console-logs" id="wbConsoleLogs">
+                <div class="wb-empty-logs">Nenhum evento registrado ainda.<br>Interaja com os canais para auditar eventos.</div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- SCRIPTS DO SISTEMA & CATÁLOGO DE TESTES                          -->
+    <!-- ================================================================= -->
+    <script src="modules/core/globals.js"></script>
+    <script src="modules/core/events.js"></script>
+    <script src="modules/core/steps.js"></script>
+    <script src="modules/core/setup.js"></script>
+    <script src="modules/services/channel_lock.js"></script>
+    <script src="modules/services/theme-manager.js"></script>
+    <script src="modules/components/channel_strip.js"></script>
+    <script src="tests.js"></script>
+
+</body>
+
+</html>

@@ -1121,12 +1121,12 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 - [x] Linkar os novos módulos CSS em `public_new/index.html` em ordem hierárquica logo após `style.css`.
 - [x] Validar que o app `/new` continua 100% íntegro e sem erros 404.
 
-### FASE 4 — Criação do Workbench de Testes (`public_new/tests.html`)
-- [ ] Criar a página de sandbox/workbench `public_new/tests.html` para validação isolada, visual e funcional de componentes.
-- [ ] Estruturar a página com **Arquitetura Zero-Hardcode**:
+### FASE 4 — Criação do Workbench de Testes (`public_new/tests.html`) (CONCLUÍDA ✅)
+- [x] Criar a página de sandbox/workbench `public_new/tests.html` para validação isolada, visual e funcional de componentes.
+- [x] Estruturar a página com **Arquitetura Zero-Hardcode**:
   - Container de renderização dinâmico (`#desktop-catalog` e `#mobile-catalog`).
   - Script declarativo (`tests.js` ou inline) que instancia programaticamente todas as variações mapeadas chamando diretamente a classe real `new ChannelStrip(config)`.
-- [ ] Implementar Top Toolbar do Sandbox:
+- [x] Implementar Top Toolbar do Sandbox:
   - **Seletor de Viewport:** Alternância rápida entre visualização `[ 🖥️ Desktop ]`, `[ 📱 Mobile ]` e `[ ↔️ Lado a Lado ]`.
   - **Simulador de Áudio & VU Meter:** Slider de injeção de sinal de teste (0 a 100%) para validar balística, subida de cortina, PEAK LED circular e cortina com glow vermelho (`.peak-glow`) com Peak Hold de 1000 ms.
   - **Seletor Dinâmico de Temas:** Validação instantânea de variáveis CSS de cores/temas.
