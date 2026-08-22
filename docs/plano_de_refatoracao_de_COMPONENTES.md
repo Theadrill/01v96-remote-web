@@ -164,16 +164,48 @@ public_new/
 
 O `ChannelStrip` é o componente universal que centraliza a renderização, a física e os eventos de qualquer faixa de controle do mixer.
 
-### 3.1 Variações Suportadas:
-1. **Modo Canal (`mode: 'channel'`):**
-   - Tipos: `input` (1–32), `st_in` (1–4), `aux_send` (Sends on Faders), `mix_master` (MIX 1–8), `bus_master` (BUS 1–8), `master` (Stereo Out), `isMini: true` (Mini-Fader de inspeção).
-   - Elementos: Fader (0–1023), Escala em dB, VU Meter 60 FPS (WASM/Peak LED), Nudges finos (+/-), ON, SOLO, Panpot e Badges de Patch.
+### 3.1 Arquitetura Canônica das 7 Zonas Modulares
 
-2. **Modo Macro Diferencial (`mode: 'macro'`):**
-   - **`macro` (Técnico / Tela Principal):** Altera apenas os canais selecionados no grid de configuração. Botão `[CONFIG]`.
-   - **`volume_geral` (Músico / Tela Principal):** Altera todos os 32 canais menos os que estão protegidos com cadeado 🔒 no grid. Botão `[CONFIG]`.
-   - **`aux_volume_geral` (Setup do Canal / Aba AUX & Visão MIX):** Altera envios em bloco para os auxiliares. Sem botão de config; possui botão vermelho **`[ZERAR]`** com modal de confirmação.
-   - Elementos: Big Nudges (+ / -) com auto-repeat acelerado, visor temporário de Delta dB (`--` → `+X.XX dB` resetando após inatividade) e botão de ação (`CONFIG` ou `ZERAR`).
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  ZONA                      │  CANAL NORMAL (1-32, ST, MASTER, MINI) │  MACRO / VOL. GERAL     │
+├────────────────────────────┼────────────────────────────────────────┼────────────────────────┤
+│ [1] HEADER (Tripartite)    │ [Copy/Swap (Futuro)] [CH X] [Lock 🔒]  │ Rótulo (MACRO, AUX)    │
+│ [2] TOP ACTION             │ Botão SOLO / CUE (ou Solo Replace)    │ Placeholder vazio      │
+│ [3] DISPLAY                │ Visor OLED Verde (Nome do Canal)       │ Visor Nome / Perfil    │
+│ [4] MIDDLE FEATURE         │ Pre/Post / Seletor de Medidores        │ Visor Delta dB (-- dB) │
+│ [5] PRIMARY ACTION & NUDGE │ Botão ON (Mute) + Nudge Fino (+)       │ (Ocupado p/ Big Nudges)│
+│ [6] FADER CORE             │ dB, Régua, Fader 0-1023, VU 60FPS, (-) │ Big Nudges (+) e (-)   │
+│ [7] FOOTER ROUTING & ACTION│ Panpot (L-C-R) + Badge de Patch I/O    │ Botão [ZERAR] / [CONFIG│
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Detalhamento Estrutural das Zonas:
+1. **Zona 1 — Header / Identificação Superior (Layout Tripartite `desk-label-wrapper`):**
+   - **Slot Esquerdo:** Slot reservado para ações contextuais rápidas futuras (ex: ícone de copiar/colar canal, trocar ordem/swap, preset rápido). Deixado flexível/placeholder sem quebrar o layout.
+   - **Centro (Rótulo Principal):** Identificação do canal (`CH 1`, `ST 1`, `MIX 1`, `STEREO`, `MACRO`). Clique abre o *Channel Setup* ou modal correspondente.
+   - **Slot Direito:** Ícone de cadeado / trava de segurança 🔒 (`channel_lock`).
+2. **Zona 2 — Top Action / Solo:**
+   - Canal Padrão: Botão `SOLO` / `CUE` (amarelo).
+   - Mini-Fader (Setup): Comportamento `Solo Replace`.
+   - Master PA: Indicador global de Solo ativo + botão `clearAllSolos()`.
+   - Macro: Placeholder vazio de alinhamento.
+3. **Zona 3 — Display Digital de Nome (`desk-ch-name-zone`):**
+   - Visor OLED estilo hardware com tipografia verde brilhante (`#00ff00`).
+   - No Mini-Fader, clique abre o teclado virtual (`VirtualKeyboard`) para edição in-place.
+4. **Zona 4 — Middle Feature / Informações Contextuais:**
+   - Master PA: Seletor de visualização dos medidores (PRE / POST).
+   - Modo Auxiliar (Sends): Indicador PRE / POST / FIXED.
+   - Modo Macro: Visor de **Delta dB** (`--` em repouso / `+1.50 dB` dinâmico).
+5. **Zona 5 — Primary Action & Nudge Superior:**
+   - Canal Normal: Botão principal **ON** (laranja `#ff4500` com glow) + botão de **Nudge Superior (+)** fino (+0.1 dB).
+6. **Zona 6 — Fader Core (Controle Central e Balística de Áudio):**
+   - Canal Normal: Visor de dB, Régua lateral (+10 a -∞), Fader vertical de 10-bit (0–1023), VU Meter 60 FPS (WASM) com Peak LED e botão de **Nudge Inferior (-)** fino.
+   - Modo Macro: **Big Nudges (+ e -)** com auto-repeat acelerado para ganho coletivo.
+7. **Zona 7 — Footer Routing & Ações de Rodapé:**
+   - Canal Normal: **Panpot (L-C-R)** com cursor centralizador e suporte a duplo pan (canais pareados) + **Badge de Patch I/O** com letreiro deslizante (*marquee*).
+   - Macro Técnico: Botão **`[CONFIG]`** (abre seletor de canais).
+   - Macro Auxiliar / Setup: Botão vermelho **`[ZERAR]`** (com modal de confirmação para resetar envios dos 8 auxiliares).
 
 ---
 
