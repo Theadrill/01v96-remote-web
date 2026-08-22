@@ -74,12 +74,6 @@
       "file": "custom_names_scene-ANDRE RIC 360-mesa-maria.json"
     },
     {
-      "custom_name": "LIVRE P SONHAR 3",
-      "physical_scene": "LIVRE P SONHAR 3",
-      "physical_id": 37,
-      "file": "custom_names_scene-LIVRE P SONHAR 3-mesa-maria.json"
-    },
-    {
       "custom_name": "DC JEITO 360",
       "physical_scene": "DC JEITO 360",
       "physical_id": 27,
@@ -114,6 +108,12 @@
       "physical_scene": "SOMALIA 360",
       "physical_id": 34,
       "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PRETTO 360",
+      "physical_scene": "PRETTO 360",
+      "physical_id": 37,
+      "file": "custom_names_scene-PRETTO 360-mesa-maria.json"
     }
   ]
 }
