@@ -4,10 +4,28 @@
     22
   ],
   "snapshot": {
-    "active": false,
-    "channels_to_restore": [],
-    "desk_name": null,
-    "scene_id": null,
-    "timestamp": null
+    "active": true,
+    "channels_to_restore": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      29,
+      31
+    ],
+    "desk_name": "01V96",
+    "scene_id": 0,
+    "timestamp": 1787373997648
   }
 }
