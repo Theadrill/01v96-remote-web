@@ -185,27 +185,227 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
    - **Slot Esquerdo:** Slot reservado para ações contextuais rápidas futuras (ex: ícone de copiar/colar canal, trocar ordem/swap, preset rápido). Deixado flexível/placeholder sem quebrar o layout.
    - **Centro (Rótulo Principal):** Identificação do canal (`CH 1`, `ST 1`, `MIX 1`, `STEREO`, `MACRO`). Clique abre o *Channel Setup* ou modal correspondente.
    - **Slot Direito:** Ícone de cadeado / trava de segurança 🔒 (`channel_lock`).
+   - *Nota Mobile:* No modo mobile, a Zona 1 é limpa e 100% centralizada apenas com a identificação do canal.
 2. **Zona 2 — Top Action / Solo:**
    - Canal Padrão: Botão `SOLO` / `CUE` (amarelo).
    - Mini-Fader (Setup): Comportamento `Solo Replace`.
    - Master PA: Indicador global de Solo ativo + botão `clearAllSolos()`.
+   - Modo Auxiliar (Sends on Faders): Badge contextual de envio `[PRE]` / `[POST]` / `[FIXED]`.
    - Macro: Placeholder vazio de alinhamento.
 3. **Zona 3 — Display Digital de Nome (`desk-ch-name-zone`):**
    - Visor OLED estilo hardware com tipografia verde brilhante (`#00ff00`).
    - No Mini-Fader, clique abre o teclado virtual (`VirtualKeyboard`) para edição in-place.
 4. **Zona 4 — Middle Feature / Informações Contextuais:**
-   - Master PA: Seletor de visualização dos medidores (PRE / POST).
+   - Master PA: Seletor de visualização dos medidores (botão `[MEDIDORES]` PRE / POST).
    - Modo Auxiliar (Sends): Indicador PRE / POST / FIXED.
-   - Modo Macro: Visor de **Delta dB** (`--` em repouso / `+1.50 dB` dinâmico).
+   - Modo Macro: Botão roxo `[CONFIG]` + Visor de **Delta dB** (`--` em repouso / `+1.50 dB` dinâmico).
 5. **Zona 5 — Primary Action & Nudge Superior:**
-   - Canal Normal: Botão principal **ON** (laranja `#ff4500` com glow) + botão de **Nudge Superior (+)** fino (+0.1 dB).
+   - Canal Normal / Master / Aux: Botão principal **ON** (laranja/amarelo ativo) posicionado logo abaixo de SOLO / Display.
+   - No Desktop: Botão de **Nudge Superior (+)** fino (+0.1 dB).
 6. **Zona 6 — Fader Core (Controle Central e Balística de Áudio):**
    - Canal Normal: Visor de dB, Régua lateral (+10 a -∞), Fader vertical de 10-bit (0–1023), VU Meter 60 FPS (WASM) com Peak LED e botão de **Nudge Inferior (-)** fino.
+   - Modo Mobile: Medidor VU implementado como **cortina de fundo total (`.has-meter` / `.mobile-meter-curtain`)** que preenche **100% da área útil do card do canal** de ponta a ponta:
+     - **Gradiente Espectral Contínuo:** A cortina possui gradiente vertical que vai do **Verde puro** na base (sinal normal), passando por **Verde Claro / Amarelo** (atenção a partir de 60-85%), até culminar em **Vermelho vivo** no topo (98% a 100%).
+     - **Preenchimento Integral:** Ocupa todo o espaço interior do canal (atrás dos botões, displays e fader), subindo fluidamente conforme a pressão sonora (Mono ou Estéreo Dividido L/R).
+   - **Mecânica de PEAK no Mobile (`.peak-glow`):** Quando o sinal de áudio atinge $\ge 98\%$ da escala, a cortina encosta no topo do card (atingindo o vermelho máximo) e ativa o estado de PEAK:
+     - Adiciona a classe `.peak-glow` ao card do canal.
+     - Aplica contorno vermelho brilhante em todo o card: `border-color: #ff0000 !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4) !important;`.
+     - Permanece ativo com retenção de pico (*Peak Hold*) por **1000 ms (1 segundo)** após o sinal baixar de 98%, retornando automaticamente ao estado normal.
    - Modo Macro: **Big Nudges (+ e -)** com auto-repeat acelerado para ganho coletivo.
 7. **Zona 7 — Footer Routing & Ações de Rodapé:**
    - Canal Normal: **Panpot (L-C-R)** com cursor centralizador e suporte a duplo pan (canais pareados) + **Badge de Patch I/O** com letreiro deslizante (*marquee*).
-   - Macro Técnico: Botão **`[CONFIG]`** (abre seletor de canais).
+   - Macro Técnico / Modo Músico: Botão **`[CONFIG]`** ou rodapé limpo.
    - Macro Auxiliar / Setup: Botão vermelho **`[ZERAR]`** (com modal de confirmação para resetar envios dos 8 auxiliares).
+
+---
+
+### 3.2 Catálogo Visual e Estrutural das Variações Mobile (`docs/imgs/`)
+
+No layout Mobile, a hierarquia vertical e a identidade visual de cada canal seguem 7 variações padronizadas:
+
+#### 1. Canal Mono Normal (`CH 13` / `SURDAO`)
+![Canal Mono Normal](imgs/mobile_mono_normal.png)
+
+```text
+┌──────────────────────────────────────────────┐
+│                    CH 13                     │  <-- Zona 1 (Header Centralizado)
+├──────────────────────────────────────────────┤  ═════════════════════════════════════════
+│                  [ SURDAO ]                  │  ▲ [TOPO - 98% a 100%]: VERMELHO (PEAK)
+├──────────────────────────────────────────────┤  │
+│                    [SOLO]                    │  │ [ALTO - 85% a 98%]: AMARELO / LARANJA
+├──────────────────────────────────────────────┤  │
+│                     [ON]                     │  │ [MÉDIO - 60% a 85%]: VERDE CLARO
+├──────────────────────────────────────────────┤  │
+│                     (+)                      │  │ CORTINA VU METER DE FUNDO INTEGRAL
+│                      │                       │  │ (Preenche 100% da área útil do card
+│    0 ───             │                       │  │ de ponta a ponta, por trás de todos
+│                      │                       │  │ os botões, displays e fader)
+│  -10 ───           [ █ ]                     │  │
+│        ░░░░░░░░░░░░░░│░░░░░░░░░░░░░░         │  │ ◄── Nível Atual do Sinal Subindo
+│  -30 ───▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │
+│        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │ [BASE - 0% a 60%]: VERDE PURO
+│                     (-)                      │  │
+├──────────────────────────────────────────────┤  ▼
+│                  -17.50 dB                   │  <-- Zona 6 (Leitura Numérica Neon)
+└──────────────────────────────────────────────┘  ═════════════════════════════════════════
+```
+
+#### 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO`)
+![Canal Pareado](imgs/mobile_paired_channel.png)
+
+```text
+┌──────────────────────────────────────────────┐  <-- Borda Verde de Pareamento
+│                  CH 21 + 22                  │  <-- Zona 1 (Header Pareado)
+├──────────────────────────────────────────────┤  ═════════════════════════════════════════
+│                 [ TECLADO ]                  │  ▲ [TOPO]: VERMELHO (PEAK)
+├──────────────────────────────────────────────┤  │
+│                    [SOLO]                    │  │ [ALTO]: AMARELO
+├──────────────────────────────────────────────┤  │
+│                     [ON]                     │  │ CORTINA VU DUAL (DIVIDIDA L / R)
+├──────────────────────────────────────────────┤  │ (Preenche 100% do fundo em 2 colunas:
+│                     (+)                      │  │  L = Canal Esquerdo, R = Canal Direito)
+│                      │                       │  │
+│    0 ───             │                       │  │
+│                    [ █ ]                     │  │
+│  -10 ───             │                       │  │
+│                      │                       │  │
+│  -30 ───             │                       │  │
+│        ▓▓▓▓▓▓▓▓▓▓ L  │  R ░░░░░░░░░░         │  │ ◄── L com sinal / R sem sinal
+│                     (-)                      │  │ [BASE]: VERDE PURO
+├──────────────────────────────────────────────┤  ▼
+│                   2.20 dB                    │  <-- Zona 6 (Leitura Numérica Neon)
+└──────────────────────────────────────────────┘  ═════════════════════════════════════════
+```
+
+#### 3. Master LR Stereo (`STEREO` / `ST`)
+![Master Stereo](imgs/mobile_master_stereo.png)
+
+```text
+┌──────────────────────────────────────────────┐  <-- Fundo Vinho / Vermelho Escuro
+│                    STEREO                    │  <-- Zona 1 (Header Centralizado)
+├──────────────────────────────────────────────┤  ═════════════════════════════════════════
+│                    [ ST ]                    │  ▲ [TOPO - 98% a 100%]: VERMELHO (PEAK)
+├──────────────────────────────────────────────┤  │
+│                    [SOLO]                    │  │ [ALTO - 85% a 98%]: AMARELO
+├──────────────────────────────────────────────┤  │
+│                     [ON]                     │  │ CORTINA VU METER DE FUNDO INTEGRAL
+├──────────────────────────────────────────────┤  │ (Preenche 100% do fundo do Master
+│                 [MEDIDORES]                  │  │ de baixo até em cima)
+├──────────────────────────────────────────────┤  │
+│                     (+)                      │  │
+│                      │                       │  │
+│    0 ───           [ █ ]                     │  │
+│  -10 ───             │                       │  │
+│  -30 ───             │                       │  │
+│        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │ ◄── Nível Atual Subindo
+│                     (-)                      │  │ [BASE - 0% a 60%]: VERDE PURO
+├──────────────────────────────────────────────┤  ▼
+│                   0.00 dB                    │  <-- Zona 6 (Leitura Numérica Neon)
+└──────────────────────────────────────────────┘  ═════════════════════════════════════════
+```
+
+#### 4. Envio Auxiliar / Mix (`CH 5` / `BAIXO` - Sends on Faders)
+![Envio Auxiliar](imgs/mobile_mix_aux_send.png)
+
+```text
+┌──────────────────────────────────────────────┐
+│                     CH 5                     │  <-- Zona 1 (Header do Canal de Entrada)
+├──────────────────────────────────────────────┤  ═════════════════════════════════════════
+│                  [ BAIXO ]                   │  ▲ [TOPO]: VERMELHO (PEAK)
+├──────────────────────────────────────────────┤  │
+│                   [ PRE ]                    │  │ [ALTO]: AMARELO
+├──────────────────────────────────────────────┤  │
+│                     [ON]                     │  │ CORTINA VU METER DE FUNDO INTEGRAL
+├──────────────────────────────────────────────┤  │ (Preenche 100% da área útil do card;
+│                     (+)                      │  │  em -∞ dB repousa na base)
+│                      │                       │  │
+│    0 ───             │                       │  │
+│  -10 ───             │                       │  │
+│  -30 ───             │                       │  │
+│                    [ █ ]                     │  │
+│                     (-)                      │  │ [BASE]: VERDE PURO
+├──────────────────────────────────────────────┤  ▼
+│                   -∞ dB                      │  <-- Zona 6 (Nível de Envio Atenuado)
+└──────────────────────────────────────────────┘  ═════════════════════════════════════════
+```
+
+#### 5. Macro Fader Técnico (`MACRO` / `MACRO FADER`)
+![Macro Fader](imgs/mobile_macro_fader.png)
+
+```text
+┌──────────────────────────────────────────────┐  <-- Fundo Cinza Claro / Prateado
+│                    MACRO                     │  <-- Zona 1 (Header Centralizado)
+├──────────────────────────────────────────────┤
+│                [MACRO FADER]                 │  <-- Zona 3 (Display do Macro)
+├──────────────────────────────────────────────┤
+│                  [ CONFIG ]                  │  <-- Zona 4 (Botão Roxo Seletor CHs)
+├──────────────────────────────────────────────┤
+│                    [--]                      │  <-- Zona 4 (Visor Preto Delta dB)
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    +                     │ │  <-- Zona 6 (Big Nudge Superior Aumentar)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    -                     │ │  <-- Zona 6 (Big Nudge Inferior Diminuir)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+└──────────────────────────────────────────────┘
+```
+
+#### 6. Volume Geral de AUX (`AUX` / `AUX GERAL`)
+![Volume Geral AUX](imgs/mobile_aux_geral.png)
+
+```text
+┌──────────────────────────────────────────────┐  <-- Fundo Cinza Claro / Prateado
+│                     AUX                      │  <-- Zona 1 (Header Centralizado)
+├──────────────────────────────────────────────┤
+│                 [AUX GERAL]                  │  <-- Zona 3 (Display do AUX Geral)
+├──────────────────────────────────────────────┤
+│                    [--]                      │  <-- Zona 4 (Visor Preto Delta dB)
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    +                     │ │  <-- Zona 6 (Big Nudge Superior Aumentar)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    -                     │ │  <-- Zona 6 (Big Nudge Inferior Diminuir)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+├──────────────────────────────────────────────┤
+│                  [ ZERAR ]                   │  <-- Zona 7 (Botão Vermelho Reset Envios)
+└──────────────────────────────────────────────┘
+```
+
+#### 7. Volume Geral do Músico (`GERAL` / `VOLUME GERAL`)
+![Volume Geral Músico](imgs/mobile_musician_volume_geral.png)
+
+```text
+┌──────────────────────────────────────────────┐  <-- Fundo Cinza Claro / Prateado
+│                    GERAL                     │  <-- Zona 1 (Header Centralizado)
+├──────────────────────────────────────────────┤
+│                [VOLUME GERAL]                │  <-- Zona 3 (Display Modo Músico)
+├──────────────────────────────────────────────┤
+│                  [ CONFIG ]                  │  <-- Zona 4 (Botão Roxo Configuração)
+├──────────────────────────────────────────────┤
+│                    [--]                      │  <-- Zona 4 (Visor Preto Delta dB)
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    +                     │ │  <-- Zona 6 (Big Nudge Superior Aumentar)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    -                     │ │  <-- Zona 6 (Big Nudge Inferior Diminuir)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+└──────────────────────────────────────────────┘
+```
 
 ---
 

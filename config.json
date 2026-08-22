@@ -46,6 +46,6 @@
   "monitoring_buffer_size": 960,
   "monitoring_format": "pcm",
   "time_between_fxs_requests": 150,
-  "active_theme": "teste_copia_copia.yaml",
+  "active_theme": "default.yaml",
   "ninja_sync_themes": true
 }
