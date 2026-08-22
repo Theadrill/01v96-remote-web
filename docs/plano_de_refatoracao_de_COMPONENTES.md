@@ -238,8 +238,11 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
 
 No layout Mobile, a hierarquia vertical e a identidade visual de cada canal seguem 7 variações padronizadas.
 
-* **Espaçamento entre Canais no Mobile (`gap` / `margin`):**
+* **Espaçamento e Agrupamento de Canais no Mobile (`gap` / `margin` e Blocos de 8 em 8):**
   * Diferente do Desktop, no modo **Mobile** os cards dos canais possuem um **espaçamento físico bem definido entre si (`gap` / margem lateral)** na lista com scroll horizontal. Isso garante toque limpo, evita disparos acidentais em canais adjacentes no palco e destaca individualmente o card de cada canal e sua cortina de medidor.
+  * **Agrupamento de 8 em 8 canais:** A interface insere automaticamente um **espaçamento maior (gap/margem ampliada)** a cada bloco de 8 canais (ex: entre CH 8 e CH 9, entre CH 16 e CH 17, etc.), facilitando a orientação rápida do operador e refletindo a organização em bancos/camadas físicas da mesa.
+  
+  ![Agrupamento e Espaçamento Mobile](imgs/mobile_channels_gap_grouping.png)
 
 #### 1. Canal Mono Normal (`CH 13` / `SURDAO`)
 ![Canal Mono Normal](imgs/mobile_mono_normal.png)
@@ -546,6 +549,8 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 
 * **Canais Colados / Sem Espaçamento no Desktop (`gap: 0`):**
   * Diferente do Mobile, no modo **Desktop** todos os channel strips são **completamente colados uns aos outros (espaçamento zero / `gap: 0` / sem margem entre strips)**, exatamente como as faixas de canais contíguas em uma console física de mixagem tradicional, maximizando a densidade visual e permitindo visualizar até 32 canais lado a lado no monitor.
+
+  ![Canais Colados Desktop Gap Zero](imgs/desktop_channels_gap_zero.png)
 
 #### 1. Canal de Input Mono (`CH 1` a `16` em Azul / `CH 17` a `32` em Esverdeado)
 ![Input Mono Desktop](imgs/desktop_input_mono.png)
