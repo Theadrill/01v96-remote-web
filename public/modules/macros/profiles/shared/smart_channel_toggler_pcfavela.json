@@ -1,10 +1,7 @@
 {
   "guardians": [
     17,
-    22,
-    20,
-    21,
-    30
+    22
   ],
   "snapshot": {
     "active": false,
