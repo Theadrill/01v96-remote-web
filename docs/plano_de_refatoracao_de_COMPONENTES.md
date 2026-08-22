@@ -204,6 +204,8 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
    - No Desktop: Botão de **Nudge Superior (+)** fino (+0.1 dB).
 6. **Zona 6 — Fader Core (Controle Central e Balística de Áudio):**
    - Canal Normal: Visor de dB, Régua lateral (+10 a -∞), Fader vertical de 10-bit (0–1023), VU Meter 60 FPS (WASM) com Peak LED e botão de **Nudge Inferior (-)** fino.
+   - **Fader Rail Físico (Sem Salto por Toque):** Em ambos os layouts (Mobile e Desktop), o trilho/calha do fader é desabilitado para cliques diretos (sem salto de volume ao tocar ou clicar no curso). O ajuste só ocorre arrastando o thumb/knob ou usando os botões de nudge (+/-), reproduzindo com fidelidade a segurança operacional de uma mesa física.
+   - **Roda do Mouse (Desktop Apenas):** No modo Desktop, o knob/thumb e o trilho respondem à roda do mouse (*scroll wheel*) para incrementar/decrementar volume com alta precisão.
    - Modo Mobile: Medidor VU implementado como **cortina de fundo total (`.has-meter` / `.mobile-meter-curtain`)** que preenche **100% da área útil do card do canal** de ponta a ponta:
      - **Gradiente Espectral Contínuo:** A cortina possui gradiente vertical que vai do **Verde puro** na base (sinal normal), passando por **Verde Claro / Amarelo** (atenção a partir de 60-85%), até culminar em **Vermelho vivo** no topo (98% a 100%).
      - **Preenchimento Integral:** Ocupa todo o espaço interior do canal (atrás dos botões, displays e fader), subindo fluidamente conforme a pressão sonora (Mono ou Estéreo Dividido L/R).
@@ -226,6 +228,10 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 #### 1. Canal Mono Normal (`CH 13` / `SURDAO`)
 ![Canal Mono Normal](imgs/mobile_mono_normal.png)
 
+* **Controle de Volume e Fader Rail (Segurança Física):**
+  * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
+  * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
+
 ```text
 ┌──────────────────────────────────────────────┐
 │                    CH 13                     │  <-- Zona 1 (Header Centralizado)
@@ -240,7 +246,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 │                      │                       │  │ (Preenche 100% da área útil do card
 │    0 ───             │                       │  │ de ponta a ponta, por trás de todos
 │                      │                       │  │ os botões, displays e fader)
-│  -10 ───           [ █ ]                     │  │
+│  -10 ───           [ █ ] ◄─ Arraste do Thumb │  │ ⚠️ Trilho desabilitado p/ toque direto
 │        ░░░░░░░░░░░░░░│░░░░░░░░░░░░░░         │  │ ◄── Nível Atual do Sinal Subindo
 │  -30 ───▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │
 │        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │ [BASE - 0% a 60%]: VERDE PURO
@@ -252,6 +258,10 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 
 #### 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO`)
 ![Canal Pareado](imgs/mobile_paired_channel.png)
+
+* **Controle de Volume e Fader Rail (Segurança Física):**
+  * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
+  * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
 
 ```text
 ┌──────────────────────────────────────────────┐  <-- Borda Verde de Pareamento
@@ -266,7 +276,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 │                     (+)                      │  │  L = Canal Esquerdo, R = Canal Direito)
 │                      │                       │  │
 │    0 ───             │                       │  │
-│                    [ █ ]                     │  │
+│                    [ █ ] ◄─ Arraste do Thumb │  │ ⚠️ Trilho desabilitado p/ toque direto
 │  -10 ───             │                       │  │
 │                      │                       │  │
 │  -30 ───             │                       │  │
@@ -279,6 +289,10 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 
 #### 3. Master LR Stereo (`STEREO` / `ST`)
 ![Master Stereo](imgs/mobile_master_stereo.png)
+
+* **Controle de Volume e Fader Rail (Segurança Física):**
+  * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
+  * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
 
 ```text
 ┌──────────────────────────────────────────────┐  <-- Fundo Vinho / Vermelho Escuro
@@ -294,7 +308,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 ├──────────────────────────────────────────────┤  │
 │                     (+)                      │  │
 │                      │                       │  │
-│    0 ───           [ █ ]                     │  │
+│    0 ───           [ █ ] ◄─ Arraste do Thumb │  │ ⚠️ Trilho desabilitado p/ toque direto
 │  -10 ───             │                       │  │
 │  -30 ───             │                       │  │
 │        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │ ◄── Nível Atual Subindo
@@ -306,6 +320,10 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 
 #### 4. Envio Auxiliar / Mix (`CH 5` / `BAIXO` - Sends on Faders)
 ![Envio Auxiliar](imgs/mobile_mix_aux_send.png)
+
+* **Controle de Volume e Fader Rail (Segurança Física):**
+  * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
+  * **Modificação Exclusiva por Arrasto:** O volume de envio só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
 
 ```text
 ┌──────────────────────────────────────────────┐
@@ -322,7 +340,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 │    0 ───             │                       │  │
 │  -10 ───             │                       │  │
 │  -30 ───             │                       │  │
-│                    [ █ ]                     │  │
+│                    [ █ ] ◄─ Arraste do Thumb │  │ ⚠️ Trilho desabilitado p/ toque direto
 │                     (-)                      │  │ [BASE]: VERDE PURO
 ├──────────────────────────────────────────────┤  ▼
 │                   -∞ dB                      │  <-- Zona 6 (Nível de Envio Atenuado)
@@ -404,6 +422,568 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 │ │                    -                     │ │  <-- Zona 6 (Big Nudge Inferior Diminuir)
 │ │                                          │ │
 │ └──────────────────────────────────────────┘ │
+└──────────────────────────────────────────────┘
+```
+
+#### 8. Canal Mobile TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO`)
+![Mobile Locked](imgs/mobile_locked.png)
+
+* **Controle de Volume e Fader Rail (Segurança Física):**
+  * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
+  * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob (quando destravado) ou usando os nudges (+/-), igual a uma mesa física.
+* **Visual Mobile:**
+  * Borda perimetral sutil em **Vermelho** contornando todo o card (`border: 1px solid #ff4444`).
+  * Card escurecido com overlay de bloqueio total de ponteiro.
+  * **Badge Circular Vermelho com Cadeado (`🔒`)** centralizado no rodapé inferior.
+* **Interação Mobile (Gestos Tácteis & Modais):**
+  * **Quando DESTRAVADO (Unlocked):**
+    * *Toque Rápido no Topo:* Abre a tela normal de configuração do canal.
+    * *Long Press no Topo ou Toque no Badge:* Abre modal com opções `[SIM, TRAVAR]`, `[RENOMEAR CANAL]` e `[CANCELAR]`.
+    * *Arrasto (> 10px):* Cancela o long press e permite scroll fluido da lista de canais.
+  * **Quando TRAVADO (Locked):**
+    * *Toque Normal em qualquer área:* Exibe modal de desbloqueio.
+    * *Long Press em qualquer área:* Também exibe o modal de desbloqueio.
+    * *Toque no Cadeado Vermelho Inferior:* Dispara imediatamente a confirmação de destravamento.
+
+```text
+┌──────────────────────────────────────────────┐  <-- Borda Vermelha de Travamento
+│                     CH 8                     │  <-- Zona 1 (Header Escurecido)
+├──────────────────────────────────────────────┤  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+│                [ VIOL AGUDO ]                │  ░
+├──────────────────────────────────────────────┤  ░
+│                    [SOLO]                    │  ░
+├──────────────────────────────────────────────┤  ░ INTERFACE MOBILE BLOQUEADA
+│                     [ON]                     │  ░ (Prevenção total contra toques
+├──────────────────────────────────────────────┤  ░  acidentais no palco/bolso)
+│                     (+)                      │  ░
+│                      │                       │  ░
+│    0 ───             │                       │  ░
+│                    [ █ ] ◄─ Fader Protegido  │  ░ ⚠️ Trilho desabilitado p/ toque direto
+│  -10 ───             │                       │  ░
+│                      │                       │  ░
+│  -30 ───             │                       │  ░
+│        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  ░ ◄── VU Meter continua ativo no fundo
+│                     (-)                      │  ░
+├─────────────────────┬───┬────────────────────┤  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+│                   -4│ 🔒 │dB                 │  <-- Badge Vermelho Circular (🔒)
+└─────────────────────┴───┴────────────────────┘      (Toque / Long Press p/ Destravar)
+```
+
+#### 9. Canal Mobile DESABILITADO / DISABLED (Ex: Modo FIXED)
+* **Comportamento Idêntico ao Hardware da Mesa:**
+  * Fader, réguas, displays e nudges ficam **completamente acinzentados (desaturados/opacidade reduzida)** e **sem ação de toque**.
+  * **EXCEÇÃO CRÍTICA — Botão ON (Mute):** O botão **ON** permanece com sua **cor normal e 100% funcional**, permitindo ligar/desligar o envio normalmente.
+
+```text
+┌──────────────────────────────────────────────┐  <-- Visual Acinzentado / Desaturado
+│                    AUX 1                     │  <-- Zona 1 (Header Acinzentado)
+├──────────────────────────────────────────────┤
+│                   [ AUX1 ]                   │  <-- Zona 3 (Display Desaturado)
+├──────────────────────────────────────────────┤
+│                   [FIXED]                    │  <-- Zona 2 (Status FIXED)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5: 100% ATIVO & COLORIDO!
+├──────────────────────────────────────────────┤      (Permite Mute/Unmute normalmente)
+│                     (+)  (inativo)           │
+│                      │                       │
+│    0 ───           [ █ ] ◄─ Fader 0 dB Fixo  │  <-- Fader Desabilitado p/ toque
+│  -10 ───             │                       │
+│  -30 ───             │                       │
+│                     (-)  (inativo)           │
+├──────────────────────────────────────────────┤
+│                   0.00 dB                    │  <-- Zona 6 (Leitura Fixa)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+### 3.3 Catálogo Visual e Estrutural das Variações Desktop (`docs/imgs/`)
+
+No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a régua analógica completa, botões de nudge dedicados (+ e - de 0.1 dB), barra(s) de VU meter independentes com LED de PEAK circular e o panpot analógico de rodapé.
+
+#### 1. Canal de Input Mono (`CH 1` a `16` em Azul / `CH 17` a `32` em Esverdeado)
+![Input Mono Desktop](imgs/desktop_input_mono.png)
+
+* **Diferenciação Cromática de Faixas:**
+  * **Canais 1 a 16:** Identidade visual com Header e acentos em **Tom Azul Yamaha** (`#0088cc`).
+  * **Canais 17 a 32:** Identidade visual com Header e acentos em **Tom Esverdeado** (`#00a86b`) para rápida distinção das camadas físicas.
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume ao clicar ao longo do curso da trilha).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir com alta precisão, exatamente como em uma mesa física de áudio.
+* **Mecânica do LED de PEAK (`.desk-peak-led`):**
+  * Localizado logo acima do VU meter (topo da calha).
+  * Em repouso/sinal normal: círculo discreto escuro (`#252525`, borda `#111`).
+  * Em $\ge 98\%$ de sinal: acende em **Vermelho Vivo** (`.active`, `background: #ff0000; box-shadow: 0 0 8px #ff4444;`) com **Peak Hold de 1000 ms (1 segundo)** após o sinal baixar.
+
+```text
+┌──────────────────────────────────────────────┐
+│ [ ]                 7                    [ ] │  <-- Zona 1 (Tripartite: Slot / CH Azul / Slot)
+├──────────────────────────────────────────────┤
+│                    [SOLO]                    │  <-- Zona 2 (Botão Solo)
+├──────────────────────────────────────────────┤
+│                 [ VIOLAO ]                   │  <-- Zona 3 (Display OLED Verde Neon)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON Amarelo Ativo)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge Fino Superior +0.1 dB)
+│                   -10.00                     │  <-- Zona 6 (Leitura Numérica em dB)
+│                                              │
+│  +10 ───          │  │                  (o)  │  <-- PEAK LED Circular (.desk-peak-led)
+│                   │  │                   │   │
+│    5 ───          │  │                   │   │
+│                   │  │                   │   │  ▲ [TOPO]: Vermelho
+│    0 ───          │  │                   │   │  │
+│                   │  │                   │   │  │ BARRA DE VU METER
+│    5 ───          │  │                   │   │  │ DEDICADA 60 FPS
+│                   │██│ ◄─ Arraste / Wheel│   │  │ (Trilho desabilitado p/ clique direto)
+│   10 ───          │██│    (Thumb Fader)  │   │  │ [MÉDIO]: Amarelo
+│                   │██│                   │   │  │ [BASE]: Verde
+│   15 ───          │  │                   │   │  ▼
+│   20 ───          │  │                   │   │
+│   30 ───          │  │                   │   │
+│   40 ───          │  │                   │   │
+│   50 ───          │  │                  ░│   │  ◄── Barra de VU Subindo
+│   -∞ ───          │  │                  ▓│   │
+│                                              │
+│                     (-)                      │  <-- Zona 6 (Nudge Fino Inferior -0.1 dB)
+├──────────────────────────────────────────────┤
+│  L ───────────────[ | ]─────────────────── R │  <-- Zona 7 (Panpot Analógico L-C-R)
+├──────────────────────────────────────────────┤
+│                    AD 7                      │  <-- Zona 7 (Patch I/O Físico)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO`)
+![Input Pareado Desktop](imgs/desktop_input_paired.png)
+
+* **Moldura:** Contorno verde neon em todo o card duplo.
+* **Zona 1:** Cabeçalho tripartite com ícone de cadeado 🔒 (`21 + 22 [🔒]`).
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+* **Zona 6 (VU Meter Estéreo Duplo):** **Duas barras verticais de VU Meter paralelas (L e R)** com seus respectivos LEDs circulares de Peak.
+* **Zona 7 (Duplo Pan com 2 Trilhas Independentes & Marquee):** **Duas barras/trilhas físicas de Panpot empilhadas (L no topo e R embaixo)**, cada uma com seu próprio cursor deslizante, e Badge de Patch com efeito marquee caso o texto (`ADAT 7 / NONE`) exceda a largura.
+
+```text
+┌──────────────────────────────────────────────┐  <-- Borda Verde de Pareamento
+│ [ ]               21 + 22                [🔒]│  <-- Zona 1 (Header Verde com Cadeado)
+├──────────────────────────────────────────────┤
+│                    [SOLO]                    │  <-- Zona 2 (Botão Solo)
+├──────────────────────────────────────────────┤
+│                 [ TECLADO ]                  │  <-- Zona 3 (Display OLED Integrado)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge Fino +0.1 dB)
+│                    2.20                      │  <-- Zona 6 (Leitura dB)
+│                                              │
+│  +10 ───          │  │                 (o)(o)│  <-- Duplo PEAK LED Estéreo
+│                   │██│ ◄─ Arraste/Wheel │  │ │  (Trilho desabilitado p/ clique direto)
+│    5 ───          │██│    (Thumb Fader) │  │ │  ▲
+│                   │██│                  │  │ │  │
+│    0 ───          │  │                  │  │ │  │ DUPLO VU METER ESTÉREO
+│                   │  │                  │  │ │  │ (Barra L e Barra R)
+│    5 ───          │  │                  │  │ │  │
+│   10 ───          │  │                  │  │ │  │
+│   20 ───          │  │                  │  │ │  ▼
+│   30 ───          │  │                  │  │ │
+│   40 ───          │  │                  │  │ │
+│   50 ───          │  │                 ░│ ░│ │  ◄── Nível L / R Independentes
+│   -∞ ───          │  │                 ▓│ ▓│ │
+│                                              │
+│                     (-)                      │  <-- Zona 6 (Nudge Fino -0.1 dB)
+├──────────────────────────────────────────────┤
+│  L ───────────────[ | ]─────────────────── R │  <-- Trilha Pan Canal Ímpar (L)
+│  L ───────────────[ | ]─────────────────── R │  <-- Trilha Pan Canal Par (R)
+├──────────────────────────────────────────────┤
+│               ADAT 7 / NONE                  │  <-- Zona 7 (Patch com Efeito Marquee)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 3. Master Fader Stereo (`MASTER` / `ST`)
+![Master Stereo Desktop](imgs/desktop_master_stereo.png)
+
+* **Identidade Visual:** Fundo Vinho / Borgonha escuro (`#3d1313`, borda `#800`).
+* **Zona 4 (Painel de Medidores Exclusivo):** Seletores de derivação de sinal:
+  * `MASTER: [ POST ]` (Post-fader / Pre-fader)
+  * `CANAIS: [ PREEQ ]` (Pre-EQ / Post-EQ / Pre-fader / Post-fader)
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume master só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+* **Zona 6 (VU Meter Master L/R):** Duplo VU Meter estéreo com escala ampla e Peak LEDs independentes.
+
+```text
+┌──────────────────────────────────────────────┐  <-- Fundo Vinho / Borgonha (#3d1313)
+│ [ ]                MASTER                [ ] │  <-- Zona 1 (Header Master)
+├──────────────────────────────────────────────┤
+│                    [SOLO]                    │  <-- Zona 2 (Solo / Clear All Solos)
+├──────────────────────────────────────────────┤
+│                    [ ST ]                    │  <-- Zona 3 (Display OLED Neon)
+├──────────────────────────────────────────────┤
+│                 MEDIDORES                    │  <-- Zona 4 (Bloco de Medidores)
+│             MASTER:  [ POST  ]               │
+│             CANAIS:  [ PREEQ ]               │
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON Amarelo)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge Fino +0.1 dB)
+│                    0.00                      │  <-- Zona 6 (Leitura dB)
+│                                              │
+│    0 ───          │██│ ◄─ Arraste/Wheel(o)(o)│  <-- Duplo PEAK LED
+│                   │██│    (Thumb Fader) │  │ │  (Trilho desabilitado p/ clique direto)
+│    5 ───          │  │                  │  │ │  ▲
+│   10 ───          │  │                  │  │ │  │ DUPLO VU METER ESTÉREO
+│   15 ───          │  │                  │  │ │  │ MASTER (L e R)
+│   20 ───          │  │                 ▓│ ▓│ │  │
+│   25 ───          │  │                 ▓│ ▓│ │  ▼
+│   30 ───          │  │                 ▓│ ▓│ │
+│   40 ───          │  │                 ▓│ ▓│ │
+│   50 ───          │  │                 ▓│ ▓│ │
+│   60 ───          │  │                 ▓│ ▓│ │
+│   -∞ ───          │  │                 ▓│ ▓│ │
+│                                              │
+│                     (-)                      │  <-- Zona 6 (Nudge Fino -0.1 dB)
+├──────────────────────────────────────────────┤
+│  L ───────────────[ | ]─────────────────── R │  <-- Zona 7 (Panpot Master Central)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 4. Macro Fader Técnico (`MACRO` / `MACRO FADER`)
+![Macro Fader Desktop](imgs/desktop_macro_fader.png)
+
+* **Identidade Visual:** Fundo Cinza Claro / Prateado metálico (`#e0e0e0`).
+* **Zona 4:** Botão roxo **`[ CONFIG ]`** (abre modal para selecionar canais controlados) + Visor OLED de **Delta dB** (`--` em repouso / `+2.00 dB` ao agir).
+* **Zona 6 (Big Nudges):** Botões retangulares brancos de grande área útil `[ + ]` e `[ - ]` com auto-repeat acelerado para compensação de ganho em bloco.
+
+```text
+┌──────────────────────────────────────────────┐  <-- Fundo Cinza Claro / Metálico
+│                    MACRO                     │  <-- Zona 1 (Header Escuro)
+├──────────────────────────────────────────────┤
+│                [MACRO FADER]                 │  <-- Zona 3 (Display OLED)
+├──────────────────────────────────────────────┤
+│                  [ CONFIG ]                  │  <-- Zona 4 (Botão Roxo Configuração)
+├──────────────────────────────────────────────┤
+│                    [--]                      │  <-- Zona 4 (Visor Delta dB)
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    +                     │ │  <-- Zona 6 (Big Nudge Superior)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    -                     │ │  <-- Zona 6 (Big Nudge Inferior)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+├──────────────────────────────────────────────┤
+│                    MACRO                     │  <-- Zona 7 (Rodapé Escuro)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2`)
+![Mix Mono Desktop](imgs/desktop_mix_mono.png)
+
+* **Identidade Visual:** Header em tom Amarelo Dourado / Âmbar (`#d4af37`).
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+* **Zona 7 (Roteamento Físico Duplo OMNI + ADAT):**
+  ![Mix Patch Outputs](imgs/desktop_mix_patch_outputs.png)
+  * **MIX 1 a 4:** Possui saída física espelhada dupla: **`OMNI X + ADAT X`** (ex: `OMNI 2 + ADAT 2`).
+  * **MIX 5 a 8:** Saída física direta padrão: **`ADAT 5` a `ADAT 8`**.
+  * Texto com efeito **Marquee contínuo** quando ultrapassa a largura física do strip.
+
+```text
+┌──────────────────────────────────────────────┐
+│ [ ]                MIX 2                 [ ] │  <-- Zona 1 (Header Âmbar / Amarelo)
+├──────────────────────────────────────────────┤
+│                    [SOLO]                    │  <-- Zona 2 (Botão Solo)
+├──────────────────────────────────────────────┤
+│                   [ AUX2 ]                   │  <-- Zona 3 (Display OLED)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge Fino +0.1 dB)
+│                    10.00                     │  <-- Zona 6 (Leitura dB)
+│                                              │
+│  +10 ───          │██│ ◄─ Arraste/Wheel (o)  │  <-- PEAK LED
+│                   │██│    (Thumb Fader)  │   │  (Trilho desabilitado p/ clique direto)
+│    5 ───          │  │                   │   │
+│    0 ───          │  │                   │   │  ▲ VU METER MONO
+│    5 ───          │  │                   │   │  │ (MIX Output)
+│   10 ───          │  │                   │   │  ▼
+│   20 ───          │  │                   │   │
+│   30 ───          │  │                   │   │
+│   40 ───          │  │                  ░│   │
+│   50 ───          │  │                  ▓│   │
+│   -∞ ───          │  │                  ▓│   │
+│                                              │
+│                     (-)                      │  <-- Zona 6 (Nudge Fino -0.1 dB)
+├──────────────────────────────────────────────┤
+│               OMNI 2 + ADAT 2                │  <-- Zona 7 (Saída Dupla com Marquee)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 6. Barramento BUS Pareado (`BUS 1 + 2` / `VHIGH`)
+![Bus Paired Desktop](imgs/desktop_bus_paired.png)
+
+* **Identidade Visual:** Header em tom Ciano / Verde-Azulado com ícone de cadeado 🔒 (`BUS 1 + 2 [🔒]`).
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+* **Correção de Especificação de VU (Stereo Dual Bar):**
+  * *Correção em relação ao legado:* No legado aparecia erroneamente com apenas 1 barra. Na nova arquitetura universal, **todo BUS pareado, Input pareado ou canal estéreo obrigatoriamente renderiza 2 barras de VU meter (L e R)** e duplo LED de Peak.
+* **Zona 7:** Patch duplo com divisória `FX 1-1 | FX 1-2`.
+
+```text
+┌──────────────────────────────────────────────┐
+│ [ ]              BUS 1 + 2               [🔒]│  <-- Zona 1 (Header Ciano com Cadeado)
+├──────────────────────────────────────────────┤
+│                    [SOLO]                    │  <-- Zona 2 (Botão Solo)
+├──────────────────────────────────────────────┤
+│                  [ VHIGH ]                   │  <-- Zona 3 (Display OLED)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge Fino +0.1 dB)
+│                    10.00                     │  <-- Zona 6 (Leitura dB)
+│                                              │
+│  +10 ───          │██│ ◄─ Arraste/Wheel(o)(o)│  <-- Duplo PEAK LED Estéreo
+│                   │██│    (Thumb Fader) │  │ │  (Trilho desabilitado p/ clique direto)
+│    5 ───          │  │                  │  │ │  ▲
+│    0 ───          │  │                  │  │ │  │ DUPLO VU METER ESTÉREO
+│    5 ───          │  │                  │  │ │  │ (Correção obrigatória: 2 barras)
+│   10 ───          │  │                  │  │ │  ▼
+│   20 ───          │  │                  │  │ │
+│   30 ───          │  │                  │  │ │
+│   40 ───          │  │                  │  │ │
+│   50 ───          │  │                 ░│ ░│ │
+│   -∞ ───          │  │                 ▓│ ▓│ │
+│                                              │
+│                     (-)                      │  <-- Zona 6 (Nudge Fino -0.1 dB)
+├──────────────────────────────────────────────┤
+│              FX 1-1 | FX 1-2                 │  <-- Zona 7 (Patch BUS Duplo)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 7. Canais ST IN (Stereo In 1 a 4 - `ST IN 1` / `REVERB VOZ`)
+![Stereo In Desktop](imgs/desktop_st_in.png)
+
+* **Zona 1:** Header azul `ST IN 1`.
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+* **Zona 6:** Fader estéreo com **duplo VU Meter L/R** e Peak LEDs.
+* **Zona 7 (Duplo Pan Estéreo com 2 Barras):** **Duas barras/trilhas físicas de Panpot independentes (uma sobre a outra)** — o cursor de cima para o canal Left (ex: roxo `[L]` na ponta esquerda) e o cursor de baixo para o canal Right (ex: roxo `[R]` na ponta direita) + Patch estéreo `FX2-1 / FX2-2`.
+
+```text
+┌──────────────────────────────────────────────┐
+│ [ ]               ST IN 1                [ ] │  <-- Zona 1 (Header ST IN Azul)
+├──────────────────────────────────────────────┤
+│                    [SOLO]                    │  <-- Zona 2 (Botão Solo)
+├──────────────────────────────────────────────┤
+│               [ REVERB VOZ ]                 │  <-- Zona 3 (Display OLED)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge Fino +0.1 dB)
+│                     -∞                       │  <-- Zona 6 (Leitura dB)
+│                                              │
+│  +10 ───          │  │                 (o)(o)│  <-- Duplo PEAK LED
+│    5 ───          │  │                  │  │ │
+│    0 ───          │  │                  │  │ │  ▲ DUPLO VU METER ESTÉREO
+│    5 ───          │  │                  │  │ │  │ (Retorno de Efeito / Estéreo)
+│   10 ───          │  │                  │  │ │  ▼
+│   20 ───          │  │                  │  │ │
+│   30 ───          │  │                  │  │ │
+│   40 ───          │  │                  │  │ │
+│   50 ───          │  │                  │  │ │
+│   -∞ ───          │██│ ◄─ Arraste/Wheel │  │ │  (Trilho desabilitado p/ clique direto)
+│                   │  │    (Thumb Fader) │  │ │
+│                     (-)                      │  <-- Zona 6 (Nudge Fino -0.1 dB)
+├──────────────────────────────────────────────┤
+│  L ───[ L ]───────────────────────────────── │  <-- Trilha Pan Canal Esquerdo (L)
+│  ─────────────────────────────────[ R ]─── R │  <-- Trilha Pan Canal Direito (R)
+├──────────────────────────────────────────────┤
+│              FX2-1 / FX2-2                   │  <-- Zona 7 (Patch ST IN com Marquee)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 8. Canal em Modo Sends on Faders Individual (`AUX 4` / `AUX4`)
+![Aux Send Desktop](imgs/desktop_aux_send.png)
+
+* **Zona 1:** Nome do barramento destino (`AUX 4`).
+* **Zona 2 (Comutador PRE / POST):** Botão roxo **`[ PRE ]`** ou **`[ POST ]`** no lugar do botão SOLO para alternar a tomada de sinal do envio auxiliar.
+* **Zona 3:** Nome do canal que está enviando (`AUX4`).
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume de envio só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** para aumentar/diminuir, igual a uma mesa física.
+* **Zona 6:** Leitura com sufixo (`-8.05 dB`), Fader vertical de envio, Régua completa e Barra de VU Meter com Peak LED.
+* **Zona 7:** Panpot do envio + Saída física (`OMNI 4 + ADAT 4`) com efeito marquee.
+
+```text
+┌──────────────────────────────────────────────┐
+│ [ ]                AUX 4                 [ ] │  <-- Zona 1 (Header do Envio Auxiliar)
+├──────────────────────────────────────────────┤
+│                   [ PRE ]                    │  <-- Zona 2 (Comutador Roxo PRE / POST)
+├──────────────────────────────────────────────┤
+│                   [ AUX4 ]                   │  <-- Zona 3 (Display OLED)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON Amarelo)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge Fino +0.1 dB)
+│                   -8.05 dB                   │  <-- Zona 6 (Leitura Numérica com dB)
+│                                              │
+│  +10 ───          │  │                  (o)  │  <-- PEAK LED
+│    5 ───          │  │                   │   │
+│    0 ───          │  │                   │   │  ▲ VU METER DO CANAL
+│    5 ───          │  │                   │   │  │
+│   10 ───          │██│ ◄─ Arraste/Wheel  │   │  ▼ (Trilho desabilitado p/ clique direto)
+│   15 ───          │██│    (Thumb Fader)  │   │
+│   20 ───          │  │                   │   │
+│   30 ───          │  │                   │   │
+│   40 ───          │  │                   │   │
+│   50 ───          │  │                   │   │
+│   -∞ ───          │  │                   │   │
+│                                              │
+│                     (-)                      │  <-- Zona 6 (Nudge Fino -0.1 dB)
+├──────────────────────────────────────────────┤
+│  L ───────────────[ | ]─────────────────── R │  <-- Zona 7 (Panpot do Envio)
+├──────────────────────────────────────────────┤
+│               OMNI 4 + ADAT 4                │  <-- Zona 7 (Saída com Efeito Marquee)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 9. Macro de Envio Geral (`AUX GERAL` / `MIX GERAL`)
+![Aux Geral Desktop](imgs/desktop_aux_geral.png)
+
+* Localizado na extremidade direita da tela de *Sends on Faders*:
+  * **Zona 1 (Header):** `AUX` (ou `MIX` na tela de Mix Sends).
+  * **Zona 3 (Display OLED):** `AUX GERAL` (ou `MIX GERAL`).
+  * **Zona 4:** Visor OLED de Delta dB (`--`).
+  * **Zona 6 (Big Nudges):** Botões retangulares brancos `[ + ]` e `[ - ]` com auto-repeat acelerado para aumentar ou diminuir coletivamente o envio de todos os canais para aquele auxiliar.
+  * **Zona 7 (Ação Crítica ZERAR):** Botão Vermelho de Destaque **`[ ZERAR ]`** (aciona modal de confirmação para zerar todos os envios de uma só vez) + Rodapé escuro `AUX` (ou `MIX`).
+
+```text
+┌──────────────────────────────────────────────┐  <-- Fundo Cinza Claro / Metálico
+│                    AUX                       │  <-- Zona 1 (Header Escuro AUX ou MIX)
+├──────────────────────────────────────────────┤
+│                 [AUX GERAL]                  │  <-- Zona 3 (Display OLED)
+├──────────────────────────────────────────────┤
+│                    [--]                      │  <-- Zona 4 (Visor Delta dB)
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    +                     │ │  <-- Zona 6 (Big Nudge Superior)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────┐ │
+│ │                                          │ │
+│ │                    -                     │ │  <-- Zona 6 (Big Nudge Inferior)
+│ │                                          │ │
+│ └──────────────────────────────────────────┘ │
+├──────────────────────────────────────────────┤
+│                  [ ZERAR ]                   │  <-- Zona 7 (Botão Vermelho Reset Envios)
+├──────────────────────────────────────────────┤
+│                    AUX                       │  <-- Zona 7 (Rodapé Escuro AUX ou MIX)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+#### 10. Canal Desktop TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO`)
+![Desktop Locked](imgs/desktop_locked.png)
+
+* **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
+  * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
+  * **Modificação Exclusiva por Arrasto ou Wheel:** Quando destravado, o volume só é modificado arrastando o thumb/knob, pelos nudges (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho**.
+* **Visual Desktop:**
+  * Linhas laterais destacadas em **Vermelho** (`border-left: 2px solid #ff4444; border-right: 2px solid #ff4444;`).
+  * Overlay protetor bloqueando cliques acidentais nos controles internos.
+  * **Cadeado Vermelho Circular Grande** posicionado no rodapé central sobre o overlay.
+* **Interação Desktop:**
+  * **Para TRAVAR:** O operador clica no slot do cadeado na Zona 1 (Header).
+  * **Para DESTRAVAR:** O operador clica diretamente no **Cadeado Vermelho Grande** do rodapé/overlay, abrindo a confirmação para destravar.
+
+```text
+┌──────────────────────────────────────────────┐  <-- Borda Lateral Vermelha (#ff4444)
+│ [ ]                 8                    [🔒]│  <-- Zona 1 (Ícone Cadeado Ativo)
+├──────────────────────────────────────────────┤
+│                   [ SOLO ]                   │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+├──────────────────────────────────────────────┤  ░
+│                [ VIOL AGUDO ]                │  ░
+├──────────────────────────────────────────────┤  ░
+│                    [ ON ]                    │  ░ CONTROLES BLOQUEADOS
+├──────────────────────────────────────────────┤  ░ POR OVERLAY PROTETOR
+│                     (+)                      │  ░ (Fader, Solo, ON, Nudges,
+│                    -4.00                     │  ░  Panpot e Patch protegidos)
+│                                              │  ░
+│  +10 ───          │  │                  (o)  │  ░
+│    5 ───          │  │                   │   │  ░
+│    0 ───          │  │                   │   │  ░
+│    5 ───          │██│ ◄─ Fader Travado  │   │  ░ (Trilho desabilitado p/ clique direto)
+│   10 ───          │  │    (Sem ação)     │   │  ░
+│   20 ───          │  │                   │   │  ░
+│   30 ───          │  │                   │   │  ░
+│   40 ───          │  │                   │   │  ░
+│   50 ───          │  │                  ░│   │  ░
+│   -∞ ───          │  │                  ▓│   │  ░
+│                     (-)                      │  ░
+├──────────────────────────────────────────────┤  ░
+│  L ───────────────[ | ]─────────────────── R │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+├─────────────────────┬───┬────────────────────┤
+│                AD 7 │ 🔒 │                   │  <-- Cadeado Vermelho Grande Central
+└─────────────────────┴───┴────────────────────┘      (Clique para Destravar)
+```
+
+---
+
+#### 11. Canal Desktop DESABILITADO / DISABLED (Ex: Modo FIXED)
+
+* **Comportamento Idêntico ao Hardware da Mesa:**
+  * Todos os controles de ganho/fader, régua, display, medidor, panpot, nudges e patch ficam **completamente acinzentados (desaturados/opacidade reduzida)** e **sem nenhuma ação de ponteiro/toque**.
+  * **EXCEÇÃO CRÍTICA — Botão ON (Mute):** O botão **ON** permanece com sua **cor normal e 100% funcional/habilitado**, permitindo ligar e desligar o canal/envio normalmente, exatamente como no console físico da Yamaha 01V96!
+
+```text
+┌──────────────────────────────────────────────┐  <-- Visual Acinzentado / Desaturado
+│ [ ]                AUX 1                 [ ] │  <-- Zona 1 (Header Acinzentado)
+├──────────────────────────────────────────────┤
+│                   [ FIXED ]                  │  <-- Zona 2 (Badge FIXED Desabilitado)
+├──────────────────────────────────────────────┤
+│                   [ AUX1 ]                   │  <-- Zona 3 (OLED Desaturado)
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5: 100% ATIVO & COLORIDO!
+├──────────────────────────────────────────────┤      (Único controle funcional)
+│                     (+)  (inativo)           │
+│                   0.00 dB (fixo)             │  <-- Zona 6 (Nível Nominal Travado)
+│                                              │
+│  +10 ───          │  │                  ( )  │
+│    5 ───          │  │                   │   │
+│    0 ───          │██│ ◄─ Fader Travado  │   │  <-- Sem ação de arraste/wheel
+│    5 ───          │  │                   │   │
+│   10 ───          │  │                   │   │
+│   -∞ ───          │  │                   │   │
+│                     (-)  (inativo)           │
+├──────────────────────────────────────────────┤
+│  L ───────────────[ | ]─────────────────── R │  <-- Zona 7 (Pan Inativo)
+├──────────────────────────────────────────────┤
+│                    FIXED                     │  <-- Zona 7 (Patch/Status FIXED)
 └──────────────────────────────────────────────┘
 ```
 
