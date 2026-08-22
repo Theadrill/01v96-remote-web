@@ -132,8 +132,10 @@ class ChannelStrip {
                         <button class="btn-zerar-sends" style="background:#dc2626; color:#fff; border:none; border-radius:4px; padding:4px 8px; font-size:10px; font-weight:bold; cursor:pointer;">[ ZERAR ]</button>
                     </div>
                 ` : ''}
-                <div class="desk-footer-zone" style="text-align:center; padding:4px; font-size:11px; background:#111; color:#888;">
-                    ${cfg.chNumber}
+                <div class="desk-footer-zone">
+                    <div class="desk-patch-area">
+                        <span>${cfg.chNumber}</span>
+                    </div>
                 </div>
             `;
         }
@@ -168,68 +170,97 @@ class ChannelStrip {
                 </div>
             ` : ''}
 
-            <!-- ZONA 5: Primary Action (ON) & Nudge Superior -->
+            <!-- ZONA 5: Primary Action (ON), Nudge Superior & Leitura dB -->
             <div class="desk-primary-action-zone">
                 <button class="desk-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
                 <button class="desk-nudge-btn desk-nudge-plus" title="Nudge + (Clique ou segure)">+</button>
+                <div class="desk-db-readout">${cfg.dbValue || '-10.00'}</div>
             </div>
 
-            <!-- ZONA 6: Fader Core (dB, Régua, Fader Rail, VU Meter & Peak LED) -->
+            <!-- ZONA 6: Fader Core (Régua, Fader Rail, VU Meter & Peak LED, Nudge -) -->
             <div class="desk-fader-core">
-                <div class="desk-db-readout">${cfg.dbValue || '-10.00'}</div>
-                <div class="desk-fader-track-area" style="position: relative; display: flex; height: 180px; align-items: stretch; justify-content: center;">
+                <div class="desk-fader-track-area" style="position: relative; display: flex; flex: 1; width: 100%; min-height: 220px; align-items: stretch; justify-content: center; margin: 2px 0;">
 
-                    <!-- Régua de dB -->
-                    <div class="desk-db-ruler" style="width: 28px; font-size: 8px; color: #666; display: flex; flex-direction: column; justify-content: space-between; user-select: none;">
-                        <span>+10</span><span>0</span><span>-10</span><span>-30</span><span>-∞</span>
+                    <!-- Régua de dB Analógica Completa -->
+                    <div class="desk-db-ruler ${isMaster ? 'master-ruler' : ''}">
+                        ${isMaster ? `
+                            <span class="mark-p10">0</span>
+                            <span class="mark-p5">-5</span>
+                            <span class="mark-0">-10</span>
+                            <span class="mark-m5">-15</span>
+                            <span class="mark-m10">-20</span>
+                            <span class="mark-m20">-30</span>
+                            <span class="mark-m30">-40</span>
+                            <span class="mark-m40">-50</span>
+                            <span class="mark-inf">-∞</span>
+                        ` : `
+                            <span class="mark-p10">+10</span>
+                            <span class="mark-p5">+5</span>
+                            <span class="mark-0">0</span>
+                            <span class="mark-m5">-5</span>
+                            <span class="mark-m10">-10</span>
+                            <span class="mark-m15">-15</span>
+                            <span class="mark-m20">-20</span>
+                            <span class="mark-m30">-30</span>
+                            <span class="mark-m40">-40</span>
+                            <span class="mark-m50">-50</span>
+                            <span class="mark-inf">-∞</span>
+                        `}
                     </div>
 
                     <!-- Trilho do Fader (Protegido contra saltos de clique) -->
-                    <div class="desk-fader-rail" style="width: 20px; position: relative; display: flex; justify-content: center;">
-                        <div class="desk-rail-groove" style="width: 4px; height: 100%; background: #111; border-radius: 2px;"></div>
-                        <div class="desk-fader-thumb" style="width: 24px; height: 38px; background: linear-gradient(180deg, #555, #222); border: 1px solid #777; border-radius: 3px; position: absolute; bottom: ${((cfg.faderValue || 0) / 1023) * 100}%; cursor: grab; box-shadow: 0 2px 5px rgba(0,0,0,0.5); touch-action: none;">
-                            <div style="width: 100%; height: 2px; background: #fff; position: absolute; top: 50%; margin-top: -1px; pointer-events: none;"></div>
+                    <div class="desk-fader-rail" style="width: 22px; position: relative; display: flex; justify-content: center;">
+                        <div class="desk-rail-groove" style="width: 4px; height: 100%; background: #0a0a0a; border: 1px solid #222; border-radius: 2px;"></div>
+                        <div class="desk-fader-thumb" style="bottom: calc((100% - 38px) * ${Math.max(0, Math.min(1, (cfg.faderValue || 0) / 1023))});">
+                            <div class="thumb-center-line"></div>
                         </div>
                     </div>
 
-                    <!-- VU Meter 60FPS + Peak LED -->
-                    <div class="desk-meter-column" style="width: ${isPaired ? '16px' : '10px'}; display: flex; flex-direction: column; align-items: center; gap: 2px; margin-left: 4px;">
+                    <!-- VU Meter 60FPS + Peak LED Circular -->
+                    <div class="desk-meter-column" style="width: ${isPaired ? '16px' : '8px'}; display: flex; flex-direction: column; align-items: center; gap: 3px; margin-left: 3px;">
                         <!-- Peak LED Circular -->
                         <div class="desk-peak-led-group" style="display: flex; gap: 2px;">
-                            <div class="desk-peak-led peak-l" style="width: 6px; height: 6px; border-radius: 50%; background: #252525; border: 1px solid #111;"></div>
-                            ${isPaired ? `<div class="desk-peak-led peak-r" style="width: 6px; height: 6px; border-radius: 50%; background: #252525; border: 1px solid #111;"></div>` : ''}
+                            <div class="desk-peak-led peak-l" style="width: 7px; height: 7px; border-radius: 50%; background: #252525; border: 1px solid #111;"></div>
+                            ${isPaired ? `<div class="desk-peak-led peak-r" style="width: 7px; height: 7px; border-radius: 50%; background: #252525; border: 1px solid #111;"></div>` : ''}
                         </div>
 
-                        <!-- Barra de Medidor VU -->
-                        <div class="desk-meter-bar-track" style="flex: 1; width: 100%; background: #111; border-radius: 2px; display: flex; gap: 2px; padding: 1px; box-sizing: border-box;">
-                            <div class="desk-vu-fill vu-l" style="flex: 1; background: #10b981; border-radius: 1px; height: 0%; margin-top: auto; transition: height 0.05s linear;"></div>
-                            ${isPaired ? `<div class="desk-vu-fill vu-r" style="flex: 1; background: #10b981; border-radius: 1px; height: 0%; margin-top: auto; transition: height 0.05s linear;"></div>` : ''}
+                        <!-- Barra de Medidor VU Gradiente Físico -->
+                        <div class="desk-meter-bar-track" style="flex: 1; width: 100%; background: #0c0c0c; border: 1px solid #222; border-radius: 2px; display: flex; gap: 2px; padding: 1px; box-sizing: border-box; overflow: hidden;">
+                            <div class="desk-vu-fill vu-l" style="flex: 1; background: linear-gradient(0deg, #10b981 0%, #22c55e 60%, #f59e0b 80%, #ef4444 100%); border-radius: 1px; height: 0%; margin-top: auto; transition: height 0.05s linear;"></div>
+                            ${isPaired ? `<div class="desk-vu-fill vu-r" style="flex: 1; background: linear-gradient(0deg, #10b981 0%, #22c55e 60%, #f59e0b 80%, #ef4444 100%); border-radius: 1px; height: 0%; margin-top: auto; transition: height 0.05s linear;"></div>` : ''}
                         </div>
                     </div>
 
                 </div>
 
                 <!-- Nudge Inferior (-) -->
-                <button class="desk-nudge-btn desk-nudge-minus" title="Nudge - (Clique ou segure)">-</button>
+                <div style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 2px 0;">
+                    <button class="desk-nudge-btn desk-nudge-minus" title="Nudge - (Clique ou segure)">-</button>
+                </div>
             </div>
 
             <!-- ZONA 7: Footer Routing & Panpot -->
             <div class="desk-footer-zone">
                 ${isPaired ? `
-                    <div class="desk-dual-pan" style="padding: 2px 4px; font-size: 8px;">
-                        <div class="pan-line">L: [ ${cfg.panL || -32} ]</div>
-                        <div class="pan-line">R: [ ${cfg.panR || 32} ]</div>
+                    <div class="desk-dual-pan" style="padding: 1px 2px 2px 2px; font-size: 8.5px; font-family: monospace; color: #ccc;">
+                        <div class="pan-line" style="display:flex; justify-content:space-between;"><span>L:</span><span style="color:#a855f7;">${cfg.panL || -32}</span></div>
+                        <div class="pan-line" style="display:flex; justify-content:space-between;"><span>R:</span><span style="color:#a855f7;">${cfg.panR || 32}</span></div>
                     </div>
                 ` : `
-                    <div class="desk-single-pan" style="padding: 2px 4px; font-size: 8px; text-align: center;">
-                        L [ | ] R
+                    <!-- Panpot Analógico L-C-R com Linha Central -->
+                    <div class="desk-pan-container" style="padding: 2px 2px 3px 2px; display: flex; flex-direction: column; align-items: center; gap: 1px;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; font-size: 7px; color: #666; font-weight: 700; padding: 0 2px; box-sizing: border-box;">
+                            <span>L</span><span>C</span><span>R</span>
+                        </div>
+                        <div class="desk-pan-track" style="width: 100%; height: 6px; background: #1a1a1a; border: 1px solid #333; border-radius: 3px; position: relative; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 1px; height: 100%; background: #444; position: absolute;"></div>
+                            <div class="desk-pan-thumb" style="width: 8px; height: 8px; border-radius: 50%; background: #a855f7; border: 1px solid #fff; position: absolute; left: calc(50% + ${((cfg.panL || 0) / 32) * 40}% - 4px); box-shadow: 0 0 4px rgba(168,85,247,0.6);"></div>
+                        </div>
                     </div>
                 `}
-                ${cfg.patch ? `
-                    <div class="desk-patch-badge" style="background: #111; color: #aaa; font-size: 9px; padding: 2px 4px; text-align: center; overflow: hidden; white-space: nowrap;">
-                        <span class="marquee-text">${cfg.patch}</span>
-                    </div>
-                ` : ''}
+                <div class="desk-patch-area">
+                    <span class="marquee-text">${cfg.patch || ''}</span>
+                </div>
             </div>
 
             <!-- Overlay de Bloqueio se Travado (Locked) -->
@@ -249,6 +280,7 @@ class ChannelStrip {
         const cfg = this.config;
         const isMacro = cfg.mode === 'macro' || (cfg.type && cfg.type.startsWith('macro'));
         const isPaired = cfg.isPaired;
+        const isMaster = cfg.type === 'master' || cfg.isMaster;
 
         if (isMacro) {
             return `
@@ -309,21 +341,28 @@ class ChannelStrip {
                 </div>
 
                 <!-- Nudge Superior (+) -->
-                <div style="text-align: center;">
-                    <button class="mob-nudge-btn mob-nudge-plus" style="background: #252a38; color: #fff; border: 1px solid #444; border-radius: 4px; width: 36px; height: 28px; font-size: 14px; font-weight: bold; cursor: pointer;">+</button>
+                <div style="text-align: center; display: flex; justify-content: center; align-items: center; padding: 2px 0;">
+                    <button class="mob-nudge-btn mob-nudge-plus" title="Nudge + (Toque ou segure)">+</button>
                 </div>
 
                 <!-- Fader Rail Central (Sem salto ao toque direto) -->
                 <div class="mob-fader-track-area" style="position: relative; height: 160px; display: flex; justify-content: center; align-items: stretch; margin: 4px 0;">
+                    <!-- Régua Simplificada Mobile (0, -10, -30) -->
+                    <div class="mob-db-ruler ${isMaster ? 'master-ruler' : ''}">
+                        <span class="mark-0">0 ───</span>
+                        <span class="mark-m10">-10 ───</span>
+                        <span class="mark-m30">-30 ───</span>
+                    </div>
+
                     <div class="mob-fader-groove" style="width: 6px; height: 100%; background: #111; border-radius: 3px;"></div>
-                    <div class="mob-fader-thumb" style="width: 38px; height: 44px; background: linear-gradient(180deg, #666, #222); border: 1px solid #888; border-radius: 6px; position: absolute; bottom: ${((cfg.faderValue || 0) / 1023) * 100}%; cursor: grab; box-shadow: 0 4px 10px rgba(0,0,0,0.6); touch-action: none;">
-                        <div style="width: 100%; height: 3px; background: #00e5ff; position: absolute; top: 50%; margin-top: -1.5px; border-radius: 1px; pointer-events: none;"></div>
+                    <div class="mob-fader-thumb" style="bottom: calc((100% - 40px) * ${Math.max(0, Math.min(1, (cfg.faderValue || 0) / 1023))});">
+                        <div class="thumb-center-line"></div>
                     </div>
                 </div>
 
                 <!-- Nudge Inferior (-) -->
-                <div style="text-align: center;">
-                    <button class="mob-nudge-btn mob-nudge-minus" style="background: #252a38; color: #fff; border: 1px solid #444; border-radius: 4px; width: 36px; height: 28px; font-size: 14px; font-weight: bold; cursor: pointer;">-</button>
+                <div style="text-align: center; display: flex; justify-content: center; align-items: center; padding: 2px 0;">
+                    <button class="mob-nudge-btn mob-nudge-minus" title="Nudge - (Toque ou segure)">-</button>
                 </div>
 
                 <!-- Zona 6: Leitura Numérica Neon em dB -->
@@ -437,7 +476,7 @@ class ChannelStrip {
             els.faderArea.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const isFine = (cfg.type === 'master' || cfg.type === 'mix' || cfg.type === 'bus_paired') ? 0.50 : 0.10;
+                const isFine = (cfg.type === 'mix' || cfg.type === 'bus' || cfg.type === 'bus_paired' || cfg.type === 'aux_send') ? 0.50 : 0.10;
                 const dir = e.deltaY < 0 ? 1 : -1;
 
                 // Atualiza valor se o canal tiver fader normal
@@ -490,7 +529,6 @@ class ChannelStrip {
      * @private
      */
     _setupNudgeButton(btnEl, direction) {
-        const isMaster = this.config.isMaster || this.config.type === 'master';
         const isOut = this.config.type === 'mix' || this.config.type === 'bus' || this.config.type === 'bus_paired';
         const isAuxSend = this.config.type === 'aux_send';
         const isMacro = this.config.mode === 'macro' || (this.config.type && this.config.type.startsWith('macro'));
@@ -498,7 +536,7 @@ class ChannelStrip {
         let step = 0.05;
         if (isAuxSend) {
             step = 0.50;
-        } else if (isMaster || isOut || isMacro) {
+        } else if (isOut || isMacro) {
             step = 0.10;
         }
 
@@ -519,20 +557,23 @@ class ChannelStrip {
             e.preventDefault();
             stepNudge();
 
-            let speed = 250;
+            let delay = 120;
+            const minDelay = 25;
+
+            const repeat = () => {
+                stepNudge();
+                delay = Math.max(minDelay, delay * 0.82);
+                this.nudgeInterval = setTimeout(repeat, delay);
+            };
+
             this.nudgeTimer = setTimeout(() => {
-                this.nudgeInterval = setInterval(() => {
-                    stepNudge();
-                    if (speed > 50) {
-                        speed -= 25;
-                    }
-                }, speed);
-            }, 350);
+                repeat();
+            }, 220);
         };
 
         const stopAutoRepeat = () => {
             if (this.nudgeTimer) clearTimeout(this.nudgeTimer);
-            if (this.nudgeInterval) clearInterval(this.nudgeInterval);
+            if (this.nudgeInterval) clearTimeout(this.nudgeInterval);
             this.nudgeTimer = null;
             this.nudgeInterval = null;
         };
@@ -612,10 +653,12 @@ class ChannelStrip {
      */
     setFaderValue(val, dbText) {
         this.config.faderValue = val;
-        const percent = (val / 1023) * 100;
+        const normalized = Math.max(0, Math.min(1, val / 1023));
 
         if (this.elements.faderThumb) {
-            this.elements.faderThumb.style.bottom = `${percent}%`;
+            const isDesk = this.config.layout === 'desktop';
+            const thumbH = isDesk ? 38 : 40;
+            this.elements.faderThumb.style.bottom = `calc((100% - ${thumbH}px) * ${normalized})`;
         }
 
         if (this.elements.dbReadout) {

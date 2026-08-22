@@ -205,20 +205,20 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
 6. **Zona 6 — Fader Core (Controle Central e Balística de Áudio):**
    - Canal Normal: Visor de dB, Régua lateral (+10 a -∞), Fader vertical de 10-bit (0–1023), VU Meter 60 FPS (WASM) com Peak LED e botão de **Nudge Inferior (-)** fino (mesmo step e física de longpress do Nudge Superior).
    - **Tabela Canônica de Steps dos Botões de Nudge (+ e -):**
-     - **Canais de Input (Mono 1-32, Pareados 1-32 e ST IN 1-4):** Step de **`0.05 dB`** por clique/toque de botão.
-     - **Canais de Saída / Masters (MIX 1-8, BUS 1-8 e Master Stereo LR):** Step de **`0.10 dB`** por clique/toque de botão.
+     - **Canais de Input (Mono 1-32, Pareados 1-32 e ST IN 1-4) e Master Stereo LR:** Step de **`0.05 dB`** por clique/toque de botão.
+     - **Canais de Saída (MIX 1-8 e BUS 1-8):** Step de **`0.10 dB`** por clique/toque de botão.
      - **Sends on Faders e Tela de AUX Individual:** Step de **`0.50 dB`** por clique/toque de botão.
      - **Macro Fader (Modo Técnico):** Step de **`0.05 dB`** por clique/toque nos Big Nudges.
      - **Macro Fader de Volume Geral (Sends on Faders / Tela AUX):** Step de **`0.10 dB`** por clique/toque nos Big Nudges.
      - **Macro Fader de Volume Geral (Modo Músico):** Step de **`0.25 dB`** por clique/toque nos Big Nudges.
    - **Tabela Canônica de Steps da Roda do Mouse (*Scroll Wheel* — Desktop):**
-     - **Canais de Input (Mono 1-32, Pareados 1-32 e ST IN 1-4):** Step de **`0.10 dB`** por entalhe do scroll wheel.
-     - **Canais de Saída / Masters (MIX 1-8, BUS 1-8 e Master Stereo LR):** Step de **`0.50 dB`** por entalhe do scroll wheel.
+     - **Canais de Input (Mono 1-32, Pareados 1-32 e ST IN 1-4) e Master Stereo LR:** Step de **`0.10 dB`** por entalhe do scroll wheel.
+     - **Canais de Saída (MIX 1-8 e BUS 1-8):** Step de **`0.50 dB`** por entalhe do scroll wheel.
      - **Sends on Faders e Tela de AUX Individual:** Step de **`0.50 dB`** por entalhe do scroll wheel.
      - **Macro Faders (Técnico, AUX Geral e Modo Músico):** **Sem suporte a roda do mouse** (ação exclusiva via Big Nudges).
-   - **Comportamento de Long Press (Desktop e Mobile):** Ao segurar pressionado qualquer botão de `(+)` ou `(-)` (no mouse ou touch screen), o valor inicia movimentação contínua automática (auto-repeat) acelerando progressivamente enquanto mantido pressionado.
+   - **Comportamento de Long Press (Desktop e Mobile):** Ao segurar pressionado qualquer botão de `(+)` ou `(-)` (no mouse ou touch screen), o valor inicia movimentação contínua automática (auto-repeat) acelerando progressivamente em alta velocidade enquanto mantido pressionado.
    - **Fader Rail Físico (Sem Salto por Toque):** Em ambos os layouts (Mobile e Desktop), o trilho/calha do fader é desabilitado para cliques diretos (sem salto de volume ao tocar ou clicar no curso). O ajuste só ocorre arrastando o thumb/knob ou usando os botões de nudge (+/-), reproduzindo com fidelidade a segurança operacional de uma mesa física.
-   - **Roda do Mouse (Desktop Apenas nos Faders Individuais):** No modo Desktop, o knob/thumb e o trilho dos canais de Input (`0.10 dB`), Saídas/Masters (`0.50 dB`) e Sends on Faders (`0.50 dB`) respondem à roda do mouse (*scroll wheel*) para incrementar/decrementar volume. Os canais em modo Macro (Técnico, AUX Geral e Músico) **não respondem à roda do mouse**.
+   - **Roda do Mouse (Desktop Apenas nos Faders Individuais):** No modo Desktop, o knob/thumb e o trilho dos canais de Input e Master (`0.10 dB`), Saídas/Buses (`0.50 dB`) e Sends on Faders (`0.50 dB`) respondem à roda do mouse (*scroll wheel*) para incrementar/decrementar volume. Os canais em modo Macro (Técnico, AUX Geral e Músico) **não respondem à roda do mouse**.
    - Modo Mobile: Medidor VU implementado como **cortina de fundo total (`.has-meter` / `.mobile-meter-curtain`)** que preenche **100% da área útil do card do canal** de ponta a ponta:
      - **Gradiente Espectral Contínuo:** A cortina possui gradiente vertical que vai do **Verde puro** na base (sinal normal), passando por **Verde Claro / Amarelo** (atenção a partir de 60-85%), até culminar em **Vermelho vivo** no topo (98% a 100%).
      - **Preenchimento Integral:** Ocupa todo o espaço interior do canal (atrás dos botões, displays e fader), subindo fluidamente conforme a pressão sonora (Mono ou Estéreo Dividido L/R).
@@ -244,7 +244,7 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
   
   ![Agrupamento e Espaçamento Mobile](imgs/mobile_channels_gap_grouping.png)
 
-#### 1. Canal Mono Normal (`CH 13` / `SURDAO`)
+#### 1. Canal Mono Normal (`CH 13` / `SURDAO`) (CONCLUÍDO ✅)
 ![Canal Mono Normal](imgs/mobile_mono_normal.png)
 
 * **Controle de Volume e Fader Rail (Segurança Física):**
@@ -319,8 +319,8 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
   * **Trilha Desabilitada para Toque:** A calha/trilho do fader é desabilitada para toques diretos (sem salto ou pulo de volume ao tocar no curso da trilha).
   * **Modificação Exclusiva por Arrasto:** O volume só é modificado arrastando ativamente o thumb/knob ou usando os botões de nudge (+/-), igual a uma mesa física de áudio.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Toque:** Incremento/decremento de **`0.10 dB`** por toque de botão no Master.
-  * **Long Press (Auto-Repeat):** Ao segurar pressionado o botão `(+)` ou `(-)`, o volume se move continuamente acelerando enquanto mantido.
+  * **Step por Toque:** Incremento/decremento fino de **`0.05 dB`** por toque de botão no Master (mesmo padrão dos canais de entrada).
+  * **Long Press (Auto-Repeat):** Ao segurar pressionado o botão `(+)` ou `(-)`, o volume se move continuamente acelerando em alta velocidade enquanto mantido.
 
 ```text
 ┌──────────────────────────────────────────────┐  <-- Fundo Vinho / Vermelho Escuro
@@ -334,13 +334,13 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 ├──────────────────────────────────────────────┤  │ (Preenche 100% do fundo do Master
 │                 [MEDIDORES]                  │  │ de baixo até em cima)
 ├──────────────────────────────────────────────┤  │
-│                     (+)                      │  │ <-- Nudge (+0.10 dB / Long Press)
+│                     (+)                      │  │ <-- Nudge (+0.05 dB / Long Press)
 │                      │                       │  │
 │    0 ───           [ █ ] ◄─ Arraste do Thumb │  │ ⚠️ Trilho desabilitado p/ toque direto
 │  -10 ───             │                       │  │
 │  -30 ───             │                       │  │
 │        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓│▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │  │ ◄── Nível Atual Subindo
-│                     (-)                      │  │ <-- Nudge (-0.10 dB / Long Press)
+│                     (-)                      │  │ <-- Nudge (-0.05 dB / Long Press)
 ├──────────────────────────────────────────────┤  ▼ [BASE - 0% a 60%]: VERDE PURO
 │                   0.00 dB                    │  <-- Zona 6 (Leitura Numérica Neon)
 └──────────────────────────────────────────────┘  ═════════════════════════════════════════
@@ -545,14 +545,14 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 
 ### 3.3 Catálogo Visual e Estrutural das Variações Desktop (`docs/imgs/`)
 
-No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a régua analógica completa, botões de nudge dedicados (+ e - de micro-ajuste), barra(s) de VU meter independentes com LED de PEAK circular e o panpot analógico de rodapé.
+No layout Desktop, a largura é fixa/padronizada em **85px** (para canais individuais) e **108px** (para canais pareados/linked), e a verticalidade acomoda a régua analógica completa, botões de nudge dedicados (+ e - de micro-ajuste), barra(s) de VU meter independentes com LED de PEAK circular e o panpot analógico de rodapé.
 
 * **Canais Colados / Sem Espaçamento no Desktop (`gap: 0`):**
-  * Diferente do Mobile, no modo **Desktop** todos os channel strips são **completamente colados uns aos outros (espaçamento zero / `gap: 0` / sem margem entre strips)**, exatamente como as faixas de canais contíguas em uma console física de mixagem tradicional, maximizando a densidade visual e permitindo visualizar até 32 canais lado a lado no monitor.
+  * Diferente do Mobile, no modo **Desktop** todos os channel strips são **completamente colados uns aos outros (espaçamento zero / `gap: 0` / sem margem entre strips)** com largura individual de **85px** (ou **108px** quando LINKED), exatamente como as faixas de canais contíguas em uma console física de mixagem tradicional, maximizando a densidade visual e permitindo visualizar até 32 canais lado a lado no monitor.
 
   ![Canais Colados Desktop Gap Zero](imgs/desktop_channels_gap_zero.png)
 
-#### 1. Canal de Input Mono (`CH 1` a `16` em Azul / `CH 17` a `32` em Esverdeado)
+#### 1. Canal de Input Mono (`CH 1` a `16` em Azul / `CH 17` a `32` em Esverdeado) (CONCLUÍDO ✅)
 ![Input Mono Desktop](imgs/desktop_input_mono.png)
 
 * **Diferenciação Cromática de Faixas:**
@@ -670,10 +670,10 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
   * `CANAIS: [ PREEQ ]` (Pre-EQ / Post-EQ / Pre-fader / Post-fader)
 * **Controle de Volume e Fader Rail (Segurança Física & Mouse Wheel):**
   * **Trilha Desabilitada para Clique:** A calha/trilho do fader é desabilitada para cliques diretos (sem salto ou pulo de volume).
-  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume master só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.50 dB`** por entalhe para aumentar/diminuir, igual a uma mesa física.
+  * **Modificação Exclusiva por Arrasto ou Wheel:** O volume master só é modificado arrastando o thumb/knob, usando os botões de nudge (+/-), ou girando a **roda do mouse (*scroll wheel*) sobre o thumb/trilho** com step de **`0.10 dB`** por entalhe para aumentar/diminuir (seguindo o padrão dos canais de input), igual a uma mesa física.
 * **Comportamento dos Nudges (+ e -):**
-  * **Step por Clique:** Incremento/decremento fino de **`0.10 dB`** por clique no Master Stereo.
-  * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, o volume se move continuamente acelerando.
+  * **Step por Clique:** Incremento/decremento fino de **`0.05 dB`** por clique no Master Stereo.
+  * **Long Press (Auto-Repeat):** Ao manter pressionado `(+)` ou `(-)`, o volume se move continuamente acelerando em alta velocidade.
 * **Zona 6 (VU Meter Master L/R):** Duplo VU Meter estéreo com escala ampla e Peak LEDs independentes.
 
 ```text
@@ -690,7 +690,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 ├──────────────────────────────────────────────┤
 │                     [ON]                     │  <-- Zona 5 (Botão ON Amarelo)
 ├──────────────────────────────────────────────┤
-│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.05 dB / Long Press)
 │                    0.00                      │  <-- Zona 6 (Leitura dB)
 │                                              │
 │    0 ───          │██│ ◄─ Arraste/Wheel(o)(o)│  <-- Duplo PEAK LED
@@ -706,7 +706,7 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 │   60 ───          │  │                 ▓│ ▓│ │
 │   -∞ ───          │  │                 ▓│ ▓│ │
 │                                              │
-│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.05 dB / Long Press)
 ├──────────────────────────────────────────────┤
 │  L ───────────────[ | ]─────────────────── R │  <-- Zona 7 (Panpot Master Central)
 └──────────────────────────────────────────────┘

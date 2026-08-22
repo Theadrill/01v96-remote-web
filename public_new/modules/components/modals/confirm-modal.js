@@ -375,6 +375,8 @@ var ConfirmModal = (function () {
         if (cs.btn_nudge_bg)        root.style.setProperty('--strip-btn-nudge-bg', cs.btn_nudge_bg);
         if (cs.btn_nudge_text)      root.style.setProperty('--strip-btn-nudge-text', cs.btn_nudge_text);
         if (cs.btn_nudge_radius)    root.style.setProperty('--strip-btn-nudge-radius', cs.btn_nudge_radius);
+        if (cs.header_font_family)  root.style.setProperty('--strip-header-font-family', cs.header_font_family);
+        if (cs.patch_font_family)   root.style.setProperty('--strip-patch-font-family', cs.patch_font_family);
         if (cs.name_display_bg)     root.style.setProperty('--strip-name-display-bg', cs.name_display_bg);
         if (cs.name_display_color)  root.style.setProperty('--strip-name-display-color', cs.name_display_color);
         if (cs.name_display_radius) root.style.setProperty('--strip-name-display-radius', cs.name_display_radius);

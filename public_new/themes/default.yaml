@@ -173,6 +173,8 @@ channel_strip:
   btn_nudge_radius: "50%"            # Arredondamento (50% = circular)
 
   # Visores e Tipografia
+  header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do cabeçalho
+  patch_font_family: 'Consolas, Menlo, "Courier New", monospace'       # Tipografia da área de patch/roteamento
   name_display_bg: "#000000"         # Fundo da caixa de identificação do canal
   name_display_color: "#00ff00"      # Cor do nome do canal (verde display)
   name_display_radius: "4px"         # Arredondamento da caixa de nome
