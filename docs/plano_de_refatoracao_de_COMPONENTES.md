@@ -223,7 +223,10 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
 
 ### 3.2 Catálogo Visual e Estrutural das Variações Mobile (`docs/imgs/`)
 
-No layout Mobile, a hierarquia vertical e a identidade visual de cada canal seguem 7 variações padronizadas:
+No layout Mobile, a hierarquia vertical e a identidade visual de cada canal seguem 7 variações padronizadas.
+
+* **Espaçamento entre Canais no Mobile (`gap` / `margin`):**
+  * Diferente do Desktop, no modo **Mobile** os cards dos canais possuem um **espaçamento físico bem definido entre si (`gap` / margem lateral)** na lista com scroll horizontal. Isso garante toque limpo, evita disparos acidentais em canais adjacentes no palco e destaca individualmente o card de cada canal e sua cortina de medidor.
 
 #### 1. Canal Mono Normal (`CH 13` / `SURDAO`)
 ![Canal Mono Normal](imgs/mobile_mono_normal.png)
@@ -500,6 +503,9 @@ No layout Mobile, a hierarquia vertical e a identidade visual de cada canal segu
 ### 3.3 Catálogo Visual e Estrutural das Variações Desktop (`docs/imgs/`)
 
 No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a régua analógica completa, botões de nudge dedicados (+ e - de 0.1 dB), barra(s) de VU meter independentes com LED de PEAK circular e o panpot analógico de rodapé.
+
+* **Canais Colados / Sem Espaçamento no Desktop (`gap: 0`):**
+  * Diferente do Mobile, no modo **Desktop** todos os channel strips são **completamente colados uns aos outros (espaçamento zero / `gap: 0` / sem margem entre strips)**, exatamente como as faixas de canais contíguas em uma console física de mixagem tradicional, maximizando a densidade visual e permitindo visualizar até 32 canais lado a lado no monitor.
 
 #### 1. Canal de Input Mono (`CH 1` a `16` em Azul / `CH 17` a `32` em Esverdeado)
 ![Input Mono Desktop](imgs/desktop_input_mono.png)
@@ -1043,36 +1049,48 @@ No layout Desktop, a largura é fixa/padronizada e a verticalidade acomoda a ré
 - [x] Linkar os novos módulos CSS em `public_new/index.html` em ordem hierárquica logo após `style.css`.
 - [x] Validar que o app `/new` continua 100% íntegro e sem erros 404.
 
-### FASE 4 — Construção da Classe e Estilos do `ChannelStrip` Universal
+### FASE 4 — Criação do Workbench de Testes (`public_new/tests.html`)
+- [ ] Criar a página de sandbox/workbench `public_new/tests.html` para validação isolada, visual e funcional de componentes.
+- [ ] Estruturar a página com **Arquitetura Zero-Hardcode**:
+  - Container de renderização dinâmico (`#desktop-catalog` e `#mobile-catalog`).
+  - Script declarativo (`tests.js` ou inline) que instancia programaticamente todas as variações mapeadas chamando diretamente a classe real `new ChannelStrip(config)`.
+- [ ] Implementar Top Toolbar do Sandbox:
+  - **Seletor de Viewport:** Alternância rápida entre visualização `[ 🖥️ Desktop ]`, `[ 📱 Mobile ]` e `[ ↔️ Lado a Lado ]`.
+  - **Simulador de Áudio & VU Meter:** Slider de injeção de sinal de teste (0 a 100%) para validar balística, subida de cortina, PEAK LED circular e cortina com glow vermelho (`.peak-glow`) com Peak Hold de 1000 ms.
+  - **Seletor Dinâmico de Temas:** Validação instantânea de variáveis CSS de cores/temas.
+  - **Console de Eventos em Tempo Real:** Painel de log para auditar eventos emitidos (bloqueio de clique no trilho, arraste de thumb, roda do mouse, mute ON, cadeado).
+
+### FASE 5 — Construção da Classe e Estilos do `ChannelStrip` Universal
 - [ ] Implementar `public_new/styles/components/channel_strip.css` isolando os estilos dos faders desktop/mobile, medidores WASM, nudges e macros.
 - [ ] Construir a classe `ChannelStrip` modular em `public_new/modules/components/channel_strip.js` (mantendo as pontes legadas para zero impacto).
 - [ ] Implementar as 7 zonas modulares (`Header`, `TopAction`, `Display`, `MiddleFeature`, `PrimaryButton`, `FaderCore`, `FooterRouting`).
 - [ ] Implementar suporte nativo a `mode: 'channel'` e `mode: 'macro'` (Big Nudges, Delta dB, botões CONFIG e ZERAR).
 - [ ] Implementar cache $O(1)$ de nós DOM em `this.elements`.
 - [ ] Implementar física de fader, retenção e auto-repeat acelerado em nudges.
+- [ ] Validar e ajustar cada variação visualmente em tempo real através do `public_new/tests.html`.
 - [ ] Integrar conexão direta com `MeterBus` / WASM.
 
-### FASE 5 — Migração Piloto: Tela de Auxiliares (`screens/auxs_sends.js`)
+### FASE 6 — Migração Piloto: Tela de Auxiliares (`screens/auxs_sends.js`)
 - [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip` com `type: 'aux_send'`.
 - [ ] Remover do arquivo as funções legadas de faders e strings HTML duplicadas.
 - [ ] Validar modos MIX e CANAL com Pre/Post e modo FIXED.
 
-### FASE 6 — Criação do Host de Edição `channel_setup_core.js` & Estilos
+### FASE 7 — Criação do Host de Edição `channel_setup_core.js` & Estilos
 - [ ] Criar `public_new/modules/screens/channel_setup/channel_setup_core.js` e seu respectivo `styles/screens/channel_setup/channel_setup_core.css` para gerenciar abas (`EQ`, `DYN`, `AUX`, `INSERTS`, `ROUTING`), navegação ◀ / ▶ e Mini-Fader lateral com Solo Replace.
 - [ ] Integrar e acionar as sub-telas (`channel_setup_*.js`).
 
-### FASE 7 — Migração das Telas Restantes (`main_view.js`, `outs_view.js`, `musician_view.js`)
+### FASE 8 — Migração das Telas Restantes (`main_view.js`, `outs_view.js`, `musician_view.js`)
 - [ ] Migrar Tela Principal (`screens/main_view.js`) para instanciar 32 inputs, Master e Macro Fader via `ChannelStrip`.
 - [ ] Migrar Tela de Saídas (`screens/outs_view.js`) para MIX 1-8 e BUS 1-8.
 - [ ] Migrar Modo Músico (`screens/musician_view.js`) para faders de envio e Volume Geral.
 
-### FASE 8 — Construção dos Componentes Puros de Áudio & Estilos
+### FASE 9 — Construção dos Componentes Puros de Áudio & Estilos
 - [ ] Implementar `components/eq.js` e `styles/components/eq.css` (Canvas puro com BiquadFilter desacoplado de IDs globais).
 - [ ] Implementar `components/gate.js`, `components/compressor.js` e `styles/components/dynamics.css` (Widgets puros de dinâmica).
 - [ ] Implementar `components/inserts.js`, `components/routing.js` e seus respectivos CSS.
 - [ ] Conectar os novos componentes aos controladores em `screens/channel_setup/`.
 
-### FASE 9 — Integração com Sistema de Temas YAML & Validação Final
+### FASE 10 — Integração com Sistema de Temas YAML & Validação Final
 - [ ] Mapear variáveis CSS `--strip-*` nos estilos e validar com `ThemeEditor` e `default.yaml`.
 - [ ] Limpar o `style.css` original removendo todo código legado migrado.
 - [ ] Realizar bateria completa de testes de regressão no endpoint `/new`.
