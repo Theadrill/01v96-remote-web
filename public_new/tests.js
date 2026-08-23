@@ -528,6 +528,9 @@ function renderMobileDeck() {
                 solo_toggle: (data, strip) => {
                     logWbEvent('solo', `[MOBILE SOLO] ${strip.config.name}: ${data.state ? 'ATIVO' : 'DESATIVADO'}`);
                 },
+                pre_post_toggle: (data, strip) => {
+                    logWbEvent('solo', `[MOBILE PRE/POST] ${strip.config.name} (${data.channel}): Comutado para ${data.mode}`);
+                },
                 lock_click: (data, strip) => {
                     logWbEvent('lock', `[MOBILE LOCK] ${strip.config.name}: Ação de trava/destrava solicitada`);
                 },
@@ -640,6 +643,12 @@ function setWbViewport(mode) {
 function changeWbTheme(themeName) {
     logWbEvent('sys', `🎨 Tema alterado para: ${themeName}`);
     document.body.dataset.theme = themeName;
+}
+
+function toggleWbToolbar() {
+    const tb = document.getElementById('wbToolbar');
+    if (!tb) return;
+    tb.classList.toggle('collapsed');
 }
 
 function toggleWbConsole() {

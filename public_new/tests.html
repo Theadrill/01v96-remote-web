@@ -73,19 +73,70 @@
             overflow: hidden;
         }
 
-        /* Top Toolbar */
+        /* Top Toolbar Retrátil */
         .wb-toolbar {
             background-color: var(--wb-surface);
             border-bottom: 1px solid var(--wb-border);
+            position: relative;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .wb-toolbar-content {
             padding: 8px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
-            flex-shrink: 0;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             flex-wrap: wrap;
+        }
+
+        .wb-toolbar.collapsed .wb-toolbar-content {
+            display: none;
+        }
+
+        .wb-toolbar.collapsed {
+            border-bottom: none;
+            box-shadow: none;
+        }
+
+        .wb-toolbar-toggle-btn {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--wb-surface);
+            color: var(--wb-text-dim);
+            border: 1px solid var(--wb-border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 3px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 110;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .wb-toolbar-toggle-btn:hover {
+            color: var(--wb-accent);
+            background: #232734;
+            border-color: var(--wb-accent);
+        }
+
+        .wb-toolbar.collapsed .wb-toolbar-toggle-btn .toggle-icon {
+            transform: rotate(0deg);
+        }
+
+        .wb-toolbar:not(.collapsed) .wb-toolbar-toggle-btn .toggle-icon {
+            transform: rotate(180deg);
         }
 
         .wb-brand {
@@ -404,54 +455,61 @@
 
 <body class="workbench-body">
 
-    <!-- Top Toolbar de Controle do Sandbox -->
-    <header class="wb-toolbar">
-        <div class="wb-brand">
-            <span>🔬 01V96 V2</span>
-            <span class="badge">Workbench</span>
-        </div>
-
-        <!-- Seletor de Viewport -->
-        <div class="wb-controls-group">
-            <span class="wb-group-title">Layout</span>
-            <button class="wb-btn-toggle active" id="btnViewBoth" onclick="setWbViewport('both')">
-                <i class="fas fa-columns"></i> Lado a Lado
-            </button>
-            <button class="wb-btn-toggle" id="btnViewDesktop" onclick="setWbViewport('desktop')">
-                <i class="fas fa-desktop"></i> Desktop (Gap 0)
-            </button>
-            <button class="wb-btn-toggle" id="btnViewMobile" onclick="setWbViewport('mobile')">
-                <i class="fas fa-mobile-alt"></i> Mobile
-            </button>
-        </div>
-
-        <!-- Simulador de Áudio & VU Meter -->
-        <div class="wb-controls-group">
-            <span class="wb-group-title">VU Simulator</span>
-            <div class="wb-meter-slider-container">
-                <input class="wb-meter-slider" id="wbMeterSlider" max="100" min="0" oninput="setSimulatorLevel(this.value)" type="range" value="0" />
-                <span class="wb-meter-val" id="wbMeterVal">0%</span>
+    <!-- Top Toolbar de Controle do Sandbox (Retrátil, Default Fechada) -->
+    <header class="wb-toolbar collapsed" id="wbToolbar">
+        <div class="wb-toolbar-content">
+            <div class="wb-brand">
+                <span>🔬 01V96 V2</span>
+                <span class="badge">Workbench</span>
             </div>
-            <button class="wb-btn-action peak-trigger" onclick="triggerSimulatorPeak()" title="Injeta 100% de sinal para testar Peak Hold de 1s">
-                💥 PEAK (100%)
-            </button>
-            <button class="wb-btn-action anim-trigger" id="btnWbAnim" onclick="toggleSimulatorAnimation()">
-                🌊 Auto Wave
-            </button>
+
+            <!-- Seletor de Viewport -->
+            <div class="wb-controls-group">
+                <span class="wb-group-title">Layout</span>
+                <button class="wb-btn-toggle active" id="btnViewBoth" onclick="setWbViewport('both')">
+                    <i class="fas fa-columns"></i> Lado a Lado
+                </button>
+                <button class="wb-btn-toggle" id="btnViewDesktop" onclick="setWbViewport('desktop')">
+                    <i class="fas fa-desktop"></i> Desktop (Gap 0)
+                </button>
+                <button class="wb-btn-toggle" id="btnViewMobile" onclick="setWbViewport('mobile')">
+                    <i class="fas fa-mobile-alt"></i> Mobile
+                </button>
+            </div>
+
+            <!-- Simulador de Áudio & VU Meter -->
+            <div class="wb-controls-group">
+                <span class="wb-group-title">VU Simulator</span>
+                <div class="wb-meter-slider-container">
+                    <input class="wb-meter-slider" id="wbMeterSlider" max="100" min="0" oninput="setSimulatorLevel(this.value)" type="range" value="0" />
+                    <span class="wb-meter-val" id="wbMeterVal">0%</span>
+                </div>
+                <button class="wb-btn-action peak-trigger" onclick="triggerSimulatorPeak()" title="Injeta 100% de sinal para testar Peak Hold de 1s">
+                    💥 PEAK (100%)
+                </button>
+                <button class="wb-btn-action anim-trigger" id="btnWbAnim" onclick="toggleSimulatorAnimation()">
+                    🌊 Auto Wave
+                </button>
+            </div>
+
+            <!-- Seletor de Temas & Ferramentas -->
+            <div class="wb-controls-group">
+                <span class="wb-group-title">Aparência</span>
+                <select class="wb-btn-action" id="wbThemeSelector" onchange="changeWbTheme(this.value)" style="outline: none;">
+                    <option value="default">Yamaha Dark (Padrão)</option>
+                    <option value="high-contrast">Alto Contraste</option>
+                    <option value="classic-analog">Classic Console</option>
+                </select>
+                <button class="wb-btn-toggle" id="btnToggleConsole" onclick="toggleWbConsole()" title="Exibir/Ocultar console de eventos">
+                    <i class="fas fa-terminal"></i> Log
+                </button>
+            </div>
         </div>
 
-        <!-- Seletor de Temas & Ferramentas -->
-        <div class="wb-controls-group">
-            <span class="wb-group-title">Aparência</span>
-            <select class="wb-btn-action" id="wbThemeSelector" onchange="changeWbTheme(this.value)" style="outline: none;">
-                <option value="default">Yamaha Dark (Padrão)</option>
-                <option value="high-contrast">Alto Contraste</option>
-                <option value="classic-analog">Classic Console</option>
-            </select>
-            <button class="wb-btn-toggle" id="btnToggleConsole" onclick="toggleWbConsole()" title="Exibir/Ocultar console de eventos">
-                <i class="fas fa-terminal"></i> Log
-            </button>
-        </div>
+        <!-- Botão Retrátil da Toolbar -->
+        <button class="wb-toolbar-toggle-btn" id="btnToggleToolbar" onclick="toggleWbToolbar()" title="Exibir/Ocultar barra de ferramentas">
+            <i class="fas fa-sliders-h"></i> <span>Controles</span> <i class="fas fa-chevron-down toggle-icon"></i>
+        </button>
     </header>
 
     <!-- Área de Conteúdo Principal -->
