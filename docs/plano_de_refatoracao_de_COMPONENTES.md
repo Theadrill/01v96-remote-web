@@ -195,10 +195,11 @@ O `ChannelStrip` é o componente universal que centraliza a renderização, a f�
 3. **Zona 3 — Display Digital de Nome (`desk-ch-name-zone`):**
    - Visor OLED estilo hardware com tipografia verde brilhante (`#00ff00`).
    - No Mini-Fader, clique abre o teclado virtual (`VirtualKeyboard`) para edição in-place.
-4. **Zona 4 — Middle Feature / Informações Contextuais:**
-   - Master PA: Seletor de visualização dos medidores (botão `[MEDIDORES]` PRE / POST).
-   - Modo Auxiliar (Sends): Indicador PRE / POST / FIXED.
-   - Modo Macro: Botão roxo `[CONFIG]` + Visor de **Delta dB** (`--` em repouso / `+1.50 dB` dinâmico).
+4. **Zona 4 — Middle Feature / Painel de Informações Contextuais (Componente Genérico Reutilizável):**
+   - **Arquitetura Reutilizável:** Estrutura modular em bloco retangular (`desk-feature-box`) compartilhada entre Master, Auxiliares e Macros, mudando apenas tipografia, cor de acento e ações:
+     - **Master Stereo LR (`Painel MEDIDORES`):** Título `MEDIDORES` em tom avermelhado/rosa, com linhas `MASTER: [ POST ]` e `CANAIS: [ PREEQ ]` para comutação rápida de pontos de medição.
+     - **Master Auxiliar / Mini-Fader Contextual (`Painel POSIÇÃO`):** Título `POSIÇÃO` em tom dourado/âmbar (`#d4af37`), com linhas `GLOBAL: [ PRE ]` (comuta tomada de sinal global) e `PRE-P: [ PRE ON ]` (comuta ponto do Pre-ON vs Pre-Fader).
+     - **Modo Macro:** Botão roxo `[CONFIG]` + Visor OLED de **Delta dB** (`--` em repouso / `+1.50 dB` dinâmico).
 5. **Zona 5 — Primary Action & Nudge Superior:**
    - Canal Normal / Master / Aux: Botão principal **ON** (laranja/amarelo ativo) posicionado logo abaixo de SOLO / Display.
    - Botão de **Nudge Superior (+)**: Micro-ajuste incremental de ganho com suporte a **toque/clique único (step específico por tipo)** e **Long Press / Segurar Pressionado (auto-repeat acelerado contínuo)**.
@@ -985,6 +986,58 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 
 ---
 
+#### 9.1 Dock Lateral de Configuração (Mini-Fader Contextual & Master Auxiliar com Painel de POSIÇÃO)
+
+* **Conceito Arquitetural:** O "Mini-Fader" **não é um componente separado**, mas sim a instância do próprio **`ChannelStrip` Universal** acoplado na lateral direita do modal (`#miniFaderContainer` / `#miniFaderContext`):
+  * **Replicação Contextual:** Ao abrir a edição de qualquer canal (`CH 1-32`, `ST IN`, `BUS`, `MIX`, `MASTER`), o dock renderiza fielmente o canal selecionado, permitindo controle contínuo de volume, mute e solo.
+  * **Comportamento Especial Solo Replace:** No Mini-Fader do modal, acionar SOLO substitui a seleção anterior de monitoração em vez de acumular.
+  * **Renomeação In-Place:** O clique no display OLED (Zona 3) abre diretamente o `VirtualKeyboard`.
+* **Caso Especial dos Auxiliares (`Sends on Faders` / `MIX 1-8`):**
+  * Quando aberto na tela de envios de um auxiliar, o strip do Master do Auxiliar renderiza na **Zona 4** o **Painel de POSIÇÃO** (compartilhando 100% da mesma arquitetura modular do painel `MEDIDORES` do Master LR):
+    * **Título:** `POSIÇÃO` (em tom âmbar/dourado `#d4af37`).
+    * **Linha 1 (GLOBAL):** Rótulo `GLOBAL:` + Badge `[ PRE ]` / `[ POST ]` para alternar a tomada de sinal de envio.
+    * **Linha 2 (PRE-P):** Rótulo `PRE-P:` + Badge `[ PRE ON ]` / `[ PRE FADER ]` para alternar o ponto Pre.
+  * **Layout do Strip do Master Auxiliar no Dock:**
+
+```text
+┌──────────────────────────────────────────────┐
+│ [ ]                 MIX 7                [ ] │  <-- Zona 1 (Header Âmbar MIX 7)
+├──────────────────────────────────────────────┤
+│                    [SOLO]                    │  <-- Zona 2 (Solo com Solo Replace)
+├──────────────────────────────────────────────┤
+│                   [ AUX7 ]                   │  <-- Zona 3 (Display OLED Verde)
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │                 POSIÇÃO                  │ │  <-- Zona 4 (Painel Modular de POSIÇÃO)
+│ │ GLOBAL:  [   PRE   ]                     │ │      (Borda e título âmbar #d4af37,
+│ │ PRE-P:   [ PRE ON  ]                     │ │       badges com texto azul neon)
+│ └──────────────────────────────────────────┘ │
+├──────────────────────────────────────────────┤
+│                     [ON]                     │  <-- Zona 5 (Botão ON Amarelo Ativo)
+├──────────────────────────────────────────────┤
+│                     (+)                      │  <-- Zona 5 (Nudge: +0.10 dB / Long Press)
+│                    10.00                     │  <-- Zona 6 (Leitura Numérica em dB)
+│                                              │
+│  +10 ───          │██│ ◄─ Arraste/Wheel      │  <-- PEAK LED Mono
+│                   │██│    (Thumb Fader)  │   │  (Trilho desabilitado p/ clique direto)
+│    5 ───          │  │                   │   │
+│    0 ───          │  │                   │   │  ▲ VU METER MONO DO AUX
+│    5 ───          │  │                   │   │  │
+│   10 ───          │  │                  ░│   │  ▼
+│   20 ───          │  │                  ▓│   │
+│   30 ───          │  │                  ▓│   │
+│   40 ───          │  │                  ▓│   │
+│   50 ───          │  │                  ▓│   │
+│   -∞ ───          │  │                  ▓│   │
+│                                              │
+│                     (-)                      │  <-- Zona 6 (Nudge: -0.10 dB / Long Press)
+├──────────────────────────────────────────────┤
+│                   ADAT 7                     │  <-- Zona 7 (Patch Sem Panpot)
+└──────────────────────────────────────────────┘
+```
+
+---
+
 #### 10. Canal Desktop TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO`)
 ![Desktop Locked](imgs/desktop_locked.png)
 
@@ -1142,14 +1195,14 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 - [x] Validar e ajustar cada variação visualmente em tempo real através do `public_new/tests.html`.
 - [x] Integrar conexão direta com `MeterBus` / WASM.
 
-### FASE 6 — Implementação e Validação Visual de Todas as Variações do Channel Strip (Desktop & Mobile)
+### FASE 6 — Implementação e Validação Visual de Todas as Variações do Channel Strip (Desktop & Mobile) (EM ANDAMENTO ⏳)
 > *Nota: A integração com variáveis de tema YAML (`--strip-*`) e o encolhimento progressivo do `style.css` legado ocorrem continuamente e em tempo real a cada variação implementada.*
 - [ ] **Variações Desktop (Validação no Workbench `tests.html`):**
   - [x] 1. Canal de Input Mono (`CH 1-16` Azul / `CH 17-32` Esverdeado) (CONCLUÍDO ✅)
   - [x] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde, duplo VU meter, duplo pan L/R empilhado, marquee) (CONCLUÍDO ✅)
   - [x] 3. Master Fader Stereo (`MASTER` / `ST` - fundo vinho, duplo VU amplo, painel exclusivo de medidores POST/PREEQ) (CONCLUÍDO ✅)
   - [x] 4. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão roxo CONFIG, visor Delta dB, Big Nudges) (CONCLUÍDO ✅)
-  - [ ] 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2` - header âmbar, saída física dupla OMNI + ADAT com marquee)
+  - [x] 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2` - header âmbar, sem Panpot, saída física dupla OMNI + ADAT com marquee) (CONCLUÍDO ✅)
   - [ ] 6. Barramento BUS Pareado (`BUS 1 + 2` / `VHIGH` - header ciano com cadeado, correção estéreo de duplo VU e duplo Peak)
   - [ ] 7. Canais ST IN (`ST IN 1` / `REVERB VOZ` - header azul, duplo VU, duplo pan estéreo com 2 barras L e R independentes)
   - [ ] 8. Canal em Modo Sends on Faders Individual (`AUX 4` / `AUX4` - botão roxo PRE/POST no lugar do Solo, leitura com sufixo dB)

@@ -78,11 +78,16 @@ class ChannelStrip {
         const wrapper = document.createElement('div');
         wrapper.id = `strip_${cfg.id}`;
         const isMaster = cfg.isMaster || cfg.type === 'master';
+        const isMacro = cfg.mode === 'macro' || (cfg.type && cfg.type.startsWith('macro'));
+        const isVolumeGeral = cfg.mode === 'macro_aux' || cfg.type === 'macro_aux' || cfg.mode === 'macro_musician' || cfg.type === 'macro_musician' || cfg.name === 'AUX GERAL' || cfg.name === 'VOLUME GERAL' || cfg.isVolumeGeral === true;
+
         wrapper.className = [
             'channel-strip-wrapper',
             isDesktop ? 'desk-strip' : 'mob-strip',
             cfg.isPaired ? 'paired-channel' : '',
             isMaster ? 'is-master' : '',
+            isMacro ? 'is-macro' : '',
+            isVolumeGeral ? 'is-volume-geral' : '',
             cfg.isLocked ? 'is-locked' : '',
             cfg.isDisabled ? 'is-disabled' : '',
             cfg.colorBand ? `band-${cfg.colorBand}` : '',
@@ -114,6 +119,9 @@ class ChannelStrip {
         const isMacro = cfg.mode === 'macro' || (cfg.type && cfg.type.startsWith('macro'));
         const isMaster = cfg.isMaster || cfg.type === 'master';
         const isPaired = cfg.isPaired;
+        const isDualMeter = isPaired || isMaster || cfg.type === 'bus_paired' || cfg.type === 'st_in' || cfg.type === 'input_paired';
+        const isDualPan = isPaired || cfg.type === 'st_in' || cfg.type === 'input_paired' || (cfg.panR !== null && cfg.panR !== undefined);
+        const hasPan = cfg.hasPan !== false && cfg.type !== 'mix' && !isMacro;
 
         if (isMacro) {
             const hasConfig = cfg.hasConfig !== false && cfg.mode !== 'macro_aux' && cfg.type !== 'macro_aux';
@@ -169,14 +177,26 @@ class ChannelStrip {
                 <span class="desk-ch-name">${cfg.name}</span>
             </div>
 
-            <!-- ZONA 4: Middle Feature (Painel de Medidores Exclusivo Master) -->
+            <!-- ZONA 4: Middle Feature (Painel de Medidores Master ou Painel de Posição do Auxiliar) -->
             ${isMaster ? `
-                <div class="desk-master-meters-toggle" title="Configurar Posição dos Medidores">
-                    <div class="desk-meters-title">MEDIDORES</div>
-                    <div class="desk-meters-row"><span class="desk-meters-lbl">MASTER:</span><span class="desk-meters-badge master-badge">${window.currentMeterPosMasterLabel || 'POST'}</span></div>
-                    <div class="desk-meters-row"><span class="desk-meters-lbl">CANAIS:</span><span class="desk-meters-badge channels-badge">${window.currentMeterPosChannelsLabel || 'PREEQ'}</span></div>
+                <div class="desk-feature-box feature-meters desk-master-meters-toggle" title="Configurar Posição dos Medidores">
+                    <div class="desk-feature-title meters-title">MEDIDORES</div>
+                    <div class="desk-feature-row"><span class="desk-feature-lbl">MASTER:</span><span class="desk-feature-badge master-badge">${window.currentMeterPosMasterLabel || 'POST'}</span></div>
+                    <div class="desk-feature-row"><span class="desk-feature-lbl">CANAIS:</span><span class="desk-feature-badge channels-badge">${window.currentMeterPosChannelsLabel || 'PREEQ'}</span></div>
                 </div>
-            ` : ''}
+            ` : (cfg.hasPositionPanel || cfg.positionPanel ? `
+                <div class="desk-feature-box feature-position" title="Configurar Posição de Envio">
+                    <div class="desk-feature-title position-title">POSIÇÃO</div>
+                    <div class="desk-feature-row">
+                        <span class="desk-feature-lbl">GLOBAL:</span>
+                        <span class="desk-feature-badge position-badge global-badge">${cfg.positionGlobal || 'PRE'}</span>
+                    </div>
+                    <div class="desk-feature-row">
+                        <span class="desk-feature-lbl">PRE-P:</span>
+                        <span class="desk-feature-badge position-badge prep-badge">${cfg.positionPrePoint || 'PRE ON'}</span>
+                    </div>
+                </div>
+            ` : '')}
 
             <!-- ZONA 5: Primary Action (ON), Nudge Superior & Leitura dB -->
             <div class="desk-primary-action-zone">
@@ -229,13 +249,13 @@ class ChannelStrip {
                         <!-- Peak LED Circular -->
                         <div class="desk-peak-led-group">
                             <div class="desk-peak-led peak-l"></div>
-                            ${(isPaired || isMaster) ? `<div class="desk-peak-led peak-r"></div>` : ''}
+                            ${isDualMeter ? `<div class="desk-peak-led peak-r"></div>` : ''}
                         </div>
 
                         <!-- Barra de Medidor VU Gradiente Físico -->
                         <div class="desk-meter-bar-track">
                             <div class="desk-vu-fill vu-l"></div>
-                            ${(isPaired || isMaster) ? `<div class="desk-vu-fill vu-r"></div>` : ''}
+                            ${isDualMeter ? `<div class="desk-vu-fill vu-r"></div>` : ''}
                         </div>
                     </div>
 
@@ -249,10 +269,10 @@ class ChannelStrip {
 
             <!-- ZONA 7: Footer Routing & Panpot -->
             <div class="desk-footer-zone">
-                ${isPaired ? `
+                ${hasPan ? (isDualPan ? `
                     <!-- Duplo Panpot Analógico Real Empilhado (L / R) -->
                     <div class="desk-dual-pan-container">
-                        <!-- Trilha Pan L (Canal Ímpar) -->
+                        <!-- Trilha Pan L (Canal Ímpar / Left) -->
                         <div class="desk-pan-row">
                             <span class="pan-ch-label">L</span>
                             <div class="desk-pan-track desk-dual-track">
@@ -261,7 +281,7 @@ class ChannelStrip {
                             </div>
                             <span class="pan-val-label">${cfg.panL !== null && cfg.panL !== undefined ? cfg.panL : -32}</span>
                         </div>
-                        <!-- Trilha Pan R (Canal Par) -->
+                        <!-- Trilha Pan R (Canal Par / Right) -->
                         <div class="desk-pan-row">
                             <span class="pan-ch-label">R</span>
                             <div class="desk-pan-track desk-dual-track">
@@ -282,7 +302,7 @@ class ChannelStrip {
                             <div class="desk-pan-thumb" style="--pan-val: ${cfg.panL || 0};"></div>
                         </div>
                     </div>
-                `}
+                `) : ''}
                 <div class="desk-patch-area">
                     <span class="marquee-text">${cfg.patch || ''}</span>
                 </div>
@@ -306,6 +326,7 @@ class ChannelStrip {
         const isMacro = cfg.mode === 'macro' || (cfg.type && cfg.type.startsWith('macro'));
         const isPaired = cfg.isPaired;
         const isMaster = cfg.type === 'master' || cfg.isMaster;
+        const isDualMeter = isPaired || isMaster || cfg.type === 'bus_paired' || cfg.type === 'st_in' || cfg.type === 'input_paired';
 
         if (isMacro) {
             const hasConfig = cfg.hasConfig !== false && cfg.mode !== 'macro_aux' && cfg.type !== 'macro_aux';
@@ -338,7 +359,7 @@ class ChannelStrip {
             <!-- Cortina de Medidor VU de Fundo Integral (100% da área do card) -->
             <div class="mob-meter-curtain-container">
                 <div class="mob-meter-curtain vu-l"></div>
-                ${(isPaired || isMaster) ? `<div class="mob-meter-curtain vu-r"></div>` : ''}
+                ${isDualMeter ? `<div class="mob-meter-curtain vu-r"></div>` : ''}
             </div>
 
             <!-- Conteúdo dos Controles sobre a Cortina -->
@@ -357,7 +378,7 @@ class ChannelStrip {
                 <!-- Zona 2: Top Action / Solo / Pre -->
                 <div class="mob-top-action">
                     ${cfg.prePost ? `
-                        <button class="mob-btn-pre">${cfg.prePost}</button>
+                        <button class="mob-btn-pre ${cfg.prePost.toLowerCase()}">${cfg.prePost}</button>
                     ` : `
                         <button class="mob-btn-solo ${cfg.soloState ? 'active' : ''}">SOLO</button>
                     `}
@@ -564,7 +585,7 @@ class ChannelStrip {
         this._bindPanEvents();
 
         // 9. Abertura do Modal de Configuração de Medidores (Master Desktop & Mobile)
-        const metersToggle = this.element.querySelector('.desk-master-meters-toggle, .mob-btn-medidores');
+        const metersToggle = this.element.querySelector('.desk-master-meters-toggle, .desk-feature-box.feature-meters, .mob-btn-medidores');
         if (metersToggle) {
             metersToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -572,6 +593,19 @@ class ChannelStrip {
                     window.openMeterConfigModal('master');
                 }
                 this._emitEvent('meters_config_click', { target: 'master' });
+            });
+        }
+
+        // 9.1 Abertura do Modal de Configuração de Posição do Auxiliar (MIX / Aux Sends)
+        const positionToggle = this.element.querySelector('.desk-feature-box.feature-position');
+        if (positionToggle) {
+            positionToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const mixIdx = typeof this.config.mixIdx === 'number' ? this.config.mixIdx : (parseInt(String(this.config.chNumber).replace(/\D/g, ''), 10) || 1);
+                if (typeof window.openAuxConfigModal === 'function') {
+                    window.openAuxConfigModal(mixIdx);
+                }
+                this._emitEvent('position_config_click', { mixIdx, chNumber: this.config.chNumber });
             });
         }
 
@@ -822,7 +856,9 @@ class ChannelStrip {
             step = 0.25;
         } else if (this.config.mode === 'macro_aux' || this.config.type === 'macro_aux') {
             step = 0.10;
-        } else if (isOut || isMacro) {
+        } else if (isOut) {
+            step = 0.10;
+        } else if (isMacro) {
             step = 0.05;
         }
 

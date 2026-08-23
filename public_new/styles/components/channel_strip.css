@@ -27,6 +27,7 @@
     --strip-group-st-color: #0088cc;
     --strip-group-mix-color: #d4af37;
     --strip-group-bus-color: #00b396;
+    --strip-group-aux-color: #7e22ce;
     --strip-master-color: #4a121a;
 
     --strip-btn-on-bg: #2b2b2b;
@@ -41,6 +42,11 @@
     --strip-btn-solo-active-bg: #eab308;
     --strip-btn-solo-active-text: #000000;
     --strip-btn-solo-radius: 4px;
+
+    --strip-btn-pre-bg: #6b21a8;
+    --strip-btn-pre-text: #ffffff;
+    --strip-btn-pre-border: #9333ea;
+    --strip-btn-pre-radius: 4px;
 
     --strip-btn-nudge-bg: #252a38;
     --strip-btn-nudge-text: #cccccc;
@@ -63,12 +69,23 @@
     --strip-peak-led-color: #ff0000;
     --strip-peak-led-glow: #ff4444;
 
+    --strip-lock-border-color: #ff4444;
+    --strip-lock-badge-bg: #ff4444;
+    --strip-lock-badge-text: #ffffff;
+    --strip-lock-overlay-bg: rgba(255, 0, 0, 0.18);
+
+    --strip-disabled-opacity: 0.45;
+    --strip-disabled-filter: grayscale(80%);
+
     --strip-meters-box-bg: rgba(0, 0, 0, 0.45);
     --strip-meters-box-border: rgba(255, 255, 255, 0.15);
     --strip-meters-box-radius: 4px;
     --strip-meters-badge-bg: #1e293b;
     --strip-meters-badge-text: #38bdf8;
     --strip-meters-badge-border: #334155;
+
+    --strip-position-box-border: rgba(212, 175, 55, 0.4);
+    --strip-position-title-color: #d4af37;
 
     --strip-macro-bg: #d4d4d8;
     --strip-macro-border: #27272a;
@@ -91,6 +108,8 @@
     --strip-macro-reset-hover-bg: #ef4444;
     --strip-macro-reset-text: #ffffff;
     --strip-macro-reset-radius: 6px;
+
+    --strip-volume-geral-width: 70px;
 }
 
 /* =========================================================================
@@ -146,6 +165,13 @@
     min-width: 108px;
     border: 1px solid #10b981;
     box-shadow: inset 0 0 6px rgba(16, 185, 129, 0.15);
+}
+
+/* Volume Geral Desktop Mais Fino (70px) */
+.channel-strip-wrapper.desk-strip.is-volume-geral {
+    width: var(--strip-volume-geral-width, 70px) !important;
+    min-width: var(--strip-volume-geral-width, 70px) !important;
+    max-width: var(--strip-volume-geral-width, 70px) !important;
 }
 
 /* Identidades Cromáticas Desktop (Bordas de Destaque Superior/Inferior, Header Navy Escuro & Footer Patch Full Bleed) */
@@ -280,6 +306,13 @@
     width: 100px;
     min-width: 100px;
     border: 1px solid #10b981;
+}
+
+/* Volume Geral Mobile Mais Fino (70px) */
+.channel-strip-wrapper.mob-strip.is-volume-geral {
+    width: var(--strip-volume-geral-width, 70px) !important;
+    min-width: var(--strip-volume-geral-width, 70px) !important;
+    max-width: var(--strip-volume-geral-width, 70px) !important;
 }
 
 /* Master Mobile (Fundo Vinho / Vermelho Escuro) */
@@ -442,14 +475,39 @@
 }
 .btn-pre-post {
     width: 100%;
-    background: #6b21a8;
-    color: #fff;
-    border: 1px solid #9333ea;
-    border-radius: 4px;
+    background: var(--strip-btn-pre-bg, #6b21a8);
+    color: var(--strip-btn-pre-text, #ffffff);
+    border: 1px solid var(--strip-btn-pre-border, #9333ea);
+    border-radius: var(--strip-btn-pre-radius, 4px);
     padding: 3px 0;
     font-size: 10px;
     font-weight: 800;
     cursor: pointer;
+    transition: all 0.15s ease;
+}
+.btn-pre-post.fixed {
+    background: #333333;
+    border-color: #555555;
+    color: #888888;
+    cursor: not-allowed;
+}
+.mob-btn-pre {
+    background: var(--strip-btn-pre-bg, #6b21a8);
+    color: var(--strip-btn-pre-text, #ffffff);
+    border: 1px solid var(--strip-btn-pre-border, #9333ea);
+    border-radius: var(--strip-btn-pre-radius, 4px);
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 800;
+    width: 80%;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.mob-btn-pre.fixed {
+    background: #333333;
+    border-color: #555555;
+    color: #888888;
+    cursor: not-allowed;
 }
 
 /* ZONA 3: Display OLED (Sem contorno/borda externa) */
@@ -755,8 +813,19 @@
 }
 
 /* =========================================================================
-   5. OVERLAY DE BLOQUEIO (LOCKED)
+   5. OVERLAY DE BLOQUEIO (LOCKED) & ESTADO DESABILITADO (DISABLED)
    ========================================================================= */
+
+/* Destaque Perimetral de Canal Travado */
+.channel-strip-wrapper.desk-strip.is-locked {
+    border-left: 2px solid var(--strip-lock-border-color, #ff4444) !important;
+    border-right: 2px solid var(--strip-lock-border-color, #ff4444) !important;
+}
+
+.channel-strip-wrapper.mob-strip.is-locked {
+    border: 1.5px solid var(--strip-lock-border-color, #ff4444) !important;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3) !important;
+}
 
 .desk-lock-overlay,
 .mob-lock-overlay {
@@ -764,8 +833,8 @@
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background: rgba(255, 0, 0, 0.18) !important;
-    border: 1px solid #ff4444 !important;
+    background: var(--strip-lock-overlay-bg, rgba(255, 0, 0, 0.18)) !important;
+    border: 1px solid var(--strip-lock-border-color, #ff4444) !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
@@ -777,8 +846,8 @@
 }
 
 .lock-badge-btn {
-    background: #ff4444;
-    color: #fff;
+    background: var(--strip-lock-badge-bg, #ff4444);
+    color: var(--strip-lock-badge-text, #ffffff);
     width: 26px;
     height: 26px;
     border-radius: 50%;
@@ -792,6 +861,35 @@
 }
 .lock-badge-btn:hover {
     transform: scale(1.1);
+}
+
+/* =========================================================================
+   6. CANAL DESABILITADO / FIXED (DISABLED)
+   ========================================================================= */
+
+.channel-strip-wrapper.is-disabled {
+    opacity: var(--strip-disabled-opacity, 0.45);
+    filter: var(--strip-disabled-filter, grayscale(80%));
+}
+
+.channel-strip-wrapper.is-disabled .desk-fader-thumb,
+.channel-strip-wrapper.is-disabled .mob-fader-thumb,
+.channel-strip-wrapper.is-disabled .desk-pan-track,
+.channel-strip-wrapper.is-disabled .desk-nudge-btn,
+.channel-strip-wrapper.is-disabled .mob-nudge-btn {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+}
+
+/* EXCEÇÃO CRÍTICA — Botão ON (Mute) permanece 100% ativo, colorido e funcional */
+.channel-strip-wrapper.is-disabled .desk-btn-on,
+.channel-strip-wrapper.is-disabled .mob-btn-on,
+.channel-strip-wrapper.is-disabled .desk-primary-action-zone .desk-btn-on,
+.channel-strip-wrapper.is-disabled .mob-primary-action .mob-btn-on {
+    opacity: 1 !important;
+    filter: none !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
 }
 
 /* =========================================================================
@@ -815,17 +913,29 @@
     color: var(--strip-macro-config-text, #ffffff);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-config-radius, 6px);
-    padding: 5px 8px;
-    font-size: 11px;
+    padding: 4px 2px;
+    font-size: 10px;
     font-weight: 800;
-    letter-spacing: 0.5px;
-    width: 88%;
+    letter-spacing: 0.2px;
+    width: 90%;
+    box-sizing: border-box;
     cursor: pointer;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     user-select: none;
     -webkit-user-select: none;
     transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.is-volume-geral .macro-config-btn {
+    font-size: 9.5px;
+    letter-spacing: 0;
+    padding: 4px 1px;
+    width: 94%;
 }
 
 .macro-config-btn:hover {
@@ -913,17 +1023,30 @@
     color: var(--strip-macro-reset-text, #ffffff);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-reset-radius, 6px);
-    padding: 6px 10px;
-    font-size: 11px;
+    padding: 5px 2px;
+    font-size: 10.5px;
     font-weight: 900;
-    letter-spacing: 0.5px;
-    width: 88%;
+    letter-spacing: 0.2px;
+    width: 90%;
+    box-sizing: border-box;
     cursor: pointer;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
     user-select: none;
     -webkit-user-select: none;
     transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.is-volume-geral .btn-zerar-sends,
+.is-volume-geral .mob-btn-zerar {
+    font-size: 9.5px;
+    letter-spacing: 0;
+    padding: 4px 1px;
+    width: 94%;
 }
 
 .btn-zerar-sends:hover,
@@ -936,67 +1059,92 @@
     transform: scale(0.97);
 }
 
-/* Master Meters Indicator Zone (Zona 4) */
+/* Middle Feature Indicator Box (Zona 4: Medidores Master & Posição Auxiliar) */
+.desk-feature-box,
 .desk-master-meters-toggle {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    padding: 4px 6px;
-    margin: 2px 4px;
+    gap: 2px;
+    padding: 3px 4px;
+    margin: 2px 2px;
     background: var(--strip-meters-box-bg, rgba(0, 0, 0, 0.45));
     border: 1px solid var(--strip-meters-box-border, rgba(255, 255, 255, 0.15));
     border-radius: var(--strip-meters-box-radius, 4px);
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
+    box-sizing: border-box;
     transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
 }
 
+.desk-feature-box.feature-position {
+    border: 1px solid var(--strip-position-box-border, rgba(212, 175, 55, 0.4));
+}
+
+.desk-feature-box.feature-position:hover {
+    background: rgba(0, 0, 0, 0.6);
+    border-color: #d4af37;
+}
+
+.desk-feature-box.feature-meters:hover,
 .desk-master-meters-toggle:hover {
     background: rgba(0, 0, 0, 0.6);
     border-color: #e11d48;
 }
 
+.desk-feature-box:active,
 .desk-master-meters-toggle:active {
     transform: scale(0.98);
 }
 
+.desk-feature-title,
 .desk-meters-title {
-    font-size: 9px;
-    font-weight: 800;
+    font-size: 8.5px;
+    font-weight: 900;
     color: #f1f5f9;
     text-align: center;
     letter-spacing: 0.5px;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
 }
 
+.desk-feature-title.position-title {
+    color: var(--strip-position-title-color, #d4af37);
+}
+
+.desk-feature-row,
 .desk-meters-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 2px;
-    padding: 0 1px;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+.desk-feature-lbl,
 .desk-meters-lbl {
-    font-size: 8px;
+    font-size: 7.5px;
     font-weight: 800;
     color: #cbd5e1;
     font-family: monospace;
-    letter-spacing: -0.2px;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
 }
 
+.desk-feature-badge,
 .desk-meters-badge {
     background: var(--strip-meters-badge-bg, #1e293b);
     color: var(--strip-meters-badge-text, #38bdf8);
     border: 1px solid var(--strip-meters-badge-border, #334155);
     border-radius: 3px;
-    font-size: 8px;
+    font-size: 7.5px;
     font-weight: 800;
     font-family: monospace;
     padding: 1px 3px;
-    min-width: 32px;
     text-align: center;
+    white-space: nowrap;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
     pointer-events: none;
 }

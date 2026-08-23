@@ -129,8 +129,45 @@ const DESKTOP_VARIATIONS = [
         isPaired: false
     },
     {
+        id: 'desk_mix_dock_position',
+        title: '6.1 Mini-Fader Master Auxiliar com POSIÇÃO (MIX 7)',
+        type: 'mix',
+        chNumber: 'MIX 7',
+        name: 'AUX7',
+        colorBand: 'amber',
+        faderValue: 1023,
+        dbValue: '10.00',
+        onState: true,
+        soloState: false,
+        isLocked: false,
+        isDisabled: false,
+        hasPositionPanel: true,
+        positionGlobal: 'PRE',
+        positionPrePoint: 'PRE ON',
+        patch: 'ADAT 7',
+        isPaired: false
+    },
+    {
+        id: 'desk_bus_mono',
+        title: '7. BUS Mono (BUS 3)',
+        type: 'bus',
+        chNumber: 'BUS 3',
+        name: 'GUIT',
+        colorBand: 'cyan',
+        faderValue: 804,
+        dbValue: '0.00',
+        onState: true,
+        soloState: false,
+        isLocked: false,
+        isDisabled: false,
+        panL: 0,
+        panR: null,
+        patch: 'FX 2-1',
+        isPaired: false
+    },
+    {
         id: 'desk_bus_paired',
-        title: '7. BUS Pareado (BUS 1+2)',
+        title: '8. BUS Pareado (BUS 1+2)',
         type: 'bus_paired',
         chNumber: 'BUS 1 + 2',
         name: 'VHIGH',
@@ -142,6 +179,8 @@ const DESKTOP_VARIATIONS = [
         isLocked: false,
         isDisabled: false,
         patch: 'FX 1-1 | FX 1-2',
+        panL: -32,
+        panR: 32,
         isPaired: true
     },
     {
@@ -403,6 +442,9 @@ function renderDesktopDeck() {
                 },
                 meters_config_click: (data, strip) => {
                     logWbEvent('lock', `[DESKTOP MEDIDORES] ${strip.config.name}: Modal de configuração de medidores aberto`);
+                },
+                position_config_click: (data, strip) => {
+                    logWbEvent('lock', `[DESKTOP POSIÇÃO] ${strip.config.name} (${data.chNumber}): openAuxConfigModal(${data.mixIdx}) acionado`);
                 },
                 macro_config_click: (data, strip) => {
                     logWbEvent('lock', `[DESKTOP MACRO CONFIG] ${strip.config.name}: Modal de configuração de canais do Macro aberto`);

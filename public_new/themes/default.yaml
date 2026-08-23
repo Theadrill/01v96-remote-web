@@ -193,13 +193,15 @@ channel_strip:
   peak_led_color: "#ff0000"          # Cor do LED de Peak aceso
   peak_led_glow: "#ff4444"           # Brilho do LED de Peak aceso
 
-  # Painel de Medidores do Master (Zona 4)
+  # Painel de Medidores do Master & Painel de Posição do Auxiliar (Zona 4)
   meters_box_bg: "rgba(0, 0, 0, 0.45)"       # Fundo do bloco de medidores no master
   meters_box_border: "rgba(255, 255, 255, 0.15)" # Borda do bloco de medidores
   meters_box_radius: "4px"                   # Arredondamento do bloco de medidores
   meters_badge_bg: "#1e293b"                 # Fundo dos badges de PRE/POST
   meters_badge_text: "#38bdf8"               # Cor do texto dos badges (azul neon)
   meters_badge_border: "#334155"             # Borda dos badges
+  position_box_border: "rgba(212, 175, 55, 0.4)" # Borda dourada do painel de posição
+  position_title_color: "#d4af37"            # Cor do título POSIÇÃO (dourado/âmbar)
 
   # Macro Fader Técnico (Variação 4)
   macro_bg: "#d4d4d8"                        # Fundo prateado/cinza claro do card Macro
@@ -223,5 +225,22 @@ channel_strip:
   macro_reset_text: "#ffffff"                # Texto do botão ZERAR
   macro_reset_radius: "6px"                  # Arredondamento do botão ZERAR
 
+  # Volume Geral (Mais Fino: 70px)
+  volume_geral_width: "70px"                 # Largura mais fina específica para Volume Geral (70px)
 
+  # Envio Auxiliar / Sends on Faders (Variação 8)
+  group_aux_color: "#7e22ce"                 # Roxo/Púrpura - Barramento AUX
+  btn_pre_bg: "#6b21a8"                      # Fundo do botão PRE/POST
+  btn_pre_text: "#ffffff"                    # Cor do texto do botão PRE/POST
+  btn_pre_border: "#9333ea"                  # Borda do botão PRE/POST
+  btn_pre_radius: "4px"                      # Arredondamento do botão PRE/POST
 
+  # Canal Travado (Variações 10 & 8 Mobile)
+  lock_border_color: "#ff4444"               # Borda vermelha de canal travado
+  lock_badge_bg: "#ff4444"                   # Fundo do badge de cadeado
+  lock_badge_text: "#ffffff"                 # Ícone do cadeado
+  lock_overlay_bg: "rgba(255, 0, 0, 0.18)"   # Fundo avermelhado do overlay de bloqueio
+
+  # Canal Desabilitado / FIXED (Variações 11 & 9 Mobile)
+  disabled_opacity: "0.45"                   # Opacidade reduzida para controles desabilitados
+  disabled_filter: "grayscale(80%)"          # Desaturação de controles inativos
