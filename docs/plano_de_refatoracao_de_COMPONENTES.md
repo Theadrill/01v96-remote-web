@@ -1217,8 +1217,8 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - [x] 5. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão CONFIG, Delta dB, Big Nudges) (CONCLUÍDO ✅)
   - [x] 6. Volume Geral de AUX (`AUX` / `AUX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR) (CONCLUÍDO ✅)
   - [x] 7. Volume Geral do Músico (`GERAL` / `VOLUME GERAL` - fundo prateado, botão CONFIG, Big Nudges +0.25 dB) (CONCLUÍDO ✅)
-  - [ ] 8. Canal Mobile TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - borda vermelha, badge circular 🔒 inferior, modais de destravar)
-  - [ ] 9. Canal Mobile DESABILITADO / DISABLED (`AUX 1` FIXED - visual desaturado, fader fixo, botão ON 100% ativo e colorido)
+  - [x] 8. Canal Mobile TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - borda vermelha, badge circular 🔒 inferior, modais de destravar) (CONCLUÍDO ✅)
+  - [x] 9. Canal Mobile DESABILITADO / DISABLED (`AUX 1` FIXED - visual desaturado, fader fixo, botão ON 100% ativo e colorido) (CONCLUÍDO ✅)
 
 ### FASE 7 — Migração Piloto: Tela Principal (`screens/main_view.js`)
 - [ ] Refatorar `main_view.js` para instanciar a classe modular `ChannelStrip`:
