@@ -1207,7 +1207,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - [x] 7. Canais ST IN (`ST IN 1` / `REVERB VOZ` - header azul, duplo VU estéreo, duplo panpot L/R independente, nudges 0.05 dB) (CONCLUÍDO ✅)
   - [x] 8. Canal em Modo Sends on Faders Individual (`AUX 4` / `AUX4` - botão roxo PRE/POST, leitura com sufixo dB, nudges e wheel 0.50 dB) (CONCLUÍDO ✅)
   - [x] 9. Macro de Envio Geral (`AUX GERAL` / `MIX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR) (CONCLUÍDO ✅)
-  - [ ] 10. Canal Desktop TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - bordas laterais vermelhas, overlay de proteção, cadeado central grande)
+  - [x] 10. Canal Desktop TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - bordas laterais vermelhas, overlay de proteção, cadeado central grande) (CONCLUÍDO ✅)
   - [ ] 11. Canal Desktop DESABILITADO / DISABLED (`AUX 1` FIXED - acinzentado/desaturado, fader travado, botão ON 100% ativo e funcional)
 - [ ] **Variações Mobile (Validação no Workbench `tests.html`):**
   - [x] 1. Canal Mono Normal (`CH 13` / `SURDAO` - cortina espectral 100%, peak glow, gap e agrupamento 8 em 8) (CONCLUÍDO ✅)

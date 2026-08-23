@@ -590,11 +590,16 @@ class ChannelStrip {
         }
 
         // 7. Ação de Trava / Destrava (Lock)
-        const lockTrigger = els.lockBadgeBtn || els.lockSlot;
-        if (lockTrigger) {
-            lockTrigger.addEventListener('click', (e) => {
+        if (els.lockSlot) {
+            els.lockSlot.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this._emitEvent('lock_click', { isLocked: this.config.isLocked });
+                this._emitEvent('lock_click', { isLocked: this.config.isLocked, target: 'slot' });
+            });
+        }
+        if (els.lockBadgeBtn) {
+            els.lockBadgeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this._emitEvent('lock_click', { isLocked: this.config.isLocked, target: 'badge' });
             });
         }
 

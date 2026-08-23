@@ -241,7 +241,7 @@ channel_strip:
   lock_border_color: "#ff4444"               # Borda vermelha de canal travado
   lock_badge_bg: "#ff4444"                   # Fundo do badge de cadeado
   lock_badge_text: "#ffffff"                 # Ícone do cadeado
-  lock_overlay_bg: "rgba(255, 0, 0, 0.18)"   # Fundo avermelhado do overlay de bloqueio
+  lock_overlay_bg: "rgba(0, 0, 0, 0.58)"     # Fundo escurecido (dim) do overlay de bloqueio
 
   # Canal Desabilitado / FIXED (Variações 11 & 9 Mobile)
   disabled_opacity: "0.45"                   # Opacidade reduzida para controles desabilitados

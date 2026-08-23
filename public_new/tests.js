@@ -401,12 +401,26 @@ const MOBILE_VARIATIONS = [
 // 2. Renderização do Catálogo no Sandbox usando a Classe ChannelStrip Real
 // ============================================================================
 
+function setupHorizontalWheel(deckEl) {
+    if (!deckEl) return;
+    deckEl.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            e.preventDefault();
+            deckEl.scrollLeft += e.deltaY * 1.2;
+        }
+    }, { passive: false });
+}
+
 function initWorkbench() {
     window.wbState.instances.desktop = [];
     window.wbState.instances.mobile = [];
 
     renderDesktopDeck();
     renderMobileDeck();
+
+    setupHorizontalWheel(document.getElementById('desktopCatalogDeck'));
+    setupHorizontalWheel(document.getElementById('mobileCatalogDeck'));
+
     logWbEvent('sys', '🔬 Workbench 01V96 V2: Instâncias reais de ChannelStrip inicializadas.');
 }
 

@@ -74,7 +74,7 @@
     --strip-lock-border-color: #ff4444;
     --strip-lock-badge-bg: #ff4444;
     --strip-lock-badge-text: #ffffff;
-    --strip-lock-overlay-bg: rgba(255, 0, 0, 0.18);
+    --strip-lock-overlay-bg: rgba(0, 0, 0, 0.58);
 
     --strip-disabled-opacity: 0.45;
     --strip-disabled-filter: grayscale(80%);
@@ -836,8 +836,7 @@
 
 /* Destaque Perimetral de Canal Travado */
 .channel-strip-wrapper.desk-strip.is-locked {
-    border-left: 2px solid var(--strip-lock-border-color, #ff4444) !important;
-    border-right: 2px solid var(--strip-lock-border-color, #ff4444) !important;
+    border: 2px solid var(--strip-lock-border-color, #ff4444) !important;
 }
 
 .channel-strip-wrapper.mob-strip.is-locked {
@@ -851,14 +850,13 @@
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background: var(--strip-lock-overlay-bg, rgba(255, 0, 0, 0.18)) !important;
-    border: 1px solid var(--strip-lock-border-color, #ff4444) !important;
+    background: var(--strip-lock-overlay-bg, rgba(0, 0, 0, 0.58)) !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
     align-items: center !important;
-    padding-bottom: 8px !important;
+    padding-bottom: 10px !important;
     z-index: 50 !important;
     pointer-events: auto !important;
 }
@@ -866,15 +864,15 @@
 .lock-badge-btn {
     background: var(--strip-lock-badge-bg, #ff4444);
     color: var(--strip-lock-badge-text, #ffffff);
-    width: 26px;
-    height: 26px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 15px;
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(255, 68, 68, 0.7);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
     transition: transform 0.15s ease;
 }
 .lock-badge-btn:hover {
