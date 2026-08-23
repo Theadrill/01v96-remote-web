@@ -56,12 +56,6 @@
       "file": "custom_names_scene-DAN VIEIRA 360-mesa-maria.json"
     },
     {
-      "custom_name": "ID DO SAMBA 360",
-      "physical_scene": "ID DO SAMBA 360",
-      "physical_id": 20,
-      "file": "custom_names_scene-ID DO SAMBA 360-mesa-maria.json"
-    },
-    {
       "custom_name": "SAID DE EMRG 3",
       "physical_scene": "SAID DE EMRG 3",
       "physical_id": 36,
@@ -114,6 +108,12 @@
       "physical_scene": "PRETTO 360",
       "physical_id": 37,
       "file": "custom_names_scene-PRETTO 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "BAT RESENH 360",
+      "physical_scene": "BAT RESENH 360",
+      "physical_id": 20,
+      "file": "custom_names_scene-BAT RESENH 360-mesa-maria.json"
     }
   ]
 }
