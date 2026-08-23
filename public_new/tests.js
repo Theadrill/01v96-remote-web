@@ -290,6 +290,7 @@ const MOBILE_VARIATIONS = [
         type: 'macro',
         chNumber: 'MACRO',
         name: 'MACRO FADER',
+        colorBand: 'silver',
         deltaDb: '--',
         mode: 'macro'
     },
@@ -299,6 +300,7 @@ const MOBILE_VARIATIONS = [
         type: 'macro_aux',
         chNumber: 'AUX',
         name: 'AUX GERAL',
+        colorBand: 'silver',
         deltaDb: '--',
         mode: 'macro_aux',
         hasResetBtn: true
@@ -309,6 +311,7 @@ const MOBILE_VARIATIONS = [
         type: 'macro_musician',
         chNumber: 'GERAL',
         name: 'VOLUME GERAL',
+        colorBand: 'silver',
         deltaDb: '--',
         mode: 'macro_musician'
     },
@@ -400,6 +403,12 @@ function renderDesktopDeck() {
                 },
                 meters_config_click: (data, strip) => {
                     logWbEvent('lock', `[DESKTOP MEDIDORES] ${strip.config.name}: Modal de configuração de medidores aberto`);
+                },
+                macro_config_click: (data, strip) => {
+                    logWbEvent('lock', `[DESKTOP MACRO CONFIG] ${strip.config.name}: Modal de configuração de canais do Macro aberto`);
+                },
+                zerar_sends_click: (data, strip) => {
+                    logWbEvent('mute', `[DESKTOP ZERAR ENVIOS] ${strip.config.name} (${data.channel}): Solicitação para zerar todos os envios`);
                 }
             }
         });
@@ -451,6 +460,12 @@ function renderMobileDeck() {
                 },
                 meters_config_click: (data, strip) => {
                     logWbEvent('lock', `[MOBILE MEDIDORES] ${strip.config.name}: Modal de configuração de medidores aberto`);
+                },
+                macro_config_click: (data, strip) => {
+                    logWbEvent('lock', `[MOBILE MACRO CONFIG] ${strip.config.name}: Modal de configuração de canais do Macro aberto`);
+                },
+                zerar_sends_click: (data, strip) => {
+                    logWbEvent('mute', `[MOBILE ZERAR ENVIOS] ${strip.config.name} (${data.channel}): Solicitação para zerar todos os envios`);
                 }
             }
         });

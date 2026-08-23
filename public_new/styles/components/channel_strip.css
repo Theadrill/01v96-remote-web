@@ -69,6 +69,28 @@
     --strip-meters-badge-bg: #1e293b;
     --strip-meters-badge-text: #38bdf8;
     --strip-meters-badge-border: #334155;
+
+    --strip-macro-bg: #d4d4d8;
+    --strip-macro-border: #27272a;
+    --strip-macro-header-bg: #3f3f46;
+    --strip-macro-header-text: #ffffff;
+    --strip-macro-config-bg: #6b21a8;
+    --strip-macro-config-hover-bg: #7e22ce;
+    --strip-macro-config-text: #ffffff;
+    --strip-macro-config-radius: 6px;
+    --strip-macro-delta-bg: #09090b;
+    --strip-macro-delta-text: #52525b;
+    --strip-macro-delta-active-text: #38bdf8;
+    --strip-macro-big-nudge-bg: #ffffff;
+    --strip-macro-big-nudge-text: #000000;
+    --strip-macro-big-nudge-border: #a1a1aa;
+    --strip-macro-big-nudge-radius: 12px;
+    --strip-macro-big-nudge-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+    --strip-macro-reset-bg: #dc2626;
+    --strip-macro-reset-hover-bg: #ef4444;
+    --strip-macro-reset-text: #ffffff;
+    --strip-macro-reset-radius: 6px;
 }
 
 /* =========================================================================
@@ -218,19 +240,25 @@
     border-bottom: 2.5px solid #555;
 }
 
-.channel-strip-wrapper.desk-strip.band-macro_silver {
-    background: #e2e8f0 !important;
-    color: #000 !important;
+.channel-strip-wrapper.desk-strip.band-macro_silver,
+.channel-strip-wrapper.desk-strip.band-silver,
+.channel-strip-wrapper.desk-strip.is-macro {
+    background: var(--strip-macro-bg, #d4d4d8) !important;
+    border: 1px solid var(--strip-macro-border, #27272a) !important;
 }
-.channel-strip-wrapper.desk-strip.band-macro_silver .desk-label-wrapper {
-    background: #1e293b;
-    color: #fff;
-    border-top: 2.5px solid #94a3b8;
+.channel-strip-wrapper.desk-strip.band-macro_silver .desk-label-wrapper,
+.channel-strip-wrapper.desk-strip.band-silver .desk-label-wrapper,
+.channel-strip-wrapper.desk-strip.is-macro .desk-label-wrapper {
+    background: var(--strip-macro-header-bg, #3f3f46);
+    color: var(--strip-macro-header-text, #ffffff);
+    border-top: none;
 }
-.channel-strip-wrapper.desk-strip.band-macro_silver .desk-footer-zone .desk-patch-area {
-    background: #1e293b;
-    color: #fff;
-    border-bottom: 2.5px solid #94a3b8;
+.channel-strip-wrapper.desk-strip.band-macro_silver .desk-footer-zone .desk-patch-area,
+.channel-strip-wrapper.desk-strip.band-silver .desk-footer-zone .desk-patch-area,
+.channel-strip-wrapper.desk-strip.is-macro .desk-footer-zone .desk-patch-area {
+    background: #18181b;
+    color: #71717a;
+    border-bottom: none;
 }
 
 /* =========================================================================
@@ -264,6 +292,21 @@
 .channel-strip-wrapper.mob-strip.is-master .mob-card-header,
 .channel-strip-wrapper.mob-strip.band-wine .mob-card-header {
     color: #ff6b81;
+}
+
+/* Macro Mobile (Fundo Prateado / Cinza Claro) */
+.channel-strip-wrapper.mob-strip.is-macro,
+.channel-strip-wrapper.mob-strip.band-silver,
+.channel-strip-wrapper.mob-strip.band-macro_silver {
+    background: var(--strip-macro-bg, #d4d4d8) !important;
+    border: 1px solid var(--strip-macro-border, #27272a) !important;
+}
+
+.channel-strip-wrapper.mob-strip.is-macro .mob-card-header,
+.channel-strip-wrapper.mob-strip.band-silver .mob-card-header,
+.channel-strip-wrapper.mob-strip.band-macro_silver .mob-card-header {
+    color: #18181b;
+    font-weight: 900;
 }
 
 /* Cortina de Medidor VU de Fundo Integral no Mobile */
@@ -755,83 +798,142 @@
    7. CLASSES MODULARES ESPECÍFICAS PARA ZONAS, MACROS, VU, FADER & FOOTER
    ========================================================================= */
 
-/* Middle Feature & Macros */
-.desk-macro-feature-zone {
-    padding: 4px;
-    text-align: center;
-}
-.macro-config-btn {
-    background: #6b21a8;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
+/* Middle Feature & Macros (Zona 4) */
+.desk-macro-feature-zone,
+.mob-macro-feature-zone {
     padding: 3px 6px;
-    font-size: 10px;
-    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.macro-config-btn {
+    background: var(--strip-macro-config-bg, #6b21a8);
+    color: var(--strip-macro-config-text, #ffffff);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--strip-macro-config-radius, 6px);
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    width: 88%;
     cursor: pointer;
-    transition: background 0.15s ease;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s ease, transform 0.05s ease;
 }
+
 .macro-config-btn:hover {
-    background: #7e22ce;
+    background: var(--strip-macro-config-hover-bg, #7e22ce);
 }
+
+.macro-config-btn:active {
+    transform: scale(0.97);
+}
+
 .macro-delta-display {
-    background: #000;
-    color: #00ff00;
+    background: var(--strip-macro-delta-bg, #09090b);
+    color: var(--strip-macro-delta-text, #52525b);
     font-family: monospace;
-    font-size: 12px;
-    margin-top: 4px;
-    padding: 2px;
-    border-radius: 3px;
-    border: 1px solid #222;
+    font-size: 11px;
+    font-weight: 800;
+    width: 76%;
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid #27272a;
+    text-align: center;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+    transition: color 0.15s ease;
 }
-.desk-fader-core.macro-fader-core {
-    padding: 10px 6px;
+
+.macro-delta-display.macro-db-active {
+    color: var(--strip-macro-delta-active-text, #38bdf8);
+}
+
+.desk-fader-core.macro-fader-core,
+.mob-macro-fader-core {
+    padding: 4px 6px 6px 6px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     flex: 1;
-    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
 }
-.desk-big-nudge {
-    height: 60px;
-    font-size: 20px;
-    font-weight: bold;
-    background: #fff;
-    color: #000;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+
+.desk-big-nudge,
+.mob-big-nudge {
+    flex: 1;
+    width: 100%;
+    min-height: 85px;
+    font-size: 32px;
+    font-weight: 900;
+    background: var(--strip-macro-big-nudge-bg, #ffffff);
+    color: var(--strip-macro-big-nudge-text, #000000);
+    border-radius: var(--strip-macro-big-nudge-radius, 12px);
+    border: 1px solid var(--strip-macro-big-nudge-border, #a1a1aa);
+    box-shadow: var(--strip-macro-big-nudge-shadow, 0 3px 6px rgba(0, 0, 0, 0.15));
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     user-select: none;
     -webkit-user-select: none;
-    transition: background 0.1s ease, transform 0.05s ease;
+    transition: background 0.1s ease, transform 0.05s ease, box-shadow 0.1s ease;
 }
-.desk-big-nudge:hover {
-    background: #e2e8f0;
+
+.desk-big-nudge:hover,
+.mob-big-nudge:hover {
+    background: #f4f4f5;
 }
-.desk-big-nudge:active {
-    background: #cbd5e1;
+
+.desk-big-nudge:active,
+.mob-big-nudge:active {
+    background: #e4e4e7;
     transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
-.macro-reset-container {
-    padding: 4px;
-    text-align: center;
+.macro-reset-container,
+.mob-macro-reset-container {
+    padding: 3px 6px 4px 6px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
 }
-.btn-zerar-sends {
-    background: #dc2626;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 10px;
-    font-weight: bold;
+
+.btn-zerar-sends,
+.mob-btn-zerar {
+    background: var(--strip-macro-reset-bg, #dc2626);
+    color: var(--strip-macro-reset-text, #ffffff);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--strip-macro-reset-radius, 6px);
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    width: 88%;
     cursor: pointer;
-    transition: background 0.15s ease;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s ease, transform 0.05s ease;
 }
-.btn-zerar-sends:hover {
-    background: #ef4444;
+
+.btn-zerar-sends:hover,
+.mob-btn-zerar:hover {
+    background: var(--strip-macro-reset-hover-bg, #ef4444);
+}
+
+.btn-zerar-sends:active,
+.mob-btn-zerar:active {
+    transform: scale(0.97);
 }
 
 /* Master Meters Indicator Zone (Zona 4) */

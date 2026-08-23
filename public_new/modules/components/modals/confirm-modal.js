@@ -394,6 +394,26 @@ var ConfirmModal = (function () {
         if (cs.meters_badge_bg)     root.style.setProperty('--strip-meters-badge-bg', cs.meters_badge_bg);
         if (cs.meters_badge_text)   root.style.setProperty('--strip-meters-badge-text', cs.meters_badge_text);
         if (cs.meters_badge_border) root.style.setProperty('--strip-meters-badge-border', cs.meters_badge_border);
+        if (cs.macro_bg)            root.style.setProperty('--strip-macro-bg', cs.macro_bg);
+        if (cs.macro_border)        root.style.setProperty('--strip-macro-border', cs.macro_border);
+        if (cs.macro_header_bg)     root.style.setProperty('--strip-macro-header-bg', cs.macro_header_bg);
+        if (cs.macro_header_text)   root.style.setProperty('--strip-macro-header-text', cs.macro_header_text);
+        if (cs.macro_config_bg)     root.style.setProperty('--strip-macro-config-bg', cs.macro_config_bg);
+        if (cs.macro_config_hover_bg) root.style.setProperty('--strip-macro-config-hover-bg', cs.macro_config_hover_bg);
+        if (cs.macro_config_text)   root.style.setProperty('--strip-macro-config-text', cs.macro_config_text);
+        if (cs.macro_config_radius) root.style.setProperty('--strip-macro-config-radius', cs.macro_config_radius);
+        if (cs.macro_delta_bg)      root.style.setProperty('--strip-macro-delta-bg', cs.macro_delta_bg);
+        if (cs.macro_delta_text)    root.style.setProperty('--strip-macro-delta-text', cs.macro_delta_text);
+        if (cs.macro_delta_active_text) root.style.setProperty('--strip-macro-delta-active-text', cs.macro_delta_active_text);
+        if (cs.macro_big_nudge_bg)  root.style.setProperty('--strip-macro-big-nudge-bg', cs.macro_big_nudge_bg);
+        if (cs.macro_big_nudge_text) root.style.setProperty('--strip-macro-big-nudge-text', cs.macro_big_nudge_text);
+        if (cs.macro_big_nudge_border) root.style.setProperty('--strip-macro-big-nudge-border', cs.macro_big_nudge_border);
+        if (cs.macro_big_nudge_radius) root.style.setProperty('--strip-macro-big-nudge-radius', cs.macro_big_nudge_radius);
+        if (cs.macro_big_nudge_shadow) root.style.setProperty('--strip-macro-big-nudge-shadow', cs.macro_big_nudge_shadow);
+        if (cs.macro_reset_bg)      root.style.setProperty('--strip-macro-reset-bg', cs.macro_reset_bg);
+        if (cs.macro_reset_hover_bg) root.style.setProperty('--strip-macro-reset-hover-bg', cs.macro_reset_hover_bg);
+        if (cs.macro_reset_text)    root.style.setProperty('--strip-macro-reset-text', cs.macro_reset_text);
+        if (cs.macro_reset_radius)  root.style.setProperty('--strip-macro-reset-radius', cs.macro_reset_radius);
     }
 
     function _alert(message, title, type) {

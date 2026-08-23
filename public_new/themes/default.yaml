@@ -201,3 +201,27 @@ channel_strip:
   meters_badge_text: "#38bdf8"               # Cor do texto dos badges (azul neon)
   meters_badge_border: "#334155"             # Borda dos badges
 
+  # Macro Fader Técnico (Variação 4)
+  macro_bg: "#d4d4d8"                        # Fundo prateado/cinza claro do card Macro
+  macro_border: "#27272a"                    # Borda escura do card Macro
+  macro_header_bg: "#3f3f46"                 # Fundo do cabeçalho do Macro
+  macro_header_text: "#ffffff"               # Cor do texto do cabeçalho
+  macro_config_bg: "#6b21a8"                 # Fundo do botão CONFIG (roxo escuro)
+  macro_config_hover_bg: "#7e22ce"           # Hover do botão CONFIG
+  macro_config_text: "#ffffff"               # Cor do texto do botão CONFIG
+  macro_config_radius: "6px"                 # Arredondamento do botão CONFIG
+  macro_delta_bg: "#09090b"                  # Fundo do visor OLED Delta dB
+  macro_delta_text: "#52525b"                # Texto do visor Delta dB em repouso
+  macro_delta_active_text: "#38bdf8"         # Texto do visor Delta dB ativo (azul neon)
+  macro_big_nudge_bg: "#ffffff"              # Fundo do botão Big Nudge
+  macro_big_nudge_text: "#000000"            # Símbolo (+/-) do Big Nudge
+  macro_big_nudge_border: "#a1a1aa"          # Borda do botão Big Nudge
+  macro_big_nudge_radius: "12px"             # Arredondamento dos Big Nudges gigantes
+  macro_big_nudge_shadow: "0 3px 6px rgba(0,0,0,0.15)" # Sombra 3D dos Big Nudges
+  macro_reset_bg: "#dc2626"                  # Fundo vermelho do botão ZERAR
+  macro_reset_hover_bg: "#ef4444"            # Hover do botão ZERAR
+  macro_reset_text: "#ffffff"                # Texto do botão ZERAR
+  macro_reset_radius: "6px"                  # Arredondamento do botão ZERAR
+
+
+

@@ -116,27 +116,30 @@ class ChannelStrip {
         const isPaired = cfg.isPaired;
 
         if (isMacro) {
+            const hasConfig = cfg.hasConfig !== false && cfg.mode !== 'macro_aux' && cfg.type !== 'macro_aux';
+            const hasReset = cfg.hasResetBtn === true || cfg.mode === 'macro_aux' || cfg.type === 'macro_aux';
+
             return `
                 <div class="desk-label-wrapper">
                     <span class="desk-ch-num">${cfg.chNumber}</span>
                 </div>
                 <div class="desk-ch-name-zone">
-                    <span class="desk-ch-name">${cfg.name}</span>
+                    <span class="desk-ch-name">${cfg.name.replace(' ', '<br>')}</span>
                 </div>
                 <div class="desk-macro-feature-zone">
-                    <button class="macro-config-btn">[ CONFIG ]</button>
+                    ${hasConfig ? `<button class="macro-config-btn">CONFIG</button>` : ''}
                     <div class="macro-delta-display">${cfg.deltaDb || '--'}</div>
                 </div>
                 <div class="desk-fader-core macro-fader-core">
-                    <button class="desk-big-nudge btn-nudge-plus">+</button>
-                    <button class="desk-big-nudge btn-nudge-minus">-</button>
+                    <button class="desk-big-nudge btn-nudge-plus" title="Aumentar">+</button>
+                    <button class="desk-big-nudge btn-nudge-minus" title="Diminuir">-</button>
                 </div>
-                ${cfg.hasResetBtn ? `
+                ${hasReset ? `
                     <div class="macro-reset-container">
-                        <button class="btn-zerar-sends">[ ZERAR ]</button>
+                        <button class="btn-zerar-sends">ZERAR</button>
                     </div>
                 ` : ''}
-                <div class="desk-footer-zone">
+                <div class="desk-footer-zone macro-footer">
                     <div class="desk-patch-area">
                         <span>${cfg.chNumber}</span>
                     </div>
@@ -305,24 +308,27 @@ class ChannelStrip {
         const isMaster = cfg.type === 'master' || cfg.isMaster;
 
         if (isMacro) {
+            const hasConfig = cfg.hasConfig !== false && cfg.mode !== 'macro_aux' && cfg.type !== 'macro_aux';
+            const hasReset = cfg.hasResetBtn === true || cfg.mode === 'macro_aux' || cfg.type === 'macro_aux';
+
             return `
                 <div class="mob-card-header">
-                    <span class="mob-ch-num">${cfg.chNumber}</span>
+                    ${cfg.chNumber}
                 </div>
                 <div class="mob-display-name">
-                    <span>${cfg.name}</span>
+                    ${cfg.name}
                 </div>
                 <div class="mob-macro-feature-zone">
-                    <button class="macro-config-btn">[ CONFIG ]</button>
+                    ${hasConfig ? `<button class="macro-config-btn">CONFIG</button>` : ''}
                     <div class="mob-macro-delta-display macro-delta-display">${cfg.deltaDb || '--'}</div>
                 </div>
                 <div class="mob-macro-fader-core">
-                    <button class="mob-big-nudge btn-nudge-plus">+</button>
-                    <button class="mob-big-nudge btn-nudge-minus">-</button>
+                    <button class="mob-big-nudge btn-nudge-plus" title="Aumentar">+</button>
+                    <button class="mob-big-nudge btn-nudge-minus" title="Diminuir">-</button>
                 </div>
-                ${cfg.hasResetBtn ? `
+                ${hasReset ? `
                     <div class="mob-macro-reset-container">
-                        <button class="mob-btn-zerar">[ ZERAR ]</button>
+                        <button class="mob-btn-zerar">ZERAR</button>
                     </div>
                 ` : ''}
             `;
@@ -568,6 +574,30 @@ class ChannelStrip {
                 this._emitEvent('meters_config_click', { target: 'master' });
             });
         }
+
+        // 10. Abertura do Modal de Configuração do Macro Fader (Desktop & Mobile)
+        const macroConfigBtn = this.element.querySelector('.macro-config-btn');
+        if (macroConfigBtn) {
+            macroConfigBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (typeof window.openMacroConfigModal === 'function') {
+                    window.openMacroConfigModal();
+                }
+                this._emitEvent('macro_config_click', { mode: this.config.mode || 'macro' });
+            });
+        }
+
+        // 11. Botão ZERAR Envios do Macro Aux Geral (Desktop & Mobile)
+        const zerarBtn = this.element.querySelector('.btn-zerar-sends, .mob-btn-zerar');
+        if (zerarBtn) {
+            zerarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (typeof window.confirmZeroSends === 'function') {
+                    window.confirmZeroSends(this.config.chNumber);
+                }
+                this._emitEvent('zerar_sends_click', { channel: this.config.chNumber });
+            });
+        }
     }
 
     /**
@@ -788,8 +818,12 @@ class ChannelStrip {
         let step = 0.05;
         if (isAuxSend) {
             step = 0.50;
-        } else if (isOut || isMacro) {
+        } else if (this.config.mode === 'macro_musician' || this.config.type === 'macro_musician') {
+            step = 0.25;
+        } else if (this.config.mode === 'macro_aux' || this.config.type === 'macro_aux') {
             step = 0.10;
+        } else if (isOut || isMacro) {
+            step = 0.05;
         }
 
         const stepNudge = () => {
