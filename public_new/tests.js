@@ -445,6 +445,9 @@ function renderDesktopDeck() {
                 solo_toggle: (data, strip) => {
                     logWbEvent('solo', `[DESKTOP SOLO] ${strip.config.name}: ${data.state ? 'ATIVO' : 'DESATIVADO'}`);
                 },
+                pre_post_toggle: (data, strip) => {
+                    logWbEvent('solo', `[DESKTOP PRE/POST] ${strip.config.name} (${data.channel}): Comutado para ${data.mode}`);
+                },
                 lock_click: (data, strip) => {
                     logWbEvent('lock', `[DESKTOP LOCK] ${strip.config.name}: Ação de trava/destrava solicitada`);
                 },
@@ -550,26 +553,14 @@ function applyMeterLevelsToAll(p) {
     // 1. Atualiza instâncias reais Desktop
     if (window.wbState.instances.desktop) {
         window.wbState.instances.desktop.forEach(strip => {
-            if (strip.config.isPaired || strip.config.isMaster || strip.config.type === 'master') {
-                // Em canais pareados ou Master Stereo, simula sinal estéreo ligeiramente diferenciado para demonstrar duplo VU
-                const pR = Math.max(0, Math.min(100, Math.round(p * 0.82)));
-                strip.setMeterLevel(p, pR);
-            } else {
-                strip.setMeterLevel(p, p);
-            }
+            strip.setMeterLevel(p, p);
         });
     }
 
     // 2. Atualiza instâncias reais Mobile
     if (window.wbState.instances.mobile) {
         window.wbState.instances.mobile.forEach(strip => {
-            if (strip.config.isPaired || strip.config.isMaster || strip.config.type === 'master') {
-                // Cortina dual mobile (L e R independentes)
-                const pR = Math.max(0, Math.min(100, Math.round(p * 0.82)));
-                strip.setMeterLevel(p, pR);
-            } else {
-                strip.setMeterLevel(p, p);
-            }
+            strip.setMeterLevel(p, p);
         });
     }
 }

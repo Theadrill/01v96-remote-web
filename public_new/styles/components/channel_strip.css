@@ -21,6 +21,8 @@
     --strip-card-border: #2c2c2c;
     --strip-card-radius: 6px;
     --strip-card-on-bg: rgba(255, 69, 0, 0.08);
+    --strip-header-height: 25px;
+    --strip-patch-height: 23px;
 
     --strip-group-1-color: #0088cc;
     --strip-group-2-color: #00a86b;
@@ -370,11 +372,11 @@
 
 .mob-meter-curtain {
     flex: 1;
-    height: 0%;
-    margin-top: auto;
-    background: linear-gradient(180deg, #ff0000 0%, #ffbb00 25%, #22c55e 60%, #10b981 100%);
+    height: 100%;
+    background: linear-gradient(180deg, #ff0000 0%, #ffbb00 20%, #22c55e 55%, #10b981 100%);
     opacity: 0.35;
-    transition: height 0.05s linear;
+    clip-path: inset(100% 0 0 0);
+    will-change: clip-path;
 }
 
 .mob-meter-curtain + .mob-meter-curtain {
@@ -397,14 +399,14 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 4px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     font-family: var(--strip-header-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
     background: #002b49;
     color: #fff;
-    height: 19px;
-    min-height: 19px;
-    max-height: 19px;
+    height: var(--strip-header-height, 25px);
+    min-height: var(--strip-header-height, 25px);
+    max-height: var(--strip-header-height, 25px);
     box-sizing: border-box;
     border-top: 2.5px solid #00e5ff;
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
@@ -784,10 +786,13 @@
     color: #00e5ff;
     border-top: 1px solid #222;
     border-bottom: 2.5px solid #00e5ff;
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 700;
     font-family: var(--strip-patch-font-family, Consolas, Menlo, "Courier New", monospace);
-    padding: 3px 4px;
+    height: var(--strip-patch-height, 27px);
+    min-height: var(--strip-patch-height, 27px);
+    max-height: var(--strip-patch-height, 27px);
+    padding: 0 4px;
     text-align: center;
     overflow: hidden;
     white-space: nowrap;
@@ -880,7 +885,23 @@
    6. CANAL DESABILITADO / FIXED (DISABLED)
    ========================================================================= */
 
-.channel-strip-wrapper.is-disabled {
+.channel-strip-wrapper.is-disabled .desk-label-wrapper,
+.channel-strip-wrapper.is-disabled .desk-top-action-zone,
+.channel-strip-wrapper.is-disabled .desk-ch-name-zone,
+.channel-strip-wrapper.is-disabled .desk-feature-box,
+.channel-strip-wrapper.is-disabled .desk-nudge-btn,
+.channel-strip-wrapper.is-disabled .desk-db-readout,
+.channel-strip-wrapper.is-disabled .desk-fader-core,
+.channel-strip-wrapper.is-disabled .desk-pan-zone,
+.channel-strip-wrapper.is-disabled .desk-footer-zone,
+.channel-strip-wrapper.is-disabled .mob-card-header,
+.channel-strip-wrapper.is-disabled .mob-display-name,
+.channel-strip-wrapper.is-disabled .mob-top-action,
+.channel-strip-wrapper.is-disabled .mob-feature-action,
+.channel-strip-wrapper.is-disabled .mob-nudge-container,
+.channel-strip-wrapper.is-disabled .mob-fader-track-area,
+.channel-strip-wrapper.is-disabled .mob-db-readout,
+.channel-strip-wrapper.is-disabled .mob-footer-patch {
     opacity: var(--strip-disabled-opacity, 0.45);
     filter: var(--strip-disabled-filter, grayscale(80%));
 }
@@ -889,20 +910,22 @@
 .channel-strip-wrapper.is-disabled .mob-fader-thumb,
 .channel-strip-wrapper.is-disabled .desk-pan-track,
 .channel-strip-wrapper.is-disabled .desk-nudge-btn,
-.channel-strip-wrapper.is-disabled .mob-nudge-btn {
+.channel-strip-wrapper.is-disabled .mob-nudge-btn,
+.channel-strip-wrapper.is-disabled .btn-pre-post,
+.channel-strip-wrapper.is-disabled .mob-btn-pre {
     pointer-events: none !important;
     cursor: not-allowed !important;
 }
 
 /* EXCEÇÃO CRÍTICA — Botão ON (Mute) permanece 100% ativo, colorido e funcional */
-.channel-strip-wrapper.is-disabled .desk-btn-on,
-.channel-strip-wrapper.is-disabled .mob-btn-on,
 .channel-strip-wrapper.is-disabled .desk-primary-action-zone .desk-btn-on,
 .channel-strip-wrapper.is-disabled .mob-primary-action .mob-btn-on {
     opacity: 1 !important;
     filter: none !important;
     pointer-events: auto !important;
     cursor: pointer !important;
+    position: relative;
+    z-index: 10;
 }
 
 /* =========================================================================
@@ -1279,11 +1302,11 @@
 }
 .desk-vu-fill {
     flex: 1;
-    background: linear-gradient(0deg, #10b981 0%, #22c55e 60%, #f59e0b 80%, #ef4444 100%);
+    height: 100%;
+    background: linear-gradient(0deg, #10b981 0%, #22c55e 65%, #f59e0b 82%, #ef4444 100%);
     border-radius: 1px;
-    height: 0%;
-    margin-top: auto;
-    transition: height 0.05s linear;
+    clip-path: inset(100% 0 0 0);
+    will-change: clip-path;
 }
 .desk-nudge-bottom-container {
     display: flex;
@@ -1427,7 +1450,7 @@
 .mob-card-header {
     text-align: center;
     font-weight: 800;
-    font-size: 13px;
+    font-size: 11px;
     color: #fff;
     padding: 2px 0;
 }

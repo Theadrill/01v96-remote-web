@@ -576,6 +576,19 @@ class ChannelStrip {
             });
         }
 
+        // 6.1 Botão PRE / POST do Envio Auxiliar
+        const prePostBtn = this.element.querySelector('.btn-pre-post, .mob-btn-pre');
+        if (prePostBtn && !cfg.isDisabled && !cfg.isLocked && cfg.prePost !== 'FIXED') {
+            prePostBtn.addEventListener('click', () => {
+                const current = (this.config.prePost || 'PRE').toUpperCase();
+                const next = current === 'PRE' ? 'POST' : 'PRE';
+                this.config.prePost = next;
+                prePostBtn.textContent = next;
+                prePostBtn.className = (this.config.layout === 'mobile' ? 'mob-btn-pre' : 'btn-pre-post') + ' ' + next.toLowerCase();
+                this._emitEvent('pre_post_toggle', { mode: next, channel: this.config.chNumber });
+            });
+        }
+
         // 7. Ação de Trava / Destrava (Lock)
         const lockTrigger = els.lockBadgeBtn || els.lockSlot;
         if (lockTrigger) {
@@ -1064,20 +1077,19 @@ class ChannelStrip {
         const pR = Math.max(0, Math.min(100, levelR));
         const isPeak = pL >= 98 || pR >= 98;
 
+        const clipL = `inset(${100 - pL}% 0 0 0)`;
+        const clipR = `inset(${100 - pR}% 0 0 0)`;
+
         if (this.config.layout === 'desktop') {
-            if (this.elements.vuL) {
-                this.elements.vuL.style.height = `${pL}%`;
-            }
-            if (this.elements.vuR) {
-                this.elements.vuR.style.height = `${pR}%`;
-            }
+            if (this.elements.vuL) this.elements.vuL.style.clipPath = clipL;
+            if (this.elements.vuR) this.elements.vuR.style.clipPath = clipR;
             if (isPeak) {
                 this._triggerDesktopPeak();
             }
         } else {
             // Mobile (Cortina de fundo integral)
-            if (this.elements.vuL) this.elements.vuL.style.height = `${pL}%`;
-            if (this.elements.vuR) this.elements.vuR.style.height = `${pR}%`;
+            if (this.elements.vuL) this.elements.vuL.style.clipPath = clipL;
+            if (this.elements.vuR) this.elements.vuR.style.clipPath = clipR;
             if (isPeak) {
                 this._triggerMobilePeakGlow();
             }

@@ -143,6 +143,8 @@ channel_strip:
   card_border: "#222222"             # Borda do card
   card_radius: "6px"                 # Arredondamento do card
   card_on_bg: "rgba(255, 69, 0, 0.08)" # Fundo sutil de destaque quando o canal está ON
+  header_height: "25px"              # Altura do cabeçalho desktop
+  patch_height: "23px"               # Altura do rodapé de patch desktop
 
   # Cores de Grupos / Barramentos
   group_1_color: "#00adef"           # Azul - Canais 1-16
