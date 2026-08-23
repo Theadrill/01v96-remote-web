@@ -189,7 +189,7 @@ const DESKTOP_VARIATIONS = [
         type: 'st_in',
         chNumber: 'ST IN 1',
         name: 'REVERB VOZ',
-        colorBand: 'blue',
+        colorBand: 'st',
         faderValue: 0,
         dbValue: '-∞',
         onState: true,
@@ -322,6 +322,20 @@ const MOBILE_VARIATIONS = [
         prePost: 'PRE',
         isLocked: false,
         isDisabled: false
+    },
+    {
+        id: 'mob_mix_master',
+        title: '4.1 Master Auxiliar com POSIÇÃO (MIX 7)',
+        type: 'mix',
+        chNumber: 'MIX 7',
+        name: 'AUX7',
+        faderValue: 1023,
+        dbValue: '10.00 dB',
+        onState: true,
+        soloState: false,
+        isLocked: false,
+        isDisabled: false,
+        hasPositionPanel: true
     },
     {
         id: 'mob_macro_tech',

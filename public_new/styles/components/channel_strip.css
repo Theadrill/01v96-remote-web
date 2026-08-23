@@ -186,6 +186,19 @@
     border-bottom: 2.5px solid #00e5ff;
 }
 
+.channel-strip-wrapper.desk-strip.band-st .desk-label-wrapper,
+.channel-strip-wrapper.desk-strip.band-st_in .desk-label-wrapper {
+    background: #002b49;
+    color: #fff;
+    border-top: 2.5px solid var(--strip-group-st-color, #4a90e2);
+}
+.channel-strip-wrapper.desk-strip.band-st .desk-footer-zone .desk-patch-area,
+.channel-strip-wrapper.desk-strip.band-st_in .desk-footer-zone .desk-patch-area {
+    background: #002b49;
+    color: var(--strip-group-st-color, #4a90e2);
+    border-bottom: 2.5px solid var(--strip-group-st-color, #4a90e2);
+}
+
 .channel-strip-wrapper.desk-strip.band-green .desk-label-wrapper {
     background: #003822;
     color: #fff;
@@ -1149,36 +1162,53 @@
     pointer-events: none;
 }
 
-/* Mobile Master Medidores Toggle */
+/* Mobile Feature Action Button (Zona 4: MEDIDORES / POSIÇÃO) */
+.mob-feature-action,
 .mob-master-meters-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
     width: 100%;
-    padding: 2px 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 1;
 }
 
-.mob-btn-medidores {
+.mob-btn-feature,
+.mob-btn-medidores,
+.mob-btn-posicao {
     background: var(--strip-meters-badge-bg, #1e293b);
     color: var(--strip-meters-badge-text, #38bdf8);
     border: 1px solid var(--strip-meters-badge-border, #334155);
-    border-radius: 4px;
-    font-size: 10px;
+    border-radius: var(--strip-btn-on-radius, 4px);
+    font-size: 8px;
     font-weight: 800;
-    font-family: monospace;
-    padding: 4px 6px;
-    width: 90%;
+    padding: 5px 3px;
+    width: 80%;
+    box-sizing: border-box;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    letter-spacing: 0;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
 }
 
-.mob-btn-medidores:hover {
-    background: #243248;
+.mob-btn-feature:hover,
+.mob-btn-medidores:hover,
+.mob-btn-posicao:hover {
+    background: #253248;
     border-color: var(--strip-meters-badge-text, #38bdf8);
+}
+
+.mob-btn-feature:active,
+.mob-btn-medidores:active,
+.mob-btn-posicao:active {
+    transform: scale(0.97);
 }
 
 /* Fader Core & Track Area */

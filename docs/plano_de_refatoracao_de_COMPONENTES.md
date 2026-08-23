@@ -1204,7 +1204,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - [x] 4. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão roxo CONFIG, visor Delta dB, Big Nudges) (CONCLUÍDO ✅)
   - [x] 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2` - header âmbar, sem Panpot, saída física dupla OMNI + ADAT com marquee) (CONCLUÍDO ✅)
   - [x] 6. Barramento BUS Pareado (`BUS 1 + 2` / `VHIGH` - header ciano com cadeado, correção estéreo de duplo VU e duplo Peak, duplo Pan L/R) (CONCLUÍDO ✅)
-  - [ ] 7. Canais ST IN (`ST IN 1` / `REVERB VOZ` - header azul, duplo VU, duplo pan estéreo com 2 barras L e R independentes)
+  - [x] 7. Canais ST IN (`ST IN 1` / `REVERB VOZ` - header azul, duplo VU estéreo, duplo panpot L/R independente, nudges 0.05 dB) (CONCLUÍDO ✅)
   - [ ] 8. Canal em Modo Sends on Faders Individual (`AUX 4` / `AUX4` - botão roxo PRE/POST no lugar do Solo, leitura com sufixo dB)
   - [x] 9. Macro de Envio Geral (`AUX GERAL` / `MIX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR) (CONCLUÍDO ✅)
   - [ ] 10. Canal Desktop TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - bordas laterais vermelhas, overlay de proteção, cadeado central grande)

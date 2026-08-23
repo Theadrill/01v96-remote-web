@@ -389,12 +389,16 @@ class ChannelStrip {
                     <button class="mob-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
                 </div>
 
-                <!-- Zona 4: Medidores Master Mobile -->
+                <!-- Zona 4: Middle Feature (Medidores Master ou Posição Auxiliar no Mobile) -->
                 ${isMaster ? `
-                    <div class="mob-master-meters-toggle" title="Configurar Posição dos Medidores">
-                        <button class="mob-btn-medidores">[ MEDIDORES ]</button>
+                    <div class="mob-feature-action mob-master-meters-toggle" title="Configurar Posição dos Medidores">
+                        <button class="mob-btn-feature mob-btn-medidores">MEDIDORES</button>
                     </div>
-                ` : ''}
+                ` : (cfg.hasPositionPanel || cfg.positionPanel ? `
+                    <div class="mob-feature-action" title="Configurar Posição de Envio">
+                        <button class="mob-btn-feature mob-btn-posicao">POSIÇÃO</button>
+                    </div>
+                ` : '')}
 
                 <!-- Nudge Superior (+) -->
                 <div class="mob-nudge-container">
@@ -596,8 +600,8 @@ class ChannelStrip {
             });
         }
 
-        // 9.1 Abertura do Modal de Configuração de Posição do Auxiliar (MIX / Aux Sends)
-        const positionToggle = this.element.querySelector('.desk-feature-box.feature-position');
+        // 9.1 Abertura do Modal de Configuração de Posição do Auxiliar (MIX / Aux Sends Desktop & Mobile)
+        const positionToggle = this.element.querySelector('.desk-feature-box.feature-position, .mob-btn-posicao');
         if (positionToggle) {
             positionToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
