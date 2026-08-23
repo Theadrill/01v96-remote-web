@@ -1,19 +1,8 @@
 {
   "0": {
-    "config": [
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      25,
-      26,
-      27,
-      30
-    ],
-    "name": "intervalo",
-    "scriptId": "channel_toggler"
+    "color": "#1976d2",
+    "name": "Smart Toggler",
+    "scriptId": "smart_channel_toggler"
   },
   "1": {
     "config": [
@@ -33,13 +22,6 @@
     },
     "name": "blackout",
     "scriptId": "lumikit"
-  },
-  "2": {
-    "config": [
-      30
-    ],
-    "name": "SFIO",
-    "scriptId": "channel_toggler"
   },
   "3": {
     "color": "#327671",
@@ -109,11 +91,6 @@
     },
     "name": "PALCO",
     "scriptId": "lumikit"
-  },
-  "9": {
-    "color": "#1976d2",
-    "name": "Smart Toggler",
-    "scriptId": "smart_channel_toggler"
   },
   "globalConfig": {
     "lumikit": {
