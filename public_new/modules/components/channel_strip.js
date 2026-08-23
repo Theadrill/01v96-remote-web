@@ -545,6 +545,215 @@ class ChannelStrip {
                 this._emitEvent('lock_click', { isLocked: this.config.isLocked });
             });
         }
+
+        // 8. Interação da Barra de Pan (Click -> Tip, Long Press Drag -> Mover, Double Click -> Centralizar)
+        this._bindPanEvents();
+    }
+
+    /**
+     * Configura interatividade do Panpot (Single e Dual)
+     * @private
+     */
+    _bindPanEvents() {
+        const root = this.element;
+        if (!root || this.config.isDisabled || this.config.isLocked) return;
+
+        // Single Pan
+        const singleTrack = root.querySelector('.desk-pan-container .desk-pan-track');
+        if (singleTrack) {
+            this._setupPanTrackInteraction(singleTrack, null, root.querySelector('.desk-pan-container'));
+        }
+
+        // Dual Pan (L e R)
+        const dualRows = root.querySelectorAll('.desk-dual-pan-container .desk-pan-row');
+        if (dualRows && dualRows.length >= 2) {
+            const rowL = dualRows[0];
+            const trackL = rowL.querySelector('.desk-pan-track');
+            if (trackL) this._setupPanTrackInteraction(trackL, 'L', rowL);
+
+            const rowR = dualRows[1];
+            const trackR = rowR.querySelector('.desk-pan-track');
+            if (trackR) this._setupPanTrackInteraction(trackR, 'R', rowR);
+        }
+    }
+
+    /**
+     * Gerencia Long Press, Drag, Double Click e Click Tip para um trilho de Pan
+     * @private
+     */
+    _setupPanTrackInteraction(trackEl, side = null, rowEl = null) {
+        let pressStartTime = 0;
+        let longPressTimer = null;
+        let pendingTipTimer = null;
+        let isDragging = false;
+        let lastClickTime = 0;
+        let didResetOnDown = false;
+
+        const containerEl = rowEl || trackEl;
+
+        const cancelTip = () => {
+            if (pendingTipTimer) {
+                clearTimeout(pendingTipTimer);
+                pendingTipTimer = null;
+            }
+            if (typeof window.BubbleModal !== 'undefined') {
+                window.BubbleModal.hideImmediate();
+            }
+        };
+
+        const getValFromClientX = (clientX) => {
+            const rect = trackEl.getBoundingClientRect();
+            if (!rect.width) return 0;
+            let pct = (clientX - rect.left) / rect.width;
+            pct = Math.max(0, Math.min(1, pct));
+            // Converte 0..1 para -32..+32
+            return Math.round((pct * 64) - 32);
+        };
+
+        const updatePan = (val) => {
+            this.setPanValue(val, side);
+        };
+
+        const doResetToCenter = () => {
+            cancelTip();
+            updatePan(0);
+            this._emitEvent('pan_reset', { side });
+        };
+
+        // Pointerdown no trilho / linha / container
+        containerEl.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const now = Date.now();
+            didResetOnDown = false;
+
+            // Verifica duplo clique (<= 350ms entre cliques)
+            if (now - lastClickTime <= 350) {
+                lastClickTime = 0;
+                didResetOnDown = true;
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+                doResetToCenter();
+                return;
+            }
+            lastClickTime = now;
+
+            pressStartTime = now;
+            isDragging = false;
+
+            longPressTimer = setTimeout(() => {
+                cancelTip();
+                isDragging = true;
+                try { trackEl.setPointerCapture(e.pointerId); } catch (_) {}
+                updatePan(getValFromClientX(e.clientX));
+            }, 250);
+        });
+
+        // Pointermove
+        containerEl.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            updatePan(getValFromClientX(e.clientX));
+        });
+
+        // Pointerup / Pointercancel
+        const handlePointerEnd = (e) => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+
+            const duration = Date.now() - pressStartTime;
+
+            if (isDragging) {
+                isDragging = false;
+                try { trackEl.releasePointerCapture(e.pointerId); } catch (_) {}
+            } else if (!didResetOnDown && duration < 250 && duration > 0) {
+                // Aguarda a janela de duplo clique (350ms) antes de abrir a dica do BubbleModal
+                cancelTip();
+                pendingTipTimer = setTimeout(() => {
+                    pendingTipTimer = null;
+                    if (typeof window.BubbleModal !== 'undefined') {
+                        window.BubbleModal.show({
+                            targetEl: containerEl,
+                            message: '💡 <b>Controle de Pan</b><br>Clique e segure para ajustar<br>Duplo clique centraliza (0)',
+                            delay: 0,
+                            duration: 3500
+                        });
+                    }
+                }, 350);
+            }
+            pressStartTime = 0;
+            didResetOnDown = false;
+        };
+
+        containerEl.addEventListener('pointerup', handlePointerEnd);
+        containerEl.addEventListener('pointercancel', handlePointerEnd);
+
+        // Duplo clique nativo (dblclick)
+        containerEl.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            doResetToCenter();
+        });
+
+        // Wheel para ajuste de Pan (Scroll Vertical ou Horizontal + Suporte a Shift)
+        containerEl.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            cancelTip();
+
+            const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+            const dir = isHorizontal ? (e.deltaX > 0 ? 1 : -1) : (e.deltaY < 0 ? 1 : -1);
+            const step = e.shiftKey ? 4 : 1; // Shift para incremento rápido
+
+            const cur = side === 'R' ? (this.config.panR !== null && this.config.panR !== undefined ? this.config.panR : 32)
+                                     : (this.config.panL !== null && this.config.panL !== undefined ? this.config.panL : (side === 'L' ? -32 : 0));
+            const next = Math.max(-32, Math.min(32, cur + (dir * step)));
+            updatePan(next);
+            this._emitEvent('wheel', { dir, step, type: 'pan', side, value: next });
+        }, { passive: false });
+    }
+
+    /**
+     * Atualiza o valor do Pan e o elemento visual correspondente
+     * @param {number} val -32 a +32
+     * @param {string|null} side 'L' | 'R' | null
+     */
+    setPanValue(val, side = null) {
+        const clamped = Math.max(-32, Math.min(32, val));
+        const root = this.element;
+        if (!root) return;
+
+        if (side === 'L') {
+            this.config.panL = clamped;
+            const rowL = root.querySelector('.desk-dual-pan-container .desk-pan-row:first-child');
+            if (rowL) {
+                const thumb = rowL.querySelector('.desk-pan-thumb');
+                if (thumb) thumb.style.setProperty('--pan-val', clamped);
+                const label = rowL.querySelector('.pan-val-label');
+                if (label) label.innerText = clamped;
+            }
+            this._emitEvent('pan_change', { panL: clamped, panR: this.config.panR, side: 'L' });
+        } else if (side === 'R') {
+            this.config.panR = clamped;
+            const rowR = root.querySelector('.desk-dual-pan-container .desk-pan-row:last-child');
+            if (rowR) {
+                const thumb = rowR.querySelector('.desk-pan-thumb');
+                if (thumb) thumb.style.setProperty('--pan-val', clamped);
+                const label = rowR.querySelector('.pan-val-label');
+                if (label) label.innerText = clamped;
+            }
+            this._emitEvent('pan_change', { panL: this.config.panL, panR: clamped, side: 'R' });
+        } else {
+            this.config.panL = clamped;
+            const singleThumb = root.querySelector('.desk-pan-container .desk-pan-thumb');
+            if (singleThumb) singleThumb.style.setProperty('--pan-val', clamped);
+            this._emitEvent('pan_change', { panL: clamped, panR: null });
+        }
     }
 
     /**

@@ -374,7 +374,11 @@ function renderDesktopDeck() {
                     logWbEvent('fader', `[DESKTOP RAIL] ${strip.config.name}: ${data.message}`);
                 },
                 wheel: (data, strip) => {
-                    logWbEvent('nudge', `[DESKTOP WHEEL] ${strip.config.name}: ${data.dir > 0 ? '+' : '-'}${data.step.toFixed(2)} dB (DeltaY: ${data.deltaY})`);
+                    if (data.type === 'pan') {
+                        logWbEvent('nudge', `[DESKTOP PAN WHEEL] ${strip.config.name} (${strip.config.chNumber}): ${data.dir > 0 ? '+R' : '-L'}${data.step} -> ${data.value} ${data.side ? `(${data.side})` : ''}`);
+                    } else {
+                        logWbEvent('nudge', `[DESKTOP WHEEL] ${strip.config.name}: ${data.dir > 0 ? '+' : '-'}${data.step?.toFixed ? data.step.toFixed(2) : data.step} dB`);
+                    }
                 },
                 nudge: (data, strip) => {
                     logWbEvent('nudge', `[DESKTOP NUDGE] ${strip.config.name}: ${data.direction > 0 ? '+' : '-'}${data.step.toFixed(2)} dB`);
@@ -387,6 +391,12 @@ function renderDesktopDeck() {
                 },
                 lock_click: (data, strip) => {
                     logWbEvent('lock', `[DESKTOP LOCK] ${strip.config.name}: Ação de trava/destrava solicitada`);
+                },
+                pan_change: (data, strip) => {
+                    logWbEvent('nudge', `[DESKTOP PAN] ${strip.config.name} (${strip.config.chNumber}): L=${data.panL} ${data.panR !== null && data.panR !== undefined ? `R=${data.panR}` : ''} ${data.side ? `(${data.side})` : ''}`);
+                },
+                pan_reset: (data, strip) => {
+                    logWbEvent('nudge', `[DESKTOP PAN RESET] ${strip.config.name}: Pan centralizado em 0 (Centro) ${data.side ? `(${data.side})` : ''}`);
                 }
             }
         });
