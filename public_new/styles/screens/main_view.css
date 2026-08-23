@@ -12,14 +12,14 @@
  */
 
 :root {
-    --main-faders-gap: 2px;
-    --main-faders-padding: 4px;
+    --main-faders-gap: 0px;
+    --main-faders-padding: 0px;
     --main-group-separator-width: 6px;
     --main-group-separator-bg: transparent;
     --main-macro-spacer-width: 55px;
     --main-macro-spacer-bg: transparent;
-    --main-mob-faders-gap: 4px;
-    --main-mob-group-gap: 12px;
+    --main-mob-faders-gap: 12px;
+    --main-mob-group-gap: 24px;
 }
 
 /* Área de Faders da Tela Principal */
@@ -27,8 +27,8 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
-    gap: var(--main-faders-gap);
-    padding: var(--main-faders-padding);
+    gap: var(--main-faders-gap, 0px);
+    padding: var(--main-faders-padding, 0px);
     box-sizing: border-box;
 }
 

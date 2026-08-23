@@ -138,138 +138,171 @@ channel_lock:
 # ─── CHANNEL STRIP (FADERS & CANAIS) ──────────────────────────
 # Faixas de canal, faders universais, botões ON/SOLO, grupos e medidores
 channel_strip:
-  # Estrutura do Card
-  card_bg: "#181818"                 # Fundo do card desktop
-  card_border: "#222222"             # Borda do card
-  card_radius: "6px"                 # Arredondamento do card
-  card_on_bg: "rgba(255, 69, 0, 0.08)" # Fundo sutil de destaque quando o canal está ON
-  header_height: "25px"              # Altura do cabeçalho desktop
-  patch_height: "23px"               # Altura do rodapé de patch desktop
 
-  # Cores de Grupos / Barramentos
-  group_1_color: "#00adef"           # Azul - Canais 1-16
-  group_2_color: "#00ff88"           # Verde - Canais 17-32
-  group_st_color: "#4a90e2"          # Azul suave - Entradas Estéreo (ST IN)
-  group_mix_color: "#d4a017"         # Amarelo/Dourado - MIX 1-8 Masters
-  group_bus_color: "#00b396"         # Ciano/Teal - BUS 1-8 Masters
-  master_color: "#dc3545"            # Vermelho - Master Stereo PA
+  # ══════════════════════════════════════════════════════════════
+  # 1. PROPRIEDADES GLOBAIS (Compartilhadas por Desktop e Mobile)
+  # ══════════════════════════════════════════════════════════════
+  global:
+    # Cores de Grupos / Barramentos
+    group_1_color: "#00adef"           # Azul - Canais 1-16
+    group_2_color: "#00ff88"           # Verde - Canais 17-32
+    group_st_color: "#4a90e2"          # Azul suave - Entradas Estéreo (ST IN)
+    group_mix_color: "#d4a017"         # Amarelo/Dourado - MIX 1-8 Masters
+    group_bus_color: "#00b396"         # Ciano/Teal - BUS 1-8 Masters
+    group_aux_color: "#7e22ce"         # Roxo/Púrpura - Barramento AUX
+    master_color: "#dc3545"            # Vermelho - Master Stereo PA
 
-  # Botão ON / MUTE
-  btn_on_bg: "#333333"               # Fundo do botão ON desligado
-  btn_on_text: "#888888"             # Texto do botão ON desligado
-  btn_on_active_bg: "#ff4500"        # Fundo do botão ON ligado (ativo)
-  btn_on_active_text: "#ffffff"      # Texto do botão ON ligado
-  btn_on_active_glow: "rgba(255, 69, 0, 0.45)" # Brilho/Glow do botão ON ligado
-  btn_on_radius: "4px"               # Arredondamento do botão ON
+    # Botão ON / MUTE (Cores & Comportamento)
+    btn_on_bg: "#333333"               # Fundo do botão ON desligado
+    btn_on_text: "#888888"             # Texto do botão ON desligado
+    btn_on_active_bg: "#ffc107"        # Fundo do botão ON ligado (ativo)
+    btn_on_active_text: "#000000"      # Texto do botão ON ligado
+    btn_on_active_glow: "rgba(255, 69, 0, 0.4)" # Brilho/Glow do botão ON ligado
 
-  # Botão SOLO / CUE
-  btn_solo_bg: "#333333"             # Fundo do botão SOLO desligado
-  btn_solo_text: "#888888"           # Texto do botão SOLO desligado
-  btn_solo_active_bg: "#22c55e"      # Fundo do botão SOLO ligado (verde)
-  btn_solo_active_text: "#ffffff"    # Texto do botão SOLO ligado (branco)
-  btn_solo_active_glow: "rgba(34, 197, 94, 0.45)" # Brilho verde do botão SOLO ligado
-  btn_solo_radius: "4px"             # Arredondamento do botão SOLO
+    # Botão SOLO / CUE (Cores)
+    btn_solo_bg: "#333333"             # Fundo do botão SOLO desligado
+    btn_solo_text: "#888888"           # Texto do botão SOLO desligado
+    btn_solo_active_bg: "#22c55e"      # Fundo do botão SOLO ligado (verde)
+    btn_solo_active_text: "#ffffff"    # Texto do botão SOLO ligado (branco)
+    btn_solo_active_glow: "rgba(34, 197, 94, 0.45)" # Brilho verde do botão SOLO ligado
 
-  # Botões de Nudge (+ / -)
-  btn_nudge_bg: "#333333"            # Fundo dos botões de Nudge
-  btn_nudge_text: "#cccccc"          # Cor do símbolo (+/-)
-  btn_nudge_radius: "50%"            # Arredondamento (50% = circular)
+    # Botão PRE / POST
+    btn_pre_bg: "#6b21a8"              # Fundo do botão PRE/POST
+    btn_pre_text: "#ffffff"            # Cor do texto do botão PRE/POST
+    btn_pre_border: "#9333ea"          # Borda do botão PRE/POST
 
-  # Visores e Tipografia
-  header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do cabeçalho
-  patch_font_family: 'Consolas, Menlo, "Courier New", monospace'       # Tipografia da área de patch/roteamento
-  name_display_bg: "#000000"         # Fundo da caixa de identificação do canal
-  name_display_color: "#00ff00"      # Cor do nome do canal (verde display)
-  name_display_radius: "4px"         # Arredondamento da caixa de nome
-  name_display_font_size: "10px"     # Tamanho da fonte do nome no Desktop (10px)
-  name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome do canal Desktop
-  db_val_color: "#5cacee"            # Cor do valor numérico de dB
+    # Botões de Nudge (+ / -)
+    btn_nudge_bg: "#333333"            # Fundo dos botões de Nudge
+    btn_nudge_text: "#cccccc"          # Cor do símbolo (+/-)
 
-  # Fader e Escala
-  fader_track_color: "#555555"       # Cor da linha central do trilho do fader
-  scale_text_color: "#999999"        # Cor dos números da escala em dB
+    # Visores e Tipografia
+    header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do cabeçalho
+    patch_font_family: 'Consolas, Menlo, "Courier New", monospace'       # Tipografia da área de patch/roteamento
+    name_display_bg: "#000000"         # Fundo da caixa de identificação do canal
+    name_display_color: "#00ff00"      # Cor do nome do canal (verde display)
+    db_val_color: "#5cacee"            # Cor do valor numérico de dB
 
-  # Indicador de Panpot (L-C-R)
-  pan_track_bg: "#222222"            # Fundo da trilha horizontal do Pan
-  pan_thumb_color: "#a855f7"         # Cor do cursor de Panpot (roxo)
-  pan_center_color: "#4a4a5a"        # Cor do cursor quando centralizado (C)
+    # Fader e Escala
+    fader_track_color: "#555555"       # Cor da linha central do trilho do fader
+    scale_text_color: "#999999"        # Cor dos números da escala em dB
 
-  # Medidores e LED de Pico
-  peak_led_color: "#ff0000"          # Cor do LED de Peak aceso
-  peak_led_glow: "#ff4444"           # Brilho do LED de Peak aceso
+    # Indicador de Panpot (L-C-R)
+    pan_track_bg: "#222222"            # Fundo da trilha horizontal do Pan
+    pan_thumb_color: "#a855f7"         # Cor do cursor de Panpot (roxo)
+    pan_center_color: "#4a4a5a"        # Cor do cursor quando centralizado (C)
 
-  # Painel de Medidores do Master & Painel de Posição do Auxiliar (Zona 4)
-  meters_box_bg: "rgba(0, 0, 0, 0.45)"       # Fundo do bloco de medidores no master
-  meters_box_border: "rgba(255, 255, 255, 0.15)" # Borda do bloco de medidores
-  meters_box_radius: "4px"                   # Arredondamento do bloco de medidores
-  meters_badge_bg: "#1e293b"                 # Fundo dos badges de PRE/POST
-  meters_badge_text: "#38bdf8"               # Cor do texto dos badges (azul neon)
-  meters_badge_border: "#334155"             # Borda dos badges
-  position_box_border: "rgba(212, 175, 55, 0.4)" # Borda dourada do painel de posição
-  position_title_color: "#d4af37"            # Cor do título POSIÇÃO (dourado/âmbar)
+    # Medidores e LED de Pico
+    peak_led_color: "#ff0000"          # Cor do LED de Peak aceso
+    peak_led_glow: "#ff4444"           # Brilho do LED de Peak aceso
 
-  # Macro Fader Técnico (Variação 4)
-  macro_bg: "#d4d4d8"                        # Fundo prateado/cinza claro do card Macro
-  macro_border: "#27272a"                    # Borda escura do card Macro
-  macro_header_bg: "#3f3f46"                 # Fundo do cabeçalho do Macro
-  macro_header_text: "#ffffff"               # Cor do texto do cabeçalho
-  macro_config_bg: "#6b21a8"                 # Fundo do botão CONFIG (roxo escuro)
-  macro_config_hover_bg: "#7e22ce"           # Hover do botão CONFIG
-  macro_config_text: "#ffffff"               # Cor do texto do botão CONFIG
-  macro_config_radius: "6px"                 # Arredondamento do botão CONFIG
-  macro_delta_bg: "#09090b"                  # Fundo do visor OLED Delta dB
-  macro_delta_text: "#52525b"                # Texto do visor Delta dB em repouso
-  macro_delta_active_text: "#38bdf8"         # Texto do visor Delta dB ativo (azul neon)
-  macro_big_nudge_bg: "#ffffff"              # Fundo do botão Big Nudge
-  macro_big_nudge_text: "#000000"            # Símbolo (+/-) do Big Nudge
-  macro_big_nudge_border: "#a1a1aa"          # Borda do botão Big Nudge
-  macro_big_nudge_radius: "12px"             # Arredondamento dos Big Nudges gigantes
-  macro_big_nudge_shadow: "0 3px 6px rgba(0,0,0,0.15)" # Sombra 3D dos Big Nudges
-  macro_reset_bg: "#dc2626"                  # Fundo vermelho do botão ZERAR
-  macro_reset_hover_bg: "#ef4444"            # Hover do botão ZERAR
-  macro_reset_text: "#ffffff"                # Texto do botão ZERAR
-  macro_reset_radius: "6px"                  # Arredondamento do botão ZERAR
+    # Painel de Medidores do Master & Painel de Posição do Auxiliar
+    meters_box_bg: "rgba(0, 0, 0, 0.45)"       # Fundo do bloco de medidores no master
+    meters_box_border: "rgba(255, 255, 255, 0.15)" # Borda do bloco de medidores
+    meters_box_radius: "4px"                   # Arredondamento do bloco de medidores
+    meters_badge_bg: "#1e293b"                 # Fundo dos badges de PRE/POST
+    meters_badge_text: "#38bdf8"               # Cor do texto dos badges (azul neon)
+    meters_badge_border: "#334155"             # Borda dos badges
+    position_box_border: "rgba(212, 175, 55, 0.4)" # Borda dourada do painel de posição
+    position_title_color: "#d4af37"            # Cor do título POSIÇÃO (dourado/âmbar)
 
-  # Volume Geral (Mais Fino: 70px)
-  volume_geral_width: "70px"                 # Largura mais fina específica para Volume Geral (70px)
+    # Macro Fader Técnico (Variação 4)
+    macro_bg: "#d4d4d8"                        # Fundo prateado/cinza claro do card Macro
+    macro_border: "#27272a"                    # Borda escura do card Macro
+    macro_header_bg: "#3f3f46"                 # Fundo do cabeçalho do Macro
+    macro_header_text: "#ffffff"               # Cor do texto do cabeçalho
+    macro_config_bg: "#6b21a8"                 # Fundo do botão CONFIG (roxo escuro)
+    macro_config_hover_bg: "#7e22ce"           # Hover do botão CONFIG
+    macro_config_text: "#ffffff"               # Cor do texto do botão CONFIG
+    macro_config_radius: "6px"                 # Arredondamento do botão CONFIG
+    macro_delta_bg: "#09090b"                  # Fundo do visor OLED Delta dB
+    macro_delta_text: "#52525b"                # Texto do visor Delta dB em repouso
+    macro_delta_active_text: "#38bdf8"         # Texto do visor Delta dB ativo (azul neon)
+    macro_big_nudge_bg: "#ffffff"              # Fundo do botão Big Nudge
+    macro_big_nudge_text: "#000000"            # Símbolo (+/-) do Big Nudge
+    macro_big_nudge_border: "#a1a1aa"          # Borda do botão Big Nudge
+    macro_big_nudge_radius: "12px"             # Arredondamento dos Big Nudges gigantes
+    macro_big_nudge_shadow: "0 3px 6px rgba(0,0,0,0.15)" # Sombra 3D dos Big Nudges
+    macro_reset_bg: "#dc2626"                  # Fundo vermelho do botão ZERAR
+    macro_reset_hover_bg: "#ef4444"            # Hover do botão ZERAR
+    macro_reset_text: "#ffffff"                # Texto do botão ZERAR
+    macro_reset_radius: "6px"                  # Arredondamento do botão ZERAR
 
-  # Envio Auxiliar / Sends on Faders (Variação 8)
-  group_aux_color: "#7e22ce"                 # Roxo/Púrpura - Barramento AUX
-  btn_pre_bg: "#6b21a8"                      # Fundo do botão PRE/POST
-  btn_pre_text: "#ffffff"                    # Cor do texto do botão PRE/POST
-  btn_pre_border: "#9333ea"                  # Borda do botão PRE/POST
-  btn_pre_radius: "4px"                      # Arredondamento do botão PRE/POST
+    # Canal Travado (Channel Lock)
+    lock_border_color: "#ff4444"               # Borda vermelha de canal travado
+    lock_badge_bg: "#ff4444"                   # Fundo do badge de cadeado
+    lock_badge_text: "#ffffff"                 # Ícone do cadeado
+    lock_overlay_bg: "rgba(0, 0, 0, 0.58)"     # Fundo escurecido (dim) do overlay de bloqueio
 
-  # Canal Travado (Variações 10 & 8 Mobile)
-  lock_border_color: "#ff4444"               # Borda vermelha de canal travado
-  lock_badge_bg: "#ff4444"                   # Fundo do badge de cadeado
-  lock_badge_text: "#ffffff"                 # Ícone do cadeado
-  lock_overlay_bg: "rgba(0, 0, 0, 0.58)"     # Fundo escurecido (dim) do overlay de bloqueio
+    # Canal Desabilitado / FIXED
+    disabled_opacity: "0.45"                   # Opacidade reduzida para controles desabilitados
+    disabled_filter: "grayscale(80%)"          # Desaturação de controles inativos
 
-  # Mobile Layout Dimensions & Controls
-  mob_card_width: "118px"                    # Largura generosa do card no layout mobile (118px)
-  mob_card_paired_width: "148px"             # Largura para canais pareados no mobile (148px)
-  mob_card_radius: "12px"                    # Arredondamento do card mobile
-  mob_btn_height: "38px"                     # Altura dobrada dos botões ON e SOLO no mobile (38px)
-  mob_btn_radius: "6px"                      # Arredondamento dos botões ON/SOLO mobile
-  mob_nudge_btn_size: "50px"                 # Tamanho aumentado dos botões de nudge (+50%: 50px)
-  mob_db_font_size: "18px"                   # Tamanho da fonte do valor em dB (+50%: 18px)
-  mob_name_display_font_size: "13px"         # Tamanho da fonte do nome do canal no Mobile (11px)
-  mob_name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome do canal Mobile
-  mob_fader_thumb_width: "46px"              # Largura do fader thumb mobile
-  mob_fader_thumb_height: "38px"             # Altura do fader thumb mobile
-  mob_fader_thumb_radius: "6px"              # Arredondamento do fader thumb mobile
+  # ══════════════════════════════════════════════════════════════
+  # 2. PROPRIEDADES DESKTOP (Dimensões e Estilos Exclusivos)
+  # ══════════════════════════════════════════════════════════════
+  desktop:
+    card_bg: "#181818"                         # Fundo do card desktop
+    card_border: "#222222"                     # Cor da borda base do card
+    card_border_width: "0px"                   # Espessura da borda base do card
+    desk_card_border: "#333333"                # Cor da borda dos cards no Desktop (superior, inferior e extremidades)
+    desk_card_border_width: "0px"              # Espessura da borda dos cards no Desktop
+    desk_card_divider: "none"                  # Divisor entre canais no Desktop (ex: "none" ou "1px solid rgba(255, 255, 255, 0.08)")
+    card_radius: "6px"                         # Arredondamento do card
+    card_on_bg: "rgba(255, 69, 0, 0.08)"       # Fundo sutil de destaque quando o canal está ON
+    header_height: "25px"                      # Altura do cabeçalho desktop
+    patch_height: "23px"                       # Altura do rodapé de patch desktop
 
-  # Canal Desabilitado / FIXED (Variações 11 & 9 Mobile)
-  disabled_opacity: "0.45"                   # Opacidade reduzida para controles desabilitados
-  disabled_filter: "grayscale(80%)"          # Desaturação de controles inativos
+    # Botões - Alturas e Dimensões Desktop
+    btn_on_height: "40px"                      # Altura do botão ON no desktop
+    btn_on_radius: "4px"                       # Arredondamento do botão ON no desktop
+    btn_solo_height: "18px"                    # Altura do botão SOLO no desktop
+    btn_solo_radius: "4px"                     # Arredondamento do botão SOLO no desktop
+    btn_pre_height: "18px"                     # Altura do botão PRE/POST no desktop
+    btn_pre_radius: "4px"                      # Arredondamento do botão PRE/POST no desktop
+    btn_nudge_size: "22px"                     # Tamanho / altura dos botões de nudge no desktop
+    btn_nudge_radius: "50%"                    # Arredondamento dos botões de nudge no desktop
+    macro_config_btn_height: "24px"            # Altura do botão CONFIG (Macro Fader)
+    macro_reset_btn_height: "24px"             # Altura do botão ZERAR (Macro Fader)
+
+    name_display_radius: "4px"                 # Arredondamento da caixa de nome no desktop
+    name_display_font_size: "10px"             # Tamanho da fonte do nome no Desktop
+    name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome no Desktop
+    volume_geral_width: "70px"                 # Largura mais fina específica para Volume Geral (70px)
+
+  # ══════════════════════════════════════════════════════════════
+  # 3. PROPRIEDADES MOBILE (Dimensões e Controles Táteis)
+  # ══════════════════════════════════════════════════════════════
+  mobile:
+    card_width: "118px"                        # Largura generosa do card no layout mobile (118px)
+    card_paired_width: "148px"                 # Largura para canais pareados no mobile (148px)
+    card_radius: "12px"                        # Arredondamento do card mobile
+    card_border: "#282828"                     # Cor da borda do contorno do card mobile
+    card_border_width: "1px"                   # Espessura da borda do contorno do card mobile
+    card_border_top_width: "3px"               # Espessura da borda superior cromática de grupo no mobile
+
+    # Botões - Alturas e Dimensões Mobile
+    btn_on_height: "38px"                      # Altura do botão ON no mobile (38px)
+    btn_solo_height: "38px"                    # Altura do botão SOLO no mobile (38px)
+    btn_pre_height: "38px"                     # Altura do botão PRE/POST no mobile (38px)
+    btn_medidores_height: "38px"               # Altura do botão MEDIDORES / POSIÇÃO no mobile (38px)
+    btn_radius: "6px"                          # Arredondamento dos botões ON/SOLO/PRE/MEDIDORES mobile
+    nudge_btn_size: "50px"                     # Tamanho aumentado dos botões de nudge (+50%: 50px)
+    macro_config_btn_height: "28px"            # Altura do botão CONFIG (Macro Mobile)
+    macro_reset_btn_height: "28px"             # Altura do botão ZERAR (Macro Mobile)
+
+    db_font_size: "18px"                       # Tamanho da fonte do valor em dB (+50%: 18px)
+    name_display_font_size: "13px"             # Tamanho da fonte do nome do canal no Mobile
+    name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome no Mobile
+    fader_thumb_width: "46px"                  # Largura do fader thumb mobile
+    fader_thumb_height: "38px"                 # Altura do fader thumb mobile
+    fader_thumb_radius: "6px"                  # Arredondamento do fader thumb mobile
 
 
 # ─── MAIN VIEW (TELA PRINCIPAL DO MIXER) ──────────────────────
 # Layout da visão principal do mixer (CH 1-32, ST IN, Macro, Master PA)
 main_view:
-  faders_gap: "2px"                          # Espaçamento padrão entre canais desktop
-  faders_padding: "4px"                      # Padding interno da área de faders
+  faders_gap: "0px"                          # Espaçamento padrão entre canais desktop
+  faders_padding: "1px"                      # Padding interno da área de faders
   group_separator_width: "6px"               # Largura do separador de grupos
   group_separator_bg: "transparent"          # Cor de fundo do separador
   macro_spacer_width: "55px"                 # Largura do espaçador do Macro Fader

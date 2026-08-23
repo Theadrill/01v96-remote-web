@@ -349,99 +349,160 @@ var ConfirmModal = (function () {
         if (cl.badge_bg) root.style.setProperty('--channel-lock-badge-bg', cl.badge_bg);
         if (cl.badge_text_color) root.style.setProperty('--channel-lock-badge-text-color', cl.badge_text_color);
 
-        // Channel Strip & Faders (Injeção de Variáveis CSS)
+        // Channel Strip & Faders (Injeção de Variáveis CSS com suporte a global, desktop e mobile)
         var cs = theme.channel_strip || {};
-        if (cs.card_bg)             root.style.setProperty('--strip-card-bg', cs.card_bg);
-        if (cs.card_border)         root.style.setProperty('--strip-card-border', cs.card_border);
-        if (cs.card_radius)         root.style.setProperty('--strip-card-radius', cs.card_radius);
-        if (cs.card_on_bg)          root.style.setProperty('--strip-card-on-bg', cs.card_on_bg);
-        if (cs.group_1_color)       root.style.setProperty('--strip-group-1-color', cs.group_1_color);
-        if (cs.group_2_color)       root.style.setProperty('--strip-group-2-color', cs.group_2_color);
-        if (cs.group_st_color)      root.style.setProperty('--strip-group-st-color', cs.group_st_color);
-        if (cs.group_mix_color)     root.style.setProperty('--strip-group-mix-color', cs.group_mix_color);
-        if (cs.group_bus_color)     root.style.setProperty('--strip-group-bus-color', cs.group_bus_color);
-        if (cs.master_color)        root.style.setProperty('--strip-master-color', cs.master_color);
-        if (cs.btn_on_bg)           root.style.setProperty('--strip-btn-on-bg', cs.btn_on_bg);
-        if (cs.btn_on_text)         root.style.setProperty('--strip-btn-on-text', cs.btn_on_text);
-        if (cs.btn_on_active_bg)    root.style.setProperty('--strip-btn-on-active-bg', cs.btn_on_active_bg);
-        if (cs.btn_on_active_text)  root.style.setProperty('--strip-btn-on-active-text', cs.btn_on_active_text);
-        if (cs.btn_on_active_glow)  root.style.setProperty('--strip-btn-on-active-glow', cs.btn_on_active_glow);
-        if (cs.btn_on_radius)       root.style.setProperty('--strip-btn-on-radius', cs.btn_on_radius);
-        if (cs.btn_solo_bg)         root.style.setProperty('--strip-btn-solo-bg', cs.btn_solo_bg);
-        if (cs.btn_solo_text)       root.style.setProperty('--strip-btn-solo-text', cs.btn_solo_text);
-        if (cs.btn_solo_active_bg)  root.style.setProperty('--strip-btn-solo-active-bg', cs.btn_solo_active_bg);
-        if (cs.btn_solo_active_text) root.style.setProperty('--strip-btn-solo-active-text', cs.btn_solo_active_text);
-        if (cs.btn_solo_active_glow) root.style.setProperty('--strip-btn-solo-active-glow', cs.btn_solo_active_glow);
-        if (cs.btn_solo_radius)     root.style.setProperty('--strip-btn-solo-radius', cs.btn_solo_radius);
-        if (cs.btn_nudge_bg)        root.style.setProperty('--strip-btn-nudge-bg', cs.btn_nudge_bg);
-        if (cs.btn_nudge_text)      root.style.setProperty('--strip-btn-nudge-text', cs.btn_nudge_text);
-        if (cs.btn_nudge_radius)    root.style.setProperty('--strip-btn-nudge-radius', cs.btn_nudge_radius);
-        if (cs.header_font_family)  root.style.setProperty('--strip-header-font-family', cs.header_font_family);
-        if (cs.patch_font_family)   root.style.setProperty('--strip-patch-font-family', cs.patch_font_family);
-        if (cs.name_display_bg)     root.style.setProperty('--strip-name-display-bg', cs.name_display_bg);
-        if (cs.name_display_color)  root.style.setProperty('--strip-name-display-color', cs.name_display_color);
-        if (cs.name_display_radius) root.style.setProperty('--strip-name-display-radius', cs.name_display_radius);
-        if (cs.name_display_font_size) root.style.setProperty('--strip-name-display-font-size', cs.name_display_font_size);
-        if (cs.name_display_font_family) root.style.setProperty('--strip-name-display-font-family', cs.name_display_font_family);
-        if (cs.db_val_color)        root.style.setProperty('--strip-db-val-color', cs.db_val_color);
-        if (cs.fader_track_color)   root.style.setProperty('--strip-fader-track-color', cs.fader_track_color);
-        if (cs.scale_text_color)    root.style.setProperty('--strip-scale-text-color', cs.scale_text_color);
-        if (cs.pan_track_bg)        root.style.setProperty('--strip-pan-track-bg', cs.pan_track_bg);
-        if (cs.pan_thumb_color)     root.style.setProperty('--strip-pan-thumb-color', cs.pan_thumb_color);
-        if (cs.pan_center_color)    root.style.setProperty('--strip-pan-center-color', cs.pan_center_color);
-        if (cs.peak_led_color)      root.style.setProperty('--strip-peak-led-color', cs.peak_led_color);
-        if (cs.peak_led_glow)       root.style.setProperty('--strip-peak-led-glow', cs.peak_led_glow);
-        if (cs.meters_box_bg)       root.style.setProperty('--strip-meters-box-bg', cs.meters_box_bg);
-        if (cs.meters_box_border)   root.style.setProperty('--strip-meters-box-border', cs.meters_box_border);
-        if (cs.meters_box_radius)   root.style.setProperty('--strip-meters-box-radius', cs.meters_box_radius);
-        if (cs.meters_badge_bg)     root.style.setProperty('--strip-meters-badge-bg', cs.meters_badge_bg);
-        if (cs.meters_badge_text)   root.style.setProperty('--strip-meters-badge-text', cs.meters_badge_text);
-        if (cs.meters_badge_border) root.style.setProperty('--strip-meters-badge-border', cs.meters_badge_border);
-        if (cs.macro_bg)            root.style.setProperty('--strip-macro-bg', cs.macro_bg);
-        if (cs.macro_border)        root.style.setProperty('--strip-macro-border', cs.macro_border);
-        if (cs.macro_header_bg)     root.style.setProperty('--strip-macro-header-bg', cs.macro_header_bg);
-        if (cs.macro_header_text)   root.style.setProperty('--strip-macro-header-text', cs.macro_header_text);
-        if (cs.macro_config_bg)     root.style.setProperty('--strip-macro-config-bg', cs.macro_config_bg);
-        if (cs.macro_config_hover_bg) root.style.setProperty('--strip-macro-config-hover-bg', cs.macro_config_hover_bg);
-        if (cs.macro_config_text)   root.style.setProperty('--strip-macro-config-text', cs.macro_config_text);
-        if (cs.macro_config_radius) root.style.setProperty('--strip-macro-config-radius', cs.macro_config_radius);
-        if (cs.macro_delta_bg)      root.style.setProperty('--strip-macro-delta-bg', cs.macro_delta_bg);
-        if (cs.macro_delta_text)    root.style.setProperty('--strip-macro-delta-text', cs.macro_delta_text);
-        if (cs.macro_delta_active_text) root.style.setProperty('--strip-macro-delta-active-text', cs.macro_delta_active_text);
-        if (cs.macro_big_nudge_bg)  root.style.setProperty('--strip-macro-big-nudge-bg', cs.macro_big_nudge_bg);
-        if (cs.macro_big_nudge_text) root.style.setProperty('--strip-macro-big-nudge-text', cs.macro_big_nudge_text);
-        if (cs.macro_big_nudge_border) root.style.setProperty('--strip-macro-big-nudge-border', cs.macro_big_nudge_border);
-        if (cs.macro_big_nudge_radius) root.style.setProperty('--strip-macro-big-nudge-radius', cs.macro_big_nudge_radius);
-        if (cs.macro_big_nudge_shadow) root.style.setProperty('--strip-macro-big-nudge-shadow', cs.macro_big_nudge_shadow);
-        if (cs.macro_reset_bg)      root.style.setProperty('--strip-macro-reset-bg', cs.macro_reset_bg);
-        if (cs.macro_reset_hover_bg) root.style.setProperty('--strip-macro-reset-hover-bg', cs.macro_reset_hover_bg);
-        if (cs.macro_reset_text)    root.style.setProperty('--strip-macro-reset-text', cs.macro_reset_text);
-        if (cs.macro_reset_radius)  root.style.setProperty('--strip-macro-reset-radius', cs.macro_reset_radius);
+        var csG = cs.global || {};
+        var csD = cs.desktop || {};
+        var csM = cs.mobile || {};
 
-        // Mobile Channel Strip Variables
-        if (cs.mob_card_width)          root.style.setProperty('--strip-mob-card-width', cs.mob_card_width);
-        if (cs.mob_card_paired_width)   root.style.setProperty('--strip-mob-card-paired-width', cs.mob_card_paired_width);
-        if (cs.mob_card_radius)         root.style.setProperty('--strip-mob-card-radius', cs.mob_card_radius);
-        if (cs.mob_btn_height)          root.style.setProperty('--strip-mob-btn-height', cs.mob_btn_height);
-        if (cs.mob_btn_radius)          root.style.setProperty('--strip-mob-btn-radius', cs.mob_btn_radius);
-        if (cs.mob_nudge_btn_size)      root.style.setProperty('--strip-mob-nudge-size', cs.mob_nudge_btn_size);
-        if (cs.mob_db_font_size)        root.style.setProperty('--strip-mob-db-font-size', cs.mob_db_font_size);
-        if (cs.mob_name_display_font_size) root.style.setProperty('--strip-mob-name-display-font-size', cs.mob_name_display_font_size);
-        if (cs.mob_name_display_font_family) root.style.setProperty('--strip-mob-name-display-font-family', cs.mob_name_display_font_family);
-        if (cs.mob_fader_thumb_width)   root.style.setProperty('--strip-mob-thumb-width', cs.mob_fader_thumb_width);
-        if (cs.mob_fader_thumb_height)  root.style.setProperty('--strip-mob-thumb-height', cs.mob_fader_thumb_height);
-        if (cs.mob_fader_thumb_radius)  root.style.setProperty('--strip-mob-thumb-radius', cs.mob_fader_thumb_radius);
+        function getVal(section, key, fallbackKey) {
+            if (section && section[key] !== undefined) return section[key];
+            if (fallbackKey && section && section[fallbackKey] !== undefined) return section[fallbackKey];
+            if (csG && csG[key] !== undefined) return csG[key];
+            if (fallbackKey && csG && csG[fallbackKey] !== undefined) return csG[fallbackKey];
+            if (cs && cs[key] !== undefined) return cs[key];
+            if (fallbackKey && cs && cs[fallbackKey] !== undefined) return cs[fallbackKey];
+            return undefined;
+        }
+
+        // Global Properties
+        var g1 = getVal(csG, 'group_1_color'); if (g1) root.style.setProperty('--strip-group-1-color', g1);
+        var g2 = getVal(csG, 'group_2_color'); if (g2) root.style.setProperty('--strip-group-2-color', g2);
+        var gst = getVal(csG, 'group_st_color'); if (gst) root.style.setProperty('--strip-group-st-color', gst);
+        var gmix = getVal(csG, 'group_mix_color'); if (gmix) root.style.setProperty('--strip-group-mix-color', gmix);
+        var gbus = getVal(csG, 'group_bus_color'); if (gbus) root.style.setProperty('--strip-group-bus-color', gbus);
+        var gaux = getVal(csG, 'group_aux_color'); if (gaux) root.style.setProperty('--strip-group-aux-color', gaux);
+        var gmst = getVal(csG, 'master_color'); if (gmst) root.style.setProperty('--strip-master-color', gmst);
+
+        var btnOnBg = getVal(csG, 'btn_on_bg'); if (btnOnBg) root.style.setProperty('--strip-btn-on-bg', btnOnBg);
+        var btnOnText = getVal(csG, 'btn_on_text'); if (btnOnText) root.style.setProperty('--strip-btn-on-text', btnOnText);
+        var btnOnActBg = getVal(csG, 'btn_on_active_bg'); if (btnOnActBg) root.style.setProperty('--strip-btn-on-active-bg', btnOnActBg);
+        var btnOnActText = getVal(csG, 'btn_on_active_text'); if (btnOnActText) root.style.setProperty('--strip-btn-on-active-text', btnOnActText);
+        var btnOnActGlow = getVal(csG, 'btn_on_active_glow'); if (btnOnActGlow) root.style.setProperty('--strip-btn-on-active-glow', btnOnActGlow);
+
+        var btnSoloBg = getVal(csG, 'btn_solo_bg'); if (btnSoloBg) root.style.setProperty('--strip-btn-solo-bg', btnSoloBg);
+        var btnSoloText = getVal(csG, 'btn_solo_text'); if (btnSoloText) root.style.setProperty('--strip-btn-solo-text', btnSoloText);
+        var btnSoloActBg = getVal(csG, 'btn_solo_active_bg'); if (btnSoloActBg) root.style.setProperty('--strip-btn-solo-active-bg', btnSoloActBg);
+        var btnSoloActText = getVal(csG, 'btn_solo_active_text'); if (btnSoloActText) root.style.setProperty('--strip-btn-solo-active-text', btnSoloActText);
+        var btnSoloActGlow = getVal(csG, 'btn_solo_active_glow'); if (btnSoloActGlow) root.style.setProperty('--strip-btn-solo-active-glow', btnSoloActGlow);
+
+        var btnPreBg = getVal(csG, 'btn_pre_bg'); if (btnPreBg) root.style.setProperty('--strip-btn-pre-bg', btnPreBg);
+        var btnPreText = getVal(csG, 'btn_pre_text'); if (btnPreText) root.style.setProperty('--strip-btn-pre-text', btnPreText);
+        var btnPreBorder = getVal(csG, 'btn_pre_border'); if (btnPreBorder) root.style.setProperty('--strip-btn-pre-border', btnPreBorder);
+
+        var btnNudgeBg = getVal(csG, 'btn_nudge_bg'); if (btnNudgeBg) root.style.setProperty('--strip-btn-nudge-bg', btnNudgeBg);
+        var btnNudgeText = getVal(csG, 'btn_nudge_text'); if (btnNudgeText) root.style.setProperty('--strip-btn-nudge-text', btnNudgeText);
+
+        var hdrFont = getVal(csG, 'header_font_family'); if (hdrFont) root.style.setProperty('--strip-header-font-family', hdrFont);
+        var patchFont = getVal(csG, 'patch_font_family'); if (patchFont) root.style.setProperty('--strip-patch-font-family', patchFont);
+        var nameBg = getVal(csG, 'name_display_bg'); if (nameBg) root.style.setProperty('--strip-name-display-bg', nameBg);
+        var nameColor = getVal(csG, 'name_display_color'); if (nameColor) root.style.setProperty('--strip-name-display-color', nameColor);
+        var dbColor = getVal(csG, 'db_val_color'); if (dbColor) root.style.setProperty('--strip-db-val-color', dbColor);
+
+        var faderTrack = getVal(csG, 'fader_track_color'); if (faderTrack) root.style.setProperty('--strip-fader-track-color', faderTrack);
+        var scaleColor = getVal(csG, 'scale_text_color'); if (scaleColor) root.style.setProperty('--strip-scale-text-color', scaleColor);
+
+        var panBg = getVal(csG, 'pan_track_bg'); if (panBg) root.style.setProperty('--strip-pan-track-bg', panBg);
+        var panThumb = getVal(csG, 'pan_thumb_color'); if (panThumb) root.style.setProperty('--strip-pan-thumb-color', panThumb);
+        var panCenter = getVal(csG, 'pan_center_color'); if (panCenter) root.style.setProperty('--strip-pan-center-color', panCenter);
+
+        var peakColor = getVal(csG, 'peak_led_color'); if (peakColor) root.style.setProperty('--strip-peak-led-color', peakColor);
+        var peakGlow = getVal(csG, 'peak_led_glow'); if (peakGlow) root.style.setProperty('--strip-peak-led-glow', peakGlow);
+
+        var mBoxBg = getVal(csG, 'meters_box_bg'); if (mBoxBg) root.style.setProperty('--strip-meters-box-bg', mBoxBg);
+        var mBoxBorder = getVal(csG, 'meters_box_border'); if (mBoxBorder) root.style.setProperty('--strip-meters-box-border', mBoxBorder);
+        var mBoxRadius = getVal(csG, 'meters_box_radius'); if (mBoxRadius) root.style.setProperty('--strip-meters-box-radius', mBoxRadius);
+        var mBadgeBg = getVal(csG, 'meters_badge_bg'); if (mBadgeBg) root.style.setProperty('--strip-meters-badge-bg', mBadgeBg);
+        var mBadgeText = getVal(csG, 'meters_badge_text'); if (mBadgeText) root.style.setProperty('--strip-meters-badge-text', mBadgeText);
+        var mBadgeBorder = getVal(csG, 'meters_badge_border'); if (mBadgeBorder) root.style.setProperty('--strip-meters-badge-border', mBadgeBorder);
+        var posBorder = getVal(csG, 'position_box_border'); if (posBorder) root.style.setProperty('--strip-position-box-border', posBorder);
+        var posColor = getVal(csG, 'position_title_color'); if (posColor) root.style.setProperty('--strip-position-title-color', posColor);
+
+        var macBg = getVal(csG, 'macro_bg'); if (macBg) root.style.setProperty('--strip-macro-bg', macBg);
+        var macBorder = getVal(csG, 'macro_border'); if (macBorder) root.style.setProperty('--strip-macro-border', macBorder);
+        var macHdrBg = getVal(csG, 'macro_header_bg'); if (macHdrBg) root.style.setProperty('--strip-macro-header-bg', macHdrBg);
+        var macHdrText = getVal(csG, 'macro_header_text'); if (macHdrText) root.style.setProperty('--strip-macro-header-text', macHdrText);
+        var macCfgBg = getVal(csG, 'macro_config_bg'); if (macCfgBg) root.style.setProperty('--strip-macro-config-bg', macCfgBg);
+        var macCfgHov = getVal(csG, 'macro_config_hover_bg'); if (macCfgHov) root.style.setProperty('--strip-macro-config-hover-bg', macCfgHov);
+        var macCfgText = getVal(csG, 'macro_config_text'); if (macCfgText) root.style.setProperty('--strip-macro-config-text', macCfgText);
+        var macCfgRad = getVal(csG, 'macro_config_radius'); if (macCfgRad) root.style.setProperty('--strip-macro-config-radius', macCfgRad);
+        var macDeltaBg = getVal(csG, 'macro_delta_bg'); if (macDeltaBg) root.style.setProperty('--strip-macro-delta-bg', macDeltaBg);
+        var macDeltaText = getVal(csG, 'macro_delta_text'); if (macDeltaText) root.style.setProperty('--strip-macro-delta-text', macDeltaText);
+        var macDeltaAct = getVal(csG, 'macro_delta_active_text'); if (macDeltaAct) root.style.setProperty('--strip-macro-delta-active-text', macDeltaAct);
+        var macBigBg = getVal(csG, 'macro_big_nudge_bg'); if (macBigBg) root.style.setProperty('--strip-macro-big-nudge-bg', macBigBg);
+        var macBigText = getVal(csG, 'macro_big_nudge_text'); if (macBigText) root.style.setProperty('--strip-macro-big-nudge-text', macBigText);
+        var macBigBrd = getVal(csG, 'macro_big_nudge_border'); if (macBigBrd) root.style.setProperty('--strip-macro-big-nudge-border', macBigBrd);
+        var macBigRad = getVal(csG, 'macro_big_nudge_radius'); if (macBigRad) root.style.setProperty('--strip-macro-big-nudge-radius', macBigRad);
+        var macBigShd = getVal(csG, 'macro_big_nudge_shadow'); if (macBigShd) root.style.setProperty('--strip-macro-big-nudge-shadow', macBigShd);
+        var macRstBg = getVal(csG, 'macro_reset_bg'); if (macRstBg) root.style.setProperty('--strip-macro-reset-bg', macRstBg);
+        var macRstHov = getVal(csG, 'macro_reset_hover_bg'); if (macRstHov) root.style.setProperty('--strip-macro-reset-hover-bg', macRstHov);
+        var macRstText = getVal(csG, 'macro_reset_text'); if (macRstText) root.style.setProperty('--strip-macro-reset-text', macRstText);
+        var macRstRad = getVal(csG, 'macro_reset_radius'); if (macRstRad) root.style.setProperty('--strip-macro-reset-radius', macRstRad);
+
+        var lockBrd = getVal(csG, 'lock_border_color'); if (lockBrd) root.style.setProperty('--strip-lock-border-color', lockBrd);
+        var lockBdg = getVal(csG, 'lock_badge_bg'); if (lockBdg) root.style.setProperty('--strip-lock-badge-bg', lockBdg);
+        var lockTxt = getVal(csG, 'lock_badge_text'); if (lockTxt) root.style.setProperty('--strip-lock-badge-text', lockTxt);
+        var lockOvl = getVal(csG, 'lock_overlay_bg'); if (lockOvl) root.style.setProperty('--strip-lock-overlay-bg', lockOvl);
+        var disOp = getVal(csG, 'disabled_opacity'); if (disOp) root.style.setProperty('--strip-disabled-opacity', disOp);
+        var disFl = getVal(csG, 'disabled_filter'); if (disFl) root.style.setProperty('--strip-disabled-filter', disFl);
+
+        // Desktop Properties
+        var dCardBg = getVal(csD, 'card_bg'); if (dCardBg) root.style.setProperty('--strip-card-bg', dCardBg);
+        var dCardBrd = getVal(csD, 'card_border'); if (dCardBrd) root.style.setProperty('--strip-card-border', dCardBrd);
+        var dCardBrdW = getVal(csD, 'card_border_width'); if (dCardBrdW) root.style.setProperty('--strip-card-border-width', dCardBrdW);
+        var dDeskBrd = getVal(csD, 'desk_card_border'); if (dDeskBrd) root.style.setProperty('--strip-desk-card-border', dDeskBrd);
+        var dDeskBrdW = getVal(csD, 'desk_card_border_width'); if (dDeskBrdW !== undefined) root.style.setProperty('--strip-desk-card-border-width', dDeskBrdW);
+        var dDeskDiv = getVal(csD, 'desk_card_divider'); if (dDeskDiv !== undefined) root.style.setProperty('--strip-desk-card-divider', dDeskDiv);
+        var dCardRad = getVal(csD, 'card_radius'); if (dCardRad) root.style.setProperty('--strip-card-radius', dCardRad);
+        var dCardOnBg = getVal(csD, 'card_on_bg'); if (dCardOnBg) root.style.setProperty('--strip-card-on-bg', dCardOnBg);
+        var dBtnOnH = getVal(csD, 'btn_on_height'); if (dBtnOnH) root.style.setProperty('--strip-btn-on-height', dBtnOnH);
+        var dBtnOnRad = getVal(csD, 'btn_on_radius'); if (dBtnOnRad) root.style.setProperty('--strip-btn-on-radius', dBtnOnRad);
+        var dBtnSoloH = getVal(csD, 'btn_solo_height'); if (dBtnSoloH) root.style.setProperty('--strip-btn-solo-height', dBtnSoloH);
+        var dBtnSoloRad = getVal(csD, 'btn_solo_radius'); if (dBtnSoloRad) root.style.setProperty('--strip-btn-solo-radius', dBtnSoloRad);
+        var dBtnPreH = getVal(csD, 'btn_pre_height'); if (dBtnPreH) root.style.setProperty('--strip-btn-pre-height', dBtnPreH);
+        var dBtnPreRad = getVal(csD, 'btn_pre_radius'); if (dBtnPreRad) root.style.setProperty('--strip-btn-pre-radius', dBtnPreRad);
+        var dBtnNudgeSize = getVal(csD, 'btn_nudge_size'); if (dBtnNudgeSize) root.style.setProperty('--strip-desk-nudge-size', dBtnNudgeSize);
+        var dBtnNudgeRad = getVal(csD, 'btn_nudge_radius'); if (dBtnNudgeRad) root.style.setProperty('--strip-btn-nudge-radius', dBtnNudgeRad);
+        var dMacroCfgH = getVal(csD, 'macro_config_btn_height'); if (dMacroCfgH) root.style.setProperty('--strip-macro-config-btn-height', dMacroCfgH);
+        var dMacroRstH = getVal(csD, 'macro_reset_btn_height'); if (dMacroRstH) root.style.setProperty('--strip-macro-reset-btn-height', dMacroRstH);
+        var dNameRad = getVal(csD, 'name_display_radius'); if (dNameRad) root.style.setProperty('--strip-name-display-radius', dNameRad);
+        var dNameSize = getVal(csD, 'name_display_font_size'); if (dNameSize) root.style.setProperty('--strip-name-display-font-size', dNameSize);
+        var dNameFont = getVal(csD, 'name_display_font_family'); if (dNameFont) root.style.setProperty('--strip-name-display-font-family', dNameFont);
+        var dVolWidth = getVal(csD, 'volume_geral_width'); if (dVolWidth) root.style.setProperty('--strip-volume-geral-width', dVolWidth);
+
+        // Mobile Properties
+        var mCardW = getVal(csM, 'card_width', 'mob_card_width'); if (mCardW) root.style.setProperty('--strip-mob-card-width', mCardW);
+        var mCardPW = getVal(csM, 'card_paired_width', 'mob_card_paired_width'); if (mCardPW) root.style.setProperty('--strip-mob-card-paired-width', mCardPW);
+        var mCardRad = getVal(csM, 'card_radius', 'mob_card_radius'); if (mCardRad) root.style.setProperty('--strip-mob-card-radius', mCardRad);
+        var mCardBrd = getVal(csM, 'card_border', 'mob_card_border'); if (mCardBrd) root.style.setProperty('--strip-mob-card-border', mCardBrd);
+        var mCardBrdW = getVal(csM, 'card_border_width', 'mob_card_border_width'); if (mCardBrdW !== undefined) root.style.setProperty('--strip-mob-card-border-width', mCardBrdW);
+        var mCardTopW = getVal(csM, 'card_border_top_width', 'mob_card_border_top_width'); if (mCardTopW !== undefined) root.style.setProperty('--strip-mob-card-border-top-width', mCardTopW);
+        var mBtnH = getVal(csM, 'btn_height', 'mob_btn_height'); if (mBtnH) root.style.setProperty('--strip-mob-btn-height', mBtnH);
+        var mBtnOnH = getVal(csM, 'btn_on_height'); if (mBtnOnH) root.style.setProperty('--strip-mob-btn-on-height', mBtnOnH);
+        var mBtnSoloH = getVal(csM, 'btn_solo_height'); if (mBtnSoloH) root.style.setProperty('--strip-mob-btn-solo-height', mBtnSoloH);
+        var mBtnPreH = getVal(csM, 'btn_pre_height'); if (mBtnPreH) root.style.setProperty('--strip-mob-btn-pre-height', mBtnPreH);
+        var mBtnMedH = getVal(csM, 'btn_medidores_height'); if (mBtnMedH) root.style.setProperty('--strip-mob-btn-medidores-height', mBtnMedH);
+        var mBtnRad = getVal(csM, 'btn_radius', 'mob_btn_radius'); if (mBtnRad) root.style.setProperty('--strip-mob-btn-radius', mBtnRad);
+        var mNudgeSize = getVal(csM, 'nudge_btn_size', 'mob_nudge_btn_size'); if (mNudgeSize) root.style.setProperty('--strip-mob-nudge-size', mNudgeSize);
+        var mMacroCfgH = getVal(csM, 'macro_config_btn_height'); if (mMacroCfgH) root.style.setProperty('--strip-mob-macro-config-btn-height', mMacroCfgH);
+        var mMacroRstH = getVal(csM, 'macro_reset_btn_height'); if (mMacroRstH) root.style.setProperty('--strip-mob-macro-reset-btn-height', mMacroRstH);
+        var mDbSize = getVal(csM, 'db_font_size', 'mob_db_font_size'); if (mDbSize) root.style.setProperty('--strip-mob-db-font-size', mDbSize);
+        var mNameSize = getVal(csM, 'name_display_font_size', 'mob_name_display_font_size'); if (mNameSize) root.style.setProperty('--strip-mob-name-display-font-size', mNameSize);
+        var mNameFont = getVal(csM, 'name_display_font_family', 'mob_name_display_font_family'); if (mNameFont) root.style.setProperty('--strip-mob-name-display-font-family', mNameFont);
+        var mThumbW = getVal(csM, 'fader_thumb_width', 'mob_fader_thumb_width'); if (mThumbW) root.style.setProperty('--strip-mob-thumb-width', mThumbW);
+        var mThumbH = getVal(csM, 'fader_thumb_height', 'mob_fader_thumb_height'); if (mThumbH) root.style.setProperty('--strip-mob-thumb-height', mThumbH);
+        var mThumbRad = getVal(csM, 'fader_thumb_radius', 'mob_fader_thumb_radius'); if (mThumbRad) root.style.setProperty('--strip-mob-thumb-radius', mThumbRad);
 
         // Main View (Layout da Tela Principal)
         var mv = theme.main_view || {};
-        if (mv.faders_gap)              root.style.setProperty('--main-faders-gap', mv.faders_gap);
-        if (mv.faders_padding)          root.style.setProperty('--main-faders-padding', mv.faders_padding);
-        if (mv.group_separator_width)   root.style.setProperty('--main-group-separator-width', mv.group_separator_width);
-        if (mv.group_separator_bg)      root.style.setProperty('--main-group-separator-bg', mv.group_separator_bg);
-        if (mv.macro_spacer_width)      root.style.setProperty('--main-macro-spacer-width', mv.macro_spacer_width);
-        if (mv.macro_spacer_bg)         root.style.setProperty('--main-macro-spacer-bg', mv.macro_spacer_bg);
-        if (mv.mobile_faders_gap)       root.style.setProperty('--main-mob-faders-gap', mv.mobile_faders_gap);
-        if (mv.mobile_group_gap)        root.style.setProperty('--main-mob-group-gap', mv.mobile_group_gap);
+        if (mv.faders_gap !== undefined)              root.style.setProperty('--main-faders-gap', mv.faders_gap);
+        if (mv.faders_padding !== undefined)          root.style.setProperty('--main-faders-padding', mv.faders_padding);
+        if (mv.group_separator_width !== undefined)   root.style.setProperty('--main-group-separator-width', mv.group_separator_width);
+        if (mv.group_separator_bg !== undefined)      root.style.setProperty('--main-group-separator-bg', mv.group_separator_bg);
+        if (mv.macro_spacer_width !== undefined)      root.style.setProperty('--main-macro-spacer-width', mv.macro_spacer_width);
+        if (mv.macro_spacer_bg !== undefined)         root.style.setProperty('--main-macro-spacer-bg', mv.macro_spacer_bg);
+        if (mv.mobile_faders_gap !== undefined)       root.style.setProperty('--main-mob-faders-gap', mv.mobile_faders_gap);
+        if (mv.mobile_group_gap !== undefined)        root.style.setProperty('--main-mob-group-gap', mv.mobile_group_gap);
     }
 
     function _alert(message, title, type) {
@@ -463,24 +524,30 @@ var ConfirmModal = (function () {
     };
 })();
 
-// Auto-carregar tema ativo no boot
+// Auto-carregar tema no boot relativo ao escopo da aplicação
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('/api/themes/active')
+    var basePath = window.location.pathname.includes('/new') ? '/new/themes/' : 'themes/';
+    fetch(basePath + 'default.yaml?t=' + Date.now())
         .then(function (r) {
-            if (!r.ok) throw new Error('Erro ao buscar tema ativo');
-            return r.json();
+            if (!r.ok) throw new Error('Falha ao carregar tema local (' + r.status + ')');
+            return r.text();
         })
-        .then(function (data) {
-            if (data && data.content && typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
-                ConfirmModal.loadTheme(data.content);
-            } else {
-                throw new Error('Conteúdo do tema ativo vazio');
+        .then(function (yaml) {
+            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
+                ConfirmModal.loadTheme(yaml);
             }
         })
         .catch(function (e) {
-            console.warn('[ConfirmModal] Fallback para default.yaml:', e);
-            fetch('themes/default.yaml')
-                .then(function (r) { return r.text(); })
-                .then(function (yaml) { ConfirmModal.loadTheme(yaml); });
+            console.warn('[ConfirmModal] Fallback de carregamento de tema:', e);
+            fetch('/api/themes/active')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data && data.content && typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
+                        ConfirmModal.loadTheme(data.content);
+                    }
+                })
+                .catch(function (err) {
+                    console.error('[ConfirmModal] Erro final ao carregar tema:', err);
+                });
         });
 });

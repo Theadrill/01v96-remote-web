@@ -128,7 +128,7 @@
     user-select: none;
     -webkit-user-select: none;
     background: var(--strip-card-bg);
-    border: 1px solid var(--strip-card-border);
+    border: var(--strip-card-border-width, 1px) solid var(--strip-card-border, #222222);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -144,10 +144,10 @@
     min-height: 0;
     flex: 1;
     border-radius: 0;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: var(--strip-desk-card-divider, 1px solid rgba(255, 255, 255, 0.08));
     border-left: none;
-    border-top: 1px solid #333;
-    border-bottom: 1px solid #333;
+    border-top: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
+    border-bottom: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -155,15 +155,15 @@
 }
 
 .channel-strip-wrapper.desk-strip:first-child {
-    border-left: 1px solid #333;
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
+    border-left: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
+    border-top-left-radius: var(--strip-card-radius, 6px);
+    border-bottom-left-radius: var(--strip-card-radius, 6px);
 }
 
 .channel-strip-wrapper.desk-strip:last-child {
-    border-right: 1px solid #333;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
+    border-right: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
+    border-top-right-radius: var(--strip-card-radius, 6px);
+    border-bottom-right-radius: var(--strip-card-radius, 6px);
 }
 
 /* Canal Pareado Desktop */
@@ -318,7 +318,7 @@
     max-height: 100%;
     min-height: 0;
     border-radius: var(--strip-mob-card-radius, 12px);
-    border: 1px solid #282828;
+    border: var(--strip-mob-card-border-width, 1px) solid var(--strip-mob-card-border, #282828);
     background: #14161d;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     flex-shrink: 0;
@@ -331,28 +331,28 @@
 
 /* Identidades Cromáticas Mobile (Borda Superior de Destaque no Topo do Card) */
 .channel-strip-wrapper.mob-strip.band-blue {
-    border-top: 3px solid var(--strip-group-1-color, #00adef);
+    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-1-color, #00adef);
 }
 .channel-strip-wrapper.mob-strip.band-green {
-    border-top: 3px solid var(--strip-group-2-color, #00ff88);
+    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-2-color, #00ff88);
 }
 .channel-strip-wrapper.mob-strip.band-paired_green,
 .channel-strip-wrapper.mob-strip.paired-channel {
     width: var(--strip-mob-card-paired-width, 148px);
     min-width: var(--strip-mob-card-paired-width, 148px);
     border: 1.5px solid #10b981;
-    border-top: 3.5px solid #10b981;
+    border-top: calc(var(--strip-mob-card-border-top-width, 3px) + 0.5px) solid #10b981;
     box-shadow: inset 0 0 8px rgba(16, 185, 129, 0.2);
 }
 .channel-strip-wrapper.mob-strip.band-amber {
-    border-top: 3px solid var(--strip-group-mix-color, #d4a017);
+    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-mix-color, #d4a017);
 }
 .channel-strip-wrapper.mob-strip.band-cyan {
-    border-top: 3px solid var(--strip-group-bus-color, #00b396);
+    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-bus-color, #00b396);
 }
 .channel-strip-wrapper.mob-strip.band-st,
 .channel-strip-wrapper.mob-strip.band-st_in {
-    border-top: 3px solid var(--strip-group-st-color, #4a90e2);
+    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-st-color, #4a90e2);
 }
 
 /* Volume Geral Mobile Mais Fino (70px) */
@@ -486,14 +486,20 @@
 }
 .desk-btn-solo {
     width: 100%;
+    height: var(--strip-btn-solo-height, 18px);
+    min-height: var(--strip-btn-solo-height, 18px);
     background: var(--strip-btn-solo-bg, #222222);
     color: var(--strip-btn-solo-text, #888888);
     border: 1px solid #444;
     border-radius: var(--strip-btn-solo-radius, 4px);
-    padding: 3px 0;
+    padding: 0;
     font-size: 10px;
     font-weight: 800;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     transition: all 0.15s ease;
 }
 .desk-btn-solo.active,
@@ -508,8 +514,8 @@
     color: var(--strip-btn-solo-text, #888888);
     border: 1px solid #444;
     border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-height, 38px);
-    min-height: var(--strip-mob-btn-height, 38px);
+    height: var(--strip-mob-btn-solo-height, var(--strip-mob-btn-height, 38px));
+    min-height: var(--strip-mob-btn-solo-height, var(--strip-mob-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
     font-size: 11px;
@@ -530,14 +536,20 @@
 }
 .btn-pre-post {
     width: 100%;
+    height: var(--strip-btn-pre-height, 18px);
+    min-height: var(--strip-btn-pre-height, 18px);
     background: var(--strip-btn-pre-bg, #6b21a8);
     color: var(--strip-btn-pre-text, #ffffff);
     border: 1px solid var(--strip-btn-pre-border, #9333ea);
     border-radius: var(--strip-btn-pre-radius, 4px);
-    padding: 3px 0;
+    padding: 0;
     font-size: 10px;
     font-weight: 800;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     transition: all 0.15s ease;
 }
 .btn-pre-post.fixed {
@@ -551,8 +563,8 @@
     color: var(--strip-btn-pre-text, #ffffff);
     border: 1px solid var(--strip-btn-pre-border, #9333ea);
     border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-height, 38px);
-    min-height: var(--strip-mob-btn-height, 38px);
+    height: var(--strip-mob-btn-pre-height, var(--strip-mob-btn-height, 38px));
+    min-height: var(--strip-mob-btn-pre-height, var(--strip-mob-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
     font-size: 11px;
@@ -601,14 +613,20 @@
 }
 .desk-btn-on {
     width: 100%;
+    height: var(--strip-btn-on-height, 22px);
+    min-height: var(--strip-btn-on-height, 22px);
     background: var(--strip-btn-on-bg);
     color: var(--strip-btn-on-text);
     border: 1px solid #444;
     border-radius: var(--strip-btn-on-radius);
-    padding: 4px 0;
+    padding: 0;
     font-size: 10px;
     font-weight: 900;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     transition: all 0.15s ease;
 }
 .desk-btn-on.active {
@@ -621,11 +639,11 @@
     background: var(--strip-btn-nudge-bg, #252a38);
     color: var(--strip-btn-nudge-text, #ccc);
     border: 1px solid #444;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    min-width: 22px;
-    min-height: 22px;
+    border-radius: var(--strip-btn-nudge-radius, 50%);
+    width: var(--strip-desk-nudge-size, 22px);
+    height: var(--strip-desk-nudge-size, 22px);
+    min-width: var(--strip-desk-nudge-size, 22px);
+    min-height: var(--strip-desk-nudge-size, 22px);
     font-size: 13px;
     font-weight: 800;
     cursor: pointer;
@@ -991,11 +1009,13 @@
 }
 
 .macro-config-btn {
+    height: var(--strip-macro-config-btn-height, 24px);
+    min-height: var(--strip-macro-config-btn-height, 24px);
     background: var(--strip-macro-config-bg, #6b21a8);
     color: var(--strip-macro-config-text, #ffffff);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-config-radius, 6px);
-    padding: 4px 2px;
+    padding: 0 2px;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.2px;
@@ -1013,10 +1033,15 @@
     transition: background 0.15s ease, transform 0.05s ease;
 }
 
+.mob-macro-feature-zone .macro-config-btn {
+    height: var(--strip-mob-macro-config-btn-height, 28px);
+    min-height: var(--strip-mob-macro-config-btn-height, 28px);
+}
+
 .is-volume-geral .macro-config-btn {
     font-size: 9.5px;
     letter-spacing: 0;
-    padding: 4px 1px;
+    padding: 0 1px;
     width: 94%;
 }
 
@@ -1099,13 +1124,39 @@
     justify-content: center;
 }
 
-.btn-zerar-sends,
-.mob-btn-zerar {
+.btn-zerar-sends {
+    height: var(--strip-macro-reset-btn-height, 24px);
+    min-height: var(--strip-macro-reset-btn-height, 24px);
     background: var(--strip-macro-reset-bg, #dc2626);
     color: var(--strip-macro-reset-text, #ffffff);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-reset-radius, 6px);
-    padding: 5px 2px;
+    padding: 0 2px;
+    font-size: 10.5px;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    width: 90%;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.mob-btn-zerar {
+    height: var(--strip-mob-macro-reset-btn-height, 28px);
+    min-height: var(--strip-mob-macro-reset-btn-height, 28px);
+    background: var(--strip-macro-reset-bg, #dc2626);
+    color: var(--strip-macro-reset-text, #ffffff);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--strip-macro-reset-radius, 6px);
+    padding: 0 2px;
     font-size: 10.5px;
     font-weight: 900;
     letter-spacing: 0.2px;
@@ -1250,8 +1301,8 @@
     color: var(--strip-meters-badge-text, #38bdf8);
     border: 1px solid var(--strip-meters-badge-border, #334155);
     border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-height, 38px);
-    min-height: var(--strip-mob-btn-height, 38px);
+    height: var(--strip-mob-btn-medidores-height, var(--strip-mob-btn-height, 38px));
+    min-height: var(--strip-mob-btn-medidores-height, var(--strip-mob-btn-height, 38px));
     font-size: 10px;
     font-weight: 800;
     width: 92%;
@@ -1542,8 +1593,8 @@
     color: var(--strip-btn-on-text, #777777);
     border: 1px solid #444;
     border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-height, 38px);
-    min-height: var(--strip-mob-btn-height, 38px);
+    height: var(--strip-mob-btn-on-height, var(--strip-mob-btn-height, 38px));
+    min-height: var(--strip-mob-btn-on-height, var(--strip-mob-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
     font-size: 11px;
