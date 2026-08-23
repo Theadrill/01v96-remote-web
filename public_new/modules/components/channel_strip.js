@@ -166,11 +166,12 @@ class ChannelStrip {
                 <span class="desk-ch-name">${cfg.name}</span>
             </div>
 
-            <!-- ZONA 4: Middle Feature -->
+            <!-- ZONA 4: Middle Feature (Painel de Medidores Exclusivo Master) -->
             ${isMaster ? `
-                <div class="desk-master-meters-toggle">
-                    <div>MEDIDORES</div>
-                    <div>POST / PREEQ</div>
+                <div class="desk-master-meters-toggle" title="Configurar Posição dos Medidores">
+                    <div class="desk-meters-title">MEDIDORES</div>
+                    <div class="desk-meters-row"><span class="desk-meters-lbl">MASTER:</span><span class="desk-meters-badge master-badge">${window.currentMeterPosMasterLabel || 'POST'}</span></div>
+                    <div class="desk-meters-row"><span class="desk-meters-lbl">CANAIS:</span><span class="desk-meters-badge channels-badge">${window.currentMeterPosChannelsLabel || 'PREEQ'}</span></div>
                 </div>
             ` : ''}
 
@@ -361,6 +362,13 @@ class ChannelStrip {
                     <button class="mob-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
                 </div>
 
+                <!-- Zona 4: Medidores Master Mobile -->
+                ${isMaster ? `
+                    <div class="mob-master-meters-toggle" title="Configurar Posição dos Medidores">
+                        <button class="mob-btn-medidores">[ MEDIDORES ]</button>
+                    </div>
+                ` : ''}
+
                 <!-- Nudge Superior (+) -->
                 <div class="mob-nudge-container">
                     <button class="mob-nudge-btn mob-nudge-plus" title="Nudge + (Toque ou segure)">+</button>
@@ -548,6 +556,18 @@ class ChannelStrip {
 
         // 8. Interação da Barra de Pan (Click -> Tip, Long Press Drag -> Mover, Double Click -> Centralizar)
         this._bindPanEvents();
+
+        // 9. Abertura do Modal de Configuração de Medidores (Master Desktop & Mobile)
+        const metersToggle = this.element.querySelector('.desk-master-meters-toggle, .mob-btn-medidores');
+        if (metersToggle) {
+            metersToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (typeof window.openMeterConfigModal === 'function') {
+                    window.openMeterConfigModal('master');
+                }
+                this._emitEvent('meters_config_click', { target: 'master' });
+            });
+        }
     }
 
     /**
@@ -2204,9 +2224,15 @@ window.updateMeterIndicatorUI = function (target, mode) {
     if (target === 'master') {
         window.currentMeterPosMasterLabel = label;
         window.currentMeterPosMaster = modeKey;
+        document.querySelectorAll('.desk-master-meters-toggle .master-badge').forEach(el => {
+            el.textContent = label;
+        });
     } else {
         window.currentMeterPosChannelsLabel = label;
         window.currentMeterPosChannels = modeKey;
+        document.querySelectorAll('.desk-master-meters-toggle .channels-badge').forEach(el => {
+            el.textContent = label;
+        });
     }
 
     const btnId = target === 'master' ? 'master-meter-indicator-btn' : 'channels-meter-indicator-btn';
@@ -2247,8 +2273,9 @@ window.setMeterPosition = function (target, modeKey) {
     };
     const value = valueMap[modeKey];
     const type = typeMap[target];
-    if (value === undefined || !type) return;
-    socket.emit('control', { type, channel: 0, value });
+    if (typeof socket !== 'undefined' && socket && typeof socket.emit === 'function') {
+        socket.emit('control', { type, channel: 0, value });
+    }
     console.log(`[MEDIDORES CONFIG] Write 0D 03 0C (${type}) = ${value} (${modeKey})`);
     if (typeof window.updateMeterIndicatorUI === 'function') {
         window.updateMeterIndicatorUI(target, modeKey);

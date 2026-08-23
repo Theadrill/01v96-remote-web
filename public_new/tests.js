@@ -397,6 +397,9 @@ function renderDesktopDeck() {
                 },
                 pan_reset: (data, strip) => {
                     logWbEvent('nudge', `[DESKTOP PAN RESET] ${strip.config.name}: Pan centralizado em 0 (Centro) ${data.side ? `(${data.side})` : ''}`);
+                },
+                meters_config_click: (data, strip) => {
+                    logWbEvent('lock', `[DESKTOP MEDIDORES] ${strip.config.name}: Modal de configuração de medidores aberto`);
                 }
             }
         });
@@ -445,6 +448,9 @@ function renderMobileDeck() {
                 },
                 lock_click: (data, strip) => {
                     logWbEvent('lock', `[MOBILE LOCK] ${strip.config.name}: Ação de trava/destrava solicitada`);
+                },
+                meters_config_click: (data, strip) => {
+                    logWbEvent('lock', `[MOBILE MEDIDORES] ${strip.config.name}: Modal de configuração de medidores aberto`);
                 }
             }
         });

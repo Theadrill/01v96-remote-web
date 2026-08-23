@@ -520,6 +520,32 @@
         </aside>
     </main>
 
+    <!-- Modal de Configuração da Posição dos Medidores -->
+    <div class="modal-overlay styled-meterConfigModal" id="meterConfigModal" style="display: none;">
+        <div class="modal-content meter-config-content">
+            <div class="meter-config-row">
+                <span class="meter-config-title">Posição dos Medidores</span>
+            </div>
+            <div class="meter-config-section">
+                <span class="meter-config-section-title">Outputs (Master - Mix - Bus)</span>
+                <div class="meter-config-btn-group" id="meterConfigMasterGroup">
+                    <button class="meter-config-pos-btn" data-target="master" data-mode="pre_eq" onclick="setMeterPosition('master','pre_eq')">PRE EQ</button>
+                    <button class="meter-config-pos-btn" data-target="master" data-mode="pre" onclick="setMeterPosition('master','pre')">PRE FADER</button>
+                    <button class="meter-config-pos-btn" data-target="master" data-mode="post" onclick="setMeterPosition('master','post')">POST FADER</button>
+                </div>
+            </div>
+            <div class="meter-config-section">
+                <span class="meter-config-section-title">Input (1-32 e ST-IN)</span>
+                <div class="meter-config-btn-group" id="meterConfigChannelsGroup">
+                    <button class="meter-config-pos-btn" data-target="channels" data-mode="pre_eq" onclick="setMeterPosition('channels','pre_eq')">PRE EQ</button>
+                    <button class="meter-config-pos-btn" data-target="channels" data-mode="pre" onclick="setMeterPosition('channels','pre')">PRE FADER</button>
+                    <button class="meter-config-pos-btn" data-target="channels" data-mode="post" onclick="setMeterPosition('channels','post')">POST FADER</button>
+                </div>
+            </div>
+            <button onclick="document.getElementById('meterConfigModal').style.display='none'" class="meter-config-close">FECHAR</button>
+        </div>
+    </div>
+
     <!-- ================================================================= -->
     <!-- SCRIPTS DO SISTEMA & CATÁLOGO DE TESTES                          -->
     <!-- ================================================================= -->

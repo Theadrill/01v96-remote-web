@@ -193,3 +193,11 @@ channel_strip:
   peak_led_color: "#ff0000"          # Cor do LED de Peak aceso
   peak_led_glow: "#ff4444"           # Brilho do LED de Peak aceso
 
+  # Painel de Medidores do Master (Zona 4)
+  meters_box_bg: "rgba(0, 0, 0, 0.45)"       # Fundo do bloco de medidores no master
+  meters_box_border: "rgba(255, 255, 255, 0.15)" # Borda do bloco de medidores
+  meters_box_radius: "4px"                   # Arredondamento do bloco de medidores
+  meters_badge_bg: "#1e293b"                 # Fundo dos badges de PRE/POST
+  meters_badge_text: "#38bdf8"               # Cor do texto dos badges (azul neon)
+  meters_badge_border: "#334155"             # Borda dos badges
+

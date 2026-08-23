@@ -1147,7 +1147,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 - [ ] **Variações Desktop (Validação no Workbench `tests.html`):**
   - [x] 1. Canal de Input Mono (`CH 1-16` Azul / `CH 17-32` Esverdeado) (CONCLUÍDO ✅)
   - [x] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde, duplo VU meter, duplo pan L/R empilhado, marquee) (CONCLUÍDO ✅)
-  - [ ] 3. Master Fader Stereo (`MASTER` / `ST` - fundo vinho, duplo VU amplo, painel exclusivo de medidores POST/PREEQ)
+  - [x] 3. Master Fader Stereo (`MASTER` / `ST` - fundo vinho, duplo VU amplo, painel exclusivo de medidores POST/PREEQ) (CONCLUÍDO ✅)
   - [ ] 4. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão roxo CONFIG, visor Delta dB, Big Nudges)
   - [ ] 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2` - header âmbar, saída física dupla OMNI + ADAT com marquee)
   - [ ] 6. Barramento BUS Pareado (`BUS 1 + 2` / `VHIGH` - header ciano com cadeado, correção estéreo de duplo VU e duplo Peak)
@@ -1159,7 +1159,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 - [ ] **Variações Mobile (Validação no Workbench `tests.html`):**
   - [x] 1. Canal Mono Normal (`CH 13` / `SURDAO` - cortina espectral 100%, peak glow, gap e agrupamento 8 em 8) (CONCLUÍDO ✅)
   - [x] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde neon, cortina VU dual dividida L/R) (CONCLUÍDO ✅)
-  - [ ] 3. Master LR Stereo (`MASTER` / `ST` - fundo vinho/vermelho escuro, cortina integral)
+  - [x] 3. Master LR Stereo (`MASTER` / `ST` - fundo vinho/vermelho escuro, cortina integral) (CONCLUÍDO ✅)
   - [ ] 4. Envio Auxiliar / Mix (`CH 5` / `BAIXO` - Sends on Faders, badge PRE/POST, cortina atenuada em -∞ dB)
   - [ ] 5. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão CONFIG, Delta dB, Big Nudges)
   - [ ] 6. Volume Geral de AUX (`AUX` / `AUX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR)

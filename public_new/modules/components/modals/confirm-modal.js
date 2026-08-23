@@ -388,6 +388,12 @@ var ConfirmModal = (function () {
         if (cs.pan_center_color)    root.style.setProperty('--strip-pan-center-color', cs.pan_center_color);
         if (cs.peak_led_color)      root.style.setProperty('--strip-peak-led-color', cs.peak_led_color);
         if (cs.peak_led_glow)       root.style.setProperty('--strip-peak-led-glow', cs.peak_led_glow);
+        if (cs.meters_box_bg)       root.style.setProperty('--strip-meters-box-bg', cs.meters_box_bg);
+        if (cs.meters_box_border)   root.style.setProperty('--strip-meters-box-border', cs.meters_box_border);
+        if (cs.meters_box_radius)   root.style.setProperty('--strip-meters-box-radius', cs.meters_box_radius);
+        if (cs.meters_badge_bg)     root.style.setProperty('--strip-meters-badge-bg', cs.meters_badge_bg);
+        if (cs.meters_badge_text)   root.style.setProperty('--strip-meters-badge-text', cs.meters_badge_text);
+        if (cs.meters_badge_border) root.style.setProperty('--strip-meters-badge-border', cs.meters_badge_border);
     }
 
     function _alert(message, title, type) {
