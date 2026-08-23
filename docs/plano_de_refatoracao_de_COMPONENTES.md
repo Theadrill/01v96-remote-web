@@ -1203,7 +1203,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - [x] 3. Master Fader Stereo (`MASTER` / `ST` - fundo vinho, duplo VU amplo, painel exclusivo de medidores POST/PREEQ) (CONCLUÍDO ✅)
   - [x] 4. Macro Fader Técnico (`MACRO` / `MACRO FADER` - fundo prateado, botão roxo CONFIG, visor Delta dB, Big Nudges) (CONCLUÍDO ✅)
   - [x] 5. Canais MIX / Saídas Auxiliares Mono (`MIX 2` / `AUX2` - header âmbar, sem Panpot, saída física dupla OMNI + ADAT com marquee) (CONCLUÍDO ✅)
-  - [ ] 6. Barramento BUS Pareado (`BUS 1 + 2` / `VHIGH` - header ciano com cadeado, correção estéreo de duplo VU e duplo Peak)
+  - [x] 6. Barramento BUS Pareado (`BUS 1 + 2` / `VHIGH` - header ciano com cadeado, correção estéreo de duplo VU e duplo Peak, duplo Pan L/R) (CONCLUÍDO ✅)
   - [ ] 7. Canais ST IN (`ST IN 1` / `REVERB VOZ` - header azul, duplo VU, duplo pan estéreo com 2 barras L e R independentes)
   - [ ] 8. Canal em Modo Sends on Faders Individual (`AUX 4` / `AUX4` - botão roxo PRE/POST no lugar do Solo, leitura com sufixo dB)
   - [x] 9. Macro de Envio Geral (`AUX GERAL` / `MIX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR) (CONCLUÍDO ✅)

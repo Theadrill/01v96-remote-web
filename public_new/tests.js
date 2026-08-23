@@ -185,7 +185,7 @@ const DESKTOP_VARIATIONS = [
     },
     {
         id: 'desk_st_in',
-        title: '8. Stereo In (ST IN 1)',
+        title: '9. Stereo In (ST IN 1)',
         type: 'st_in',
         chNumber: 'ST IN 1',
         name: 'REVERB VOZ',
@@ -203,7 +203,7 @@ const DESKTOP_VARIATIONS = [
     },
     {
         id: 'desk_aux_send',
-        title: '9. Sends on Faders (AUX 4)',
+        title: '10. Sends on Faders (AUX 4)',
         type: 'aux_send',
         chNumber: 'AUX 4',
         name: 'AUX4',
@@ -219,7 +219,7 @@ const DESKTOP_VARIATIONS = [
     },
     {
         id: 'desk_aux_geral',
-        title: '10. Macro Envio Geral (AUX)',
+        title: '11. Macro Envio Geral (AUX)',
         type: 'macro_aux',
         chNumber: 'AUX',
         name: 'AUX GERAL',
@@ -235,7 +235,7 @@ const DESKTOP_VARIATIONS = [
     },
     {
         id: 'desk_locked',
-        title: '11. Desktop TRAVADO (🔒)',
+        title: '12. Desktop TRAVADO (🔒)',
         type: 'input',
         chNumber: 8,
         name: 'VIOL AGUDO',
@@ -250,7 +250,7 @@ const DESKTOP_VARIATIONS = [
     },
     {
         id: 'desk_disabled',
-        title: '12. Desktop FIXED / Disabled',
+        title: '13. Desktop FIXED / Disabled',
         type: 'aux_send',
         chNumber: 'AUX 1',
         name: 'AUX1',

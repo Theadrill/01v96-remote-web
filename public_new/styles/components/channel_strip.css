@@ -222,12 +222,12 @@
 .channel-strip-wrapper.desk-strip.band-cyan .desk-label-wrapper {
     background: #003d33;
     color: #00ffcc;
-    border-top: 2.5px solid #00b396;
+    border-top: 2.5px solid var(--strip-group-bus-color, #00b396);
 }
 .channel-strip-wrapper.desk-strip.band-cyan .desk-footer-zone .desk-patch-area {
     background: #003d33;
     color: #00ffcc;
-    border-bottom: 2.5px solid #00b396;
+    border-bottom: 2.5px solid var(--strip-group-bus-color, #00b396);
 }
 
 .channel-strip-wrapper.desk-strip.band-purple .desk-label-wrapper {
