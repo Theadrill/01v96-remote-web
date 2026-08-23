@@ -507,9 +507,11 @@ class ChannelStrip {
 
             els.faderThumb.addEventListener('pointermove', (e) => {
                 if (!this.isDragging) return;
-                const railHeight = els.faderArea ? (els.faderArea.clientHeight || 180) : 180;
+                const thumbH = els.faderThumb ? (els.faderThumb.offsetHeight || 38) : 38;
+                const railHeight = els.faderArea ? (els.faderArea.clientHeight || 200) : 200;
+                const travelDist = Math.max(1, railHeight - thumbH);
                 const deltaY = this.dragStartY - e.clientY; // Subir = positivo
-                const deltaVal = (deltaY / railHeight) * 1023;
+                const deltaVal = (deltaY / travelDist) * 1023;
                 const newVal = Math.max(0, Math.min(1023, Math.round(this.dragStartVal + deltaVal)));
 
                 const isMaster = this.config.isMaster || this.config.type === 'master';
@@ -652,6 +654,22 @@ class ChannelStrip {
                     window.confirmZeroSends(this.config.chNumber);
                 }
                 this._emitEvent('zerar_sends_click', { channel: this.config.chNumber });
+            });
+        }
+
+        // 12. Clique no Cabeçalho (Header) / Configuração do Canal
+        if (els.headerNum && !cfg.isDisabled && !cfg.isLocked) {
+            els.headerNum.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this._emitEvent('header_click', { channel: this.config.evtCh, chNumber: this.config.chNumber });
+            });
+        }
+
+        // 13. Clique no Visor OLED de Nome
+        if (els.nameDisplay && !cfg.isDisabled && !cfg.isLocked) {
+            els.nameDisplay.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this._emitEvent('name_click', { channel: this.config.evtCh, name: this.config.name });
             });
         }
     }
@@ -1240,6 +1258,10 @@ function updateUI(ch, val, onState, soloState) {
 
     if (!stateRef) return;
 
+    if (typeof MainView !== 'undefined' && MainView.isActive && MainView.isActive()) {
+        MainView.updateChannel(uiId, val, onState, soloState);
+    }
+
     if (val !== undefined && val !== null) {
         const elF = document.getElementById(`f${uiId}`);
         if (elF) elF.value = val;
@@ -1474,6 +1496,10 @@ function createDesktopStrip(config) {
  * @param {number}        panValue Valor entre -63 (L) e +63 (R)
  */
 function updatePanIndicator(channel, panValue) {
+    if (typeof MainView !== 'undefined' && MainView.isActive && MainView.isActive()) {
+        MainView.updatePan(channel, panValue);
+    }
+
     // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%
     const pct = ((panValue + 63) / 126) * 100;
 
@@ -2034,6 +2060,24 @@ function initUI() {
         } else {
             musicianFsBtn.style.setProperty('display', 'none', 'important');
         }
+    }
+
+    const isMainScreen = (!outsMode && !musicianMode && !technicianMixMode && activeConfigChannel === null);
+
+    if (isMainScreen && typeof MainView !== 'undefined' && typeof MainView.render === 'function') {
+        MainView.render();
+        // Inicializa os indicadores de Pan
+        for (let i = 0; i < NUM_CHANNELS; i++) {
+            if (!isValidChannelForLayer(i)) continue;
+            const s = channelStates[i];
+            if (s && s.pan !== undefined) updatePanIndicator(i, s.pan);
+        }
+        checkMasterSoloIndicator();
+        return;
+    }
+
+    if (typeof MainView !== 'undefined' && typeof MainView.deactivate === 'function') {
+        MainView.deactivate();
     }
 
     if (outsMode && !musicianMode && !technicianMixMode) {

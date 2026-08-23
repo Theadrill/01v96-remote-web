@@ -1195,9 +1195,9 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 - [x] Validar e ajustar cada variação visualmente em tempo real através do `public_new/tests.html`.
 - [x] Integrar conexão direta com `MeterBus` / WASM.
 
-### FASE 6 — Implementação e Validação Visual de Todas as Variações do Channel Strip (Desktop & Mobile) (EM ANDAMENTO ⏳)
+### FASE 6 — Implementação e Validação Visual de Todas as Variações do Channel Strip (Desktop & Mobile) (CONCLUÍDA ✅)
 > *Nota: A integração com variáveis de tema YAML (`--strip-*`) e o encolhimento progressivo do `style.css` legado ocorrem continuamente e em tempo real a cada variação implementada.*
-- [ ] **Variações Desktop (Validação no Workbench `tests.html`):**
+- [x] **Variações Desktop (Validação no Workbench `tests.html`):**
   - [x] 1. Canal de Input Mono (`CH 1-16` Azul / `CH 17-32` Esverdeado) (CONCLUÍDO ✅)
   - [x] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde, duplo VU meter, duplo pan L/R empilhado, marquee) (CONCLUÍDO ✅)
   - [x] 3. Master Fader Stereo (`MASTER` / `ST` - fundo vinho, duplo VU amplo, painel exclusivo de medidores POST/PREEQ) (CONCLUÍDO ✅)
@@ -1209,7 +1209,7 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - [x] 9. Macro de Envio Geral (`AUX GERAL` / `MIX GERAL` - fundo prateado, Big Nudges +0.10 dB, botão vermelho ZERAR) (CONCLUÍDO ✅)
   - [x] 10. Canal Desktop TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - bordas laterais vermelhas, overlay de proteção, cadeado central grande) (CONCLUÍDO ✅)
   - [x] 11. Canal Desktop DESABILITADO / DISABLED (`AUX 1` FIXED - acinzentado/desaturado, fader travado, botão ON 100% ativo e funcional) (CONCLUÍDO ✅)
-- [ ] **Variações Mobile (Validação no Workbench `tests.html`):**
+- [x] **Variações Mobile (Validação no Workbench `tests.html`):**
   - [x] 1. Canal Mono Normal (`CH 13` / `SURDAO` - cortina espectral 100%, peak glow, gap e agrupamento 8 em 8) (CONCLUÍDO ✅)
   - [x] 2. Canal Pareado / Linkado (`CH 21 + 22` / `TECLADO` - borda verde neon, cortina VU dual dividida L/R) (CONCLUÍDO ✅)
   - [x] 3. Master LR Stereo (`MASTER` / `ST` - fundo vinho/vermelho escuro, cortina integral) (CONCLUÍDO ✅)
@@ -1220,14 +1220,29 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - [x] 8. Canal Mobile TRAVADO / LOCKED (`CH 8` / `VIOL AGUDO` - borda vermelha, badge circular 🔒 inferior, modais de destravar) (CONCLUÍDO ✅)
   - [x] 9. Canal Mobile DESABILITADO / DISABLED (`AUX 1` FIXED - visual desaturado, fader fixo, botão ON 100% ativo e colorido) (CONCLUÍDO ✅)
 
-### FASE 7 — Migração Piloto: Tela Principal (`screens/main_view.js`)
-- [ ] Refatorar `main_view.js` para instanciar a classe modular `ChannelStrip`:
+### FASE 7 — Migração Piloto: Tela Principal (`screens/main_view.js`) (EM AJUSTES VISUAIS ⏳)
+- [x] Criar e estruturar `screens/main_view.js` instanciando a classe modular `ChannelStrip`:
   - 32 canais de entrada Mono e Pareados (`CH 1` a `32`).
-  - 4 retornos estéreo (`ST IN 1` a `4`).
   - Master Stereo LR (`STEREO`).
   - Macro Fader Técnico (`MACRO`).
-- [ ] Conectar bindings reativos de WebSocket/MIDI, Trava de Canal (`channel_lock`), VU Meters WASM e ThemeManager.
-- [ ] Remover templates HTML duplicados e código legado de renderização da Tela Principal.
+- [x] Conectar bindings reativos de WebSocket/MIDI, Trava de Canal (`channel_lock`), VU Meters WASM e ThemeManager.
+- [x] Desacoplar renderização legada da Tela Principal em `channel_strip.js` e delegar para `MainView.render()`.
+- [x] Suporte completo a variáveis de tema YAML (`--main-*` e `--strip-*`) e zero CSS inline.
+
+#### 7.1 Ajustes e Calibração Fina do Layout Mobile (EM ANDAMENTO ⏳)
+- [ ] **1. Dimensões & Largura dos Cards Mobile (`.mob-strip`):**
+  - [ ] Aumentar a largura dos cards normais de 86px para ~115px–120px e dos pareados para ~140px.
+- [ ] **2. Espaçamentos (Gaps) e Agrupamento de 8 em 8:**
+  - [ ] Aumentar o espaçamento padrão entre os canais mobile (`gap` de 10px a 14px).
+  - [ ] Aumentar o espaçamento entre grupos de 8 canais (`mob-group-separator` de 16px a 20px).
+- [ ] **3. Borda Superior Cromática de Grupo (Header Border):**
+  - [ ] Adicionar borda superior de destaque no header dos cards mobile (`CH 1-16` azul neon `#00e5ff`, `CH 17-32` verde neon `#00ff88`, pareados verde `#10b981`, MIX âmbar, Master vinho/vermelho).
+- [ ] **4. Botões de Ação SOLO e ON:**
+  - [ ] Dobrar a altura dos botões SOLO e ON (~36px–40px) com cantos arredondados, fonte mais destacada e toque confortável.
+- [ ] **5. Trilho do Fader e Régua Mobile:**
+  - [ ] Aumentar a altura útil total do trilho (`.mob-fader-track-area`), garantindo proporcionalidade e alinhamento do thumb com os marcadores 0, -10, -30.
+- [ ] **6. Visor OLED de Nome do Canal:**
+  - [ ] Aumentar a largura do visor digital OLED (`.mob-display-name`) e reduzir o padding lateral para comportar nomes customizados longos sem quebras indevidas.
 
 ### FASE 8 — Migração: Tela de Envios Auxiliares (`screens/auxs_sends.js`)
 - [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip`:

@@ -246,3 +246,17 @@ channel_strip:
   # Canal Desabilitado / FIXED (Variações 11 & 9 Mobile)
   disabled_opacity: "0.45"                   # Opacidade reduzida para controles desabilitados
   disabled_filter: "grayscale(80%)"          # Desaturação de controles inativos
+
+
+# ─── MAIN VIEW (TELA PRINCIPAL DO MIXER) ──────────────────────
+# Layout da visão principal do mixer (CH 1-32, ST IN, Macro, Master PA)
+main_view:
+  faders_gap: "2px"                          # Espaçamento padrão entre canais desktop
+  faders_padding: "4px"                      # Padding interno da área de faders
+  group_separator_width: "6px"               # Largura do separador de grupos
+  group_separator_bg: "transparent"          # Cor de fundo do separador
+  macro_spacer_width: "55px"                 # Largura do espaçador do Macro Fader
+  macro_spacer_bg: "transparent"             # Fundo do espaçador do Macro Fader
+  mobile_faders_gap: "4px"                   # Espaçamento entre canais no mobile
+  mobile_group_gap: "12px"                   # Espaçamento maior a cada 8 canais no mobile
+

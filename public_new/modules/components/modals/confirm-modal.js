@@ -414,6 +414,17 @@ var ConfirmModal = (function () {
         if (cs.macro_reset_hover_bg) root.style.setProperty('--strip-macro-reset-hover-bg', cs.macro_reset_hover_bg);
         if (cs.macro_reset_text)    root.style.setProperty('--strip-macro-reset-text', cs.macro_reset_text);
         if (cs.macro_reset_radius)  root.style.setProperty('--strip-macro-reset-radius', cs.macro_reset_radius);
+
+        // Main View (Layout da Tela Principal)
+        var mv = theme.main_view || {};
+        if (mv.faders_gap)              root.style.setProperty('--main-faders-gap', mv.faders_gap);
+        if (mv.faders_padding)          root.style.setProperty('--main-faders-padding', mv.faders_padding);
+        if (mv.group_separator_width)   root.style.setProperty('--main-group-separator-width', mv.group_separator_width);
+        if (mv.group_separator_bg)      root.style.setProperty('--main-group-separator-bg', mv.group_separator_bg);
+        if (mv.macro_spacer_width)      root.style.setProperty('--main-macro-spacer-width', mv.macro_spacer_width);
+        if (mv.macro_spacer_bg)         root.style.setProperty('--main-macro-spacer-bg', mv.macro_spacer_bg);
+        if (mv.mobile_faders_gap)       root.style.setProperty('--main-mob-faders-gap', mv.mobile_faders_gap);
+        if (mv.mobile_group_gap)        root.style.setProperty('--main-mob-group-gap', mv.mobile_group_gap);
     }
 
     function _alert(message, title, type) {

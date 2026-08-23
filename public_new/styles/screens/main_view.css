@@ -5,10 +5,61 @@
  * Arquitetura Frontend V2 - Camada de Estilos de Telas / Visões
  *
  * Responsabilidade:
- * - Layout da tela principal do Mixer (32 canais de entrada, ST IN e canal Master Stereo PA).
- * - Espaçamento entre os faders, agrupamento visual (CH 1-16 e CH 17-32) e fader-card-desktop.
- * - Posicionamento e visibilidade do Macro Fader diferencial na tela principal.
+ * - Layout e deck da tela principal do Mixer (32 canais de entrada, ST IN, Macro Fader e Master PA).
+ * - Espaçamentos canônicos e separadores de grupo (CH 1-16 / CH 17-32) em Desktop e Mobile.
+ * - Totalmente integrado ao sistema de variáveis de temas YAML (--main-* e --strip-*).
  * =========================================================================================
  */
 
-/* Placeholder - Regras de layout da tela principal */
+:root {
+    --main-faders-gap: 2px;
+    --main-faders-padding: 4px;
+    --main-group-separator-width: 6px;
+    --main-group-separator-bg: transparent;
+    --main-macro-spacer-width: 55px;
+    --main-macro-spacer-bg: transparent;
+    --main-mob-faders-gap: 4px;
+    --main-mob-group-gap: 12px;
+}
+
+/* Área de Faders da Tela Principal */
+#faders-container.main-view-active {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--main-faders-gap);
+    padding: var(--main-faders-padding);
+    box-sizing: border-box;
+}
+
+/* Separadores de Grupo Desktop (1-16 / 17-32 / ST IN) */
+.main-group-separator {
+    flex: 0 0 var(--main-group-separator-width);
+    width: var(--main-group-separator-width);
+    background: var(--main-group-separator-bg);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Espaçador do Macro Fader Técnico */
+.main-macro-spacer {
+    flex: 0 0 var(--main-macro-spacer-width);
+    width: var(--main-macro-spacer-width);
+    background: var(--main-macro-spacer-bg);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Mobile: Espaçamento de canais e agrupamento a cada 8 canais */
+body:not(.layout-desktop) #faders-container.main-view-active {
+    gap: var(--main-mob-faders-gap);
+}
+
+body:not(.layout-desktop) .mob-group-separator {
+    flex: 0 0 var(--main-mob-group-gap);
+    width: var(--main-mob-group-gap);
+    background: transparent;
+    pointer-events: none;
+    user-select: none;
+}
+
