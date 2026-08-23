@@ -371,6 +371,7 @@ var ConfirmModal = (function () {
         if (cs.btn_solo_text)       root.style.setProperty('--strip-btn-solo-text', cs.btn_solo_text);
         if (cs.btn_solo_active_bg)  root.style.setProperty('--strip-btn-solo-active-bg', cs.btn_solo_active_bg);
         if (cs.btn_solo_active_text) root.style.setProperty('--strip-btn-solo-active-text', cs.btn_solo_active_text);
+        if (cs.btn_solo_active_glow) root.style.setProperty('--strip-btn-solo-active-glow', cs.btn_solo_active_glow);
         if (cs.btn_solo_radius)     root.style.setProperty('--strip-btn-solo-radius', cs.btn_solo_radius);
         if (cs.btn_nudge_bg)        root.style.setProperty('--strip-btn-nudge-bg', cs.btn_nudge_bg);
         if (cs.btn_nudge_text)      root.style.setProperty('--strip-btn-nudge-text', cs.btn_nudge_text);
@@ -380,6 +381,8 @@ var ConfirmModal = (function () {
         if (cs.name_display_bg)     root.style.setProperty('--strip-name-display-bg', cs.name_display_bg);
         if (cs.name_display_color)  root.style.setProperty('--strip-name-display-color', cs.name_display_color);
         if (cs.name_display_radius) root.style.setProperty('--strip-name-display-radius', cs.name_display_radius);
+        if (cs.name_display_font_size) root.style.setProperty('--strip-name-display-font-size', cs.name_display_font_size);
+        if (cs.name_display_font_family) root.style.setProperty('--strip-name-display-font-family', cs.name_display_font_family);
         if (cs.db_val_color)        root.style.setProperty('--strip-db-val-color', cs.db_val_color);
         if (cs.fader_track_color)   root.style.setProperty('--strip-fader-track-color', cs.fader_track_color);
         if (cs.scale_text_color)    root.style.setProperty('--strip-scale-text-color', cs.scale_text_color);
@@ -414,6 +417,20 @@ var ConfirmModal = (function () {
         if (cs.macro_reset_hover_bg) root.style.setProperty('--strip-macro-reset-hover-bg', cs.macro_reset_hover_bg);
         if (cs.macro_reset_text)    root.style.setProperty('--strip-macro-reset-text', cs.macro_reset_text);
         if (cs.macro_reset_radius)  root.style.setProperty('--strip-macro-reset-radius', cs.macro_reset_radius);
+
+        // Mobile Channel Strip Variables
+        if (cs.mob_card_width)          root.style.setProperty('--strip-mob-card-width', cs.mob_card_width);
+        if (cs.mob_card_paired_width)   root.style.setProperty('--strip-mob-card-paired-width', cs.mob_card_paired_width);
+        if (cs.mob_card_radius)         root.style.setProperty('--strip-mob-card-radius', cs.mob_card_radius);
+        if (cs.mob_btn_height)          root.style.setProperty('--strip-mob-btn-height', cs.mob_btn_height);
+        if (cs.mob_btn_radius)          root.style.setProperty('--strip-mob-btn-radius', cs.mob_btn_radius);
+        if (cs.mob_nudge_btn_size)      root.style.setProperty('--strip-mob-nudge-size', cs.mob_nudge_btn_size);
+        if (cs.mob_db_font_size)        root.style.setProperty('--strip-mob-db-font-size', cs.mob_db_font_size);
+        if (cs.mob_name_display_font_size) root.style.setProperty('--strip-mob-name-display-font-size', cs.mob_name_display_font_size);
+        if (cs.mob_name_display_font_family) root.style.setProperty('--strip-mob-name-display-font-family', cs.mob_name_display_font_family);
+        if (cs.mob_fader_thumb_width)   root.style.setProperty('--strip-mob-thumb-width', cs.mob_fader_thumb_width);
+        if (cs.mob_fader_thumb_height)  root.style.setProperty('--strip-mob-thumb-height', cs.mob_fader_thumb_height);
+        if (cs.mob_fader_thumb_radius)  root.style.setProperty('--strip-mob-thumb-radius', cs.mob_fader_thumb_radius);
 
         // Main View (Layout da Tela Principal)
         var mv = theme.main_view || {};

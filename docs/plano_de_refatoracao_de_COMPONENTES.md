@@ -1229,20 +1229,20 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 - [x] Desacoplar renderização legada da Tela Principal em `channel_strip.js` e delegar para `MainView.render()`.
 - [x] Suporte completo a variáveis de tema YAML (`--main-*` e `--strip-*`) e zero CSS inline.
 
-#### 7.1 Ajustes e Calibração Fina do Layout Mobile (EM ANDAMENTO ⏳)
-- [ ] **1. Dimensões & Largura dos Cards Mobile (`.mob-strip`):**
-  - [ ] Aumentar a largura dos cards normais de 86px para ~115px–120px e dos pareados para ~140px.
-- [ ] **2. Espaçamentos (Gaps) e Agrupamento de 8 em 8:**
-  - [ ] Aumentar o espaçamento padrão entre os canais mobile (`gap` de 10px a 14px).
-  - [ ] Aumentar o espaçamento entre grupos de 8 canais (`mob-group-separator` de 16px a 20px).
-- [ ] **3. Borda Superior Cromática de Grupo (Header Border):**
-  - [ ] Adicionar borda superior de destaque no header dos cards mobile (`CH 1-16` azul neon `#00e5ff`, `CH 17-32` verde neon `#00ff88`, pareados verde `#10b981`, MIX âmbar, Master vinho/vermelho).
-- [ ] **4. Botões de Ação SOLO e ON:**
-  - [ ] Dobrar a altura dos botões SOLO e ON (~36px–40px) com cantos arredondados, fonte mais destacada e toque confortável.
-- [ ] **5. Trilho do Fader e Régua Mobile:**
-  - [ ] Aumentar a altura útil total do trilho (`.mob-fader-track-area`), garantindo proporcionalidade e alinhamento do thumb com os marcadores 0, -10, -30.
-- [ ] **6. Visor OLED de Nome do Canal:**
-  - [ ] Aumentar a largura do visor digital OLED (`.mob-display-name`) e reduzir o padding lateral para comportar nomes customizados longos sem quebras indevidas.
+#### 7.1 Ajustes e Calibração Fina do Layout Mobile (CONCLUÍDO ✅)
+- [x] **1. Dimensões & Largura dos Cards Mobile (`.mob-strip`):**
+  - [x] Aumentar a largura dos cards normais de 86px para ~118px e dos pareados para ~148px via variáveis YAML.
+- [x] **2. Espaçamentos (Gaps) e Agrupamento de 8 em 8:**
+  - [x] Aumentar o espaçamento padrão entre os canais mobile (`gap: 12px`).
+  - [x] Aumentar o espaçamento entre grupos de 8 canais (`mob-group-separator: 24px`).
+- [x] **3. Borda Superior Cromática de Grupo (Header Border):**
+  - [x] Adicionar borda superior de destaque no header dos cards mobile (`CH 1-16` azul neon `#00adef`, `CH 17-32` verde neon `#00ff88`, pareados verde `#10b981`, MIX âmbar, Master vinho/vermelho).
+- [x] **4. Botões de Ação SOLO e ON:**
+  - [x] Dobrar a altura dos botões SOLO e ON (`38px`) com cantos arredondados (`6px`), fonte mais destacada e toque confortável.
+- [x] **5. Trilho do Fader e Régua Mobile:**
+  - [x] Aumentar a altura útil total do trilho (`.mob-fader-track-area` flex: 1), fader thumb ciano neon (`46px x 38px`) e alinhamento do thumb com os marcadores 0, -10, -30.
+- [x] **6. Visor OLED de Nome do Canal:**
+  - [x] Aumentar a largura do visor digital OLED (`.mob-display-name`) e reduzir o padding lateral para comportar nomes customizados longos sem quebras indevidas.
 
 ### FASE 8 — Migração: Tela de Envios Auxiliares (`screens/auxs_sends.js`)
 - [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip`:

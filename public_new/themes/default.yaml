@@ -165,8 +165,9 @@ channel_strip:
   # Botão SOLO / CUE
   btn_solo_bg: "#333333"             # Fundo do botão SOLO desligado
   btn_solo_text: "#888888"           # Texto do botão SOLO desligado
-  btn_solo_active_bg: "#ffc107"      # Fundo do botão SOLO ligado (amarelo)
-  btn_solo_active_text: "#000000"    # Texto do botão SOLO ligado
+  btn_solo_active_bg: "#22c55e"      # Fundo do botão SOLO ligado (verde)
+  btn_solo_active_text: "#ffffff"    # Texto do botão SOLO ligado (branco)
+  btn_solo_active_glow: "rgba(34, 197, 94, 0.45)" # Brilho verde do botão SOLO ligado
   btn_solo_radius: "4px"             # Arredondamento do botão SOLO
 
   # Botões de Nudge (+ / -)
@@ -180,6 +181,8 @@ channel_strip:
   name_display_bg: "#000000"         # Fundo da caixa de identificação do canal
   name_display_color: "#00ff00"      # Cor do nome do canal (verde display)
   name_display_radius: "4px"         # Arredondamento da caixa de nome
+  name_display_font_size: "10px"     # Tamanho da fonte do nome no Desktop (10px)
+  name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome do canal Desktop
   db_val_color: "#5cacee"            # Cor do valor numérico de dB
 
   # Fader e Escala
@@ -243,6 +246,20 @@ channel_strip:
   lock_badge_text: "#ffffff"                 # Ícone do cadeado
   lock_overlay_bg: "rgba(0, 0, 0, 0.58)"     # Fundo escurecido (dim) do overlay de bloqueio
 
+  # Mobile Layout Dimensions & Controls
+  mob_card_width: "118px"                    # Largura generosa do card no layout mobile (118px)
+  mob_card_paired_width: "148px"             # Largura para canais pareados no mobile (148px)
+  mob_card_radius: "12px"                    # Arredondamento do card mobile
+  mob_btn_height: "38px"                     # Altura dobrada dos botões ON e SOLO no mobile (38px)
+  mob_btn_radius: "6px"                      # Arredondamento dos botões ON/SOLO mobile
+  mob_nudge_btn_size: "50px"                 # Tamanho aumentado dos botões de nudge (+50%: 50px)
+  mob_db_font_size: "18px"                   # Tamanho da fonte do valor em dB (+50%: 18px)
+  mob_name_display_font_size: "13px"         # Tamanho da fonte do nome do canal no Mobile (11px)
+  mob_name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome do canal Mobile
+  mob_fader_thumb_width: "46px"              # Largura do fader thumb mobile
+  mob_fader_thumb_height: "38px"             # Altura do fader thumb mobile
+  mob_fader_thumb_radius: "6px"              # Arredondamento do fader thumb mobile
+
   # Canal Desabilitado / FIXED (Variações 11 & 9 Mobile)
   disabled_opacity: "0.45"                   # Opacidade reduzida para controles desabilitados
   disabled_filter: "grayscale(80%)"          # Desaturação de controles inativos
@@ -257,6 +274,6 @@ main_view:
   group_separator_bg: "transparent"          # Cor de fundo do separador
   macro_spacer_width: "55px"                 # Largura do espaçador do Macro Fader
   macro_spacer_bg: "transparent"             # Fundo do espaçador do Macro Fader
-  mobile_faders_gap: "4px"                   # Espaçamento entre canais no mobile
-  mobile_group_gap: "12px"                   # Espaçamento maior a cada 8 canais no mobile
+  mobile_faders_gap: "12px"                  # Espaçamento entre canais no mobile (aumentado para 12px)
+  mobile_group_gap: "24px"                   # Espaçamento maior a cada 8 canais no mobile (aumentado para 24px)
 
