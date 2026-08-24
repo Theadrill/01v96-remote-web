@@ -45,12 +45,21 @@
     --strip-gst-header-bg: #14283d;
     --strip-gst-header-on-bg: #1d3c5c;
     --strip-gmix-header-bg: #332800;
-    --strip-gmix-header-on-bg: #4d3c00;
+    --strip-gmix-header-on-bg: #594500;
     --strip-gbus-header-bg: #002e27;
-    --strip-gbus-header-on-bg: #00453a;
+    --strip-gbus-header-on-bg: #005a4e;
     --strip-master-header-bg: #4a0014;
-    --strip-master-header-on-bg: #5d1a1a;
+    --strip-master-header-on-bg: #6b1426;
     --strip-master-header-text: #ff6b81;
+
+    /* Cores de Fundo Sutil do Corpo do Canal quando ON (Desktop) */
+    --strip-g1-body-on-bg: #1a2633;
+    --strip-g2-body-on-bg: #1a2b22;
+    --strip-gst-body-on-bg: #182533;
+    --strip-gmix-body-on-bg: #2b2615;
+    --strip-gbus-body-on-bg: #162925;
+    --strip-gaux-body-on-bg: #261833;
+    --strip-master-body-on-bg: #33141a;
 
     /* Botão ON / MUTE */
     --strip-btn-on-bg: #333333;
@@ -103,7 +112,12 @@
     /* Display OLED Digital de Nome */
     --strip-name-display-bg: #000000;
     --strip-name-display-color: #00ff00;
+    --strip-name-display-width: calc(100% - 8px);
     --strip-name-display-radius: 4px;
+    --strip-name-display-padding: 2px 2px;
+    --strip-name-display-margin: 0 auto;
+    --strip-name-display-zone-padding: 1px 0;
+    --strip-name-display-zone-margin: 0;
     --strip-name-display-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     --strip-name-display-font-weight: 700;
     --strip-name-display-font-size: 10px;
@@ -234,10 +248,10 @@
    ========================================================================= */
 
 .channel-strip-wrapper.desk-strip {
-    width: 86px;
-    min-width: 86px;
-    max-width: 86px;
-    flex: 0 0 86px;
+    width: var(--strip-desk-card-width, 86px);
+    min-width: var(--strip-desk-card-width, 86px);
+    max-width: var(--strip-desk-card-width, 86px);
+    flex: 0 0 var(--strip-desk-card-width, 86px);
     height: 100%;
     max-height: 100%;
     min-height: 0;
@@ -262,10 +276,10 @@
 
 /* Canal Pareado Desktop */
 .channel-strip-wrapper.desk-strip.paired-channel {
-    width: 108px;
-    min-width: 108px;
-    max-width: 108px;
-    flex: 0 0 108px;
+    width: var(--strip-desk-card-paired-width, 108px);
+    min-width: var(--strip-desk-card-paired-width, 108px);
+    max-width: var(--strip-desk-card-paired-width, 108px);
+    flex: 0 0 var(--strip-desk-card-paired-width, 108px);
     border: 1px solid #10b981;
     box-shadow: inset 0 0 6px rgba(16, 185, 129, 0.15);
 }
@@ -278,136 +292,242 @@
     flex: 0 0 var(--strip-volume-geral-width, 70px) !important;
 }
 
+/* =========================================================================
+   FUNDO SUTIL DO CORPO DO CANAL QUANDO ON (DESKTOP)
+   ========================================================================= */
+
+.channel-strip-wrapper.desk-strip.band-blue.is-on,
+.channel-strip-wrapper.desk-strip.band-blue.desk-on-bg,
+.fader-card-desktop.fader-group-1.desk-on-bg,
+.fader-card-desktop.fader-group-1.is-on {
+    background-color: var(--strip-g1-body-on-bg, #1a2633) !important;
+}
+
+.channel-strip-wrapper.desk-strip.band-green.is-on,
+.channel-strip-wrapper.desk-strip.band-green.desk-on-bg,
+.channel-strip-wrapper.desk-strip.band-paired_green.is-on,
+.channel-strip-wrapper.desk-strip.band-paired_green.desk-on-bg,
+.fader-card-desktop.fader-group-2.desk-on-bg,
+.fader-card-desktop.fader-group-2.is-on {
+    background-color: var(--strip-g2-body-on-bg, #1a2b22) !important;
+}
+
+.channel-strip-wrapper.desk-strip.band-st.is-on,
+.channel-strip-wrapper.desk-strip.band-st.desk-on-bg,
+.channel-strip-wrapper.desk-strip.band-st_in.is-on,
+.channel-strip-wrapper.desk-strip.band-st_in.desk-on-bg,
+.fader-card-desktop.fader-group-st.desk-on-bg,
+.fader-card-desktop.fader-group-st.is-on {
+    background-color: var(--strip-gst-body-on-bg, #182533) !important;
+}
+
+.channel-strip-wrapper.desk-strip.band-amber.is-on,
+.channel-strip-wrapper.desk-strip.band-amber.desk-on-bg,
+.fader-card-desktop.fader-group-mix.desk-on-bg,
+.fader-card-desktop.fader-group-mix.is-on {
+    background-color: var(--strip-gmix-body-on-bg, #2b2615) !important;
+}
+
+.channel-strip-wrapper.desk-strip.band-cyan.is-on,
+.channel-strip-wrapper.desk-strip.band-cyan.desk-on-bg,
+.fader-card-desktop.fader-group-bus.desk-on-bg,
+.fader-card-desktop.fader-group-bus.is-on {
+    background-color: var(--strip-gbus-body-on-bg, #162925) !important;
+}
+
+.channel-strip-wrapper.desk-strip.band-purple.is-on,
+.channel-strip-wrapper.desk-strip.band-purple.desk-on-bg,
+.fader-card-desktop.fader-group-aux.desk-on-bg,
+.fader-card-desktop.fader-group-aux.is-on {
+    background-color: var(--strip-gaux-body-on-bg, #261833) !important;
+}
+
+.channel-strip-wrapper.desk-strip.band-wine.is-on,
+.channel-strip-wrapper.desk-strip.band-wine.desk-on-bg,
+.channel-strip-wrapper.desk-strip.is-master.is-on,
+.channel-strip-wrapper.desk-strip.is-master.desk-on-bg,
+.master-card-desktop.desk-on-bg,
+.master-card-desktop.is-on {
+    background-color: var(--strip-master-body-on-bg, #33141a) !important;
+}
+
 /* Identidades Cromáticas Desktop: Header OFF/ON por Grupo e Footer Patch Full Bleed */
 
 /* Grupo 1 (CH 1-16) */
-.channel-strip-wrapper.desk-strip.band-blue .desk-label-wrapper {
-    background: var(--strip-g1-header-bg, #003a5e);
-    color: var(--strip-group-1-color, #00adef);
-    border-top: 2px solid var(--strip-group-1-color, #00adef);
+.channel-strip-wrapper.desk-strip.band-blue .desk-label-wrapper,
+.fader-card-desktop.fader-group-1 .desk-label-wrapper,
+.fader-group-1 .desk-label-wrapper {
+    background: var(--strip-g1-header-bg, #003a5e) !important;
+    color: var(--strip-group-1-color, #00adef) !important;
+    border-top: 2px solid var(--strip-group-1-color, #00adef) !important;
 }
 .channel-strip-wrapper.desk-strip.band-blue .desk-label-wrapper.label-on,
-.channel-strip-wrapper.desk-strip.band-blue.is-on .desk-label-wrapper {
-    background: var(--strip-g1-header-on-bg, #00568a);
-    color: var(--strip-group-1-color, #00adef);
+.channel-strip-wrapper.desk-strip.band-blue.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-1 .desk-label-wrapper.label-on,
+.fader-card-desktop.fader-group-1 .desk-label.label-on {
+    background: var(--strip-g1-header-on-bg, #00568a) !important;
+    color: var(--strip-group-1-color, #00adef) !important;
     font-weight: 900;
 }
-.channel-strip-wrapper.desk-strip.band-blue .desk-footer-zone .desk-patch-area {
-    background: #002b49;
-    color: var(--strip-group-1-color, #00adef);
-    border-bottom: 2px solid var(--strip-group-1-color, #00adef);
+.channel-strip-wrapper.desk-strip.band-blue .desk-footer-zone .desk-patch-area,
+.fader-group-1 .desk-patch-zone {
+    background: #002b49 !important;
+    color: var(--strip-group-1-color, #00adef) !important;
+    border-bottom: 2px solid var(--strip-group-1-color, #00adef) !important;
 }
 
 /* Grupo 2 (CH 17-32) */
-.channel-strip-wrapper.desk-strip.band-green .desk-label-wrapper {
-    background: var(--strip-g2-header-bg, #004a30);
-    color: var(--strip-group-2-color, #00ff88);
-    border-top: 2px solid var(--strip-group-2-color, #00ff88);
+.channel-strip-wrapper.desk-strip.band-green .desk-label-wrapper,
+.fader-card-desktop.fader-group-2 .desk-label-wrapper,
+.fader-group-2 .desk-label-wrapper {
+    background: var(--strip-g2-header-bg, #004a30) !important;
+    color: var(--strip-group-2-color, #00ff88) !important;
+    border-top: 2px solid var(--strip-group-2-color, #00ff88) !important;
 }
 .channel-strip-wrapper.desk-strip.band-green .desk-label-wrapper.label-on,
-.channel-strip-wrapper.desk-strip.band-green.is-on .desk-label-wrapper {
-    background: var(--strip-g2-header-on-bg, #006b41);
-    color: var(--strip-group-2-color, #00ff88);
+.channel-strip-wrapper.desk-strip.band-green.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-2 .desk-label-wrapper.label-on,
+.fader-card-desktop.fader-group-2 .desk-label.label-on {
+    background: var(--strip-g2-header-on-bg, #006b41) !important;
+    color: var(--strip-group-2-color, #00ff88) !important;
     font-weight: 900;
 }
-.channel-strip-wrapper.desk-strip.band-green .desk-footer-zone .desk-patch-area {
-    background: #003822;
-    color: var(--strip-group-2-color, #00ff88);
-    border-bottom: 2px solid var(--strip-group-2-color, #00ff88);
+.channel-strip-wrapper.desk-strip.band-green .desk-footer-zone .desk-patch-area,
+.fader-group-2 .desk-patch-zone {
+    background: #003822 !important;
+    color: var(--strip-group-2-color, #00ff88) !important;
+    border-bottom: 2px solid var(--strip-group-2-color, #00ff88) !important;
 }
 
 /* Grupo ST IN */
 .channel-strip-wrapper.desk-strip.band-st .desk-label-wrapper,
-.channel-strip-wrapper.desk-strip.band-st_in .desk-label-wrapper {
-    background: var(--strip-gst-header-bg, #14283d);
-    color: var(--strip-group-st-color, #5cacee);
-    border-top: 2px solid var(--strip-group-st-color, #4a90e2);
+.channel-strip-wrapper.desk-strip.band-st_in .desk-label-wrapper,
+.fader-card-desktop.fader-group-st .desk-label-wrapper,
+.fader-group-st .desk-label-wrapper {
+    background: var(--strip-gst-header-bg, #14283d) !important;
+    color: var(--strip-group-st-color, #5cacee) !important;
+    border-top: 2px solid var(--strip-group-st-color, #4a90e2) !important;
 }
 .channel-strip-wrapper.desk-strip.band-st .desk-label-wrapper.label-on,
 .channel-strip-wrapper.desk-strip.band-st_in .desk-label-wrapper.label-on,
 .channel-strip-wrapper.desk-strip.band-st.is-on .desk-label-wrapper,
-.channel-strip-wrapper.desk-strip.band-st_in.is-on .desk-label-wrapper {
-    background: var(--strip-gst-header-on-bg, #1d3c5c);
-    color: var(--strip-group-st-color, #5cacee);
+.channel-strip-wrapper.desk-strip.band-st_in.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-st .desk-label-wrapper.label-on,
+.fader-card-desktop.fader-group-st .desk-label.label-on {
+    background: var(--strip-gst-header-on-bg, #1d3c5c) !important;
+    color: var(--strip-group-st-color, #5cacee) !important;
     font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-st .desk-footer-zone .desk-patch-area,
-.channel-strip-wrapper.desk-strip.band-st_in .desk-footer-zone .desk-patch-area {
-    background: #14283d;
-    color: var(--strip-group-st-color, #5cacee);
-    border-bottom: 2px solid var(--strip-group-st-color, #4a90e2);
+.channel-strip-wrapper.desk-strip.band-st_in .desk-footer-zone .desk-patch-area,
+.fader-group-st .desk-patch-zone {
+    background: #14283d !important;
+    color: var(--strip-group-st-color, #5cacee) !important;
+    border-bottom: 2px solid var(--strip-group-st-color, #4a90e2) !important;
 }
 
 /* Grupo Paired Green */
 .channel-strip-wrapper.desk-strip.band-paired_green .desk-label-wrapper {
-    background: var(--strip-g2-header-bg, #004a30);
-    color: var(--strip-group-2-color, #00ff88);
-    border-top: 2px solid #10b981;
+    background: var(--strip-g2-header-bg, #004a30) !important;
+    color: var(--strip-group-2-color, #00ff88) !important;
+    border-top: 2px solid #10b981 !important;
 }
 .channel-strip-wrapper.desk-strip.band-paired_green .desk-label-wrapper.label-on,
 .channel-strip-wrapper.desk-strip.band-paired_green.is-on .desk-label-wrapper {
-    background: var(--strip-g2-header-on-bg, #006b41);
-    color: var(--strip-group-2-color, #00ff88);
+    background: var(--strip-g2-header-on-bg, #006b41) !important;
+    color: var(--strip-group-2-color, #00ff88) !important;
     font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-paired_green .desk-footer-zone .desk-patch-area {
-    background: #023824;
-    color: #10b981;
-    border-bottom: 2px solid #10b981;
+    background: #023824 !important;
+    color: #10b981 !important;
+    border-bottom: 2px solid #10b981 !important;
 }
 
 /* Grupo MIX (Masters 1-8) */
-.channel-strip-wrapper.desk-strip.band-amber .desk-label-wrapper {
-    background: var(--strip-gmix-header-bg, #332800);
-    color: var(--strip-group-mix-color, #ffcc00);
-    border-top: 2px solid var(--strip-group-mix-color, #d4a017);
+.channel-strip-wrapper.desk-strip.band-amber .desk-label-wrapper,
+.fader-card-desktop.fader-group-mix .desk-label-wrapper,
+.fader-group-mix .desk-label-wrapper {
+    background: var(--strip-gmix-header-bg, #332800) !important;
+    color: var(--strip-group-mix-color, #ffcc00) !important;
+    border-top: 2px solid var(--strip-group-mix-color, #d4a017) !important;
 }
 .channel-strip-wrapper.desk-strip.band-amber .desk-label-wrapper.label-on,
-.channel-strip-wrapper.desk-strip.band-amber.is-on .desk-label-wrapper {
-    background: var(--strip-gmix-header-on-bg, #4d3c00);
-    color: var(--strip-group-mix-color, #ffcc00);
+.channel-strip-wrapper.desk-strip.band-amber.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-mix .desk-label-wrapper.label-on,
+.fader-card-desktop.fader-group-mix.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-mix.desk-on-bg .desk-label-wrapper,
+.fader-card-desktop.fader-group-mix .desk-label.label-on {
+    background: var(--strip-gmix-header-on-bg, #594500) !important;
+    color: var(--strip-group-mix-color, #ffcc00) !important;
     font-weight: 900;
 }
-.channel-strip-wrapper.desk-strip.band-amber .desk-footer-zone .desk-patch-area {
-    background: #332800;
-    color: var(--strip-group-mix-color, #ffcc00);
-    border-bottom: 2px solid var(--strip-group-mix-color, #d4a017);
+.channel-strip-wrapper.desk-strip.band-amber .desk-footer-zone .desk-patch-area,
+.fader-group-mix .desk-patch-zone {
+    background: #332800 !important;
+    color: var(--strip-group-mix-color, #ffcc00) !important;
+    border-bottom: 2px solid var(--strip-group-mix-color, #d4a017) !important;
 }
 
 /* Grupo BUS (Masters 1-8) */
-.channel-strip-wrapper.desk-strip.band-cyan .desk-label-wrapper {
-    background: var(--strip-gbus-header-bg, #002e27);
-    color: var(--strip-group-bus-color, #00ffcc);
-    border-top: 2px solid var(--strip-group-bus-color, #00b396);
+.channel-strip-wrapper.desk-strip.band-cyan .desk-label-wrapper,
+.fader-card-desktop.fader-group-bus .desk-label-wrapper,
+.fader-group-bus .desk-label-wrapper {
+    background: var(--strip-gbus-header-bg, #002e27) !important;
+    color: var(--strip-group-bus-color, #00ffcc) !important;
+    border-top: 2px solid var(--strip-group-bus-color, #00b396) !important;
 }
 .channel-strip-wrapper.desk-strip.band-cyan .desk-label-wrapper.label-on,
-.channel-strip-wrapper.desk-strip.band-cyan.is-on .desk-label-wrapper {
-    background: var(--strip-gbus-header-on-bg, #00453a);
-    color: var(--strip-group-bus-color, #00ffcc);
+.channel-strip-wrapper.desk-strip.band-cyan.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-bus .desk-label-wrapper.label-on,
+.fader-card-desktop.fader-group-bus.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-bus.desk-on-bg .desk-label-wrapper,
+.fader-card-desktop.fader-group-bus .desk-label.label-on {
+    background: var(--strip-gbus-header-on-bg, #005a4e) !important;
+    color: var(--strip-group-bus-color, #00ffcc) !important;
     font-weight: 900;
 }
-.channel-strip-wrapper.desk-strip.band-cyan .desk-footer-zone .desk-patch-area {
-    background: #002e27;
-    color: var(--strip-group-bus-color, #00ffcc);
-    border-bottom: 2px solid var(--strip-group-bus-color, #00b396);
+.channel-strip-wrapper.desk-strip.band-cyan .desk-footer-zone .desk-patch-area,
+.fader-group-bus .desk-patch-zone {
+    background: #002e27 !important;
+    color: var(--strip-group-bus-color, #00ffcc) !important;
+    border-bottom: 2px solid var(--strip-group-bus-color, #00b396) !important;
 }
 
 /* Grupo AUX */
-.channel-strip-wrapper.desk-strip.band-purple .desk-label-wrapper {
-    background: #2b0942;
-    color: #e9d5ff;
-    border-top: 2px solid var(--strip-group-aux-color, #7e22ce);
+.channel-strip-wrapper.desk-strip.band-purple .desk-label-wrapper,
+.fader-card-desktop.fader-group-aux .desk-label-wrapper,
+.fader-group-aux .desk-label-wrapper {
+    background: #2b0942 !important;
+    color: #e9d5ff !important;
+    border-top: 2px solid var(--strip-group-aux-color, #7e22ce) !important;
 }
 .channel-strip-wrapper.desk-strip.band-purple .desk-label-wrapper.label-on,
-.channel-strip-wrapper.desk-strip.band-purple.is-on .desk-label-wrapper {
-    background: #3f1060;
-    color: #ffffff;
+.channel-strip-wrapper.desk-strip.band-purple.is-on .desk-label-wrapper,
+.fader-card-desktop.fader-group-aux .desk-label-wrapper.label-on,
+.fader-card-desktop.fader-group-aux .desk-label.label-on {
+    background: #3f1060 !important;
+    color: #ffffff !important;
     font-weight: 900;
 }
-.channel-strip-wrapper.desk-strip.band-purple .desk-footer-zone .desk-patch-area {
-    background: #2b0942;
-    color: #e9d5ff;
-    border-bottom: 2px solid var(--strip-group-aux-color, #7e22ce);
+.channel-strip-wrapper.desk-strip.band-purple .desk-footer-zone .desk-patch-area,
+.fader-group-aux .desk-patch-zone {
+    background: #2b0942 !important;
+    color: #e9d5ff !important;
+    border-bottom: 2px solid var(--strip-group-aux-color, #7e22ce) !important;
+}
+
+/* Normalização de filhos .desk-label dentro de .desk-label-wrapper */
+.desk-label-wrapper .desk-label {
+    background: transparent !important;
+    border: none !important;
+    color: inherit !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 /* Master Stereo PA */
@@ -428,7 +548,7 @@
 .channel-strip-wrapper.desk-strip.band-wine.is-on .desk-label-wrapper,
 .channel-strip-wrapper.desk-strip.is-master .desk-label-wrapper.label-on,
 .channel-strip-wrapper.desk-strip.is-master.is-on .desk-label-wrapper {
-    background: var(--strip-master-header-on-bg, #5d1a1a);
+    background: var(--strip-master-header-on-bg, #6b1426);
     color: #ffffff;
     font-weight: 900;
 }
@@ -464,6 +584,124 @@
     background: var(--strip-macro-header-bg, #3f3f46);
     color: var(--strip-macro-header-text, #ffffff);
     border-top: 2px solid #71717a;
+    font-weight: 800;
+}
+.channel-strip-wrapper.desk-strip.is-macro .btn-cue-placeholder,
+.macro-fader-card .btn-cue-placeholder {
+    height: 16px !important;
+    min-height: 16px !important;
+    margin: 0 !important;
+}
+
+/* 1. Elemento 1: Display OLED do Nome (MACRO FADER) */
+.channel-strip-wrapper.desk-strip.band-macro_silver .desk-ch-name-zone,
+.channel-strip-wrapper.desk-strip.is-macro .desk-ch-name-zone,
+.macro-fader-card .macro-ch-name-zone {
+    background: var(--strip-macro-title-bg, #000000) !important;
+    border-radius: 6px !important;
+    width: var(--strip-macro-element-width, 90%) !important;
+    margin: 4px auto !important;
+    padding: 2px 4px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid #222 !important;
+}
+.channel-strip-wrapper.desk-strip.band-macro_silver .desk-ch-name,
+.channel-strip-wrapper.desk-strip.is-macro .desk-ch-name,
+.macro-fader-card .desk-ch-name,
+.macro-fader-card .macro-ch-name-zone .desk-ch-name {
+    background: transparent !important;
+    color: var(--strip-macro-title-color, #ffffff) !important;
+    font-family: var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    white-space: normal !important;
+}
+
+/* 2. Elemento 2: Botão CONFIG (Mesmo tamanho e largura do botão ON, com variável própria) */
+.macro-fader-card .macro-fader-config-wrap,
+.channel-strip-wrapper.desk-strip.is-macro .macro-fader-config-wrap {
+    padding: 0 !important;
+    width: var(--strip-macro-element-width, 90%) !important;
+    margin: 4px auto !important;
+    display: flex !important;
+    box-sizing: border-box !important;
+}
+.macro-fader-card .macro-fader-config-btn,
+.channel-strip-wrapper.desk-strip.is-macro .macro-fader-config-btn {
+    width: 100% !important;
+    height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px)) !important;
+    min-height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px)) !important;
+    background: var(--strip-macro-config-bg, #6a1b9a) !important;
+    color: var(--strip-macro-config-text, #ffffff) !important;
+    border: none !important;
+    border-radius: var(--strip-macro-config-radius, 6px) !important;
+    font-family: var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-macro-config-font-size, 11px) !important;
+    font-weight: var(--strip-macro-config-font-weight, 800) !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    box-sizing: border-box;
+    transition: background 0.15s ease;
+}
+.macro-fader-card .macro-fader-config-btn:hover,
+.channel-strip-wrapper.desk-strip.is-macro .macro-fader-config-btn:hover {
+    background: var(--strip-macro-config-hover-bg, #7e22ce) !important;
+}
+
+/* 3. Elemento 3: Visor Delta dB (--) */
+.macro-fader-card .macro-db-display,
+.macro-fader-card .macro-db-display,
+.channel-strip-wrapper.desk-strip.is-macro .macro-db-display {
+    font-family: var(--strip-macro-delta-font-family, 'Courier New', Courier, monospace);
+    font-size: var(--strip-macro-delta-font-size, 13px);
+    font-weight: var(--strip-macro-delta-font-weight, bold);
+    letter-spacing: 1px;
+    text-align: center;
+    background: var(--strip-macro-delta-bg, #0a0a0a) !important;
+    color: var(--strip-macro-delta-text, #00ff00) !important;
+    border: 1px solid #222 !important;
+    border-radius: 6px !important;
+    width: var(--strip-macro-element-width, 90%) !important;
+    margin: 4px auto !important;
+    padding: 5px 4px !important;
+    min-height: 26px !important;
+    height: 26px !important;
+    line-height: 1;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8) !important;
+    box-sizing: border-box !important;
+    user-select: none;
+    transition: color 0.2s, text-shadow 0.2s;
+    flex-shrink: 0;
+}
+.macro-fader-card .macro-db-display.macro-db-active,
+.channel-strip-wrapper.desk-strip.is-macro .macro-db-display.macro-db-active {
+    color: var(--strip-macro-delta-active-text, #00ff00) !important;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.8), 0 0 16px rgba(0, 255, 0, 0.4) !important;
+}
+.macro-fader-card .macro-fader-nudge-wrap {
+    margin-top: 8px !important;
+    gap: 8px !important;
+    padding: 0 5px !important;
 }
 .channel-strip-wrapper.desk-strip.band-macro_silver .desk-footer-zone .desk-patch-area,
 .channel-strip-wrapper.desk-strip.band-silver .desk-footer-zone .desk-patch-area,
@@ -757,24 +995,41 @@
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
-/* ZONA 3: Display OLED (Sem contorno/borda externa) */
+/* ZONA 3: Display OLED (Centralizado com respiro lateral e largura configurável) */
+.channel-strip-wrapper.desk-strip .desk-ch-name-zone,
 .desk-ch-name-zone {
-    padding: 1px 4px;
+    padding: var(--strip-name-display-zone-padding, 1px 0) !important;
+    margin: var(--strip-name-display-zone-margin, 0) !important;
+    width: 100% !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
+.channel-strip-wrapper.desk-strip .desk-ch-name,
 .desk-ch-name {
-    display: block;
-    background: var(--strip-name-display-bg, #000000);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: var(--strip-name-display-width, calc(100% - 8px)) !important;
+    max-width: 100% !important;
+    margin: var(--strip-name-display-margin, 0 auto) !important;
+    box-sizing: border-box !important;
+    background: var(--strip-name-display-bg, #000000) !important;
     color: var(--strip-name-display-color, #00ff00);
     border: none;
-    border-radius: var(--strip-name-display-radius, 4px);
-    padding: 2px 1px;
+    border-radius: var(--strip-name-display-radius, 4px) !important;
+    height: var(--strip-name-display-height, 24px);
+    min-height: var(--strip-name-display-height, 24px);
+    padding: var(--strip-name-display-padding, 2px 2px);
     font-size: var(--strip-name-display-font-size, 10px);
     font-weight: var(--strip-name-display-font-weight, 700);
     text-align: center;
     font-family: var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: clip;
 }
 
 /* ZONA 5: Primary Action (ON) & Nudge Superior */
@@ -889,12 +1144,20 @@
     box-sizing: border-box;
 }
 .desk-db-readout {
-    font-family: var(--strip-db-val-font-family, Consolas, Menlo, "Courier New", monospace);
-    font-size: var(--strip-db-val-font-size, 10.5px);
+    font-family: var(--strip-db-val-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-db-val-font-size, 13px);
     font-weight: var(--strip-db-val-font-weight, 800);
     color: var(--strip-db-val-color, #5cacee);
     text-align: center;
-    line-height: 1.2;
+    height: 16px;
+    min-height: 16px;
+    max-height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 /* Régua Analógica de Decibéis (Calibrada com precisão logarítmica/piecewise da 01V96) */
@@ -1046,6 +1309,9 @@
     justify-content: center;
     position: relative;
 }
+.desk-patch-area.has-overflow {
+    justify-content: flex-start !important;
+}
 .desk-patch-area .marquee-text {
     display: inline-block;
     white-space: nowrap;
@@ -1053,7 +1319,7 @@
     text-overflow: ellipsis;
     width: 100%;
     text-align: center;
-    transition: transform 0.3s ease;
+    will-change: transform;
 }
 
 /* Efeito Marquee Deslizante Direto se Extrapolar a Largura */
@@ -1062,14 +1328,15 @@
     width: auto;
     max-width: none;
     text-align: left;
-    animation: patch-marquee 4.5s ease-in-out infinite alternate;
+    padding-left: 1px;
+    animation: patch-marquee 6s ease-in-out infinite alternate;
 }
 
 @keyframes patch-marquee {
-    0%, 20% {
+    0%, 25% {
         transform: translateX(0);
     }
-    80%, 100% {
+    75%, 100% {
         transform: translateX(var(--marquee-dist, -35px));
     }
 }
@@ -1177,7 +1444,7 @@
 /* Middle Feature & Macros (Zona 4) */
 .desk-macro-feature-zone,
 .mob-macro-feature-zone {
-    padding: 3px 6px;
+    padding: 0 !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1187,15 +1454,15 @@
 }
 
 .macro-config-btn {
-    height: var(--strip-macro-config-btn-height, 24px);
-    min-height: var(--strip-macro-config-btn-height, 24px);
+    height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px));
+    min-height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px));
     background: var(--strip-macro-config-bg, #6b21a8);
     color: var(--strip-macro-config-text, #ffffff);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-config-radius, 6px);
     padding: 0 2px;
     font-family: var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
-    font-size: var(--strip-macro-config-font-size, 10px);
+    font-size: var(--strip-macro-config-font-size, 11px);
     font-weight: var(--strip-macro-config-font-weight, 800);
     letter-spacing: 0.2px;
     width: 90%;
@@ -1213,8 +1480,8 @@
 }
 
 .mob-macro-feature-zone .macro-config-btn {
-    height: var(--strip-mob-macro-config-btn-height, 28px);
-    min-height: var(--strip-mob-macro-config-btn-height, 28px);
+    height: var(--strip-mob-macro-config-btn-height, 38px);
+    min-height: var(--strip-mob-macro-config-btn-height, 38px);
     font-family: var(--strip-mob-macro-config-font-family, var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
     font-size: var(--strip-mob-macro-config-font-size, 12px);
 }
@@ -1223,7 +1490,7 @@
     font-size: 9.5px;
     letter-spacing: 0;
     padding: 0 1px;
-    width: 94%;
+    width: 90%;
 }
 
 .macro-config-btn:hover {
@@ -1236,21 +1503,23 @@
 
 .macro-delta-display {
     background: var(--strip-macro-delta-bg, #09090b);
-    color: var(--strip-macro-delta-text, #52525b);
+    color: var(--strip-macro-delta-text, #00ff00);
     font-family: var(--strip-macro-delta-font-family, Consolas, Menlo, "Courier New", monospace);
     font-size: var(--strip-macro-delta-font-size, 11px);
     font-weight: var(--strip-macro-delta-font-weight, 800);
-    width: 76%;
+    width: 90%;
     padding: 3px 6px;
-    border-radius: 4px;
+    border-radius: 6px;
     border: 1px solid #27272a;
     text-align: center;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
     transition: color 0.15s ease;
+    box-sizing: border-box;
 }
 
 .macro-delta-display.macro-db-active {
-    color: var(--strip-macro-delta-active-text, #38bdf8);
+    color: var(--strip-macro-delta-active-text, #00ff00);
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
 }
 
 .desk-fader-core.macro-fader-core,
@@ -1765,8 +2034,7 @@
     font-family: var(--strip-mob-name-display-font-family, var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
-    box-sizing: border-box;
+    text-overflow: clip;
 }
 .mob-top-action {
     text-align: center;
@@ -1845,7 +2113,7 @@
 
 /* Mobile Macro Variations */
 .mob-macro-feature-zone {
-    padding: 4px;
+    padding: 0 !important;
     text-align: center;
 }
 .mob-macro-fader-core {

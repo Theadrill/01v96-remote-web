@@ -388,6 +388,15 @@ var ConfirmModal = (function () {
         var mstHdrBg = getVal(csG, 'master_header_bg'); if (mstHdrBg) root.style.setProperty('--strip-master-header-bg', mstHdrBg);
         var mstHdrOnBg = getVal(csG, 'master_header_on_bg'); if (mstHdrOnBg) root.style.setProperty('--strip-master-header-on-bg', mstHdrOnBg);
 
+        // Body Backgrounds (ON)
+        var g1BodyOnBg = getVal(csG, 'group_1_body_on_bg'); if (g1BodyOnBg) root.style.setProperty('--strip-g1-body-on-bg', g1BodyOnBg);
+        var g2BodyOnBg = getVal(csG, 'group_2_body_on_bg'); if (g2BodyOnBg) root.style.setProperty('--strip-g2-body-on-bg', g2BodyOnBg);
+        var gstBodyOnBg = getVal(csG, 'group_st_body_on_bg'); if (gstBodyOnBg) root.style.setProperty('--strip-gst-body-on-bg', gstBodyOnBg);
+        var gmixBodyOnBg = getVal(csG, 'group_mix_body_on_bg'); if (gmixBodyOnBg) root.style.setProperty('--strip-gmix-body-on-bg', gmixBodyOnBg);
+        var gbusBodyOnBg = getVal(csG, 'group_bus_body_on_bg'); if (gbusBodyOnBg) root.style.setProperty('--strip-gbus-body-on-bg', gbusBodyOnBg);
+        var gauxBodyOnBg = getVal(csG, 'group_aux_body_on_bg'); if (gauxBodyOnBg) root.style.setProperty('--strip-gaux-body-on-bg', gauxBodyOnBg);
+        var mstBodyOnBg = getVal(csG, 'master_body_on_bg'); if (mstBodyOnBg) root.style.setProperty('--strip-master-body-on-bg', mstBodyOnBg);
+
         var btnOnBg = getVal(csG, 'btn_on_bg'); if (btnOnBg) root.style.setProperty('--strip-btn-on-bg', btnOnBg);
         var btnOnText = getVal(csG, 'btn_on_text'); if (btnOnText) root.style.setProperty('--strip-btn-on-text', btnOnText);
         var btnOnActBg = getVal(csG, 'btn_on_active_bg'); if (btnOnActBg) root.style.setProperty('--strip-btn-on-active-bg', btnOnActBg);
@@ -417,6 +426,11 @@ var ConfirmModal = (function () {
         var nameFont = getVal(csG, 'name_display_font_family'); if (nameFont) root.style.setProperty('--strip-name-display-font-family', nameFont);
         var nameWeight = getVal(csG, 'name_display_font_weight'); if (nameWeight) root.style.setProperty('--strip-name-display-font-weight', nameWeight);
         var nameSize = getVal(csG, 'name_display_font_size'); if (nameSize) root.style.setProperty('--strip-name-display-font-size', nameSize);
+        var namePad = getVal(csG, 'name_display_padding'); if (namePad) root.style.setProperty('--strip-name-display-padding', namePad);
+        var nameMarg = getVal(csG, 'name_display_margin'); if (nameMarg) root.style.setProperty('--strip-name-display-margin', nameMarg);
+        var nameZonePad = getVal(csG, 'name_display_zone_padding'); if (nameZonePad) root.style.setProperty('--strip-name-display-zone-padding', nameZonePad);
+        var nameZoneMarg = getVal(csG, 'name_display_zone_margin'); if (nameZoneMarg) root.style.setProperty('--strip-name-display-zone-margin', nameZoneMarg);
+        var nameW = getVal(csG, 'name_display_width'); if (nameW) root.style.setProperty('--strip-name-display-width', nameW);
 
         var soloFont = getVal(csG, 'btn_solo_font_family'); if (soloFont) root.style.setProperty('--strip-btn-solo-font-family', soloFont);
         var soloWeight = getVal(csG, 'btn_solo_font_weight'); if (soloWeight) root.style.setProperty('--strip-btn-solo-font-weight', soloWeight);
@@ -485,6 +499,8 @@ var ConfirmModal = (function () {
         var macBorder = getVal(csG, 'macro_border'); if (macBorder) root.style.setProperty('--strip-macro-border', macBorder);
         var macHdrBg = getVal(csG, 'macro_header_bg'); if (macHdrBg) root.style.setProperty('--strip-macro-header-bg', macHdrBg);
         var macHdrText = getVal(csG, 'macro_header_text'); if (macHdrText) root.style.setProperty('--strip-macro-header-text', macHdrText);
+        var macTitleColor = getVal(csG, 'macro_title_color'); if (macTitleColor) root.style.setProperty('--strip-macro-title-color', macTitleColor);
+        var macTitleBg = getVal(csG, 'macro_title_bg'); if (macTitleBg) root.style.setProperty('--strip-macro-title-bg', macTitleBg);
         var macCfgBg = getVal(csG, 'macro_config_bg'); if (macCfgBg) root.style.setProperty('--strip-macro-config-bg', macCfgBg);
         var macCfgHov = getVal(csG, 'macro_config_hover_bg'); if (macCfgHov) root.style.setProperty('--strip-macro-config-hover-bg', macCfgHov);
         var macCfgText = getVal(csG, 'macro_config_text'); if (macCfgText) root.style.setProperty('--strip-macro-config-text', macCfgText);
@@ -579,11 +595,14 @@ var ConfirmModal = (function () {
         var dScaleSize = getVal(csD, 'scale_font_size'); if (dScaleSize) root.style.setProperty('--strip-scale-font-size', dScaleSize);
         var dScaleFont = getVal(csD, 'scale_font_family'); if (dScaleFont) root.style.setProperty('--strip-scale-font-family', dScaleFont);
 
+        var dCardW = getVal(csD, 'card_width'); if (dCardW) root.style.setProperty('--strip-desk-card-width', dCardW);
+        var dCardPW = getVal(csD, 'card_paired_width'); if (dCardPW) root.style.setProperty('--strip-desk-card-paired-width', dCardPW);
         var dVolWidth = getVal(csD, 'volume_geral_width'); if (dVolWidth) root.style.setProperty('--strip-volume-geral-width', dVolWidth);
 
         // Mobile Properties
         var mCardW = getVal(csM, 'card_width', 'mob_card_width'); if (mCardW) root.style.setProperty('--strip-mob-card-width', mCardW);
         var mCardPW = getVal(csM, 'card_paired_width', 'mob_card_paired_width'); if (mCardPW) root.style.setProperty('--strip-mob-card-paired-width', mCardPW);
+        var mVolW = getVal(csM, 'volume_geral_width'); if (mVolW) root.style.setProperty('--strip-volume-geral-width', mVolW);
         var mCardRad = getVal(csM, 'card_radius', 'mob_card_radius'); if (mCardRad) root.style.setProperty('--strip-mob-card-radius', mCardRad);
         var mCardBrd = getVal(csM, 'card_border', 'mob_card_border'); if (mCardBrd) root.style.setProperty('--strip-mob-card-border', mCardBrd);
         var mCardBrdW = getVal(csM, 'card_border_width', 'mob_card_border_width'); if (mCardBrdW !== undefined) root.style.setProperty('--strip-mob-card-border-width', mCardBrdW);

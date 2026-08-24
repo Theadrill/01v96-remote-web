@@ -147,8 +147,8 @@ channel_strip:
     group_1_color: "#00adef"           # Azul - Canais 1-16
     group_2_color: "#00ff88"           # Verde - Canais 17-32
     group_st_color: "#4a90e2"          # Azul suave - Entradas Estéreo (ST IN)
-    group_mix_color: "#d4a017"         # Amarelo/Dourado - MIX 1-8 Masters
-    group_bus_color: "#00b396"         # Ciano/Teal - BUS 1-8 Masters
+    group_mix_color: rgb(255, 204, 0)         # Amarelo/Dourado - MIX 1-8 Masters
+    group_bus_color: "#00ffcc"         # Ciano/Teal - BUS 1-8 Masters
     group_aux_color: "#7e22ce"         # Roxo/Púrpura - Barramento AUX
     master_color: "#dc3545"            # Vermelho - Master Stereo PA
 
@@ -160,11 +160,20 @@ channel_strip:
     group_st_header_bg: "#14283d"      # Fundo do cabeçalho ST IN (OFF)
     group_st_header_on_bg: "#1d3c5c"   # Fundo do cabeçalho ST IN (ON)
     group_mix_header_bg: "#332800"     # Fundo do cabeçalho MIX (OFF)
-    group_mix_header_on_bg: "#4d3c00"  # Fundo do cabeçalho MIX (ON)
+    group_mix_header_on_bg: "#594500"  # Fundo do cabeçalho MIX (ON)
     group_bus_header_bg: "#002e27"     # Fundo do cabeçalho BUS (OFF)
-    group_bus_header_on_bg: "#00453a"  # Fundo do cabeçalho BUS (ON)
+    group_bus_header_on_bg: "#005a4e"  # Fundo do cabeçalho BUS (ON)
     master_header_bg: "#4a0014"        # Fundo do cabeçalho Master (OFF)
-    master_header_on_bg: "#5d1a1a"     # Fundo do cabeçalho Master (ON)
+    master_header_on_bg: "#6b1426"     # Fundo do cabeçalho Master (ON)
+
+    # Cores de Fundo Sutil do Corpo do Canal quando ON (Desktop)
+    group_1_body_on_bg: "#1a2633"       # Fundo do corpo Grupo 1 (ON)
+    group_2_body_on_bg: "#1a2b22"       # Fundo do corpo Grupo 2 (ON)
+    group_st_body_on_bg: "#182533"      # Fundo do corpo ST IN (ON)
+    group_mix_body_on_bg: "#2b2615"     # Fundo do corpo MIX (ON)
+    group_bus_body_on_bg: "#162925"     # Fundo do corpo BUS (ON)
+    group_aux_body_on_bg: "#261833"     # Fundo do corpo AUX (ON)
+    master_body_on_bg: "#33141a"        # Fundo do corpo Master (ON)
 
     # ── Font Face & Tipografia de Cada Elemento de Texto ──
 
@@ -176,13 +185,19 @@ channel_strip:
     # Display OLED Digital de Nome do Canal
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     name_display_font_weight: "700"
-    name_display_font_size: "10px"
+    name_display_font_size: "11px"
     name_display_bg: "#000000"
     name_display_color: "#00ff00"
+    name_display_width: "calc(100% - 5px)"       # Largura do display LED (deixa espaço simétrico nas laterais)
+    name_display_padding: "2px 2px"             # Espaçamento interno do texto no LED
+    name_display_margin: "0px auto"             # Margem do display LED
+    name_display_zone_padding: "1px 0px"        # Espaçamento interno da área do LED
+    name_display_zone_margin: "0px"             # Margem externa da área do LED
+    name_display_radius: "4px"                  # Arredondamento do visor LED
 
     # Botão SOLO / CUE
-    btn_solo_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    btn_solo_font_weight: "800"
+    btn_solo_font_family: '"Arial"'
+    btn_solo_font_weight: "600"
     btn_solo_font_size: "10px"
     btn_solo_bg: "#333333"
     btn_solo_text: "#888888"
@@ -201,7 +216,7 @@ channel_strip:
     # Botão ON / MUTE
     btn_on_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_on_font_weight: "900"
-    btn_on_font_size: "10px"
+    btn_on_font_size: "11px"
     btn_on_bg: "#333333"
     btn_on_text: "#888888"
     btn_on_active_bg: "#ffc107"
@@ -216,9 +231,9 @@ channel_strip:
     btn_nudge_text: "#cccccc"
 
     # Visor Digital de Ganho / Valor Numérico em dB (Readout)
-    db_val_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    db_val_font_weight: "800"
-    db_val_font_size: "10.5px"
+    db_val_font_family: '"Arial Narrow", sans-serif'
+    db_val_font_weight: "600"
+    db_val_font_size: "13px"
     db_val_color: "#5cacee"
 
     # Escala e Régua Analógica em dB
@@ -282,13 +297,15 @@ channel_strip:
     macro_border: "#27272a"                    # Borda escura do card Macro
     macro_header_bg: "#3f3f46"                 # Fundo do cabeçalho do Macro
     macro_header_text: "#ffffff"               # Cor do texto do cabeçalho
+    macro_title_color: "#ffffff"               # Cor do texto no visor OLED do Macro (branco puro)
+    macro_title_bg: "#000000"                  # Fundo do visor OLED do Macro
     macro_config_bg: "#6b21a8"                 # Fundo do botão CONFIG (roxo escuro)
     macro_config_hover_bg: "#7e22ce"           # Hover do botão CONFIG
     macro_config_text: "#ffffff"               # Cor do texto do botão CONFIG
     macro_config_radius: "6px"                 # Arredondamento do botão CONFIG
     macro_delta_bg: "#09090b"                  # Fundo do visor OLED Delta dB
-    macro_delta_text: "#52525b"                # Texto do visor Delta dB em repouso
-    macro_delta_active_text: "#38bdf8"         # Texto do visor Delta dB ativo (azul neon)
+    macro_delta_text: "#00ff00"                # Texto do visor Delta dB em repouso (verde neon)
+    macro_delta_active_text: "#00ff00"         # Texto do visor Delta dB ativo (verde neon)
     macro_big_nudge_bg: "#ffffff"              # Fundo do botão Big Nudge
     macro_big_nudge_text: "#000000"            # Símbolo (+/-) do Big Nudge
     macro_big_nudge_border: "#a1a1aa"          # Borda do botão Big Nudge
@@ -318,7 +335,9 @@ channel_strip:
   # 2. PROPRIEDADES DESKTOP (Dimensões e Estilos Exclusivos)
   # ══════════════════════════════════════════════════════════════
   desktop:
-    card_bg: rgb(34, 34, 34)                        # Fundo do card desktop
+    card_width: "86px"                         # Largura de cada canal no modo desktop (86px)
+    card_paired_width: "108px"                 # Largura de canais estéreo pareados no desktop (108px)
+    card_bg: rgb(34, 34, 34)                  # Fundo do card desktop
     card_border: "#222222"                     # Cor da borda base do card
     card_border_width: "1px"                   # Espessura da borda base do card
     desk_card_border: "#333333"                # Cor da borda dos cards no Desktop (superior, inferior e extremidades)
@@ -327,44 +346,20 @@ channel_strip:
     card_radius: "0px"                         # Arredondamento do card
     card_on_bg: "rgba(255, 69, 0, 0.08)"       # Fundo sutil de destaque quando o canal está ON
     header_height: "26px"                      # Altura do cabeçalho desktop
-    header_font_size: "11px"                   # Tamanho da fonte do cabeçalho no Desktop
-    header_font_weight: "800"                  # Peso da fonte do cabeçalho no Desktop
-    header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     patch_height: "23px"                       # Altura do rodapé de patch desktop
-    patch_font_size: "10px"                    # Tamanho da fonte do patch no Desktop
-    patch_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
 
-    # Botões - Alturas, Fontes e Dimensões Desktop
+    # Botões - Dimensões Físicas Desktop
     btn_on_height: "40px"                      # Altura do botão ON no desktop
     btn_on_radius: "4px"                       # Arredondamento do botão ON no desktop
-    btn_on_font_size: "10px"                   # Tamanho da fonte do botão ON no desktop
-    btn_on_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_solo_height: "28px"                    # Altura do botão SOLO no desktop
     btn_solo_radius: "4px"                     # Arredondamento do botão SOLO no desktop
-    btn_solo_font_size: "10px"                 # Tamanho da fonte do botão SOLO no desktop
-    btn_solo_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_pre_height: "18px"                     # Altura do botão PRE/POST no desktop
     btn_pre_radius: "4px"                      # Arredondamento do botão PRE/POST no desktop
-    btn_pre_font_size: "10px"                  # Tamanho da fonte do botão PRE/POST no desktop
-    btn_pre_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_nudge_size: "22px"                     # Tamanho / altura dos botões de nudge no desktop
     btn_nudge_radius: "50%"                    # Arredondamento dos botões de nudge no desktop
-    btn_nudge_font_size: "13px"                # Tamanho da fonte do nudge no desktop
-    btn_nudge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    macro_config_btn_height: "24px"            # Altura do botão CONFIG (Macro Fader)
-    macro_config_font_size: "10px"             # Tamanho da fonte do botão CONFIG no desktop
-    macro_config_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    macro_config_btn_height: "40px"            # Altura do botão CONFIG (Macro Fader no desktop - mesmo tamanho do ON: 40px)
     macro_reset_btn_height: "24px"             # Altura do botão ZERAR (Macro Fader)
-    macro_reset_font_size: "10px"              # Tamanho da fonte do botão ZERAR no desktop
-    macro_reset_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-
-    name_display_radius: "4px"                 # Arredondamento da caixa de nome no desktop
-    name_display_font_size: "10px"             # Tamanho da fonte do nome no Desktop
-    name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome no Desktop
-    db_val_font_size: "10.5px"                 # Tamanho da fonte do dB no Desktop
-    db_val_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    scale_font_size: "7.5px"                   # Tamanho da régua no Desktop
-    scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    name_display_radius: "0px"                 # Arredondamento da caixa de nome no desktop
     volume_geral_width: "70px"                 # Largura mais fina específica para Volume Geral (70px)
 
   # ══════════════════════════════════════════════════════════════
@@ -373,6 +368,7 @@ channel_strip:
   mobile:
     card_width: "118px"                        # Largura generosa do card no layout mobile (118px)
     card_paired_width: "148px"                 # Largura para canais pareados no mobile (148px)
+    volume_geral_width: "70px"                 # Largura do Volume Geral no mobile (70px)
     card_radius: "12px"                        # Arredondamento do card mobile
     card_border: "#282828"                     # Cor da borda do contorno do card mobile
     card_border_width: "1px"                   # Espessura da borda do contorno do card mobile

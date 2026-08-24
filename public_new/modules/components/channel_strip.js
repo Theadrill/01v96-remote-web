@@ -478,6 +478,7 @@ class ChannelStrip {
             lockSlot: root.querySelector('.desk-slot-right'),
             nameDisplay: root.querySelector('.desk-ch-name, .mob-display-name'),
             soloBtn: root.querySelector('.desk-btn-solo, .mob-btn-solo'),
+            btnPre: root.querySelector('.btn-pre-post, .mob-btn-pre'),
             onBtn: root.querySelector('.desk-btn-on, .mob-btn-on'),
             nudgePlus: root.querySelector('.desk-nudge-plus, .mob-nudge-plus, .btn-nudge-plus'),
             nudgeMinus: root.querySelector('.desk-nudge-minus, .mob-nudge-minus, .btn-nudge-minus'),
@@ -1065,14 +1066,17 @@ class ChannelStrip {
         const text = this.elements.patchText;
 
         text.classList.remove('is-overflowing');
+        area.classList.remove('has-overflow');
         text.style.removeProperty('--marquee-dist');
 
         const scrollW = text.scrollWidth;
         const clientW = area.clientWidth;
 
         if (scrollW > clientW && clientW > 0) {
-            const overflowPx = scrollW - clientW + 8;
+            const availableW = Math.max(10, clientW - 8);
+            const overflowPx = scrollW - availableW + 4;
             text.style.setProperty('--marquee-dist', `-${overflowPx}px`);
+            area.classList.add('has-overflow');
             text.classList.add('is-overflowing');
         }
     }
@@ -1106,6 +1110,20 @@ class ChannelStrip {
         if (this.elements.soloBtn) {
             this.elements.soloBtn.classList.toggle('active', this.config.soloState);
             this.elements.soloBtn.classList.toggle('solo-active', this.config.soloState);
+        }
+    }
+
+    /**
+     * Define o estado PRE ou POST do botão de envio auxiliar
+     * @param {string|boolean} mode 'PRE' | 'POST' ou boolean (true=PRE)
+     */
+    setPrePost(mode) {
+        const modeStr = (typeof mode === 'boolean') ? (mode ? 'PRE' : 'POST') : String(mode).toUpperCase();
+        this.config.prePost = modeStr;
+        if (this.elements.btnPre) {
+            this.elements.btnPre.innerText = modeStr;
+            this.elements.btnPre.className = (this.config.layout === 'mobile' ? 'mob-btn-pre' : 'btn-pre-post') + ' ' + modeStr.toLowerCase();
+            this.elements.btnPre.title = modeStr === 'PRE' ? 'PRE (Pre-Fader)' : 'POST (Post-Fader)';
         }
     }
 
@@ -1291,6 +1309,9 @@ function updateUI(ch, val, onState, soloState) {
 
     if (typeof MainView !== 'undefined' && MainView.isActive && MainView.isActive()) {
         MainView.updateChannel(uiId, val, onState, soloState);
+    }
+    if (typeof OutsView !== 'undefined' && OutsView.isActive && OutsView.isActive()) {
+        OutsView.updateChannel(uiId, val, onState, soloState);
     }
 
     if (val !== undefined && val !== null) {
@@ -1529,6 +1550,9 @@ function createDesktopStrip(config) {
 function updatePanIndicator(channel, panValue) {
     if (typeof MainView !== 'undefined' && MainView.isActive && MainView.isActive()) {
         MainView.updatePan(channel, panValue);
+    }
+    if (typeof OutsView !== 'undefined' && OutsView.isActive && OutsView.isActive()) {
+        OutsView.updatePan(channel, panValue);
     }
 
     // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%
@@ -2109,6 +2133,18 @@ function initUI() {
 
     if (typeof MainView !== 'undefined' && typeof MainView.deactivate === 'function') {
         MainView.deactivate();
+    }
+
+    const isOutsScreen = (outsMode && !musicianMode && !technicianMixMode && activeConfigChannel === null);
+
+    if (isOutsScreen && typeof OutsView !== 'undefined' && typeof OutsView.render === 'function') {
+        OutsView.render();
+        checkMasterSoloIndicator();
+        return;
+    }
+
+    if (typeof OutsView !== 'undefined' && typeof OutsView.deactivate === 'function') {
+        OutsView.deactivate();
     }
 
     if (outsMode && !musicianMode && !technicianMixMode) {

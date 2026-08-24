@@ -1244,19 +1244,19 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
 - [x] **6. Visor OLED de Nome do Canal:**
   - [x] Aumentar a largura do visor digital OLED (`.mob-display-name`) e reduzir o padding lateral para comportar nomes customizados longos sem quebras indevidas.
 
-### FASE 8 — Migração: Tela de Envios Auxiliares (`screens/auxs_sends.js`)
-- [ ] Refatorar `auxs_sends.js` para instanciar `ChannelStrip`:
+### FASE 8 — Migração: Tela de Envios Auxiliares (`screens/auxs_sends.js`) (CONCLUÍDO ✅)
+- [x] Refatorar `auxs_sends.js` para instanciar `ChannelStrip`:
   - Modo MIX (visão geral dos 32 canais enviando para um barramento com badges `[PRE]`/`[POST]`).
   - Modo CANAL (visão dos 8 envios do canal selecionado).
   - Macro `AUX GERAL` / `MIX GERAL` com Big Nudges e botão `[ZERAR]`.
   - Tratamento do modo `FIXED` (canal acinzentado com botão `ON` ativo).
-- [ ] Limpeza de funções legadas de template em `auxs_sends.js`.
+- [x] Limpeza de funções legadas de template em `auxs_sends.js`.
 
-### FASE 9 — Migração: Tela de Barramentos de Saída (`screens/outs_view.js`)
-- [ ] Refatorar `outs_view.js` para instanciar `ChannelStrip`:
+### FASE 9 — Migração: Tela de Barramentos de Saída (`screens/outs_view.js`) (CONCLUÍDO ✅)
+- [x] Refatorar `outs_view.js` para instanciar `ChannelStrip`:
   - Barramentos de Saída `MIX 1-8` (com patch duplo OMNI + ADAT e efeito marquee).
   - Barramentos `BUS 1-8` Mono e Pareados (com correção de duplo VU estéreo).
-- [ ] Conectar medidores WASM, mutes e nudges dedicados de saída (+/- 0.10 dB).
+- [x] Conectar medidores WASM, mutes e nudges dedicados de saída (+/- 0.10 dB).
 
 ### FASE 10 — Migração: Tela do Músico (`screens/musician_view.js`)
 - [ ] Refatorar `musician_view.js` para instanciar `ChannelStrip`:

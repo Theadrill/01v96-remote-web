@@ -1998,14 +1998,16 @@ body.layout-desktop .sidebar-macros {
 
 .desk-ch-name-zone {
     height: 32px;
-    background: #000;
-    margin: 2px 4px;
-    border-radius: 4px;
+    background: transparent;
+    margin: 0;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: 1px solid #333;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .desk-ch-name {
@@ -4492,9 +4494,9 @@ body.is-portrait .dyn-box {
 }
 
 .macro-fader-card .desk-label {
-    background: #555 !important;
-    color: #fff !important;
-    font-weight: bold !important;
+    background: #3f3f46 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
 }
 
 .macro-fader-card .card-title {
@@ -4505,26 +4507,38 @@ body.is-portrait .dyn-box {
     font-weight: bold;
 }
 
-.macro-ch-name-zone {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    height: 35px;
+.macro-fader-card .macro-ch-name-zone {
+    background: #000000 !important;
+    border-radius: 6px !important;
+    width: 90% !important;
+    margin: 4px auto !important;
+    padding: 2px 4px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid #222 !important;
 }
 
 .macro-fader-card .ch-name,
 .macro-fader-card .desk-ch-name {
     background: transparent !important;
-    color: #fff !important;
+    color: #ffffff !important;
+    font-family: var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
     border: none !important;
     box-shadow: none !important;
-    backdrop-filter: none !important;
-    font-size: 11px;
-    white-space: normal;
-    line-height: 1.1;
-    text-align: center;
-    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    white-space: normal !important;
 }
 
 .macro-ch-clickable-zone {
@@ -4547,8 +4561,9 @@ body.is-portrait .dyn-box {
 }
 
 .fader-card-desktop.macro-fader-card .macro-fader-nudge-wrap {
-    gap: 5px;
-    padding: 5px;
+    gap: 8px;
+    padding: 0 5px;
+    margin-top: 8px;
 }
 
 .fader-card.macro-fader-card .macro-fader-nudge-wrap {
@@ -4557,19 +4572,30 @@ body.is-portrait .dyn-box {
 }
 
 .macro-fader-config-wrap {
-    padding: 10px 5px;
+    padding: 0 !important;
+    width: 90% !important;
+    margin: 4px auto !important;
+    display: flex !important;
+    box-sizing: border-box !important;
 }
 
 .macro-fader-config-btn {
-    margin: 0;
-    width: 100%;
-    height: 35px;
-    font-size: 10px;
-    background: #6a1b9a;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    width: 100% !important;
+    height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px)) !important;
+    min-height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px)) !important;
+    background: #6a1b9a !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-family: var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: 11px !important;
+    font-weight: 800 !important;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    box-sizing: border-box;
 }
 
 .macro-fader-config-btn-mobile {
@@ -4638,25 +4664,28 @@ body.is-portrait .dyn-box {
     letter-spacing: 1px;
     text-align: center;
     background: #0a0a0a;
-    color: #3a3a3a;
-    border: 1px solid #222;
+    color: #00ff00;
+    border: 1px solid #222 !important;
     border-radius: 6px;
-    margin: 4px 6px;
+    width: 90% !important;
+    margin: 4px auto !important;
     padding: 5px 4px;
     min-height: 26px;
+    height: 26px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+    box-sizing: border-box !important;
     user-select: none;
     transition: color 0.2s, text-shadow 0.2s;
     flex-shrink: 0;
 }
 
 .macro-db-display.macro-db-active {
-    color: #00ff88;
-    text-shadow: 0 0 8px rgba(0, 255, 136, 0.8), 0 0 16px rgba(0, 255, 136, 0.4);
+    color: #00ff00;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.8), 0 0 16px rgba(0, 255, 0, 0.4);
     animation: macro-db-blink-in 0.15s ease-out;
 }
 
