@@ -96,7 +96,10 @@ class ChannelStrip {
         ].filter(Boolean).join(' ');
 
         wrapper.dataset.id = cfg.id;
-        wrapper.dataset.ch = cfg.evtCh;
+        wrapper.dataset.ch = isMaster ? 'master' : (cfg.evtCh !== undefined && cfg.evtCh !== null ? cfg.evtCh : cfg.id);
+        if (cfg.partnerId !== undefined && cfg.partnerId !== null) {
+            wrapper.dataset.partnerCh = cfg.partnerId;
+        }
         wrapper.dataset.layout = cfg.layout;
         wrapper.dataset.type = cfg.type;
 

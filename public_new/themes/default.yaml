@@ -216,19 +216,19 @@ channel_strip:
     btn_nudge_text: "#cccccc"
 
     # Visor Digital de Ganho / Valor Numérico em dB (Readout)
-    db_val_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    db_val_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     db_val_font_weight: "800"
     db_val_font_size: "10.5px"
     db_val_color: "#5cacee"
 
     # Escala e Régua Analógica em dB
-    scale_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     scale_font_weight: "700"
     scale_font_size: "7.5px"
     scale_text_color: "#999999"
 
     # Panpot (L-C-R e Leitura Numérica)
-    pan_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    pan_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     pan_font_weight: "700"
     pan_font_size: "8px"
     pan_track_bg: "#222222"
@@ -236,7 +236,7 @@ channel_strip:
     pan_center_color: "#4a4a5a"
 
     # Rodapé de Roteamento e Badge de Patch I/O
-    patch_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    patch_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     patch_font_weight: "800"
     patch_font_size: "10px"
 
@@ -244,7 +244,7 @@ channel_strip:
     meters_title_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     meters_title_font_weight: "800"
     meters_title_font_size: "9px"
-    meters_badge_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    meters_badge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     meters_badge_font_weight: "800"
     meters_badge_font_size: "8.5px"
     meters_box_bg: "rgba(0, 0, 0, 0.45)"
@@ -258,7 +258,7 @@ channel_strip:
     position_title_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     position_title_font_weight: "800"
     position_title_font_size: "9px"
-    position_badge_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    position_badge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     position_badge_font_weight: "800"
     position_badge_font_size: "8.5px"
     position_box_border: "rgba(212, 175, 55, 0.4)"
@@ -268,7 +268,7 @@ channel_strip:
     macro_config_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_config_font_weight: "800"
     macro_config_font_size: "10px"
-    macro_delta_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    macro_delta_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_delta_font_weight: "800"
     macro_delta_font_size: "11px"
     macro_big_nudge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
@@ -318,7 +318,7 @@ channel_strip:
   # 2. PROPRIEDADES DESKTOP (Dimensões e Estilos Exclusivos)
   # ══════════════════════════════════════════════════════════════
   desktop:
-    card_bg: "#181818"                         # Fundo do card desktop
+    card_bg: rgb(34, 34, 34)                        # Fundo do card desktop
     card_border: "#222222"                     # Cor da borda base do card
     card_border_width: "1px"                   # Espessura da borda base do card
     desk_card_border: "#333333"                # Cor da borda dos cards no Desktop (superior, inferior e extremidades)
@@ -332,7 +332,7 @@ channel_strip:
     header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     patch_height: "23px"                       # Altura do rodapé de patch desktop
     patch_font_size: "10px"                    # Tamanho da fonte do patch no Desktop
-    patch_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    patch_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
 
     # Botões - Alturas, Fontes e Dimensões Desktop
     btn_on_height: "40px"                      # Altura do botão ON no desktop
@@ -362,9 +362,9 @@ channel_strip:
     name_display_font_size: "10px"             # Tamanho da fonte do nome no Desktop
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome no Desktop
     db_val_font_size: "10.5px"                 # Tamanho da fonte do dB no Desktop
-    db_val_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    db_val_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     scale_font_size: "7.5px"                   # Tamanho da régua no Desktop
-    scale_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     volume_geral_width: "70px"                 # Largura mais fina específica para Volume Geral (70px)
 
   # ══════════════════════════════════════════════════════════════
@@ -406,11 +406,11 @@ channel_strip:
     macro_reset_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
 
     db_font_size: "18px"                       # Tamanho da fonte do valor em dB (+50%: 18px)
-    db_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    db_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     name_display_font_size: "13px"             # Tamanho da fonte do nome do canal no Mobile
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome no Mobile
     scale_font_size: "8.5px"                   # Tamanho da régua mobile
-    scale_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_big_nudge_font_size: "28px"          # Tamanho dos big nudges mobile
     fader_thumb_width: "46px"                  # Largura do fader thumb mobile
     fader_thumb_height: "38px"                 # Altura do fader thumb mobile
