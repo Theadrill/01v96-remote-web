@@ -340,8 +340,11 @@ function toggleMacroChannel(i) {
     renderMacroGrid();
 }
 
+window.openMacroConfig = openMacroConfig;
+window.openMacroConfigModal = openMacroConfig;
 window.saveMacroChannels = saveMacroChannels;
 window.clearMacroSelection = clearMacroSelection;
+window.toggleMacroChannel = toggleMacroChannel;
 
 function renderMacroFader() {
     if (typeof initUI === 'function') initUI();

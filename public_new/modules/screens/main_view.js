@@ -200,7 +200,9 @@ var MainView = (function () {
             colorBand: 'macro_silver',
             callbacks: {
                 macro_config_click: function () {
-                    if (typeof openMacroConfigModal === 'function') {
+                    if (typeof window.openMacroConfig === 'function') {
+                        window.openMacroConfig();
+                    } else if (typeof openMacroConfigModal === 'function') {
                         openMacroConfigModal();
                     }
                 },

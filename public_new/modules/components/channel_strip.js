@@ -658,11 +658,13 @@ class ChannelStrip {
         }
 
         // 10. Abertura do Modal de Configuração do Macro Fader (Desktop & Mobile)
-        const macroConfigBtn = this.element.querySelector('.macro-config-btn');
+        const macroConfigBtn = this.element.querySelector('.macro-config-btn, .macro-fader-config-btn');
         if (macroConfigBtn) {
             macroConfigBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (typeof window.openMacroConfigModal === 'function') {
+                if (typeof window.openMacroConfig === 'function') {
+                    window.openMacroConfig();
+                } else if (typeof window.openMacroConfigModal === 'function') {
                     window.openMacroConfigModal();
                 }
                 this._emitEvent('macro_config_click', { mode: this.config.mode || 'macro' });
