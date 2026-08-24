@@ -152,60 +152,132 @@ channel_strip:
     group_aux_color: "#7e22ce"         # Roxo/Púrpura - Barramento AUX
     master_color: "#dc3545"            # Vermelho - Master Stereo PA
 
-    # Botão ON / MUTE (Cores & Comportamento)
-    btn_on_bg: "#333333"               # Fundo do botão ON desligado
-    btn_on_text: "#888888"             # Texto do botão ON desligado
-    btn_on_active_bg: "#ff4500"        # Fundo do botão ON ligado (ativo)
-    btn_on_active_text: "#ffffff"      # Texto do botão ON ligado
-    btn_on_active_glow: "rgba(255, 69, 0, 0.45)" # Brilho/Glow do botão ON ligado
+    # Cores de Fundo do Header Desktop por Grupo (OFF e ON)
+    group_1_header_bg: "#003a5e"       # Fundo do cabeçalho Grupo 1 (OFF)
+    group_1_header_on_bg: "#00568a"    # Fundo do cabeçalho Grupo 1 (ON)
+    group_2_header_bg: "#004a30"       # Fundo do cabeçalho Grupo 2 (OFF)
+    group_2_header_on_bg: "#006b41"    # Fundo do cabeçalho Grupo 2 (ON)
+    group_st_header_bg: "#14283d"      # Fundo do cabeçalho ST IN (OFF)
+    group_st_header_on_bg: "#1d3c5c"   # Fundo do cabeçalho ST IN (ON)
+    group_mix_header_bg: "#332800"     # Fundo do cabeçalho MIX (OFF)
+    group_mix_header_on_bg: "#4d3c00"  # Fundo do cabeçalho MIX (ON)
+    group_bus_header_bg: "#002e27"     # Fundo do cabeçalho BUS (OFF)
+    group_bus_header_on_bg: "#00453a"  # Fundo do cabeçalho BUS (ON)
+    master_header_bg: "#4a0014"        # Fundo do cabeçalho Master (OFF)
+    master_header_on_bg: "#5d1a1a"     # Fundo do cabeçalho Master (ON)
 
-    # Botão SOLO / CUE (Cores)
-    btn_solo_bg: "#333333"             # Fundo do botão SOLO desligado
-    btn_solo_text: "#888888"           # Texto do botão SOLO desligado
-    btn_solo_active_bg: "#22c55e"      # Fundo do botão SOLO ligado (verde)
-    btn_solo_active_text: "#ffffff"    # Texto do botão SOLO ligado (branco)
-    btn_solo_active_glow: "rgba(34, 197, 94, 0.45)" # Brilho verde do botão SOLO ligado
+    # ── Font Face & Tipografia de Cada Elemento de Texto ──
 
-    # Botão PRE / POST
-    btn_pre_bg: "#6b21a8"              # Fundo do botão PRE/POST
-    btn_pre_text: "#ffffff"            # Cor do texto do botão PRE/POST
-    btn_pre_border: "#9333ea"          # Borda do botão PRE/POST
+    # Header / Identificação do Canal (Número / Rótulo)
+    header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    header_font_weight: "800"
+    header_font_size: "11px"
+
+    # Display OLED Digital de Nome do Canal
+    name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    name_display_font_weight: "700"
+    name_display_font_size: "10px"
+    name_display_bg: "#000000"
+    name_display_color: "#00ff00"
+
+    # Botão SOLO / CUE
+    btn_solo_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    btn_solo_font_weight: "800"
+    btn_solo_font_size: "10px"
+    btn_solo_bg: "#333333"
+    btn_solo_text: "#888888"
+    btn_solo_active_bg: "#22c55e"
+    btn_solo_active_text: "#ffffff"
+    btn_solo_active_glow: "rgba(34, 197, 94, 0.45)"
+
+    # Botão PRE / POST (Envios Auxiliares)
+    btn_pre_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    btn_pre_font_weight: "800"
+    btn_pre_font_size: "10px"
+    btn_pre_bg: "#6b21a8"
+    btn_pre_text: "#ffffff"
+    btn_pre_border: "#9333ea"
+
+    # Botão ON / MUTE
+    btn_on_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    btn_on_font_weight: "900"
+    btn_on_font_size: "10px"
+    btn_on_bg: "#333333"
+    btn_on_text: "#888888"
+    btn_on_active_bg: "#ffc107"
+    btn_on_active_text: "#000000"
+    btn_on_active_glow: "rgba(255, 69, 0, 0.4)"
 
     # Botões de Nudge (+ / -)
-    btn_nudge_bg: "#333333"            # Fundo dos botões de Nudge
-    btn_nudge_text: "#cccccc"          # Cor do símbolo (+/-)
+    btn_nudge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    btn_nudge_font_weight: "800"
+    btn_nudge_font_size: "13px"
+    btn_nudge_bg: "#333333"
+    btn_nudge_text: "#cccccc"
 
-    # Visores e Tipografia
-    header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do cabeçalho
-    patch_font_family: 'Consolas, Menlo, "Courier New", monospace'       # Tipografia da área de patch/roteamento
-    name_display_bg: "#000000"         # Fundo da caixa de identificação do canal
-    name_display_color: "#00ff00"      # Cor do nome do canal (verde display)
-    db_val_color: "#5cacee"            # Cor do valor numérico de dB
+    # Visor Digital de Ganho / Valor Numérico em dB (Readout)
+    db_val_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    db_val_font_weight: "800"
+    db_val_font_size: "10.5px"
+    db_val_color: "#5cacee"
 
-    # Fader e Escala
-    fader_track_color: "#555555"       # Cor da linha central do trilho do fader
-    scale_text_color: "#999999"        # Cor dos números da escala em dB
+    # Escala e Régua Analógica em dB
+    scale_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    scale_font_weight: "700"
+    scale_font_size: "7.5px"
+    scale_text_color: "#999999"
 
-    # Indicador de Panpot (L-C-R)
-    pan_track_bg: "#222222"            # Fundo da trilha horizontal do Pan
-    pan_thumb_color: "#a855f7"         # Cor do cursor de Panpot (roxo)
-    pan_center_color: "#4a4a5a"        # Cor do cursor quando centralizado (C)
+    # Panpot (L-C-R e Leitura Numérica)
+    pan_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    pan_font_weight: "700"
+    pan_font_size: "8px"
+    pan_track_bg: "#222222"
+    pan_thumb_color: "#a855f7"
+    pan_center_color: "#4a4a5a"
 
-    # Medidores e LED de Pico
-    peak_led_color: "#ff0000"          # Cor do LED de Peak aceso
-    peak_led_glow: "#ff4444"           # Brilho do LED de Peak aceso
+    # Rodapé de Roteamento e Badge de Patch I/O
+    patch_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    patch_font_weight: "800"
+    patch_font_size: "10px"
 
-    # Painel de Medidores do Master & Painel de Posição do Auxiliar
-    meters_box_bg: "rgba(0, 0, 0, 0.45)"       # Fundo do bloco de medidores no master
-    meters_box_border: "rgba(255, 255, 255, 0.15)" # Borda do bloco de medidores
-    meters_box_radius: "4px"                   # Arredondamento do bloco de medidores
-    meters_badge_bg: "#1e293b"                 # Fundo dos badges de PRE/POST
-    meters_badge_text: "#38bdf8"               # Cor do texto dos badges (azul neon)
-    meters_badge_border: "#334155"             # Borda dos badges
-    position_box_border: "rgba(212, 175, 55, 0.4)" # Borda dourada do painel de posição
-    position_title_color: "#d4af37"            # Cor do título POSIÇÃO (dourado/âmbar)
+    # Bloco de Medidores do Master (Feature Box)
+    meters_title_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    meters_title_font_weight: "800"
+    meters_title_font_size: "9px"
+    meters_badge_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    meters_badge_font_weight: "800"
+    meters_badge_font_size: "8.5px"
+    meters_box_bg: "rgba(0, 0, 0, 0.45)"
+    meters_box_border: "rgba(255, 255, 255, 0.15)"
+    meters_box_radius: "4px"
+    meters_badge_bg: "#1e293b"
+    meters_badge_text: "#38bdf8"
+    meters_badge_border: "#334155"
 
-    # Macro Fader Técnico (Variação 4)
+    # Bloco de Posição do Auxiliar (Feature Box)
+    position_title_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    position_title_font_weight: "800"
+    position_title_font_size: "9px"
+    position_badge_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    position_badge_font_weight: "800"
+    position_badge_font_size: "8.5px"
+    position_box_border: "rgba(212, 175, 55, 0.4)"
+    position_title_color: "#d4af37"
+
+    # Macro Fader Técnico (Configuração, Delta dB, Big Nudges e Botão Zerar)
+    macro_config_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    macro_config_font_weight: "800"
+    macro_config_font_size: "10px"
+    macro_delta_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    macro_delta_font_weight: "800"
+    macro_delta_font_size: "11px"
+    macro_big_nudge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    macro_big_nudge_font_weight: "900"
+    macro_big_nudge_font_size: "24px"
+    macro_reset_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    macro_reset_font_weight: "800"
+    macro_reset_font_size: "10px"
+
     macro_bg: "#d4d4d8"                        # Fundo prateado/cinza claro do card Macro
     macro_border: "#27272a"                    # Borda escura do card Macro
     macro_header_bg: "#3f3f46"                 # Fundo do cabeçalho do Macro
@@ -227,6 +299,11 @@ channel_strip:
     macro_reset_text: "#ffffff"                # Texto do botão ZERAR
     macro_reset_radius: "6px"                  # Arredondamento do botão ZERAR
 
+    # Medidores e LED de Pico
+    peak_led_color: "#ff0000"                  # Cor do LED de Peak aceso
+    peak_led_glow: "#ff4444"                   # Brilho do LED de Peak aceso
+    fader_track_color: "#555555"               # Cor da linha central do trilho do fader
+
     # Canal Travado (Channel Lock)
     lock_border_color: "#ff4444"               # Borda vermelha de canal travado
     lock_badge_bg: "#ff4444"                   # Fundo do badge de cadeado
@@ -243,30 +320,51 @@ channel_strip:
   desktop:
     card_bg: "#181818"                         # Fundo do card desktop
     card_border: "#222222"                     # Cor da borda base do card
-    card_border_width: "0px"                   # Espessura da borda base do card
+    card_border_width: "1px"                   # Espessura da borda base do card
     desk_card_border: "#333333"                # Cor da borda dos cards no Desktop (superior, inferior e extremidades)
-    desk_card_border_width: "0px"              # Espessura da borda dos cards no Desktop
-    desk_card_divider: "none"                  # Divisor entre canais no Desktop (ex: "none" ou "1px solid rgba(255, 255, 255, 0.08)")
-    card_radius: "6px"                         # Arredondamento do card
+    desk_card_border_width: "1px"              # Espessura da borda dos cards no Desktop
+    desk_card_divider: "1px solid #111111"     # Divisor fino entre canais colados no Desktop
+    card_radius: "0px"                         # Arredondamento do card
     card_on_bg: "rgba(255, 69, 0, 0.08)"       # Fundo sutil de destaque quando o canal está ON
-    header_height: "25px"                      # Altura do cabeçalho desktop
+    header_height: "26px"                      # Altura do cabeçalho desktop
+    header_font_size: "11px"                   # Tamanho da fonte do cabeçalho no Desktop
+    header_font_weight: "800"                  # Peso da fonte do cabeçalho no Desktop
+    header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     patch_height: "23px"                       # Altura do rodapé de patch desktop
+    patch_font_size: "10px"                    # Tamanho da fonte do patch no Desktop
+    patch_font_family: 'Consolas, Menlo, "Courier New", monospace'
 
-    # Botões - Alturas e Dimensões Desktop
+    # Botões - Alturas, Fontes e Dimensões Desktop
     btn_on_height: "40px"                      # Altura do botão ON no desktop
     btn_on_radius: "4px"                       # Arredondamento do botão ON no desktop
-    btn_solo_height: "18px"                    # Altura do botão SOLO no desktop
+    btn_on_font_size: "10px"                   # Tamanho da fonte do botão ON no desktop
+    btn_on_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    btn_solo_height: "28px"                    # Altura do botão SOLO no desktop
     btn_solo_radius: "4px"                     # Arredondamento do botão SOLO no desktop
+    btn_solo_font_size: "10px"                 # Tamanho da fonte do botão SOLO no desktop
+    btn_solo_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_pre_height: "18px"                     # Altura do botão PRE/POST no desktop
     btn_pre_radius: "4px"                      # Arredondamento do botão PRE/POST no desktop
+    btn_pre_font_size: "10px"                  # Tamanho da fonte do botão PRE/POST no desktop
+    btn_pre_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_nudge_size: "22px"                     # Tamanho / altura dos botões de nudge no desktop
     btn_nudge_radius: "50%"                    # Arredondamento dos botões de nudge no desktop
+    btn_nudge_font_size: "13px"                # Tamanho da fonte do nudge no desktop
+    btn_nudge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_config_btn_height: "24px"            # Altura do botão CONFIG (Macro Fader)
+    macro_config_font_size: "10px"             # Tamanho da fonte do botão CONFIG no desktop
+    macro_config_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_reset_btn_height: "24px"             # Altura do botão ZERAR (Macro Fader)
+    macro_reset_font_size: "10px"              # Tamanho da fonte do botão ZERAR no desktop
+    macro_reset_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
 
     name_display_radius: "4px"                 # Arredondamento da caixa de nome no desktop
     name_display_font_size: "10px"             # Tamanho da fonte do nome no Desktop
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome no Desktop
+    db_val_font_size: "10.5px"                 # Tamanho da fonte do dB no Desktop
+    db_val_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    scale_font_size: "7.5px"                   # Tamanho da régua no Desktop
+    scale_font_family: 'Consolas, Menlo, "Courier New", monospace'
     volume_geral_width: "70px"                 # Largura mais fina específica para Volume Geral (70px)
 
   # ══════════════════════════════════════════════════════════════
@@ -280,19 +378,40 @@ channel_strip:
     card_border_width: "1px"                   # Espessura da borda do contorno do card mobile
     card_border_top_width: "3px"               # Espessura da borda superior cromática de grupo no mobile
 
+    header_height: "30px"                      # Altura do cabeçalho mobile
+    header_font_size: "13px"                   # Tamanho da fonte do cabeçalho mobile
+    header_font_weight: "800"                  # Peso da fonte do cabeçalho mobile
+    header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+
     # Botões - Alturas e Dimensões Mobile
     btn_on_height: "38px"                      # Altura do botão ON no mobile (38px)
+    btn_on_font_size: "12px"                   # Tamanho da fonte do botão ON mobile
+    btn_on_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_solo_height: "38px"                    # Altura do botão SOLO no mobile (38px)
+    btn_solo_font_size: "11px"                 # Tamanho da fonte do botão SOLO mobile
+    btn_solo_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_pre_height: "38px"                     # Altura do botão PRE/POST no mobile (38px)
+    btn_pre_font_size: "11px"                  # Tamanho da fonte do botão PRE/POST mobile
+    btn_pre_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_medidores_height: "38px"               # Altura do botão MEDIDORES / POSIÇÃO no mobile (38px)
     btn_radius: "6px"                          # Arredondamento dos botões ON/SOLO/PRE/MEDIDORES mobile
     nudge_btn_size: "50px"                     # Tamanho aumentado dos botões de nudge (+50%: 50px)
+    nudge_font_size: "24px"                    # Tamanho do símbolo de nudge mobile
+    nudge_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_config_btn_height: "28px"            # Altura do botão CONFIG (Macro Mobile)
+    macro_config_font_size: "12px"             # Tamanho da fonte do botão CONFIG mobile
+    macro_config_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_reset_btn_height: "28px"             # Altura do botão ZERAR (Macro Mobile)
+    macro_reset_font_size: "12px"              # Tamanho da fonte do botão ZERAR mobile
+    macro_reset_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
 
     db_font_size: "18px"                       # Tamanho da fonte do valor em dB (+50%: 18px)
+    db_font_family: 'Consolas, Menlo, "Courier New", monospace'
     name_display_font_size: "13px"             # Tamanho da fonte do nome do canal no Mobile
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' # Tipografia do nome no Mobile
+    scale_font_size: "8.5px"                   # Tamanho da régua mobile
+    scale_font_family: 'Consolas, Menlo, "Courier New", monospace'
+    macro_big_nudge_font_size: "28px"          # Tamanho dos big nudges mobile
     fader_thumb_width: "46px"                  # Largura do fader thumb mobile
     fader_thumb_height: "38px"                 # Altura do fader thumb mobile
     fader_thumb_radius: "6px"                  # Arredondamento do fader thumb mobile

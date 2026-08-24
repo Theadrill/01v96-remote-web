@@ -90,7 +90,7 @@ var MainView = (function () {
                 fadersContainer.appendChild(mobSep);
             }
 
-            var chTitle = isPaired ? `CH ${i + 1} + ${i + 2}` : `CH ${i + 1}`;
+            var chTitle = isPaired ? `${i + 1} + ${i + 2}` : `${i + 1}`;
             var chName = _getResolvedName(i);
             var chColorBand = isPaired ? 'paired_green' : (i < 16 ? 'blue' : 'green');
             var chVal = state.value || 0;

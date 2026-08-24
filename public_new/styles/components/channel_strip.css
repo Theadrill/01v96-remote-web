@@ -18,78 +18,159 @@
 /* Mapeamento Base de Variáveis CSS com Fallbacks */
 :root {
     --strip-card-bg: #181818;
-    --strip-card-border: #2c2c2c;
-    --strip-card-radius: 6px;
+    --strip-card-border: #222222;
+    --strip-card-border-width: 1px;
+    --strip-desk-card-border: #333333;
+    --strip-desk-card-border-width: 1px;
+    --strip-desk-card-divider: 1px solid #111111;
+    --strip-card-radius: 0px;
     --strip-card-on-bg: rgba(255, 69, 0, 0.08);
-    --strip-header-height: 25px;
+    --strip-header-height: 26px;
     --strip-patch-height: 23px;
 
-    --strip-group-1-color: #0088cc;
-    --strip-group-2-color: #00a86b;
-    --strip-group-st-color: #0088cc;
-    --strip-group-mix-color: #d4af37;
+    /* Cores de Grupos / Barramentos */
+    --strip-group-1-color: #00adef;
+    --strip-group-2-color: #00ff88;
+    --strip-group-st-color: #4a90e2;
+    --strip-group-mix-color: #d4a017;
     --strip-group-bus-color: #00b396;
     --strip-group-aux-color: #7e22ce;
-    --strip-master-color: #4a121a;
+    --strip-master-color: #dc3545;
 
-    --strip-btn-on-bg: #2b2b2b;
+    /* Cores de Cabeçalho Desktop por Grupo (OFF e ON) */
+    --strip-g1-header-bg: #003a5e;
+    --strip-g1-header-on-bg: #00568a;
+    --strip-g2-header-bg: #004a30;
+    --strip-g2-header-on-bg: #006b41;
+    --strip-gst-header-bg: #14283d;
+    --strip-gst-header-on-bg: #1d3c5c;
+    --strip-gmix-header-bg: #332800;
+    --strip-gmix-header-on-bg: #4d3c00;
+    --strip-gbus-header-bg: #002e27;
+    --strip-gbus-header-on-bg: #00453a;
+    --strip-master-header-bg: #4a0014;
+    --strip-master-header-on-bg: #5d1a1a;
+    --strip-master-header-text: #ff6b81;
+
+    /* Botão ON / MUTE */
+    --strip-btn-on-bg: #333333;
     --strip-btn-on-text: #888888;
-    --strip-btn-on-active-bg: #f59e0b;
+    --strip-btn-on-active-bg: #ffc107;
     --strip-btn-on-active-text: #000000;
-    --strip-btn-on-active-glow: rgba(245, 158, 11, 0.45);
+    --strip-btn-on-active-glow: rgba(255, 69, 0, 0.4);
     --strip-btn-on-radius: 4px;
+    --strip-btn-on-height: 40px;
+    --strip-btn-on-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-btn-on-font-weight: 900;
+    --strip-btn-on-font-size: 10px;
 
-    --strip-btn-solo-bg: #222222;
+    /* Botão SOLO / CUE */
+    --strip-btn-solo-bg: #333333;
     --strip-btn-solo-text: #888888;
     --strip-btn-solo-active-bg: #22c55e;
     --strip-btn-solo-active-text: #ffffff;
     --strip-btn-solo-active-glow: rgba(34, 197, 94, 0.45);
     --strip-btn-solo-radius: 4px;
+    --strip-btn-solo-height: 28px;
+    --strip-btn-solo-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-btn-solo-font-weight: 800;
+    --strip-btn-solo-font-size: 10px;
 
+    /* Botão PRE / POST */
     --strip-btn-pre-bg: #6b21a8;
     --strip-btn-pre-text: #ffffff;
     --strip-btn-pre-border: #9333ea;
     --strip-btn-pre-radius: 4px;
+    --strip-btn-pre-height: 18px;
+    --strip-btn-pre-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-btn-pre-font-weight: 800;
+    --strip-btn-pre-font-size: 10px;
 
-    --strip-btn-nudge-bg: #252a38;
+    /* Botões de Nudge (+ / -) */
+    --strip-btn-nudge-bg: #333333;
     --strip-btn-nudge-text: #cccccc;
     --strip-btn-nudge-radius: 50%;
+    --strip-desk-nudge-size: 22px;
+    --strip-btn-nudge-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-btn-nudge-font-weight: 800;
+    --strip-btn-nudge-font-size: 13px;
 
+    /* Tipografia de Cabeçalho / Identificação do Canal */
     --strip-header-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    --strip-patch-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-header-font-weight: 800;
+    --strip-header-font-size: 11px;
+
+    /* Display OLED Digital de Nome */
     --strip-name-display-bg: #000000;
     --strip-name-display-color: #00ff00;
     --strip-name-display-radius: 4px;
-    --strip-db-val-color: #00e5ff;
+    --strip-name-display-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-name-display-font-weight: 700;
+    --strip-name-display-font-size: 10px;
 
-    --strip-fader-track-color: #111111;
-    --strip-scale-text-color: #888888;
+    /* Visor Digital de Ganho dB */
+    --strip-db-val-color: #5cacee;
+    --strip-db-val-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-db-val-font-weight: 800;
+    --strip-db-val-font-size: 10.5px;
 
-    --strip-pan-track-bg: #1c1c1c;
+    /* Escala e Régua Analógica em dB */
+    --strip-scale-text-color: #999999;
+    --strip-scale-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-scale-font-weight: 700;
+    --strip-scale-font-size: 7.5px;
+    --strip-fader-track-color: #555555;
+
+    /* Panpot */
+    --strip-pan-track-bg: #222222;
     --strip-pan-thumb-color: #a855f7;
     --strip-pan-center-color: #4a4a5a;
+    --strip-pan-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-pan-font-weight: 700;
+    --strip-pan-font-size: 8px;
 
+    /* Rodapé de Patch I/O */
+    --strip-patch-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-patch-font-weight: 800;
+    --strip-patch-font-size: 10px;
+
+    /* Medidores e LED de Pico */
     --strip-peak-led-color: #ff0000;
     --strip-peak-led-glow: #ff4444;
 
+    /* Canal Travado e Desabilitado */
     --strip-lock-border-color: #ff4444;
     --strip-lock-badge-bg: #ff4444;
     --strip-lock-badge-text: #ffffff;
     --strip-lock-overlay-bg: rgba(0, 0, 0, 0.58);
-
     --strip-disabled-opacity: 0.45;
     --strip-disabled-filter: grayscale(80%);
 
+    /* Bloco de Medidores do Master */
     --strip-meters-box-bg: rgba(0, 0, 0, 0.45);
     --strip-meters-box-border: rgba(255, 255, 255, 0.15);
     --strip-meters-box-radius: 4px;
     --strip-meters-badge-bg: #1e293b;
     --strip-meters-badge-text: #38bdf8;
     --strip-meters-badge-border: #334155;
+    --strip-meters-title-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-meters-title-font-weight: 800;
+    --strip-meters-title-font-size: 9px;
+    --strip-meters-badge-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-meters-badge-font-weight: 800;
+    --strip-meters-badge-font-size: 8.5px;
 
+    /* Bloco de Posição do Auxiliar */
     --strip-position-box-border: rgba(212, 175, 55, 0.4);
     --strip-position-title-color: #d4af37;
+    --strip-position-title-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-position-title-font-weight: 800;
+    --strip-position-title-font-size: 9px;
+    --strip-position-badge-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-position-badge-font-weight: 800;
+    --strip-position-badge-font-size: 8.5px;
 
+    /* Macro Fader */
     --strip-macro-bg: #d4d4d8;
     --strip-macro-border: #27272a;
     --strip-macro-header-bg: #3f3f46;
@@ -98,19 +179,35 @@
     --strip-macro-config-hover-bg: #7e22ce;
     --strip-macro-config-text: #ffffff;
     --strip-macro-config-radius: 6px;
+    --strip-macro-config-btn-height: 24px;
+    --strip-macro-config-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-macro-config-font-weight: 800;
+    --strip-macro-config-font-size: 10px;
+
     --strip-macro-delta-bg: #09090b;
     --strip-macro-delta-text: #52525b;
     --strip-macro-delta-active-text: #38bdf8;
+    --strip-macro-delta-font-family: Consolas, Menlo, "Courier New", monospace;
+    --strip-macro-delta-font-weight: 800;
+    --strip-macro-delta-font-size: 11px;
+
     --strip-macro-big-nudge-bg: #ffffff;
     --strip-macro-big-nudge-text: #000000;
     --strip-macro-big-nudge-border: #a1a1aa;
     --strip-macro-big-nudge-radius: 12px;
     --strip-macro-big-nudge-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    --strip-macro-big-nudge-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-macro-big-nudge-font-weight: 900;
+    --strip-macro-big-nudge-font-size: 24px;
 
     --strip-macro-reset-bg: #dc2626;
     --strip-macro-reset-hover-bg: #ef4444;
     --strip-macro-reset-text: #ffffff;
     --strip-macro-reset-radius: 6px;
+    --strip-macro-reset-btn-height: 24px;
+    --strip-macro-reset-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --strip-macro-reset-font-weight: 800;
+    --strip-macro-reset-font-size: 10px;
 
     --strip-volume-geral-width: 70px;
 }
@@ -137,14 +234,15 @@
    ========================================================================= */
 
 .channel-strip-wrapper.desk-strip {
-    width: 85px;
-    min-width: 85px;
+    width: 86px;
+    min-width: 86px;
+    max-width: 86px;
+    flex: 0 0 86px;
     height: 100%;
     max-height: 100%;
     min-height: 0;
-    flex: 1;
-    border-radius: 0;
-    border-right: var(--strip-desk-card-divider, 1px solid rgba(255, 255, 255, 0.08));
+    border-radius: var(--strip-card-radius, 0px);
+    border-right: var(--strip-desk-card-divider, 1px solid #111111);
     border-left: none;
     border-top: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
     border-bottom: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
@@ -156,20 +254,18 @@
 
 .channel-strip-wrapper.desk-strip:first-child {
     border-left: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
-    border-top-left-radius: var(--strip-card-radius, 6px);
-    border-bottom-left-radius: var(--strip-card-radius, 6px);
 }
 
 .channel-strip-wrapper.desk-strip:last-child {
     border-right: var(--strip-desk-card-border-width, 1px) solid var(--strip-desk-card-border, #333333);
-    border-top-right-radius: var(--strip-card-radius, 6px);
-    border-bottom-right-radius: var(--strip-card-radius, 6px);
 }
 
 /* Canal Pareado Desktop */
 .channel-strip-wrapper.desk-strip.paired-channel {
     width: 108px;
     min-width: 108px;
+    max-width: 108px;
+    flex: 0 0 108px;
     border: 1px solid #10b981;
     box-shadow: inset 0 0 6px rgba(16, 185, 129, 0.15);
 }
@@ -179,113 +275,183 @@
     width: var(--strip-volume-geral-width, 70px) !important;
     min-width: var(--strip-volume-geral-width, 70px) !important;
     max-width: var(--strip-volume-geral-width, 70px) !important;
+    flex: 0 0 var(--strip-volume-geral-width, 70px) !important;
 }
 
-/* Identidades Cromáticas Desktop (Bordas de Destaque Superior/Inferior, Header Navy Escuro & Footer Patch Full Bleed) */
+/* Identidades Cromáticas Desktop: Header OFF/ON por Grupo e Footer Patch Full Bleed */
+
+/* Grupo 1 (CH 1-16) */
 .channel-strip-wrapper.desk-strip.band-blue .desk-label-wrapper {
-    background: #002b49;
-    color: #fff;
-    border-top: 2.5px solid #00e5ff;
+    background: var(--strip-g1-header-bg, #003a5e);
+    color: var(--strip-group-1-color, #00adef);
+    border-top: 2px solid var(--strip-group-1-color, #00adef);
+}
+.channel-strip-wrapper.desk-strip.band-blue .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-blue.is-on .desk-label-wrapper {
+    background: var(--strip-g1-header-on-bg, #00568a);
+    color: var(--strip-group-1-color, #00adef);
+    font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-blue .desk-footer-zone .desk-patch-area {
     background: #002b49;
-    color: #00e5ff;
-    border-bottom: 2.5px solid #00e5ff;
+    color: var(--strip-group-1-color, #00adef);
+    border-bottom: 2px solid var(--strip-group-1-color, #00adef);
 }
 
-.channel-strip-wrapper.desk-strip.band-st .desk-label-wrapper,
-.channel-strip-wrapper.desk-strip.band-st_in .desk-label-wrapper {
-    background: #002b49;
-    color: #fff;
-    border-top: 2.5px solid var(--strip-group-st-color, #4a90e2);
-}
-.channel-strip-wrapper.desk-strip.band-st .desk-footer-zone .desk-patch-area,
-.channel-strip-wrapper.desk-strip.band-st_in .desk-footer-zone .desk-patch-area {
-    background: #002b49;
-    color: var(--strip-group-st-color, #4a90e2);
-    border-bottom: 2.5px solid var(--strip-group-st-color, #4a90e2);
-}
-
+/* Grupo 2 (CH 17-32) */
 .channel-strip-wrapper.desk-strip.band-green .desk-label-wrapper {
-    background: #003822;
-    color: #fff;
-    border-top: 2.5px solid #00ff88;
+    background: var(--strip-g2-header-bg, #004a30);
+    color: var(--strip-group-2-color, #00ff88);
+    border-top: 2px solid var(--strip-group-2-color, #00ff88);
+}
+.channel-strip-wrapper.desk-strip.band-green .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-green.is-on .desk-label-wrapper {
+    background: var(--strip-g2-header-on-bg, #006b41);
+    color: var(--strip-group-2-color, #00ff88);
+    font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-green .desk-footer-zone .desk-patch-area {
     background: #003822;
-    color: #00ff88;
-    border-bottom: 2.5px solid #00ff88;
+    color: var(--strip-group-2-color, #00ff88);
+    border-bottom: 2px solid var(--strip-group-2-color, #00ff88);
 }
 
+/* Grupo ST IN */
+.channel-strip-wrapper.desk-strip.band-st .desk-label-wrapper,
+.channel-strip-wrapper.desk-strip.band-st_in .desk-label-wrapper {
+    background: var(--strip-gst-header-bg, #14283d);
+    color: var(--strip-group-st-color, #5cacee);
+    border-top: 2px solid var(--strip-group-st-color, #4a90e2);
+}
+.channel-strip-wrapper.desk-strip.band-st .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-st_in .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-st.is-on .desk-label-wrapper,
+.channel-strip-wrapper.desk-strip.band-st_in.is-on .desk-label-wrapper {
+    background: var(--strip-gst-header-on-bg, #1d3c5c);
+    color: var(--strip-group-st-color, #5cacee);
+    font-weight: 900;
+}
+.channel-strip-wrapper.desk-strip.band-st .desk-footer-zone .desk-patch-area,
+.channel-strip-wrapper.desk-strip.band-st_in .desk-footer-zone .desk-patch-area {
+    background: #14283d;
+    color: var(--strip-group-st-color, #5cacee);
+    border-bottom: 2px solid var(--strip-group-st-color, #4a90e2);
+}
+
+/* Grupo Paired Green */
 .channel-strip-wrapper.desk-strip.band-paired_green .desk-label-wrapper {
-    background: #023824;
-    color: #fff;
-    border-top: 2.5px solid #10b981;
+    background: var(--strip-g2-header-bg, #004a30);
+    color: var(--strip-group-2-color, #00ff88);
+    border-top: 2px solid #10b981;
+}
+.channel-strip-wrapper.desk-strip.band-paired_green .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-paired_green.is-on .desk-label-wrapper {
+    background: var(--strip-g2-header-on-bg, #006b41);
+    color: var(--strip-group-2-color, #00ff88);
+    font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-paired_green .desk-footer-zone .desk-patch-area {
     background: #023824;
     color: #10b981;
-    border-bottom: 2.5px solid #10b981;
+    border-bottom: 2px solid #10b981;
 }
 
+/* Grupo MIX (Masters 1-8) */
 .channel-strip-wrapper.desk-strip.band-amber .desk-label-wrapper {
-    background: #4a3800;
-    color: #ffd700;
-    border-top: 2.5px solid #f59e0b;
+    background: var(--strip-gmix-header-bg, #332800);
+    color: var(--strip-group-mix-color, #ffcc00);
+    border-top: 2px solid var(--strip-group-mix-color, #d4a017);
+}
+.channel-strip-wrapper.desk-strip.band-amber .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-amber.is-on .desk-label-wrapper {
+    background: var(--strip-gmix-header-on-bg, #4d3c00);
+    color: var(--strip-group-mix-color, #ffcc00);
+    font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-amber .desk-footer-zone .desk-patch-area {
-    background: #4a3800;
-    color: #ffd700;
-    border-bottom: 2.5px solid #f59e0b;
+    background: #332800;
+    color: var(--strip-group-mix-color, #ffcc00);
+    border-bottom: 2px solid var(--strip-group-mix-color, #d4a017);
 }
 
+/* Grupo BUS (Masters 1-8) */
 .channel-strip-wrapper.desk-strip.band-cyan .desk-label-wrapper {
-    background: #003d33;
-    color: #00ffcc;
-    border-top: 2.5px solid var(--strip-group-bus-color, #00b396);
+    background: var(--strip-gbus-header-bg, #002e27);
+    color: var(--strip-group-bus-color, #00ffcc);
+    border-top: 2px solid var(--strip-group-bus-color, #00b396);
+}
+.channel-strip-wrapper.desk-strip.band-cyan .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-cyan.is-on .desk-label-wrapper {
+    background: var(--strip-gbus-header-on-bg, #00453a);
+    color: var(--strip-group-bus-color, #00ffcc);
+    font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-cyan .desk-footer-zone .desk-patch-area {
-    background: #003d33;
-    color: #00ffcc;
-    border-bottom: 2.5px solid var(--strip-group-bus-color, #00b396);
+    background: #002e27;
+    color: var(--strip-group-bus-color, #00ffcc);
+    border-bottom: 2px solid var(--strip-group-bus-color, #00b396);
 }
 
+/* Grupo AUX */
 .channel-strip-wrapper.desk-strip.band-purple .desk-label-wrapper {
     background: #2b0942;
     color: #e9d5ff;
-    border-top: 2.5px solid #a855f7;
+    border-top: 2px solid var(--strip-group-aux-color, #7e22ce);
+}
+.channel-strip-wrapper.desk-strip.band-purple .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-purple.is-on .desk-label-wrapper {
+    background: #3f1060;
+    color: #ffffff;
+    font-weight: 900;
 }
 .channel-strip-wrapper.desk-strip.band-purple .desk-footer-zone .desk-patch-area {
     background: #2b0942;
     color: #e9d5ff;
-    border-bottom: 2.5px solid #a855f7;
+    border-bottom: 2px solid var(--strip-group-aux-color, #7e22ce);
 }
 
-.channel-strip-wrapper.desk-strip.band-wine {
+/* Master Stereo PA */
+.channel-strip-wrapper.desk-strip.band-wine,
+.channel-strip-wrapper.desk-strip.is-master {
     background: #2a0a0f !important;
 }
-.channel-strip-wrapper.desk-strip.band-wine .desk-label-wrapper {
-    background: #4a0014;
-    color: #fff;
-    border-top: 2.5px solid #e11d48;
+.channel-strip-wrapper.desk-strip.band-wine .desk-label-wrapper,
+.channel-strip-wrapper.desk-strip.is-master .desk-label-wrapper {
+    background: var(--strip-master-header-bg, #4a0014);
+    color: var(--strip-master-header-text, #ff6b81);
+    border-top: 2px solid var(--strip-master-color, #dc3545);
+    height: 35px;
+    min-height: 35px;
+    max-height: 35px;
 }
-.channel-strip-wrapper.desk-strip.band-wine .desk-footer-zone .desk-patch-area {
+.channel-strip-wrapper.desk-strip.band-wine .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.band-wine.is-on .desk-label-wrapper,
+.channel-strip-wrapper.desk-strip.is-master .desk-label-wrapper.label-on,
+.channel-strip-wrapper.desk-strip.is-master.is-on .desk-label-wrapper {
+    background: var(--strip-master-header-on-bg, #5d1a1a);
+    color: #ffffff;
+    font-weight: 900;
+}
+.channel-strip-wrapper.desk-strip.band-wine .desk-footer-zone .desk-patch-area,
+.channel-strip-wrapper.desk-strip.is-master .desk-footer-zone .desk-patch-area {
     background: #4a0014;
     color: #fca5a5;
-    border-bottom: 2.5px solid #e11d48;
+    border-bottom: 2px solid var(--strip-master-color, #dc3545);
 }
 
+/* Gray / Neutro */
 .channel-strip-wrapper.desk-strip.band-gray .desk-label-wrapper {
     background: #222;
     color: #888;
-    border-top: 2.5px solid #555;
+    border-top: 2px solid #555;
 }
 .channel-strip-wrapper.desk-strip.band-gray .desk-footer-zone .desk-patch-area {
     background: #222;
     color: #888;
-    border-bottom: 2.5px solid #555;
+    border-bottom: 2px solid #555;
 }
 
+/* Macro Fader Técnico */
 .channel-strip-wrapper.desk-strip.band-macro_silver,
 .channel-strip-wrapper.desk-strip.band-silver,
 .channel-strip-wrapper.desk-strip.is-macro {
@@ -297,7 +463,7 @@
 .channel-strip-wrapper.desk-strip.is-macro .desk-label-wrapper {
     background: var(--strip-macro-header-bg, #3f3f46);
     color: var(--strip-macro-header-text, #ffffff);
-    border-top: none;
+    border-top: 2px solid #71717a;
 }
 .channel-strip-wrapper.desk-strip.band-macro_silver .desk-footer-zone .desk-patch-area,
 .channel-strip-wrapper.desk-strip.band-silver .desk-footer-zone .desk-patch-area,
@@ -433,17 +599,18 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 4px;
-    font-size: 10px;
-    font-weight: 800;
+    font-size: var(--strip-header-font-size, 11px);
+    font-weight: var(--strip-header-font-weight, 800);
     font-family: var(--strip-header-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
-    background: #002b49;
-    color: #fff;
-    height: var(--strip-header-height, 25px);
-    min-height: var(--strip-header-height, 25px);
-    max-height: var(--strip-header-height, 25px);
+    background: var(--strip-g1-header-bg, #003a5e);
+    color: var(--strip-group-1-color, #00adef);
+    height: var(--strip-header-height, 26px);
+    min-height: var(--strip-header-height, 26px);
+    max-height: var(--strip-header-height, 26px);
     box-sizing: border-box;
-    border-top: 2.5px solid #00e5ff;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    border-top: 2px solid var(--strip-group-1-color, #00adef);
+    border-bottom: 1px solid #111111;
+    position: relative;
 }
 .desk-slot-left {
     width: 14px;
@@ -463,12 +630,22 @@
     font-size: 10px;
     user-select: none;
     cursor: pointer;
+    color: #888888;
     opacity: 0;
-    transition: opacity 0.15s ease;
+    pointer-events: none;
+    transition: opacity 0.15s ease, color 0.15s ease;
 }
-.desk-label-wrapper:hover .desk-slot-right,
+.desk-slot-right svg {
+    display: block;
+}
+.channel-strip-wrapper:hover .desk-slot-right,
 .channel-strip-wrapper.is-locked .desk-slot-right {
+    opacity: 0.85;
+    pointer-events: auto;
+}
+.desk-slot-right:hover {
     opacity: 1;
+    color: #ffffff;
 }
 .desk-ch-num {
     flex: 1;
@@ -486,15 +663,16 @@
 }
 .desk-btn-solo {
     width: 100%;
-    height: var(--strip-btn-solo-height, 18px);
-    min-height: var(--strip-btn-solo-height, 18px);
-    background: var(--strip-btn-solo-bg, #222222);
+    height: var(--strip-btn-solo-height, 28px);
+    min-height: var(--strip-btn-solo-height, 28px);
+    background: var(--strip-btn-solo-bg, #333333);
     color: var(--strip-btn-solo-text, #888888);
     border: 1px solid #444;
     border-radius: var(--strip-btn-solo-radius, 4px);
     padding: 0;
-    font-size: 10px;
-    font-weight: 800;
+    font-family: var(--strip-btn-solo-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-btn-solo-font-size, 10px);
+    font-weight: var(--strip-btn-solo-font-weight, 800);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -510,7 +688,7 @@
     box-shadow: 0 0 10px var(--strip-btn-solo-active-glow, rgba(34, 197, 94, 0.45)) !important;
 }
 .mob-btn-solo {
-    background: var(--strip-btn-solo-bg, #222222);
+    background: var(--strip-btn-solo-bg, #333333);
     color: var(--strip-btn-solo-text, #888888);
     border: 1px solid #444;
     border-radius: var(--strip-mob-btn-radius, 6px);
@@ -518,7 +696,8 @@
     min-height: var(--strip-mob-btn-solo-height, var(--strip-mob-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
-    font-size: 11px;
+    font-family: var(--strip-mob-btn-solo-font-family, var(--strip-btn-solo-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mob-btn-solo-font-size, 11px);
     font-weight: 800;
     cursor: pointer;
     display: flex;
@@ -543,8 +722,9 @@
     border: 1px solid var(--strip-btn-pre-border, #9333ea);
     border-radius: var(--strip-btn-pre-radius, 4px);
     padding: 0;
-    font-size: 10px;
-    font-weight: 800;
+    font-family: var(--strip-btn-pre-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-btn-pre-font-size, 10px);
+    font-weight: var(--strip-btn-pre-font-weight, 800);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -567,7 +747,8 @@
     min-height: var(--strip-mob-btn-pre-height, var(--strip-mob-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
-    font-size: 11px;
+    font-family: var(--strip-mob-btn-pre-font-family, var(--strip-btn-pre-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mob-btn-pre-font-size, 11px);
     font-weight: 800;
     cursor: pointer;
     display: flex;
@@ -576,26 +757,19 @@
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
-.mob-btn-pre.fixed {
-    background: #333333;
-    border-color: #555555;
-    color: #888888;
-    cursor: not-allowed;
-}
-
 /* ZONA 3: Display OLED (Sem contorno/borda externa) */
 .desk-ch-name-zone {
     padding: 1px 4px;
 }
 .desk-ch-name {
     display: block;
-    background: #000;
+    background: var(--strip-name-display-bg, #000000);
     color: var(--strip-name-display-color, #00ff00);
     border: none;
-    border-radius: 3px;
+    border-radius: var(--strip-name-display-radius, 4px);
     padding: 2px 1px;
     font-size: var(--strip-name-display-font-size, 10px);
-    font-weight: 700;
+    font-weight: var(--strip-name-display-font-weight, 700);
     text-align: center;
     font-family: var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
     white-space: nowrap;
@@ -613,15 +787,16 @@
 }
 .desk-btn-on {
     width: 100%;
-    height: var(--strip-btn-on-height, 22px);
-    min-height: var(--strip-btn-on-height, 22px);
-    background: var(--strip-btn-on-bg);
-    color: var(--strip-btn-on-text);
+    height: var(--strip-btn-on-height, 40px);
+    min-height: var(--strip-btn-on-height, 40px);
+    background: var(--strip-btn-on-bg, #333333);
+    color: var(--strip-btn-on-text, #888888);
     border: 1px solid #444;
-    border-radius: var(--strip-btn-on-radius);
+    border-radius: var(--strip-btn-on-radius, 4px);
     padding: 0;
-    font-size: 10px;
-    font-weight: 900;
+    font-family: var(--strip-btn-on-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-btn-on-font-size, 10px);
+    font-weight: var(--strip-btn-on-font-weight, 900);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -630,22 +805,23 @@
     transition: all 0.15s ease;
 }
 .desk-btn-on.active {
-    background: var(--strip-btn-on-active-bg);
-    color: var(--strip-btn-on-active-text);
+    background: var(--strip-btn-on-active-bg, #ffc107);
+    color: var(--strip-btn-on-active-text, #000000);
     border-color: #f59e0b;
-    box-shadow: 0 0 8px var(--strip-btn-on-active-glow);
+    box-shadow: 0 0 8px var(--strip-btn-on-active-glow, rgba(255, 69, 0, 0.4));
 }
 .desk-nudge-btn {
-    background: var(--strip-btn-nudge-bg, #252a38);
-    color: var(--strip-btn-nudge-text, #ccc);
+    background: var(--strip-btn-nudge-bg, #333333);
+    color: var(--strip-btn-nudge-text, #cccccc);
     border: 1px solid #444;
     border-radius: var(--strip-btn-nudge-radius, 50%);
     width: var(--strip-desk-nudge-size, 22px);
     height: var(--strip-desk-nudge-size, 22px);
     min-width: var(--strip-desk-nudge-size, 22px);
     min-height: var(--strip-desk-nudge-size, 22px);
-    font-size: 13px;
-    font-weight: 800;
+    font-family: var(--strip-btn-nudge-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-btn-nudge-font-size, 13px);
+    font-weight: var(--strip-btn-nudge-font-weight, 800);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -669,7 +845,7 @@
 
 /* Nudge Buttons Mobile (Circulares) */
 .mob-nudge-btn {
-    background: var(--strip-btn-nudge-bg, #252a38);
+    background: var(--strip-btn-nudge-bg, #333333);
     color: #fff;
     border: 1.5px solid #444;
     border-radius: 50%;
@@ -677,7 +853,8 @@
     height: var(--strip-mob-nudge-size, 50px);
     min-width: var(--strip-mob-nudge-size, 50px);
     min-height: var(--strip-mob-nudge-size, 50px);
-    font-size: 24px;
+    font-family: var(--strip-mob-nudge-font-family, var(--strip-btn-nudge-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mob-nudge-font-size, 24px);
     font-weight: 800;
     cursor: pointer;
     display: flex;
@@ -712,10 +889,10 @@
     box-sizing: border-box;
 }
 .desk-db-readout {
-    font-family: monospace;
-    font-size: 10.5px;
-    font-weight: 800;
-    color: var(--strip-db-val-color, #00e5ff);
+    font-family: var(--strip-db-val-font-family, Consolas, Menlo, "Courier New", monospace);
+    font-size: var(--strip-db-val-font-size, 10.5px);
+    font-weight: var(--strip-db-val-font-weight, 800);
+    color: var(--strip-db-val-color, #5cacee);
     text-align: center;
     line-height: 1.2;
 }
@@ -727,9 +904,10 @@
     height: 100%;
     user-select: none;
     -webkit-user-select: none;
-    font-size: 7.5px;
-    font-family: monospace;
-    color: #777;
+    font-size: var(--strip-scale-font-size, 7.5px);
+    font-family: var(--strip-scale-font-family, Consolas, Menlo, "Courier New", monospace);
+    font-weight: var(--strip-scale-font-weight, 700);
+    color: var(--strip-scale-text-color, #999999);
     pointer-events: none;
 }
 .desk-db-ruler span {
@@ -852,12 +1030,12 @@
     color: #00e5ff;
     border-top: 1px solid #222;
     border-bottom: 2.5px solid #00e5ff;
-    font-size: 9.5px;
-    font-weight: 700;
+    font-size: var(--strip-patch-font-size, 10px);
+    font-weight: var(--strip-patch-font-weight, 800);
     font-family: var(--strip-patch-font-family, Consolas, Menlo, "Courier New", monospace);
-    height: var(--strip-patch-height, 27px);
-    min-height: var(--strip-patch-height, 27px);
-    max-height: var(--strip-patch-height, 27px);
+    height: var(--strip-patch-height, 23px);
+    min-height: var(--strip-patch-height, 23px);
+    max-height: var(--strip-patch-height, 23px);
     padding: 0 4px;
     text-align: center;
     overflow: hidden;
@@ -1016,8 +1194,9 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-config-radius, 6px);
     padding: 0 2px;
-    font-size: 10px;
-    font-weight: 800;
+    font-family: var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-macro-config-font-size, 10px);
+    font-weight: var(--strip-macro-config-font-weight, 800);
     letter-spacing: 0.2px;
     width: 90%;
     box-sizing: border-box;
@@ -1036,6 +1215,8 @@
 .mob-macro-feature-zone .macro-config-btn {
     height: var(--strip-mob-macro-config-btn-height, 28px);
     min-height: var(--strip-mob-macro-config-btn-height, 28px);
+    font-family: var(--strip-mob-macro-config-font-family, var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mob-macro-config-font-size, 12px);
 }
 
 .is-volume-geral .macro-config-btn {
@@ -1056,9 +1237,9 @@
 .macro-delta-display {
     background: var(--strip-macro-delta-bg, #09090b);
     color: var(--strip-macro-delta-text, #52525b);
-    font-family: monospace;
-    font-size: 11px;
-    font-weight: 800;
+    font-family: var(--strip-macro-delta-font-family, Consolas, Menlo, "Courier New", monospace);
+    font-size: var(--strip-macro-delta-font-size, 11px);
+    font-weight: var(--strip-macro-delta-font-weight, 800);
     width: 76%;
     padding: 3px 6px;
     border-radius: 4px;
@@ -1088,8 +1269,9 @@
     flex: 1;
     width: 100%;
     min-height: 85px;
-    font-size: 32px;
-    font-weight: 900;
+    font-family: var(--strip-macro-big-nudge-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-macro-big-nudge-font-size, 24px);
+    font-weight: var(--strip-macro-big-nudge-font-weight, 900);
     background: var(--strip-macro-big-nudge-bg, #ffffff);
     color: var(--strip-macro-big-nudge-text, #000000);
     border-radius: var(--strip-macro-big-nudge-radius, 12px);
@@ -1132,8 +1314,9 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-reset-radius, 6px);
     padding: 0 2px;
-    font-size: 10.5px;
-    font-weight: 900;
+    font-family: var(--strip-macro-reset-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-macro-reset-font-size, 10px);
+    font-weight: var(--strip-macro-reset-font-weight, 800);
     letter-spacing: 0.2px;
     width: 90%;
     box-sizing: border-box;
@@ -1157,8 +1340,9 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-reset-radius, 6px);
     padding: 0 2px;
-    font-size: 10.5px;
-    font-weight: 900;
+    font-family: var(--strip-mob-macro-reset-font-family, var(--strip-macro-reset-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mob-macro-reset-font-size, 12px);
+    font-weight: 800;
     letter-spacing: 0.2px;
     width: 90%;
     box-sizing: border-box;
@@ -1232,8 +1416,9 @@
 
 .desk-feature-title,
 .desk-meters-title {
-    font-size: 8.5px;
-    font-weight: 900;
+    font-size: var(--strip-meters-title-font-size, 9px);
+    font-weight: var(--strip-meters-title-font-weight, 800);
+    font-family: var(--strip-meters-title-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
     color: #f1f5f9;
     text-align: center;
     letter-spacing: 0.5px;
@@ -1242,6 +1427,9 @@
 }
 
 .desk-feature-title.position-title {
+    font-family: var(--strip-position-title-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: var(--strip-position-title-font-size, 9px);
+    font-weight: var(--strip-position-title-font-weight, 800);
     color: var(--strip-position-title-color, #d4af37);
 }
 
@@ -1272,14 +1460,20 @@
     color: var(--strip-meters-badge-text, #38bdf8);
     border: 1px solid var(--strip-meters-badge-border, #334155);
     border-radius: 3px;
-    font-size: 7.5px;
-    font-weight: 800;
-    font-family: monospace;
+    font-size: var(--strip-meters-badge-font-size, 8.5px);
+    font-weight: var(--strip-meters-badge-font-weight, 800);
+    font-family: var(--strip-meters-badge-font-family, Consolas, Menlo, "Courier New", monospace);
     padding: 1px 3px;
     text-align: center;
     white-space: nowrap;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
     pointer-events: none;
+}
+
+.desk-feature-badge.position-badge {
+    font-family: var(--strip-position-badge-font-family, Consolas, Menlo, "Courier New", monospace);
+    font-size: var(--strip-position-badge-font-size, 8.5px);
+    font-weight: var(--strip-position-badge-font-weight, 800);
 }
 
 /* Mobile Feature Action Button (Zona 4: MEDIDORES / POSIÇÃO) */
@@ -1470,10 +1664,10 @@
     transform: translate(-50%, -50%);
 }
 .desk-pan-row .pan-val-label {
-    font-size: 7.5px;
+    font-size: var(--strip-pan-font-size, 8px);
     color: var(--strip-pan-thumb-color, #a855f7);
-    font-family: monospace;
-    font-weight: 700;
+    font-family: var(--strip-pan-font-family, Consolas, Menlo, "Courier New", monospace);
+    font-weight: var(--strip-pan-font-weight, 700);
     width: 16px;
     text-align: right;
 }
@@ -1490,9 +1684,10 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    font-size: 7px;
+    font-size: var(--strip-pan-font-size, 8px);
+    font-family: var(--strip-pan-font-family, Consolas, Menlo, "Courier New", monospace);
     color: #666;
-    font-weight: 700;
+    font-weight: var(--strip-pan-font-weight, 700);
     padding: 0 2px;
     box-sizing: border-box;
 }
@@ -1549,24 +1744,25 @@
 }
 .mob-card-header {
     text-align: center;
-    font-weight: 800;
-    font-size: 11.5px;
+    font-weight: var(--strip-mob-header-font-weight, var(--strip-header-font-weight, 800));
+    font-size: var(--strip-mob-header-font-size, 13px);
+    font-family: var(--strip-mob-header-font-family, var(--strip-header-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
     color: #fff;
     padding: 2px 0;
     letter-spacing: 0.5px;
 }
 .mob-display-name {
-    background: #000;
+    background: var(--strip-name-display-bg, #000000);
     border: 1px solid #333;
-    border-radius: 4px;
+    border-radius: var(--strip-name-display-radius, 4px);
     padding: 4px 2px;
     width: calc(100% - 6px);
     margin: 0 auto;
     text-align: center;
     color: var(--strip-name-display-color, #00ff00);
-    font-weight: 800;
-    font-size: var(--strip-mob-name-display-font-size, 11px);
-    font-family: var(--strip-mob-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-weight: var(--strip-name-display-font-weight, 800);
+    font-size: var(--strip-mob-name-display-font-size, 13px);
+    font-family: var(--strip-mob-name-display-font-family, var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1589,15 +1785,16 @@
     padding: 2px 0;
 }
 .mob-btn-on {
-    background: var(--strip-btn-on-bg, #222222);
-    color: var(--strip-btn-on-text, #777777);
+    background: var(--strip-btn-on-bg, #333333);
+    color: var(--strip-btn-on-text, #888888);
     border: 1px solid #444;
     border-radius: var(--strip-mob-btn-radius, 6px);
     height: var(--strip-mob-btn-on-height, var(--strip-mob-btn-height, 38px));
     min-height: var(--strip-mob-btn-on-height, var(--strip-mob-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
-    font-size: 11px;
+    font-family: var(--strip-mob-btn-on-font-family, var(--strip-btn-on-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mob-btn-on-font-size, 12px);
     font-weight: 900;
     cursor: pointer;
     display: flex;
@@ -1608,10 +1805,10 @@
 }
 .mob-btn-on.active,
 .mob-btn-on.on-active {
-    background: var(--strip-btn-on-active-bg, #ff4500) !important;
-    color: var(--strip-btn-on-active-text, #ffffff) !important;
+    background: var(--strip-btn-on-active-bg, #ffc107) !important;
+    color: var(--strip-btn-on-active-text, #000000) !important;
     border-color: #f59e0b !important;
-    box-shadow: 0 0 10px var(--strip-btn-on-active-glow, rgba(255, 69, 0, 0.45)) !important;
+    box-shadow: 0 0 10px var(--strip-btn-on-active-glow, rgba(255, 69, 0, 0.4)) !important;
 }
 .mob-nudge-container {
     text-align: center;
@@ -1641,8 +1838,8 @@
     text-align: center;
     font-size: var(--strip-mob-db-font-size, 18px);
     font-weight: 800;
-    color: var(--strip-db-val-color, #00e5ff);
-    font-family: monospace;
+    color: var(--strip-db-val-color, #5cacee);
+    font-family: var(--strip-mob-db-font-family, var(--strip-db-val-font-family, Consolas, Menlo, "Courier New", monospace));
     padding: 4px 0;
 }
 
@@ -1661,7 +1858,7 @@
 }
 .mob-big-nudge {
     height: 70px;
-    font-size: 24px;
+    font-size: var(--strip-mob-macro-big-nudge-font-size, 28px);
     font-weight: bold;
     background: #fff;
     color: #000;
@@ -1687,12 +1884,13 @@
     text-align: center;
 }
 .mob-btn-zerar {
-    background: #dc2626;
-    color: #fff;
+    background: var(--strip-macro-reset-bg, #dc2626);
+    color: var(--strip-macro-reset-text, #ffffff);
     border: none;
     border-radius: 6px;
     padding: 6px 12px;
-    font-size: 11px;
+    font-family: var(--strip-mob-macro-reset-font-family, var(--strip-macro-reset-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mob-macro-reset-font-size, 12px);
     font-weight: bold;
     cursor: pointer;
 }

@@ -88,6 +88,7 @@ class ChannelStrip {
             isMaster ? 'is-master' : '',
             isMacro ? 'is-macro' : '',
             isVolumeGeral ? 'is-volume-geral' : '',
+            cfg.onState ? 'is-on desk-on-bg' : '',
             cfg.isLocked ? 'is-locked' : '',
             cfg.isDisabled ? 'is-disabled' : '',
             cfg.colorBand ? `band-${cfg.colorBand}` : '',
@@ -111,17 +112,31 @@ class ChannelStrip {
     }
 
     /**
-     * Constrói o HTML Desktop das 7 Zonas Modulares
+     * Retorna o título/número do canal formatado para o header (sem o prefixo 'CH ')
+     * @returns {string}
+     * @private
+     */
+    _getHeaderTitle() {
+        const num = String(this.config.chNumber !== undefined && this.config.chNumber !== null ? this.config.chNumber : '');
+        if (num.startsWith('CH ')) {
+            return num.substring(3);
+        }
+        return num;
+    }
+
+    /**
+     * Constrói o HTML estrutural para o layout Desktop (Compacto, Gap Zero, 7 Zonas)
+     * @returns {string}
      * @private
      */
     _buildDesktopHTML() {
         const cfg = this.config;
         const isMacro = cfg.mode === 'macro' || (cfg.type && cfg.type.startsWith('macro'));
-        const isMaster = cfg.isMaster || cfg.type === 'master';
         const isPaired = cfg.isPaired;
+        const isMaster = cfg.type === 'master' || cfg.isMaster;
         const isDualMeter = isPaired || isMaster || cfg.type === 'bus_paired' || cfg.type === 'st_in' || cfg.type === 'input_paired';
-        const isDualPan = isPaired || cfg.type === 'st_in' || cfg.type === 'input_paired' || (cfg.panR !== null && cfg.panR !== undefined);
-        const hasPan = cfg.hasPan !== false && cfg.type !== 'mix' && !isMacro;
+        const isDualPan = isPaired || cfg.type === 'bus_paired' || cfg.type === 'st_in' || cfg.type === 'input_paired' || (cfg.panR !== null && cfg.panR !== undefined);
+        const hasPan = cfg.hasPan !== false && cfg.type !== 'mix' && !isMacro && !isMaster;
 
         if (isMacro) {
             const hasConfig = cfg.hasConfig !== false && cfg.mode !== 'macro_aux' && cfg.type !== 'macro_aux';
@@ -129,7 +144,7 @@ class ChannelStrip {
 
             return `
                 <div class="desk-label-wrapper">
-                    <span class="desk-ch-num">${cfg.chNumber}</span>
+                    <span class="desk-ch-num">${this._getHeaderTitle()}</span>
                 </div>
                 <div class="desk-ch-name-zone">
                     <span class="desk-ch-name">${cfg.name.replace(' ', '<br>')}</span>
@@ -149,7 +164,7 @@ class ChannelStrip {
                 ` : ''}
                 <div class="desk-footer-zone macro-footer">
                     <div class="desk-patch-area">
-                        <span>${cfg.chNumber}</span>
+                        <span>${this._getHeaderTitle()}</span>
                     </div>
                 </div>
             `;
@@ -157,10 +172,15 @@ class ChannelStrip {
 
         return `
             <!-- ZONA 1: Header Tripartite -->
-            <div class="desk-label-wrapper">
+            <div class="desk-label-wrapper ${cfg.onState ? 'label-on' : ''}">
                 <span class="desk-slot-left"></span>
-                <span class="desk-ch-num">${cfg.chNumber}</span>
-                <span class="desk-slot-right" title="${cfg.isLocked ? 'Canal Travado' : 'Travar Canal'}">🔒</span>
+                <span class="desk-ch-num">${this._getHeaderTitle()}</span>
+                <span class="desk-slot-right" title="${cfg.isLocked ? 'Canal Travado' : 'Travar Canal'}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </span>
             </div>
 
             <!-- ZONA 2: Top Action / Solo -->
@@ -334,7 +354,7 @@ class ChannelStrip {
 
             return `
                 <div class="mob-card-header">
-                    ${cfg.chNumber}
+                    ${this._getHeaderTitle()}
                 </div>
                 <div class="mob-display-name">
                     ${cfg.name}
@@ -367,7 +387,7 @@ class ChannelStrip {
 
                 <!-- Zona 1: Header Centralizado -->
                 <div class="mob-card-header">
-                    ${cfg.chNumber}
+                    ${this._getHeaderTitle()}
                 </div>
 
                 <!-- Zona 3: Display do Canal -->
@@ -1063,6 +1083,14 @@ class ChannelStrip {
         if (this.elements.onBtn) {
             this.elements.onBtn.classList.toggle('active', this.config.onState);
             this.elements.onBtn.classList.toggle('on-active', this.config.onState);
+        }
+        if (this.element) {
+            this.element.classList.toggle('is-on', this.config.onState);
+            this.element.classList.toggle('desk-on-bg', this.config.onState);
+            const labelWrapper = this.element.querySelector('.desk-label-wrapper');
+            if (labelWrapper) {
+                labelWrapper.classList.toggle('label-on', this.config.onState);
+            }
         }
     }
 

@@ -96,9 +96,9 @@ function renderAuxs(ch) {
             const currentVal = (state && state[`aux${auxIdx}`]) || 0;
             const isOn = (state && state[`aux${auxIdx}On`]) || false;
             const isPre = getAuxPre(i, auxIdx);
-            let baseTitle = `CH ${i+1}`;
+            let baseTitle = `${i+1}`;
             if (state && state.paired) {
-                baseTitle = `CH ${i+1} + ${i+2}`;
+                baseTitle = `${i+1} + ${i+2}`;
             }
 
             let chName = baseTitle;

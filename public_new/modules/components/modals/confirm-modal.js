@@ -365,7 +365,7 @@ var ConfirmModal = (function () {
             return undefined;
         }
 
-        // Global Properties
+        // Global Properties & Header Colors
         var g1 = getVal(csG, 'group_1_color'); if (g1) root.style.setProperty('--strip-group-1-color', g1);
         var g2 = getVal(csG, 'group_2_color'); if (g2) root.style.setProperty('--strip-group-2-color', g2);
         var gst = getVal(csG, 'group_st_color'); if (gst) root.style.setProperty('--strip-group-st-color', gst);
@@ -373,6 +373,20 @@ var ConfirmModal = (function () {
         var gbus = getVal(csG, 'group_bus_color'); if (gbus) root.style.setProperty('--strip-group-bus-color', gbus);
         var gaux = getVal(csG, 'group_aux_color'); if (gaux) root.style.setProperty('--strip-group-aux-color', gaux);
         var gmst = getVal(csG, 'master_color'); if (gmst) root.style.setProperty('--strip-master-color', gmst);
+
+        // Header Backgrounds (OFF and ON)
+        var g1HdrBg = getVal(csG, 'group_1_header_bg'); if (g1HdrBg) root.style.setProperty('--strip-g1-header-bg', g1HdrBg);
+        var g1HdrOnBg = getVal(csG, 'group_1_header_on_bg'); if (g1HdrOnBg) root.style.setProperty('--strip-g1-header-on-bg', g1HdrOnBg);
+        var g2HdrBg = getVal(csG, 'group_2_header_bg'); if (g2HdrBg) root.style.setProperty('--strip-g2-header-bg', g2HdrBg);
+        var g2HdrOnBg = getVal(csG, 'group_2_header_on_bg'); if (g2HdrOnBg) root.style.setProperty('--strip-g2-header-on-bg', g2HdrOnBg);
+        var gstHdrBg = getVal(csG, 'group_st_header_bg'); if (gstHdrBg) root.style.setProperty('--strip-gst-header-bg', gstHdrBg);
+        var gstHdrOnBg = getVal(csG, 'group_st_header_on_bg'); if (gstHdrOnBg) root.style.setProperty('--strip-gst-header-on-bg', gstHdrOnBg);
+        var gmixHdrBg = getVal(csG, 'group_mix_header_bg'); if (gmixHdrBg) root.style.setProperty('--strip-gmix-header-bg', gmixHdrBg);
+        var gmixHdrOnBg = getVal(csG, 'group_mix_header_on_bg'); if (gmixHdrOnBg) root.style.setProperty('--strip-gmix-header-on-bg', gmixHdrOnBg);
+        var gbusHdrBg = getVal(csG, 'group_bus_header_bg'); if (gbusHdrBg) root.style.setProperty('--strip-gbus-header-bg', gbusHdrBg);
+        var gbusHdrOnBg = getVal(csG, 'group_bus_header_on_bg'); if (gbusHdrOnBg) root.style.setProperty('--strip-gbus-header-on-bg', gbusHdrOnBg);
+        var mstHdrBg = getVal(csG, 'master_header_bg'); if (mstHdrBg) root.style.setProperty('--strip-master-header-bg', mstHdrBg);
+        var mstHdrOnBg = getVal(csG, 'master_header_on_bg'); if (mstHdrOnBg) root.style.setProperty('--strip-master-header-on-bg', mstHdrOnBg);
 
         var btnOnBg = getVal(csG, 'btn_on_bg'); if (btnOnBg) root.style.setProperty('--strip-btn-on-bg', btnOnBg);
         var btnOnText = getVal(csG, 'btn_on_text'); if (btnOnText) root.style.setProperty('--strip-btn-on-text', btnOnText);
@@ -393,18 +407,54 @@ var ConfirmModal = (function () {
         var btnNudgeBg = getVal(csG, 'btn_nudge_bg'); if (btnNudgeBg) root.style.setProperty('--strip-btn-nudge-bg', btnNudgeBg);
         var btnNudgeText = getVal(csG, 'btn_nudge_text'); if (btnNudgeText) root.style.setProperty('--strip-btn-nudge-text', btnNudgeText);
 
+        // Tipografia / Font Face Global
         var hdrFont = getVal(csG, 'header_font_family'); if (hdrFont) root.style.setProperty('--strip-header-font-family', hdrFont);
-        var patchFont = getVal(csG, 'patch_font_family'); if (patchFont) root.style.setProperty('--strip-patch-font-family', patchFont);
+        var hdrWeight = getVal(csG, 'header_font_weight'); if (hdrWeight) root.style.setProperty('--strip-header-font-weight', hdrWeight);
+        var hdrSize = getVal(csG, 'header_font_size'); if (hdrSize) root.style.setProperty('--strip-header-font-size', hdrSize);
+
         var nameBg = getVal(csG, 'name_display_bg'); if (nameBg) root.style.setProperty('--strip-name-display-bg', nameBg);
         var nameColor = getVal(csG, 'name_display_color'); if (nameColor) root.style.setProperty('--strip-name-display-color', nameColor);
+        var nameFont = getVal(csG, 'name_display_font_family'); if (nameFont) root.style.setProperty('--strip-name-display-font-family', nameFont);
+        var nameWeight = getVal(csG, 'name_display_font_weight'); if (nameWeight) root.style.setProperty('--strip-name-display-font-weight', nameWeight);
+        var nameSize = getVal(csG, 'name_display_font_size'); if (nameSize) root.style.setProperty('--strip-name-display-font-size', nameSize);
+
+        var soloFont = getVal(csG, 'btn_solo_font_family'); if (soloFont) root.style.setProperty('--strip-btn-solo-font-family', soloFont);
+        var soloWeight = getVal(csG, 'btn_solo_font_weight'); if (soloWeight) root.style.setProperty('--strip-btn-solo-font-weight', soloWeight);
+        var soloSize = getVal(csG, 'btn_solo_font_size'); if (soloSize) root.style.setProperty('--strip-btn-solo-font-size', soloSize);
+
+        var preFont = getVal(csG, 'btn_pre_font_family'); if (preFont) root.style.setProperty('--strip-btn-pre-font-family', preFont);
+        var preWeight = getVal(csG, 'btn_pre_font_weight'); if (preWeight) root.style.setProperty('--strip-btn-pre-font-weight', preWeight);
+        var preSize = getVal(csG, 'btn_pre_font_size'); if (preSize) root.style.setProperty('--strip-btn-pre-font-size', preSize);
+
+        var onFont = getVal(csG, 'btn_on_font_family'); if (onFont) root.style.setProperty('--strip-btn-on-font-family', onFont);
+        var onWeight = getVal(csG, 'btn_on_font_weight'); if (onWeight) root.style.setProperty('--strip-btn-on-font-weight', onWeight);
+        var onSize = getVal(csG, 'btn_on_font_size'); if (onSize) root.style.setProperty('--strip-btn-on-font-size', onSize);
+
+        var nudgeFont = getVal(csG, 'btn_nudge_font_family'); if (nudgeFont) root.style.setProperty('--strip-btn-nudge-font-family', nudgeFont);
+        var nudgeWeight = getVal(csG, 'btn_nudge_font_weight'); if (nudgeWeight) root.style.setProperty('--strip-btn-nudge-font-weight', nudgeWeight);
+        var nudgeSize = getVal(csG, 'btn_nudge_font_size'); if (nudgeSize) root.style.setProperty('--strip-btn-nudge-font-size', nudgeSize);
+
         var dbColor = getVal(csG, 'db_val_color'); if (dbColor) root.style.setProperty('--strip-db-val-color', dbColor);
+        var dbFont = getVal(csG, 'db_val_font_family'); if (dbFont) root.style.setProperty('--strip-db-val-font-family', dbFont);
+        var dbWeight = getVal(csG, 'db_val_font_weight'); if (dbWeight) root.style.setProperty('--strip-db-val-font-weight', dbWeight);
+        var dbSize = getVal(csG, 'db_val_font_size'); if (dbSize) root.style.setProperty('--strip-db-val-font-size', dbSize);
 
         var faderTrack = getVal(csG, 'fader_track_color'); if (faderTrack) root.style.setProperty('--strip-fader-track-color', faderTrack);
         var scaleColor = getVal(csG, 'scale_text_color'); if (scaleColor) root.style.setProperty('--strip-scale-text-color', scaleColor);
+        var scaleFont = getVal(csG, 'scale_font_family'); if (scaleFont) root.style.setProperty('--strip-scale-font-family', scaleFont);
+        var scaleWeight = getVal(csG, 'scale_font_weight'); if (scaleWeight) root.style.setProperty('--strip-scale-font-weight', scaleWeight);
+        var scaleSize = getVal(csG, 'scale_font_size'); if (scaleSize) root.style.setProperty('--strip-scale-font-size', scaleSize);
 
         var panBg = getVal(csG, 'pan_track_bg'); if (panBg) root.style.setProperty('--strip-pan-track-bg', panBg);
         var panThumb = getVal(csG, 'pan_thumb_color'); if (panThumb) root.style.setProperty('--strip-pan-thumb-color', panThumb);
         var panCenter = getVal(csG, 'pan_center_color'); if (panCenter) root.style.setProperty('--strip-pan-center-color', panCenter);
+        var panFont = getVal(csG, 'pan_font_family'); if (panFont) root.style.setProperty('--strip-pan-font-family', panFont);
+        var panWeight = getVal(csG, 'pan_font_weight'); if (panWeight) root.style.setProperty('--strip-pan-font-weight', panWeight);
+        var panSize = getVal(csG, 'pan_font_size'); if (panSize) root.style.setProperty('--strip-pan-font-size', panSize);
+
+        var patchFont = getVal(csG, 'patch_font_family'); if (patchFont) root.style.setProperty('--strip-patch-font-family', patchFont);
+        var patchWeight = getVal(csG, 'patch_font_weight'); if (patchWeight) root.style.setProperty('--strip-patch-font-weight', patchWeight);
+        var patchSize = getVal(csG, 'patch_font_size'); if (patchSize) root.style.setProperty('--strip-patch-font-size', patchSize);
 
         var peakColor = getVal(csG, 'peak_led_color'); if (peakColor) root.style.setProperty('--strip-peak-led-color', peakColor);
         var peakGlow = getVal(csG, 'peak_led_glow'); if (peakGlow) root.style.setProperty('--strip-peak-led-glow', peakGlow);
@@ -415,8 +465,21 @@ var ConfirmModal = (function () {
         var mBadgeBg = getVal(csG, 'meters_badge_bg'); if (mBadgeBg) root.style.setProperty('--strip-meters-badge-bg', mBadgeBg);
         var mBadgeText = getVal(csG, 'meters_badge_text'); if (mBadgeText) root.style.setProperty('--strip-meters-badge-text', mBadgeText);
         var mBadgeBorder = getVal(csG, 'meters_badge_border'); if (mBadgeBorder) root.style.setProperty('--strip-meters-badge-border', mBadgeBorder);
+        var mTitleFont = getVal(csG, 'meters_title_font_family'); if (mTitleFont) root.style.setProperty('--strip-meters-title-font-family', mTitleFont);
+        var mTitleWeight = getVal(csG, 'meters_title_font_weight'); if (mTitleWeight) root.style.setProperty('--strip-meters-title-font-weight', mTitleWeight);
+        var mTitleSize = getVal(csG, 'meters_title_font_size'); if (mTitleSize) root.style.setProperty('--strip-meters-title-font-size', mTitleSize);
+        var mBadgeFont = getVal(csG, 'meters_badge_font_family'); if (mBadgeFont) root.style.setProperty('--strip-meters-badge-font-family', mBadgeFont);
+        var mBadgeWeight = getVal(csG, 'meters_badge_font_weight'); if (mBadgeWeight) root.style.setProperty('--strip-meters-badge-font-weight', mBadgeWeight);
+        var mBadgeSize = getVal(csG, 'meters_badge_font_size'); if (mBadgeSize) root.style.setProperty('--strip-meters-badge-font-size', mBadgeSize);
+
         var posBorder = getVal(csG, 'position_box_border'); if (posBorder) root.style.setProperty('--strip-position-box-border', posBorder);
         var posColor = getVal(csG, 'position_title_color'); if (posColor) root.style.setProperty('--strip-position-title-color', posColor);
+        var posTitleFont = getVal(csG, 'position_title_font_family'); if (posTitleFont) root.style.setProperty('--strip-position-title-font-family', posTitleFont);
+        var posTitleWeight = getVal(csG, 'position_title_font_weight'); if (posTitleWeight) root.style.setProperty('--strip-position-title-font-weight', posTitleWeight);
+        var posTitleSize = getVal(csG, 'position_title_font_size'); if (posTitleSize) root.style.setProperty('--strip-position-title-font-size', posTitleSize);
+        var posBadgeFont = getVal(csG, 'position_badge_font_family'); if (posBadgeFont) root.style.setProperty('--strip-position-badge-font-family', posBadgeFont);
+        var posBadgeWeight = getVal(csG, 'position_badge_font_weight'); if (posBadgeWeight) root.style.setProperty('--strip-position-badge-font-weight', posBadgeWeight);
+        var posBadgeSize = getVal(csG, 'position_badge_font_size'); if (posBadgeSize) root.style.setProperty('--strip-position-badge-font-size', posBadgeSize);
 
         var macBg = getVal(csG, 'macro_bg'); if (macBg) root.style.setProperty('--strip-macro-bg', macBg);
         var macBorder = getVal(csG, 'macro_border'); if (macBorder) root.style.setProperty('--strip-macro-border', macBorder);
@@ -426,18 +489,33 @@ var ConfirmModal = (function () {
         var macCfgHov = getVal(csG, 'macro_config_hover_bg'); if (macCfgHov) root.style.setProperty('--strip-macro-config-hover-bg', macCfgHov);
         var macCfgText = getVal(csG, 'macro_config_text'); if (macCfgText) root.style.setProperty('--strip-macro-config-text', macCfgText);
         var macCfgRad = getVal(csG, 'macro_config_radius'); if (macCfgRad) root.style.setProperty('--strip-macro-config-radius', macCfgRad);
+        var macCfgFont = getVal(csG, 'macro_config_font_family'); if (macCfgFont) root.style.setProperty('--strip-macro-config-font-family', macCfgFont);
+        var macCfgWeight = getVal(csG, 'macro_config_font_weight'); if (macCfgWeight) root.style.setProperty('--strip-macro-config-font-weight', macCfgWeight);
+        var macCfgSize = getVal(csG, 'macro_config_font_size'); if (macCfgSize) root.style.setProperty('--strip-macro-config-font-size', macCfgSize);
+
         var macDeltaBg = getVal(csG, 'macro_delta_bg'); if (macDeltaBg) root.style.setProperty('--strip-macro-delta-bg', macDeltaBg);
         var macDeltaText = getVal(csG, 'macro_delta_text'); if (macDeltaText) root.style.setProperty('--strip-macro-delta-text', macDeltaText);
         var macDeltaAct = getVal(csG, 'macro_delta_active_text'); if (macDeltaAct) root.style.setProperty('--strip-macro-delta-active-text', macDeltaAct);
+        var macDeltaFont = getVal(csG, 'macro_delta_font_family'); if (macDeltaFont) root.style.setProperty('--strip-macro-delta-font-family', macDeltaFont);
+        var macDeltaWeight = getVal(csG, 'macro_delta_font_weight'); if (macDeltaWeight) root.style.setProperty('--strip-macro-delta-font-weight', macDeltaWeight);
+        var macDeltaSize = getVal(csG, 'macro_delta_font_size'); if (macDeltaSize) root.style.setProperty('--strip-macro-delta-font-size', macDeltaSize);
+
         var macBigBg = getVal(csG, 'macro_big_nudge_bg'); if (macBigBg) root.style.setProperty('--strip-macro-big-nudge-bg', macBigBg);
         var macBigText = getVal(csG, 'macro_big_nudge_text'); if (macBigText) root.style.setProperty('--strip-macro-big-nudge-text', macBigText);
         var macBigBrd = getVal(csG, 'macro_big_nudge_border'); if (macBigBrd) root.style.setProperty('--strip-macro-big-nudge-border', macBigBrd);
         var macBigRad = getVal(csG, 'macro_big_nudge_radius'); if (macBigRad) root.style.setProperty('--strip-macro-big-nudge-radius', macBigRad);
         var macBigShd = getVal(csG, 'macro_big_nudge_shadow'); if (macBigShd) root.style.setProperty('--strip-macro-big-nudge-shadow', macBigShd);
+        var macBigFont = getVal(csG, 'macro_big_nudge_font_family'); if (macBigFont) root.style.setProperty('--strip-macro-big-nudge-font-family', macBigFont);
+        var macBigWeight = getVal(csG, 'macro_big_nudge_font_weight'); if (macBigWeight) root.style.setProperty('--strip-macro-big-nudge-font-weight', macBigWeight);
+        var macBigSize = getVal(csG, 'macro_big_nudge_font_size'); if (macBigSize) root.style.setProperty('--strip-macro-big-nudge-font-size', macBigSize);
+
         var macRstBg = getVal(csG, 'macro_reset_bg'); if (macRstBg) root.style.setProperty('--strip-macro-reset-bg', macRstBg);
         var macRstHov = getVal(csG, 'macro_reset_hover_bg'); if (macRstHov) root.style.setProperty('--strip-macro-reset-hover-bg', macRstHov);
         var macRstText = getVal(csG, 'macro_reset_text'); if (macRstText) root.style.setProperty('--strip-macro-reset-text', macRstText);
         var macRstRad = getVal(csG, 'macro_reset_radius'); if (macRstRad) root.style.setProperty('--strip-macro-reset-radius', macRstRad);
+        var macRstFont = getVal(csG, 'macro_reset_font_family'); if (macRstFont) root.style.setProperty('--strip-macro-reset-font-family', macRstFont);
+        var macRstWeight = getVal(csG, 'macro_reset_font_weight'); if (macRstWeight) root.style.setProperty('--strip-macro-reset-font-weight', macRstWeight);
+        var macRstSize = getVal(csG, 'macro_reset_font_size'); if (macRstSize) root.style.setProperty('--strip-macro-reset-font-size', macRstSize);
 
         var lockBrd = getVal(csG, 'lock_border_color'); if (lockBrd) root.style.setProperty('--strip-lock-border-color', lockBrd);
         var lockBdg = getVal(csG, 'lock_badge_bg'); if (lockBdg) root.style.setProperty('--strip-lock-badge-bg', lockBdg);
@@ -455,19 +533,52 @@ var ConfirmModal = (function () {
         var dDeskDiv = getVal(csD, 'desk_card_divider'); if (dDeskDiv !== undefined) root.style.setProperty('--strip-desk-card-divider', dDeskDiv);
         var dCardRad = getVal(csD, 'card_radius'); if (dCardRad) root.style.setProperty('--strip-card-radius', dCardRad);
         var dCardOnBg = getVal(csD, 'card_on_bg'); if (dCardOnBg) root.style.setProperty('--strip-card-on-bg', dCardOnBg);
+        var dHdrH = getVal(csD, 'header_height'); if (dHdrH) root.style.setProperty('--strip-header-height', dHdrH);
+        var dHdrSize = getVal(csD, 'header_font_size'); if (dHdrSize) root.style.setProperty('--strip-header-font-size', dHdrSize);
+        var dHdrWeight = getVal(csD, 'header_font_weight'); if (dHdrWeight) root.style.setProperty('--strip-header-font-weight', dHdrWeight);
+        var dHdrFont = getVal(csD, 'header_font_family'); if (dHdrFont) root.style.setProperty('--strip-header-font-family', dHdrFont);
+        var dPatchH = getVal(csD, 'patch_height'); if (dPatchH) root.style.setProperty('--strip-patch-height', dPatchH);
+        var dPatchSize = getVal(csD, 'patch_font_size'); if (dPatchSize) root.style.setProperty('--strip-patch-font-size', dPatchSize);
+        var dPatchFont = getVal(csD, 'patch_font_family'); if (dPatchFont) root.style.setProperty('--strip-patch-font-family', dPatchFont);
+
         var dBtnOnH = getVal(csD, 'btn_on_height'); if (dBtnOnH) root.style.setProperty('--strip-btn-on-height', dBtnOnH);
         var dBtnOnRad = getVal(csD, 'btn_on_radius'); if (dBtnOnRad) root.style.setProperty('--strip-btn-on-radius', dBtnOnRad);
+        var dBtnOnSize = getVal(csD, 'btn_on_font_size'); if (dBtnOnSize) root.style.setProperty('--strip-btn-on-font-size', dBtnOnSize);
+        var dBtnOnFont = getVal(csD, 'btn_on_font_family'); if (dBtnOnFont) root.style.setProperty('--strip-btn-on-font-family', dBtnOnFont);
+
         var dBtnSoloH = getVal(csD, 'btn_solo_height'); if (dBtnSoloH) root.style.setProperty('--strip-btn-solo-height', dBtnSoloH);
         var dBtnSoloRad = getVal(csD, 'btn_solo_radius'); if (dBtnSoloRad) root.style.setProperty('--strip-btn-solo-radius', dBtnSoloRad);
+        var dBtnSoloSize = getVal(csD, 'btn_solo_font_size'); if (dBtnSoloSize) root.style.setProperty('--strip-btn-solo-font-size', dBtnSoloSize);
+        var dBtnSoloFont = getVal(csD, 'btn_solo_font_family'); if (dBtnSoloFont) root.style.setProperty('--strip-btn-solo-font-family', dBtnSoloFont);
+
         var dBtnPreH = getVal(csD, 'btn_pre_height'); if (dBtnPreH) root.style.setProperty('--strip-btn-pre-height', dBtnPreH);
         var dBtnPreRad = getVal(csD, 'btn_pre_radius'); if (dBtnPreRad) root.style.setProperty('--strip-btn-pre-radius', dBtnPreRad);
+        var dBtnPreSize = getVal(csD, 'btn_pre_font_size'); if (dBtnPreSize) root.style.setProperty('--strip-btn-pre-font-size', dBtnPreSize);
+        var dBtnPreFont = getVal(csD, 'btn_pre_font_family'); if (dBtnPreFont) root.style.setProperty('--strip-btn-pre-font-family', dBtnPreFont);
+
         var dBtnNudgeSize = getVal(csD, 'btn_nudge_size'); if (dBtnNudgeSize) root.style.setProperty('--strip-desk-nudge-size', dBtnNudgeSize);
         var dBtnNudgeRad = getVal(csD, 'btn_nudge_radius'); if (dBtnNudgeRad) root.style.setProperty('--strip-btn-nudge-radius', dBtnNudgeRad);
+        var dBtnNudgeFontSize = getVal(csD, 'btn_nudge_font_size'); if (dBtnNudgeFontSize) root.style.setProperty('--strip-btn-nudge-font-size', dBtnNudgeFontSize);
+        var dBtnNudgeFont = getVal(csD, 'btn_nudge_font_family'); if (dBtnNudgeFont) root.style.setProperty('--strip-btn-nudge-font-family', dBtnNudgeFont);
+
         var dMacroCfgH = getVal(csD, 'macro_config_btn_height'); if (dMacroCfgH) root.style.setProperty('--strip-macro-config-btn-height', dMacroCfgH);
+        var dMacroCfgSize = getVal(csD, 'macro_config_font_size'); if (dMacroCfgSize) root.style.setProperty('--strip-macro-config-font-size', dMacroCfgSize);
+        var dMacroCfgFont = getVal(csD, 'macro_config_font_family'); if (dMacroCfgFont) root.style.setProperty('--strip-macro-config-font-family', dMacroCfgFont);
+
         var dMacroRstH = getVal(csD, 'macro_reset_btn_height'); if (dMacroRstH) root.style.setProperty('--strip-macro-reset-btn-height', dMacroRstH);
+        var dMacroRstSize = getVal(csD, 'macro_reset_font_size'); if (dMacroRstSize) root.style.setProperty('--strip-macro-reset-font-size', dMacroRstSize);
+        var dMacroRstFont = getVal(csD, 'macro_reset_font_family'); if (dMacroRstFont) root.style.setProperty('--strip-macro-reset-font-family', dMacroRstFont);
+
         var dNameRad = getVal(csD, 'name_display_radius'); if (dNameRad) root.style.setProperty('--strip-name-display-radius', dNameRad);
         var dNameSize = getVal(csD, 'name_display_font_size'); if (dNameSize) root.style.setProperty('--strip-name-display-font-size', dNameSize);
         var dNameFont = getVal(csD, 'name_display_font_family'); if (dNameFont) root.style.setProperty('--strip-name-display-font-family', dNameFont);
+
+        var dDbSize = getVal(csD, 'db_val_font_size'); if (dDbSize) root.style.setProperty('--strip-db-val-font-size', dDbSize);
+        var dDbFont = getVal(csD, 'db_val_font_family'); if (dDbFont) root.style.setProperty('--strip-db-val-font-family', dDbFont);
+
+        var dScaleSize = getVal(csD, 'scale_font_size'); if (dScaleSize) root.style.setProperty('--strip-scale-font-size', dScaleSize);
+        var dScaleFont = getVal(csD, 'scale_font_family'); if (dScaleFont) root.style.setProperty('--strip-scale-font-family', dScaleFont);
+
         var dVolWidth = getVal(csD, 'volume_geral_width'); if (dVolWidth) root.style.setProperty('--strip-volume-geral-width', dVolWidth);
 
         // Mobile Properties
@@ -477,18 +588,50 @@ var ConfirmModal = (function () {
         var mCardBrd = getVal(csM, 'card_border', 'mob_card_border'); if (mCardBrd) root.style.setProperty('--strip-mob-card-border', mCardBrd);
         var mCardBrdW = getVal(csM, 'card_border_width', 'mob_card_border_width'); if (mCardBrdW !== undefined) root.style.setProperty('--strip-mob-card-border-width', mCardBrdW);
         var mCardTopW = getVal(csM, 'card_border_top_width', 'mob_card_border_top_width'); if (mCardTopW !== undefined) root.style.setProperty('--strip-mob-card-border-top-width', mCardTopW);
+
+        var mHdrH = getVal(csM, 'header_height'); if (mHdrH) root.style.setProperty('--strip-mob-header-height', mHdrH);
+        var mHdrSize = getVal(csM, 'header_font_size'); if (mHdrSize) root.style.setProperty('--strip-mob-header-font-size', mHdrSize);
+        var mHdrWeight = getVal(csM, 'header_font_weight'); if (mHdrWeight) root.style.setProperty('--strip-mob-header-font-weight', mHdrWeight);
+        var mHdrFont = getVal(csM, 'header_font_family'); if (mHdrFont) root.style.setProperty('--strip-mob-header-font-family', mHdrFont);
+
         var mBtnH = getVal(csM, 'btn_height', 'mob_btn_height'); if (mBtnH) root.style.setProperty('--strip-mob-btn-height', mBtnH);
         var mBtnOnH = getVal(csM, 'btn_on_height'); if (mBtnOnH) root.style.setProperty('--strip-mob-btn-on-height', mBtnOnH);
+        var mBtnOnSize = getVal(csM, 'btn_on_font_size'); if (mBtnOnSize) root.style.setProperty('--strip-mob-btn-on-font-size', mBtnOnSize);
+        var mBtnOnFont = getVal(csM, 'btn_on_font_family'); if (mBtnOnFont) root.style.setProperty('--strip-mob-btn-on-font-family', mBtnOnFont);
+
         var mBtnSoloH = getVal(csM, 'btn_solo_height'); if (mBtnSoloH) root.style.setProperty('--strip-mob-btn-solo-height', mBtnSoloH);
+        var mBtnSoloSize = getVal(csM, 'btn_solo_font_size'); if (mBtnSoloSize) root.style.setProperty('--strip-mob-btn-solo-font-size', mBtnSoloSize);
+        var mBtnSoloFont = getVal(csM, 'btn_solo_font_family'); if (mBtnSoloFont) root.style.setProperty('--strip-mob-btn-solo-font-family', mBtnSoloFont);
+
         var mBtnPreH = getVal(csM, 'btn_pre_height'); if (mBtnPreH) root.style.setProperty('--strip-mob-btn-pre-height', mBtnPreH);
+        var mBtnPreSize = getVal(csM, 'btn_pre_font_size'); if (mBtnPreSize) root.style.setProperty('--strip-mob-btn-pre-font-size', mBtnPreSize);
+        var mBtnPreFont = getVal(csM, 'btn_pre_font_family'); if (mBtnPreFont) root.style.setProperty('--strip-mob-btn-pre-font-family', mBtnPreFont);
+
         var mBtnMedH = getVal(csM, 'btn_medidores_height'); if (mBtnMedH) root.style.setProperty('--strip-mob-btn-medidores-height', mBtnMedH);
         var mBtnRad = getVal(csM, 'btn_radius', 'mob_btn_radius'); if (mBtnRad) root.style.setProperty('--strip-mob-btn-radius', mBtnRad);
         var mNudgeSize = getVal(csM, 'nudge_btn_size', 'mob_nudge_btn_size'); if (mNudgeSize) root.style.setProperty('--strip-mob-nudge-size', mNudgeSize);
+        var mNudgeFontSize = getVal(csM, 'nudge_font_size'); if (mNudgeFontSize) root.style.setProperty('--strip-mob-nudge-font-size', mNudgeFontSize);
+        var mNudgeFont = getVal(csM, 'nudge_font_family'); if (mNudgeFont) root.style.setProperty('--strip-mob-nudge-font-family', mNudgeFont);
+
         var mMacroCfgH = getVal(csM, 'macro_config_btn_height'); if (mMacroCfgH) root.style.setProperty('--strip-mob-macro-config-btn-height', mMacroCfgH);
+        var mMacroCfgSize = getVal(csM, 'macro_config_font_size'); if (mMacroCfgSize) root.style.setProperty('--strip-mob-macro-config-font-size', mMacroCfgSize);
+        var mMacroCfgFont = getVal(csM, 'macro_config_font_family'); if (mMacroCfgFont) root.style.setProperty('--strip-mob-macro-config-font-family', mMacroCfgFont);
+
         var mMacroRstH = getVal(csM, 'macro_reset_btn_height'); if (mMacroRstH) root.style.setProperty('--strip-mob-macro-reset-btn-height', mMacroRstH);
+        var mMacroRstSize = getVal(csM, 'macro_reset_font_size'); if (mMacroRstSize) root.style.setProperty('--strip-mob-macro-reset-font-size', mMacroRstSize);
+        var mMacroRstFont = getVal(csM, 'macro_reset_font_family'); if (mMacroRstFont) root.style.setProperty('--strip-mob-macro-reset-font-family', mMacroRstFont);
+
         var mDbSize = getVal(csM, 'db_font_size', 'mob_db_font_size'); if (mDbSize) root.style.setProperty('--strip-mob-db-font-size', mDbSize);
+        var mDbFont = getVal(csM, 'db_font_family'); if (mDbFont) root.style.setProperty('--strip-mob-db-font-family', mDbFont);
+
         var mNameSize = getVal(csM, 'name_display_font_size', 'mob_name_display_font_size'); if (mNameSize) root.style.setProperty('--strip-mob-name-display-font-size', mNameSize);
         var mNameFont = getVal(csM, 'name_display_font_family', 'mob_name_display_font_family'); if (mNameFont) root.style.setProperty('--strip-mob-name-display-font-family', mNameFont);
+
+        var mScaleSize = getVal(csM, 'scale_font_size'); if (mScaleSize) root.style.setProperty('--strip-mob-scale-font-size', mScaleSize);
+        var mScaleFont = getVal(csM, 'scale_font_family'); if (mScaleFont) root.style.setProperty('--strip-mob-scale-font-family', mScaleFont);
+
+        var mBigNudgeSize = getVal(csM, 'macro_big_nudge_font_size'); if (mBigNudgeSize) root.style.setProperty('--strip-mob-macro-big-nudge-font-size', mBigNudgeSize);
+
         var mThumbW = getVal(csM, 'fader_thumb_width', 'mob_fader_thumb_width'); if (mThumbW) root.style.setProperty('--strip-mob-thumb-width', mThumbW);
         var mThumbH = getVal(csM, 'fader_thumb_height', 'mob_fader_thumb_height'); if (mThumbH) root.style.setProperty('--strip-mob-thumb-height', mThumbH);
         var mThumbRad = getVal(csM, 'fader_thumb_radius', 'mob_fader_thumb_radius'); if (mThumbRad) root.style.setProperty('--strip-mob-thumb-radius', mThumbRad);
