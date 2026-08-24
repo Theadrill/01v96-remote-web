@@ -243,9 +243,9 @@ channel_strip:
   desktop:
     card_bg: "#181818"                         # Fundo do card desktop
     card_border: "#222222"                     # Cor da borda base do card
-    card_border_width: "0px"                   # Espessura da borda base do card
+    card_border_width: "1px"                   # Espessura da borda base do card
     desk_card_border: "#333333"                # Cor da borda dos cards no Desktop (superior, inferior e extremidades)
-    desk_card_border_width: "0px"              # Espessura da borda dos cards no Desktop
+    desk_card_border_width: "1px"              # Espessura da borda dos cards no Desktop
     desk_card_divider: "none"                  # Divisor entre canais no Desktop (ex: "none" ou "1px solid rgba(255, 255, 255, 0.08)")
     card_radius: "6px"                         # Arredondamento do card
     card_on_bg: "rgba(255, 69, 0, 0.08)"       # Fundo sutil de destaque quando o canal está ON
