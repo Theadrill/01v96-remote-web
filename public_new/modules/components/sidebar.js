@@ -1117,15 +1117,24 @@ function triggerExitActiveMode() {
             return;
         }
     }
+    const chModal = document.getElementById('chConfigModal');
+    if (isModalOpen(chModal) || (typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null)) {
+        if (typeof closeChannelConfig === 'function') {
+            closeChannelConfig();
+            return;
+        }
+    }
     const mode = window.currentDockMode;
-    if (mode === 'main' || mode === 'musician') {
-        showLogoutConfirm();
-    } else if (mode === 'channelConfig') {
+    if (mode === 'channelConfig') {
         if (typeof closeChannelConfig === 'function') closeChannelConfig();
     } else if (mode === 'outs') {
         if (typeof toggleOuts === 'function') toggleOuts();
     } else if (mode === 'techMix') {
         if (typeof exitTechnicianMixMode === 'function') exitTechnicianMixMode();
+    } else if (mode === 'main' || mode === 'musician') {
+        showLogoutConfirm();
+    } else {
+        showLogoutConfirm();
     }
 }
 window.triggerExitActiveMode = triggerExitActiveMode;
@@ -1153,19 +1162,43 @@ function updateSidebarInfo() {
     const navPrev = document.getElementById('navPrev');
     const navNext = document.getElementById('navNext');
 
-    if (activeConfigChannel !== null) {
-        const ch = activeConfigChannel;
-        const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-        let name = '';
-        if (window.resolvedNames && window.resolvedNames[ch]) {
-            name = window.resolvedNames[ch].name;
-        } else if (stateRef && stateRef.name) {
-            name = stateRef.name;
+    const ch = (typeof activeConfigChannel !== 'undefined' && activeConfigChannel !== null)
+        ? activeConfigChannel
+        : (typeof window.activeConfigChannel !== 'undefined' && window.activeConfigChannel !== null
+            ? window.activeConfigChannel
+            : (typeof ChannelSetupCore !== 'undefined' && typeof ChannelSetupCore.getActiveChannel === 'function' ? ChannelSetupCore.getActiveChannel() : null));
+
+    if (ch !== null) {
+        let targetId = `name${ch}`;
+        let displayTitle = `${ch + 1}`;
+
+        if (ch >= 0 && ch <= 31) {
+            const s = typeof channelStates !== 'undefined' ? channelStates[ch] : null;
+            targetId = `name${ch}`;
+            displayTitle = (s && s.paired) ? `CH ${ch + 1} + ${ch + 2}` : `CH ${ch + 1}`;
+        } else if (ch >= 36 && ch <= 43) {
+            targetId = `namem${ch - 36}`;
+            displayTitle = `MIX ${ch - 35}`;
+        } else if (ch >= 44 && ch <= 51) {
+            targetId = `nameb${ch - 44}`;
+            displayTitle = `BUS ${ch - 43}`;
+        } else if (ch === 52) {
+            targetId = `namemaster`;
+            displayTitle = `MASTER`;
+        } else if (ch >= 60 && ch <= 67) {
+            const stIdx = (ch - 60) / 2;
+            targetId = `namest${stIdx}`;
+            displayTitle = `ST IN ${stIdx + 1}`;
         }
-        const label = typeof getChannelLabel === 'function' ? getChannelLabel(ch) : `CH ${ch + 1}`;
+
+        const nameEl = document.getElementById(targetId);
+        const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+        let name = (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) || (nameEl ? nameEl.innerText.trim() : '');
+        if (!name && stateRef && stateRef.name) name = stateRef.name;
+
         if (chTitle) {
-            chTitle.style.display = 'block';
-            chTitle.innerText = `${label} - ${name || '...'}`;
+            chTitle.style.display = 'flex';
+            chTitle.innerText = `${displayTitle} - ${name || '...'}`;
             if (window.autoScaleTitle) window.autoScaleTitle();
         }
         if (tmTitle) tmTitle.style.display = 'none';

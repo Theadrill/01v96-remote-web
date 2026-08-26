@@ -169,8 +169,8 @@ var MainView = (function () {
                     })(i),
                     name_click: (function (chIdx) {
                         return function () {
-                            if (typeof openNameEditor === 'function') {
-                                openNameEditor(chIdx);
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, chIdx);
                             }
                         };
                     })(i)

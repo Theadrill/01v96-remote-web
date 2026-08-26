@@ -51,8 +51,10 @@ window.mixesState = mixesState;
 window.busesState = busesState;
 window.masterState = masterState;
 
-let activeConfigChannel = null;
-let activeConfigTab = "aux"; // Auxiliares por padrão
+var activeConfigChannel = null;
+window.activeConfigChannel = null;
+var activeConfigTab = "aux"; // Auxiliares por padrão
+window.activeConfigTab = "aux";
 let appOrientation = 'vertical';
 let musicianMode = false;
 window.showMetersInMusicianMode = localStorage.getItem('01v96_musician_meters') === 'true';

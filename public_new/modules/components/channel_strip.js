@@ -474,9 +474,9 @@ class ChannelStrip {
 
         this.elements = {
             wrapper: root,
-            headerNum: root.querySelector('.desk-ch-num, .mob-ch-num'),
+            headerNum: root.querySelector('.desk-label-wrapper, .mob-header-zone, .desk-ch-num, .mob-ch-num'),
             lockSlot: root.querySelector('.desk-slot-right'),
-            nameDisplay: root.querySelector('.desk-ch-name, .mob-display-name'),
+            nameDisplay: root.querySelector('.desk-ch-name-zone, .mob-display-name, .desk-ch-name'),
             soloBtn: root.querySelector('.desk-btn-solo, .mob-btn-solo'),
             btnPre: root.querySelector('.btn-pre-post, .mob-btn-pre'),
             onBtn: root.querySelector('.desk-btn-on, .mob-btn-on'),

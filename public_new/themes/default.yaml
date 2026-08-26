@@ -425,3 +425,32 @@ main_view:
   mobile_faders_gap: "12px"                  # Espaçamento entre canais no mobile (aumentado para 12px)
   mobile_group_gap: "24px"                   # Espaçamento maior a cada 8 canais no mobile (aumentado para 24px)
 
+
+# ─── CHANNEL SETUP (CENTRAL DE EDIÇÃO DO CANAL) ──────────────
+# Modal de edição detalhada (EQ, Dinâmica, Auxiliares, Inserts, Roteamento)
+channel_setup:
+  overlay_bg: "#000000"                      # Fundo totalmente preto do modal
+  modal_bg: "#000000"                        # Fundo principal do modal (preto sólido)
+  modal_border: "#262936"                    # Borda do modal
+  modal_radius: "8px"                        # Arredondamento do modal
+  header_bg: "#181b24"                       # Fundo do cabeçalho de navegação
+  header_text: "#ffffff"                     # Cor do título do canal
+  header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+  header_font_size: "14px"                   # Tamanho da fonte do título
+  nav_btn_bg: "#202533"                      # Fundo dos botões de navegação ◀ ▶
+  nav_btn_text: "#38bdf8"                    # Cor das setas ◀ ▶ (azul neon)
+  nav_btn_border: "#334155"                  # Borda dos botões ◀ ▶
+  nav_btn_radius: "6px"                      # Arredondamento dos botões ◀ ▶
+  tab_active_bg: "#2563eb"                   # Fundo da aba selecionada (azul vibrante)
+  tab_active_text: "#ffffff"                 # Texto da aba selecionada
+  tab_inactive_bg: "#1e222d"                 # Fundo das abas inativas
+  tab_inactive_text: "#94a3b8"               # Texto das abas inativas
+  tab_radius: "6px"                          # Arredondamento das abas
+  tab_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+  tab_font_size: "12px"                      # Tamanho da fonte das abas
+  mini_fader_bg: "#101218"                   # Fundo do dock lateral do mini-fader
+  mini_fader_border: "#262936"               # Borda divisória do mini-fader
+  mini_fader_width: "85px"                   # Largura do dock do mini-fader no desktop
+  mob_mini_fader_width: "118px"              # Largura do dock do mini-fader no mobile
+
+

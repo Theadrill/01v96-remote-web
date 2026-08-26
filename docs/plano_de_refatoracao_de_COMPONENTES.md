@@ -1258,25 +1258,29 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - Barramentos `BUS 1-8` Mono e Pareados (com correção de duplo VU estéreo).
 - [x] Conectar medidores WASM, mutes e nudges dedicados de saída (+/- 0.10 dB).
 
-### FASE 10 — Migração: Tela do Músico (`screens/musician_view.js`)
-- [ ] Refatorar `musician_view.js` para instanciar `ChannelStrip`:
-  - Faders de envio simplificados com proteção tátil de `channel_lock`.
-  - Macro Fader de `VOLUME GERAL` do fone do músico (step de 0.25 dB).
-- [ ] Conectar fluxo de travamento/destravamento e modais de confirmação.
-
-### FASE 11 — Host de Edição do Canal & Mini-Fader Lateral (`screens/channel_setup/channel_setup_core.js`)
-- [ ] Criar `channel_setup_core.js` e `channel_setup_core.css` gerenciando:
+### FASE 10 — Host de Edição do Canal & Mini-Fader Lateral (`screens/channel_setup/channel_setup_core.js`) (CONCLUÍDO ✅)
+- [x] Criar `channel_setup_core.js` e `channel_setup_core.css` gerenciando:
   - Navegação entre abas (`EQ`, `DYN`, `AUX`, `INSERTS`, `ROUTING`).
-  - Navegação de canal ◀ / ▶.
-  - Mini-Fader lateral com modo `Solo Replace` e renomeação de canal in-place via `VirtualKeyboard`.
+  - Navegação de canal ◀ / ▶ sincronizada com a Sidebar e atalhos globais.
+  - Mini-Fader lateral contextual instanciando a classe `ChannelStrip` modular com suporte a inputs mono/pareados, MIX, BUS, ST IN e Master Stereo.
+  - Fundo preto sólido `#000000` via variáveis YAML do tema e preservação total da Sidebar à direita.
 
-### FASE 12 — Construção dos Componentes Puros de Áudio & Estilos
+### FASE 11 — Construção dos Componentes Puros de Áudio & Estilos
 - [ ] Implementar `components/eq.js` e `styles/components/eq.css` (Canvas puro com BiquadFilter desacoplado de IDs globais).
 - [ ] Implementar `components/gate.js`, `components/compressor.js` e `styles/components/dynamics.css` (Widgets puros de dinâmica).
 - [ ] Implementar `components/inserts.js`, `components/routing.js` e seus respectivos CSS.
 - [ ] Conectar os novos componentes aos controladores em `screens/channel_setup/`.
 
-### FASE 13 — Limpeza Final do `style.css` Legado e Testes de Regressão em `/new`
+### FASE 12 — Visão Geral de Roteamento & Cenas
+- [ ] Refatorar `screens/routing_overview.js` e `screens/scenes_view.js` com estilos modulares e integração limpa.
+
+### FASE 13 — Migração: Tela do Músico (`screens/musician_view.js`)
+- [ ] Refatorar `musician_view.js` para instanciar `ChannelStrip`:
+  - Faders de envio simplificados com proteção tátil de `channel_lock`.
+  - Macro Fader de `VOLUME GERAL` do fone do músico (step de 0.25 dB).
+- [ ] Conectar fluxo de travamento/destravamento e modais de confirmação.
+
+### FASE 14 — Limpeza Final do `style.css` Legado e Testes de Regressão em `/new`
 - [ ] Auditar e remover definitivamente qualquer resquício de CSS legado no `style.css`.
 - [ ] Validar compatibilidade 100% dos temas YAML (`default.yaml`) em todas as telas e visões.
 - [ ] Executar bateria completa de testes funcionais e de performance 60 FPS na rota `/new`.

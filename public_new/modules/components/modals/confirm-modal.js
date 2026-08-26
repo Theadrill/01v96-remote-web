@@ -664,7 +664,33 @@ var ConfirmModal = (function () {
         if (mv.macro_spacer_width !== undefined)      root.style.setProperty('--main-macro-spacer-width', mv.macro_spacer_width);
         if (mv.macro_spacer_bg !== undefined)         root.style.setProperty('--main-macro-spacer-bg', mv.macro_spacer_bg);
         if (mv.mobile_faders_gap !== undefined)       root.style.setProperty('--main-mob-faders-gap', mv.mobile_faders_gap);
-        if (mv.mobile_group_gap !== undefined)        root.style.setProperty('--main-mob-group-gap', mv.mobile_group_gap);
+        if (mv.mobile_group_gap !== undefined)        root.style.setProperty('--main-group-gap', mv.mobile_group_gap);
+
+        // Channel Setup (Central de Edição do Canal)
+        var csetup = theme.channel_setup || {};
+        if (csetup.overlay_bg)         root.style.setProperty('--csetup-overlay-bg', csetup.overlay_bg);
+        if (csetup.modal_bg)           root.style.setProperty('--csetup-modal-bg', csetup.modal_bg);
+        if (csetup.modal_border)       root.style.setProperty('--csetup-modal-border', csetup.modal_border);
+        if (csetup.modal_radius)       root.style.setProperty('--csetup-modal-radius', csetup.modal_radius);
+        if (csetup.header_bg)          root.style.setProperty('--csetup-header-bg', csetup.header_bg);
+        if (csetup.header_text)        root.style.setProperty('--csetup-header-text', csetup.header_text);
+        if (csetup.header_font_family) root.style.setProperty('--csetup-header-font-family', csetup.header_font_family);
+        if (csetup.header_font_size)   root.style.setProperty('--csetup-header-font-size', csetup.header_font_size);
+        if (csetup.nav_btn_bg)         root.style.setProperty('--csetup-nav-btn-bg', csetup.nav_btn_bg);
+        if (csetup.nav_btn_text)       root.style.setProperty('--csetup-nav-btn-text', csetup.nav_btn_text);
+        if (csetup.nav_btn_border)     root.style.setProperty('--csetup-nav-btn-border', csetup.nav_btn_border);
+        if (csetup.nav_btn_radius)     root.style.setProperty('--csetup-nav-btn-radius', csetup.nav_btn_radius);
+        if (csetup.tab_active_bg)      root.style.setProperty('--csetup-tab-active-bg', csetup.tab_active_bg);
+        if (csetup.tab_active_text)    root.style.setProperty('--csetup-tab-active-text', csetup.tab_active_text);
+        if (csetup.tab_inactive_bg)    root.style.setProperty('--csetup-tab-inactive-bg', csetup.tab_inactive_bg);
+        if (csetup.tab_inactive_text)  root.style.setProperty('--csetup-tab-inactive-text', csetup.tab_inactive_text);
+        if (csetup.tab_radius)         root.style.setProperty('--csetup-tab-radius', csetup.tab_radius);
+        if (csetup.tab_font_family)    root.style.setProperty('--csetup-tab-font-family', csetup.tab_font_family);
+        if (csetup.tab_font_size)      root.style.setProperty('--csetup-tab-font-size', csetup.tab_font_size);
+        if (csetup.mini_fader_bg)      root.style.setProperty('--csetup-mini-fader-bg', csetup.mini_fader_bg);
+        if (csetup.mini_fader_border)  root.style.setProperty('--csetup-mini-fader-border', csetup.mini_fader_border);
+        if (csetup.mini_fader_width)   root.style.setProperty('--csetup-mini-fader-width', csetup.mini_fader_width);
+        if (csetup.mob_mini_fader_width) root.style.setProperty('--csetup-mob-mini-fader-width', csetup.mob_mini_fader_width);
     }
 
     function _alert(message, title, type) {

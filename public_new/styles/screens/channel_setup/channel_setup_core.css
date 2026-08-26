@@ -8,8 +8,366 @@
  * - Estilização da estrutura geral da tela de Edição de Canal (Channel Setup Modal).
  * - Barra superior de abas de navegação ([EQ], [DYN], [AUX], [INSERTS], [ROUTING]).
  * - Botões laterais de navegação rápida de canais (◀ Anterior / Próximo ▶).
- * - Dock lateral do Mini-Fader contextual integrado à esquerda.
+ * - Dock lateral do Mini-Fader contextual integrado à direita.
+ * - Totalmente integrado ao sistema de variáveis de temas YAML (--csetup-*).
  * =========================================================================================
  */
 
-/* Placeholder - Regras CSS serão migradas na Fase 5 */
+:root {
+    --csetup-overlay-bg: rgba(0, 0, 0, 0.75);
+    --csetup-modal-bg: #12141a;
+    --csetup-modal-border: #262936;
+    --csetup-modal-radius: 10px;
+    --csetup-header-bg: #181b24;
+    --csetup-header-text: #ffffff;
+    --csetup-header-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --csetup-header-font-size: 14px;
+    --csetup-nav-btn-bg: #202533;
+    --csetup-nav-btn-text: #38bdf8;
+    --csetup-nav-btn-border: #334155;
+    --csetup-nav-btn-radius: 6px;
+    --csetup-tab-active-bg: #2563eb;
+    --csetup-tab-active-text: #ffffff;
+    --csetup-tab-inactive-bg: #1e222d;
+    --csetup-tab-inactive-text: #94a3b8;
+    --csetup-tab-radius: 6px;
+    --csetup-tab-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --csetup-tab-font-size: 12px;
+    --csetup-mini-fader-bg: #101218;
+    --csetup-mini-fader-border: #262936;
+    --csetup-mini-fader-width: 85px;
+    --csetup-mob-mini-fader-width: 118px;
+}
+
+/* Overlay do Modal de Edição de Canal (Ocupa a área de faders à esquerda da Sidebar com fundo PRETO sólido) */
+.ch-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 200px;
+    bottom: 0;
+    width: auto;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--csetup-overlay-bg, #000000) !important;
+    background-color: #000000 !important;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Fundo do corpo interno do modal de setup */
+.inline-style-22,
+.ch-modal-body,
+.styled-chModalContent,
+#chModalContent {
+    background: #000000 !important;
+    background-color: #000000 !important;
+}
+
+/* Modo Mobile: Sidebar com largura compacta (115px) */
+body:not(.layout-desktop) .ch-modal-overlay {
+    right: 115px;
+}
+
+/* Modo Retrato Mobile */
+body:not(.layout-desktop).is-portrait .ch-modal-overlay {
+    right: 0;
+    bottom: 60px;
+}
+
+/* Shell do Diálogo */
+.ch-setup-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1280px;
+    height: 100%;
+    max-height: 94dvh;
+    background: var(--csetup-modal-bg);
+    border: 1px solid var(--csetup-modal-border);
+    border-radius: var(--csetup-modal-radius);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Cabeçalho de Navegação e Título */
+.ch-setup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: var(--csetup-header-bg);
+    border-bottom: 1px solid var(--csetup-modal-border);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ch-setup-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ch-setup-nav-btn {
+    background: var(--csetup-nav-btn-bg);
+    color: var(--csetup-nav-btn-text);
+    border: 1px solid var(--csetup-nav-btn-border);
+    border-radius: var(--csetup-nav-btn-radius);
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 800;
+    font-family: var(--csetup-header-font-family);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.ch-setup-nav-btn:hover {
+    background: #283042;
+    border-color: var(--csetup-nav-btn-text);
+}
+
+.ch-setup-nav-btn:active {
+    transform: scale(0.97);
+}
+
+.ch-setup-title-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ch-setup-title {
+    color: var(--csetup-header-text);
+    font-family: var(--csetup-header-font-family);
+    font-size: var(--csetup-header-font-size);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.ch-setup-badge-mode {
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ch-setup-close-btn {
+    background: #2a1b1b;
+    color: #f87171;
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.ch-setup-close-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.ch-setup-close-btn:active {
+    transform: scale(0.95);
+}
+
+/* Barra de Abas */
+.ch-setup-tabs-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #151821;
+    border-bottom: 1px solid var(--csetup-modal-border);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.ch-setup-tab-btn {
+    background: var(--csetup-tab-inactive-bg);
+    color: var(--csetup-tab-inactive-text);
+    border: 1px solid transparent;
+    border-radius: var(--csetup-tab-radius);
+    padding: 6px 14px;
+    font-family: var(--csetup-tab-font-family);
+    font-size: var(--csetup-tab-font-size);
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: all 0.15s ease;
+}
+
+.ch-setup-tab-btn:hover {
+    color: #ffffff;
+    background: #252a38;
+}
+
+.ch-setup-tab-btn.active {
+    background: var(--csetup-tab-active-bg);
+    color: var(--csetup-tab-active-text);
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+/* Área Principal (Conteúdo da Aba + Mini-Fader Lateral) */
+.ch-setup-body {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Conteúdo Dinâmico da Aba */
+.ch-setup-tab-content {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+/* Dock Lateral do Mini-Fader */
+.ch-setup-fader-dock {
+    width: var(--csetup-mini-fader-width);
+    min-width: var(--csetup-mini-fader-width);
+    height: 100%;
+    background: var(--csetup-mini-fader-bg);
+    border-left: 1px solid var(--csetup-mini-fader-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.ch-setup-fader-dock .channel-strip-wrapper {
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 6px;
+}
+
+/* Responsividade Mobile */
+body:not(.layout-desktop) .ch-setup-fader-dock {
+    width: var(--csetup-mob-mini-fader-width);
+    min-width: var(--csetup-mob-mini-fader-width);
+}
+
+body:not(.layout-desktop) .ch-setup-shell {
+    max-height: 98dvh;
+    border-radius: 8px;
+}
+
+/* Sidebar: Navegação entre Canais & Título no Header da Sidebar */
+.sidebar-nav {
+    display: none;
+    gap: 6px;
+    width: 100%;
+    margin-top: 4px;
+    box-sizing: border-box;
+}
+
+body.screen-config .sidebar-nav,
+body.screen-techmix .sidebar-nav {
+    display: flex !important;
+}
+
+.sidebar-nav-btn {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border-radius: var(--csetup-nav-btn-radius, 6px);
+    border: 1px solid var(--csetup-nav-btn-border, #334155);
+    background: var(--csetup-nav-btn-bg, #202533);
+    color: var(--csetup-nav-btn-text, #38bdf8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    outline: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.sidebar-nav-btn svg {
+    display: block;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    margin: 0 auto;
+}
+
+.sidebar-nav-btn:hover {
+    background: #283042;
+    border-color: #38bdf8;
+}
+
+.sidebar-nav-btn:active {
+    transform: scale(0.92);
+}
+
+#chSideTitle,
+#techMixTitle {
+    color: var(--strip-name-display-color, #00ff00);
+    font-family: var(--strip-header-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+    width: 100%;
+    margin: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: none;
+}
+
+body.screen-config #chSideTitle {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+body.screen-config #techMixTitle,
+body.screen-config #foneIndicatorSidebar {
+    display: none !important;
+}
+
+body.screen-techmix #chSideTitle {
+    display: none !important;
+}
+
+body.screen-techmix #techMixTitle {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+

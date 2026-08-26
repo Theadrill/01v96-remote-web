@@ -119,8 +119,22 @@ var OutsView = (function () {
                     })(m, mGlobalId),
                     config_click: (function (gId) {
                         return function () {
-                            if (typeof openChannelConfigModal === 'function') {
-                                openChannelConfigModal(gId);
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(mGlobalId),
+                    header_click: (function (gId) {
+                        return function () {
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(mGlobalId),
+                    name_click: (function (gId) {
+                        return function () {
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
                             }
                         };
                     })(mGlobalId),
@@ -225,8 +239,22 @@ var OutsView = (function () {
                     })(b, bGlobalId, isBPaired),
                     config_click: (function (gId) {
                         return function () {
-                            if (typeof openChannelConfigModal === 'function') {
-                                openChannelConfigModal(gId);
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(bGlobalId),
+                    header_click: (function (gId) {
+                        return function () {
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(bGlobalId),
+                    name_click: (function (gId) {
+                        return function () {
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
                             }
                         };
                     })(bGlobalId),
@@ -330,8 +358,22 @@ var OutsView = (function () {
                     })(stCh, stGlobalId),
                     config_click: (function (gId) {
                         return function () {
-                            if (typeof openChannelConfigModal === 'function') {
-                                openChannelConfigModal(gId);
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(stGlobalId),
+                    header_click: (function (gId) {
+                        return function () {
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(stGlobalId),
+                    name_click: (function (gId) {
+                        return function () {
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
                             }
                         };
                     })(stGlobalId),

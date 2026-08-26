@@ -1,14 +1,23 @@
 function openChannelConfig(e, ch) {
-    if (musicianMode) return; // Apenas Músico é bloqueado de abrir config base
-    if (e.target.closest('button') || e.target.closest('input')) return;
+    if (typeof ChannelSetupCore !== 'undefined' && ChannelSetupCore.open) {
+        ChannelSetupCore.open(e, ch);
+        return;
+    }
+    if (musicianMode) return;
+    if (e && e.target && (e.target.closest('button') || e.target.closest('input'))) return;
 
     activeConfigChannel = ch;
     updateConfigUIForChannel(ch);
-    activeConfigTab = 'aux'; // Sempre abre em Aux por padrão
+    activeConfigTab = 'aux';
     switchTab(activeConfigTab);
 }
 
 function updateConfigUIForChannel(ch) {
+    if (typeof ChannelSetupCore !== 'undefined' && ChannelSetupCore.updateHeader) {
+        ChannelSetupCore.updateHeader(ch);
+        ChannelSetupCore.renderMiniFader(ch);
+        return;
+    }
     let targetId = `name${ch}`;
     let displayTitle = `${ch + 1}`;
 
@@ -37,11 +46,9 @@ function updateConfigUIForChannel(ch) {
 
     document.getElementById('chConfigModal').style.display = 'flex';
 
-    // Sidebar: channel config mode
     if (typeof renderDock === 'function') renderDock('channelConfig');
     if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
 
-    // Ocultar aba DYN para canais ST IN (não possuem Dynamics na 01v96)
     const dynTabBtn = document.querySelectorAll('.dock-tab')[1];
     if (dynTabBtn) {
         dynTabBtn.style.display = (ch >= 60 && ch <= 67) ? 'none' : '';
@@ -65,10 +72,8 @@ function updateConfigUIForChannel(ch) {
 
     if (window.autoScaleTitle) autoScaleTitle();
 
-    // Remove realce de todos
     document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
 
-    // Aplica realce no card correto
     let currentCard = null;
     if (ch >= 0 && ch <= 31) {
         currentCard = document.querySelectorAll('.fader-card')[ch];
@@ -89,8 +94,11 @@ function updateConfigUIForChannel(ch) {
 }
 
 function changeConfigChannel(delta) {
+    if (typeof ChannelSetupCore !== 'undefined' && ChannelSetupCore.changeChannel) {
+        ChannelSetupCore.changeChannel(delta);
+        return;
+    }
     let nextCh = activeConfigChannel;
-
     let safetyCounter = 0;
     do {
         if (nextCh >= 60 && nextCh <= 67) {
@@ -116,11 +124,14 @@ function changeConfigChannel(delta) {
 
     activeConfigChannel = nextCh;
     updateConfigUIForChannel(nextCh);
-
     switchTab(activeConfigTab);
 }
 
 function closeChannelConfig() {
+    if (typeof ChannelSetupCore !== 'undefined' && ChannelSetupCore.close) {
+        ChannelSetupCore.close();
+        return;
+    }
     if (window.stopEQAnimation) stopEQAnimation();
     if (typeof window.stopMixVolumeGeralNudge === 'function') window.stopMixVolumeGeralNudge();
     if (typeof window.stopAuxVolumeGeralNudge === 'function') window.stopAuxVolumeGeralNudge();
@@ -134,7 +145,6 @@ function closeChannelConfig() {
     if (vgSlot) vgSlot.remove();
 
     initUI();
-
     document.querySelectorAll('.fader-card').forEach(c => c.style.background = '');
 }
 
