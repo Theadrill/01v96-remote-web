@@ -408,9 +408,9 @@ channel_strip:
     scale_font_size: "8.5px"                   # Tamanho da régua mobile
     scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_big_nudge_font_size: "28px"          # Tamanho dos big nudges mobile
-    fader_thumb_width: "46px"                  # Largura do fader thumb mobile
-    fader_thumb_height: "38px"                 # Altura do fader thumb mobile
-    fader_thumb_radius: "6px"                  # Arredondamento do fader thumb mobile
+    fader_thumb_width: "58px"                  # Largura do fader thumb mobile (+25%)
+    fader_thumb_height: "48px"                 # Altura do fader thumb mobile (+25%)
+    fader_thumb_radius: "7px"                  # Arredondamento do fader thumb mobile
 
 
 # ─── MAIN VIEW (TELA PRINCIPAL DO MIXER) ──────────────────────

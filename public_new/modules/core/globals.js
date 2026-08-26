@@ -169,33 +169,40 @@ function getChannelParamPrefix(id) {
  * Calcula o próximo valor RAW baseado em um step em dB.
  * Útil para botões de nudge (+/-) que operam em passos fixos de volume.
  */
-function getSteppedRaw(currentRaw, dir, stepDb = 0.5) {
-    const magnitude = Math.abs(dir);
+function getSteppedRaw(currentRaw, dir, stepDb = 0.5, isMaster = false) {
     const isUp = dir > 0;
-    const currentDbStr = rawToDb(currentRaw, false);
-    let currentDb = currentDbStr === "-∞" ? -138 : parseFloat(currentDbStr);
+    if (currentRaw <= 0 && !isUp) return 0;
+    if (currentRaw >= 1023 && isUp) return 1023;
 
-    // Se estiver no infinito e subir, começa do fundo da curva (-138)
+    // Se estiver no infinito (raw=0) e subir, vai para o primeiro degrau audível (raw=1)
     if (currentRaw === 0 && isUp) {
-        return dbToRaw(-138 + (stepDb * magnitude));
+        return 1;
     }
 
-    let nextDb = isUp ? (currentDb + (stepDb * magnitude)) : (currentDb - (stepDb * magnitude));
+    // Se estiver em raw=1 e descer, vai para -infinito (raw=0)
+    if (currentRaw === 1 && !isUp) {
+        return 0;
+    }
 
-    // Proteções de limites
-    if (nextDb > 10) nextDb = 10;
+    const currentDbStr = typeof rawToDb === 'function' ? rawToDb(currentRaw, false, isMaster) : '0';
+    let currentDb = (currentDbStr === "-∞" || currentDbStr === "-inf") ? -138 : parseFloat(currentDbStr);
+    if (isNaN(currentDb)) currentDb = -138;
+
+    const maxDb = isMaster ? 0.0 : 10.0;
+    let nextDb = isUp ? (currentDb + stepDb) : (currentDb - stepDb);
+
+    if (nextDb > maxDb) nextDb = maxDb;
     if (nextDb < -138) return 0;
 
-    let nRaw = dbToRaw(nextDb);
+    let nRaw = typeof dbToRaw === 'function' ? dbToRaw(isMaster ? nextDb + 10 : nextDb) : Math.round(currentRaw + (isUp ? 1 : -1));
 
-    // 🚨 CORREÇÃO: Se nRaw não mudou mas houve direção, força mudança de pelo menos 1 unidade raw
-    // Isso evita o "travamento" em áreas de baixa resolução da curva (ex: perto de -∞)
+    // Se a resolução da curva em dB não gerou pelo menos 1 unidade de alteração raw:
     if (nRaw === currentRaw) {
         if (isUp && currentRaw < 1023) nRaw = currentRaw + 1;
         else if (!isUp && currentRaw > 0) nRaw = currentRaw - 1;
     }
 
-    return nRaw;
+    return Math.max(0, Math.min(1023, nRaw));
 }
 
 /**

@@ -326,6 +326,12 @@ var MainView = (function () {
         var strip = _strips[ch];
         if (!strip) return;
 
+        // Guard anti-echo: durante nudge, bloqueia atualização do fader para evitar
+        // que o echo do mixer sobrescreva o valor recém-calculado pelo _applyNudgeStep
+        if (val !== undefined && val !== null && typeof window !== 'undefined' && window._nudgeBlockUntil && Date.now() < window._nudgeBlockUntil) {
+            return;
+        }
+
         var isMaster = ch === 'master' || ch === 52;
         var isDesktop = typeof layoutMode !== 'undefined' ? (layoutMode === 'desktop') : true;
 

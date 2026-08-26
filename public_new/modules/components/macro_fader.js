@@ -60,33 +60,48 @@ function createMacroFaderInstance(config) {
         }, 5000);
     }
 
-    function nudge(dir) {
+    function nudge(dir, stepDb = 0.05) {
         const channels = getChannelIds();
         if (!channels.length) return;
 
-        const step = musicianMode ? dir * 20 : dir;
         let anyChanged = false;
 
         channels.forEach(chIdx => {
             let s = channelStates[chIdx];
             if (!s) return;
 
-            let currentVal = ((musicianMode || technicianMixMode)) ? (s[`aux${activeMix}`] || 0) : s.value;
+            let isAuxMode = ((musicianMode || technicianMixMode));
+            let currentVal = isAuxMode ? (s[`aux${activeMix}`] || 0) : s.value;
             if (musicianMode && currentVal <= 0) return;
-            let nRaw = currentVal + step;
+
+            let nRaw = typeof getSteppedRaw === 'function'
+                ? getSteppedRaw(currentVal, dir, stepDb, false)
+                : Math.max(0, Math.min(1023, currentVal + (dir > 0 ? 1 : -1)));
+
             if (nRaw < 0) nRaw = 0;
             if (nRaw > 1023) nRaw = 1023;
 
             if (nRaw === currentVal) return;
 
             anyChanged = true;
-            updateUI(chIdx, nRaw, undefined, undefined);
+            if (isAuxMode) {
+                s[`aux${activeMix}`] = nRaw;
+            } else {
+                s.value = nRaw;
+            }
+
+            if (typeof updateUI === 'function') {
+                updateUI(chIdx, nRaw, undefined, undefined);
+            }
+            if (typeof MainView !== 'undefined' && MainView.updateChannel) {
+                MainView.updateChannel(chIdx, nRaw);
+            }
 
             let typeFader;
-            if ((musicianMode || technicianMixMode)) typeFader = `kInputAUX/kAUX${activeMix}Level`;
+            if (isAuxMode) typeFader = `kInputAUX/kAUX${activeMix}Level`;
             else typeFader = 'kInputFader/kFader';
 
-            if (appReady) {
+            if (appReady && typeof socket !== 'undefined') {
                 socket.emit('control', { type: typeFader, channel: chIdx, value: nRaw });
             }
         });
@@ -99,13 +114,13 @@ function createMacroFaderInstance(config) {
 
     function startNudge(dir) {
         stopNudge();
-        nudge(dir);
+        nudge(dir, 0.05);
 
-        const repeatMs = musicianMode ? 160 : 80;
-        const holdMs = musicianMode ? 200 : 500;
+        const repeatMs = musicianMode ? 140 : 80;
+        const holdMs = musicianMode ? 200 : 260;
         nudgeTimeout = setTimeout(() => {
             nudgeInterval = setInterval(() => {
-                nudge(dir * 3);
+                nudge(dir, 0.10);
             }, repeatMs);
         }, holdMs);
 
@@ -214,7 +229,8 @@ const macroFader = createMacroFaderInstance({
 window.getMacroFaderHtml = () => macroFader.getHtml();
 window.startMacroNudge = (dir) => macroFader.startNudge(dir);
 window.stopMacroNudge = () => macroFader.stopNudge();
-window.nudgeMacro = (dir) => macroFader.nudge(dir);
+window.nudgeMacro = (dir, stepDb) => macroFader.nudge(dir, stepDb);
+window.handleMacroNudge = (dir, stepDb) => macroFader.nudge(dir, stepDb);
 
 // --- Config Modal (so existe para o Macro Fader principal) ---
 function openMacroConfig() {

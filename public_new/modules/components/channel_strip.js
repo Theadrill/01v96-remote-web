@@ -60,6 +60,7 @@ class ChannelStrip {
         this.deltaResetTimer = null;
         this.nudgeTimer = null;
         this.nudgeInterval = null;
+        this._lastNudgeRaw = null;
         this.peakHoldTimerL = null;
         this.peakHoldTimerR = null;
         this.isDragging = false;
@@ -587,7 +588,15 @@ class ChannelStrip {
         // 5. Botão ON / Mute
         if (els.onBtn) {
             els.onBtn.addEventListener('click', () => {
+                const isMaster = this.config.isMaster || this.config.type === 'master';
                 const newState = !this.config.onState;
+
+                // Se for o canal Master e estiver LIGADO, não escurece/desliga visualmente antes da confirmação no modal
+                if (isMaster && this.config.onState) {
+                    this._emitEvent('on_toggle', { state: newState });
+                    return;
+                }
+
                 this.setOnState(newState);
                 this._emitEvent('on_toggle', { state: newState });
             });
@@ -942,75 +951,99 @@ class ChannelStrip {
     }
 
     /**
-     * Configura botão de Nudge com auto-repeat acelerado
+     * Configura botão de Nudge com auto-repeat acelerado e proteção contra duplo disparo no touch
      * @private
      */
     _setupNudgeButton(btnEl, direction) {
         const isOut = this.config.type === 'mix' || this.config.type === 'bus' || this.config.type === 'bus_paired';
         const isAuxSend = this.config.type === 'aux_send';
         const isMacro = this.config.mode === 'macro' || (this.config.type && this.config.type.startsWith('macro'));
+        const isMacroMusician = this.config.mode === 'macro_musician' || this.config.type === 'macro_musician';
+        const isMacroAux = this.config.mode === 'macro_aux' || this.config.type === 'macro_aux';
 
-        let step = 0.05;
+        let singleStep = 0.05;
+        let holdStep = 0.10;
+
         if (isAuxSend) {
-            step = 0.50;
-        } else if (this.config.mode === 'macro_musician' || this.config.type === 'macro_musician') {
-            step = 0.25;
-        } else if (this.config.mode === 'macro_aux' || this.config.type === 'macro_aux') {
-            step = 0.10;
-        } else if (isOut) {
-            step = 0.10;
-        } else if (isMacro) {
-            step = 0.05;
+            singleStep = 0.50;
+            holdStep = 0.50;
+        } else if (isMacroMusician) {
+            singleStep = 0.25;
+            holdStep = 0.50;
+        } else if (isMacroAux || isOut) {
+            singleStep = 0.10;
+            holdStep = 0.20;
+        } else {
+            // Inputs (Mono 1-32, Pareados, ST IN), Master e Macro Técnico
+            singleStep = 0.05;
+            holdStep = 0.10;
         }
 
-        const stepNudge = () => {
+        const stepNudge = (stepVal) => {
             if (isMacro) {
                 // Em macros, acumula delta dB, atualiza o LED e agenda retorno para '--' após 5s
-                this._applyMacroDelta(direction, step);
-                this._emitEvent('nudge', { direction, step });
+                this._applyMacroDelta(direction, stepVal);
+                this._emitEvent('nudge', { direction, step: stepVal });
             } else if (isAuxSend) {
                 // AUX sends usam path legado (nudgeAuxLevel) que emite socket kInputAUX/kAUX...
-                // NÃO usar _applyNudgeStep aqui porque commitFaderChange emite kInputFader (errado p/ AUX)
-                this._emitEvent('nudge', { direction, step });
+                this._emitEvent('nudge', { direction, step: stepVal });
             } else if (typeof this.config.faderValue === 'number') {
                 // Canais normais: _applyNudgeStep calcula step dB correto e emite fader_change
-                // → commitFaderChange → updateUI + socket.emit (kInputFader).
-                // NÃO emitir 'nudge' para evitar que nudgeFader sobrescreva com incremento raw +1.
-                this._applyNudgeStep(direction, step);
+                this._applyNudgeStep(direction, stepVal);
             } else {
-                this._emitEvent('nudge', { direction, step });
+                this._emitEvent('nudge', { direction, step: stepVal });
             }
         };
 
-        const startAutoRepeat = (e) => {
-            e.preventDefault();
-            stepNudge();
+        let lastTriggerTime = 0;
 
-            let delay = 120;
-            const minDelay = 25;
+        const startAutoRepeat = (e) => {
+            if (e) {
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+            }
+
+            const now = Date.now();
+            if (now - lastTriggerTime < 80) return; // Anti-bounce / anti-duplo-toque
+            lastTriggerTime = now;
+
+            // Toque inicial com singleStep (0.05 dB nos inputs)
+            stepNudge(singleStep);
+
+            let delay = 140;
+            const minDelay = 30;
 
             const repeat = () => {
-                stepNudge();
+                // Hold contínuo com holdStep (0.10 dB nos inputs)
+                stepNudge(holdStep);
                 delay = Math.max(minDelay, delay * 0.82);
                 this.nudgeInterval = setTimeout(repeat, delay);
             };
 
+            if (this.nudgeTimer) clearTimeout(this.nudgeTimer);
             this.nudgeTimer = setTimeout(() => {
                 repeat();
-            }, 220);
+            }, 260);
         };
 
-        const stopAutoRepeat = () => {
+        const stopAutoRepeat = (e) => {
+            if (e && e.cancelable) e.preventDefault();
             if (this.nudgeTimer) clearTimeout(this.nudgeTimer);
             if (this.nudgeInterval) clearTimeout(this.nudgeInterval);
             this.nudgeTimer = null;
             this.nudgeInterval = null;
+            setTimeout(() => { this._lastNudgeRaw = null; }, 200);
         };
 
         btnEl.addEventListener('pointerdown', startAutoRepeat);
         btnEl.addEventListener('pointerup', stopAutoRepeat);
         btnEl.addEventListener('pointerleave', stopAutoRepeat);
         btnEl.addEventListener('pointercancel', stopAutoRepeat);
+        btnEl.addEventListener('contextmenu', (e) => e.preventDefault());
+        btnEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
     }
 
     /**
@@ -1045,34 +1078,67 @@ class ChannelStrip {
         const isDesktop = this.config.layout === 'desktop';
         const currentRaw = this.config.faderValue !== null && this.config.faderValue !== undefined ? this.config.faderValue : 0;
 
-        let currentDb = -138;
-        if (currentRaw > 0) {
-            const rawText = typeof rawToDb === 'function' ? rawToDb(currentRaw, false, isMaster) : '0';
-            currentDb = parseFloat(rawText);
-            if (isNaN(currentDb)) currentDb = -138;
+        // Guard anti-echo: se o mixer sobrescreveu o valor desde o último nudge,
+        // restaura para o valor que nós calculamos e recalcula a partir dele
+        if (this._lastNudgeRaw !== null && currentRaw !== this._lastNudgeRaw) {
+            this.config.faderValue = this._lastNudgeRaw;
+            this._lastNudgeRaw = null;
+            return this._applyNudgeStep(direction, stepDb);
         }
 
-        let newDb;
-        if (currentRaw === 0 && direction > 0) {
-            newDb = -60.0;
+        // Proteção de limites
+        if (currentRaw <= 0 && direction < 0) return;
+        if (currentRaw >= 1023 && direction > 0) return;
+
+        let newRaw;
+        if (typeof getSteppedRaw === 'function') {
+            newRaw = getSteppedRaw(currentRaw, direction, stepDb, isMaster);
         } else {
-            newDb = currentDb + (direction * stepDb);
+            newRaw = Math.max(0, Math.min(1023, currentRaw + (direction > 0 ? 1 : -1)));
         }
 
-        const maxDb = isMaster ? 0.0 : 10.0;
-        if (newDb > maxDb) newDb = maxDb;
-        if (newDb < -60.0) newDb = -138;
-
-        let newRaw = 0;
-        if (newDb > -138) {
-            newRaw = typeof dbToRaw === 'function' ? dbToRaw(isMaster ? newDb + 10 : newDb) : Math.round((newDb + 60) * 10);
-            newRaw = Math.max(0, Math.min(1023, newRaw));
+        // Garante que houve mudança de pelo menos 1 unidade raw
+        if (newRaw === currentRaw) {
+            if (direction > 0 && currentRaw < 1023) newRaw = currentRaw + 1;
+            else if (direction < 0 && currentRaw > 0) newRaw = currentRaw - 1;
         }
 
-        const newDbText = typeof rawToDb === 'function' ? rawToDb(newRaw, !isDesktop, isMaster) : `${newDb.toFixed(2)} dB`;
+        if (newRaw === currentRaw) return;
 
+        const newDbText = typeof rawToDb === 'function' ? rawToDb(newRaw, !isDesktop, isMaster) : `${newRaw}`;
+
+        // Atualiza o componente local
         this.setFaderValue(newRaw, newDbText);
-        this._emitEvent('fader_change', { value: newRaw, dbText: newDbText });
+        this._lastNudgeRaw = newRaw;
+
+        // Bloqueia updateUI/MainView.updateChannel por 200ms para impedir echo
+        if (typeof window !== 'undefined') {
+            window._nudgeBlockUntil = Date.now() + 200;
+        }
+
+        // Atualiza o estado global diretamente
+        const ch = this.config.evtCh !== undefined ? this.config.evtCh : this.config.id;
+        if (typeof channelStates !== 'undefined' && typeof ch === 'number') {
+            if (channelStates[ch]) channelStates[ch].value = newRaw;
+        } else if (typeof masterState !== 'undefined' && (ch === 'master' || this.config.isMaster)) {
+            masterState.value = newRaw;
+        }
+
+        // Envia ao mixer
+        if (typeof appReady !== 'undefined' && appReady && typeof socket !== 'undefined') {
+            let typeFader = 'kInputFader/kFader';
+            if (isMaster) typeFader = 'kStereoFader/kFader';
+            else if ((typeof musicianMode !== 'undefined' && musicianMode || typeof technicianMixMode !== 'undefined' && technicianMixMode) && typeof ch === 'number' && ch < 32) {
+                typeFader = `kInputAUX/kAUX${activeMix}Level`;
+            } else if (typeof ch === 'string' && ch.startsWith('m')) typeFader = 'kAUXFader/kFader';
+            else if (typeof ch === 'string' && ch.startsWith('b')) typeFader = 'kBusFader/kFader';
+
+            let emitCh = ch;
+            if (isMaster) emitCh = 0;
+            else if (typeof ch === 'string') emitCh = parseInt(ch.substring(1));
+
+            socket.emit('control', { type: typeFader, channel: emitCh, value: newRaw });
+        }
     }
 
     /**
@@ -1530,14 +1596,18 @@ function updateUI(ch, val, onState, soloState) {
 
     if (!stateRef) return;
 
+    // Guard anti-echo: bloqueia atualização de fader durante nudge para impedir
+    // que o echo do mixer sobrescreva o valor recém-calculado pelo _applyNudgeStep
+    const blockFaderUpdate = val !== undefined && val !== null && typeof window !== 'undefined' && window._nudgeBlockUntil && Date.now() < window._nudgeBlockUntil;
+
     if (typeof MainView !== 'undefined' && MainView.isActive && MainView.isActive()) {
-        MainView.updateChannel(uiId, val, onState, soloState);
+        MainView.updateChannel(uiId, blockFaderUpdate ? undefined : val, onState, soloState);
     }
     if (typeof OutsView !== 'undefined' && OutsView.isActive && OutsView.isActive()) {
-        OutsView.updateChannel(uiId, val, onState, soloState);
+        OutsView.updateChannel(uiId, blockFaderUpdate ? undefined : val, onState, soloState);
     }
 
-    if (val !== undefined && val !== null) {
+    if (val !== undefined && val !== null && !blockFaderUpdate) {
         const elF = document.getElementById(`f${uiId}`);
         if (elF) elF.value = val;
         const elFMini = document.getElementById(`mini-f${uiId}`);

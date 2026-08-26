@@ -422,11 +422,11 @@ var OutsView = (function () {
                             socket.emit('control', { type: 'kFader/kFaderIndex', channel: 'master', value: data.value });
                         }
                     },
-                    on_toggle: function (data) {
-                        var newVal = data.state !== undefined ? data.state : (typeof masterState !== 'undefined' ? !masterState.on : true);
-                        if (typeof masterState !== 'undefined') masterState.on = newVal;
-                        if (typeof socket !== 'undefined') {
-                            socket.emit('control', { type: 'kChannelOn/kOn', channel: 'master', value: newVal ? 1 : 0 });
+                    on_toggle: function () {
+                        if (typeof confirmMasterOn === 'function') {
+                            confirmMasterOn();
+                        } else if (typeof toggleState === 'function') {
+                            toggleState('kStereoChannelOn/kChannelOn', 'master');
                         }
                     },
                     pan_change: function (data) {

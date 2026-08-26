@@ -696,7 +696,6 @@
 .macro-fader-card .macro-db-display.macro-db-active,
 .channel-strip-wrapper.desk-strip.is-macro .macro-db-display.macro-db-active {
     color: var(--strip-macro-delta-active-text, #00ff00) !important;
-    text-shadow: 0 0 8px rgba(0, 255, 0, 0.8), 0 0 16px rgba(0, 255, 0, 0.4) !important;
 }
 .macro-fader-card .macro-fader-nudge-wrap {
     margin-top: 8px !important;
@@ -835,7 +834,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 4px;
+    padding: 0;
     font-size: var(--strip-header-font-size, 11px);
     font-weight: var(--strip-header-font-weight, 800);
     font-family: var(--strip-header-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
@@ -850,17 +849,20 @@
     position: relative;
 }
 .desk-slot-left {
-    width: 14px;
-    min-width: 14px;
+    width: 22px;
+    min-width: 22px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 10px;
     user-select: none;
+    box-sizing: border-box;
 }
 .desk-slot-right {
-    width: 14px;
-    min-width: 14px;
+    width: 22px;
+    min-width: 22px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -870,10 +872,12 @@
     color: #888888;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.15s ease, color 0.15s ease;
+    transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+    box-sizing: border-box;
 }
 .desk-slot-right svg {
     display: block;
+    pointer-events: none;
 }
 .channel-strip-wrapper:hover .desk-slot-right,
 .channel-strip-wrapper.is-locked .desk-slot-right {
@@ -882,7 +886,11 @@
 }
 .desk-slot-right:hover {
     opacity: 1;
-    color: #ffffff;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+}
+.desk-slot-right:hover svg {
+    filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.8));
 }
 .desk-ch-num {
     flex: 1;
@@ -1250,11 +1258,11 @@
 }
 
 .mob-fader-thumb {
-    width: var(--strip-mob-thumb-width, 46px) !important;
-    height: var(--strip-mob-thumb-height, 38px) !important;
+    width: var(--strip-mob-thumb-width, 58px) !important;
+    height: var(--strip-mob-thumb-height, 48px) !important;
     background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%) !important;
     border: 1.5px solid #000 !important;
-    border-radius: var(--strip-mob-thumb-radius, 6px) !important;
+    border-radius: var(--strip-mob-thumb-radius, 7px) !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
     cursor: grab;
     touch-action: none;
@@ -1263,7 +1271,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    bottom: calc((100% - 38px) * var(--fader-pos, 0));
+    bottom: calc((100% - var(--strip-mob-thumb-height, 48px)) * var(--fader-pos, 0));
 }
 .mob-fader-thumb .thumb-center-line {
     width: 100%;
@@ -1518,7 +1526,6 @@
 
 .macro-delta-display.macro-db-active {
     color: var(--strip-macro-delta-active-text, #00ff00);
-    text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
 }
 
 .desk-fader-core.macro-fader-core,
@@ -2110,42 +2117,159 @@
     padding: 4px 0;
 }
 
-/* Mobile Macro Variations */
-.mob-macro-feature-zone {
+/* =========================================================================
+   ESTRUTURA UNIFICADA: MACRO FADER (DESKTOP E MOBILE)
+   ========================================================================= */
+
+/* 1. Header */
+.channel-strip-wrapper.is-macro .desk-label-wrapper,
+.channel-strip-wrapper.is-macro .mob-card-header {
+    background: var(--strip-macro-header-bg, #3f3f46) !important;
+    color: var(--strip-macro-header-text, #ffffff) !important;
+    border-top: 2px solid #71717a !important;
+    font-weight: 800 !important;
+    font-size: 11px !important;
+    text-align: center !important;
+}
+
+/* 2. Display OLED do Nome (MACRO FADER) */
+.channel-strip-wrapper.is-macro .desk-ch-name-zone,
+.channel-strip-wrapper.is-macro .mob-display-name {
+    background: var(--strip-macro-title-bg, #000000) !important;
+    border-radius: 6px !important;
+    width: var(--strip-macro-element-width, 90%) !important;
+    margin: 4px auto !important;
+    padding: 2px 4px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid #222 !important;
+    color: var(--strip-macro-title-color, #ffffff) !important;
+    font-family: var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif) !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+}
+
+/* 3. Botão CONFIG */
+.channel-strip-wrapper.is-macro .macro-fader-config-wrap,
+.channel-strip-wrapper.is-macro .mob-macro-feature-zone {
     padding: 0 !important;
-    text-align: center;
+    width: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
 }
-.mob-macro-fader-core {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px 6px;
-    flex: 1;
-    justify-content: center;
-}
-.mob-big-nudge {
-    height: 70px;
-    font-size: var(--strip-mob-macro-big-nudge-font-size, 28px);
-    font-weight: bold;
-    background: #fff;
-    color: #000;
-    border-radius: 8px;
-    border: none;
+
+.channel-strip-wrapper.is-macro .macro-fader-config-btn,
+.channel-strip-wrapper.is-macro .macro-config-btn {
+    width: var(--strip-macro-element-width, 90%) !important;
+    height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px)) !important;
+    min-height: var(--strip-macro-config-btn-height, var(--strip-btn-on-height, 40px)) !important;
+    background: var(--strip-macro-config-bg, #6b21a8) !important;
+    color: var(--strip-macro-config-text, #ffffff) !important;
+    border: none !important;
+    border-radius: var(--strip-macro-config-radius, 6px) !important;
+    font-family: var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif) !important;
+    font-size: var(--strip-macro-config-font-size, 11px) !important;
+    font-weight: var(--strip-macro-config-font-weight, 800) !important;
+    letter-spacing: 0.2px !important;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 4px auto !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.channel-strip-wrapper.is-macro .macro-fader-config-btn:hover,
+.channel-strip-wrapper.is-macro .macro-config-btn:hover {
+    background: var(--strip-macro-config-hover-bg, #7e22ce) !important;
+}
+
+/* 4. Visor Delta dB (--) */
+.channel-strip-wrapper.is-macro .macro-db-display,
+.channel-strip-wrapper.is-macro .macro-delta-display,
+.channel-strip-wrapper.is-macro .mob-macro-delta-display {
+    font-family: var(--strip-macro-delta-font-family, Consolas, Menlo, "Courier New", monospace) !important;
+    font-size: var(--strip-macro-delta-font-size, 13px) !important;
+    font-weight: var(--strip-macro-delta-font-weight, 800) !important;
+    letter-spacing: 1px !important;
+    text-align: center !important;
+    background: var(--strip-macro-delta-bg, #0a0a0a) !important;
+    color: var(--strip-macro-delta-text, #00ff00) !important;
+    border: 1px solid #222 !important;
+    border-radius: 6px !important;
+    width: var(--strip-macro-element-width, 90%) !important;
+    margin: 4px auto !important;
+    padding: 4px 4px !important;
+    min-height: 26px !important;
+    height: 26px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8) !important;
+    box-sizing: border-box !important;
     user-select: none;
-    -webkit-user-select: none;
-    transition: background 0.1s ease, transform 0.05s ease;
 }
-.mob-big-nudge:hover {
-    background: #e2e8f0;
+
+/* 5. Big Nudges (+ e -) */
+.channel-strip-wrapper.is-macro .desk-fader-core.macro-fader-core,
+.channel-strip-wrapper.is-macro .mob-macro-fader-core {
+    padding: 6px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex: 1 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
-.mob-big-nudge:active {
-    background: #cbd5e1;
-    transform: scale(0.98);
+
+.channel-strip-wrapper.is-macro .desk-big-nudge,
+.channel-strip-wrapper.is-macro .mob-big-nudge {
+    width: var(--strip-macro-element-width, 90%) !important;
+    flex: 1 !important;
+    min-height: 80px !important;
+    margin: 0 auto !important;
+    font-family: var(--strip-macro-big-nudge-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif) !important;
+    font-size: var(--strip-macro-big-nudge-font-size, 26px) !important;
+    font-weight: var(--strip-macro-big-nudge-font-weight, 900) !important;
+    background: var(--strip-macro-big-nudge-bg, #ffffff) !important;
+    color: var(--strip-macro-big-nudge-text, #000000) !important;
+    border-radius: var(--strip-macro-big-nudge-radius, 12px) !important;
+    border: 1px solid var(--strip-macro-big-nudge-border, #a1a1aa) !important;
+    box-shadow: var(--strip-macro-big-nudge-shadow, 0 3px 6px rgba(0, 0, 0, 0.15)) !important;
+    cursor: pointer;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    user-select: none;
+    box-sizing: border-box !important;
+    transition: background 0.1s ease, transform 0.05s ease, box-shadow 0.1s ease;
 }
+
+.channel-strip-wrapper.is-macro .desk-big-nudge:hover,
+.channel-strip-wrapper.is-macro .mob-big-nudge:hover {
+    background: #f4f4f5 !important;
+}
+
+.channel-strip-wrapper.is-macro .desk-big-nudge:active,
+.channel-strip-wrapper.is-macro .mob-big-nudge:active {
+    background: #e4e4e7 !important;
+    transform: scale(0.98) !important;
+}
+
 .mob-macro-reset-container {
     padding: 6px;
     text-align: center;
@@ -2160,5 +2284,19 @@
     font-size: var(--strip-mob-macro-reset-font-size, 12px);
     font-weight: bold;
     cursor: pointer;
+}
+
+/* Aviso explicativo no Modal de Trava de Canal */
+.lock-modal-notice {
+    color: #fbbf24;
+    font-size: 11.5px;
+    margin-top: 10px;
+    line-height: 1.4;
+    display: block;
+    background: rgba(251, 191, 36, 0.08);
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    text-align: left;
 }
 

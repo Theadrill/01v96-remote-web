@@ -63,26 +63,31 @@ function auxVG_resetDbDisplay() {
     }, 5000);
 }
 
-function nudgeAuxVolumeGeral(dir) {
+function nudgeAuxVolumeGeral(dir, stepDb = 0.10) {
     const ch = activeConfigChannel;
     if (ch === null || ch > 31) return;
     const s = channelStates[ch];
     if (!s) return;
 
-    const step = dir;
     let anyChanged = false;
 
     for (let auxIdx = 1; auxIdx <= 8; auxIdx++) {
         const currentVal = s[`aux${auxIdx}`] || 0;
         if (currentVal <= 0) continue;
-        let nRaw = currentVal + step;
+        let nRaw = typeof getSteppedRaw === 'function'
+            ? getSteppedRaw(currentVal, dir, stepDb, false)
+            : Math.max(0, Math.min(1023, currentVal + (dir > 0 ? 1 : -1)));
+
         if (nRaw < 0) nRaw = 0;
         if (nRaw > 1023) nRaw = 1023;
         if (nRaw === currentVal) continue;
 
         anyChanged = true;
-        updateAuxManual(ch, auxIdx, nRaw);
-        if (appReady) {
+        s[`aux${auxIdx}`] = nRaw;
+        if (typeof updateAuxManual === 'function') {
+            updateAuxManual(ch, auxIdx, nRaw);
+        }
+        if (appReady && typeof socket !== 'undefined') {
             socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });
         }
     }

@@ -94,13 +94,13 @@
 
         const config = isLocked ? {
             title: `DESTRAVAR CANAL ${lockId}`,
-            message: `Deseja DESTRAVAR as interações do canal ${lockId}?`,
+            message: `Deseja <strong>DESTRAVAR</strong> o canal <strong>${lockId}</strong> no aplicativo?`,
             type: 'info',
             confirmText: 'SIM, DESTRAVAR',
             cancelText: 'CANCELAR'
         } : {
             title: `TRAVAR CANAL ${lockId}`,
-            message: `Deseja TRAVAR as interações do canal ${lockId}? Isso impedirá movimentos acidentais de fader, mute ou solo.`,
+            message: `Deseja <strong>TRAVAR</strong> o canal <strong>${lockId}</strong> para evitar cliques ou movimentos por engano na tela?<div class="lock-modal-notice">⚠️ <strong>Atenção:</strong> Esta trava protege apenas o aplicativo (a mesa física continua liberada e funcionando normalmente).</div>`,
             type: 'warning',
             confirmText: 'SIM, TRAVAR',
             cancelText: 'CANCELAR'
@@ -180,8 +180,8 @@
         const config = {
             title: isLocked ? `DESTRAVAR / RENOMEAR — ${normalizedLockId}` : `TRAVAR / RENOMEAR — ${normalizedLockId}`,
             message: isLocked
-                ? `O canal ${normalizedLockId} está TRAVADO. Escolha uma ação:`
-                : `O canal ${normalizedLockId} está destravado. Escolha uma ação:`,
+                ? `O canal <strong>${normalizedLockId}</strong> está <strong>TRAVADO</strong> neste aplicativo. Escolha uma ação:`
+                : `Deseja travar o canal <strong>${normalizedLockId}</strong> para evitar toques por engano na tela?<div class="lock-modal-notice">⚠️ <strong>Atenção:</strong> Esta trava protege apenas o aplicativo (a mesa física continua liberada e funcionando normalmente).</div>`,
             type: isLocked ? 'warning' : 'info',
             buttons: [
                 { label: isLocked ? 'SIM, DESTRAVAR' : 'SIM, TRAVAR', type: isLocked ? 'info' : 'warning', action: 'toggle' },
