@@ -158,8 +158,12 @@ class ChannelStrip {
                     <div class="macro-delta-display">${cfg.deltaDb || '--'}</div>
                 </div>
                 <div class="desk-fader-core macro-fader-core">
-                    <button class="desk-big-nudge btn-nudge-plus" title="Aumentar">+</button>
-                    <button class="desk-big-nudge btn-nudge-minus" title="Diminuir">-</button>
+                    <button class="desk-big-nudge btn-nudge-plus" title="Aumentar">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
+                    <button class="desk-big-nudge btn-nudge-minus" title="Diminuir">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
                 </div>
                 ${hasReset ? `
                     <div class="macro-reset-container">
@@ -225,7 +229,9 @@ class ChannelStrip {
             <!-- ZONA 5: Primary Action (ON), Nudge Superior & Leitura dB -->
             <div class="desk-primary-action-zone">
                 <button class="desk-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
-                <button class="desk-nudge-btn desk-nudge-plus" title="Nudge + (Clique ou segure)">+</button>
+                <button class="desk-nudge-btn desk-nudge-plus" title="Nudge + (Clique ou segure)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                </button>
                 <div class="desk-db-readout">${cfg.dbValue || '-10.00'}</div>
             </div>
 
@@ -287,7 +293,9 @@ class ChannelStrip {
 
                 <!-- Nudge Inferior (-) -->
                 <div class="desk-nudge-bottom-container">
-                    <button class="desk-nudge-btn desk-nudge-minus" title="Nudge - (Clique ou segure)">-</button>
+                    <button class="desk-nudge-btn desk-nudge-minus" title="Nudge - (Clique ou segure)">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
                 </div>
             </div>
 
@@ -368,8 +376,12 @@ class ChannelStrip {
                     <div class="mob-macro-delta-display macro-delta-display">${cfg.deltaDb || '--'}</div>
                 </div>
                 <div class="mob-macro-fader-core">
-                    <button class="mob-big-nudge btn-nudge-plus" title="Aumentar">+</button>
-                    <button class="mob-big-nudge btn-nudge-minus" title="Diminuir">-</button>
+                    <button class="mob-big-nudge btn-nudge-plus" title="Aumentar">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
+                    <button class="mob-big-nudge btn-nudge-minus" title="Diminuir">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
                 </div>
                 ${hasReset ? `
                     <div class="mob-macro-reset-container">
@@ -426,7 +438,9 @@ class ChannelStrip {
 
                 <!-- Nudge Superior (+) -->
                 <div class="mob-nudge-container">
-                    <button class="mob-nudge-btn mob-nudge-plus" title="Nudge + (Toque ou segure)">+</button>
+                    <button class="mob-nudge-btn mob-nudge-plus" title="Nudge + (Toque ou segure)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
                 </div>
 
                 <!-- Fader Rail Central (Sem salto ao toque direto) -->
@@ -446,7 +460,9 @@ class ChannelStrip {
 
                 <!-- Nudge Inferior (-) -->
                 <div class="mob-nudge-container">
-                    <button class="mob-nudge-btn mob-nudge-minus" title="Nudge - (Toque ou segure)">-</button>
+                    <button class="mob-nudge-btn mob-nudge-minus" title="Nudge - (Toque ou segure)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
                 </div>
 
                 <!-- Zona 6: Leitura Numérica Neon em dB -->
