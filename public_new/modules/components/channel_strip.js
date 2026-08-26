@@ -474,7 +474,7 @@ class ChannelStrip {
 
         this.elements = {
             wrapper: root,
-            headerNum: root.querySelector('.desk-label-wrapper, .mob-header-zone, .desk-ch-num, .mob-ch-num'),
+            headerNum: root.querySelector('.desk-label-wrapper, .mob-card-header, .mob-header-zone, .desk-ch-num, .mob-ch-num'),
             lockSlot: root.querySelector('.desk-slot-right'),
             nameDisplay: root.querySelector('.desk-ch-name-zone, .mob-display-name, .desk-ch-name'),
             soloBtn: root.querySelector('.desk-btn-solo, .mob-btn-solo'),
@@ -684,18 +684,59 @@ class ChannelStrip {
         }
 
         // 12. Clique no Cabeçalho (Header) / Configuração do Canal
-        if (els.headerNum && !cfg.isDisabled && !cfg.isLocked) {
+        if (els.headerNum && !cfg.isDisabled) {
             els.headerNum.addEventListener('click', (e) => {
+                if (this.config.isLocked) return;
                 e.stopPropagation();
                 this._emitEvent('header_click', { channel: this.config.evtCh, chNumber: this.config.chNumber });
             });
         }
 
         // 13. Clique no Visor OLED de Nome
-        if (els.nameDisplay && !cfg.isDisabled && !cfg.isLocked) {
+        if (els.nameDisplay && !cfg.isDisabled) {
             els.nameDisplay.addEventListener('click', (e) => {
+                if (this.config.isLocked) return;
                 e.stopPropagation();
                 this._emitEvent('name_click', { channel: this.config.evtCh, name: this.config.name });
+            });
+        }
+
+        // 14. Clique no Cadeado / Lock Slot (Desktop)
+        const lockSlot = els.lockSlot || this.element.querySelector('.desk-slot-right, .desk-label-lock');
+        if (lockSlot) {
+            lockSlot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this._emitEvent('lock_click', { channel: this.config.evtCh });
+            });
+        }
+
+        // 15. Interação no Overlay de Travamento (Desktop vs Mobile)
+        const lockOverlay = els.lockOverlay || this.element.querySelector('.desk-lock-overlay, .mob-lock-overlay');
+        if (lockOverlay) {
+            this._bindLockOverlayInteraction(lockOverlay);
+        }
+
+        // 16. Long-Press Mobile no Card, Header e Área do Trilho do Fader (Travar/Renomear)
+        if (this.config.layout === 'mobile') {
+            const openModal = () => {
+                if (typeof ChannelLock !== 'undefined' && typeof ChannelLock.openActionsModal === 'function') {
+                    ChannelLock.openActionsModal(this.config.evtCh);
+                } else if (typeof window.openChannelActionsModal === 'function') {
+                    const lockId = typeof window.getChannelLockId === 'function' ? window.getChannelLockId(this.config.evtCh) : null;
+                    if (lockId) window.openChannelActionsModal(lockId);
+                }
+            };
+
+            const targets = [
+                els.headerNum,
+                els.nameDisplay,
+                this.element.querySelector('.mob-card-header'),
+                els.faderArea,
+                els.faderRail
+            ].filter(Boolean);
+
+            targets.forEach(target => {
+                this._bindGesture(target, openModal, null);
             });
         }
     }
@@ -927,9 +968,15 @@ class ChannelStrip {
                 // Em macros, acumula delta dB, atualiza o LED e agenda retorno para '--' após 5s
                 this._applyMacroDelta(direction, step);
                 this._emitEvent('nudge', { direction, step });
-            } else if (typeof this.config.faderValue === 'number') {
-                this._applyNudgeStep(direction, step);
+            } else if (isAuxSend) {
+                // AUX sends usam path legado (nudgeAuxLevel) que emite socket kInputAUX/kAUX...
+                // NÃO usar _applyNudgeStep aqui porque commitFaderChange emite kInputFader (errado p/ AUX)
                 this._emitEvent('nudge', { direction, step });
+            } else if (typeof this.config.faderValue === 'number') {
+                // Canais normais: _applyNudgeStep calcula step dB correto e emite fader_change
+                // → commitFaderChange → updateUI + socket.emit (kInputFader).
+                // NÃO emitir 'nudge' para evitar que nudgeFader sobrescreva com incremento raw +1.
+                this._applyNudgeStep(direction, step);
             } else {
                 this._emitEvent('nudge', { direction, step });
             }
@@ -1124,6 +1171,178 @@ class ChannelStrip {
     }
 
     /**
+     * Atualiza o nome exibido no visor OLED do canal
+     * @param {string} name
+     */
+    setName(name) {
+        this.config.name = name;
+        if (this.elements.nameDisplay) {
+            this.elements.nameDisplay.innerText = name || (this.config.chNumber ? `CH ${this.config.chNumber}` : '');
+            this.elements.nameDisplay.title = name || '';
+        }
+    }
+
+    /**
+     * Helper universal para gestos Mobile (Touch + Pointer): Long-Press e Double-Tap
+     * @private
+     */
+    _bindGesture(el, onLongPress, onDoubleTap) {
+        if (!el) return;
+
+        let timer = null;
+        let startX = 0;
+        let startY = 0;
+        let lastTap = 0;
+        let active = false;
+
+        const onStart = (clientX, clientY) => {
+            startX = clientX;
+            startY = clientY;
+            active = true;
+
+            const now = Date.now();
+            if (onDoubleTap && (now - lastTap <= 350)) {
+                lastTap = 0;
+                if (timer) { clearTimeout(timer); timer = null; }
+                active = false;
+                setTimeout(onDoubleTap, 50);
+                return;
+            }
+            lastTap = now;
+
+            if (timer) clearTimeout(timer);
+            if (onLongPress) {
+                timer = setTimeout(() => {
+                    timer = null;
+                    if (active) {
+                        active = false;
+                        onLongPress();
+                    }
+                }, 500);
+            }
+        };
+
+        const onMove = (clientX, clientY) => {
+            if (!active || !timer) return;
+            if (Math.hypot(clientX - startX, clientY - startY) > 10) {
+                clearTimeout(timer);
+                timer = null;
+                active = false;
+            }
+        };
+
+        const onEnd = () => {
+            if (timer) {
+                clearTimeout(timer);
+                timer = null;
+            }
+            active = false;
+        };
+
+        // Eventos Touch Nativos
+        el.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches[0]) {
+                onStart(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        el.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches[0]) {
+                onMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        el.addEventListener('touchend', onEnd, { passive: true });
+        el.addEventListener('touchcancel', onEnd, { passive: true });
+
+        // Eventos Pointer (Desktop / Mouse / Caneta)
+        el.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'touch') return; // Evita duplicidade com touch
+            if (e.button && e.button !== 0) return;
+            onStart(e.clientX, e.clientY);
+        });
+
+        el.addEventListener('pointermove', (e) => {
+            if (e.pointerType === 'touch') return;
+            onMove(e.clientX, e.clientY);
+        });
+
+        el.addEventListener('pointerup', (e) => {
+            if (e.pointerType === 'touch') return;
+            onEnd();
+        });
+        el.addEventListener('pointercancel', (e) => {
+            if (e.pointerType === 'touch') return;
+            onEnd();
+        });
+        el.addEventListener('pointerleave', (e) => {
+            if (e.pointerType === 'touch') return;
+            onEnd();
+        });
+    }
+
+    /**
+     * Configura os eventos e gestos no overlay de travamento (Desktop vs Mobile)
+     * @private
+     */
+    _bindLockOverlayInteraction(overlay) {
+        if (!overlay) return;
+
+        if (this.config.layout === 'desktop') {
+            const badge = overlay.querySelector('.lock-badge-btn') || overlay;
+            badge.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof ChannelLock !== 'undefined' && typeof ChannelLock.toggleLock === 'function') {
+                    ChannelLock.toggleLock(this.config.evtCh);
+                } else if (typeof window.confirmToggleChannelLock === 'function') {
+                    const lockId = typeof window.getChannelLockId === 'function' ? window.getChannelLockId(this.config.evtCh) : null;
+                    if (lockId) window.confirmToggleChannelLock(lockId);
+                }
+                this._emitEvent('lock_click', { channel: this.config.evtCh });
+            });
+        } else {
+            // SOMENTE MOBILE: Long-Press (> 500ms) e Double-Tap (<= 350ms) para exibir o modal de opções
+            const openModal = () => {
+                if (typeof ChannelLock !== 'undefined' && typeof ChannelLock.openActionsModal === 'function') {
+                    ChannelLock.openActionsModal(this.config.evtCh);
+                } else if (typeof window.openChannelActionsModal === 'function') {
+                    const lockId = typeof window.getChannelLockId === 'function' ? window.getChannelLockId(this.config.evtCh) : null;
+                    if (lockId) window.openChannelActionsModal(lockId);
+                }
+            };
+
+            this._bindGesture(overlay, openModal, openModal);
+        }
+    }
+
+    /**
+     * Atualiza dinamicamente o estado de travamento (lock) do canal
+     * @param {boolean} isLocked
+     */
+    setLockState(isLocked) {
+        this.config.isLocked = !!isLocked;
+        const root = this.element;
+        if (!root) return;
+
+        root.classList.toggle('is-locked', !!isLocked);
+        root.classList.toggle('channel-locked', !!isLocked);
+
+        let overlay = root.querySelector('.desk-lock-overlay, .mob-lock-overlay');
+        if (isLocked) {
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = this.config.layout === 'desktop' ? 'desk-lock-overlay' : 'mob-lock-overlay';
+                overlay.innerHTML = `<div class="lock-badge-btn" title="Toque para destravar">🔒</div>`;
+                this._bindLockOverlayInteraction(overlay);
+                root.appendChild(overlay);
+            }
+        } else {
+            if (overlay) overlay.remove();
+        }
+    }
+
+    /**
      * Atualiza o texto do badge de Patch I/O e recalcula o marquee
      * @param {string} patchText
      */
@@ -1133,6 +1352,14 @@ class ChannelStrip {
             this.elements.patchText.innerText = patchText || '';
             this._checkMarquee();
         }
+    }
+
+    /**
+     * Alias para setPatch
+     * @param {string} patchText
+     */
+    setPatchText(patchText) {
+        this.setPatch(patchText);
     }
 
     /**

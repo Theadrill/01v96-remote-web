@@ -812,7 +812,6 @@
     flex: 1;
     height: 100%;
     background: linear-gradient(180deg, #ff0000 0%, #ffbb00 20%, #22c55e 55%, #10b981 100%);
-    opacity: 0.35;
     clip-path: inset(100% 0 0 0);
     will-change: clip-path;
 }

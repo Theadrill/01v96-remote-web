@@ -16,6 +16,7 @@ var ConfirmModal = (function () {
     var _hasInput = false;
     var _customResult = null;
     var _inputId = 'confirm-modal-input-' + Date.now();
+    var _openedAt = 0;
 
     // ─── DOM helpers ────────────────────────────────────────────
 
@@ -54,9 +55,9 @@ var ConfirmModal = (function () {
         _root.appendChild(_content);
         document.body.appendChild(_root);
 
-        // Fechar com clique no overlay
+        // Fechar com clique no overlay (com debounce de 350ms após abertura para evitar ghost clicks)
         _root.addEventListener('click', function (e) {
-            if (e.target === _root) {
+            if (e.target === _root && (Date.now() - _openedAt > 350)) {
                 _close(false);
             }
         });
@@ -238,6 +239,7 @@ var ConfirmModal = (function () {
         }
 
         // Mostrar
+        _openedAt = Date.now();
         _root.style.display = 'flex';
         _isOpen = true;
         requestAnimationFrame(function () {

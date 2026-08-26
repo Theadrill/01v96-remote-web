@@ -22,6 +22,12 @@
     const DOUBLE_TAP_DELAY = 350;
 
     function getLockIdForDataCh(dataCh) {
+        if (dataCh === null || dataCh === undefined) return null;
+        if (typeof dataCh === 'string') {
+            const upper = dataCh.trim().toUpperCase();
+            if (upper === 'MASTER' || upper === '52' || upper === "'MASTER'") return 'MASTER';
+            if (upper.startsWith('CH') || upper.startsWith('MIX') || upper.startsWith('BUS')) return upper;
+        }
         if (dataCh === 'master' || dataCh === '52' || dataCh === 52) return 'MASTER';
         const val = parseInt(dataCh, 10);
         if (isNaN(val)) return null;
@@ -161,15 +167,21 @@
 
     // ── Modal de ações (travar/destravar/renomear) ──────────────
     window.openChannelActionsModal = function (lockId) {
-        if (!lockId) return;
-        const isLocked = window.lockedChannels && window.lockedChannels.includes(lockId);
-        const chId = getChannelIdFromLockId(lockId);
+        if (lockId === null || lockId === undefined) return;
+        const normalizedLockId = (typeof lockId === 'string' && (lockId.startsWith('CH') || lockId.startsWith('MIX') || lockId.startsWith('BUS') || lockId === 'MASTER'))
+            ? lockId
+            : getLockIdForDataCh(lockId);
+
+        if (!normalizedLockId) return;
+
+        const isLocked = window.lockedChannels && window.lockedChannels.includes(normalizedLockId);
+        const chId = getChannelIdFromLockId(normalizedLockId);
 
         const config = {
-            title: isLocked ? `DESTRAVAR / RENOMEAR — ${lockId}` : `TRAVAR / RENOMEAR — ${lockId}`,
+            title: isLocked ? `DESTRAVAR / RENOMEAR — ${normalizedLockId}` : `TRAVAR / RENOMEAR — ${normalizedLockId}`,
             message: isLocked
-                ? `O canal ${lockId} está TRAVADO. Escolha uma ação:`
-                : `O canal ${lockId} está destravado. Escolha uma ação:`,
+                ? `O canal ${normalizedLockId} está TRAVADO. Escolha uma ação:`
+                : `O canal ${normalizedLockId} está destravado. Escolha uma ação:`,
             type: isLocked ? 'warning' : 'info',
             buttons: [
                 { label: isLocked ? 'SIM, DESTRAVAR' : 'SIM, TRAVAR', type: isLocked ? 'info' : 'warning', action: 'toggle' },
@@ -181,9 +193,11 @@
         if (typeof ConfirmModal !== 'undefined' && ConfirmModal.show) {
             ConfirmModal.show(config).then(function (action) {
                 if (action === 'toggle') {
-                    socket.emit('toggle_channel_lock', { channel: lockId });
+                    if (typeof socket !== 'undefined' && socket.emit) {
+                        socket.emit('toggle_channel_lock', { channel: normalizedLockId });
+                    }
                 } else if (action === 'rename') {
-                    openNameEditorForLockId(lockId);
+                    openNameEditorForLockId(normalizedLockId);
                 }
             });
         }
@@ -295,64 +309,68 @@
         if (delegationInitialized) return;
         delegationInitialized = true;
 
-        document.addEventListener('click', onDocumentClickCapture, true);
         document.addEventListener('contextmenu', onContextMenu, true);
-
-        const containers = ['#faders-container', '#master-container'];
-        containers.forEach(selector => {
-            const el = document.querySelector(selector);
-            if (!el) return;
-
-            el.addEventListener('pointerdown', onPointerDown);
-            el.addEventListener('pointermove', onPointerMove);
-            el.addEventListener('pointerup', onPointerUp);
-            el.addEventListener('pointercancel', onPointerUp);
-
-            el.addEventListener('pointerup', onTap, true);
-
-            el.addEventListener('click', onBadgeClick, true);
-            el.addEventListener('click', onHeaderLockClick);
-        });
     }
+
+    // ── Objeto ChannelLock Global para Integração Modular ──────
+    window.ChannelLock = {
+        isLocked: function (ch) {
+            const lockId = getLockIdForDataCh(ch);
+            return !!(lockId && window.lockedChannels && window.lockedChannels.includes(lockId));
+        },
+        toggleLock: function (ch) {
+            const lockId = getLockIdForDataCh(ch);
+            if (lockId) {
+                window.confirmToggleChannelLock(lockId);
+            }
+        },
+        getLockId: getLockIdForDataCh,
+        openActionsModal: function (ch) {
+            const lockId = typeof ch === 'string' && (ch.startsWith('CH') || ch.startsWith('MIX') || ch.startsWith('BUS') || ch === 'MASTER') ? ch : getLockIdForDataCh(ch);
+            if (lockId) {
+                window.openChannelActionsModal(lockId);
+            }
+        }
+    };
 
     // ── Renderização do overlay ────────────────────────────────
     window.updateLockedChannelsUI = function () {
         const lockedList = window.lockedChannels || [];
-        const cards = document.querySelectorAll('.fader-card, .fader-card-desktop');
 
+        // 1. Atualiza MainView (CH 1-32 + STEREO Master)
+        if (typeof MainView !== 'undefined' && typeof MainView.updateLock === 'function') {
+            for (let i = 0; i < 32; i++) {
+                const isLocked = lockedList.includes('CH' + (i + 1));
+                MainView.updateLock(i, isLocked);
+            }
+            MainView.updateLock('master', lockedList.includes('MASTER'));
+        }
+
+        // 2. Atualiza OutsView (MIX 1-8 e BUS 1-8)
+        if (typeof OutsView !== 'undefined' && typeof OutsView.getStrip === 'function') {
+            for (let m = 1; m <= 8; m++) {
+                const gId = 35 + m;
+                const isLocked = lockedList.includes('MIX' + m);
+                const strip = OutsView.getStrip(gId);
+                if (strip && strip.setLockState) strip.setLockState(isLocked);
+            }
+            for (let b = 1; b <= 8; b++) {
+                const gId = 43 + b;
+                const isLocked = lockedList.includes('BUS' + b);
+                const strip = OutsView.getStrip(gId);
+                if (strip && strip.setLockState) strip.setLockState(isLocked);
+            }
+        }
+
+        // 3. Atualiza wrappers DOM
+        const cards = document.querySelectorAll('.channel-strip-wrapper, .fader-card, .fader-card-desktop');
         cards.forEach(card => {
             const dataCh = card.getAttribute('data-ch');
+            if (!dataCh) return;
             const lockId = getLockIdForDataCh(dataCh);
-            let overlay = card.querySelector('.channel-lock-overlay');
-
-            if (lockId && lockedList.includes(lockId)) {
-                if (!overlay) {
-                    overlay = document.createElement('div');
-                    overlay.className = 'channel-lock-overlay';
-                    overlay.innerHTML = `
-                        <div class="channel-lock-badge" data-lock-id="${lockId}">
-                            <svg class="channel-lock-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
-                        </div>
-                    `;
-                    // Bloqueia seleções e arrastos nativos no overlay, permitindo
-                    // que PointerEvents borbulhem para os listeners de long press e double-tap
-                    const eventsToBlock = ['selectstart', 'dragstart'];
-                    eventsToBlock.forEach(evt => {
-                        overlay.addEventListener(evt, (e) => {
-                            e.preventDefault();
-                        });
-                    });
-
-                    card.appendChild(overlay);
-                }
-                card.classList.add('channel-locked');
-            } else {
-                if (overlay) overlay.remove();
-                card.classList.remove('channel-locked');
-            }
+            const isLocked = !!(lockId && lockedList.includes(lockId));
+            card.classList.toggle('is-locked', isLocked);
+            card.classList.toggle('channel-locked', isLocked);
         });
     };
 
