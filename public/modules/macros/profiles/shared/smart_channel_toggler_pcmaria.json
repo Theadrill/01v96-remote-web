@@ -6,10 +6,12 @@
     28
   ],
   "snapshot": {
-    "active": false,
-    "channels_to_restore": [],
-    "desk_name": null,
-    "scene_id": null,
-    "timestamp": null
+    "active": true,
+    "channels_to_restore": [
+      0
+    ],
+    "desk_name": "mesa-maria",
+    "scene_id": 34,
+    "timestamp": 1787716755507
   }
 }
