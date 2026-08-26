@@ -48,8 +48,8 @@ window.MixerAPI = {
             const id = parseInt(ch);
             return (id % 2 === 0) ? id + 1 : id - 1;
         },
-        getCurrentScene: () => window.currentSceneId || 0,
-        getDeskName: () => window.deskName || '01V96'
+        getCurrentScene: () => window.currentSceneNumber ?? 0,
+        getDeskName: () => window.serverName || '01V96'
     },
 
     // 🎨 MANIPULAÇÃO DINÂMICA DE UI (PADS DE MACRO)

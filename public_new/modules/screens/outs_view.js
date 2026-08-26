@@ -227,12 +227,12 @@ var OutsView = (function () {
                     })(b, bGlobalId),
                     pan_change: (function (busIdx, gId, isPairedBus) {
                         return function (data) {
-                            if (typeof socket !== 'undefined') {
+                            if (typeof socket !== 'undefined' && socket.emit) {
                                 if (data.side === 'L' || data.side === null) {
-                                    socket.emit('control', { type: 'kPan/kPanIndex', channel: gId, value: data.panL });
+                                    socket.emit('setPan', { channel: gId, value: data.panL });
                                 }
                                 if (data.side === 'R' && isPairedBus) {
-                                    socket.emit('control', { type: 'kPan/kPanIndex', channel: gId + 1, value: data.panR });
+                                    socket.emit('setPan', { channel: gId + 1, value: data.panR });
                                 }
                             }
                         };
@@ -346,12 +346,12 @@ var OutsView = (function () {
                     })(stCh, stGlobalId),
                     pan_change: (function (stId, gId) {
                         return function (data) {
-                            if (typeof socket !== 'undefined') {
+                            if (typeof socket !== 'undefined' && socket.emit) {
                                 if (data.side === 'L' || data.side === null) {
-                                    socket.emit('control', { type: 'kPan/kPanIndex', channel: gId, value: data.panL });
+                                    socket.emit('setPan', { channel: gId, value: data.panL });
                                 }
                                 if (data.side === 'R') {
-                                    socket.emit('control', { type: 'kPan/kPanIndex', channel: gId + 1, value: data.panR });
+                                    socket.emit('setPan', { channel: gId + 1, value: data.panR });
                                 }
                             }
                         };
@@ -430,8 +430,8 @@ var OutsView = (function () {
                         }
                     },
                     pan_change: function (data) {
-                        if (typeof socket !== 'undefined') {
-                            socket.emit('control', { type: 'kPan/kPanIndex', channel: 'master', value: data.panL });
+                        if (typeof socket !== 'undefined' && socket.emit) {
+                            socket.emit('setPan', { channel: 'master', value: data.panL });
                         }
                     },
                     nudge: function (data) {
@@ -486,8 +486,20 @@ var OutsView = (function () {
      */
     function updatePan(channel, panValue) {
         var strip = _strips[channel];
-        if (!strip) return;
-        strip.setPanValue(panValue);
+        if (strip) {
+            if (strip.config.isPaired) {
+                strip.setPanValue(panValue, 'L', false);
+            } else {
+                strip.setPanValue(panValue, null, false);
+            }
+            return;
+        }
+        if (typeof channel === 'number' && channel > 0) {
+            var primaryStrip = _strips[channel - 1];
+            if (primaryStrip && primaryStrip.config && primaryStrip.config.isPaired) {
+                primaryStrip.setPanValue(panValue, 'R', false);
+            }
+        }
     }
 
     function deactivate() {

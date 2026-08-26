@@ -145,14 +145,32 @@ var MainView = (function () {
                             }
                         };
                     })(i),
-                    pan_reset: (function (chIdx) {
+                    pan_change: (function (chIdx, isPairedCh) {
                         return function (data) {
                             if (typeof socket !== 'undefined' && socket.emit) {
-                                var targetCh = (data && data.side === 'R') ? (chIdx + 1) : chIdx;
-                                socket.emit('control', { type: 'kInputPan/kPan', channel: targetCh, value: 0 });
+                                if (data.side === 'L' || data.side === null) {
+                                    var s = typeof getChannelStateById === 'function' ? getChannelStateById(chIdx) : null;
+                                    if (s) s.pan = data.panL;
+                                    socket.emit('setPan', { channel: chIdx, value: data.panL });
+                                }
+                                if (data.side === 'R' && isPairedCh) {
+                                    var sR = typeof getChannelStateById === 'function' ? getChannelStateById(chIdx + 1) : null;
+                                    if (sR) sR.pan = data.panR;
+                                    socket.emit('setPan', { channel: chIdx + 1, value: data.panR });
+                                }
                             }
                         };
-                    })(i),
+                    })(i, isPaired),
+                    pan_reset: (function (chIdx, isPairedCh) {
+                        return function (data) {
+                            if (typeof socket !== 'undefined' && socket.emit) {
+                                var targetCh = (data && data.side === 'R' && isPairedCh) ? (chIdx + 1) : chIdx;
+                                var s = typeof getChannelStateById === 'function' ? getChannelStateById(targetCh) : null;
+                                if (s) s.pan = 0;
+                                socket.emit('setPan', { channel: targetCh, value: 0 });
+                            }
+                        };
+                    })(i, isPaired),
                     lock_click: (function (chIdx) {
                         return function () {
                             if (typeof ChannelLock !== 'undefined' && typeof ChannelLock.toggleLock === 'function') {
@@ -333,10 +351,22 @@ var MainView = (function () {
      */
     function updatePan(ch, panL, panR) {
         var strip = _strips[ch];
-        if (!strip) return;
-        strip.setPanValue(panL, 'L');
-        if (panR !== undefined && panR !== null) {
-            strip.setPanValue(panR, 'R');
+        if (strip) {
+            if (strip.config.isPaired) {
+                strip.setPanValue(panL, 'L', false);
+                if (panR !== undefined && panR !== null) {
+                    strip.setPanValue(panR, 'R', false);
+                }
+            } else {
+                strip.setPanValue(panL, null, false);
+            }
+            return;
+        }
+        if (typeof ch === 'number' && ch > 0) {
+            var primaryStrip = _strips[ch - 1];
+            if (primaryStrip && primaryStrip.config && primaryStrip.config.isPaired) {
+                primaryStrip.setPanValue(panL, 'R', false);
+            }
         }
     }
 

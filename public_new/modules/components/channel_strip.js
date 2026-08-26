@@ -751,17 +751,20 @@ class ChannelStrip {
             }
         };
 
+        const isBus = this.config.type === 'bus' || this.config.type === 'bus_paired';
+        const maxPan = isBus ? 32 : 63;
+
         const getValFromClientX = (clientX) => {
             const rect = trackEl.getBoundingClientRect();
             if (!rect.width) return 0;
             let pct = (clientX - rect.left) / rect.width;
             pct = Math.max(0, Math.min(1, pct));
-            // Converte 0..1 para -32..+32
-            return Math.round((pct * 64) - 32);
+            // Converte 0..1 para -maxPan..+maxPan
+            return Math.round((pct * (maxPan * 2)) - maxPan);
         };
 
         const updatePan = (val) => {
-            this.setPanValue(val, side);
+            this.setPanValue(val, side, true);
         };
 
         const doResetToCenter = () => {
@@ -782,24 +785,15 @@ class ChannelStrip {
             if (now - lastClickTime <= 350) {
                 lastClickTime = 0;
                 didResetOnDown = true;
-                if (longPressTimer) {
-                    clearTimeout(longPressTimer);
-                    longPressTimer = null;
-                }
                 doResetToCenter();
                 return;
             }
             lastClickTime = now;
 
             pressStartTime = now;
-            isDragging = false;
-
-            longPressTimer = setTimeout(() => {
-                cancelTip();
-                isDragging = true;
-                try { trackEl.setPointerCapture(e.pointerId); } catch (_) {}
-                updatePan(getValFromClientX(e.clientX));
-            }, 250);
+            isDragging = true;
+            try { containerEl.setPointerCapture(e.pointerId); } catch (_) {}
+            updatePan(getValFromClientX(e.clientX));
         });
 
         // Pointermove
@@ -811,30 +805,9 @@ class ChannelStrip {
 
         // Pointerup / Pointercancel
         const handlePointerEnd = (e) => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-
-            const duration = Date.now() - pressStartTime;
-
             if (isDragging) {
                 isDragging = false;
-                try { trackEl.releasePointerCapture(e.pointerId); } catch (_) {}
-            } else if (!didResetOnDown && duration < 250 && duration > 0) {
-                // Aguarda a janela de duplo clique (350ms) antes de abrir a dica do BubbleModal
-                cancelTip();
-                pendingTipTimer = setTimeout(() => {
-                    pendingTipTimer = null;
-                    if (typeof window.BubbleModal !== 'undefined') {
-                        window.BubbleModal.show({
-                            targetEl: containerEl,
-                            message: '💡 <b>Controle de Pan</b><br>Clique e segure para ajustar<br>Duplo clique centraliza (0)',
-                            delay: 0,
-                            duration: 3500
-                        });
-                    }
-                }, 350);
+                try { containerEl.releasePointerCapture(e.pointerId); } catch (_) {}
             }
             pressStartTime = 0;
             didResetOnDown = false;
@@ -860,9 +833,11 @@ class ChannelStrip {
             const dir = isHorizontal ? (e.deltaX > 0 ? 1 : -1) : (e.deltaY < 0 ? 1 : -1);
             const step = e.shiftKey ? 4 : 1; // Shift para incremento rápido
 
-            const cur = side === 'R' ? (this.config.panR !== null && this.config.panR !== undefined ? this.config.panR : 32)
-                                     : (this.config.panL !== null && this.config.panL !== undefined ? this.config.panL : (side === 'L' ? -32 : 0));
-            const next = Math.max(-32, Math.min(32, cur + (dir * step)));
+            const defaultL = isBus ? -32 : -63;
+            const defaultR = isBus ? 32 : 63;
+            const cur = side === 'R' ? (this.config.panR !== null && this.config.panR !== undefined ? this.config.panR : defaultR)
+                                     : (this.config.panL !== null && this.config.panL !== undefined ? this.config.panL : (side === 'L' ? defaultL : 0));
+            const next = Math.max(-maxPan, Math.min(maxPan, cur + (dir * step)));
             updatePan(next);
             this._emitEvent('wheel', { dir, step, type: 'pan', side, value: next });
         }, { passive: false });
@@ -870,39 +845,58 @@ class ChannelStrip {
 
     /**
      * Atualiza o valor do Pan e o elemento visual correspondente
-     * @param {number} val -32 a +32
-     * @param {string|null} side 'L' | 'R' | null
+     * @param {number} val -63 a +63 (ou -32 a +32)
+     * @param {string|null} [side=null] 'L' | 'R' | null
+     * @param {boolean} [emit=false] se deve emitir evento pan_change (default: false para evitar loops de socket)
      */
-    setPanValue(val, side = null) {
-        const clamped = Math.max(-32, Math.min(32, val));
+    setPanValue(val, side = null, emit = false) {
+        const isBus = this.config.type === 'bus' || this.config.type === 'bus_paired';
+        const maxPan = isBus ? 32 : 63;
+        const clamped = Math.max(-maxPan, Math.min(maxPan, val));
         const root = this.element;
         if (!root) return;
 
-        if (side === 'L') {
+        const pct = ((clamped + maxPan) / (maxPan * 2)) * 100;
+
+        if (side === 'L' && this.config.isPaired) {
             this.config.panL = clamped;
             const rowL = root.querySelector('.desk-dual-pan-container .desk-pan-row:first-child');
             if (rowL) {
                 const thumb = rowL.querySelector('.desk-pan-thumb');
-                if (thumb) thumb.style.setProperty('--pan-val', clamped);
+                if (thumb) {
+                    thumb.style.left = `${pct}%`;
+                    thumb.style.setProperty('--pan-val', clamped);
+                }
                 const label = rowL.querySelector('.pan-val-label');
                 if (label) label.innerText = clamped;
             }
-            this._emitEvent('pan_change', { panL: clamped, panR: this.config.panR, side: 'L' });
-        } else if (side === 'R') {
+            if (emit) this._emitEvent('pan_change', { panL: clamped, panR: this.config.panR, side: 'L' });
+        } else if (side === 'R' && this.config.isPaired) {
             this.config.panR = clamped;
             const rowR = root.querySelector('.desk-dual-pan-container .desk-pan-row:last-child');
             if (rowR) {
                 const thumb = rowR.querySelector('.desk-pan-thumb');
-                if (thumb) thumb.style.setProperty('--pan-val', clamped);
+                if (thumb) {
+                    thumb.style.left = `${pct}%`;
+                    thumb.style.setProperty('--pan-val', clamped);
+                }
                 const label = rowR.querySelector('.pan-val-label');
                 if (label) label.innerText = clamped;
             }
-            this._emitEvent('pan_change', { panL: this.config.panL, panR: clamped, side: 'R' });
+            if (emit) this._emitEvent('pan_change', { panL: this.config.panL, panR: clamped, side: 'R' });
         } else {
             this.config.panL = clamped;
-            const singleThumb = root.querySelector('.desk-pan-container .desk-pan-thumb');
-            if (singleThumb) singleThumb.style.setProperty('--pan-val', clamped);
-            this._emitEvent('pan_change', { panL: clamped, panR: null });
+            const singleThumb = root.querySelector('.desk-pan-container .desk-pan-thumb, .desk-pan-track .desk-pan-thumb');
+            if (singleThumb) {
+                singleThumb.style.left = `${pct}%`;
+                singleThumb.style.setProperty('--pan-val', clamped);
+                if (clamped === 0) {
+                    singleThumb.classList.add('pan-center');
+                } else {
+                    singleThumb.classList.remove('pan-center');
+                }
+            }
+            if (emit) this._emitEvent('pan_change', { panL: clamped, panR: null, side: null });
         }
     }
 
