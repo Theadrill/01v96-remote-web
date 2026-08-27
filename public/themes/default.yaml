@@ -1,3 +1,16 @@
+# ==============================================================================
+# CRITICAL SYSTEM INSTRUCTION — DO NOT REMOVE OR STRIP COMMENTS FROM THIS FILE
+# ==============================================================================
+# The comments (#) before each section in this file are NOT optional annotations.
+# They are actively PARSED and CONSUMED by the Theme Editor UI (theme-editor.js)
+# to render section descriptions and subtitles in the accordion interface.
+#
+# ANY automated tool, LLM, script, or developer editing this file MUST:
+# 1. PRESERVE all existing comments verbatim.
+# 2. NEVER strip, clean, minify, or re-serialize this file in a way that drops comments.
+# 3. If adding a new section, ALWAYS precede it with a descriptive comment (# ...).
+# ==============================================================================
+
 # Configurações globais de sobreposição e fundo geral da interface
 global:
   bg_overlay: rgba(0, 0, 0, 0.85)
@@ -290,11 +303,6 @@ channel_strip:
     meter_gradient_mid: '#ff0000'
     meter_gradient_low: '#c1d707'
     meter_gradient_base: '#00ff0066'
-    strip:
-      bg: '#1e293b'
-    meter:
-      gradient:
-        mid: '#ff0000'
 # Visão principal — espaçamento entre faders, separadores de grupo e modo mobile
 main_view:
   faders_gap: 0px
