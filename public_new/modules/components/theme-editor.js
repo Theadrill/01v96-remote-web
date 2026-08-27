@@ -235,6 +235,7 @@ var ThemeEditor = (function () {
                                 ${_isReadOnly ? '' : `onclick="ThemeEditor.pickColor('${sectionKey}', '${fullPath}', '${inputId}')"`}></div>
                             <input type="text" id="${inputId}" class="te-field-input te-color-hex" value="${val}"
                                 ${_isReadOnly ? 'readonly' : ''}
+                                oninput="ThemeEditor.onColorInput(this)"
                                 onchange="ThemeEditor.onFieldChange('${sectionKey}', '${fullPath}', this.value)" />
                         </div>
                     </div>
@@ -299,10 +300,6 @@ var ThemeEditor = (function () {
         if (!_parsedData[sectionKey]) _parsedData[sectionKey] = {};
         _setNestedValue(_parsedData[sectionKey], fieldKey, newValue);
 
-        // Atualizar cor da swatch box se for campo de cor
-        var swatchBox = document.getElementById('te-' + sectionKey + '-' + fieldKey.replace(/\./g, '_') + '_swatch');
-        if (swatchBox) swatchBox.style.backgroundColor = newValue;
-
         // Live Preview das variáveis CSS
         if (typeof jsyaml !== 'undefined') {
             try {
@@ -311,6 +308,39 @@ var ThemeEditor = (function () {
                     ConfirmModal.loadTheme(liveYaml);
                 }
             } catch (e) {}
+        }
+    }
+
+    /**
+     * Atualiza o swatch de cor em tempo real enquanto o usuário digita no input de texto.
+     * Chamado pelo evento oninput do input de cor.
+     * @param {HTMLInputElement} inputEl - Elemento input de texto de cor
+     */
+    function onColorInput(inputEl) {
+        var value = inputEl.value;
+        var inputId = inputEl.id;
+        var swatchBox = document.getElementById(inputId + '_swatch');
+        if (swatchBox) {
+            // Atualiza a cor de fundo se for um valor de cor válido
+            if (value && (value.startsWith('#') || value.startsWith('rgb') || value.startsWith('hsl'))) {
+                swatchBox.style.backgroundColor = value;
+            }
+        }
+
+        // Atualiza também os dados internos do tema para live preview
+        if (_isReadOnly) return;
+        // Extrai sectionKey e fieldKey a partir do ID do input: te-{sIdx}-{fullPath}
+        var idParts = inputId.split('-');
+        if (idParts.length >= 3) {
+            var fieldPath = idParts.slice(2).join('-').replace(/_/g, '.');
+            // Encontra a sectionKey correspondente ao sIdx
+            var sIdx = parseInt(idParts[1], 10);
+            var keys = Object.keys(_parsedData);
+            if (sIdx >= 0 && sIdx < keys.length) {
+                var sectionKey = keys[sIdx];
+                if (!_parsedData[sectionKey]) _parsedData[sectionKey] = {};
+                _setNestedValue(_parsedData[sectionKey], fieldPath, value);
+            }
         }
     }
 
@@ -425,6 +455,7 @@ var ThemeEditor = (function () {
         close: close,
         toggleAccordion: toggleAccordion,
         onFieldChange: onFieldChange,
+        onColorInput: onColorInput,
         pickColor: pickColor,
         saveTheme: saveTheme
     };
