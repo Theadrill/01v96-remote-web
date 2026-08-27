@@ -10,6 +10,7 @@
 # 2. NEVER strip, clean, minify, or re-serialize this file in a way that drops comments.
 # 3. If adding a new section, ALWAYS precede it with a descriptive comment (# ...).
 # ==============================================================================
+# ENDOFHEADER
 
 # Configurações globais de sobreposição e fundo geral da interface
 global:
