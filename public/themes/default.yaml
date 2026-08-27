@@ -283,10 +283,6 @@ channel_strip:
     meter_gradient_mid: '#ffbb00'
     meter_gradient_low: '#c1d707'
     meter_gradient_base: '#00ff0066'
-    meter:
-      gradient:
-        base: '#00ff0066'
-        low: '#00ff0066'
 main_view:
   faders_gap: 0px
   faders_padding: 1px
