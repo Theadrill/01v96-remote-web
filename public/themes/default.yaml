@@ -244,7 +244,7 @@ channel_strip:
     card_border: '#282828'
     card_border_width: 1px
     card_border_top_width: 3px
-    strip_bg: '#14161d'
+    strip_bg: '#222222'
     header_height: 30px
     header_font_size: 13px
     header_font_weight: '800'
@@ -273,16 +273,22 @@ channel_strip:
     db_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     name_display_font_size: 13px
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    scale_font_size: 8.5px
+    scale_font_size: 10px
     scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    db_text_stroke: '1px #000000'
     macro_big_nudge_font_size: 28px
     fader_thumb_width: 58px
     fader_thumb_height: 48px
     fader_thumb_radius: 7px
     meter_gradient_top: '#ff0000'
-    meter_gradient_mid: '#ffbb00'
+    meter_gradient_mid: '#ff0000'
     meter_gradient_low: '#c1d707'
     meter_gradient_base: '#00ff0066'
+    strip:
+      bg: '#1e293b'
+    meter:
+      gradient:
+        mid: '#ff0000'
 main_view:
   faders_gap: 0px
   faders_padding: 1px

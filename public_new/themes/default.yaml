@@ -1,7 +1,5 @@
-# Configurações globais de sobreposição e fundo geral da interface
 global:
   bg_overlay: rgba(0, 0, 0, 0.85)
-# Modal de confirmação — botões de ação, tipografia e cores de status
 confirm_modal:
   bg_content: '#1a1a1a'
   border_color: '#333'
@@ -27,7 +25,6 @@ confirm_modal:
   icon_success_color: '#28a745'
   icon_size: 24px
   z_index: '999999'
-# Teclado virtual — aparência das teclas, espaçamento e cores de destaque
 virtual_keyboard:
   key_bg: '#333'
   key_border: '1px solid #555'
@@ -41,7 +38,6 @@ virtual_keyboard:
   space_font_size: 14px
   row_gap: 4px
   keyboard_gap: 4px
-# Bubble modal — tooltip flutuante com seta, cores e animação de duração
 bubble_modal:
   bg_color: '#1e293b'
   border_color: '#3b82f6'
@@ -54,7 +50,6 @@ bubble_modal:
   arrow_color: '#3b82f6'
   duration: 5000
   delay: 300
-# Trava de canal — overlay de bloqueio, ícone, badge e comportamento de hold
 channel_lock:
   hold_duration_ms: 750
   z_index: 100
@@ -67,7 +62,6 @@ channel_lock:
   border_color: '#ff4444'
   badge_bg: '#ff4444'
   badge_text_color: '#ffffff'
-# Channel strip — cores de grupo, tipografia, botões, metros e faders (global/desktop/mobile)
 channel_strip:
   global:
     group_1_color: '#00adef'
@@ -250,7 +244,7 @@ channel_strip:
     card_border: '#282828'
     card_border_width: 1px
     card_border_top_width: 3px
-    strip_bg: '#14161d'
+    strip_bg: '#222222'
     header_height: 30px
     header_font_size: 13px
     header_font_weight: '800'
@@ -279,17 +273,22 @@ channel_strip:
     db_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     name_display_font_size: 13px
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    scale_font_size: 8.5px
+    scale_font_size: 10px
     scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    db_text_stroke: '1px #000000'
     macro_big_nudge_font_size: 28px
     fader_thumb_width: 58px
     fader_thumb_height: 48px
     fader_thumb_radius: 7px
     meter_gradient_top: '#ff0000'
-    meter_gradient_mid: '#ffbb00'
+    meter_gradient_mid: '#ff0000'
     meter_gradient_low: '#c1d707'
     meter_gradient_base: '#00ff0066'
-# Visão principal — espaçamento entre faders, separadores de grupo e modo mobile
+    strip:
+      bg: '#1e293b'
+    meter:
+      gradient:
+        mid: '#ff0000'
 main_view:
   faders_gap: 0px
   faders_padding: 1px
@@ -299,7 +298,6 @@ main_view:
   macro_spacer_bg: transparent
   mobile_faders_gap: 12px
   mobile_group_gap: 24px
-# Setup de canal — modal de configuração, abas de navegação e mini-fader
 channel_setup:
   overlay_bg: '#000000'
   modal_bg: '#000000'

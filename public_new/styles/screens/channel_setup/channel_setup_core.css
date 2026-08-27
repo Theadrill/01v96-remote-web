@@ -371,3 +371,16 @@ body.screen-techmix #techMixTitle {
     align-items: center;
 }
 
+/* =====================================================================
+ * AUX Send Meters: Hidden in Channel Setup modal (Desktop & Mobile)
+ * =====================================================================
+ * In Channel Setup -> AUX tab (channels 0-31), all 8 AUX faders show
+ * the same input meter level as the source channel (which is already
+ * visible on the docked mini-fader on the right). Hiding them reduces
+ * visual clutter.
+ * ===================================================================== */
+.ch-modal-body .aux-sends-area .channel-strip-wrapper[data-type="aux_send"] .mobile-meter-curtain-container,
+.ch-modal-body .aux-sends-area .channel-strip-wrapper[data-type="aux_send"] .desk-meter-column {
+    display: none !important;
+}
+

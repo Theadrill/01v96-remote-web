@@ -133,6 +133,7 @@
     --strip-scale-font-family: Consolas, Menlo, "Courier New", monospace;
     --strip-scale-font-weight: 700;
     --strip-scale-font-size: 7.5px;
+    --strip-mobile-db-stroke: 1px #000000;
     --strip-fader-track-color: #555555;
 
     /* Panpot */
@@ -223,7 +224,8 @@
     --strip-macro-reset-font-weight: 800;
     --strip-macro-reset-font-size: 10px;
 
-    --strip-volume-geral-width: 70px;
+    --strip-desk-volume-geral-width: 70px;
+    --strip-mobile-volume-geral-width: 70px;
 
     /* Mobile Strip */
     --strip-mobile-bg: #14161d;
@@ -289,10 +291,10 @@
 
 /* Volume Geral Desktop Mais Fino (70px) */
 .channel-strip-wrapper.desk-strip.is-volume-geral {
-    width: var(--strip-volume-geral-width, 70px) !important;
-    min-width: var(--strip-volume-geral-width, 70px) !important;
-    max-width: var(--strip-volume-geral-width, 70px) !important;
-    flex: 0 0 var(--strip-volume-geral-width, 70px) !important;
+    width: var(--strip-desk-volume-geral-width, 70px) !important;
+    min-width: var(--strip-desk-volume-geral-width, 70px) !important;
+    max-width: var(--strip-desk-volume-geral-width, 70px) !important;
+    flex: 0 0 var(--strip-desk-volume-geral-width, 70px) !important;
 }
 
 /* =========================================================================
@@ -763,9 +765,9 @@
 
 /* Volume Geral Mobile Mais Fino (70px) */
 .channel-strip-wrapper.mobile-strip.is-volume-geral {
-    width: var(--strip-volume-geral-width, 70px) !important;
-    min-width: var(--strip-volume-geral-width, 70px) !important;
-    max-width: var(--strip-volume-geral-width, 70px) !important;
+    width: var(--strip-mobile-volume-geral-width, 70px) !important;
+    min-width: var(--strip-mobile-volume-geral-width, 70px) !important;
+    max-width: var(--strip-mobile-volume-geral-width, 70px) !important;
 }
 
 /* Master Mobile (Fundo Vinho / Vermelho Escuro) */
@@ -1225,10 +1227,10 @@
     width: 34px;
     user-select: none;
     -webkit-user-select: none;
-    font-size: 8.5px;
-    font-family: monospace;
-    font-weight: 700;
-    color: #777;
+    font-size: var(--strip-mobile-scale-font-size, 8.5px);
+    font-family: var(--strip-mobile-scale-font-family, monospace);
+    font-weight: var(--strip-mobile-scale-font-weight, 700);
+    color: var(--strip-mobile-scale-text-color, #777);
     pointer-events: none;
     z-index: 2;
 }
@@ -1239,6 +1241,7 @@
     line-height: 1;
     white-space: nowrap;
     letter-spacing: -0.5px;
+    /* text-stroke removed from ruler; applied to dB value display instead */
 }
 .mobile-db-ruler span.mark-0   { bottom: calc(19px + (100% - 38px) * 0.8045); }
 .mobile-db-ruler span.mark-m10 { bottom: calc(19px + (100% - 38px) * 0.6090); }
@@ -1263,6 +1266,7 @@
     align-items: center;
     justify-content: center;
     position: absolute;
+    z-index: 10;
     box-sizing: border-box;
     bottom: calc((100% - 38px) * var(--fader-pos, 0));
 }
@@ -1284,6 +1288,7 @@
     cursor: grab;
     touch-action: none;
     position: absolute;
+    z-index: 10;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -2139,6 +2144,8 @@
     color: var(--strip-db-val-color, #5cacee);
     font-family: var(--strip-mobile-db-font-family, var(--strip-db-val-font-family, Consolas, Menlo, "Courier New", monospace));
     padding: 4px 0;
+    -webkit-text-stroke: var(--strip-mobile-db-stroke, 1px #000000);
+    text-shadow: 0 0 2px #000000, 0 0 1px #000000;
 }
 
 /* =========================================================================

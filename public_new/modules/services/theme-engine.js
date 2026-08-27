@@ -351,12 +351,12 @@ var ThemeEngine = (function () {
 
         var dCardW = getVal(csD, 'card_width'); if (dCardW) root.style.setProperty('--strip-desk-card-width', dCardW);
         var dCardPW = getVal(csD, 'card_paired_width'); if (dCardPW) root.style.setProperty('--strip-desk-card-paired-width', dCardPW);
-        var dVolWidth = getVal(csD, 'volume_geral_width'); if (dVolWidth) root.style.setProperty('--strip-volume-geral-width', dVolWidth);
+        var dVolWidth = getVal(csD, 'volume_geral_width'); if (dVolWidth) root.style.setProperty('--strip-desk-volume-geral-width', dVolWidth);
 
         // Mobile Properties
         var mCardW = getVal(csM, 'card_width', 'mobile_card_width'); if (mCardW) root.style.setProperty('--strip-mobile-card-width', mCardW);
         var mCardPW = getVal(csM, 'card_paired_width', 'mobile_card_paired_width'); if (mCardPW) root.style.setProperty('--strip-mobile-card-paired-width', mCardPW);
-        var mVolW = getVal(csM, 'volume_geral_width'); if (mVolW) root.style.setProperty('--strip-volume-geral-width', mVolW);
+        var mVolW = getVal(csM, 'volume_geral_width'); if (mVolW) root.style.setProperty('--strip-mobile-volume-geral-width', mVolW);
         var mCardRad = getVal(csM, 'card_radius', 'mobile_card_radius'); if (mCardRad) root.style.setProperty('--strip-mobile-card-radius', mCardRad);
         var mCardBrd = getVal(csM, 'card_border', 'mobile_card_border'); if (mCardBrd) root.style.setProperty('--strip-mobile-card-border', mCardBrd);
         var mCardBrdW = getVal(csM, 'card_border_width', 'mobile_card_border_width'); if (mCardBrdW !== undefined) root.style.setProperty('--strip-mobile-card-border-width', mCardBrdW);
@@ -404,6 +404,7 @@ var ThemeEngine = (function () {
 
         var mScaleSize = getVal(csM, 'scale_font_size'); if (mScaleSize) root.style.setProperty('--strip-mobile-scale-font-size', mScaleSize);
         var mScaleFont = getVal(csM, 'scale_font_family'); if (mScaleFont) root.style.setProperty('--strip-mobile-scale-font-family', mScaleFont);
+        var mDbStroke = getVal(csM, 'db_text_stroke'); if (mDbStroke) root.style.setProperty('--strip-mobile-db-stroke', mDbStroke);
 
         var mBigNudgeSize = getVal(csM, 'macro_big_nudge_font_size'); if (mBigNudgeSize) root.style.setProperty('--strip-mobile-macro-big-nudge-font-size', mBigNudgeSize);
 

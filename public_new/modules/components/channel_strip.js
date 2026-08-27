@@ -447,9 +447,9 @@ class ChannelStrip {
                 <div class="mobile-fader-track-area">
                     <!-- Régua Simplificada Mobile (0, -10, -30) -->
                     <div class="mobile-db-ruler ${isMaster ? 'master-ruler' : ''}">
-                        <span class="mark-0">0 ───</span>
-                        <span class="mark-m10">-10 ───</span>
-                        <span class="mark-m30">-30 ───</span>
+                        <span class="mark-0">0 ─</span>
+                        <span class="mark-m10">-10 ─</span>
+                        <span class="mark-m30">-30 ─</span>
                     </div>
 
                     <div class="mobile-fader-groove"></div>
