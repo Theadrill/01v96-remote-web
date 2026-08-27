@@ -304,8 +304,8 @@ var ThemeEditor = (function () {
         if (typeof jsyaml !== 'undefined') {
             try {
                 var liveYaml = jsyaml.dump(_parsedData);
-                if (typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
-                    ConfirmModal.loadTheme(liveYaml);
+                if (typeof ThemeEngine !== 'undefined' && ThemeEngine.apply) {
+                    ThemeEngine.apply(liveYaml);
                 }
             } catch (e) {}
         }
@@ -403,8 +403,8 @@ var ThemeEditor = (function () {
                     throw new Error(adminErr.error || 'Erro ao salvar default.yaml');
                 }
 
-                if (typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
-                    ConfirmModal.loadTheme(yamlString);
+                if (typeof ThemeEngine !== 'undefined' && ThemeEngine.apply) {
+                    ThemeEngine.apply(yamlString);
                 }
 
                 if (typeof ConfirmModal !== 'undefined' && ConfirmModal.alert) {
@@ -426,8 +426,8 @@ var ThemeEditor = (function () {
                 throw new Error(err.error || 'Erro ao salvar tema');
             }
 
-            if (typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
-                ConfirmModal.loadTheme(yamlString);
+            if (typeof ThemeEngine !== 'undefined' && ThemeEngine.apply) {
+                ThemeEngine.apply(yamlString);
             }
 
             close();

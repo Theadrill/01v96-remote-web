@@ -120,8 +120,8 @@ var ThemeManager = (function () {
             var themeRes = await fetch('/api/themes/' + encodeURIComponent(themeName));
             if (themeRes.ok) {
                 var data = await themeRes.json();
-                if (data && data.content && typeof ConfirmModal !== 'undefined' && ConfirmModal.loadTheme) {
-                    ConfirmModal.loadTheme(data.content);
+                if (data && data.content && typeof ThemeEngine !== 'undefined' && ThemeEngine.apply) {
+                    ThemeEngine.apply(data.content);
                 }
             }
 
