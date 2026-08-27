@@ -85,9 +85,9 @@ var MainView = (function () {
 
             // Separador mobile a cada bloco de 8 canais
             if (!isDesktop && visibleCount > 0 && (visibleCount % 8 === 0)) {
-                var mobSep = document.createElement('div');
-                mobSep.className = 'mob-group-separator';
-                fadersContainer.appendChild(mobSep);
+                var mobileSep = document.createElement('div');
+                mobileSep.className = 'mobile-group-separator';
+                fadersContainer.appendChild(mobileSep);
             }
 
             var chTitle = isPaired ? `${i + 1} + ${i + 2}` : `${i + 1}`;

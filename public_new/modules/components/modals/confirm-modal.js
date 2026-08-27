@@ -602,60 +602,68 @@ var ConfirmModal = (function () {
         var dVolWidth = getVal(csD, 'volume_geral_width'); if (dVolWidth) root.style.setProperty('--strip-volume-geral-width', dVolWidth);
 
         // Mobile Properties
-        var mCardW = getVal(csM, 'card_width', 'mob_card_width'); if (mCardW) root.style.setProperty('--strip-mob-card-width', mCardW);
-        var mCardPW = getVal(csM, 'card_paired_width', 'mob_card_paired_width'); if (mCardPW) root.style.setProperty('--strip-mob-card-paired-width', mCardPW);
+        var mCardW = getVal(csM, 'card_width', 'mobile_card_width'); if (mCardW) root.style.setProperty('--strip-mobile-card-width', mCardW);
+        var mCardPW = getVal(csM, 'card_paired_width', 'mobile_card_paired_width'); if (mCardPW) root.style.setProperty('--strip-mobile-card-paired-width', mCardPW);
         var mVolW = getVal(csM, 'volume_geral_width'); if (mVolW) root.style.setProperty('--strip-volume-geral-width', mVolW);
-        var mCardRad = getVal(csM, 'card_radius', 'mob_card_radius'); if (mCardRad) root.style.setProperty('--strip-mob-card-radius', mCardRad);
-        var mCardBrd = getVal(csM, 'card_border', 'mob_card_border'); if (mCardBrd) root.style.setProperty('--strip-mob-card-border', mCardBrd);
-        var mCardBrdW = getVal(csM, 'card_border_width', 'mob_card_border_width'); if (mCardBrdW !== undefined) root.style.setProperty('--strip-mob-card-border-width', mCardBrdW);
-        var mCardTopW = getVal(csM, 'card_border_top_width', 'mob_card_border_top_width'); if (mCardTopW !== undefined) root.style.setProperty('--strip-mob-card-border-top-width', mCardTopW);
+        var mCardRad = getVal(csM, 'card_radius', 'mobile_card_radius'); if (mCardRad) root.style.setProperty('--strip-mobile-card-radius', mCardRad);
+        var mCardBrd = getVal(csM, 'card_border', 'mobile_card_border'); if (mCardBrd) root.style.setProperty('--strip-mobile-card-border', mCardBrd);
+        var mCardBrdW = getVal(csM, 'card_border_width', 'mobile_card_border_width'); if (mCardBrdW !== undefined) root.style.setProperty('--strip-mobile-card-border-width', mCardBrdW);
+        var mCardTopW = getVal(csM, 'card_border_top_width', 'mobile_card_border_top_width'); if (mCardTopW !== undefined) root.style.setProperty('--strip-mobile-card-border-top-width', mCardTopW);
 
-        var mHdrH = getVal(csM, 'header_height'); if (mHdrH) root.style.setProperty('--strip-mob-header-height', mHdrH);
-        var mHdrSize = getVal(csM, 'header_font_size'); if (mHdrSize) root.style.setProperty('--strip-mob-header-font-size', mHdrSize);
-        var mHdrWeight = getVal(csM, 'header_font_weight'); if (mHdrWeight) root.style.setProperty('--strip-mob-header-font-weight', mHdrWeight);
-        var mHdrFont = getVal(csM, 'header_font_family'); if (mHdrFont) root.style.setProperty('--strip-mob-header-font-family', mHdrFont);
+        var mStripBg = getVal(csM, 'strip_bg', 'mobile_strip_bg'); if (mStripBg) root.style.setProperty('--strip-mobile-bg', mStripBg);
 
-        var mBtnH = getVal(csM, 'btn_height', 'mob_btn_height'); if (mBtnH) root.style.setProperty('--strip-mob-btn-height', mBtnH);
-        var mBtnOnH = getVal(csM, 'btn_on_height'); if (mBtnOnH) root.style.setProperty('--strip-mob-btn-on-height', mBtnOnH);
-        var mBtnOnSize = getVal(csM, 'btn_on_font_size'); if (mBtnOnSize) root.style.setProperty('--strip-mob-btn-on-font-size', mBtnOnSize);
-        var mBtnOnFont = getVal(csM, 'btn_on_font_family'); if (mBtnOnFont) root.style.setProperty('--strip-mob-btn-on-font-family', mBtnOnFont);
+        var mHdrH = getVal(csM, 'header_height'); if (mHdrH) root.style.setProperty('--strip-mobile-header-height', mHdrH);
+        var mHdrSize = getVal(csM, 'header_font_size'); if (mHdrSize) root.style.setProperty('--strip-mobile-header-font-size', mHdrSize);
+        var mHdrWeight = getVal(csM, 'header_font_weight'); if (mHdrWeight) root.style.setProperty('--strip-mobile-header-font-weight', mHdrWeight);
+        var mHdrFont = getVal(csM, 'header_font_family'); if (mHdrFont) root.style.setProperty('--strip-mobile-header-font-family', mHdrFont);
 
-        var mBtnSoloH = getVal(csM, 'btn_solo_height'); if (mBtnSoloH) root.style.setProperty('--strip-mob-btn-solo-height', mBtnSoloH);
-        var mBtnSoloSize = getVal(csM, 'btn_solo_font_size'); if (mBtnSoloSize) root.style.setProperty('--strip-mob-btn-solo-font-size', mBtnSoloSize);
-        var mBtnSoloFont = getVal(csM, 'btn_solo_font_family'); if (mBtnSoloFont) root.style.setProperty('--strip-mob-btn-solo-font-family', mBtnSoloFont);
+        var mBtnH = getVal(csM, 'btn_height', 'mobile_btn_height'); if (mBtnH) root.style.setProperty('--strip-mobile-btn-height', mBtnH);
+        var mBtnOnH = getVal(csM, 'btn_on_height'); if (mBtnOnH) root.style.setProperty('--strip-mobile-btn-on-height', mBtnOnH);
+        var mBtnOnSize = getVal(csM, 'btn_on_font_size'); if (mBtnOnSize) root.style.setProperty('--strip-mobile-btn-on-font-size', mBtnOnSize);
+        var mBtnOnFont = getVal(csM, 'btn_on_font_family'); if (mBtnOnFont) root.style.setProperty('--strip-mobile-btn-on-font-family', mBtnOnFont);
 
-        var mBtnPreH = getVal(csM, 'btn_pre_height'); if (mBtnPreH) root.style.setProperty('--strip-mob-btn-pre-height', mBtnPreH);
-        var mBtnPreSize = getVal(csM, 'btn_pre_font_size'); if (mBtnPreSize) root.style.setProperty('--strip-mob-btn-pre-font-size', mBtnPreSize);
-        var mBtnPreFont = getVal(csM, 'btn_pre_font_family'); if (mBtnPreFont) root.style.setProperty('--strip-mob-btn-pre-font-family', mBtnPreFont);
+        var mBtnSoloH = getVal(csM, 'btn_solo_height'); if (mBtnSoloH) root.style.setProperty('--strip-mobile-btn-solo-height', mBtnSoloH);
+        var mBtnSoloSize = getVal(csM, 'btn_solo_font_size'); if (mBtnSoloSize) root.style.setProperty('--strip-mobile-btn-solo-font-size', mBtnSoloSize);
+        var mBtnSoloFont = getVal(csM, 'btn_solo_font_family'); if (mBtnSoloFont) root.style.setProperty('--strip-mobile-btn-solo-font-family', mBtnSoloFont);
 
-        var mBtnMedH = getVal(csM, 'btn_medidores_height'); if (mBtnMedH) root.style.setProperty('--strip-mob-btn-medidores-height', mBtnMedH);
-        var mBtnRad = getVal(csM, 'btn_radius', 'mob_btn_radius'); if (mBtnRad) root.style.setProperty('--strip-mob-btn-radius', mBtnRad);
-        var mNudgeSize = getVal(csM, 'nudge_btn_size', 'mob_nudge_btn_size'); if (mNudgeSize) root.style.setProperty('--strip-mob-nudge-size', mNudgeSize);
-        var mNudgeFontSize = getVal(csM, 'nudge_font_size'); if (mNudgeFontSize) root.style.setProperty('--strip-mob-nudge-font-size', mNudgeFontSize);
-        var mNudgeFont = getVal(csM, 'nudge_font_family'); if (mNudgeFont) root.style.setProperty('--strip-mob-nudge-font-family', mNudgeFont);
+        var mBtnPreH = getVal(csM, 'btn_pre_height'); if (mBtnPreH) root.style.setProperty('--strip-mobile-btn-pre-height', mBtnPreH);
+        var mBtnPreSize = getVal(csM, 'btn_pre_font_size'); if (mBtnPreSize) root.style.setProperty('--strip-mobile-btn-pre-font-size', mBtnPreSize);
+        var mBtnPreFont = getVal(csM, 'btn_pre_font_family'); if (mBtnPreFont) root.style.setProperty('--strip-mobile-btn-pre-font-family', mBtnPreFont);
 
-        var mMacroCfgH = getVal(csM, 'macro_config_btn_height'); if (mMacroCfgH) root.style.setProperty('--strip-mob-macro-config-btn-height', mMacroCfgH);
-        var mMacroCfgSize = getVal(csM, 'macro_config_font_size'); if (mMacroCfgSize) root.style.setProperty('--strip-mob-macro-config-font-size', mMacroCfgSize);
-        var mMacroCfgFont = getVal(csM, 'macro_config_font_family'); if (mMacroCfgFont) root.style.setProperty('--strip-mob-macro-config-font-family', mMacroCfgFont);
+        var mBtnMedH = getVal(csM, 'btn_medidores_height'); if (mBtnMedH) root.style.setProperty('--strip-mobile-btn-medidores-height', mBtnMedH);
+        var mBtnRad = getVal(csM, 'btn_radius', 'mobile_btn_radius'); if (mBtnRad) root.style.setProperty('--strip-mobile-btn-radius', mBtnRad);
+        var mNudgeSize = getVal(csM, 'nudge_btn_size', 'mobile_nudge_btn_size'); if (mNudgeSize) root.style.setProperty('--strip-mobile-nudge-size', mNudgeSize);
+        var mNudgeFontSize = getVal(csM, 'nudge_font_size'); if (mNudgeFontSize) root.style.setProperty('--strip-mobile-nudge-font-size', mNudgeFontSize);
+        var mNudgeFont = getVal(csM, 'nudge_font_family'); if (mNudgeFont) root.style.setProperty('--strip-mobile-nudge-font-family', mNudgeFont);
 
-        var mMacroRstH = getVal(csM, 'macro_reset_btn_height'); if (mMacroRstH) root.style.setProperty('--strip-mob-macro-reset-btn-height', mMacroRstH);
-        var mMacroRstSize = getVal(csM, 'macro_reset_font_size'); if (mMacroRstSize) root.style.setProperty('--strip-mob-macro-reset-font-size', mMacroRstSize);
-        var mMacroRstFont = getVal(csM, 'macro_reset_font_family'); if (mMacroRstFont) root.style.setProperty('--strip-mob-macro-reset-font-family', mMacroRstFont);
+        var mMacroCfgH = getVal(csM, 'macro_config_btn_height'); if (mMacroCfgH) root.style.setProperty('--strip-mobile-macro-config-btn-height', mMacroCfgH);
+        var mMacroCfgSize = getVal(csM, 'macro_config_font_size'); if (mMacroCfgSize) root.style.setProperty('--strip-mobile-macro-config-font-size', mMacroCfgSize);
+        var mMacroCfgFont = getVal(csM, 'macro_config_font_family'); if (mMacroCfgFont) root.style.setProperty('--strip-mobile-macro-config-font-family', mMacroCfgFont);
 
-        var mDbSize = getVal(csM, 'db_font_size', 'mob_db_font_size'); if (mDbSize) root.style.setProperty('--strip-mob-db-font-size', mDbSize);
-        var mDbFont = getVal(csM, 'db_font_family'); if (mDbFont) root.style.setProperty('--strip-mob-db-font-family', mDbFont);
+        var mMacroRstH = getVal(csM, 'macro_reset_btn_height'); if (mMacroRstH) root.style.setProperty('--strip-mobile-macro-reset-btn-height', mMacroRstH);
+        var mMacroRstSize = getVal(csM, 'macro_reset_font_size'); if (mMacroRstSize) root.style.setProperty('--strip-mobile-macro-reset-font-size', mMacroRstSize);
+        var mMacroRstFont = getVal(csM, 'macro_reset_font_family'); if (mMacroRstFont) root.style.setProperty('--strip-mobile-macro-reset-font-family', mMacroRstFont);
 
-        var mNameSize = getVal(csM, 'name_display_font_size', 'mob_name_display_font_size'); if (mNameSize) root.style.setProperty('--strip-mob-name-display-font-size', mNameSize);
-        var mNameFont = getVal(csM, 'name_display_font_family', 'mob_name_display_font_family'); if (mNameFont) root.style.setProperty('--strip-mob-name-display-font-family', mNameFont);
+        var mDbSize = getVal(csM, 'db_font_size', 'mobile_db_font_size'); if (mDbSize) root.style.setProperty('--strip-mobile-db-font-size', mDbSize);
+        var mDbFont = getVal(csM, 'db_font_family'); if (mDbFont) root.style.setProperty('--strip-mobile-db-font-family', mDbFont);
 
-        var mScaleSize = getVal(csM, 'scale_font_size'); if (mScaleSize) root.style.setProperty('--strip-mob-scale-font-size', mScaleSize);
-        var mScaleFont = getVal(csM, 'scale_font_family'); if (mScaleFont) root.style.setProperty('--strip-mob-scale-font-family', mScaleFont);
+        var mNameSize = getVal(csM, 'name_display_font_size', 'mobile_name_display_font_size'); if (mNameSize) root.style.setProperty('--strip-mobile-name-display-font-size', mNameSize);
+        var mNameFont = getVal(csM, 'name_display_font_family', 'mobile_name_display_font_family'); if (mNameFont) root.style.setProperty('--strip-mobile-name-display-font-family', mNameFont);
 
-        var mBigNudgeSize = getVal(csM, 'macro_big_nudge_font_size'); if (mBigNudgeSize) root.style.setProperty('--strip-mob-macro-big-nudge-font-size', mBigNudgeSize);
+        var mScaleSize = getVal(csM, 'scale_font_size'); if (mScaleSize) root.style.setProperty('--strip-mobile-scale-font-size', mScaleSize);
+        var mScaleFont = getVal(csM, 'scale_font_family'); if (mScaleFont) root.style.setProperty('--strip-mobile-scale-font-family', mScaleFont);
 
-        var mThumbW = getVal(csM, 'fader_thumb_width', 'mob_fader_thumb_width'); if (mThumbW) root.style.setProperty('--strip-mob-thumb-width', mThumbW);
-        var mThumbH = getVal(csM, 'fader_thumb_height', 'mob_fader_thumb_height'); if (mThumbH) root.style.setProperty('--strip-mob-thumb-height', mThumbH);
-        var mThumbRad = getVal(csM, 'fader_thumb_radius', 'mob_fader_thumb_radius'); if (mThumbRad) root.style.setProperty('--strip-mob-thumb-radius', mThumbRad);
+        var mBigNudgeSize = getVal(csM, 'macro_big_nudge_font_size'); if (mBigNudgeSize) root.style.setProperty('--strip-mobile-macro-big-nudge-font-size', mBigNudgeSize);
+
+        var mThumbW = getVal(csM, 'fader_thumb_width', 'mobile_fader_thumb_width'); if (mThumbW) root.style.setProperty('--strip-mobile-thumb-width', mThumbW);
+        var mThumbH = getVal(csM, 'fader_thumb_height', 'mobile_fader_thumb_height'); if (mThumbH) root.style.setProperty('--strip-mobile-thumb-height', mThumbH);
+        var mThumbRad = getVal(csM, 'fader_thumb_radius', 'mobile_fader_thumb_radius'); if (mThumbRad) root.style.setProperty('--strip-mobile-thumb-radius', mThumbRad);
+
+        // Mobile VU Meter Gradient (Cortina de Medidor)
+        var mGradTop = getVal(csM, 'meter_gradient_top'); if (mGradTop) root.style.setProperty('--strip-mobile-meter-gradient-top', mGradTop);
+        var mGradMid = getVal(csM, 'meter_gradient_mid'); if (mGradMid) root.style.setProperty('--strip-mobile-meter-gradient-mid', mGradMid);
+        var mGradLow = getVal(csM, 'meter_gradient_low'); if (mGradLow) root.style.setProperty('--strip-mobile-meter-gradient-low', mGradLow);
+        var mGradBase = getVal(csM, 'meter_gradient_base'); if (mGradBase) root.style.setProperty('--strip-mobile-meter-gradient-base', mGradBase);
 
         // Main View (Layout da Tela Principal)
         var mv = theme.main_view || {};
@@ -665,7 +673,7 @@ var ConfirmModal = (function () {
         if (mv.group_separator_bg !== undefined)      root.style.setProperty('--main-group-separator-bg', mv.group_separator_bg);
         if (mv.macro_spacer_width !== undefined)      root.style.setProperty('--main-macro-spacer-width', mv.macro_spacer_width);
         if (mv.macro_spacer_bg !== undefined)         root.style.setProperty('--main-macro-spacer-bg', mv.macro_spacer_bg);
-        if (mv.mobile_faders_gap !== undefined)       root.style.setProperty('--main-mob-faders-gap', mv.mobile_faders_gap);
+        if (mv.mobile_faders_gap !== undefined)       root.style.setProperty('--main-mobile-faders-gap', mv.mobile_faders_gap);
         if (mv.mobile_group_gap !== undefined)        root.style.setProperty('--main-group-gap', mv.mobile_group_gap);
 
         // Channel Setup (Central de Edição do Canal)
@@ -692,7 +700,7 @@ var ConfirmModal = (function () {
         if (csetup.mini_fader_bg)      root.style.setProperty('--csetup-mini-fader-bg', csetup.mini_fader_bg);
         if (csetup.mini_fader_border)  root.style.setProperty('--csetup-mini-fader-border', csetup.mini_fader_border);
         if (csetup.mini_fader_width)   root.style.setProperty('--csetup-mini-fader-width', csetup.mini_fader_width);
-        if (csetup.mob_mini_fader_width) root.style.setProperty('--csetup-mob-mini-fader-width', csetup.mob_mini_fader_width);
+        if (csetup.mobile_mini_fader_width) root.style.setProperty('--csetup-mobile-mini-fader-width', csetup.mobile_mini_fader_width);
     }
 
     function _alert(message, title, type) {

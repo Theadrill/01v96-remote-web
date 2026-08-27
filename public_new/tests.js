@@ -268,7 +268,7 @@ const DESKTOP_VARIATIONS = [
 
 const MOBILE_VARIATIONS = [
     {
-        id: 'mob_mono',
+        id: 'mobile_mono',
         title: '1. Canal Mono Normal (CH 13)',
         type: 'input',
         chNumber: '13',
@@ -281,7 +281,7 @@ const MOBILE_VARIATIONS = [
         isDisabled: false
     },
     {
-        id: 'mob_paired',
+        id: 'mobile_paired',
         title: '2. Canal Pareado (CH 21+22)',
         type: 'input_paired',
         chNumber: '21 + 22',
@@ -295,7 +295,7 @@ const MOBILE_VARIATIONS = [
         isPaired: true
     },
     {
-        id: 'mob_master',
+        id: 'mobile_master',
         title: '3. Master LR Stereo',
         type: 'master',
         chNumber: 'MASTER',
@@ -310,7 +310,7 @@ const MOBILE_VARIATIONS = [
         isMaster: true
     },
     {
-        id: 'mob_aux_send',
+        id: 'mobile_aux_send',
         title: '4. Envio Auxiliar (CH 5 BAIXO)',
         type: 'aux_send',
         chNumber: '5',
@@ -324,7 +324,7 @@ const MOBILE_VARIATIONS = [
         isDisabled: false
     },
     {
-        id: 'mob_mix_master',
+        id: 'mobile_mix_master',
         title: '4.1 Master Auxiliar com POSIÇÃO (MIX 7)',
         type: 'mix',
         chNumber: 'MIX 7',
@@ -338,7 +338,7 @@ const MOBILE_VARIATIONS = [
         hasPositionPanel: true
     },
     {
-        id: 'mob_macro_tech',
+        id: 'mobile_macro_tech',
         title: '5. Macro Fader Técnico',
         type: 'macro',
         chNumber: 'MACRO',
@@ -348,7 +348,7 @@ const MOBILE_VARIATIONS = [
         mode: 'macro'
     },
     {
-        id: 'mob_macro_aux',
+        id: 'mobile_macro_aux',
         title: '6. Volume Geral de AUX',
         type: 'macro_aux',
         chNumber: 'AUX',
@@ -359,7 +359,7 @@ const MOBILE_VARIATIONS = [
         hasResetBtn: true
     },
     {
-        id: 'mob_macro_musician',
+        id: 'mobile_macro_musician',
         title: '7. Volume Geral do Músico',
         type: 'macro_musician',
         chNumber: 'GERAL',
@@ -369,7 +369,7 @@ const MOBILE_VARIATIONS = [
         mode: 'macro_musician'
     },
     {
-        id: 'mob_locked',
+        id: 'mobile_locked',
         title: '8. Canal Mobile TRAVADO (🔒)',
         type: 'input',
         chNumber: '8',
@@ -382,7 +382,7 @@ const MOBILE_VARIATIONS = [
         isDisabled: false
     },
     {
-        id: 'mob_disabled',
+        id: 'mobile_disabled',
         title: '9. Mobile FIXED / Disabled',
         type: 'aux_send',
         chNumber: 'AUX 1',
@@ -621,21 +621,21 @@ function toggleSimulatorAnimation() {
 function setWbViewport(mode) {
     window.wbState.viewport = mode;
     const secDesk = document.getElementById('sectionDesktop');
-    const secMob = document.getElementById('sectionMobile');
+    const secMobile = document.getElementById('sectionMobile');
 
     document.querySelectorAll('.wb-btn-toggle').forEach(b => b.classList.remove('active'));
 
     if (mode === 'both') {
         if (secDesk) secDesk.style.display = 'block';
-        if (secMob) secMob.style.display = 'block';
+        if (secMobile) secMobile.style.display = 'block';
         document.getElementById('btnViewBoth').classList.add('active');
     } else if (mode === 'desktop') {
         if (secDesk) secDesk.style.display = 'block';
-        if (secMob) secMob.style.display = 'none';
+        if (secMobile) secMobile.style.display = 'none';
         document.getElementById('btnViewDesktop').classList.add('active');
     } else if (mode === 'mobile') {
         if (secDesk) secDesk.style.display = 'none';
-        if (secMob) secMob.style.display = 'block';
+        if (secMobile) secMobile.style.display = 'block';
         document.getElementById('btnViewMobile').classList.add('active');
     }
 }

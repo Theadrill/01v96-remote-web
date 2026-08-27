@@ -373,6 +373,7 @@ channel_strip:
     card_border: "#282828"                     # Cor da borda do contorno do card mobile
     card_border_width: "1px"                   # Espessura da borda do contorno do card mobile
     card_border_top_width: "3px"               # Espessura da borda superior cromática de grupo no mobile
+    strip_bg: "#14161d"                        # Fundo padrão do card mobile (cor do fundo geral do strip mobile)
 
     header_height: "30px"                      # Altura do cabeçalho mobile
     header_font_size: "13px"                   # Tamanho da fonte do cabeçalho mobile
@@ -411,6 +412,12 @@ channel_strip:
     fader_thumb_width: "58px"                  # Largura do fader thumb mobile (+25%)
     fader_thumb_height: "48px"                 # Altura do fader thumb mobile (+25%)
     fader_thumb_radius: "7px"                  # Arredondamento do fader thumb mobile
+
+    # Gradiente da cortina do VU Meter mobile
+    meter_gradient_top: "#ff0000"              # Vermelho - topo do gradiente (clipe)
+    meter_gradient_mid: "#ffbb00"              # Amarelo - meio do gradiente (quase no clip)
+    meter_gradient_low: "#166534"              # Verde escuro - faixa intermediária
+    meter_gradient_base: "#064e3b"             # Verde muito escuro - base do medidor
 
 
 # ─── MAIN VIEW (TELA PRINCIPAL DO MIXER) ──────────────────────
@@ -451,6 +458,6 @@ channel_setup:
   mini_fader_bg: "#101218"                   # Fundo do dock lateral do mini-fader
   mini_fader_border: "#262936"               # Borda divisória do mini-fader
   mini_fader_width: "85px"                   # Largura do dock do mini-fader no desktop
-  mob_mini_fader_width: "118px"              # Largura do dock do mini-fader no mobile
+  mobile_mini_fader_width: "118px"              # Largura do dock do mini-fader no mobile
 
 

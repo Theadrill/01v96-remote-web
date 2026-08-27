@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Theme Admin Editor</title>
+    <base href="/new/" />
+
+    <!-- CSS para o ThemeEditor -->
+    <link href="style.css" rel="stylesheet" />
+    <link href="styles/base/base.css" rel="stylesheet" />
+    <link href="styles/base/layout.css" rel="stylesheet" />
+    <link href="styles/components/theme-editor.css" rel="stylesheet" />
+    <link href="styles/components/overlay_info.css" rel="stylesheet" />
+    <link href="styles/components/modals/confirm-modal.css" rel="stylesheet" />
+    <link href="styles/components/modals/color-picker.css" rel="stylesheet" />
+
+    <!-- js-yaml (dependência do ThemeEditor) -->
+    <script src="vendor/js-yaml/js-yaml.min.js"></script>
+</head>
+
+<body style="margin: 0; padding: 0; background: #0a0a0f; min-height: 100vh;">
+
+    <!-- Badge fixo no topo -->
+    <div id="adminBadge" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 16000;
+        background: #1a1a2e;
+        border-bottom: 1px solid #333;
+        padding: 10px 16px;
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #e0e0e0;
+        letter-spacing: 0.5px;
+    ">
+        &#9881;&#65039; Editor Admin &mdash; default.yaml
+    </div>
+
+    <!-- Espaçador para o badge fixo -->
+    <div style="height: 44px;"></div>
+
+    <!-- Modal do ThemeEditor (mesmo DOM do index.html) -->
+    <div class="modal-overlay" id="themeEditorModal" style="display: none; z-index: 15000;">
+        <div class="modal-content" style="max-width: 600px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; background: #1e1e1e; border: 1px solid #333; border-radius: 12px; color: #fff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 12px;">
+                <span id="themeEditorTitle" style="font-size: 1.2rem; font-weight: bold;">&#9998;&#65039; Editor de Tema</span>
+                <button style="background: transparent; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer;" onclick="ThemeEditor.close()">&times;</button>
+            </div>
+
+            <!-- Banner Somente Leitura -->
+            <div id="themeEditorReadOnlyBanner" class="te-readonly-banner" style="display: none;">
+                &#128737;&#65039; ESTE É O TEMA PADRÃO DO SISTEMA (MODO SOMENTE LEITURA)
+            </div>
+
+            <!-- Container das Seções Auto-Categorizadas -->
+            <div id="themeEditorSections" style="flex: 1; overflow-y: auto; margin-bottom: 15px;">
+                <div class="theme-loading">&#8987;&#65039; Carregando estrutura do tema...</div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-close" style="flex: 1; padding: 12px; font-weight: bold; border-radius: 8px;" onclick="ThemeEditor.close()">CANCELAR</button>
+                <button id="themeEditorSaveBtn" class="btn-connect theme-btn-apply" style="flex: 1; padding: 12px; font-weight: bold; border-radius: 8px;" onclick="ThemeEditor.saveTheme()">SALVAR TEMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts necessários para o ThemeEditor -->
+    <script src="modules/components/modals/confirm-modal.js"></script>
+    <script src="modules/components/modals/color-picker.js"></script>
+    <script src="modules/services/theme-manager.js"></script>
+    <script src="modules/components/theme-editor.js"></script>
+
+    <!-- Bootstrap: abre o editor em modo admin para default.yaml -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            ThemeEditor.open('default.yaml', { adminMode: true });
+        });
+    </script>
+</body>
+
+</html>

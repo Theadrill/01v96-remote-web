@@ -84,7 +84,7 @@ class ChannelStrip {
 
         wrapper.className = [
             'channel-strip-wrapper',
-            isDesktop ? 'desk-strip' : 'mob-strip',
+            isDesktop ? 'desk-strip' : 'mobile-strip',
             cfg.isPaired ? 'paired-channel' : '',
             isMaster ? 'is-master' : '',
             isMacro ? 'is-macro' : '',
@@ -365,27 +365,27 @@ class ChannelStrip {
             const hasReset = cfg.hasResetBtn === true || cfg.mode === 'macro_aux' || cfg.type === 'macro_aux';
 
             return `
-                <div class="mob-card-header">
+                <div class="mobile-card-header">
                     ${this._getHeaderTitle()}
                 </div>
-                <div class="mob-display-name">
+                <div class="mobile-display-name">
                     ${cfg.name}
                 </div>
-                <div class="mob-macro-feature-zone">
+                <div class="mobile-macro-feature-zone">
                     ${hasConfig ? `<button class="macro-config-btn">CONFIG</button>` : ''}
-                    <div class="mob-macro-delta-display macro-delta-display">${cfg.deltaDb || '--'}</div>
+                    <div class="mobile-macro-delta-display macro-delta-display">${cfg.deltaDb || '--'}</div>
                 </div>
-                <div class="mob-macro-fader-core">
-                    <button class="mob-big-nudge btn-nudge-plus" title="Aumentar">
+                <div class="mobile-macro-fader-core">
+                    <button class="mobile-big-nudge btn-nudge-plus" title="Aumentar">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
                     </button>
-                    <button class="mob-big-nudge btn-nudge-minus" title="Diminuir">
+                    <button class="mobile-big-nudge btn-nudge-minus" title="Diminuir">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
                     </button>
                 </div>
                 ${hasReset ? `
-                    <div class="mob-macro-reset-container">
-                        <button class="mob-btn-zerar">ZERAR</button>
+                    <div class="mobile-macro-reset-container">
+                        <button class="mobile-btn-zerar">ZERAR</button>
                     </div>
                 ` : ''}
             `;
@@ -393,80 +393,80 @@ class ChannelStrip {
 
         return `
             <!-- Cortina de Medidor VU de Fundo Integral (100% da área do card) -->
-            <div class="mob-meter-curtain-container">
-                <div class="mob-meter-curtain vu-l"></div>
-                ${isDualMeter ? `<div class="mob-meter-curtain vu-r"></div>` : ''}
+            <div class="mobile-meter-curtain-container">
+                <div class="mobile-meter-curtain vu-l"></div>
+                ${isDualMeter ? `<div class="mobile-meter-curtain vu-r"></div>` : ''}
             </div>
 
             <!-- Conteúdo dos Controles sobre a Cortina -->
-            <div class="mob-card-content">
+            <div class="mobile-card-content">
 
                 <!-- Zona 1: Header Centralizado -->
-                <div class="mob-card-header">
+                <div class="mobile-card-header">
                     ${this._getHeaderTitle()}
                 </div>
 
                 <!-- Zona 3: Display do Canal -->
-                <div class="mob-display-name">
+                <div class="mobile-display-name">
                     ${cfg.name}
                 </div>
 
                 <!-- Zona 2: Top Action / Solo / Pre -->
-                <div class="mob-top-action">
+                <div class="mobile-top-action">
                     ${cfg.prePost ? `
-                        <button class="mob-btn-pre ${cfg.prePost.toLowerCase()}">${cfg.prePost}</button>
+                        <button class="mobile-btn-pre ${cfg.prePost.toLowerCase()}">${cfg.prePost}</button>
                     ` : `
-                        <button class="mob-btn-solo ${cfg.soloState ? 'active' : ''}">SOLO</button>
+                        <button class="mobile-btn-solo ${cfg.soloState ? 'active' : ''}">SOLO</button>
                     `}
                 </div>
 
                 <!-- Zona 5: Botão ON (Mute) -->
-                <div class="mob-primary-action">
-                    <button class="mob-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
+                <div class="mobile-primary-action">
+                    <button class="mobile-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
                 </div>
 
                 <!-- Zona 4: Middle Feature (Medidores Master ou Posição Auxiliar no Mobile) -->
                 ${isMaster ? `
-                    <div class="mob-feature-action mob-master-meters-toggle" title="Configurar Posição dos Medidores">
-                        <button class="mob-btn-feature mob-btn-medidores">MEDIDORES</button>
+                    <div class="mobile-feature-action mobile-master-meters-toggle" title="Configurar Posição dos Medidores">
+                        <button class="mobile-btn-feature mobile-btn-medidores">MEDIDORES</button>
                     </div>
                 ` : (cfg.hasPositionPanel || cfg.positionPanel ? `
-                    <div class="mob-feature-action" title="Configurar Posição de Envio">
-                        <button class="mob-btn-feature mob-btn-posicao">POSIÇÃO</button>
+                    <div class="mobile-feature-action" title="Configurar Posição de Envio">
+                        <button class="mobile-btn-feature mobile-btn-posicao">POSIÇÃO</button>
                     </div>
                 ` : '')}
 
                 <!-- Nudge Superior (+) -->
-                <div class="mob-nudge-container">
-                    <button class="mob-nudge-btn mob-nudge-plus" title="Nudge + (Toque ou segure)">
+                <div class="mobile-nudge-container">
+                    <button class="mobile-nudge-btn mobile-nudge-plus" title="Nudge + (Toque ou segure)">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
                     </button>
                 </div>
 
                 <!-- Fader Rail Central (Sem salto ao toque direto) -->
-                <div class="mob-fader-track-area">
+                <div class="mobile-fader-track-area">
                     <!-- Régua Simplificada Mobile (0, -10, -30) -->
-                    <div class="mob-db-ruler ${isMaster ? 'master-ruler' : ''}">
+                    <div class="mobile-db-ruler ${isMaster ? 'master-ruler' : ''}">
                         <span class="mark-0">0 ───</span>
                         <span class="mark-m10">-10 ───</span>
                         <span class="mark-m30">-30 ───</span>
                     </div>
 
-                    <div class="mob-fader-groove"></div>
-                    <div class="mob-fader-thumb" style="--fader-pos: ${((cfg.faderValue || 0) / 1023).toFixed(4)};">
+                    <div class="mobile-fader-groove"></div>
+                    <div class="mobile-fader-thumb" style="--fader-pos: ${((cfg.faderValue || 0) / 1023).toFixed(4)};">
                         <div class="thumb-center-line"></div>
                     </div>
                 </div>
 
                 <!-- Nudge Inferior (-) -->
-                <div class="mob-nudge-container">
-                    <button class="mob-nudge-btn mob-nudge-minus" title="Nudge - (Toque ou segure)">
+                <div class="mobile-nudge-container">
+                    <button class="mobile-nudge-btn mobile-nudge-minus" title="Nudge - (Toque ou segure)">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
                     </button>
                 </div>
 
                 <!-- Zona 6: Leitura Numérica Neon em dB -->
-                <div class="mob-db-readout">
+                <div class="mobile-db-readout">
                     ${cfg.dbValue || '-17.50 dB'}
                 </div>
 
@@ -474,7 +474,7 @@ class ChannelStrip {
 
             <!-- Overlay de Travamento Mobile -->
             ${cfg.isLocked ? `
-                <div class="mob-lock-overlay">
+                <div class="mobile-lock-overlay">
                     <div class="lock-badge-btn" title="Toque para destravar">🔒</div>
                 </div>
             ` : ''}
@@ -491,18 +491,18 @@ class ChannelStrip {
 
         this.elements = {
             wrapper: root,
-            headerNum: root.querySelector('.desk-label-wrapper, .mob-card-header, .mob-header-zone, .desk-ch-num, .mob-ch-num'),
+            headerNum: root.querySelector('.desk-label-wrapper, .mobile-card-header, .mobile-header-zone, .desk-ch-num, .mobile-ch-num'),
             lockSlot: root.querySelector('.desk-slot-right'),
-            nameDisplay: root.querySelector('.desk-ch-name-zone, .mob-display-name, .desk-ch-name'),
-            soloBtn: root.querySelector('.desk-btn-solo, .mob-btn-solo'),
-            btnPre: root.querySelector('.btn-pre-post, .mob-btn-pre'),
-            onBtn: root.querySelector('.desk-btn-on, .mob-btn-on'),
-            nudgePlus: root.querySelector('.desk-nudge-plus, .mob-nudge-plus, .btn-nudge-plus'),
-            nudgeMinus: root.querySelector('.desk-nudge-minus, .mob-nudge-minus, .btn-nudge-minus'),
-            faderArea: root.querySelector('.desk-fader-track-area, .mob-fader-track-area'),
-            faderRail: root.querySelector('.desk-fader-rail, .mob-fader-groove'),
-            faderThumb: root.querySelector('.desk-fader-thumb, .mob-fader-thumb'),
-            dbReadout: root.querySelector('.desk-db-readout, .mob-db-readout'),
+            nameDisplay: root.querySelector('.desk-ch-name-zone, .mobile-display-name, .desk-ch-name'),
+            soloBtn: root.querySelector('.desk-btn-solo, .mobile-btn-solo'),
+            btnPre: root.querySelector('.btn-pre-post, .mobile-btn-pre'),
+            onBtn: root.querySelector('.desk-btn-on, .mobile-btn-on'),
+            nudgePlus: root.querySelector('.desk-nudge-plus, .mobile-nudge-plus, .btn-nudge-plus'),
+            nudgeMinus: root.querySelector('.desk-nudge-minus, .mobile-nudge-minus, .btn-nudge-minus'),
+            faderArea: root.querySelector('.desk-fader-track-area, .mobile-fader-track-area'),
+            faderRail: root.querySelector('.desk-fader-rail, .mobile-fader-groove'),
+            faderThumb: root.querySelector('.desk-fader-thumb, .mobile-fader-thumb'),
+            dbReadout: root.querySelector('.desk-db-readout, .mobile-db-readout'),
             deltaDisplay: root.querySelector('.macro-delta-display'),
             patchArea: root.querySelector('.desk-patch-area'),
             patchText: root.querySelector('.desk-patch-area .marquee-text'),
@@ -510,7 +510,7 @@ class ChannelStrip {
             vuR: root.querySelector('.vu-r'),
             peakL: root.querySelector('.peak-l'),
             peakR: root.querySelector('.peak-r'),
-            lockOverlay: root.querySelector('.desk-lock-overlay, .mob-lock-overlay'),
+            lockOverlay: root.querySelector('.desk-lock-overlay, .mobile-lock-overlay'),
             lockBadgeBtn: root.querySelector('.lock-badge-btn')
         };
     }
@@ -628,14 +628,14 @@ class ChannelStrip {
         }
 
         // 6.1 Botão PRE / POST do Envio Auxiliar
-        const prePostBtn = this.element.querySelector('.btn-pre-post, .mob-btn-pre');
+        const prePostBtn = this.element.querySelector('.btn-pre-post, .mobile-btn-pre');
         if (prePostBtn && !cfg.isDisabled && !cfg.isLocked && cfg.prePost !== 'FIXED') {
             prePostBtn.addEventListener('click', () => {
                 const current = (this.config.prePost || 'PRE').toUpperCase();
                 const next = current === 'PRE' ? 'POST' : 'PRE';
                 this.config.prePost = next;
                 prePostBtn.textContent = next;
-                prePostBtn.className = (this.config.layout === 'mobile' ? 'mob-btn-pre' : 'btn-pre-post') + ' ' + next.toLowerCase();
+                prePostBtn.className = (this.config.layout === 'mobile' ? 'mobile-btn-pre' : 'btn-pre-post') + ' ' + next.toLowerCase();
                 this._emitEvent('pre_post_toggle', { mode: next, channel: this.config.chNumber });
             });
         }
@@ -658,7 +658,7 @@ class ChannelStrip {
         this._bindPanEvents();
 
         // 9. Abertura do Modal de Configuração de Medidores (Master Desktop & Mobile)
-        const metersToggle = this.element.querySelector('.desk-master-meters-toggle, .desk-feature-box.feature-meters, .mob-btn-medidores');
+        const metersToggle = this.element.querySelector('.desk-master-meters-toggle, .desk-feature-box.feature-meters, .mobile-btn-medidores');
         if (metersToggle) {
             metersToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -670,7 +670,7 @@ class ChannelStrip {
         }
 
         // 9.1 Abertura do Modal de Configuração de Posição do Auxiliar (MIX / Aux Sends Desktop & Mobile)
-        const positionToggle = this.element.querySelector('.desk-feature-box.feature-position, .mob-btn-posicao');
+        const positionToggle = this.element.querySelector('.desk-feature-box.feature-position, .mobile-btn-posicao');
         if (positionToggle) {
             positionToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -697,7 +697,7 @@ class ChannelStrip {
         }
 
         // 11. Botão ZERAR Envios do Macro Aux Geral (Desktop & Mobile)
-        const zerarBtn = this.element.querySelector('.btn-zerar-sends, .mob-btn-zerar');
+        const zerarBtn = this.element.querySelector('.btn-zerar-sends, .mobile-btn-zerar');
         if (zerarBtn) {
             zerarBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -736,7 +736,7 @@ class ChannelStrip {
         }
 
         // 15. Interação no Overlay de Travamento (Desktop vs Mobile)
-        const lockOverlay = els.lockOverlay || this.element.querySelector('.desk-lock-overlay, .mob-lock-overlay');
+        const lockOverlay = els.lockOverlay || this.element.querySelector('.desk-lock-overlay, .mobile-lock-overlay');
         if (lockOverlay) {
             this._bindLockOverlayInteraction(lockOverlay);
         }
@@ -755,7 +755,7 @@ class ChannelStrip {
             const targets = [
                 els.headerNum,
                 els.nameDisplay,
-                this.element.querySelector('.mob-card-header'),
+                this.element.querySelector('.mobile-card-header'),
                 els.faderArea,
                 els.faderRail
             ].filter(Boolean);
@@ -1247,7 +1247,7 @@ class ChannelStrip {
         this.config.prePost = modeStr;
         if (this.elements.btnPre) {
             this.elements.btnPre.innerText = modeStr;
-            this.elements.btnPre.className = (this.config.layout === 'mobile' ? 'mob-btn-pre' : 'btn-pre-post') + ' ' + modeStr.toLowerCase();
+            this.elements.btnPre.className = (this.config.layout === 'mobile' ? 'mobile-btn-pre' : 'btn-pre-post') + ' ' + modeStr.toLowerCase();
             this.elements.btnPre.title = modeStr === 'PRE' ? 'PRE (Pre-Fader)' : 'POST (Post-Fader)';
         }
     }
@@ -1410,11 +1410,11 @@ class ChannelStrip {
         root.classList.toggle('is-locked', !!isLocked);
         root.classList.toggle('channel-locked', !!isLocked);
 
-        let overlay = root.querySelector('.desk-lock-overlay, .mob-lock-overlay');
+        let overlay = root.querySelector('.desk-lock-overlay, .mobile-lock-overlay');
         if (isLocked) {
             if (!overlay) {
                 overlay = document.createElement('div');
-                overlay.className = this.config.layout === 'desktop' ? 'desk-lock-overlay' : 'mob-lock-overlay';
+                overlay.className = this.config.layout === 'desktop' ? 'desk-lock-overlay' : 'mobile-lock-overlay';
                 overlay.innerHTML = `<div class="lock-badge-btn" title="Toque para destravar">🔒</div>`;
                 this._bindLockOverlayInteraction(overlay);
                 root.appendChild(overlay);

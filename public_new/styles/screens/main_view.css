@@ -18,8 +18,8 @@
     --main-group-separator-bg: transparent;
     --main-macro-spacer-width: 55px;
     --main-macro-spacer-bg: transparent;
-    --main-mob-faders-gap: 12px;
-    --main-mob-group-gap: 24px;
+    --main-mobile-faders-gap: 12px;
+    --main-mobile-group-gap: 24px;
 }
 
 /* Área de Faders da Tela Principal */
@@ -52,12 +52,12 @@
 
 /* Mobile: Espaçamento de canais e agrupamento a cada 8 canais */
 body:not(.layout-desktop) #faders-container.main-view-active {
-    gap: var(--main-mob-faders-gap);
+    gap: var(--main-mobile-faders-gap);
 }
 
-body:not(.layout-desktop) .mob-group-separator {
-    flex: 0 0 var(--main-mob-group-gap);
-    width: var(--main-mob-group-gap);
+body:not(.layout-desktop) .mobile-group-separator {
+    flex: 0 0 var(--main-mobile-group-gap);
+    width: var(--main-mobile-group-gap);
     background: transparent;
     pointer-events: none;
     user-select: none;

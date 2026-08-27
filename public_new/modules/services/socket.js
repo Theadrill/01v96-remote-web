@@ -1246,7 +1246,7 @@ function buildMeterCache() {
             dataCh: card.getAttribute('data-ch'),
             partnerCh: card.getAttribute('data-partner-ch'),
             curtains: Array.from(card.querySelectorAll('.desk-vu-fill, .desk-meter-curtain')),
-            mobileCurtains: Array.from(card.querySelectorAll('.mob-meter-curtain, .mobile-meter-curtain')),
+            mobileCurtains: Array.from(card.querySelectorAll('.mobile-meter-curtain, .mobile-meter-curtain')),
             peakLed: card.querySelector('.desk-peak-led.peak-l, .peak-l, .desk-peak-led, .mobile-peak-led'),
             peakLedR: card.querySelector('.desk-peak-led.peak-r, .peak-r'),
             hasMeter: card.classList.contains('has-meter') || card.classList.contains('has-paired-meter'),
@@ -1384,7 +1384,7 @@ function tryLoadWasmCalibration() {
 
 function _updateMeterElementLevel(el, percent) {
     if (!el) return;
-    if (el.classList.contains('desk-vu-fill') || el.classList.contains('mob-meter-curtain') || el.classList.contains('vu-l') || el.classList.contains('vu-r')) {
+    if (el.classList.contains('desk-vu-fill') || el.classList.contains('mobile-meter-curtain') || el.classList.contains('vu-l') || el.classList.contains('vu-r')) {
         const topInset = Math.max(0, Math.min(100, 100 - percent)).toFixed(1);
         el.style.clipPath = `inset(${topInset}% 0 0 0)`;
     } else {

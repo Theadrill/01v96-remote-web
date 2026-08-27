@@ -224,6 +224,9 @@
     --strip-macro-reset-font-size: 10px;
 
     --strip-volume-geral-width: 70px;
+
+    /* Mobile Strip */
+    --strip-mobile-bg: #14161d;
 }
 
 /* =========================================================================
@@ -714,15 +717,15 @@
    3. VARIAÇÕES DE LARGURA E FORMATO: MOBILE (COM GAP & GROUPING)
    ========================================================================= */
 
-.channel-strip-wrapper.mob-strip {
-    width: var(--strip-mob-card-width, 118px);
-    min-width: var(--strip-mob-card-width, 118px);
+.channel-strip-wrapper.mobile-strip {
+    width: var(--strip-mobile-card-width, 118px);
+    min-width: var(--strip-mobile-card-width, 118px);
     height: 100%;
     max-height: 100%;
     min-height: 0;
-    border-radius: var(--strip-mob-card-radius, 12px);
-    border: var(--strip-mob-card-border-width, 1px) solid var(--strip-mob-card-border, #282828);
-    background: #14161d;
+    border-radius: var(--strip-mobile-card-radius, 12px);
+    border: var(--strip-mobile-card-border-width, 1px) solid var(--strip-mobile-card-border, #282828);
+    background: var(--strip-mobile-bg, #14161d);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     flex-shrink: 0;
     box-sizing: border-box;
@@ -733,69 +736,69 @@
 }
 
 /* Identidades Cromáticas Mobile (Borda Superior de Destaque no Topo do Card) */
-.channel-strip-wrapper.mob-strip.band-blue {
-    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-1-color, #00adef);
+.channel-strip-wrapper.mobile-strip.band-blue {
+    border-top: var(--strip-mobile-card-border-top-width, 3px) solid var(--strip-group-1-color, #00adef);
 }
-.channel-strip-wrapper.mob-strip.band-green {
-    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-2-color, #00ff88);
+.channel-strip-wrapper.mobile-strip.band-green {
+    border-top: var(--strip-mobile-card-border-top-width, 3px) solid var(--strip-group-2-color, #00ff88);
 }
-.channel-strip-wrapper.mob-strip.band-paired_green,
-.channel-strip-wrapper.mob-strip.paired-channel {
-    width: var(--strip-mob-card-paired-width, 148px);
-    min-width: var(--strip-mob-card-paired-width, 148px);
+.channel-strip-wrapper.mobile-strip.band-paired_green,
+.channel-strip-wrapper.mobile-strip.paired-channel {
+    width: var(--strip-mobile-card-paired-width, 148px);
+    min-width: var(--strip-mobile-card-paired-width, 148px);
     border: 1.5px solid #10b981;
-    border-top: calc(var(--strip-mob-card-border-top-width, 3px) + 0.5px) solid #10b981;
+    border-top: calc(var(--strip-mobile-card-border-top-width, 3px) + 0.5px) solid #10b981;
     box-shadow: inset 0 0 8px rgba(16, 185, 129, 0.2);
 }
-.channel-strip-wrapper.mob-strip.band-amber {
-    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-mix-color, #d4a017);
+.channel-strip-wrapper.mobile-strip.band-amber {
+    border-top: var(--strip-mobile-card-border-top-width, 3px) solid var(--strip-group-mix-color, #d4a017);
 }
-.channel-strip-wrapper.mob-strip.band-cyan {
-    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-bus-color, #00b396);
+.channel-strip-wrapper.mobile-strip.band-cyan {
+    border-top: var(--strip-mobile-card-border-top-width, 3px) solid var(--strip-group-bus-color, #00b396);
 }
-.channel-strip-wrapper.mob-strip.band-st,
-.channel-strip-wrapper.mob-strip.band-st_in {
-    border-top: var(--strip-mob-card-border-top-width, 3px) solid var(--strip-group-st-color, #4a90e2);
+.channel-strip-wrapper.mobile-strip.band-st,
+.channel-strip-wrapper.mobile-strip.band-st_in {
+    border-top: var(--strip-mobile-card-border-top-width, 3px) solid var(--strip-group-st-color, #4a90e2);
 }
 
 /* Volume Geral Mobile Mais Fino (70px) */
-.channel-strip-wrapper.mob-strip.is-volume-geral {
+.channel-strip-wrapper.mobile-strip.is-volume-geral {
     width: var(--strip-volume-geral-width, 70px) !important;
     min-width: var(--strip-volume-geral-width, 70px) !important;
     max-width: var(--strip-volume-geral-width, 70px) !important;
 }
 
 /* Master Mobile (Fundo Vinho / Vermelho Escuro) */
-.channel-strip-wrapper.mob-strip.is-master,
-.channel-strip-wrapper.mob-strip.band-wine {
+.channel-strip-wrapper.mobile-strip.is-master,
+.channel-strip-wrapper.mobile-strip.band-wine {
     background: #2a0a0f !important;
     border: 1px solid #5c0f1c;
     border-top: 3.5px solid var(--strip-master-color, #dc3545);
 }
 
-.channel-strip-wrapper.mob-strip.is-master .mob-card-header,
-.channel-strip-wrapper.mob-strip.band-wine .mob-card-header {
+.channel-strip-wrapper.mobile-strip.is-master .mobile-card-header,
+.channel-strip-wrapper.mobile-strip.band-wine .mobile-card-header {
     color: #ff6b81;
 }
 
 /* Macro Mobile (Fundo Prateado / Cinza Claro) */
-.channel-strip-wrapper.mob-strip.is-macro,
-.channel-strip-wrapper.mob-strip.band-silver,
-.channel-strip-wrapper.mob-strip.band-macro_silver {
+.channel-strip-wrapper.mobile-strip.is-macro,
+.channel-strip-wrapper.mobile-strip.band-silver,
+.channel-strip-wrapper.mobile-strip.band-macro_silver {
     background: var(--strip-macro-bg, #d4d4d8) !important;
     border: 1px solid var(--strip-macro-border, #27272a) !important;
     border-top: 3.5px solid #71717a !important;
 }
 
-.channel-strip-wrapper.mob-strip.is-macro .mob-card-header,
-.channel-strip-wrapper.mob-strip.band-silver .mob-card-header,
-.channel-strip-wrapper.mob-strip.band-macro_silver .mob-card-header {
+.channel-strip-wrapper.mobile-strip.is-macro .mobile-card-header,
+.channel-strip-wrapper.mobile-strip.band-silver .mobile-card-header,
+.channel-strip-wrapper.mobile-strip.band-macro_silver .mobile-card-header {
     color: #18181b;
     font-weight: 900;
 }
 
 /* Cortina de Medidor VU de Fundo Integral no Mobile */
-.mob-meter-curtain-container {
+.mobile-meter-curtain-container {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -807,20 +810,26 @@
     display: flex;
 }
 
-.mob-meter-curtain {
+.mobile-meter-curtain {
     flex: 1;
     height: 100%;
-    background: linear-gradient(180deg, #ff0000 0%, #ffbb00 20%, #22c55e 55%, #10b981 100%);
+    background: linear-gradient(
+        180deg,
+        var(--strip-mobile-meter-gradient-top, #ff0000) 0%,
+        var(--strip-mobile-meter-gradient-mid, #ffbb00) 20%,
+        var(--strip-mobile-meter-gradient-low, #166534) 55%,
+        var(--strip-mobile-meter-gradient-base, #064e3b) 100%
+    );
     clip-path: inset(100% 0 0 0);
     will-change: clip-path;
 }
 
-.mob-meter-curtain + .mob-meter-curtain {
+.mobile-meter-curtain + .mobile-meter-curtain {
     border-left: 1px solid rgba(0, 0, 0, 0.45);
 }
 
 /* Peak Glow Mobile */
-.channel-strip-wrapper.mob-strip.peak-glow {
+.channel-strip-wrapper.mobile-strip.peak-glow {
     border-color: #ff0000 !important;
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.5) !important;
 }
@@ -932,17 +941,17 @@
     border-color: #10b981 !important;
     box-shadow: 0 0 10px var(--strip-btn-solo-active-glow, rgba(34, 197, 94, 0.45)) !important;
 }
-.mob-btn-solo {
+.mobile-btn-solo {
     background: var(--strip-btn-solo-bg, #333333);
     color: var(--strip-btn-solo-text, #888888);
     border: 1px solid #444;
-    border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-solo-height, var(--strip-mob-btn-height, 38px));
-    min-height: var(--strip-mob-btn-solo-height, var(--strip-mob-btn-height, 38px));
+    border-radius: var(--strip-mobile-btn-radius, 6px);
+    height: var(--strip-mobile-btn-solo-height, var(--strip-mobile-btn-height, 38px));
+    min-height: var(--strip-mobile-btn-solo-height, var(--strip-mobile-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
-    font-family: var(--strip-mob-btn-solo-font-family, var(--strip-btn-solo-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
-    font-size: var(--strip-mob-btn-solo-font-size, 11px);
+    font-family: var(--strip-mobile-btn-solo-font-family, var(--strip-btn-solo-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mobile-btn-solo-font-size, 11px);
     font-weight: 800;
     cursor: pointer;
     display: flex;
@@ -951,8 +960,8 @@
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
-.mob-btn-solo.active,
-.mob-btn-solo.solo-active {
+.mobile-btn-solo.active,
+.mobile-btn-solo.solo-active {
     background: var(--strip-btn-solo-active-bg, #22c55e) !important;
     color: var(--strip-btn-solo-active-text, #ffffff) !important;
     border-color: #10b981 !important;
@@ -983,17 +992,17 @@
     color: #888888;
     cursor: not-allowed;
 }
-.mob-btn-pre {
+.mobile-btn-pre {
     background: var(--strip-btn-pre-bg, #6b21a8);
     color: var(--strip-btn-pre-text, #ffffff);
     border: 1px solid var(--strip-btn-pre-border, #9333ea);
-    border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-pre-height, var(--strip-mob-btn-height, 38px));
-    min-height: var(--strip-mob-btn-pre-height, var(--strip-mob-btn-height, 38px));
+    border-radius: var(--strip-mobile-btn-radius, 6px);
+    height: var(--strip-mobile-btn-pre-height, var(--strip-mobile-btn-height, 38px));
+    min-height: var(--strip-mobile-btn-pre-height, var(--strip-mobile-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
-    font-family: var(--strip-mob-btn-pre-font-family, var(--strip-btn-pre-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
-    font-size: var(--strip-mob-btn-pre-font-size, 11px);
+    font-family: var(--strip-mobile-btn-pre-font-family, var(--strip-btn-pre-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mobile-btn-pre-font-size, 11px);
     font-weight: 800;
     cursor: pointer;
     display: flex;
@@ -1109,15 +1118,15 @@
 }
 
 /* Nudge Buttons Mobile (Circulares) */
-.mob-nudge-btn {
+.mobile-nudge-btn {
     background: var(--strip-btn-nudge-bg, #333333);
     color: #fff;
     border: 1.5px solid #444;
     border-radius: 50%;
-    width: var(--strip-mob-nudge-size, 50px);
-    height: var(--strip-mob-nudge-size, 50px);
-    min-width: var(--strip-mob-nudge-size, 50px);
-    min-height: var(--strip-mob-nudge-size, 50px);
+    width: var(--strip-mobile-nudge-size, 50px);
+    height: var(--strip-mobile-nudge-size, 50px);
+    min-width: var(--strip-mobile-nudge-size, 50px);
+    min-height: var(--strip-mobile-nudge-size, 50px);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1129,16 +1138,16 @@
     user-select: none;
     -webkit-user-select: none;
 }
-.mob-nudge-btn svg {
+.mobile-nudge-btn svg {
     display: block;
     pointer-events: none;
     margin: auto;
 }
-.mob-nudge-btn:hover {
+.mobile-nudge-btn:hover {
     background: #3b4254;
     border-color: #666;
 }
-.mob-nudge-btn:active {
+.mobile-nudge-btn:active {
     background: #00e5ff;
     color: #000;
     border-color: #00e5ff;
@@ -1208,7 +1217,7 @@
 .desk-db-ruler span.mark-inf { bottom: calc(19px + (100% - 38px) * 0.0); }
 
 /* Régua Simplificada Mobile (0, -10, -30 com traços direcionais) */
-.mob-db-ruler {
+.mobile-db-ruler {
     position: absolute;
     left: 6px;
     top: 0;
@@ -1223,7 +1232,7 @@
     pointer-events: none;
     z-index: 2;
 }
-.mob-db-ruler span {
+.mobile-db-ruler span {
     position: absolute;
     left: 0;
     transform: translateY(50%);
@@ -1231,14 +1240,14 @@
     white-space: nowrap;
     letter-spacing: -0.5px;
 }
-.mob-db-ruler span.mark-0   { bottom: calc(19px + (100% - 38px) * 0.8045); }
-.mob-db-ruler span.mark-m10 { bottom: calc(19px + (100% - 38px) * 0.6090); }
-.mob-db-ruler span.mark-m30 { bottom: calc(19px + (100% - 38px) * 0.3236); }
+.mobile-db-ruler span.mark-0   { bottom: calc(19px + (100% - 38px) * 0.8045); }
+.mobile-db-ruler span.mark-m10 { bottom: calc(19px + (100% - 38px) * 0.6090); }
+.mobile-db-ruler span.mark-m30 { bottom: calc(19px + (100% - 38px) * 0.3236); }
 
 /* Master Mobile Ruler */
-.mob-db-ruler.master-ruler span.mark-0   { bottom: calc(19px + (100% - 38px) * 1.0); }
-.mob-db-ruler.master-ruler span.mark-m10 { bottom: calc(19px + (100% - 38px) * 0.8045); }
-.mob-db-ruler.master-ruler span.mark-m30 { bottom: calc(19px + (100% - 38px) * 0.4135); }
+.mobile-db-ruler.master-ruler span.mark-0   { bottom: calc(19px + (100% - 38px) * 1.0); }
+.mobile-db-ruler.master-ruler span.mark-m10 { bottom: calc(19px + (100% - 38px) * 0.8045); }
+.mobile-db-ruler.master-ruler span.mark-m30 { bottom: calc(19px + (100% - 38px) * 0.4135); }
 
 /* Fader Thumbs nos moldes do sistema original */
 .desk-fader-thumb {
@@ -1265,12 +1274,12 @@
     pointer-events: none;
 }
 
-.mob-fader-thumb {
-    width: var(--strip-mob-thumb-width, 58px) !important;
-    height: var(--strip-mob-thumb-height, 48px) !important;
+.mobile-fader-thumb {
+    width: var(--strip-mobile-thumb-width, 58px) !important;
+    height: var(--strip-mobile-thumb-height, 48px) !important;
     background: linear-gradient(180deg, #e8e8e8 0%, #c4c4c4 50%, #999999 100%) !important;
     border: 1.5px solid #111 !important;
-    border-radius: var(--strip-mob-thumb-radius, 7px) !important;
+    border-radius: var(--strip-mobile-thumb-radius, 7px) !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
     cursor: grab;
     touch-action: none;
@@ -1279,9 +1288,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    bottom: calc((100% - var(--strip-mob-thumb-height, 48px)) * var(--fader-pos, 0));
+    bottom: calc((100% - var(--strip-mobile-thumb-height, 48px)) * var(--fader-pos, 0));
 }
-.mob-fader-thumb .thumb-center-line {
+.mobile-fader-thumb .thumb-center-line {
     width: 100%;
     height: 2px;
     background: #111;
@@ -1365,13 +1374,13 @@
     border: 2px solid var(--strip-lock-border-color, #ff4444) !important;
 }
 
-.channel-strip-wrapper.mob-strip.is-locked {
+.channel-strip-wrapper.mobile-strip.is-locked {
     border: 1.5px solid var(--strip-lock-border-color, #ff4444) !important;
     box-shadow: 0 0 10px rgba(255, 68, 68, 0.3) !important;
 }
 
 .desk-lock-overlay,
-.mob-lock-overlay {
+.mobile-lock-overlay {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -1418,32 +1427,32 @@
 .channel-strip-wrapper.is-disabled .desk-fader-core,
 .channel-strip-wrapper.is-disabled .desk-pan-zone,
 .channel-strip-wrapper.is-disabled .desk-footer-zone,
-.channel-strip-wrapper.is-disabled .mob-card-header,
-.channel-strip-wrapper.is-disabled .mob-display-name,
-.channel-strip-wrapper.is-disabled .mob-top-action,
-.channel-strip-wrapper.is-disabled .mob-feature-action,
-.channel-strip-wrapper.is-disabled .mob-nudge-container,
-.channel-strip-wrapper.is-disabled .mob-fader-track-area,
-.channel-strip-wrapper.is-disabled .mob-db-readout,
-.channel-strip-wrapper.is-disabled .mob-footer-patch {
+.channel-strip-wrapper.is-disabled .mobile-card-header,
+.channel-strip-wrapper.is-disabled .mobile-display-name,
+.channel-strip-wrapper.is-disabled .mobile-top-action,
+.channel-strip-wrapper.is-disabled .mobile-feature-action,
+.channel-strip-wrapper.is-disabled .mobile-nudge-container,
+.channel-strip-wrapper.is-disabled .mobile-fader-track-area,
+.channel-strip-wrapper.is-disabled .mobile-db-readout,
+.channel-strip-wrapper.is-disabled .mobile-footer-patch {
     opacity: var(--strip-disabled-opacity, 0.45);
     filter: var(--strip-disabled-filter, grayscale(80%));
 }
 
 .channel-strip-wrapper.is-disabled .desk-fader-thumb,
-.channel-strip-wrapper.is-disabled .mob-fader-thumb,
+.channel-strip-wrapper.is-disabled .mobile-fader-thumb,
 .channel-strip-wrapper.is-disabled .desk-pan-track,
 .channel-strip-wrapper.is-disabled .desk-nudge-btn,
-.channel-strip-wrapper.is-disabled .mob-nudge-btn,
+.channel-strip-wrapper.is-disabled .mobile-nudge-btn,
 .channel-strip-wrapper.is-disabled .btn-pre-post,
-.channel-strip-wrapper.is-disabled .mob-btn-pre {
+.channel-strip-wrapper.is-disabled .mobile-btn-pre {
     pointer-events: none !important;
     cursor: not-allowed !important;
 }
 
 /* EXCEÇÃO CRÍTICA — Botão ON (Mute) permanece 100% ativo, colorido e funcional */
 .channel-strip-wrapper.is-disabled .desk-primary-action-zone .desk-btn-on,
-.channel-strip-wrapper.is-disabled .mob-primary-action .mob-btn-on {
+.channel-strip-wrapper.is-disabled .mobile-primary-action .mobile-btn-on {
     opacity: 1 !important;
     filter: none !important;
     pointer-events: auto !important;
@@ -1458,7 +1467,7 @@
 
 /* Middle Feature & Macros (Zona 4) */
 .desk-macro-feature-zone,
-.mob-macro-feature-zone {
+.mobile-macro-feature-zone {
     padding: 0 !important;
     display: flex;
     flex-direction: column;
@@ -1494,11 +1503,11 @@
     transition: background 0.15s ease, transform 0.05s ease;
 }
 
-.mob-macro-feature-zone .macro-config-btn {
-    height: var(--strip-mob-macro-config-btn-height, 38px);
-    min-height: var(--strip-mob-macro-config-btn-height, 38px);
-    font-family: var(--strip-mob-macro-config-font-family, var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
-    font-size: var(--strip-mob-macro-config-font-size, 12px);
+.mobile-macro-feature-zone .macro-config-btn {
+    height: var(--strip-mobile-macro-config-btn-height, 38px);
+    min-height: var(--strip-mobile-macro-config-btn-height, 38px);
+    font-family: var(--strip-mobile-macro-config-font-family, var(--strip-macro-config-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mobile-macro-config-font-size, 12px);
 }
 
 .is-volume-geral .macro-config-btn {
@@ -1537,7 +1546,7 @@
 }
 
 .desk-fader-core.macro-fader-core,
-.mob-macro-fader-core {
+.mobile-macro-fader-core {
     padding: 4px 6px 6px 6px;
     display: flex;
     flex-direction: column;
@@ -1548,7 +1557,7 @@
 }
 
 .desk-big-nudge,
-.mob-big-nudge {
+.mobile-big-nudge {
     flex: 1;
     width: 100%;
     min-height: 85px;
@@ -1570,18 +1579,18 @@
 }
 
 .desk-big-nudge:hover,
-.mob-big-nudge:hover {
+.mobile-big-nudge:hover {
     background: #f4f4f5;
 }
 
 .desk-big-nudge:active,
-.mob-big-nudge:active {
+.mobile-big-nudge:active {
     background: #e4e4e7;
     transform: scale(0.98);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 .macro-reset-container,
-.mob-macro-reset-container {
+.mobile-macro-reset-container {
     padding: 3px 6px 4px 6px;
     width: 100%;
     box-sizing: border-box;
@@ -1615,16 +1624,16 @@
     transition: background 0.15s ease, transform 0.05s ease;
 }
 
-.mob-btn-zerar {
-    height: var(--strip-mob-macro-reset-btn-height, 28px);
-    min-height: var(--strip-mob-macro-reset-btn-height, 28px);
+.mobile-btn-zerar {
+    height: var(--strip-mobile-macro-reset-btn-height, 28px);
+    min-height: var(--strip-mobile-macro-reset-btn-height, 28px);
     background: var(--strip-macro-reset-bg, #dc2626);
     color: var(--strip-macro-reset-text, #ffffff);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--strip-macro-reset-radius, 6px);
     padding: 0 2px;
-    font-family: var(--strip-mob-macro-reset-font-family, var(--strip-macro-reset-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
-    font-size: var(--strip-mob-macro-reset-font-size, 12px);
+    font-family: var(--strip-mobile-macro-reset-font-family, var(--strip-macro-reset-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mobile-macro-reset-font-size, 12px);
     font-weight: 800;
     letter-spacing: 0.2px;
     width: 90%;
@@ -1642,7 +1651,7 @@
 }
 
 .is-volume-geral .btn-zerar-sends,
-.is-volume-geral .mob-btn-zerar {
+.is-volume-geral .mobile-btn-zerar {
     font-size: 9.5px;
     letter-spacing: 0;
     padding: 4px 1px;
@@ -1650,12 +1659,12 @@
 }
 
 .btn-zerar-sends:hover,
-.mob-btn-zerar:hover {
+.mobile-btn-zerar:hover {
     background: var(--strip-macro-reset-hover-bg, #ef4444);
 }
 
 .btn-zerar-sends:active,
-.mob-btn-zerar:active {
+.mobile-btn-zerar:active {
     transform: scale(0.97);
 }
 
@@ -1760,8 +1769,8 @@
 }
 
 /* Mobile Feature Action Button (Zona 4: MEDIDORES / POSIÇÃO) */
-.mob-feature-action,
-.mob-master-meters-toggle {
+.mobile-feature-action,
+.mobile-master-meters-toggle {
     text-align: center;
     width: 100%;
     display: flex;
@@ -1771,15 +1780,15 @@
     z-index: 1;
 }
 
-.mob-btn-feature,
-.mob-btn-medidores,
-.mob-btn-posicao {
+.mobile-btn-feature,
+.mobile-btn-medidores,
+.mobile-btn-posicao {
     background: var(--strip-meters-badge-bg, #1e293b);
     color: var(--strip-meters-badge-text, #38bdf8);
     border: 1px solid var(--strip-meters-badge-border, #334155);
-    border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-medidores-height, var(--strip-mob-btn-height, 38px));
-    min-height: var(--strip-mob-btn-medidores-height, var(--strip-mob-btn-height, 38px));
+    border-radius: var(--strip-mobile-btn-radius, 6px);
+    height: var(--strip-mobile-btn-medidores-height, var(--strip-mobile-btn-height, 38px));
+    min-height: var(--strip-mobile-btn-medidores-height, var(--strip-mobile-btn-height, 38px));
     font-size: 10px;
     font-weight: 800;
     width: 92%;
@@ -1797,16 +1806,16 @@
     transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
 }
 
-.mob-btn-feature:hover,
-.mob-btn-medidores:hover,
-.mob-btn-posicao:hover {
+.mobile-btn-feature:hover,
+.mobile-btn-medidores:hover,
+.mobile-btn-posicao:hover {
     background: #253248;
     border-color: var(--strip-meters-badge-text, #38bdf8);
 }
 
-.mob-btn-feature:active,
-.mob-btn-medidores:active,
-.mob-btn-posicao:active {
+.mobile-btn-feature:active,
+.mobile-btn-medidores:active,
+.mobile-btn-posicao:active {
     transform: scale(0.97);
 }
 
@@ -2022,7 +2031,7 @@
    8. CLASSES MODULARES ESPECÍFICAS MOBILE
    ========================================================================= */
 
-.mob-card-content {
+.mobile-card-content {
     position: relative;
     z-index: 1;
     display: flex;
@@ -2032,16 +2041,16 @@
     padding: 8px 4px 6px 4px;
     box-sizing: border-box;
 }
-.mob-card-header {
+.mobile-card-header {
     text-align: center;
-    font-weight: var(--strip-mob-header-font-weight, var(--strip-header-font-weight, 800));
-    font-size: var(--strip-mob-header-font-size, 13px);
-    font-family: var(--strip-mob-header-font-family, var(--strip-header-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-weight: var(--strip-mobile-header-font-weight, var(--strip-header-font-weight, 800));
+    font-size: var(--strip-mobile-header-font-size, 13px);
+    font-family: var(--strip-mobile-header-font-family, var(--strip-header-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
     color: #fff;
     padding: 2px 0;
     letter-spacing: 0.5px;
 }
-.mob-display-name {
+.mobile-display-name {
     background: var(--strip-name-display-bg, #000000);
     border: 1px solid #333;
     border-radius: var(--strip-name-display-radius, 4px);
@@ -2051,13 +2060,13 @@
     text-align: center;
     color: var(--strip-name-display-color, #00ff00);
     font-weight: var(--strip-name-display-font-weight, 800);
-    font-size: var(--strip-mob-name-display-font-size, 13px);
-    font-family: var(--strip-mob-name-display-font-family, var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mobile-name-display-font-size, 13px);
+    font-family: var(--strip-mobile-name-display-font-family, var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
 }
-.mob-top-action {
+.mobile-top-action {
     text-align: center;
     display: flex;
     justify-content: center;
@@ -2065,7 +2074,7 @@
     width: 100%;
     padding: 2px 0;
 }
-.mob-primary-action {
+.mobile-primary-action {
     text-align: center;
     display: flex;
     justify-content: center;
@@ -2073,17 +2082,17 @@
     width: 100%;
     padding: 2px 0;
 }
-.mob-btn-on {
+.mobile-btn-on {
     background: var(--strip-btn-on-bg, #333333);
     color: var(--strip-btn-on-text, #888888);
     border: 1px solid #444;
-    border-radius: var(--strip-mob-btn-radius, 6px);
-    height: var(--strip-mob-btn-on-height, var(--strip-mob-btn-height, 38px));
-    min-height: var(--strip-mob-btn-on-height, var(--strip-mob-btn-height, 38px));
+    border-radius: var(--strip-mobile-btn-radius, 6px);
+    height: var(--strip-mobile-btn-on-height, var(--strip-mobile-btn-height, 38px));
+    min-height: var(--strip-mobile-btn-on-height, var(--strip-mobile-btn-height, 38px));
     width: 92%;
     margin: 0 auto;
-    font-family: var(--strip-mob-btn-on-font-family, var(--strip-btn-on-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
-    font-size: var(--strip-mob-btn-on-font-size, 12px);
+    font-family: var(--strip-mobile-btn-on-font-family, var(--strip-btn-on-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mobile-btn-on-font-size, 12px);
     font-weight: 900;
     cursor: pointer;
     display: flex;
@@ -2092,21 +2101,21 @@
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
-.mob-btn-on.active,
-.mob-btn-on.on-active {
+.mobile-btn-on.active,
+.mobile-btn-on.on-active {
     background: var(--strip-btn-on-active-bg, #ffc107) !important;
     color: var(--strip-btn-on-active-text, #000000) !important;
     border-color: #f59e0b !important;
     box-shadow: 0 0 10px var(--strip-btn-on-active-glow, rgba(255, 69, 0, 0.4)) !important;
 }
-.mob-nudge-container {
+.mobile-nudge-container {
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 2px 0;
 }
-.mob-fader-track-area {
+.mobile-fader-track-area {
     position: relative;
     flex: 1;
     min-height: 180px;
@@ -2116,19 +2125,19 @@
     margin: 4px 0;
     box-sizing: border-box;
 }
-.mob-fader-groove {
+.mobile-fader-groove {
     width: 6px;
     height: 100%;
     background: #0a0a0a;
     border-radius: 3px;
     border: 1px solid #222;
 }
-.mob-db-readout {
+.mobile-db-readout {
     text-align: center;
-    font-size: var(--strip-mob-db-font-size, 18px);
+    font-size: var(--strip-mobile-db-font-size, 18px);
     font-weight: 800;
     color: var(--strip-db-val-color, #5cacee);
-    font-family: var(--strip-mob-db-font-family, var(--strip-db-val-font-family, Consolas, Menlo, "Courier New", monospace));
+    font-family: var(--strip-mobile-db-font-family, var(--strip-db-val-font-family, Consolas, Menlo, "Courier New", monospace));
     padding: 4px 0;
 }
 
@@ -2138,7 +2147,7 @@
 
 /* 1. Header */
 .channel-strip-wrapper.is-macro .desk-label-wrapper,
-.channel-strip-wrapper.is-macro .mob-card-header {
+.channel-strip-wrapper.is-macro .mobile-card-header {
     background: var(--strip-macro-header-bg, #3f3f46) !important;
     color: var(--strip-macro-header-text, #ffffff) !important;
     border-top: 2px solid #71717a !important;
@@ -2149,7 +2158,7 @@
 
 /* 2. Display OLED do Nome (MACRO FADER) */
 .channel-strip-wrapper.is-macro .desk-ch-name-zone,
-.channel-strip-wrapper.is-macro .mob-display-name {
+.channel-strip-wrapper.is-macro .mobile-display-name {
     background: var(--strip-macro-title-bg, #000000) !important;
     border-radius: 6px !important;
     width: var(--strip-macro-element-width, 90%) !important;
@@ -2174,7 +2183,7 @@
 
 /* 3. Botão CONFIG */
 .channel-strip-wrapper.is-macro .macro-fader-config-wrap,
-.channel-strip-wrapper.is-macro .mob-macro-feature-zone {
+.channel-strip-wrapper.is-macro .mobile-macro-feature-zone {
     padding: 0 !important;
     width: 100% !important;
     margin: 0 !important;
@@ -2215,7 +2224,7 @@
 /* 4. Visor Delta dB (--) */
 .channel-strip-wrapper.is-macro .macro-db-display,
 .channel-strip-wrapper.is-macro .macro-delta-display,
-.channel-strip-wrapper.is-macro .mob-macro-delta-display {
+.channel-strip-wrapper.is-macro .mobile-macro-delta-display {
     font-family: var(--strip-macro-delta-font-family, Consolas, Menlo, "Courier New", monospace) !important;
     font-size: var(--strip-macro-delta-font-size, 13px) !important;
     font-weight: var(--strip-macro-delta-font-weight, 800) !important;
@@ -2240,7 +2249,7 @@
 
 /* 5. Big Nudges (+ e -) */
 .channel-strip-wrapper.is-macro .desk-fader-core.macro-fader-core,
-.channel-strip-wrapper.is-macro .mob-macro-fader-core {
+.channel-strip-wrapper.is-macro .mobile-macro-fader-core {
     padding: 6px 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -2252,7 +2261,7 @@
 }
 
 .channel-strip-wrapper.is-macro .desk-big-nudge,
-.channel-strip-wrapper.is-macro .mob-big-nudge {
+.channel-strip-wrapper.is-macro .mobile-big-nudge {
     width: var(--strip-macro-element-width, 90%) !important;
     flex: 1 !important;
     min-height: 80px !important;
@@ -2273,35 +2282,35 @@
 }
 
 .channel-strip-wrapper.is-macro .desk-big-nudge svg,
-.channel-strip-wrapper.is-macro .mob-big-nudge svg {
+.channel-strip-wrapper.is-macro .mobile-big-nudge svg {
     display: block;
     pointer-events: none;
     margin: auto;
 }
 
 .channel-strip-wrapper.is-macro .desk-big-nudge:hover,
-.channel-strip-wrapper.is-macro .mob-big-nudge:hover {
+.channel-strip-wrapper.is-macro .mobile-big-nudge:hover {
     background: #f4f4f5 !important;
 }
 
 .channel-strip-wrapper.is-macro .desk-big-nudge:active,
-.channel-strip-wrapper.is-macro .mob-big-nudge:active {
+.channel-strip-wrapper.is-macro .mobile-big-nudge:active {
     background: #e4e4e7 !important;
     transform: scale(0.98) !important;
 }
 
-.mob-macro-reset-container {
+.mobile-macro-reset-container {
     padding: 6px;
     text-align: center;
 }
-.mob-btn-zerar {
+.mobile-btn-zerar {
     background: var(--strip-macro-reset-bg, #dc2626);
     color: var(--strip-macro-reset-text, #ffffff);
     border: none;
     border-radius: 6px;
     padding: 6px 12px;
-    font-family: var(--strip-mob-macro-reset-font-family, var(--strip-macro-reset-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
-    font-size: var(--strip-mob-macro-reset-font-size, 12px);
+    font-family: var(--strip-mobile-macro-reset-font-family, var(--strip-macro-reset-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
+    font-size: var(--strip-mobile-macro-reset-font-size, 12px);
     font-weight: bold;
     cursor: pointer;
 }

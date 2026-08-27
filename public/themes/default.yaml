@@ -147,8 +147,8 @@ channel_strip:
     group_1_color: "#00adef"           # Azul - Canais 1-16
     group_2_color: "#00ff88"           # Verde - Canais 17-32
     group_st_color: "#4a90e2"          # Azul suave - Entradas Estéreo (ST IN)
-    group_mix_color: "#d4a017"         # Amarelo/Dourado - MIX 1-8 Masters
-    group_bus_color: "#00b396"         # Ciano/Teal - BUS 1-8 Masters
+    group_mix_color: rgb(255, 204, 0)         # Amarelo/Dourado - MIX 1-8 Masters
+    group_bus_color: "#00ffcc"         # Ciano/Teal - BUS 1-8 Masters
     group_aux_color: "#7e22ce"         # Roxo/Púrpura - Barramento AUX
     master_color: "#dc3545"            # Vermelho - Master Stereo PA
 
@@ -188,7 +188,7 @@ channel_strip:
     name_display_font_size: "11px"
     name_display_bg: "#000000"
     name_display_color: "#00ff00"
-    name_display_width: "calc(100% - 8px)"       # Largura do display LED (deixa espaço simétrico nas laterais)
+    name_display_width: "calc(100% - 5px)"       # Largura do display LED (deixa espaço simétrico nas laterais)
     name_display_padding: "2px 2px"             # Espaçamento interno do texto no LED
     name_display_margin: "0px auto"             # Margem do display LED
     name_display_zone_padding: "1px 0px"        # Espaçamento interno da área do LED
@@ -196,8 +196,8 @@ channel_strip:
     name_display_radius: "4px"                  # Arredondamento do visor LED
 
     # Botão SOLO / CUE
-    btn_solo_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    btn_solo_font_weight: "800"
+    btn_solo_font_family: '"Arial"'
+    btn_solo_font_weight: "600"
     btn_solo_font_size: "10px"
     btn_solo_bg: "#333333"
     btn_solo_text: "#888888"
@@ -216,7 +216,7 @@ channel_strip:
     # Botão ON / MUTE
     btn_on_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_on_font_weight: "900"
-    btn_on_font_size: "10px"
+    btn_on_font_size: "11px"
     btn_on_bg: "#333333"
     btn_on_text: "#888888"
     btn_on_active_bg: "#ffc107"
@@ -231,9 +231,9 @@ channel_strip:
     btn_nudge_text: "#cccccc"
 
     # Visor Digital de Ganho / Valor Numérico em dB (Readout)
-    db_val_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    db_val_font_weight: "800"
-    db_val_font_size: "10.5px"
+    db_val_font_family: '"Arial Narrow", sans-serif'
+    db_val_font_weight: "600"
+    db_val_font_size: "13px"
     db_val_color: "#5cacee"
 
     # Escala e Régua Analógica em dB
@@ -337,7 +337,7 @@ channel_strip:
   desktop:
     card_width: "86px"                         # Largura de cada canal no modo desktop (86px)
     card_paired_width: "108px"                 # Largura de canais estéreo pareados no desktop (108px)
-    card_bg: "#181818"                         # Fundo do card desktop
+    card_bg: rgb(34, 34, 34)                  # Fundo do card desktop
     card_border: "#222222"                     # Cor da borda base do card
     card_border_width: "1px"                   # Espessura da borda base do card
     desk_card_border: "#333333"                # Cor da borda dos cards no Desktop (superior, inferior e extremidades)
@@ -373,6 +373,7 @@ channel_strip:
     card_border: "#282828"                     # Cor da borda do contorno do card mobile
     card_border_width: "1px"                   # Espessura da borda do contorno do card mobile
     card_border_top_width: "3px"               # Espessura da borda superior cromática de grupo no mobile
+    strip_bg: "#14161d"                        # Fundo padrão do card mobile (cor do fundo geral do strip mobile)
 
     header_height: "30px"                      # Altura do cabeçalho mobile
     header_font_size: "13px"                   # Tamanho da fonte do cabeçalho mobile
@@ -408,9 +409,9 @@ channel_strip:
     scale_font_size: "8.5px"                   # Tamanho da régua mobile
     scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     macro_big_nudge_font_size: "28px"          # Tamanho dos big nudges mobile
-    fader_thumb_width: "46px"                  # Largura do fader thumb mobile
-    fader_thumb_height: "38px"                 # Altura do fader thumb mobile
-    fader_thumb_radius: "6px"                  # Arredondamento do fader thumb mobile
+    fader_thumb_width: "58px"                  # Largura do fader thumb mobile (+25%)
+    fader_thumb_height: "48px"                 # Altura do fader thumb mobile (+25%)
+    fader_thumb_radius: "7px"                  # Arredondamento do fader thumb mobile
 
 
 # ─── MAIN VIEW (TELA PRINCIPAL DO MIXER) ──────────────────────
@@ -425,3 +426,30 @@ main_view:
   mobile_faders_gap: "12px"                  # Espaçamento entre canais no mobile (aumentado para 12px)
   mobile_group_gap: "24px"                   # Espaçamento maior a cada 8 canais no mobile (aumentado para 24px)
 
+
+# ─── CHANNEL SETUP (CENTRAL DE EDIÇÃO DO CANAL) ──────────────
+# Modal de edição detalhada (EQ, Dinâmica, Auxiliares, Inserts, Roteamento)
+channel_setup:
+  overlay_bg: "#000000"                      # Fundo totalmente preto do modal
+  modal_bg: "#000000"                        # Fundo principal do modal (preto sólido)
+  modal_border: "#262936"                    # Borda do modal
+  modal_radius: "8px"                        # Arredondamento do modal
+  header_bg: "#181b24"                       # Fundo do cabeçalho de navegação
+  header_text: "#ffffff"                     # Cor do título do canal
+  header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+  header_font_size: "14px"                   # Tamanho da fonte do título
+  nav_btn_bg: "#202533"                      # Fundo dos botões de navegação ◀ ▶
+  nav_btn_text: "#38bdf8"                    # Cor das setas ◀ ▶ (azul neon)
+  nav_btn_border: "#334155"                  # Borda dos botões ◀ ▶
+  nav_btn_radius: "6px"                      # Arredondamento dos botões ◀ ▶
+  tab_active_bg: "#2563eb"                   # Fundo da aba selecionada (azul vibrante)
+  tab_active_text: "#ffffff"                 # Texto da aba selecionada
+  tab_inactive_bg: "#1e222d"                 # Fundo das abas inativas
+  tab_inactive_text: "#94a3b8"               # Texto das abas inativas
+  tab_radius: "6px"                          # Arredondamento das abas
+  tab_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+  tab_font_size: "12px"                      # Tamanho da fonte das abas
+  mini_fader_bg: "#101218"                   # Fundo do dock lateral do mini-fader
+  mini_fader_border: "#262936"               # Borda divisória do mini-fader
+  mini_fader_width: "85px"                   # Largura do dock do mini-fader no desktop
+  mobile_mini_fader_width: "118px"              # Largura do dock do mini-fader no mobile

@@ -36,7 +36,7 @@
     --csetup-mini-fader-bg: #101218;
     --csetup-mini-fader-border: #262936;
     --csetup-mini-fader-width: 85px;
-    --csetup-mob-mini-fader-width: 118px;
+    --csetup-mobile-mini-fader-width: 118px;
 }
 
 /* Overlay do Modal de Edição de Canal (Ocupa a área de faders à esquerda da Sidebar com fundo PRETO sólido) */
@@ -276,8 +276,8 @@ body:not(.layout-desktop).is-portrait .ch-modal-overlay {
 
 /* Responsividade Mobile */
 body:not(.layout-desktop) .ch-setup-fader-dock {
-    width: var(--csetup-mob-mini-fader-width);
-    min-width: var(--csetup-mob-mini-fader-width);
+    width: var(--csetup-mobile-mini-fader-width);
+    min-width: var(--csetup-mobile-mini-fader-width);
 }
 
 body:not(.layout-desktop) .ch-setup-shell {

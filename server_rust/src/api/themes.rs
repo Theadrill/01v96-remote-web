@@ -1,5 +1,5 @@
 use axum::{
-    extract::Path,
+    extract::{Path, Query},
     http::StatusCode,
     routing::{get, post},
     Json, Router,
@@ -35,12 +35,79 @@ pub struct SyncDirectionPayload {
     pub direction: String,
 }
 
+#[derive(Deserialize, Debug, Default)]
+pub struct ThemeSourceQuery {
+    pub source: Option<String>,
+}
+
+fn get_public_new_themes_dir() -> PathBuf {
+    let root = get_project_root();
+    let themes_dir = root.join("public_new").join("themes");
+    if !themes_dir.exists() {
+        let _ = fs::create_dir_all(&themes_dir);
+    }
+    themes_dir
+}
+
+fn resolve_themes_dir(source: Option<&str>) -> PathBuf {
+    match source {
+        Some("public_new") => get_public_new_themes_dir(),
+        _ => get_themes_dir(),
+    }
+}
+
+/// POST /api/themes/default/admin-save
+/// Rota administrativa para editar o default.yaml protegido em public_new/themes/
+async fn save_default_admin(
+    body: axum::body::Bytes,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    let yaml_content = if let Ok(payload) = serde_json::from_slice::<SaveThemePayload>(&body) {
+        payload.content.unwrap_or_default()
+    } else {
+        String::from_utf8_lossy(&body).to_string()
+    };
+
+    if yaml_content.trim().is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "Conteúdo do tema não pode ser vazio" })),
+        ));
+    }
+
+    // Grava em public_new/themes/default.yaml
+    let themes_dir = get_public_new_themes_dir();
+    let file_path = themes_dir.join("default.yaml");
+
+    if let Err(e) = fs::write(&file_path, &yaml_content) {
+        error!("[THEMES] Erro ao salvar default admin {:?}: {}", file_path, e);
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": "Erro ao salvar o arquivo de tema" })),
+        ));
+    }
+
+    // Também sincroniza para public/themes/default.yaml
+    let public_themes_dir = get_themes_dir();
+    let public_file_path = public_themes_dir.join("default.yaml");
+    if let Err(e) = fs::write(&public_file_path, &yaml_content) {
+        error!("[THEMES] Aviso: falha ao sincronizar default para public/themes: {}", e);
+    }
+
+    info!("[THEMES] default.yaml atualizado via admin-save");
+    Ok(Json(json!({
+        "success": true,
+        "name": "default.yaml",
+        "message": "default.yaml salvo com sucesso"
+    })))
+}
+
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_themes))
         .route("/active", get(get_active_theme).post(update_active_theme))
         .route("/compare", get(compare_themes))
         .route("/sync_direction", post(set_sync_direction))
+        .route("/default/admin-save", post(save_default_admin))
         .route("/{name}", get(get_theme).post(save_theme).delete(delete_theme))
 }
 
@@ -231,7 +298,10 @@ async fn update_active_theme(
 }
 
 /// GET /api/themes/:name
-async fn get_theme(Path(name): Path<String>) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+async fn get_theme(
+    Path(name): Path<String>,
+    Query(query): Query<ThemeSourceQuery>,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     if name == "active" {
         return Ok(get_active_theme().await);
     }
@@ -246,7 +316,7 @@ async fn get_theme(Path(name): Path<String>) -> Result<Json<Value>, (StatusCode,
         }
     };
 
-    let themes_dir = get_themes_dir();
+    let themes_dir = resolve_themes_dir(query.source.as_deref());
     let file_path = themes_dir.join(&filename);
 
     if !file_path.exists() {
@@ -274,6 +344,7 @@ async fn get_theme(Path(name): Path<String>) -> Result<Json<Value>, (StatusCode,
 /// POST /api/themes/:name
 async fn save_theme(
     Path(name): Path<String>,
+    Query(query): Query<ThemeSourceQuery>,
     body: axum::body::Bytes,
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     if name == "active" {
@@ -293,8 +364,10 @@ async fn save_theme(
         }
     };
 
-    // PROTEÇÃO RULE (3.5): default.yaml não pode ser alterado
-    if is_default_theme(&filename) {
+    // PROTEÇÃO RULE (3.5): default.yaml não pode ser alterado em public (comportamento atual).
+    // Quando source=public_new, a proteção é removida para permitir edição direta.
+    let is_public_new = query.source.as_deref() == Some("public_new");
+    if !is_public_new && is_default_theme(&filename) {
         return Err((
             StatusCode::FORBIDDEN,
             Json(json!({ "error": "O tema default.yaml é protegido e não pode ser alterado." })),
@@ -315,7 +388,7 @@ async fn save_theme(
         ));
     }
 
-    let themes_dir = get_themes_dir();
+    let themes_dir = resolve_themes_dir(query.source.as_deref());
     let file_path = themes_dir.join(&filename);
 
     if let Err(e) = fs::write(&file_path, &yaml_content) {

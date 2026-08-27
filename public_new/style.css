@@ -9825,6 +9825,25 @@ body:not(.layout-desktop).is-portrait #sidebarMacros {
     gap: 12px;
 }
 
+.te-sub-section {
+    padding-left: 12px;
+    border-left: 2px solid #3b82f6;
+    margin-left: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.te-sub-section-title {
+    font-size: 0.8rem;
+    color: #3b82f6;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
 .te-field-label {
     font-size: 0.9rem;
     color: #ddd;
