@@ -338,6 +338,15 @@ var AuxSendsView = (function () {
 
 // --- Funções Globais e Handlers de Compatibilidade ---
 
+function updateAuxManual(ch, auxIdx, val) {
+    var state = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+    if (state) state[`aux${auxIdx}`] = val;
+    if (typeof updateAuxFromSocket === 'function') {
+        updateAuxFromSocket(ch, `kInputAUX/kAUX${auxIdx}Level`, val);
+    }
+}
+window.updateAuxManual = updateAuxManual;
+
 function renderAuxs(ch) {
     AuxSendsView.render(ch);
 }
