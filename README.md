@@ -221,6 +221,7 @@ O servidor legado em Node.js continua funcional para testes básicos, mas possui
   - [x] Emitir confirm modal quando alternar de VARIABLE <-> FIXED
 - [ ] Flags de Prontidão e Estado de Loading dos Modais (PatchRegistry)
 - [ ] Troca de Canais (faz cópia de dois canais e cola um no outro para realizar uma troca)
+- [ ] Longpress no display de dB do canal para inserção direta de valor numérico via modal (com arredondamento automático para múltiplos de 0.05 dB)
 
 ### 🏗️ Refatoração Arquitetural — v2 (`public_new/`)
 
