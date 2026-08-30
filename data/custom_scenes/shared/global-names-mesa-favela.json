@@ -1,33 +1,33 @@
 {
   "mesa_nome": "mesa-favela",
   "channels": {
-    "20": {
-      "name": "CELULAR",
-      "short": "CELU"
-    },
-    "24": {
-      "name": "MIC MC",
-      "short": "MICM"
+    "bus3": {
+      "name": "VLOW",
+      "short": "VLOW"
     },
     "bus1": {
       "name": "VHIGH",
       "short": "VHIG"
     },
-    "23": {
-      "name": "MIC DJ",
-      "short": "MICD"
-    },
     "18": {
       "name": "DJ",
       "short": "DJ  "
     },
-    "bus3": {
-      "name": "VLOW",
-      "short": "VLOW"
-    },
     "33": {
       "name": "REVERB VOZ",
       "short": "REVE"
+    },
+    "23": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "24": {
+      "name": "CONVIDADO",
+      "short": "CONV"
+    },
+    "20": {
+      "name": "CELULAR",
+      "short": "CELU"
     }
   }
 }
