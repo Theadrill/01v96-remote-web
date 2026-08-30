@@ -34,6 +34,17 @@
     "name": "intervalo",
     "scriptId": "channel_toggler"
   },
+  "11": {
+    "color": "#ff24d7",
+    "config": {
+      "extras": [
+        0
+      ],
+      "scenes": []
+    },
+    "name": "fog",
+    "scriptId": "lumikit"
+  },
   "2": {
     "color": "#919a19",
     "config": {
@@ -98,17 +109,6 @@
       ]
     },
     "name": "blackout",
-    "scriptId": "lumikit"
-  },
-  "8": {
-    "color": "#ff24d7",
-    "config": {
-      "extras": [
-        0
-      ],
-      "scenes": []
-    },
-    "name": "fog",
     "scriptId": "lumikit"
   },
   "globalConfig": {
