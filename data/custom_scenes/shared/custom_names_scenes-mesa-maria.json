@@ -2,12 +2,6 @@
   "mesa_nome": "mesa-maria",
   "scenes": [
     {
-      "custom_name": "SKEMA BOM",
-      "physical_scene": "SKEMA BOM",
-      "physical_id": 11,
-      "file": "custom_names_scene-SKEMA BOM-mesa-maria.json"
-    },
-    {
       "custom_name": "CHOCO 360",
       "physical_scene": "CHOCO 360",
       "physical_id": 33,
@@ -114,6 +108,18 @@
       "physical_scene": "BAT RESENH 360",
       "physical_id": 20,
       "file": "custom_names_scene-BAT RESENH 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SENSIBILDADE 360",
+      "physical_scene": "SENSIBILDADE 360",
+      "physical_id": 23,
+      "file": "custom_names_scene-SENSIBILDADE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SKEMA BOM 360",
+      "physical_scene": "SKEMA BOM 360",
+      "physical_id": 11,
+      "file": "custom_names_scene-SKEMA BOM 360-mesa-maria.json"
     }
   ]
 }
