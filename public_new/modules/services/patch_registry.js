@@ -839,6 +839,20 @@
     }
 
     /**
+     * Retorna o patch de entrada para um par estéreo ST IN (1-4).
+     * @param {number} sIdx - Índice ST IN (0-3)
+     * @returns {string} Ex: 'AD 13 / 14', 'ADAT 1 / 2', etc.
+     */
+    function getStereoInInput(sIdx) {
+        if (sIdx >= 0 && sIdx < 4) {
+            var ch1 = 32 + (sIdx * 2);
+            var ch2 = ch1 + 1;
+            return getPairedChannelInput(ch1, ch2);
+        }
+        return '--';
+    }
+
+    /**
      * Retorna as portas físicas onde um MIX/AUX está roteado.
      * @param {number} mixIdx - Índice do MIX (0-7)
      * @returns {string} Ex: 'OMNI 1', 'ADAT 3', '--'
@@ -1062,6 +1076,7 @@
         // Consulta O(1)
         getChannelInput: getChannelInput,
         getPairedChannelInput: getPairedChannelInput,
+        getStereoInInput: getStereoInInput,
         getMixOutput: getMixOutput,
         getBusOutput: getBusOutput,
         getStereoOutput: getStereoOutput,

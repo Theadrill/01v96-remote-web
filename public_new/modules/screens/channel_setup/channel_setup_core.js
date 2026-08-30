@@ -32,35 +32,31 @@ var ChannelSetupCore = (function () {
         var isMaster = false;
         var isStIn = false;
 
+        var state = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+        if (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) {
+            customName = window.resolvedNames[ch].name;
+        } else if (state && state.name) {
+            customName = state.name;
+        }
+
         if (ch >= 0 && ch <= 31) {
-            var s = (typeof channelStates !== 'undefined' && channelStates[ch]) ? channelStates[ch] : null;
-            isPaired = !!(s && s.paired);
+            isPaired = !!(state && state.paired);
             displayTitle = isPaired ? ('CH ' + (ch + 1) + ' + ' + (ch + 2)) : ('CH ' + (ch + 1));
-            var nameEl = document.getElementById('name' + ch);
-            if (nameEl) customName = nameEl.innerText || '';
         } else if (ch >= 36 && ch <= 43) {
             isOut = true;
             var mixIdx = ch - 36;
             displayTitle = 'MIX ' + (mixIdx + 1);
-            var nameMixEl = document.getElementById('namem' + mixIdx);
-            if (nameMixEl) customName = nameMixEl.innerText || '';
         } else if (ch >= 44 && ch <= 51) {
             isOut = true;
             var busIdx = ch - 44;
             displayTitle = 'BUS ' + (busIdx + 1);
-            var nameBusEl = document.getElementById('nameb' + busIdx);
-            if (nameBusEl) customName = nameBusEl.innerText || '';
         } else if (ch === 52) {
             isMaster = true;
             displayTitle = 'MASTER STEREO';
-            var nameMEl = document.getElementById('namemaster');
-            if (nameMEl) customName = nameMEl.innerText || '';
         } else if (ch >= 60 && ch <= 67) {
             isStIn = true;
             var stIdx = (ch - 60) / 2;
             displayTitle = 'ST IN ' + (stIdx + 1);
-            var nameStEl = document.getElementById('namest' + stIdx);
-            if (nameStEl) customName = nameStEl.innerText || '';
         }
 
         return {
@@ -490,6 +486,72 @@ var ChannelSetupCore = (function () {
         renderMiniFader(ch);
     };
 
+    function updateName(ch, name) {
+        if (_activeChannel === ch) {
+            updateHeader(ch);
+            if (_miniStripInstance && typeof _miniStripInstance.setName === 'function') {
+                _miniStripInstance.setName(name);
+            }
+        }
+    }
+
+    function updateChannel(ch, val, onState, soloState) {
+        if (!_miniStripInstance) return;
+
+        var active = _activeChannel;
+        if (active === null || active === undefined) return;
+
+        var matches = false;
+        if (ch === 'master' || ch === 52) {
+            matches = (active === 52 || active === 'master');
+        } else if (typeof ch === 'string' && ch.startsWith('m')) {
+            matches = (active === (36 + parseInt(ch.substring(1), 10)));
+        } else if (typeof ch === 'string' && ch.startsWith('b')) {
+            matches = (active === (44 + parseInt(ch.substring(1), 10)));
+        } else if (typeof ch === 'string' && ch.startsWith('st')) {
+            var stIdx = parseInt(ch.substring(2), 10);
+            matches = (active === (60 + stIdx * 2) || active === (60 + stIdx * 2 + 1));
+        } else if (typeof ch === 'number') {
+            matches = (active === ch);
+        } else {
+            matches = (active == ch);
+        }
+
+        if (!matches) return;
+
+        if (val !== undefined && val !== null) {
+            var isMaster = (active === 52 || active === 'master');
+            var isDesktop = document.body.classList.contains('layout-desktop');
+            var db = typeof rawToDb === 'function' ? rawToDb(val, !isDesktop, isMaster) : ('' + val);
+            _miniStripInstance.setFaderValue(val, db, true);
+        }
+        if (onState !== undefined && onState !== null) {
+            _miniStripInstance.setOnState(onState);
+        }
+        if (soloState !== undefined && soloState !== null) {
+            _miniStripInstance.setSoloState(soloState);
+        }
+    }
+
+    function updatePan(ch, panValue, side) {
+        if (!_miniStripInstance) return;
+        var active = _activeChannel;
+        if (active === null || active === undefined) return;
+
+        var matches = false;
+        if (ch === 'master' || ch === 52) {
+            matches = (active === 52 || active === 'master');
+        } else if (typeof ch === 'number') {
+            matches = (active === ch);
+        } else {
+            matches = (active == ch);
+        }
+
+        if (matches && typeof _miniStripInstance.setPanValue === 'function') {
+            _miniStripInstance.setPanValue(panValue, side || 'L', false);
+        }
+    }
+
     return {
         open: open,
         close: close,
@@ -497,6 +559,9 @@ var ChannelSetupCore = (function () {
         switchTab: switchTab,
         updateHeader: updateHeader,
         renderMiniFader: renderMiniFader,
+        updateName: updateName,
+        updateChannel: updateChannel,
+        updatePan: updatePan,
         getActiveChannel: function () { return _activeChannel; },
         getActiveTab: function () { return _activeTab; }
     };

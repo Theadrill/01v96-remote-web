@@ -44,7 +44,7 @@ var MainView = (function () {
         if (typeof channelStates !== 'undefined' && channelStates[ch] && channelStates[ch].name) {
             return channelStates[ch].name;
         }
-        return `CH ${ch + 1}`;
+        return '';
     }
 
     /**

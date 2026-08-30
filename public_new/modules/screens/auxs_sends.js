@@ -332,9 +332,25 @@ var AuxSendsView = (function () {
         }
     }
 
+    function updateName(ch, name) {
+        if (_activeChannel >= 36 && _activeChannel <= 43) {
+            var strip = _strips[ch];
+            if (strip) strip.setName(name);
+        } else if (_activeChannel === ch) {
+            // Em modo canal (0-31), os strips são os 8 auxiliares (1-8)
+            // Se o nome de um dos auxiliares mudou (36..43 -> auxIdx 1..8):
+            if (typeof ch === 'number' && ch >= 36 && ch <= 43) {
+                var auxIdx = ch - 35;
+                var stripAux = _strips[auxIdx];
+                if (stripAux) stripAux.setName(name);
+            }
+        }
+    }
+
     return {
         render: render,
-        updateAuxFromSocket: updateAuxFromSocket
+        updateAuxFromSocket: updateAuxFromSocket,
+        updateName: updateName
     };
 })();
 

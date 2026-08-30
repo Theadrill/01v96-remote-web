@@ -973,9 +973,9 @@
     width: 100%;
     height: var(--strip-btn-pre-height, 18px);
     min-height: var(--strip-btn-pre-height, 18px);
-    background: var(--strip-btn-pre-bg, #6b21a8);
-    color: var(--strip-btn-pre-text, #ffffff);
-    border: 1px solid var(--strip-btn-pre-border, #9333ea);
+    background: #333333;
+    color: #888888;
+    border: 1px solid #444444;
     border-radius: var(--strip-btn-pre-radius, 4px);
     padding: 0;
     font-family: var(--strip-btn-pre-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
@@ -988,16 +988,30 @@
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
+.btn-pre-post.pre,
+.btn-pre-post.active {
+    background: var(--strip-btn-pre-bg, #6b21a8) !important;
+    color: var(--strip-btn-pre-text, #ffffff) !important;
+    border-color: var(--strip-btn-pre-border, #9333ea) !important;
+    box-shadow: 0 0 8px rgba(147, 51, 234, 0.4) !important;
+}
+.btn-pre-post.post {
+    background: #333333 !important;
+    color: #888888 !important;
+    border-color: #444444 !important;
+    box-shadow: none !important;
+}
 .btn-pre-post.fixed {
-    background: #333333;
-    border-color: #555555;
-    color: #888888;
-    cursor: not-allowed;
+    background: #222222 !important;
+    border-color: #333333 !important;
+    color: #555555 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
 }
 .mobile-btn-pre {
-    background: var(--strip-btn-pre-bg, #6b21a8);
-    color: var(--strip-btn-pre-text, #ffffff);
-    border: 1px solid var(--strip-btn-pre-border, #9333ea);
+    background: #333333;
+    color: #888888;
+    border: 1px solid #444444;
     border-radius: var(--strip-mobile-btn-radius, 6px);
     height: var(--strip-mobile-btn-pre-height, var(--strip-mobile-btn-height, 38px));
     min-height: var(--strip-mobile-btn-pre-height, var(--strip-mobile-btn-height, 38px));
@@ -1013,6 +1027,26 @@
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
+.mobile-btn-pre.pre,
+.mobile-btn-pre.active {
+    background: var(--strip-btn-pre-bg, #6b21a8) !important;
+    color: var(--strip-btn-pre-text, #ffffff) !important;
+    border-color: var(--strip-btn-pre-border, #9333ea) !important;
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.45) !important;
+}
+.mobile-btn-pre.post {
+    background: #333333 !important;
+    color: #888888 !important;
+    border-color: #444444 !important;
+    box-shadow: none !important;
+}
+.mobile-btn-pre.fixed {
+    background: #222222 !important;
+    border-color: #333333 !important;
+    color: #555555 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
 /* ZONA 3: Display OLED (Centralizado com respiro lateral e largura configurável) */
 .channel-strip-wrapper.desk-strip .desk-ch-name-zone,
 .desk-ch-name-zone {
@@ -1024,6 +1058,8 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    height: var(--strip-name-display-zone-height, 28px) !important;
+    min-height: var(--strip-name-display-zone-height, 28px) !important;
 }
 .channel-strip-wrapper.desk-strip .desk-ch-name,
 .desk-ch-name {
@@ -1035,19 +1071,20 @@
     margin: var(--strip-name-display-margin, 0 auto) !important;
     box-sizing: border-box !important;
     background: var(--strip-name-display-bg, #000000) !important;
-    color: var(--strip-name-display-color, #00ff00);
-    border: none;
+    color: var(--strip-name-display-color, #00ff00) !important;
+    border: 1px solid #222222 !important;
     border-radius: var(--strip-name-display-radius, 4px) !important;
-    height: var(--strip-name-display-height, 24px);
-    min-height: var(--strip-name-display-height, 24px);
-    padding: var(--strip-name-display-padding, 2px 2px);
-    font-size: var(--strip-name-display-font-size, 10px);
-    font-weight: var(--strip-name-display-font-weight, 700);
-    text-align: center;
-    font-family: var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
+    height: var(--strip-name-display-height, 24px) !important;
+    min-height: var(--strip-name-display-height, 24px) !important;
+    max-height: var(--strip-name-display-height, 24px) !important;
+    padding: var(--strip-name-display-padding, 2px 2px) !important;
+    font-size: var(--strip-name-display-font-size, 10px) !important;
+    font-weight: var(--strip-name-display-font-weight, 700) !important;
+    text-align: center !important;
+    font-family: var(--strip-name-display-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
 }
 
 /* ZONA 5: Primary Action (ON) & Nudge Superior */
@@ -2059,7 +2096,7 @@
     background: var(--strip-name-display-bg, #000000);
     border: 1px solid #333;
     border-radius: var(--strip-name-display-radius, 4px);
-    padding: 4px 2px;
+    padding: 2px 2px;
     width: calc(100% - 6px);
     margin: 0 auto;
     text-align: center;
@@ -2070,6 +2107,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
+    height: 24px;
+    min-height: 24px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .mobile-top-action {
     text-align: center;

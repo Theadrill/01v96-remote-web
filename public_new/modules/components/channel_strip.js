@@ -31,7 +31,7 @@ class ChannelStrip {
             id: 'ch_0',
             evtCh: 0,
             chNumber: 1,
-            name: 'CH 1',
+            name: '',
             type: 'input',              // 'input' | 'input_paired' | 'master' | 'mix' | 'bus' | 'macro'
             layout: 'desktop',          // 'desktop' | 'mobile'
             colorBand: 'blue',          // 'blue' | 'green' | 'paired_green' | 'amber' | 'cyan' | 'wine' | 'macro_silver'
@@ -202,7 +202,7 @@ class ChannelStrip {
 
             <!-- ZONA 3: Display OLED -->
             <div class="desk-ch-name-zone">
-                <span class="desk-ch-name">${cfg.name}</span>
+                <span class="desk-ch-name">${cfg.name || ''}</span>
             </div>
 
             <!-- ZONA 4: Middle Feature (Painel de Medidores Master ou Painel de Posição do Auxiliar) -->
@@ -408,7 +408,7 @@ class ChannelStrip {
 
                 <!-- Zona 3: Display do Canal -->
                 <div class="mobile-display-name">
-                    ${cfg.name}
+                    ${cfg.name || ''}
                 </div>
 
                 <!-- Zona 2: Top Action / Solo / Pre -->
@@ -493,7 +493,7 @@ class ChannelStrip {
             wrapper: root,
             headerNum: root.querySelector('.desk-label-wrapper, .mobile-card-header, .mobile-header-zone, .desk-ch-num, .mobile-ch-num'),
             lockSlot: root.querySelector('.desk-slot-right'),
-            nameDisplay: root.querySelector('.desk-ch-name-zone, .mobile-display-name, .desk-ch-name'),
+            nameDisplay: root.querySelector('.desk-ch-name, .mobile-display-name'),
             soloBtn: root.querySelector('.desk-btn-solo, .mobile-btn-solo'),
             btnPre: root.querySelector('.btn-pre-post, .mobile-btn-pre'),
             onBtn: root.querySelector('.desk-btn-on, .mobile-btn-on'),
@@ -1309,9 +1309,9 @@ class ChannelStrip {
      * @param {string} name
      */
     setName(name) {
-        this.config.name = name;
+        this.config.name = name || '';
         if (this.elements.nameDisplay) {
-            this.elements.nameDisplay.innerText = name || (this.config.chNumber ? `CH ${this.config.chNumber}` : '');
+            this.elements.nameDisplay.innerText = name || '';
             this.elements.nameDisplay.title = name || '';
         }
     }
@@ -1674,6 +1674,9 @@ function updateUI(ch, val, onState, soloState) {
     if (typeof OutsView !== 'undefined' && OutsView.isActive && OutsView.isActive()) {
         OutsView.updateChannel(uiId, blockFaderUpdate ? undefined : val, onState, soloState);
     }
+    if (typeof ChannelSetupCore !== 'undefined' && typeof ChannelSetupCore.updateChannel === 'function') {
+        ChannelSetupCore.updateChannel(ch, blockFaderUpdate ? undefined : val, onState, soloState);
+    }
 
     if (val !== undefined && val !== null && !blockFaderUpdate) {
         const elF = document.getElementById(`f${uiId}`);
@@ -1914,6 +1917,9 @@ function updatePanIndicator(channel, panValue) {
     }
     if (typeof OutsView !== 'undefined' && OutsView.isActive && OutsView.isActive()) {
         OutsView.updatePan(channel, panValue);
+    }
+    if (typeof ChannelSetupCore !== 'undefined' && typeof ChannelSetupCore.updatePan === 'function') {
+        ChannelSetupCore.updatePan(channel, panValue);
     }
 
     // pan -63 → 0%, pan 0 → 50%, pan +63 → 100%

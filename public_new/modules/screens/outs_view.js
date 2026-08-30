@@ -284,8 +284,11 @@ var OutsView = (function () {
             var stName = _getResolvedName(stGlobalId, stStateL.name || stTitle);
             var stVal = stStateL.value || 0;
             var stDb = typeof rawToDb === 'function' ? rawToDb(stVal, !isDesktop, false) : `${stVal}`;
-            var stLocked = typeof ChannelLock !== 'undefined' && typeof ChannelLock.isLocked === 'function' ? ChannelLock.isLocked(stGlobalId) : false;
-            var stPatch = window.PatchRegistry ? window.PatchRegistry.getStereoInInput(sIdx) : `ST IN ${sIdx + 1}`;
+            var stPatch = (window.PatchRegistry && typeof window.PatchRegistry.getStereoInInput === 'function')
+                ? window.PatchRegistry.getStereoInInput(sIdx)
+                : (window.PatchRegistry && typeof window.PatchRegistry.getPairedChannelInput === 'function'
+                    ? window.PatchRegistry.getPairedChannelInput(stCh, stCh + 1)
+                    : `ST IN ${sIdx + 1}`);
 
             var stStrip = new ChannelStrip({
                 id: `st${sIdx}`,
@@ -502,6 +505,15 @@ var OutsView = (function () {
         }
     }
 
+    /**
+     * Atualização do nome do barramento em tempo real
+     */
+    function updateName(id, name) {
+        var strip = _strips[id];
+        if (!strip) return;
+        strip.setName(name);
+    }
+
     function deactivate() {
         _active = false;
         _strips = {};
@@ -515,6 +527,7 @@ var OutsView = (function () {
         render: render,
         updateChannel: updateChannel,
         updatePan: updatePan,
+        updateName: updateName,
         deactivate: deactivate,
         isActive: isActive
     };

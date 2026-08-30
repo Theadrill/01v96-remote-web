@@ -2012,12 +2012,22 @@ body.layout-desktop .sidebar-macros {
 
 .desk-ch-name {
     color: #0f0;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-transform: uppercase;
+    height: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    width: calc(100% - 8px);
+    background: #000000;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .btn-on-desk {

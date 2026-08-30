@@ -398,6 +398,14 @@ window.removeCustomName = function () {
             delete window.activeCustomSceneChannels[ch];
         }
     }
+    if (window.resolvedNames) {
+        delete window.resolvedNames[ch];
+    }
+    const state = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+    const fallbackName = (state && state.physicalName) || '';
+    if (typeof window.updateNameUI === 'function') {
+        window.updateNameUI(ch, fallbackName);
+    }
     document.getElementById('nameEditorModal').style.display = 'none';
 };
 
@@ -405,19 +413,9 @@ window.openNameEditor = function () {
     const ch = activeConfigChannel;
     if (ch === null) return;
 
-    let targetId = `name${ch}`;
-    if (ch >= 0 && ch <= 31) {
-        targetId = `name${ch}`;
-    } else if (ch >= 36 && ch <= 43) {
-        targetId = `namem${ch - 36}`;
-    } else if (ch >= 44 && ch <= 51) {
-        targetId = `nameb${ch - 44}`;
-    } else if (ch === 52) {
-        targetId = `namemaster`;
-    }
-
-    const nameEl = document.getElementById(targetId);
-    const currentName = nameEl ? nameEl.innerText.trim() : '';
+    const resolvedObj = window.resolvedNames && window.resolvedNames[ch];
+    const chState = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
+    const currentName = (resolvedObj && resolvedObj.name) || (chState && chState.name) || '';
     const input = document.getElementById('inputChName');
     input.value = currentName === '...' ? '' : currentName;
 
@@ -495,32 +493,32 @@ window.saveChannelName = function () {
 
     if (isGlobal) {
         newName = normalizeNameEditor(newName).substring(0, 10);
-        socket.emit('saveGlobalName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
-        if (typeof window.updateNameUI === 'function') {
-            window.updateNameUI(ch, newName);
-        }
         if (!window.globalNames) window.globalNames = {};
         window.globalNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4) };
         if (!window.resolvedNames) window.resolvedNames = {};
         window.resolvedNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4), source: 'global' };
+        socket.emit('saveGlobalName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
+        if (typeof window.updateNameUI === 'function') {
+            window.updateNameUI(ch, newName);
+        }
     } else if (isCustom) {
         newName = normalizeNameEditor(newName).substring(0, 10);
-        socket.emit('saveCustomName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
-        if (typeof window.updateNameUI === 'function') {
-            window.updateNameUI(ch, newName.substring(0, 4));
-        }
         if (!window.activeCustomSceneChannels) window.activeCustomSceneChannels = {};
         window.activeCustomSceneChannels[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4) };
         if (!window.resolvedNames) window.resolvedNames = {};
         window.resolvedNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4), source: 'custom' };
+        socket.emit('saveCustomName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
+        if (typeof window.updateNameUI === 'function') {
+            window.updateNameUI(ch, newName.substring(0, 4));
+        }
     } else {
         newName = newName.toUpperCase().substring(0, 4);
+        if (!window.resolvedNames) window.resolvedNames = {};
+        window.resolvedNames[ch] = { name: newName, short: newName, source: 'physical' };
         socket.emit('updateName', { channel: ch, name: newName });
         if (typeof window.updateNameUI === 'function') {
             window.updateNameUI(ch, newName);
         }
-        if (!window.resolvedNames) window.resolvedNames = {};
-        window.resolvedNames[ch] = { name: newName, short: newName, source: 'physical' };
     }
 
     document.getElementById('nameEditorModal').style.display = 'none';

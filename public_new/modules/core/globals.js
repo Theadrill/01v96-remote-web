@@ -210,26 +210,43 @@ function getSteppedRaw(currentRaw, dir, stepDb = 0.5, isMaster = false) {
  * Fader Principal, Mini Fader (Config) e Sidebar Title.
  */
 window.updateNameUI = function (channel, name) {
-    // 0. Fonte da verdade ABSOLUTA: se o backend já resolveu este nome (Global/Custom), forçamos ele.
-    if (window.resolvedNames && window.resolvedNames[channel]) {
-        name = window.resolvedNames[channel].name;
+    // 0. Fonte da verdade: se name não foi passado explicitamente, busca nos nomes resolvidos ou estado
+    if (name === undefined || name === null) {
+        if (window.resolvedNames && window.resolvedNames[channel] && window.resolvedNames[channel].name !== undefined) {
+            name = window.resolvedNames[channel].name;
+        } else {
+            const s = typeof getChannelStateById === 'function' ? getChannelStateById(channel) : null;
+            name = (s && s.name) || '';
+        }
     }
 
-    const limitedName = (name !== undefined && name !== null ? name : '').substring(0, 16).trim(); // Armazenamos até 16, mas exibimos 4 no visor
-    let defaultShortName = '';
-    if (channel >= 0 && channel <= 31) defaultShortName = `CH ${channel + 1}`;
-    else if (channel >= 60 && channel <= 67) defaultShortName = `ST ${Math.floor((channel - 60) / 2) + 1}`;
-    else if (channel >= 36 && channel <= 43) defaultShortName = `AUX${channel - 35}`;
-    else if (channel >= 44 && channel <= 51) defaultShortName = `BUS${channel - 43}`;
-    else if (channel === 52) defaultShortName = `MSTR`;
+    const limitedName = (name || '').substring(0, 16).trim();
 
-    let displayName = name !== undefined ? limitedName : defaultShortName;
-
-    // 1. Atualiza o estado local para consistência (guardando o nome resolvido ou o físico limitados)
-    const stateObj = getChannelStateById(channel);
+    // 1. Atualiza o estado local para consistência
+    const stateObj = typeof getChannelStateById === 'function' ? getChannelStateById(channel) : null;
     if (stateObj) stateObj.name = limitedName;
 
-    // 2. Resolve IDs de elementos
+    // 2. Atualiza via MainView (Componentes V2)
+    if (typeof window.MainView !== 'undefined' && typeof window.MainView.updateName === 'function') {
+        window.MainView.updateName(channel, limitedName);
+    }
+
+    // 3. Atualiza via OutsView (Componentes V2)
+    if (typeof window.OutsView !== 'undefined' && typeof window.OutsView.updateName === 'function') {
+        window.OutsView.updateName(channel, limitedName);
+    }
+
+    // 4. Atualiza via AuxSendsView (Componentes V2)
+    if (typeof window.AuxSendsView !== 'undefined' && typeof window.AuxSendsView.updateName === 'function') {
+        window.AuxSendsView.updateName(channel, limitedName);
+    }
+
+    // 5. Atualiza o Mini-Fader e Modal de Configuração se aberto
+    if (typeof window.ChannelSetupCore !== 'undefined' && typeof window.ChannelSetupCore.updateName === 'function') {
+        window.ChannelSetupCore.updateName(channel, limitedName);
+    }
+
+    // 6. Resolve IDs de elementos para compatibilidade legada
     let baseId = '';
     let displayTitle = '';
 
@@ -237,10 +254,7 @@ window.updateNameUI = function (channel, name) {
         baseId = `name${channel}`;
         displayTitle = `${channel + 1}`;
     } else if (channel >= 60 && channel <= 67) {
-        // Para ST IN, apenas o canal "L" (par: 60, 62, 64, 66) deve atualizar o visor,
-        // pois eles compartilham o mesmo strip físico na interface.
         if (channel % 2 !== 0) return;
-
         const stNum = Math.floor((channel - 60) / 2) + 1;
         baseId = `namest${stNum - 1}`;
         displayTitle = `ST IN ${stNum}`;
@@ -250,41 +264,28 @@ window.updateNameUI = function (channel, name) {
     } else if (channel >= 44 && channel <= 51) {
         baseId = `nameb${channel - 44}`;
         displayTitle = `BUS ${channel - 43}`;
-    } else if (channel === 52) {
+    } else if (channel === 52 || channel === 'master') {
         baseId = `namemaster`;
         displayTitle = `MASTER`;
     }
 
-    if (!baseId) return;
-
-    // 3. Atualiza fader na tela principal
-    const el = document.getElementById(baseId);
-    if (el) {
-        el.innerText = displayName;
-        // if (displayName.length > 7) {
-        //     el.classList.add('long-name');
-        // } else {
-        //     el.classList.remove('long-name');
-        // }
+    if (baseId) {
+        const el = document.getElementById(baseId);
+        if (el) el.innerText = limitedName;
+        const elMini = document.getElementById(`mini-${baseId}`);
+        if (elMini) elMini.innerText = limitedName;
     }
 
-    // 4. Atualiza mini-fader se estiver aberto na config
-    const elMini = document.getElementById(`mini-${baseId}`);
-    if (elMini) {
-        elMini.innerText = displayName;
-        // if (displayName.length > 7) {
-        //     elMini.classList.add('long-name');
-        // } else {
-        //     elMini.classList.remove('long-name');
-        // }
-    }
-
-    // 5. Atualiza título da sidebar se este canal for o ativo na config
-    if (activeConfigChannel === channel) {
+    // 7. Atualiza título da sidebar se este canal for o ativo na config
+    if (typeof activeConfigChannel !== 'undefined' && activeConfigChannel === channel) {
         const sideTitle = document.getElementById('chSideTitle');
         if (sideTitle) {
-            sideTitle.innerText = `${displayTitle} - ${displayName || '...'}`;
+            sideTitle.innerText = `${displayTitle}${limitedName ? (' - ' + limitedName) : ''}`;
             if (window.autoScaleTitle) window.autoScaleTitle();
+        }
+        const headerTitle = document.getElementById('chSetupHeaderTitle');
+        if (headerTitle) {
+            headerTitle.innerText = `${displayTitle}${limitedName ? (' - ' + limitedName) : ''}`;
         }
     }
 };
