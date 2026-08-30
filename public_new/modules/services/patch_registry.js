@@ -750,7 +750,7 @@
         // element 1: Channel In (0..39)
         if (element === 1 && channel >= 0 && channel < 40) {
             setInputPatch(channel, sv);
-            if (typeof activeConfigChannel !== 'undefined' && activeConfigChannel === channel && typeof window.renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && typeof activeConfigChannel !== 'undefined' && activeConfigChannel === channel && typeof window.renderRouting === 'function') {
                 window.renderRouting(channel);
             }
         }

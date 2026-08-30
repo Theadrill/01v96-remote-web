@@ -535,16 +535,36 @@ class ChannelStrip {
             }, { passive: true });
         }
 
-        // 2. Arraste do Fader Thumb (Pointer Events)
+        // 2. Arraste do Fader Thumb (Pointer Events com RAF Throttling)
         if (els.faderThumb && !cfg.isDisabled && !cfg.isLocked) {
-            els.faderThumb.addEventListener('pointerdown', (e) => {
+            let rafId = null;
+            let pendingVal = null;
+            let pendingDbText = null;
+
+            const emitThrottled = (newVal, dbText) => {
+                pendingVal = newVal;
+                pendingDbText = dbText;
+                if (!rafId) {
+                    rafId = requestAnimationFrame(() => {
+                        rafId = null;
+                        if (pendingVal !== null) {
+                            this._emitEvent('fader_change', { value: pendingVal, dbText: pendingDbText });
+                        }
+                    });
+                }
+            };
+
+            const onPointerDown = (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 this.isDragging = true;
                 this.dragStartY = e.clientY;
-                this.dragStartVal = cfg.faderValue || 0;
-                els.faderThumb.setPointerCapture(e.pointerId);
+                this.dragStartVal = this.config.faderValue || 0;
+                try { els.faderThumb.setPointerCapture(e.pointerId); } catch (_) {}
                 els.faderThumb.style.cursor = 'grabbing';
-            });
+            };
+
+            els.faderThumb.addEventListener('pointerdown', onPointerDown);
 
             els.faderThumb.addEventListener('pointermove', (e) => {
                 if (!this.isDragging) return;
@@ -555,12 +575,14 @@ class ChannelStrip {
                 const deltaVal = (deltaY / travelDist) * 1023;
                 const newVal = Math.max(0, Math.min(1023, Math.round(this.dragStartVal + deltaVal)));
 
+                if (newVal === this.config.faderValue) return;
+
                 const isMaster = this.config.isMaster || this.config.type === 'master';
                 const isDesktop = this.config.layout === 'desktop';
                 const dbText = typeof rawToDb === 'function' ? rawToDb(newVal, !isDesktop, isMaster) : `${newVal}`;
 
                 this.setFaderValue(newVal, dbText);
-                this._emitEvent('fader_change', { value: newVal, dbText });
+                emitThrottled(newVal, dbText);
             });
 
             const stopDrag = (e) => {
@@ -568,6 +590,15 @@ class ChannelStrip {
                     this.isDragging = false;
                     try { els.faderThumb.releasePointerCapture(e.pointerId); } catch (_) {}
                     els.faderThumb.style.cursor = 'grab';
+                    if (rafId) {
+                        cancelAnimationFrame(rafId);
+                        rafId = null;
+                    }
+                    if (pendingVal !== null) {
+                        this._emitEvent('fader_change', { value: pendingVal, dbText: pendingDbText });
+                        pendingVal = null;
+                        pendingDbText = null;
+                    }
                 }
             };
 
@@ -584,8 +615,15 @@ class ChannelStrip {
                 const isFine = (cfg.type === 'mix' || cfg.type === 'bus' || cfg.type === 'bus_paired' || cfg.type === 'aux_send') ? 0.50 : 0.10;
                 const dir = e.deltaY < 0 ? 1 : -1;
 
-                // Atualiza valor se o canal tiver fader normal
-                if (typeof this.config.faderValue === 'number') {
+                if (typeof this.config.callbacks.fader_change === 'function') {
+                    const isMaster = this.config.isMaster || this.config.type === 'master';
+                    const isDesktop = this.config.layout === 'desktop';
+                    const currentRaw = this.config.faderValue || 0;
+                    const newRaw = typeof getSteppedRaw === 'function' ? getSteppedRaw(currentRaw, dir, isFine, isMaster) : Math.max(0, Math.min(1023, currentRaw + (dir * 10)));
+                    const dbText = typeof rawToDb === 'function' ? rawToDb(newRaw, !isDesktop, isMaster) : `${newRaw}`;
+                    this.setFaderValue(newRaw, dbText);
+                    this._emitEvent('fader_change', { value: newRaw, dbText });
+                } else if (typeof this.config.faderValue === 'number') {
                     this._applyNudgeStep(dir, isFine);
                 }
 
@@ -972,7 +1010,7 @@ class ChannelStrip {
      */
     _setupNudgeButton(btnEl, direction) {
         const isOut = this.config.type === 'mix' || this.config.type === 'bus' || this.config.type === 'bus_paired';
-        const isAuxSend = this.config.type === 'aux_send';
+        const isAuxSend = this.config.type === 'aux_send' || this.config.isAuxSend === true || (this.config.customClass && this.config.customClass.includes('aux'));
         const isMacro = this.config.mode === 'macro' || (this.config.type && this.config.type.startsWith('macro'));
         const isMacroMusician = this.config.mode === 'macro_musician' || this.config.type === 'macro_musician';
         const isMacroAux = this.config.mode === 'macro_aux' || this.config.type === 'macro_aux';
@@ -1000,11 +1038,22 @@ class ChannelStrip {
                 // Em macros, acumula delta dB, atualiza o LED e agenda retorno para '--' após 5s
                 this._applyMacroDelta(direction, stepVal);
                 this._emitEvent('nudge', { direction, step: stepVal });
-            } else if (isAuxSend) {
-                // AUX sends usam path legado (nudgeAuxLevel) que emite socket kInputAUX/kAUX...
+            } else if (typeof this.config.callbacks.nudge === 'function') {
                 this._emitEvent('nudge', { direction, step: stepVal });
+            } else if (typeof this.config.callbacks.fader_change === 'function') {
+                const isMaster = this.config.isMaster || this.config.type === 'master';
+                const isDesktop = this.config.layout === 'desktop';
+                const currentRaw = this.config.faderValue || 0;
+                let newRaw = typeof getSteppedRaw === 'function' ? getSteppedRaw(currentRaw, direction, stepVal, isMaster) : Math.max(0, Math.min(1023, currentRaw + (direction * 10)));
+                if (newRaw === currentRaw) {
+                    if (direction > 0 && currentRaw < 1023) newRaw = currentRaw + 1;
+                    else if (direction < 0 && currentRaw > 0) newRaw = currentRaw - 1;
+                }
+                const dbText = typeof rawToDb === 'function' ? rawToDb(newRaw, !isDesktop, isMaster) : `${newRaw}`;
+                this.setFaderValue(newRaw, dbText);
+                this._emitEvent('fader_change', { value: newRaw, dbText });
             } else if (typeof this.config.faderValue === 'number') {
-                // Canais normais: _applyNudgeStep calcula step dB correto e emite fader_change
+                // Canais normais sem callback explícito: _applyNudgeStep calcula step dB correto e emite fader_change
                 this._applyNudgeStep(direction, stepVal);
             } else {
                 this._emitEvent('nudge', { direction, step: stepVal });
@@ -1161,8 +1210,11 @@ class ChannelStrip {
      * Atualiza o valor do fader e a posição do thumb
      * @param {number} val 0 a 1023
      * @param {string} [dbText] Texto em dB opcional (se omitido, calcula automaticamente)
+     * @param {boolean} [fromExternal=false] Se a atualização veio de evento externo (socket/midi)
      */
-    setFaderValue(val, dbText) {
+    setFaderValue(val, dbText, fromExternal = false) {
+        if (fromExternal && this.isDragging) return;
+
         this.config.faderValue = val;
         const normalized = Math.max(0, Math.min(1, val / 1023));
 

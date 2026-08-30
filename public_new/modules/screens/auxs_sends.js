@@ -116,6 +116,7 @@ var AuxSendsView = (function () {
                     chNumber: baseTitle,
                     name: chName,
                     type: isPaired ? 'input_paired' : 'input',
+                    isAuxSend: true,
                     colorBand: colorBand,
                     layout: layout,
                     faderValue: currentVal,
@@ -186,6 +187,7 @@ var AuxSendsView = (function () {
                     chNumber: baseTitleA,
                     name: auxNameA,
                     type: 'aux_send',
+                    isAuxSend: true,
                     colorBand: 'amber',
                     layout: layout,
                     faderValue: currentValA,
@@ -300,10 +302,10 @@ var AuxSendsView = (function () {
 
             if (_activeChannel >= 36 && _activeChannel <= 43 && (_activeChannel - 35) === auxIdx) {
                 var stripMix = _strips[ch];
-                if (stripMix) stripMix.setFaderValue(value, dbText);
+                if (stripMix) stripMix.setFaderValue(value, dbText, true);
             } else if (_activeChannel === ch) {
                 var stripCh = _strips[auxIdx];
-                if (stripCh) stripCh.setFaderValue(value, dbText);
+                if (stripCh) stripCh.setFaderValue(value, dbText, true);
             }
         } else if (subType === 'On') {
             var isTrue = (value === 1 || value === true);
@@ -387,6 +389,7 @@ function nudgeAuxLevel(ch, auxIdx, dir) {
     const nRaw = typeof getSteppedRaw === 'function' ? getSteppedRaw(currentRaw, dir, 0.5) : Math.max(0, Math.min(1023, currentRaw + (dir * 10)));
 
     if (state) state[`aux${auxIdx}`] = nRaw;
+    updateAuxManual(ch, auxIdx, nRaw);
     if (typeof socket !== 'undefined') {
         socket.emit('control', { type: `kInputAUX/kAUX${auxIdx}Level`, channel: ch, value: nRaw });
     }

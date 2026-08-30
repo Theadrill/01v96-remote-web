@@ -257,7 +257,12 @@ function nudgeFader(ch, dir) {
 
     let emitCh = ch;
     if (isMaster) emitCh = 0;
-    else if (typeof ch === 'string') emitCh = parseInt(ch.substring(1));
+    else if (typeof ch === 'string' && ch.startsWith('m')) emitCh = parseInt(ch.substring(1));
+    else if (typeof ch === 'string' && ch.startsWith('b')) emitCh = parseInt(ch.substring(1));
+    else if (typeof ch === 'string' && ch.startsWith('st')) emitCh = 32 + parseInt(ch.substring(2)) * 2;
+    else if (typeof ch === 'number' && ch >= 36 && ch <= 43) emitCh = ch - 36;
+    else if (typeof ch === 'number' && ch >= 44 && ch <= 51) emitCh = ch - 44;
+    else if (typeof ch === 'number' && ch >= 60 && ch <= 67) emitCh = 32 + (ch - 60);
 
     socket.emit('control', { type: typeFader, channel: emitCh, value: nRaw });
 }
@@ -281,7 +286,12 @@ function commitFaderChange(ch, v) {
 
     let emitCh = ch;
     if (isMaster) emitCh = 0;
-    else if (typeof ch === 'string') emitCh = parseInt(ch.substring(1));
+    else if (typeof ch === 'string' && ch.startsWith('m')) emitCh = parseInt(ch.substring(1));
+    else if (typeof ch === 'string' && ch.startsWith('b')) emitCh = parseInt(ch.substring(1));
+    else if (typeof ch === 'string' && ch.startsWith('st')) emitCh = 32 + parseInt(ch.substring(2)) * 2;
+    else if (typeof ch === 'number' && ch >= 36 && ch <= 43) emitCh = ch - 36;
+    else if (typeof ch === 'number' && ch >= 44 && ch <= 51) emitCh = ch - 44;
+    else if (typeof ch === 'number' && ch >= 60 && ch <= 67) emitCh = 32 + (ch - 60);
 
     socket.emit('control', { type: typeFader, channel: emitCh, value: v });
 }
@@ -568,7 +578,7 @@ let scrollLeft;
 document.addEventListener('mousedown', (e) => {
     if (layoutMode !== 'desktop') return;
     const area = e.target.closest('.faders-area');
-    if (area && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('.desk-pan-indicator')) {
+    if (area && !e.target.closest('input, button, select, .desk-fader-thumb, .mobile-fader-thumb, .desk-fader-rail, .desk-fader-track-area, .mobile-fader-track-area, .mobile-fader-groove, .desk-pan-track, .desk-pan-thumb, .desk-pan-container, .desk-dual-pan-container, .desk-nudge-btn, .mobile-nudge-btn, .btn-nudge-desk, .btn-nudge, .desk-pan-indicator')) {
         isMouseDown = true;
         area.classList.add('is-grabbing');
         startX = e.pageX - area.offsetLeft;

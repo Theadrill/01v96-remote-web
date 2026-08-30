@@ -471,7 +471,7 @@ var OutsView = (function () {
         if (!strip) return;
 
         if (val !== undefined && val !== null) {
-            strip.setFaderValue(val);
+            strip.setFaderValue(val, undefined, true);
         }
         if (onState !== undefined && onState !== null) {
             strip.setOnState(!!onState);

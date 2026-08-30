@@ -337,7 +337,7 @@ var MainView = (function () {
 
         if (val !== undefined && val !== null) {
             var dbText = typeof rawToDb === 'function' ? rawToDb(val, !isDesktop, isMaster) : `${val}`;
-            strip.setFaderValue(val, dbText);
+            strip.setFaderValue(val, dbText, true);
         }
 
         if (onState !== undefined && onState !== null) {
