@@ -207,7 +207,7 @@ socket.on('update', (d) => {
         if (typeof window.updateAuxPositionBadgeUI === 'function') window.updateAuxPositionBadgeUI(d.channel);
         if (typeof window.updateAuxConfigModalUI === 'function') window.updateAuxConfigModalUI(d.channel);
         const ch = 36 + d.channel;
-        if (activeConfigChannel === ch && typeof renderAuxs === 'function') {
+        if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'aux' && activeConfigChannel === ch && typeof renderAuxs === 'function') {
             renderAuxs(ch);
         }
         return;
@@ -300,7 +300,7 @@ socket.on('update', (d) => {
             const state = getChannelStateById(d.channel);
             if (state) state.patch = d.value;
             if (window.PatchRegistry) window.PatchRegistry.setInputPatch(d.channel, d.value);
-            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
@@ -311,7 +311,7 @@ socket.on('update', (d) => {
             const state = getChannelStateById(d.channel);
             if (state && state.insert) state.insert.on = !!d.value;
             if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(d.channel, state.insert);
-            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
@@ -321,7 +321,7 @@ socket.on('update', (d) => {
             const state = getChannelStateById(d.channel);
             if (state && state.insert) state.insert.position = d.value;
             if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(d.channel, state.insert);
-            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
@@ -331,7 +331,7 @@ socket.on('update', (d) => {
             const state = getChannelStateById(d.channel);
             if (state && state.insert) state.insert.patch_in = d.value;
             if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(d.channel, state.insert);
-            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
@@ -345,7 +345,7 @@ socket.on('update', (d) => {
             const state = busesState[busIdx];
             if (state && state.insert) state.insert.on = !!d.value;
             if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(globalCh, state.insert);
-            if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === globalCh && typeof renderRouting === 'function') {
                 renderRouting(globalCh);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
@@ -357,7 +357,7 @@ socket.on('update', (d) => {
             const state = busesState[busIdx];
             if (state && state.insert) state.insert.position = d.value;
             if (window.PatchRegistry && state && state.insert) window.PatchRegistry.setInsertInfo(globalCh, state.insert);
-            if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === globalCh && typeof renderRouting === 'function') {
                 renderRouting(globalCh);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
@@ -368,7 +368,7 @@ socket.on('update', (d) => {
             const globalCh = 44 + busIdx;
             const state = busesState[busIdx];
             if (state) state.stereo = !!d.value;
-            if (activeConfigChannel === globalCh && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === globalCh && typeof renderRouting === 'function') {
                 renderRouting(globalCh);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
@@ -387,7 +387,7 @@ socket.on('update', (d) => {
                 }
             }
 
-            if (activeConfigChannel === d.channel && typeof renderRouting === 'function') {
+            if (typeof activeConfigTab !== 'undefined' && activeConfigTab === 'etc' && activeConfigChannel === d.channel && typeof renderRouting === 'function') {
                 renderRouting(d.channel);
             }
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
