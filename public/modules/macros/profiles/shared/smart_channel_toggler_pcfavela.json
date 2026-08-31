@@ -6,10 +6,23 @@
     6
   ],
   "snapshot": {
-    "active": false,
-    "channels_to_restore": [],
-    "desk_name": null,
-    "scene_id": null,
-    "timestamp": null
+    "active": true,
+    "channels_to_restore": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      25,
+      26,
+      27,
+      28,
+      30
+    ],
+    "desk_name": "mesa-favela",
+    "scene_id": 12,
+    "timestamp": 1788159441368
   }
 }
