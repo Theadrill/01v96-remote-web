@@ -1,0 +1,170 @@
+{
+  "scene_name": "SOMALIA 360",
+  "scene_id": 34,
+  "channels": {
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "14": {
+      "name": "MICA",
+      "short": "MICA"
+    },
+    "2": {
+      "name": "CHIM",
+      "short": "CHIM"
+    },
+    "24": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "33": {
+      "name": "CH34",
+      "short": "CH34"
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "1": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "37": {
+      "name": "CH38",
+      "short": "CH38"
+    },
+    "15": {
+      "name": "REGE",
+      "short": "REGE"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "23": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "13": {
+      "name": "MICC",
+      "short": "MICC"
+    },
+    "29": {
+      "name": "VOZE",
+      "short": "VOZE"
+    },
+    "35": {
+      "name": "CH36",
+      "short": "CH36"
+    },
+    "18": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "21": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "30": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "19": {
+      "name": "CONV",
+      "short": "CONV"
+    },
+    "7": {
+      "name": "",
+      "short": "    "
+    },
+    "5": {
+      "name": "tant",
+      "short": "TANT"
+    },
+    "9": {
+      "name": "CAVA",
+      "short": "CAVA"
+    },
+    "12": {
+      "name": "MICV",
+      "short": "MICV"
+    },
+    "4": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "10": {
+      "name": "VIOL",
+      "short": "VIOL"
+    },
+    "8": {
+      "name": "DJ",
+      "short": "DJ  "
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "17": {
+      "name": "MICV",
+      "short": "MICV"
+    },
+    "31": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "39": {
+      "name": "CH40",
+      "short": "CH40"
+    },
+    "26": {
+      "name": "",
+      "short": "    "
+    },
+    "25": {
+      "name": "",
+      "short": "    "
+    },
+    "20": {
+      "name": "CELU",
+      "short": "CELU"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "11": {
+      "name": "MICP",
+      "short": "MICP"
+    },
+    "32": {
+      "name": "KICK",
+      "short": "KICK"
+    },
+    "master": {
+      "name": "STER",
+      "short": "STER"
+    }
+  }
+}

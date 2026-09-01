@@ -2,40 +2,22 @@
   "mesa_nome": "mesa-favela",
   "scenes": [
     {
-      "custom_name": "FORRO ENGATILHAD",
-      "physical_scene": "FORRO ENGATILHAD",
-      "physical_id": 36,
-      "file": "custom_names_scene-FORRO ENGATILHAD-mesa-favela.json"
-    },
-    {
-      "custom_name": "FORRO ENGATILH",
-      "physical_scene": "FORRO ENGATILH",
-      "physical_id": 36,
-      "file": "custom_names_scene-FORRO ENGATILH-mesa-favela.json"
-    },
-    {
-      "custom_name": "SARU",
-      "physical_scene": "SARU",
+      "custom_name": "TESTE 2",
+      "physical_scene": "TESTE 2",
       "physical_id": 2,
-      "file": "custom_names_scene-SARU-mesa-favela.json"
+      "file": "custom_names_scene-TESTE 2-mesa-favela.json"
     },
     {
-      "custom_name": "REGIS",
-      "physical_scene": "REGIS",
-      "physical_id": 12,
-      "file": "custom_names_scene-REGIS-mesa-favela.json"
+      "custom_name": "TESTE 1",
+      "physical_scene": "TESTE 1",
+      "physical_id": 1,
+      "file": "custom_names_scene-TESTE 1-mesa-favela.json"
     },
     {
-      "custom_name": "PISEIRO",
-      "physical_scene": "PISEIRO",
-      "physical_id": 38,
-      "file": "custom_names_scene-PISEIRO-mesa-favela.json"
-    },
-    {
-      "custom_name": "SEXTETO",
-      "physical_scene": "SEXTETO",
+      "custom_name": "SOMALIA 360",
+      "physical_scene": "SOMALIA 360",
       "physical_id": 34,
-      "file": "custom_names_scene-SEXTETO-mesa-favela.json"
+      "file": "custom_names_scene-SOMALIA 360-mesa-favela.json"
     }
   ]
 }
