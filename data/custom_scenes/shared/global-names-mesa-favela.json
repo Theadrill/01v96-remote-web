@@ -1,9 +1,13 @@
 {
   "mesa_nome": "mesa-favela",
   "channels": {
-    "18": {
+    "21": {
       "name": "DJ",
       "short": "DJ  "
+    },
+    "18": {
+      "name": "MICDJ",
+      "short": "MICD"
     },
     "23": {
       "name": "MIC DJ",
@@ -16,6 +20,10 @@
     "8": {
       "name": "",
       "short": "    "
+    },
+    "16": {
+      "name": "CELULAR",
+      "short": "CELU"
     }
   }
 }
