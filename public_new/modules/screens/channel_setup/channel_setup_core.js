@@ -20,9 +20,6 @@ var ChannelSetupCore = (function () {
     var _activeTab = 'aux';
     var _previousChannel = null;
     var _miniStripInstance = null;
-    var _flashTimer = null;
-    var _tabFlashTimer = null;
-    var _toastTimer = null;
 
     /**
      * Retorna os metadados do canal (rótulo, nome, tipo e estado de pareamento)
@@ -260,23 +257,7 @@ var ChannelSetupCore = (function () {
                         if (typeof nudgeFader === 'function') {
                             nudgeFader(isMaster ? 'master' : ch, data.direction);
                         }
-                    },
-                    header_click: isMix ? (function (gId) {
-                        return function () {
-                            console.log('[MINIFADER CLICK] Header clicado - Canal:', gId, '| _activeChannel:', _activeChannel, '| outsMode:', typeof outsMode !== 'undefined' ? outsMode : 'undefined', '| activeMix:', typeof activeMix !== 'undefined' ? activeMix : 'undefined');
-                            if (typeof openChannelConfig === 'function') {
-                                openChannelConfig(null, gId);
-                            }
-                        };
-                    })(ch) : undefined,
-                    name_click: isMix ? (function (gId) {
-                        return function () {
-                            console.log('[MINIFADER CLICK] Nome clicado - Canal:', gId, '| _activeChannel:', _activeChannel, '| outsMode:', typeof outsMode !== 'undefined' ? outsMode : 'undefined', '| activeMix:', typeof activeMix !== 'undefined' ? activeMix : 'undefined');
-                            if (typeof openChannelConfig === 'function') {
-                                openChannelConfig(null, gId);
-                            }
-                        };
-                    })(ch) : undefined
+                    }
                 }
             };
 
@@ -430,42 +411,22 @@ var ChannelSetupCore = (function () {
     }
 
     /**
-     * Pulso visual de confirmação no minifader.
-     * Reabrir o canal já ativo (ex: clique no header/nome do próprio minifader)
-     * re-renderiza conteúdo idêntico — o flash mostra que o clique foi registrado.
-     */
-    function _flashMiniFader() {
-        var container = document.getElementById('miniFaderContext');
-        if (!container) return;
-        container.classList.remove('mini-reopen-flash');
-        // Força reflow para reiniciar a animação em cliques sucessivos
-        void container.offsetWidth;
-        container.classList.add('mini-reopen-flash');
-        setTimeout(function () {
-            container.classList.remove('mini-reopen-flash');
-        }, 550);
-    }
-
-    /**
      * Abre a central de edição para o canal especificado
      * @param {Event|null} e 
      * @param {number} ch 
      * @param {string} [defaultTab='aux'] 
      */
     function open(e, ch, defaultTab) {
-        console.log('[CONFIG OPEN] Abrindo config - Canal:', ch, '| _activeChannel antes:', _activeChannel, '| Reabertura?:', (_activeChannel === ch), '| outsMode:', typeof outsMode !== 'undefined' ? outsMode : 'undefined', '| Event:', e);
         if (typeof musicianMode !== 'undefined' && musicianMode) return;
         if (e && e.target && (e.target.closest('button') || e.target.closest('input'))) return;
 
-        var isReopenSame = (_activeChannel === ch);
         // Memoriza contexto anterior apenas na navegação INPUT → MIX (36-43).
         // Reabertura do mesmo canal não toca no contexto já salvo.
-        if (!isReopenSame) {
+        if (_activeChannel !== ch) {
             var openingMix = (ch >= 36 && ch <= 43);
             var currentIsMix = (_activeChannel !== null && _activeChannel >= 36 && _activeChannel <= 43);
             if (openingMix && _activeChannel !== null && !currentIsMix) {
                 _previousChannel = _activeChannel;
-                console.log('[CONFIG OPEN] Contexto anterior salvo - _previousChannel:', _previousChannel);
             } else {
                 _previousChannel = null;
             }
@@ -484,10 +445,6 @@ var ChannelSetupCore = (function () {
         switchTab(defaultTab || _activeTab || 'aux');
         _highlightActiveCard(ch);
 
-        if (isReopenSame) {
-            _flashMiniFader();
-        }
-
         if (typeof renderDock === 'function') renderDock('channelConfig');
         if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
     }
@@ -501,7 +458,6 @@ var ChannelSetupCore = (function () {
             var returnCh = _previousChannel;
             var returnTab = _activeTab;
             _previousChannel = null;
-            console.log('[CONFIG CLOSE] Voltando ao contexto anterior - Canal:', returnCh, '| Aba:', returnTab);
             if (window.stopEQAnimation) stopEQAnimation();
             if (typeof window.stopMixVolumeGeralNudge === 'function') window.stopMixVolumeGeralNudge();
             if (typeof window.stopAuxVolumeGeralNudge === 'function') window.stopAuxVolumeGeralNudge();
