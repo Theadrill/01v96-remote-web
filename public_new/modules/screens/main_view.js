@@ -286,6 +286,16 @@ var MainView = (function () {
                     if (typeof openMeterConfigModal === 'function') {
                         openMeterConfigModal('master');
                     }
+                },
+                header_click: function () {
+                    if (typeof openChannelConfig === 'function') {
+                        openChannelConfig(null, 52);
+                    }
+                },
+                name_click: function () {
+                    if (typeof openChannelConfig === 'function') {
+                        openChannelConfig(null, 52);
+                    }
                 }
             }
         };

@@ -446,6 +446,16 @@ var OutsView = (function () {
                         if (typeof clearAllSolos === 'function') {
                             clearAllSolos();
                         }
+                    },
+                    header_click: function () {
+                        if (typeof openChannelConfig === 'function') {
+                            openChannelConfig(null, 52);
+                        }
+                    },
+                    name_click: function () {
+                        if (typeof openChannelConfig === 'function') {
+                            openChannelConfig(null, 52);
+                        }
                     }
                 }
             });
