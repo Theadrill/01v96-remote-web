@@ -256,7 +256,23 @@ var ChannelSetupCore = (function () {
                         if (typeof nudgeFader === 'function') {
                             nudgeFader(isMaster ? 'master' : ch, data.direction);
                         }
-                    }
+                    },
+                    header_click: isMix ? (function (gId) {
+                        return function () {
+                            console.log('[MINIFADER CLICK] Header clicado - Canal:', gId, '| _activeChannel:', _activeChannel, '| outsMode:', typeof outsMode !== 'undefined' ? outsMode : 'undefined', '| activeMix:', typeof activeMix !== 'undefined' ? activeMix : 'undefined');
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(ch) : undefined,
+                    name_click: isMix ? (function (gId) {
+                        return function () {
+                            console.log('[MINIFADER CLICK] Nome clicado - Canal:', gId, '| _activeChannel:', _activeChannel, '| outsMode:', typeof outsMode !== 'undefined' ? outsMode : 'undefined', '| activeMix:', typeof activeMix !== 'undefined' ? activeMix : 'undefined');
+                            if (typeof openChannelConfig === 'function') {
+                                openChannelConfig(null, gId);
+                            }
+                        };
+                    })(ch) : undefined
                 }
             };
 
@@ -410,15 +426,34 @@ var ChannelSetupCore = (function () {
     }
 
     /**
+     * Pulso visual de confirmação no minifader.
+     * Reabrir o canal já ativo (ex: clique no header/nome do próprio minifader)
+     * re-renderiza conteúdo idêntico — o flash mostra que o clique foi registrado.
+     */
+    function _flashMiniFader() {
+        var container = document.getElementById('miniFaderContext');
+        if (!container) return;
+        container.classList.remove('mini-reopen-flash');
+        // Força reflow para reiniciar a animação em cliques sucessivos
+        void container.offsetWidth;
+        container.classList.add('mini-reopen-flash');
+        setTimeout(function () {
+            container.classList.remove('mini-reopen-flash');
+        }, 550);
+    }
+
+    /**
      * Abre a central de edição para o canal especificado
      * @param {Event|null} e 
      * @param {number} ch 
      * @param {string} [defaultTab='aux'] 
      */
     function open(e, ch, defaultTab) {
+        console.log('[CONFIG OPEN] Abrindo config - Canal:', ch, '| _activeChannel antes:', _activeChannel, '| Reabertura?:', (_activeChannel === ch), '| outsMode:', typeof outsMode !== 'undefined' ? outsMode : 'undefined', '| Event:', e);
         if (typeof musicianMode !== 'undefined' && musicianMode) return;
         if (e && e.target && (e.target.closest('button') || e.target.closest('input'))) return;
 
+        var isReopenSame = (_activeChannel === ch);
         _activeChannel = ch;
         try { activeConfigChannel = ch; } catch (err) { }
         window.activeConfigChannel = ch;
@@ -432,6 +467,10 @@ var ChannelSetupCore = (function () {
         renderMiniFader(ch);
         switchTab(defaultTab || _activeTab || 'aux');
         _highlightActiveCard(ch);
+
+        if (isReopenSame) {
+            _flashMiniFader();
+        }
 
         if (typeof renderDock === 'function') renderDock('channelConfig');
         if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
@@ -466,7 +505,6 @@ var ChannelSetupCore = (function () {
         if (vgSlot) vgSlot.remove();
 
         if (typeof initUI === 'function') initUI();
-        if (typeof renderDock === 'function') renderDock('main');
         if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
 
         document.querySelectorAll('.fader-card, .channel-strip-wrapper').forEach(function (c) {

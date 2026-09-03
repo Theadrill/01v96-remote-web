@@ -284,6 +284,7 @@ var OutsView = (function () {
             var stName = _getResolvedName(stGlobalId, stStateL.name || stTitle);
             var stVal = stStateL.value || 0;
             var stDb = typeof rawToDb === 'function' ? rawToDb(stVal, !isDesktop, false) : `${stVal}`;
+            var stLocked = typeof ChannelLock !== 'undefined' && typeof ChannelLock.isLocked === 'function' ? ChannelLock.isLocked(stGlobalId) : false;
             var stPatch = (window.PatchRegistry && typeof window.PatchRegistry.getStereoInInput === 'function')
                 ? window.PatchRegistry.getStereoInInput(sIdx)
                 : (window.PatchRegistry && typeof window.PatchRegistry.getPairedChannelInput === 'function'
