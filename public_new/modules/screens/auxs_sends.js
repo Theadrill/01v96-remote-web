@@ -229,6 +229,22 @@ var AuxSendsView = (function () {
                             return function (data) {
                                 nudgeAuxLevel(chIdx, aIdx, data.direction || (data.dir === 'plus' ? 1 : -1));
                             };
+                        })(ch, a),
+                        header_click: (function (chIdx, aIdx) {
+                            return function () {
+                                var globalMixId = 35 + aIdx; // 36..43
+                                if (typeof openChannelConfig === 'function') {
+                                    openChannelConfig(null, globalMixId);
+                                }
+                            };
+                        })(ch, a),
+                        name_click: (function (chIdx, aIdx) {
+                            return function () {
+                                var globalMixId = 35 + aIdx;
+                                if (typeof openChannelConfig === 'function') {
+                                    openChannelConfig(null, globalMixId);
+                                }
+                            };
                         })(ch, a)
                     }
                 });
