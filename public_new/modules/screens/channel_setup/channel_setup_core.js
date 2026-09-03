@@ -18,7 +18,11 @@ var ChannelSetupCore = (function () {
 
     var _activeChannel = null;
     var _activeTab = 'aux';
+    var _previousChannel = null;
     var _miniStripInstance = null;
+    var _flashTimer = null;
+    var _tabFlashTimer = null;
+    var _toastTimer = null;
 
     /**
      * Retorna os metadados do canal (rótulo, nome, tipo e estado de pareamento)
@@ -454,6 +458,18 @@ var ChannelSetupCore = (function () {
         if (e && e.target && (e.target.closest('button') || e.target.closest('input'))) return;
 
         var isReopenSame = (_activeChannel === ch);
+        // Memoriza contexto anterior apenas na navegação INPUT → MIX (36-43).
+        // Reabertura do mesmo canal não toca no contexto já salvo.
+        if (!isReopenSame) {
+            var openingMix = (ch >= 36 && ch <= 43);
+            var currentIsMix = (_activeChannel !== null && _activeChannel >= 36 && _activeChannel <= 43);
+            if (openingMix && _activeChannel !== null && !currentIsMix) {
+                _previousChannel = _activeChannel;
+                console.log('[CONFIG OPEN] Contexto anterior salvo - _previousChannel:', _previousChannel);
+            } else {
+                _previousChannel = null;
+            }
+        }
         _activeChannel = ch;
         try { activeConfigChannel = ch; } catch (err) { }
         window.activeConfigChannel = ch;
@@ -480,6 +496,18 @@ var ChannelSetupCore = (function () {
      * Fecha o modal de edição de canal
      */
     function close() {
+        // Volta ao canal anterior quando veio de INPUT → MIX (ex: Canal 17 → MIX 3 → SAIR volta ao Canal 17)
+        if (_previousChannel !== null) {
+            var returnCh = _previousChannel;
+            var returnTab = _activeTab;
+            _previousChannel = null;
+            console.log('[CONFIG CLOSE] Voltando ao contexto anterior - Canal:', returnCh, '| Aba:', returnTab);
+            if (window.stopEQAnimation) stopEQAnimation();
+            if (typeof window.stopMixVolumeGeralNudge === 'function') window.stopMixVolumeGeralNudge();
+            if (typeof window.stopAuxVolumeGeralNudge === 'function') window.stopAuxVolumeGeralNudge();
+            open(null, returnCh, returnTab);
+            return;
+        }
         if (window.stopEQAnimation) stopEQAnimation();
         if (typeof window.stopMixVolumeGeralNudge === 'function') window.stopMixVolumeGeralNudge();
         if (typeof window.stopAuxVolumeGeralNudge === 'function') window.stopAuxVolumeGeralNudge();
