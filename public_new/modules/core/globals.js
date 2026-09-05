@@ -1,8 +1,179 @@
-// 🚨 [CRITICAL SYNC LOGIC] - O socket DEVE ser inicializado aqui, como primeiro script.
-// Se mover para o app.js ou carregar depois, os listeners nos outros módulos darão erro de 'undefined'.
-const socket = typeof io === 'function' ? io({
-    transports: ['websocket']
-}) : null;
+// 🚨 [CRITICAL SYNC LOGIC] - O SocketProxy DEVE ser inicializado aqui, como primeiro script.
+// Permite que todos os módulos downstream registrem listeners (.on, .once) antes da conexão
+// e suporta troca dinâmica de host (Tauri / multi-servidores) sem perda de handlers.
+
+class SocketProxy {
+    constructor() {
+        this._listeners = new Map(); // Map<string, Set<{ fn: Function, once: boolean }>>
+        this._boundRawEvents = new Set();
+        this._rawSocket = null;
+        this.connected = false;
+        this.id = null;
+    }
+
+    get io() {
+        return this._rawSocket ? this._rawSocket.io : null;
+    }
+
+    getUnderlyingSocket() {
+        return this._rawSocket;
+    }
+
+    on(event, fn) {
+        if (typeof fn !== 'function') return this;
+        if (!this._listeners.has(event)) {
+            this._listeners.set(event, new Set());
+        }
+        this._listeners.get(event).add({ fn, once: false });
+        if (this._rawSocket) {
+            this._bindRawEvent(event);
+        }
+        return this;
+    }
+
+    once(event, fn) {
+        if (typeof fn !== 'function') return this;
+        if (!this._listeners.has(event)) {
+            this._listeners.set(event, new Set());
+        }
+        this._listeners.get(event).add({ fn, once: true });
+        if (this._rawSocket) {
+            this._bindRawEvent(event);
+        }
+        return this;
+    }
+
+    off(event, fn) {
+        if (!event) {
+            this._listeners.clear();
+            return this;
+        }
+        if (!fn) {
+            this._listeners.delete(event);
+            return this;
+        }
+        const set = this._listeners.get(event);
+        if (set) {
+            for (const item of set) {
+                if (item.fn === fn) set.delete(item);
+            }
+            if (set.size === 0) {
+                this._listeners.delete(event);
+            }
+        }
+        return this;
+    }
+
+    addEventListener(event, fn) { return this.on(event, fn); }
+    removeEventListener(event, fn) { return this.off(event, fn); }
+    removeAllListeners(event) { return this.off(event); }
+
+    emit(event, ...args) {
+        if (this._rawSocket) {
+            this._rawSocket.emit(event, ...args);
+        }
+        return this;
+    }
+
+    connect(url, options) {
+        if (typeof io !== 'function') {
+            console.warn('[SocketProxy] socket.io client library (io) is not available.');
+            return this;
+        }
+
+        // Limpa socket e bindings anteriores em caso de reconexão ou troca de host
+        if (this._rawSocket) {
+            this._rawSocket.removeAllListeners();
+            this._rawSocket.disconnect();
+            this._rawSocket = null;
+            this._boundRawEvents.clear();
+        }
+
+        const socketOpts = options || { transports: ['websocket'] };
+        this._rawSocket = url ? io(url, socketOpts) : io(socketOpts);
+
+        // Lifecycle bindings
+        this._rawSocket.on('connect', () => {
+            this.connected = true;
+            this.id = this._rawSocket.id;
+            this._dispatch('connect');
+        });
+
+        this._rawSocket.on('disconnect', (reason) => {
+            this.connected = false;
+            this.id = null;
+            this._dispatch('disconnect', reason);
+        });
+
+        this._rawSocket.on('connect_error', (err) => {
+            this._dispatch('connect_error', err);
+        });
+
+        // Re-vincula todos os eventos já registrados pelos módulos da aplicação
+        for (const event of this._listeners.keys()) {
+            if (event !== 'connect' && event !== 'disconnect' && event !== 'connect_error') {
+                this._bindRawEvent(event);
+            }
+        }
+
+        return this;
+    }
+
+    disconnect() {
+        if (this._rawSocket) {
+            this._rawSocket.disconnect();
+        }
+        this.connected = false;
+        this.id = null;
+        return this;
+    }
+
+    changeHost(newUrl, options) {
+        console.log(`[SocketProxy] Changing host target to: ${newUrl || 'origin'}`);
+        return this.connect(newUrl, options);
+    }
+
+    _bindRawEvent(event) {
+        if (!this._rawSocket || this._boundRawEvents.has(event)) return;
+        this._boundRawEvents.add(event);
+        this._rawSocket.on(event, (...args) => this._dispatch(event, ...args));
+    }
+
+    _dispatch(event, ...args) {
+        const handlers = this._listeners.get(event);
+        if (!handlers || handlers.size === 0) return;
+
+        const toRemove = [];
+        const snapshot = Array.from(handlers);
+
+        for (const item of snapshot) {
+            try {
+                item.fn.apply(this, args);
+            } catch (err) {
+                console.error(`[SocketProxy] Error in event listener [${event}]:`, err);
+            }
+            if (item.once) toRemove.push(item);
+        }
+
+        for (const item of toRemove) {
+            handlers.delete(item);
+        }
+    }
+}
+
+// Instanciação e exposição global
+const socketProxy = new SocketProxy();
+const socket = socketProxy;
+window.socket = socketProxy;
+window.socketProxy = socketProxy;
+
+// Detecção de ambiente e auto-conexão:
+// 1. Web Mode: auto-conecta ao origin atual.
+// 2. Tauri Mode: aguarda ConnectionService ou perfil de conexão configurado.
+const isTauriEnv = typeof window !== 'undefined' && (Boolean(window.__TAURI__) || Boolean(window.__TAURI_INTERNALS__));
+if (!isTauriEnv && typeof io === 'function') {
+    socketProxy.connect();
+}
 let appReady = false;
 const NUM_CHANNELS = 32;
 let channelStates = [];

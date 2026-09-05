@@ -148,12 +148,12 @@ window.MixerAPI = {
     storage: {
         getModConfig: async (modId) => {
             const preset = window.MixerAPI.utils.getPreset();
-            const res = await fetch(`/api/macros/config/${encodeURIComponent(modId)}?preset=${encodeURIComponent(preset)}`);
+            const res = await window.apiFetch(`/api/macros/config/${encodeURIComponent(modId)}?preset=${encodeURIComponent(preset)}`);
             return res.json();
         },
         saveModConfig: async (modId, data, syncShared = false) => {
             const preset = window.MixerAPI.utils.getPreset();
-            const res = await fetch(`/api/macros/config/${encodeURIComponent(modId)}?preset=${encodeURIComponent(preset)}&syncShared=${syncShared}`, {
+            const res = await window.apiFetch(`/api/macros/config/${encodeURIComponent(modId)}?preset=${encodeURIComponent(preset)}&syncShared=${syncShared}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -166,7 +166,7 @@ window.MixerAPI = {
     network: {
         fetch: async (url, options = {}) => {
             const { fireAndForget, ...httpOptions } = options;
-            const res = await fetch('/api/macros/proxy/http', {
+            const res = await window.apiFetch('/api/macros/proxy/http', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url, options: httpOptions, fireAndForget: !!fireAndForget })
@@ -174,7 +174,7 @@ window.MixerAPI = {
             return res.json();
         },
         udpSend: async (host, port, data) => {
-            return fetch('/api/macros/proxy/udp', {
+            return window.apiFetch('/api/macros/proxy/udp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ host, port, data })

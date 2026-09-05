@@ -367,7 +367,7 @@ window.requestCustomSceneHistory = function(source) {
     const overlay = typeof OverlayInfo !== 'undefined' && OverlayInfo.show;
     document.getElementById('restoreSourceModal').style.display = 'none';
 
-    fetch(url)
+    window.apiFetch(url)
         .then(async (res) => {
             if (!res.ok) {
                 let errMsg = 'Erro HTTP ' + res.status;
@@ -467,7 +467,7 @@ window.confirmRestoreScene = function() {
     if (!pending) return;
     const overlay = typeof OverlayInfo !== 'undefined' && OverlayInfo.show;
 
-    fetch('/api/custom-scenes/restore', {
+    window.apiFetch('/api/custom-scenes/restore', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pending)

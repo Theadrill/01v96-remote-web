@@ -45,7 +45,7 @@ async function initMacros() {
 
 async function detectCurrentPreset() {
     try {
-        const res = await fetch('/api/macros/hosts');
+        const res = await window.apiFetch('/api/macros/hosts');
         const hosts = await res.json() || [];
         const currentUrl = window.location.href.toLowerCase();
         const hostname = window.location.hostname.toLowerCase();
@@ -115,7 +115,7 @@ window.toggleSharedSync = async function(enabled) {
     // Etapa 1: Pre-flight check de conectividade com a nuvem/Git
     let checkOk = false;
     try {
-        const checkResp = await fetch('/api/macros/sync/check').catch(() => null);
+        const checkResp = await window.apiFetch('/api/macros/sync/check').catch(() => null);
         checkOk = !!(checkResp && checkResp.ok);
     } catch (e) { checkOk = false; }
     if (!checkOk) {
@@ -128,7 +128,7 @@ window.toggleSharedSync = async function(enabled) {
     // Etapa 2: Checagem de existência e comparação com o perfil remoto
     let compData = null;
     try {
-        const compResp = await fetch(`/api/macros/compare?preset=${encodeURIComponent(currentPreset)}`);
+        const compResp = await window.apiFetch(`/api/macros/compare?preset=${encodeURIComponent(currentPreset)}`);
         compData = await compResp.json();
     } catch (e) {
         console.error("Erro ao comparar perfis:", e);
@@ -151,7 +151,7 @@ window.toggleSharedSync = async function(enabled) {
 
 async function performUnshare() {
     try {
-        const resp = await fetch(`/api/macros/sync?preset=${encodeURIComponent(currentPreset)}`, { method: 'DELETE' });
+        const resp = await window.apiFetch(`/api/macros/sync?preset=${encodeURIComponent(currentPreset)}`, { method: 'DELETE' });
         if (!resp.ok) {
             const err = await resp.json().catch(() => ({}));
             console.warn('⚠️ Falha ao remover preset remoto:', err);
@@ -313,7 +313,7 @@ window.uploadLocalToCloud = async function () {
 window.downloadCloudToLocal = async function () {
     const modal = document.getElementById('macroSyncDiffModal');
     try {
-        const res = await fetch(`/api/macros/slots?preset=${encodeURIComponent(currentPreset)}&syncShared=true`);
+        const res = await window.apiFetch(`/api/macros/slots?preset=${encodeURIComponent(currentPreset)}&syncShared=true`);
         const data = await res.json() || {};
         globalMacroConfig = data.globalConfig || {};
         assignedMacros = {};
@@ -322,7 +322,7 @@ window.downloadCloudToLocal = async function () {
                 assignedMacros[k] = (typeof data[k] === 'string') ? { scriptId: data[k], name: `MACRO ${parseInt(k, 10) + 1}` } : data[k];
             }
         });
-        await fetch(`/api/macros/slots?preset=${encodeURIComponent(currentPreset)}&syncShared=false`, {
+        await window.apiFetch(`/api/macros/slots?preset=${encodeURIComponent(currentPreset)}&syncShared=false`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -361,7 +361,7 @@ window.openPresetPicker = async function () {
     document.getElementById('macroPresetModal').style.display = 'flex';
 
     try {
-        const res = await fetch('/api/macros/slots');
+        const res = await window.apiFetch('/api/macros/slots');
         const data = await res.json() || {};
         const keys = Object.keys(data);
         list.innerHTML = '';
@@ -395,7 +395,7 @@ window.openPresetPicker = async function () {
 
 async function fetchProtectedPresets() {
     try {
-        const res = await fetch('/api/macros/hosts');
+        const res = await window.apiFetch('/api/macros/hosts');
         const hosts = await res.json() || [];
         protectedPresets = ['default', ...hosts.map(h => h.preset)];
     } catch (e) { protectedPresets = ['default']; }
@@ -431,7 +431,7 @@ function askDeletePreset(name) {
 window.confirmDeletePreset = async function () {
     if (!presetToDelete) return;
     try {
-        const res = await fetch(`/api/macros/slots?preset=${presetToDelete}`, { method: 'DELETE' });
+        const res = await window.apiFetch(`/api/macros/slots?preset=${presetToDelete}`, { method: 'DELETE' });
         if (res.ok) {
             console.log(`🗑️ Preset [${presetToDelete}] deletado.`);
             if (currentPreset === presetToDelete) currentPreset = 'default';
@@ -482,7 +482,7 @@ window.savePresetAs = async function () {
 
 async function refreshAvailableScripts() {
     try {
-        const res = await fetch('/api/macros');
+        const res = await window.apiFetch('/api/macros');
         const data = await res.json() || [];
         availableManifests = data;
         availableScripts = data.map(m => (typeof m === 'object' && m && m.id) ? m.id : m);
@@ -500,9 +500,9 @@ function findManifest(id) {
 async function loadGlobalSlotsManifest() {
     try {
         const syncState = localStorage.getItem(`macro_sync_shared_${currentPreset}`) === 'true';
-        const res = await fetch(`/api/macros/slots?preset=${currentPreset}&syncShared=${syncState}`);
+        const res = await window.apiFetch(`/api/macros/slots?preset=${currentPreset}&syncShared=${syncState}`);
         const data = await res.json() || {};
-        
+
         // Separa os slots da configuração global embutida
         globalMacroConfig = data.globalConfig || {};
         assignedMacros = {};
@@ -524,7 +524,7 @@ async function saveGlobalSlotsManifest() {
         const syncShared = localStorage.getItem(`macro_sync_shared_${currentPreset}`) === 'true';
         // Pacote unificado para salvar
         const payload = { ...assignedMacros, globalConfig: globalMacroConfig };
-        await fetch(`/api/macros/slots?preset=${currentPreset}&syncShared=${syncShared}`, {
+        await window.apiFetch(`/api/macros/slots?preset=${currentPreset}&syncShared=${syncShared}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -815,7 +815,7 @@ async function completeMacroMove(targetIndex) {
         renderMacros();
 
         try {
-            await fetch(`/api/macros/swap?preset=${currentPreset}`, {
+            await window.apiFetch(`/api/macros/swap?preset=${currentPreset}`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ from: fromIndex, to: targetIndex })
             });

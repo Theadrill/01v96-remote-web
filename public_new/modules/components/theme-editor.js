@@ -63,7 +63,7 @@ var ThemeEditor = (function () {
         }
 
         try {
-            var res = await fetch('/api/themes/' + encodeURIComponent(themeName) + '?source=' + _getThemeSource());
+            var res = await window.apiFetch('/api/themes/' + encodeURIComponent(themeName) + '?source=' + _getThemeSource());
             if (!res.ok) throw new Error('Falha ao carregar tema');
             var data = await res.json();
 
@@ -392,7 +392,7 @@ var ThemeEditor = (function () {
 
             if (_adminMode) {
                 // Modo admin: salva o default.yaml diretamente no servidor
-                var adminRes = await fetch('/api/themes/default/admin-save', {
+                var adminRes = await window.apiFetch('/api/themes/default/admin-save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: yamlString
@@ -415,7 +415,7 @@ var ThemeEditor = (function () {
                 return;
             }
 
-            var res = await fetch('/api/themes/' + encodeURIComponent(_currentThemeName) + '?source=' + _getThemeSource(), {
+            var res = await window.apiFetch('/api/themes/' + encodeURIComponent(_currentThemeName) + '?source=' + _getThemeSource(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: yamlString })

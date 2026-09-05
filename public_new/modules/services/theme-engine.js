@@ -476,7 +476,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(function (e) {
             console.warn('[ThemeEngine] Fallback de carregamento de tema:', e);
-            fetch('/api/themes/active')
+            const fetchFn = typeof window.apiFetch === 'function' ? window.apiFetch : fetch;
+            fetchFn('/api/themes/active')
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     if (data && data.content && typeof ThemeEngine !== 'undefined' && ThemeEngine.apply) {

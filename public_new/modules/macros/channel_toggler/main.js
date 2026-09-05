@@ -38,9 +38,9 @@
 
         title.innerText = `Configurar Toggler - Slot ${slotIndex + 1}`;
         grid.innerHTML = '<p style="grid-column: 1 / -1; color:#666; font-size:11px; text-align:center; width:100%;">Carregando nomes...</p>';
-        
+
         let namesMap = {};
-        try { const res = await fetch('/api/names'); namesMap = await res.json(); } catch (e) {}
+        try { const res = await window.apiFetch('/api/names'); namesMap = await res.json(); } catch (e) {}
 
         grid.innerHTML = '';
         for (let i = 0; i < 32; i++) {

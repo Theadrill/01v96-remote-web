@@ -854,7 +854,8 @@ async function fetchAndRenderNetworkInfo() {
     listContainer.innerHTML = '<div class="network-info-loading">🔍 Buscando endereços da rede...</div>';
 
     try {
-        const response = await fetch('/api/network-info');
+        const fetchFn = typeof window.apiFetch === 'function' ? window.apiFetch : fetch;
+        const response = await fetchFn('/api/network-info');
         if (!response.ok) throw new Error('Falha HTTP');
         const data = await response.json();
 

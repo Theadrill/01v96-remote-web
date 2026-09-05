@@ -28,7 +28,7 @@ var ThemeManager = (function () {
 
         try {
             // Carregar tema ativo e status do Ninja Sync
-            var activeRes = await fetch('/api/themes/active');
+            var activeRes = await window.apiFetch('/api/themes/active');
             if (activeRes.ok) {
                 var activeData = await activeRes.json();
                 _activeTheme = activeData.active_theme || 'default.yaml';
@@ -39,7 +39,7 @@ var ThemeManager = (function () {
             }
 
             // Carregar lista de temas
-            var listRes = await fetch('/api/themes');
+            var listRes = await window.apiFetch('/api/themes');
             if (listRes.ok) {
                 _themes = await listRes.json();
                 renderThemeList();
@@ -108,7 +108,7 @@ var ThemeManager = (function () {
 
     async function applyTheme(themeName) {
         try {
-            var res = await fetch('/api/themes/active', {
+            var res = await window.apiFetch('/api/themes/active', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ active_theme: themeName })
@@ -117,7 +117,7 @@ var ThemeManager = (function () {
             if (!res.ok) throw new Error('Erro ao definir tema ativo');
 
             // Recarregar o conteúdo do tema para aplicar instantaneamente
-            var themeRes = await fetch('/api/themes/' + encodeURIComponent(themeName));
+            var themeRes = await window.apiFetch('/api/themes/' + encodeURIComponent(themeName));
             if (themeRes.ok) {
                 var data = await themeRes.json();
                 if (data && data.content && typeof ThemeEngine !== 'undefined' && ThemeEngine.apply) {
@@ -174,7 +174,7 @@ var ThemeManager = (function () {
 
         try {
             // Obter tema padrão como base
-            var defaultRes = await fetch('/api/themes/default.yaml');
+            var defaultRes = await window.apiFetch('/api/themes/default.yaml');
             var baseContent = '';
             if (defaultRes.ok) {
                 var defData = await defaultRes.json();
@@ -185,7 +185,7 @@ var ThemeManager = (function () {
                 baseContent = '# Novo Tema Customizado\nglobal:\n  bg_overlay: "rgba(0,0,0,0.7)"\n';
             }
 
-            var saveRes = await fetch('/api/themes/' + encodeURIComponent(cleanName), {
+            var saveRes = await window.apiFetch('/api/themes/' + encodeURIComponent(cleanName), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: baseContent })
@@ -235,11 +235,11 @@ var ThemeManager = (function () {
         }
 
         try {
-            var origRes = await fetch('/api/themes/' + encodeURIComponent(themeName));
+            var origRes = await window.apiFetch('/api/themes/' + encodeURIComponent(themeName));
             if (!origRes.ok) throw new Error('Erro ao obter conteúdo do tema de origem');
             var origData = await origRes.json();
 
-            var saveRes = await fetch('/api/themes/' + encodeURIComponent(cleanName), {
+            var saveRes = await window.apiFetch('/api/themes/' + encodeURIComponent(cleanName), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: origData.content })
@@ -272,7 +272,7 @@ var ThemeManager = (function () {
         if (!confirm) return;
 
         try {
-            var res = await fetch('/api/themes/' + encodeURIComponent(themeName), {
+            var res = await window.apiFetch('/api/themes/' + encodeURIComponent(themeName), {
                 method: 'DELETE'
             });
 
@@ -310,7 +310,7 @@ var ThemeManager = (function () {
             }
 
             try {
-                var res = await fetch('/api/themes/active', {
+                var res = await window.apiFetch('/api/themes/active', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ninja_sync_themes: false })
@@ -329,7 +329,7 @@ var ThemeManager = (function () {
 
         // Ativação: Verificar se há diferenças/conflitos entre temas locais e nuvem
         try {
-            var compareRes = await fetch('/api/themes/compare');
+            var compareRes = await window.apiFetch('/api/themes/compare');
             if (!compareRes.ok) throw new Error('Erro ao comparar temas');
             var compareData = await compareRes.json();
 
@@ -350,7 +350,7 @@ var ThemeManager = (function () {
                     }
                 }
 
-                await fetch('/api/themes/sync_direction', {
+                await window.apiFetch('/api/themes/sync_direction', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ direction: 'upload' })
@@ -372,7 +372,7 @@ var ThemeManager = (function () {
                     });
 
                     if (conflictRes === 'upload' || conflictRes === 'download') {
-                        await fetch('/api/themes/sync_direction', {
+                        await window.apiFetch('/api/themes/sync_direction', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ direction: conflictRes })
