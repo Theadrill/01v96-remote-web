@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Setup Tauri v2 Build Dependencies on Arch Linux / SteamOS
+# Setup & Build Tauri v2 on Arch Linux / SteamOS (100% Rust / Cargo)
 # ==============================================================================
 # Execução:
-#   chmod +x setup_tauri_archlinux.sh
-#   ./setup_tauri_archlinux.sh
+#   chmod +x scripts/setup_tauri_archlinux.sh
+#   ./scripts/setup_tauri_archlinux.sh
 # ==============================================================================
 
 set -o pipefail
@@ -14,6 +14,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 log_info() {
@@ -32,7 +33,7 @@ log_error() {
     echo -e "${RED}[ERRO]${NC} $1"
 }
 
-# Função executora de passos: aborta se houver qualquer erro
+# Executa um comando com verificação estrita de erro
 run_step() {
     local step_name="$1"
     shift
@@ -42,36 +43,59 @@ run_step() {
         log_success "${step_name} concluído com sucesso!"
         echo "------------------------------------------------------------"
     else
+        echo ""
         log_error "FALHA ao executar: ${step_name}"
         log_error "Comando que falhou: $*"
         echo -e "${RED}O script foi interrompido para evitar inconsistências.${NC}"
+        echo -e "${YELLOW}Verifique as mensagens de erro acima para solucionar o problema.${NC}\n"
         exit 1
     fi
 }
 
-echo -e "${BLUE}============================================================${NC}"
-echo -e "${BLUE}    INSTALADOR DE DEPENDÊNCIAS TAURI (ARCH LINUX / STEAMOS) ${NC}"
-echo -e "${BLUE}============================================================${NC}"
+# Garantir que estamos na raiz do projeto (um diretório acima de scripts/)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${ROOT_DIR}" || exit 1
 
-# 1. Se for SteamOS (Steam Deck), desativar temporariamente o modo read-only
+echo -e "${BLUE}============================================================${NC}"
+echo -e "${BLUE}    SETUP & BUILD TAURI (ARCH LINUX / STEAMOS - 100% RUST)  ${NC}"
+echo -e "${BLUE}============================================================${NC}"
+log_info "Diretório raiz do projeto: ${ROOT_DIR}"
+
+# 1. Configuração específica do SteamOS (Steam Deck)
 if command -v steamos-readonly &> /dev/null; then
     log_info "Detectado ambiente SteamOS (Steam Deck)."
-    run_step "Desativar proteção somente-leitura (steamos-readonly disable)" \
-        sudo steamos-readonly disable
 
+    # Desativar read-only do sistema de arquivos
+    if steamos-readonly status 2>/dev/null | grep -qi "enabled"; then
+        run_step "Desativar proteção somente-leitura (steamos-readonly disable)" \
+            sudo steamos-readonly disable
+    else
+        log_success "SteamOS read-only já está desativado."
+    fi
+
+    # Reparar / Inicializar chaveiros do pacman (necessário no SteamOS após desativar readonly)
+    log_info "Garantindo chaveiros e chaves PGP do pacman (Arch Linux & Valve Holo)..."
     run_step "Inicializar pacman-key keyring" \
         sudo pacman-key --init
 
-    run_step "Popular pacman-key com chaves Arch e Holo" \
+    run_step "Popular chaves archlinux e holo" \
         sudo pacman-key --populate archlinux holo
 fi
 
-# 2. Atualizar base de dados de pacotes do Arch Linux
-run_step "Sincronizar base de dados de pacotes (pacman -Sy)" \
-    sudo pacman -Sy --noconfirm
+# 2. Restaurar headers C fundamentais do sistema (SteamOS corta /usr/include da imagem base)
+if [ ! -f "/usr/include/stdio.h" ] || [ ! -f "/usr/include/stdint.h" ]; then
+    log_warn "Headers C (/usr/include) ausentes no sistema (padrão em imagens SteamOS limpas)."
+    run_step "Sincronizar base de pacotes do pacman" \
+        sudo pacman -Sy --noconfirm
+    run_step "Restaurar headers glibc e linux-api-headers" \
+        sudo pacman -S --needed --noconfirm --overwrite '*' glibc linux-api-headers
+else
+    log_success "Headers C do sistema (/usr/include) verificados e presentes."
+fi
 
-# 3. Instalar ferramentas essenciais de compilação (C/C++, headers, libs básicas)
-PACKAGES_BASE=(
+# 3. Pacotes de sistema necessários (base de compilação + libs gráficas/WebKit do Tauri)
+REQUIRED_PACKAGES=(
     base-devel
     curl
     wget
@@ -79,52 +103,94 @@ PACKAGES_BASE=(
     pkgconf
     openssl
     clang
-)
-run_step "Instalar ferramentas de build base (C/C++, Clang, OpenSSL)" \
-    sudo pacman -S --needed --noconfirm "${PACKAGES_BASE[@]}"
-
-# 4. Instalar bibliotecas de sistema exigidas pelo Tauri v2 / WebKit / GTK3
-PACKAGES_TAURI=(
     gtk3
     webkit2gtk-4.1
     libappindicator-gtk3
     librsvg
 )
-run_step "Instalar bibliotecas gráficas e WebKit para Tauri (GTK3, WebKit2GTK 4.1, libappindicator)" \
-    sudo pacman -S --needed --noconfirm "${PACKAGES_TAURI[@]}"
 
-# 5. Instalar ou verificar Node.js e NPM
-if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
-    run_step "Instalar Node.js e NPM" \
-        sudo pacman -S --needed --noconfirm nodejs npm
+MISSING_PACKAGES=()
+for pkg in "${REQUIRED_PACKAGES[@]}"; do
+    if ! pacman -Qi "$pkg" &> /dev/null; then
+        MISSING_PACKAGES+=("$pkg")
+    fi
+done
+
+if [ ${#MISSING_PACKAGES[@]} -gt 0 ]; then
+    log_info "Pacotes do sistema faltantes detectados: ${MISSING_PACKAGES[*]}"
+    run_step "Sincronizar base de dados do pacman" \
+        sudo pacman -Sy --noconfirm
+    run_step "Instalar dependências de sistema faltantes" \
+        sudo pacman -S --needed --noconfirm "${MISSING_PACKAGES[@]}"
 else
-    log_success "Node.js ($(node -v)) e NPM ($(npm -v)) já estão instalados."
+    log_success "Todas as dependências de sistema (GTK3, WebKit2GTK, Clang, OpenSSL, etc.) já estão instaladas."
 fi
 
-# 6. Instalar e configurar Rust / Cargo via rustup
+# 4. Carregar e verificar Rust / Cargo
+if [ -f "$HOME/.cargo/env" ]; then
+    # shellcheck source=/dev/null
+    source "$HOME/.cargo/env"
+fi
+export PATH="$HOME/.cargo/bin:$PATH"
+
 if ! command -v rustup &> /dev/null && ! command -v cargo &> /dev/null; then
-    log_info "Rust não encontrado. Instalando rustup..."
-    run_step "Baixar e instalar rustup" \
+    log_info "Rust/Cargo não encontrado. Instalando rustup..."
+    run_step "Baixar e instalar rustup (Rust + Cargo)" \
         bash -c "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
 
-    # Carregar Rust no ambiente atual
     if [ -f "$HOME/.cargo/env" ]; then
+        # shellcheck source=/dev/null
         source "$HOME/.cargo/env"
     fi
+    export PATH="$HOME/.cargo/bin:$PATH"
 else
-    log_success "Rust/Cargo já instalado ($(cargo --version 2>/dev/null || echo 'ok'))."
+    log_success "Rust/Cargo já instalado ($(cargo --version 2>/dev/null || echo 'Rust instalado'))."
 fi
 
-# Garantir que o toolchain stable do Rust está configurado
+# Garantir toolchain stable configurado
 if command -v rustup &> /dev/null; then
-    run_step "Configurar toolchain stable do Rust" \
-        rustup default stable
+    CURRENT_DEFAULT=$(rustup default 2>/dev/null || echo "")
+    if [[ "$CURRENT_DEFAULT" != *"stable"* ]]; then
+        run_step "Configurar toolchain stable do Rust" \
+            rustup default stable
+    else
+        log_success "Toolchain stable do Rust já está ativa."
+    fi
 fi
+
+# 5. Verificar ou instalar Tauri CLI via Cargo (cargo-tauri)
+if ! cargo tauri --version &> /dev/null; then
+    log_info "CLI do Tauri (cargo-tauri) não encontrada. Instalando..."
+
+    # Se cargo-binstall não existir, tenta instalar para acelerar downloads binários
+    if ! command -v cargo-binstall &> /dev/null; then
+        log_info "Tentando obter cargo-binstall para instalação rápida de binários..."
+        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash 2>/dev/null || true
+    fi
+
+    if command -v cargo-binstall &> /dev/null; then
+        run_step "Instalar tauri-cli (binário pré-compilado via binstall)" \
+            cargo binstall -y tauri-cli
+    else
+        run_step "Instalar tauri-cli via Cargo (compilação)" \
+            cargo install tauri-cli --version "^2.0.0" --locked
+    fi
+else
+    log_success "Tauri CLI já instalada ($(cargo tauri --version 2>/dev/null))."
+fi
+
+# 6. Executar o build do Tauri (Release)
+echo -e "\n${CYAN}============================================================${NC}"
+echo -e "${CYAN}             INICIANDO COMPILAÇÃO DO TAURI                  ${NC}"
+echo -e "${CYAN}============================================================${NC}"
+
+run_step "Compilar aplicação Tauri (cargo tauri build)" \
+    cargo tauri build
 
 echo -e "\n${GREEN}============================================================${NC}"
-echo -e "${GREEN}  TODAS AS DEPENDÊNCIAS DO TAURI FORAM INSTALADAS COM SUCESSO!  ${NC}"
+echo -e "${GREEN}          BUILD CONCLUÍDO COM SUCESSO!                      ${NC}"
 echo -e "${GREEN}============================================================${NC}"
-echo -e "Para compilar o aplicativo no Arch Linux / SteamOS, execute na pasta do projeto:"
-echo -e "  ${YELLOW}npm install${NC}"
-echo -e "  ${YELLOW}npx @tauri-apps/cli build${NC}"
+echo -e "Os binários gerados estão disponíveis em:"
+echo -e "  Binário direto: ${YELLOW}src-tauri/target/release/app${NC} (ou target/release/)"
+echo -e "  Pacote/Bundle:  ${YELLOW}src-tauri/target/release/bundle/${NC}"
 echo -e "${GREEN}============================================================${NC}\n"
