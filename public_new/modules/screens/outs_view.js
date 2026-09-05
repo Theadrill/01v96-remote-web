@@ -463,7 +463,18 @@ var OutsView = (function () {
 
             _strips['master'] = masterStrip;
             _strips[52] = masterStrip;
-            masterContainer.appendChild(masterStrip.render());
+
+            var masterEl = masterStrip.render();
+            if (isDesktop && masterContainer) {
+                masterContainer.appendChild(masterEl);
+                masterContainer.style.cssText = '';
+            } else {
+                fadersContainer.appendChild(masterEl);
+                if (masterContainer) {
+                    masterContainer.innerHTML = '';
+                    masterContainer.style.cssText = '';
+                }
+            }
         }
 
         if (typeof window.updateDesktopPatchBadges === 'function') {

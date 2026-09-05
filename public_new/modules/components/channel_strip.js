@@ -1329,7 +1329,14 @@ class ChannelStrip {
         let lastTap = 0;
         let active = false;
 
-        const onStart = (clientX, clientY) => {
+        const isThumbEvent = (target) => {
+            if (!target) return false;
+            return !!(target.closest && target.closest('.mobile-fader-thumb, .desk-fader-thumb'));
+        };
+
+        const onStart = (clientX, clientY, target) => {
+            if (isThumbEvent(target)) return;
+
             startX = clientX;
             startY = clientY;
             active = true;
@@ -1376,7 +1383,7 @@ class ChannelStrip {
         // Eventos Touch Nativos
         el.addEventListener('touchstart', (e) => {
             if (e.touches && e.touches[0]) {
-                onStart(e.touches[0].clientX, e.touches[0].clientY);
+                onStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
             }
         }, { passive: true });
 
@@ -1393,7 +1400,7 @@ class ChannelStrip {
         el.addEventListener('pointerdown', (e) => {
             if (e.pointerType === 'touch') return; // Evita duplicidade com touch
             if (e.button && e.button !== 0) return;
-            onStart(e.clientX, e.clientY);
+            onStart(e.clientX, e.clientY, e.target);
         });
 
         el.addEventListener('pointermove', (e) => {
