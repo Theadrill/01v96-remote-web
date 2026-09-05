@@ -1265,11 +1265,50 @@ No layout Desktop, a largura é fixa/padronizada em **85px** (para canais indivi
   - Mini-Fader lateral contextual instanciando a classe `ChannelStrip` modular com suporte a inputs mono/pareados, MIX, BUS, ST IN e Master Stereo.
   - Fundo preto sólido `#000000` via variáveis YAML do tema e preservação total da Sidebar à direita.
 
-### FASE 11 — Construção dos Componentes Puros de Áudio & Estilos
-- [ ] Implementar `components/eq.js` e `styles/components/eq.css` (Canvas puro com BiquadFilter desacoplado de IDs globais).
-- [ ] Implementar `components/gate.js`, `components/compressor.js` e `styles/components/dynamics.css` (Widgets puros de dinâmica).
+### FASE 11 — Construção dos Componentes Puros de Áudio & Estilos (EM ANDAMENTO ⏳)
+> *Estratégia de Execução:* Iniciaremos pelo subsistema de **Dinâmica (Gate & Compressor)** e integrações com o Channel Setup, deixando o EQ por último devido à sua maior complexidade biquad. Cada etapa é isolada e com checkpoint de validação visual e tátil nos dispositivos-alvo (Desktop, Steam Deck 1280x800, Galaxy A55 ~6" e iPhone SE 3 4.7").
+
+#### 11.1 Subsistema de Dinâmica (Gate & Compressor)
+* **Especificação Física e Regras da Mesa Yamaha 01V96:**
+  * **Gate:** Disponível exclusivamente nos canais de entrada **CH 1 a 32** (`0 a 31`). Em canais de saída (MIX 1-8, BUS 1-8 e Master Stereo), o painel de Gate deve ser desabilitado com aviso "N/A" e opacidade 0.5.
+    * *Threshold:* -54.0 dB a 0.0 dB (step 0.1 dB / raw 1).
+    * *Range:* -60 dB a 0 dB (step 1 dB).
+    * *Attack:* 0 ms a 120 ms (step 1 ms).
+    * *Hold:* 141 passos tabelados (`0.02ms` a `1.96s`).
+    * *Decay:* 140 passos tabelados (`5ms` a `42.3s`).
+  * **Compressor:** Universal em todos os canais (Inputs, Stereo In, Aux/Mix, Bus e Master Stereo) com resolução de prefixo MIDI dinâmico (`kInputComp`, `kAUXComp`, `kBusComp`, `kStereoComp`).
+    * *Threshold:* -54.0 dB a 0.0 dB (step 0.1 dB).
+    * *Ratio:* 16 passos tabelados (`1:1`, `1.1:1`, `1.3:1`, `1.5:1`, `1.7:1`, `2:1`, `2.5:1`, `3:1`, `3.5:1`, `4:1`, `5:1`, `6:1`, `8:1`, `10:1`, `20:1`, `inf:1`).
+    * *Attack:* 0 ms a 120 ms (step 1 ms).
+    * *Release:* 139 passos tabelados (`5ms` a `42.3s`).
+    * *Gain (Makeup):* 0.0 dB a +18.0 dB (step 0.1 dB).
+    * *Knee:* 0 a 5 (onde 0 = `HARD`).
+  * **Física de Interação & Medidores:**
+    * *Nudges (+ e -):* Toque simples para step fino; long press (segurar pressionado) com delay de 500ms e auto-repeat acelerado contínuo a cada 100ms.
+    * *Scroll Wheel do Mouse:* Ajuste incremental/decremental de 1 unidade diretamente sobre o slider.
+    * *Medidor de Input:* Mapeamento piecewise de -54 a 0 dB com marcador geométrico de Threshold (`.dyn-thresh-arrow`).
+    * *Medidor de GR (Gain Reduction):* Escala invertida de 0 a -18 dB (preenchimento da direita para a esquerda).
+    * *Polling GR:* Requisitado a cada 100ms via WebSocket enquanto a aba DYN estiver aberta.
+  * **Matriz de Responsividade Crítica:**
+    * *Desktop / Telas Grandes:* Layout em 2 colunas lado a lado (Gate à esquerda, Comp à direita).
+    * *Steam Deck (1280x800 Paisagem / Altura Reduzida):* Gap e padding reduzidos para exibição completa sem rolagem vertical excessiva.
+    * *Galaxy A55 (Retrato ~6"):* Layout empilhado (Gate em cima, Comp embaixo), sliders confortáveis para toque.
+    * *iPhone SE 3 (Retrato 4.7" Ultra-Compacto):* Grid otimizado (`55px 1fr 50px`), fontes compactas (`11px`), sliders responsivos e scroll suave sem corte lateral.
+
+* **Roteiro de Etapas da Dinâmica:**
+  - [ ] **Etapa 1:** Componente Visual Puro do Gate (`components/gate.js` & `styles/components/dynamics.css`) + Validação no Sandbox `public_new/tests.html`.
+  - [ ] **Etapa 2:** Componente Visual Puro do Compressor (`components/compressor.js`) + Validação no Sandbox `public_new/tests.html`.
+  - [ ] **Etapa 3:** Widget Integrador de Dinâmica (`components/dynamics.js`) com gestão de canais de saída N/A.
+  - [ ] **Etapa 4:** Integração Real na Tela de Setup (`channel_setup_dynamics.js` e `channel_setup_core.js`) com polling de GR e bindings MIDI/WebSocket.
+  - [ ] **Etapa 5:** Theming YAML (`default.yaml`) e Limpeza de CSS Legado de Dynamics.
+
+#### 11.2 Subsistema de Inserts & Routing
 - [ ] Implementar `components/inserts.js`, `components/routing.js` e seus respectivos CSS.
 - [ ] Conectar os novos componentes aos controladores em `screens/channel_setup/`.
+
+#### 11.3 Subsistema de Equalização (EQ)
+- [ ] Implementar `components/eq.js` e `styles/components/eq.css` (Canvas puro com BiquadFilter de 4 bandas desacoplado de IDs globais).
+- [ ] Conectar ao controlador `channel_setup_eq.js`.
 
 ### FASE 12 — Visão Geral de Roteamento & Cenas
 - [ ] Refatorar `screens/routing_overview.js` e `screens/scenes_view.js` com estilos modulares e integração limpa.
