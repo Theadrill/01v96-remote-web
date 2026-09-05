@@ -856,18 +856,37 @@ async function fetchAndRenderNetworkInfo() {
     try {
         const fetchFn = typeof window.apiFetch === 'function' ? window.apiFetch : fetch;
         const response = await fetchFn('/api/network-info');
-        if (!response.ok) throw new Error('Falha HTTP');
+        if (!response.ok) throw new Error(`Falha HTTP ${response.status}`);
         const data = await response.json();
 
-        if (!data.urls || data.urls.length === 0) {
-            listContainer.innerHTML = '<div class="network-info-empty">Nenhum endereço de rede ativo.</div>';
+        // Se estiver conectado via Tauri ou domínio customizado e o servidor remoto não retornou URLs próprias
+        let urls = Array.isArray(data.urls) ? [...data.urls] : [];
+
+        // Adiciona o endereço do host ativo no topo se for relevante
+        if (window.HostManager && typeof window.HostManager.getActiveHost === 'function') {
+            const active = window.HostManager.getActiveHost();
+            if (active && active.host) {
+                const activeHttpUrl = window.HostManager.getHttpUrl(active);
+                const alreadyHas = urls.some(u => u.url && u.url.includes(active.host));
+                if (!alreadyHas && active.host !== '127.0.0.1' && active.host !== 'localhost') {
+                    urls.unshift({
+                        label: `${active.name || 'Mesa Ativa'} (Conectado)`,
+                        url: activeHttpUrl,
+                        category: 'active_desk'
+                    });
+                }
+            }
+        }
+
+        if (urls.length === 0) {
+            listContainer.innerHTML = '<div class="network-info-empty">Nenhum endereço de rede ativo detectado.</div>';
             return;
         }
 
         const escapeHtml = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
         let html = '';
-        data.urls.forEach(item => {
+        urls.forEach(item => {
             const categoryClass = 'badge-' + (item.category || 'localhost');
             const label = item.label || 'Endereço';
             const url = item.url || '';
@@ -888,6 +907,28 @@ async function fetchAndRenderNetworkInfo() {
         listContainer.innerHTML = html;
     } catch (err) {
         console.error('[NETWORK] Erro ao buscar endereços do servidor:', err);
+
+        // Fallback resiliente: se a API REST falhar por isolamento ou rede, monta com base no HostManager ativo
+        if (window.HostManager && typeof window.HostManager.getActiveHost === 'function') {
+            const active = window.HostManager.getActiveHost();
+            if (active && active.host) {
+                const activeUrl = window.HostManager.getHttpUrl(active);
+                const escapeHtml = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                listContainer.innerHTML = `
+                    <div class="network-card" onclick="copyNetworkUrl('${escapeHtml(activeUrl)}', this.querySelector('.network-copy-btn'), event, '${escapeHtml(active.name || 'Mesa')}', 'badge-lan')" title="Clique para copiar e ver QR Code">
+                        <div class="network-card-details">
+                            <span class="network-card-badge badge-lan">${escapeHtml(active.name || 'Mesa Ativa')}</span>
+                            <span class="network-card-url">${escapeHtml(activeUrl)}</span>
+                        </div>
+                        <button class="network-copy-btn" onclick="copyNetworkUrl('${escapeHtml(activeUrl)}', this, event, '${escapeHtml(active.name || 'Mesa')}', 'badge-lan')">
+                            COPIAR
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+        }
+
         listContainer.innerHTML = '<div class="network-info-empty">⚠️ Não foi possível carregar os endereços do servidor.</div>';
     }
 }

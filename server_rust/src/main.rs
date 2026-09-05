@@ -225,6 +225,11 @@ async fn async_main(
     let canvas_dir = public_dir.parent().unwrap().join("canvas_frontend").join("public");
     let public_new_dir = public_dir.parent().unwrap().join("public_new");
 
+    let cors = tower_http::cors::CorsLayer::new()
+        .allow_origin(tower_http::cors::Any)
+        .allow_methods(tower_http::cors::Any)
+        .allow_headers(tower_http::cors::Any);
+
     // --- SERVIDOR HTTP SOBE PRIMEIRO (antes de conectar MIDI) ---
     let app = Router::new()
         .nest("/api", api::router(global_state_api.clone(), custom_scene_manager.clone(), io.clone()))
@@ -235,6 +240,7 @@ async fn async_main(
                 .layer(middleware::from_fn(no_cache_css_mw))
                 .service(tower_http::services::ServeDir::new(public_dir.clone()))
         )
+        .layer(cors)
         .layer(layer);
 
     let port = app_config.port;
