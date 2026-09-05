@@ -250,7 +250,20 @@ var activeConfigTab = "aux"; // Auxiliares por padrão
 window.activeConfigTab = "aux";
 let appOrientation = 'vertical';
 let musicianMode = false;
-window.showMetersInMusicianMode = localStorage.getItem('01v96_musician_meters') === 'true';
+// Helpers seguros de leitura de localStorage com fallback defensivo
+function safeGetLocalStorage(key, defaultVal) {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            const val = window.localStorage.getItem(key);
+            return val !== null ? val : defaultVal;
+        }
+    } catch (e) {
+        console.warn(`[SafeStorage] Could not read ${key}`, e);
+    }
+    return defaultVal;
+}
+
+window.showMetersInMusicianMode = safeGetLocalStorage('01v96_musician_meters', 'false') === 'true';
 window.showVolumeGeral = true;
 let outsMode = false;
 let technicianMixMode = false;
@@ -259,13 +272,15 @@ let tecnicoPassword = null; // Definido apenas pelo servidor via socket (lido do
 window.tecnicoPassword = tecnicoPassword;
 window.envStatus = 'not_found';
 window.serverName = null;
-const savedRole = localStorage.getItem('01v96_role');
-let layoutMode = savedRole === 'musician' ? 'mobile' : (localStorage.getItem('mixer_layout') || 'mobile');
-document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
-window.customNamesEnabled = localStorage.getItem('custom_names_enabled') !== 'false';
+const savedRole = safeGetLocalStorage('01v96_role', null);
+let layoutMode = savedRole === 'musician' ? 'mobile' : (safeGetLocalStorage('mixer_layout', 'mobile') || 'mobile');
+if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.toggle('layout-desktop', layoutMode === 'desktop');
+}
+window.customNamesEnabled = safeGetLocalStorage('custom_names_enabled', 'true') !== 'false';
 let layerNavEnabled = false;
 let activeLayerStart = 0;
-try { layerNavEnabled = localStorage.getItem('01v96_layer_nav') === 'true'; } catch (e) { }
+try { layerNavEnabled = safeGetLocalStorage('01v96_layer_nav', 'false') === 'true'; } catch (e) { }
 window.globalNames = null;
 window.lockedChannels = [];
 window.themeChannelLockConfig = {

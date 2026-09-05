@@ -48,8 +48,8 @@
             this._profiles = Array.isArray(raw) ? raw : [];
             this._activeHostId = window.StorageService ? window.StorageService.getItem(this.STORAGE_KEY_ACTIVE_ID, null) : null;
 
-            // Se for navegador padrão e a lista estiver vazia, cria o perfil correspondente à origem
-            if (this._profiles.length === 0 && typeof window !== 'undefined' && window.location && window.location.hostname) {
+            // Se a lista de perfis estiver vazia, adiciona o perfil padrão de fallback
+            if (this._profiles.length === 0 && typeof window !== 'undefined') {
                 const isTauriOrigin = (
                     window.location.hostname === 'tauri.localhost' ||
                     window.location.protocol === 'tauri:' ||
@@ -57,22 +57,21 @@
                     Boolean(window.__TAURI__) ||
                     Boolean(window.__TAURI_INTERNALS__)
                 );
-                const isLocalOrigin = !isTauriOrigin && window.location.protocol.startsWith('http');
-                if (isLocalOrigin) {
-                    const defaultProfile = {
-                        id: 'default_local',
-                        name: 'Servidor Local (Origem)',
-                        host: window.location.hostname,
-                        port: window.location.port ? parseInt(window.location.port, 10) : (window.location.protocol === 'https:' ? 443 : 4000),
-                        useSsl: window.location.protocol === 'https:',
-                        autoConnect: true,
-                        lastConnected: new Date().toISOString(),
-                        notes: 'Detectado automaticamente pelo navegador'
-                    };
-                    this._profiles.push(defaultProfile);
-                    this._activeHostId = defaultProfile.id;
-                    this._save();
-                }
+                const isLocalOrigin = !isTauriOrigin && window.location && window.location.protocol && window.location.protocol.startsWith('http');
+
+                const defaultProfile = {
+                    id: 'default_local',
+                    name: isLocalOrigin ? 'Servidor Local (Origem)' : '01V96 Localhost',
+                    host: isLocalOrigin ? window.location.hostname : '127.0.0.1',
+                    port: (isLocalOrigin && window.location.port) ? parseInt(window.location.port, 10) : 4000,
+                    useSsl: isLocalOrigin ? (window.location.protocol === 'https:') : false,
+                    autoConnect: false,
+                    lastConnected: new Date().toISOString(),
+                    notes: isLocalOrigin ? 'Detectado automaticamente pelo navegador' : 'Mesa Local 01V96 Padrão'
+                };
+                this._profiles.push(defaultProfile);
+                this._activeHostId = defaultProfile.id;
+                this._save();
             }
         }
 

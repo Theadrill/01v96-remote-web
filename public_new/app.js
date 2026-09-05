@@ -1,7 +1,26 @@
 // O app.js agora atua apenas como Bootstrapper final.
 // Responsabilidades removidas daqui:
 //   - scenesLibrary / showSceneGrid → modules/scene_grid.js
-initUI();
+
+// Execução segura da inicialização da UI (garante que o DOM está pronto)
+function bootstrapApp() {
+    try {
+        if (typeof initUI === 'function') {
+            initUI();
+        }
+        if (window.ConnectionManagerUI && typeof window.ConnectionManagerUI.init === 'function') {
+            window.ConnectionManagerUI.init();
+        }
+    } catch (e) {
+        console.error('[App Boot] Error during initUI:', e);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrapApp);
+} else {
+    bootstrapApp();
+}
 
 // Aguardamos um breve momento para estabilizar a renderização e o sync inicial antes de permitir envios.
 setTimeout(() => {

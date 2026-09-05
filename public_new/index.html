@@ -12,17 +12,34 @@
     <meta content="yes" name="mobile-web-app-capable" />
     <title>01V96 - LIVE SAFE</title>
     <script>
+        // Global Error Trap para depuração e proteção de boot no WebKitGTK / Safari
+        window.addEventListener('error', function(e) {
+            console.error('[GLOBAL BOOT ERROR]:', e.message, 'at', e.filename, 'line:', e.lineno, e.error);
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('[UNHANDLED PROMISE REJECTION]:', e.reason);
+        });
+
         // Garante que a URL no navegador termine com /new/ se acessada como /new
         (function() {
-            var isLocal = window.location.protocol === 'tauri:' ||
-                          window.location.protocol === 'asset:' ||
-                          window.location.hostname === 'tauri.localhost' ||
-                          window.location.protocol === 'file:';
+            var proto = window.location.protocol;
+            var host = window.location.hostname;
+            var isLocal = proto === 'tauri:' ||
+                          proto === 'asset:' ||
+                          proto === 'file:' ||
+                          proto === 'https:' && host === 'tauri.localhost' ||
+                          proto === 'http:' && host === 'tauri.localhost' ||
+                          host === 'localhost' && window.location.pathname.indexOf('/new') === -1;
             if (!isLocal && window.location.pathname === '/new') {
                 window.location.replace('/new/' + window.location.search + window.location.hash);
             }
             var baseHref = isLocal ? './' : '/new/';
-            document.write('<base href="' + baseHref + '" />');
+            var existingBase = document.querySelector('base');
+            if (!existingBase) {
+                var baseEl = document.createElement('base');
+                baseEl.href = baseHref;
+                document.head.appendChild(baseEl);
+            }
         })();
     </script>
     <link href="style.css?v=1.0.10" rel="stylesheet" />
