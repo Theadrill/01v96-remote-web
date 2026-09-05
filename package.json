@@ -4,11 +4,15 @@
   "description": "MIDI Monitor for 01v96-remote-web",
   "main": "monitor.js",
   "scripts": {
-    "start": "node monitor.js"
+    "start": "node monitor.js",
+    "tauri": "tauri"
   },
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "midi": "^2.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4"
   }
 }

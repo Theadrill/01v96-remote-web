@@ -5,6 +5,7 @@ members = [
     "server_rust",
     "client_wasm",
     "fx_type_query",
+    "src-tauri",
 ]
 resolver = "2"
 default-members = [
