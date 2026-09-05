@@ -11,7 +11,14 @@
     <meta content="01V96 LIVE" name="apple-mobile-web-app-title" />
     <meta content="yes" name="mobile-web-app-capable" />
     <title>01V96 - LIVE SAFE</title>
-    <base href="/new/" />
+    <script>
+        // No Tauri e em modo local, o <base href> deve ser relativo (./) para carregar scripts e css empacotados
+        if (window.location.protocol === 'tauri:' || window.location.protocol === 'asset:' || window.location.hostname === 'tauri.localhost' || window.location.protocol === 'file:') {
+            document.write('<base href="./" />');
+        } else {
+            document.write('<base href="/new/" />');
+        }
+    </script>
     <link href="style.css?v=1.0.10" rel="stylesheet" />
     <!-- Módulos de Estilos CSS: Base, Core & Layout -->
     <link href="styles/base/base.css" rel="stylesheet" />
@@ -49,6 +56,7 @@
     <link href="styles/screens/channel_setup/channel_setup_aux.css" rel="stylesheet" />
     <link href="styles/screens/channel_setup/channel_setup_inserts.css" rel="stylesheet" />
     <link href="styles/screens/channel_setup/channel_setup_routing.css" rel="stylesheet" />
+    <link href="styles/screens/connection_manager.css" rel="stylesheet" />
     <link href="modules/FXS/fx.css?v=1.0.2" rel="stylesheet" />
     <link href="vendor/fontawesome/all.min.css" rel="stylesheet" />
     <!-- UI UPDATE: 2026-06-07 -->
@@ -296,6 +304,14 @@
                 <div class="network-info-list" id="networkInfoList">
                     <div class="network-info-loading">🔍 Carregando endereços da rede...</div>
                 </div>
+            </div>
+
+            <!-- Seção de Conexões e Mesas Multi-Host -->
+            <div class="config-section" style="margin-top: 15px;">
+                <p class="config-section-header">🎛️ Conexão & Mesas 01V96</p>
+                <button class="btn-connect" style="width: 100%; margin-top: 8px; background: #2e7d32; color: #fff;" onclick="window.ConnectionManagerUI.open()">
+                    GERENCIAR CONEXÕES (MULTI-HOST)
+                </button>
             </div>
 
             <!-- Selects ocultos usados por conn() para índices de porta MIDI -->
@@ -1363,6 +1379,98 @@
         </div>
     </div>
 
+    <!-- Modal de Gerenciamento de Conexões Multi-Host (Tauri / Network) -->
+    <div id="connectionScreenModal" class="connection-screen-overlay">
+        <div class="conn-card">
+            <div class="conn-header">
+                <div class="conn-header-left">
+                    <div class="conn-header-icon">🎛️</div>
+                    <div class="conn-header-titles">
+                        <h2 class="conn-title">01V96 Live Remote</h2>
+                        <p class="conn-subtitle">Gerenciador de Conexão Multi-Host</p>
+                    </div>
+                </div>
+                <div class="conn-header-actions">
+                    <button class="conn-btn-icon" onclick="window.ConnectionManagerUI.openAddModal()" title="Adicionar Nova Mesa">+ ADICIONAR MESA</button>
+                    <button class="conn-btn-close" onclick="window.ConnectionManagerUI.close()">&times;</button>
+                </div>
+            </div>
+
+            <div class="conn-body">
+                <!-- Seção Destaque / Conectar com 1-Clique -->
+                <div class="conn-quick-section">
+                    <div class="conn-quick-header">
+                        <span class="conn-section-label">Mesa Selecionada</span>
+                    </div>
+                    <div class="conn-active-host-display">
+                        <div class="conn-active-host-info">
+                            <span id="connActiveHostName" class="conn-active-host-name">Mesa Principal</span>
+                            <span id="connActiveHostAddress" class="conn-active-host-address">http://127.0.0.1:4000</span>
+                        </div>
+                    </div>
+                    <button id="connConnectBtn" class="conn-btn-primary-large" onclick="window.ConnectionManagerUI.connectActive()">
+                        <span>CONECTAR NA MESA</span> ➔
+                    </button>
+                    <div id="connStatusBanner" class="conn-status-banner">
+                        <div class="conn-spinner"></div>
+                        <span id="connStatusBannerText">Conectando...</span>
+                    </div>
+                </div>
+
+                <!-- Lista de Mesas e Hosts Cadastrados -->
+                <div class="conn-hosts-section">
+                    <div class="conn-quick-header">
+                        <span class="conn-section-label">Mesas Salvas</span>
+                    </div>
+                    <div id="connHostsList" class="conn-hosts-list">
+                        <!-- Renderizado via connection_manager.js -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form de Adicionar/Editar Mesa -->
+    <div id="connectionFormModal" class="conn-modal-overlay">
+        <div class="conn-form-card">
+            <div class="conn-form-header">
+                <h3 id="connFormTitle" class="conn-form-title">Adicionar Mesa 01V96</h3>
+                <button class="conn-btn-close" onclick="window.ConnectionManagerUI.closeFormModal()">&times;</button>
+            </div>
+            <div class="conn-form-body">
+                <div class="conn-form-group">
+                    <label class="conn-form-label" for="connFormName">Nome de Identificação</label>
+                    <input type="text" id="connFormName" class="conn-form-input" placeholder="ex: Mesa Principal, PA Igreja, Retorno" maxlength="30" />
+                </div>
+                <div class="conn-form-row">
+                    <div class="conn-form-group" style="flex: 3;">
+                        <label class="conn-form-label" for="connFormHost">Endereço IP da Mesa</label>
+                        <input type="text" id="connFormHost" class="conn-form-input" placeholder="ex: 192.168.1.100 ou tailscale-node" />
+                    </div>
+                    <div class="conn-form-group" style="flex: 1;">
+                        <label class="conn-form-label" for="connFormPort">Porta</label>
+                        <input type="number" id="connFormPort" class="conn-form-input" value="4000" />
+                    </div>
+                </div>
+                <div class="conn-form-row" style="margin-top: 4px;">
+                    <label class="conn-form-checkbox-label">
+                        <input type="checkbox" id="connFormAuto" checked />
+                        Conectar automaticamente ao iniciar
+                    </label>
+                    <label class="conn-form-checkbox-label">
+                        <input type="checkbox" id="connFormSsl" />
+                        Usar SSL (HTTPS)
+                    </label>
+                </div>
+            </div>
+            <div class="conn-form-footer">
+                <button id="connFormDeleteBtn" class="conn-btn-danger" style="margin-right: auto; display: none;" onclick="window.ConnectionManagerUI.deleteCurrentFormHost()">EXCLUIR</button>
+                <button class="conn-btn-secondary" onclick="window.ConnectionManagerUI.closeFormModal()">CANCELAR</button>
+                <button class="conn-btn-save" onclick="window.ConnectionManagerUI.saveForm()">SALVAR</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ================================================================= -->
     <!-- SCRIPTS MODULARES (Carregamento ordenado em camadas no body)      -->
     <!-- ================================================================= -->
@@ -1403,6 +1511,7 @@
     <script src="modules/components/routing.js?v=11"></script>
     <script src="modules/components/sidebar.js?v=14"></script>
     <script src="modules/components/search.js?v=4"></script>
+    <script src="modules/components/connection_manager.js"></script>
     <script src="modules/components/theme-editor.js"></script>
     <script src="modules/components/overlay_info.js"></script>
 

@@ -169,8 +169,18 @@ window.socketProxy = socketProxy;
 
 // Detecção de ambiente e auto-conexão:
 // 1. Web Mode: auto-conecta ao origin atual.
-// 2. Tauri Mode: aguarda ConnectionService ou perfil de conexão configurado.
-const isTauriEnv = typeof window !== 'undefined' && (Boolean(window.__TAURI__) || Boolean(window.__TAURI_INTERNALS__));
+// 2. Tauri Mode: detecta ambiente desktop (tauri.localhost, tauri://, __TAURI__) e aguarda conexão via ConnectionService/HostManager.
+const isTauriEnv = typeof window !== 'undefined' && (
+    Boolean(window.__TAURI__) ||
+    Boolean(window.__TAURI_INTERNALS__) ||
+    (window.location && (
+        window.location.hostname === 'tauri.localhost' ||
+        window.location.protocol === 'tauri:' ||
+        window.location.protocol === 'asset:'
+    ))
+);
+window.isTauriEnv = isTauriEnv;
+
 if (!isTauriEnv && typeof io === 'function') {
     socketProxy.connect();
 }

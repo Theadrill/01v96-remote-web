@@ -1,0 +1,638 @@
+/**
+ * =========================================================================================
+ * STYLES: Multi-Host Connection Manager (connection_manager.css)
+ * =========================================================================================
+ * Interface para seleção, diagnóstico e gerenciamento de hosts/mesas 01V96.
+ * Totalmente integrado à paleta dark do console 01V96 LIVE SAFE.
+ * =========================================================================================
+ */
+
+/* Overlay principal da tela de conexão */
+.connection-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #1b2028 0%, #0a0c10 100%);
+    z-index: 25000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.connection-screen-overlay.active {
+    display: flex;
+}
+
+/* Card central principal */
+.conn-card {
+    background: #161a22;
+    border: 1px solid #28303f;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+}
+
+/* Header */
+.conn-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid #252d3b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #13171e;
+}
+
+.conn-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.conn-header-icon {
+    font-size: 22px;
+    color: #00c853;
+}
+
+.conn-header-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.conn-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.conn-subtitle {
+    margin: 0;
+    font-size: 11px;
+    color: #8b949e;
+}
+
+.conn-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.conn-btn-icon {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.conn-btn-icon:hover {
+    background: #30363d;
+    border-color: #484f58;
+    color: #fff;
+}
+
+.conn-btn-close {
+    background: transparent;
+    border: none;
+    color: #8b949e;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.conn-btn-close:hover {
+    background: #21262d;
+    color: #fff;
+}
+
+/* Corpo scrollável */
+.conn-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+
+/* Seção de Destaque / Conexão Rápida */
+.conn-quick-section {
+    background: #1a202c;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.conn-quick-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.conn-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #718096;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.conn-active-host-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.conn-active-host-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.conn-active-host-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conn-active-host-address {
+    font-size: 12px;
+    font-family: monospace;
+    color: #a0aec0;
+}
+
+/* Botão Conectar Grande */
+.conn-btn-primary-large {
+    background: #00c853;
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 14px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 4px 14px rgba(0, 200, 83, 0.35);
+    width: 100%;
+}
+
+.conn-btn-primary-large:hover {
+    background: #00e676;
+    transform: translateY(-1px);
+}
+
+.conn-btn-primary-large:active {
+    transform: translateY(1px);
+}
+
+.conn-btn-primary-large:disabled {
+    background: #2d3748;
+    color: #718096;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Banner de Status / Conectando */
+.conn-status-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.conn-status-banner.connecting {
+    display: flex;
+    background: rgba(49, 130, 206, 0.15);
+    border: 1px solid #3182ce;
+    color: #63b3ed;
+}
+
+.conn-status-banner.error {
+    display: flex;
+    background: rgba(229, 62, 62, 0.15);
+    border: 1px solid #e53e3e;
+    color: #feb2b2;
+}
+
+.conn-status-banner.success {
+    display: flex;
+    background: rgba(56, 161, 105, 0.15);
+    border: 1px solid #38a169;
+    color: #9ae6b4;
+}
+
+.conn-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: connSpin 0.8s linear infinite;
+}
+
+@keyframes connSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Lista de Hosts */
+.conn-hosts-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.conn-hosts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.conn-host-item {
+    background: #1c222c;
+    border: 1px solid #293241;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.conn-host-item:hover {
+    background: #222a36;
+    border-color: #3b4759;
+}
+
+.conn-host-item.selected {
+    background: #1f2b23;
+    border-color: #00c853;
+}
+
+.conn-host-item-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.conn-host-radio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #4a5568;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.conn-host-item.selected .conn-host-radio {
+    border-color: #00c853;
+    background: #00c853;
+}
+
+.conn-host-item.selected .conn-host-radio::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #000;
+}
+
+.conn-host-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.conn-host-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.conn-host-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conn-host-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.conn-badge-auto {
+    background: #1976d2;
+    color: #fff;
+}
+
+.conn-badge-ssl {
+    background: #7b1fa2;
+    color: #fff;
+}
+
+.conn-host-address {
+    font-size: 11px;
+    font-family: monospace;
+    color: #718096;
+}
+
+.conn-host-item-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.conn-host-actions-btn {
+    background: transparent;
+    border: none;
+    color: #718096;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.conn-host-actions-btn:hover {
+    background: #2d3748;
+    color: #fff;
+}
+
+/* Empty State */
+.conn-empty-state {
+    text-align: center;
+    padding: 28px 20px;
+    color: #a0aec0;
+    font-size: 13px;
+    background: #141923;
+    border: 2px dashed #2d3748;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.conn-empty-icon {
+    font-size: 32px;
+}
+
+.conn-empty-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.conn-empty-desc {
+    margin: 0;
+    font-size: 12px;
+    color: #718096;
+    max-width: 400px;
+    line-height: 1.4;
+}
+
+.conn-btn-add-highlight {
+    margin-top: 8px;
+    background: #00c853;
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 12px 24px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(0, 200, 83, 0.35);
+    transition: background 0.15s, transform 0.1s;
+}
+
+.conn-btn-add-highlight:hover {
+    background: #00e676;
+    transform: translateY(-1px);
+}
+
+.conn-btn-add-highlight:active {
+    transform: translateY(1px);
+}
+
+/* Modal de Criação / Edição de Host */
+.conn-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 26000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.conn-modal-overlay.active {
+    display: flex;
+}
+
+.conn-form-card {
+    background: #181d26;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+}
+
+.conn-form-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #252d3b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #13171e;
+}
+
+.conn-form-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.conn-form-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.conn-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.conn-form-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.conn-form-input {
+    background: #10141a;
+    border: 1px solid #2d3748;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #fff;
+    outline: none;
+    box-sizing: border-box;
+    width: 100%;
+    transition: border-color 0.15s;
+}
+
+.conn-form-input:focus {
+    border-color: #3182ce;
+}
+
+.conn-form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.conn-form-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #cbd5e0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.conn-form-checkbox-label input {
+    cursor: pointer;
+    accent-color: #00c853;
+}
+
+.conn-form-footer {
+    padding: 14px 18px;
+    border-top: 1px solid #252d3b;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #13171e;
+}
+
+.conn-btn-secondary {
+    background: #2d3748;
+    border: none;
+    color: #cbd5e0;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.conn-btn-secondary:hover {
+    background: #3a475c;
+    color: #fff;
+}
+
+.conn-btn-danger {
+    background: #9b2c2c;
+    border: none;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.conn-btn-danger:hover {
+    background: #c53030;
+}
+
+.conn-btn-save {
+    background: #00c853;
+    border: none;
+    color: #000;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.conn-btn-save:hover {
+    background: #00e676;
+}

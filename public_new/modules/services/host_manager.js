@@ -50,7 +50,14 @@
 
             // Se for navegador padrão e a lista estiver vazia, cria o perfil correspondente à origem
             if (this._profiles.length === 0 && typeof window !== 'undefined' && window.location && window.location.hostname) {
-                const isLocalOrigin = window.location.hostname !== 'tauri.localhost' && window.location.protocol.startsWith('http');
+                const isTauriOrigin = (
+                    window.location.hostname === 'tauri.localhost' ||
+                    window.location.protocol === 'tauri:' ||
+                    window.location.protocol === 'asset:' ||
+                    Boolean(window.__TAURI__) ||
+                    Boolean(window.__TAURI_INTERNALS__)
+                );
+                const isLocalOrigin = !isTauriOrigin && window.location.protocol.startsWith('http');
                 if (isLocalOrigin) {
                     const defaultProfile = {
                         id: 'default_local',

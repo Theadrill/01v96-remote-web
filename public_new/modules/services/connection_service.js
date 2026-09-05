@@ -99,6 +99,17 @@
         }
 
         /**
+         * Conecta a um perfil específico por ID ou objeto de host
+         */
+        connectToProfile(profileOrId) {
+            let profile = profileOrId;
+            if (typeof profileOrId === 'string' && window.HostManager) {
+                profile = window.HostManager.getProfileById(profileOrId);
+            }
+            return this.connectToHost(profile);
+        }
+
+        /**
          * Conecta o SocketProxy ao host atualmente selecionado no HostManager
          */
         connectToActiveHost() {
@@ -136,45 +147,6 @@
                 window.socket.disconnect();
             }
             this._notify('disconnected', null);
-        }
-
-        /**
-         * Executa um teste de Ping HTTP em um host específico
-         */
-        async testPing(hostProfile, timeoutMs = 3000) {
-            const baseUrl = window.HostManager ? window.HostManager.getHttpUrl(hostProfile) : this.getHttpBase();
-            const targetUrl = `${baseUrl.replace(/\/+$/, '')}/api/network-info?_t=${Date.now()}`;
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-            const startTime = performance.now();
-            try {
-                const response = await fetch(targetUrl, {
-                    method: 'GET',
-                    signal: controller.signal,
-                    cache: 'no-store'
-                });
-                clearTimeout(timeoutId);
-
-                const latency = Math.round(performance.now() - startTime);
-
-                if (response.ok) {
-                    let data = null;
-                    try { data = await response.json(); } catch (e) { }
-                    return { success: true, latency, data, status: response.status };
-                } else {
-                    return { success: false, latency, error: `HTTP ${response.status}`, status: response.status };
-                }
-            } catch (err) {
-                clearTimeout(timeoutId);
-                const isAbort = err.name === 'AbortError';
-                return {
-                    success: false,
-                    latency: isAbort ? timeoutMs : Math.round(performance.now() - startTime),
-                    error: isAbort ? 'Timeout' : (err.message || 'Offline')
-                };
-            }
         }
     }
 
