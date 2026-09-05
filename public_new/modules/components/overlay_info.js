@@ -115,5 +115,6 @@ const OverlayInfo = (() => {
         return activeType;
     }
 
-    return { show, hide, isActive, getActiveType };
+    window.OverlayInfo = { show, hide, isActive, getActiveType };
+    return window.OverlayInfo;
 })();

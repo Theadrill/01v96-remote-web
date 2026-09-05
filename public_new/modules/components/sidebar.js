@@ -5,6 +5,7 @@ function conn() {
     });
     document.getElementById('configModal').style.display = 'none';
 }
+window.conn = conn;
 
 function toggleDemoMode() {
     const btn = document.getElementById('demoBtn');

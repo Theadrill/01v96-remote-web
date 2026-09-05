@@ -14,7 +14,7 @@ setTimeout(() => {
 // Eventos de Visibilidade (Troca de aba/Minimizar)
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'hidden') {
-        if (typeof socket !== 'undefined' && socket.connected) {
+        if (typeof socket !== 'undefined' && socket && socket.connected) {
             console.log("⏸️ Aba oculta. Desconectando socket para poupar recursos.");
             socket.disconnect();
             if (window.activeConfigTab === 'eq' && typeof window.pauseRTA === 'function') {
@@ -22,9 +22,13 @@ document.addEventListener("visibilitychange", () => {
             }
         }
     } else {
-        if (typeof socket !== 'undefined' && socket.disconnected) {
+        if (typeof socket !== 'undefined' && socket && socket.disconnected) {
             console.log("▶️ Aba visível. Reconectando socket.");
-            socket.connect();
+            if (window.ConnectionService && typeof window.ConnectionService.connectToActiveHost === 'function') {
+                window.ConnectionService.connectToActiveHost();
+            } else if (typeof socket.connect === 'function') {
+                socket.connect();
+            }
         }
         
         setTimeout(() => {

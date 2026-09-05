@@ -52,28 +52,71 @@ async fn trigger_git_sync() {
 
         println!("🚀 [NINJA SYNC] Iniciando sync: {}", commit_msg);
 
+        // 1. git add
         let mut add = tokio::process::Command::new("git");
         add.arg("add").args(&files).current_dir(&root_dir);
-        if add.status().await.map_or(false, |s| s.success()) {
-            let mut commit = tokio::process::Command::new("git");
-            commit
-                .args(&["commit", "-m", &commit_msg])
-                .current_dir(&root_dir);
-            let _ = commit.status().await;
-
-            let mut pull = tokio::process::Command::new("git");
-            pull.args(&["pull", "--rebase", "--autostash"])
-                .current_dir(&root_dir);
-            if pull.status().await.map_or(false, |s| s.success()) {
-                let mut push = tokio::process::Command::new("git");
-                push.arg("push").current_dir(&root_dir);
-                if push.status().await.map_or(false, |s| s.success()) {
-                    println!("🌍 [NINJA SYNC] GitHub Atualizado com Sucesso!");
-                    return;
-                }
+        let add_res = match add.output().await {
+            Ok(out) => out,
+            Err(e) => {
+                eprintln!("❌ [NINJA SYNC] Erro ao executar 'git add': {}", e);
+                return;
             }
+        };
+        if !add_res.status.success() {
+            eprintln!("❌ [NINJA SYNC] 'git add' falhou: {}", String::from_utf8_lossy(&add_res.stderr));
+            return;
         }
-        eprintln!("❌ [NINJA SYNC] Falha no comando Git!");
+
+        // 2. git commit
+        let mut commit = tokio::process::Command::new("git");
+        commit
+            .args(&["commit", "-m", &commit_msg])
+            .current_dir(&root_dir);
+        let commit_res = match commit.output().await {
+            Ok(out) => out,
+            Err(e) => {
+                eprintln!("❌ [NINJA SYNC] Erro ao executar 'git commit': {}", e);
+                return;
+            }
+        };
+        // Se nada mudou, git commit retorna não-zero (clean working tree), mas não é erro fatal
+        let stdout_commit = String::from_utf8_lossy(&commit_res.stdout);
+        let stderr_commit = String::from_utf8_lossy(&commit_res.stderr);
+        if !commit_res.status.success() && !stdout_commit.contains("nothing to commit") && !stderr_commit.contains("nothing to commit") {
+            eprintln!("⚠️ [NINJA SYNC] Aviso em 'git commit': {}", stderr_commit);
+        }
+
+        // 3. git pull --rebase --autostash
+        let mut pull = tokio::process::Command::new("git");
+        pull.args(&["pull", "--rebase", "--autostash"])
+            .current_dir(&root_dir);
+        let pull_res = match pull.output().await {
+            Ok(out) => out,
+            Err(e) => {
+                eprintln!("❌ [NINJA SYNC] Erro ao executar 'git pull': {}", e);
+                return;
+            }
+        };
+        if !pull_res.status.success() {
+            eprintln!("❌ [NINJA SYNC] 'git pull' falhou: {}", String::from_utf8_lossy(&pull_res.stderr));
+            return;
+        }
+
+        // 4. git push
+        let mut push = tokio::process::Command::new("git");
+        push.arg("push").current_dir(&root_dir);
+        let push_res = match push.output().await {
+            Ok(out) => out,
+            Err(e) => {
+                eprintln!("❌ [NINJA SYNC] Erro ao executar 'git push': {}", e);
+                return;
+            }
+        };
+        if push_res.status.success() {
+            println!("🌍 [NINJA SYNC] GitHub Atualizado com Sucesso!");
+        } else {
+            eprintln!("❌ [NINJA SYNC] 'git push' falhou: {}", String::from_utf8_lossy(&push_res.stderr));
+        }
     });
 }
 

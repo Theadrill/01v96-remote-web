@@ -123,9 +123,17 @@ socket.on('syncStatus', (data) => {
                 text = `SINCRONIZANDO - CENAS ${percent}%`;
             }
         }
-        OverlayInfo.show('sync', text);
+        if (typeof OverlayInfo !== 'undefined' && OverlayInfo && typeof OverlayInfo.show === 'function') {
+            OverlayInfo.show('sync', text);
+        } else if (typeof window.OverlayInfo !== 'undefined' && window.OverlayInfo && typeof window.OverlayInfo.show === 'function') {
+            window.OverlayInfo.show('sync', text);
+        }
     } else {
-        OverlayInfo.hide();
+        if (typeof OverlayInfo !== 'undefined' && OverlayInfo && typeof OverlayInfo.hide === 'function') {
+            OverlayInfo.hide();
+        } else if (typeof window.OverlayInfo !== 'undefined' && window.OverlayInfo && typeof window.OverlayInfo.hide === 'function') {
+            window.OverlayInfo.hide();
+        }
     }
 
     if (blocker) {
@@ -990,9 +998,14 @@ socket.on('portsList', (data) => {
     if (soutEl) soutEl.innerHTML = data.available.outputs.map(p => `<option value="${p.id}" ${data.savedConfig.outIdx == p.id ? 'selected' : ''}>OUT: ${p.name}</option>`).join('');
 
     if (data.savedConfig && data.savedConfig.inIdx !== null && data.savedConfig.outIdx !== null) {
-        conn();
+        if (typeof conn === 'function') {
+            conn();
+        } else if (typeof window.conn === 'function') {
+            window.conn();
+        }
     } else {
-        document.getElementById('configModal').style.display = 'flex';
+        const cfgModal = document.getElementById('configModal');
+        if (cfgModal) cfgModal.style.display = 'flex';
     }
     // Sincroniza o modo demo e opacidade
     const demoBtn = document.getElementById('demoBtn');

@@ -12,12 +12,18 @@
     <meta content="yes" name="mobile-web-app-capable" />
     <title>01V96 - LIVE SAFE</title>
     <script>
-        // No Tauri e em modo local, o <base href> deve ser relativo (./) para carregar scripts e css empacotados
-        if (window.location.protocol === 'tauri:' || window.location.protocol === 'asset:' || window.location.hostname === 'tauri.localhost' || window.location.protocol === 'file:') {
-            document.write('<base href="./" />');
-        } else {
-            document.write('<base href="/new/" />');
-        }
+        // Garante que a URL no navegador termine com /new/ se acessada como /new
+        (function() {
+            var isLocal = window.location.protocol === 'tauri:' ||
+                          window.location.protocol === 'asset:' ||
+                          window.location.hostname === 'tauri.localhost' ||
+                          window.location.protocol === 'file:';
+            if (!isLocal && window.location.pathname === '/new') {
+                window.location.replace('/new/' + window.location.search + window.location.hash);
+            }
+            var baseHref = isLocal ? './' : '/new/';
+            document.write('<base href="' + baseHref + '" />');
+        })();
     </script>
     <link href="style.css?v=1.0.10" rel="stylesheet" />
     <!-- Módulos de Estilos CSS: Base, Core & Layout -->
@@ -1481,6 +1487,7 @@
     <script src="modules/core/steps.js"></script>
     <script src="modules/core/setup.js?v=6"></script>
     <script src="modules/core/splash_screen.js?v=7"></script>
+    <script src="modules/components/overlay_info.js?v=1"></script>
 
     <!-- CAMADA 2: Serviços & Rede -->
     <script src="modules/services/storage_service.js"></script>
@@ -1513,7 +1520,6 @@
     <script src="modules/components/search.js?v=4"></script>
     <script src="modules/components/connection_manager.js"></script>
     <script src="modules/components/theme-editor.js"></script>
-    <script src="modules/components/overlay_info.js"></script>
 
     <!-- CAMADA 3.1: Subsistema de Processadores FXS -->
     <script src="modules/FXS/fx_utils.js?v=1"></script>

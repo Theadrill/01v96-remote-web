@@ -9,6 +9,12 @@ class SocketProxy {
         this._rawSocket = null;
         this.connected = false;
         this.id = null;
+        this._lastUrl = null;
+        this._lastOptions = null;
+    }
+
+    get disconnected() {
+        return !this.connected;
     }
 
     get io() {
@@ -81,7 +87,14 @@ class SocketProxy {
             return this;
         }
 
-        // Limpa socket e bindings anteriores em caso de reconexão ou troca de host
+        // Se chamado sem url mas temos uma URL gravada, reutiliza-a
+        const targetUrl = url || this._lastUrl;
+        const targetOpts = options || this._lastOptions || { transports: ['websocket'] };
+
+        this._lastUrl = targetUrl;
+        this._lastOptions = targetOpts;
+
+        // Se já existe socket subjacente desconectado, podemos reconectar ou recriar
         if (this._rawSocket) {
             this._rawSocket.removeAllListeners();
             this._rawSocket.disconnect();
@@ -89,8 +102,7 @@ class SocketProxy {
             this._boundRawEvents.clear();
         }
 
-        const socketOpts = options || { transports: ['websocket'] };
-        this._rawSocket = url ? io(url, socketOpts) : io(socketOpts);
+        this._rawSocket = targetUrl ? io(targetUrl, targetOpts) : io(targetOpts);
 
         // Lifecycle bindings
         this._rawSocket.on('connect', () => {
