@@ -40,14 +40,17 @@ jobs:
         run: cargo install tauri-cli --version "^2.0" --locked
 
       - name: Build Tauri App
-        run: cargo tauri build
+        run: cargo tauri build --bundles appimage,deb
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: tauri-linux-build
+          name: 01v96-remote-client-linux
           path: |
-            target/release/app
             target/release/bundle/appimage/*.AppImage
             target/release/bundle/deb/*.deb
+            target/release/01v96-remote-client
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/01v96-remote-client
           if-no-files-found: warn
