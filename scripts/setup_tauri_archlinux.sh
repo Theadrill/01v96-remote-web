@@ -83,15 +83,33 @@ if command -v steamos-readonly &> /dev/null; then
         sudo pacman-key --populate archlinux holo
 fi
 
-# 2. Restaurar headers C fundamentais do sistema (SteamOS corta /usr/include da imagem base)
-if [ ! -f "/usr/include/stdio.h" ] || [ ! -f "/usr/include/stdint.h" ]; then
-    log_warn "Headers C (/usr/include) ausentes no sistema (padrão em imagens SteamOS limpas)."
+# 2. Restaurar headers C e arquivos de desenvolvimento (.pc, headers) do sistema
+# No SteamOS, a imagem de fábrica vem com /usr/include e /usr/lib/pkgconfig incompletos para pacotes pré-instalados
+DEV_SYSTEM_PACKAGES=(
+    glibc
+    linux-api-headers
+    glib2
+    gtk3
+    cairo
+    pango
+    gdk-pixbuf2
+    harfbuzz
+    libsoup3
+)
+
+NEED_DEV_RESTORE=false
+if [ ! -f "/usr/include/stdio.h" ] || [ ! -f "/usr/include/stdint.h" ] || [ ! -f "/usr/lib/pkgconfig/glib-2.0.pc" ] || [ ! -f "/usr/lib/pkgconfig/gtk+-3.0.pc" ]; then
+    NEED_DEV_RESTORE=true
+fi
+
+if [ "$NEED_DEV_RESTORE" = true ]; then
+    log_warn "Arquivos de desenvolvimento/headers ausentes (padrão em imagens de fábrica do SteamOS)."
     run_step "Sincronizar base de pacotes do pacman" \
         sudo pacman -Sy --noconfirm
-    run_step "Restaurar headers glibc e linux-api-headers" \
-        sudo pacman -S --needed --noconfirm --overwrite '*' glibc linux-api-headers
+    run_step "Restaurar pacotes base de desenvolvimento (headers, .pc, pkg-config)" \
+        sudo pacman -S --needed --noconfirm --overwrite '*' "${DEV_SYSTEM_PACKAGES[@]}"
 else
-    log_success "Headers C do sistema (/usr/include) verificados e presentes."
+    log_success "Arquivos de desenvolvimento do sistema (glib-2.0.pc, gtk+-3.0.pc, headers) verificados e presentes."
 fi
 
 # 3. Pacotes de sistema necessários (base de compilação + libs gráficas/WebKit do Tauri)
