@@ -42,15 +42,24 @@ jobs:
       - name: Build Tauri App
         run: cargo tauri build --bundles appimage,deb
 
+      - name: Prepare Standalone Binary
+        run: |
+          mkdir -p target/release/standalone
+          if [ -f target/release/app ]; then
+            cp target/release/app target/release/standalone/01v96-remote-client
+            chmod +x target/release/standalone/01v96-remote-client
+          fi
+          if [ -f src-tauri/target/release/app ]; then
+            cp src-tauri/target/release/app target/release/standalone/01v96-remote-client
+            chmod +x target/release/standalone/01v96-remote-client
+          fi
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: 01v96-remote-client-linux
           path: |
+            target/release/standalone/01v96-remote-client
             target/release/bundle/appimage/*.AppImage
             target/release/bundle/deb/*.deb
-            target/release/01v96-remote-client
-            src-tauri/target/release/bundle/appimage/*.AppImage
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/01v96-remote-client
           if-no-files-found: warn
