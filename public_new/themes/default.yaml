@@ -168,6 +168,7 @@ channel_strip:
     patch_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     patch_font_weight: '800'
     patch_font_size: 10px
+    patch_color: '#5cacee'
     meters_title_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     meters_title_font_weight: '800'
     meters_title_font_size: 9px
@@ -289,13 +290,15 @@ channel_strip:
     macro_reset_btn_height: 28px
     macro_reset_font_size: 12px
     macro_reset_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    db_font_size: 18px
+    db_font_size: 20px
     db_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+    patch_font_size: 18px
+    patch_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     name_display_font_size: 13px
     name_display_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     scale_font_size: 10px
     scale_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    db_text_stroke: '1px #000000'
+    db_text_stroke: '1px #2b2a2aff'
     macro_big_nudge_font_size: 28px
     fader_thumb_width: 58px
     fader_thumb_height: 48px

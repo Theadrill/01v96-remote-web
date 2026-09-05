@@ -2186,9 +2186,22 @@
     font-weight: 800;
     color: var(--strip-db-val-color, #5cacee);
     font-family: var(--strip-mobile-db-font-family, var(--strip-db-val-font-family, Consolas, Menlo, "Courier New", monospace));
-    padding: 4px 0;
+    padding: 2px 0 0 0;
     -webkit-text-stroke: var(--strip-mobile-db-stroke, 1px #000000);
     text-shadow: 0 0 2px #000000, 0 0 1px #000000;
+}
+.mobile-patch-readout {
+    text-align: center;
+    font-size: var(--strip-mobile-patch-font-size, 14px);
+    font-weight: 800;
+    color: var(--strip-patch-color, var(--strip-db-val-color, #5cacee));
+    font-family: var(--strip-mobile-patch-font-family, var(--strip-patch-font-family, var(--strip-mobile-db-font-family, Consolas, Menlo, "Courier New", monospace)));
+    padding: 0 0 2px 0;
+    -webkit-text-stroke: var(--strip-mobile-db-stroke, 1px #000000);
+    text-shadow: 0 0 2px #000000, 0 0 1px #000000;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 /* =========================================================================

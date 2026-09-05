@@ -223,6 +223,7 @@ var ThemeEngine = (function () {
         var patchFont = getVal(csG, 'patch_font_family'); if (patchFont) root.style.setProperty('--strip-patch-font-family', patchFont);
         var patchWeight = getVal(csG, 'patch_font_weight'); if (patchWeight) root.style.setProperty('--strip-patch-font-weight', patchWeight);
         var patchSize = getVal(csG, 'patch_font_size'); if (patchSize) root.style.setProperty('--strip-patch-font-size', patchSize);
+        var patchColor = getVal(csG, 'patch_color'); if (patchColor) root.style.setProperty('--strip-patch-color', patchColor);
 
         var peakColor = getVal(csG, 'peak_led_color'); if (peakColor) root.style.setProperty('--strip-peak-led-color', peakColor);
         var peakGlow = getVal(csG, 'peak_led_glow'); if (peakGlow) root.style.setProperty('--strip-peak-led-glow', peakGlow);
@@ -398,6 +399,9 @@ var ThemeEngine = (function () {
 
         var mDbSize = getVal(csM, 'db_font_size', 'mobile_db_font_size'); if (mDbSize) root.style.setProperty('--strip-mobile-db-font-size', mDbSize);
         var mDbFont = getVal(csM, 'db_font_family'); if (mDbFont) root.style.setProperty('--strip-mobile-db-font-family', mDbFont);
+
+        var mPatchSize = getVal(csM, 'patch_font_size', 'mobile_patch_font_size'); if (mPatchSize) root.style.setProperty('--strip-mobile-patch-font-size', mPatchSize);
+        var mPatchFont = getVal(csM, 'patch_font_family'); if (mPatchFont) root.style.setProperty('--strip-mobile-patch-font-family', mPatchFont);
 
         var mNameSize = getVal(csM, 'name_display_font_size', 'mobile_name_display_font_size'); if (mNameSize) root.style.setProperty('--strip-mobile-name-display-font-size', mNameSize);
         var mNameFont = getVal(csM, 'name_display_font_family', 'mobile_name_display_font_family'); if (mNameFont) root.style.setProperty('--strip-mobile-name-display-font-family', mNameFont);

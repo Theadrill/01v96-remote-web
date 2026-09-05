@@ -26,10 +26,19 @@ var MainView = (function () {
      * @returns {string}
      */
     function _getPatchText(ch, isPaired) {
-        if (isPaired) {
-            return `AD ${ch + 1} | AD ${ch + 2}`;
+        if (typeof window.PatchRegistry !== 'undefined' && window.PatchRegistry) {
+            if (isPaired) {
+                var s = (typeof getChannelStateById === 'function') ? getChannelStateById(ch) : (window.channelStates && window.channelStates[ch]);
+                var partner = (s && s.pairedWith !== null && s.pairedWith !== undefined) ? s.pairedWith : (ch + 1);
+                return window.PatchRegistry.getPairedChannelInput(ch, partner);
+            }
+            return window.PatchRegistry.getChannelInput(ch);
         }
-        return `AD ${ch + 1}`;
+        var cs = window.channelStates || (typeof channelStates !== 'undefined' ? channelStates : null);
+        if (cs && cs[ch] && cs[ch].patch !== undefined) {
+            return (typeof decodeInputPatch === 'function') ? decodeInputPatch(cs[ch].patch) : 'ID ' + cs[ch].patch;
+        }
+        return '--';
     }
 
     /**
@@ -316,6 +325,10 @@ var MainView = (function () {
         _strips['master'] = masterStrip;
 
         _active = true;
+
+        if (typeof window.updateDesktopPatchBadges === 'function') {
+            window.updateDesktopPatchBadges();
+        }
 
         // Atualiza cache de medidores WASM
         if (typeof resetFaderCache === 'function') {

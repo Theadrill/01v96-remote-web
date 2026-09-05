@@ -470,6 +470,13 @@ class ChannelStrip {
                     ${cfg.dbValue || '-17.50 dB'}
                 </div>
 
+                <!-- Patch I/O (Mobile) -->
+                ${cfg.patch !== undefined && cfg.patch !== null && cfg.patch !== '' ? `
+                    <div class="mobile-patch-readout" title="${cfg.patch}">
+                        ${cfg.patch}
+                    </div>
+                ` : ''}
+
             </div>
 
             <!-- Overlay de Travamento Mobile -->
@@ -505,7 +512,8 @@ class ChannelStrip {
             dbReadout: root.querySelector('.desk-db-readout, .mobile-db-readout'),
             deltaDisplay: root.querySelector('.macro-delta-display'),
             patchArea: root.querySelector('.desk-patch-area'),
-            patchText: root.querySelector('.desk-patch-area .marquee-text'),
+            patchText: root.querySelector('.desk-patch-area .marquee-text, .mobile-patch-readout'),
+            mobilePatch: root.querySelector('.mobile-patch-readout'),
             vuL: root.querySelector('.vu-l'),
             vuR: root.querySelector('.vu-r'),
             peakL: root.querySelector('.peak-l'),
@@ -1491,7 +1499,17 @@ class ChannelStrip {
         this.config.patch = patchText;
         if (this.elements.patchText) {
             this.elements.patchText.innerText = patchText || '';
+            this.elements.patchText.title = patchText || '';
             this._checkMarquee();
+        } else if (this.config.layout === 'mobile' && this.elements.dbReadout && patchText) {
+            // Se o elemento mobile-patch-readout ainda não existia no DOM (patch era vazio), cria dinamicamente
+            const patchEl = document.createElement('div');
+            patchEl.className = 'mobile-patch-readout';
+            patchEl.title = patchText;
+            patchEl.innerText = patchText;
+            this.elements.dbReadout.insertAdjacentElement('afterend', patchEl);
+            this.elements.patchText = patchEl;
+            this.elements.mobilePatch = patchEl;
         }
     }
 
@@ -1955,10 +1973,23 @@ function updatePanIndicator(channel, panValue) {
 }
 
 /**
- * Atualiza dinamicamente os badges de patch no layout desktop.
+ * Atualiza dinamicamente os badges de patch no layout desktop e mobile.
  */
 function updateDesktopPatchBadges() {
-    if (layoutMode !== 'desktop' || !window.PatchRegistry) return;
+    if (!window.PatchRegistry) return;
+
+    // Se estiver usando o novo gerenciador MainView / OutsView
+    if (typeof MainView !== 'undefined' && MainView.isActive && MainView.isActive()) {
+        for (let i = 0; i < 32; i++) {
+            const s = (typeof getChannelStateById === 'function') ? getChannelStateById(i) : (window.channelStates && window.channelStates[i]);
+            const txt = (s && s.paired && s.pairedWith !== null)
+                ? window.PatchRegistry.getPairedChannelInput(i, s.pairedWith)
+                : window.PatchRegistry.getChannelInput(i);
+            MainView.updatePatch(i, txt);
+        }
+    }
+
+    if (layoutMode !== 'desktop') return;
 
     function applyTextAndMarquee(el, txt) {
         if (!el) return;
