@@ -85,8 +85,8 @@ var OutsView = (function () {
                             if (typeof mixesState !== 'undefined' && mixesState[mixIdx]) {
                                 mixesState[mixIdx].value = data.value;
                             }
-                            if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kFader/kFaderIndex', channel: gId, value: data.value });
+                            if (typeof commitFaderChange === 'function') {
+                                commitFaderChange(gId, data.value);
                             }
                         };
                     })(m, mGlobalId),
@@ -112,8 +112,8 @@ var OutsView = (function () {
                     })(m, mGlobalId),
                     nudge: (function (mixIdx, gId) {
                         return function (data) {
-                            if (typeof handleNudgeOuts === 'function') {
-                                handleNudgeOuts(gId, data.direction || (data.dir === 'plus' ? 1 : -1));
+                            if (typeof nudgeFader === 'function') {
+                                nudgeFader(gId, data.direction || (data.dir === 'plus' ? 1 : -1));
                             }
                         };
                     })(m, mGlobalId),
@@ -193,8 +193,8 @@ var OutsView = (function () {
                             if (typeof busesState !== 'undefined' && busesState[busIdx]) {
                                 busesState[busIdx].value = data.value;
                             }
-                            if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kFader/kFaderIndex', channel: gId, value: data.value });
+                            if (typeof commitFaderChange === 'function') {
+                                commitFaderChange(gId, data.value);
                             }
                         };
                     })(b, bGlobalId),
@@ -220,8 +220,8 @@ var OutsView = (function () {
                     })(b, bGlobalId),
                     nudge: (function (busIdx, gId) {
                         return function (data) {
-                            if (typeof handleNudgeOuts === 'function') {
-                                handleNudgeOuts(gId, data.direction || (data.dir === 'plus' ? 1 : -1));
+                            if (typeof nudgeFader === 'function') {
+                                nudgeFader(gId, data.direction || (data.dir === 'plus' ? 1 : -1));
                             }
                         };
                     })(b, bGlobalId),
@@ -316,8 +316,8 @@ var OutsView = (function () {
                             if (typeof channelStates !== 'undefined' && channelStates[stId]) {
                                 channelStates[stId].value = data.value;
                             }
-                            if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kFader/kFaderIndex', channel: gId, value: data.value });
+                            if (typeof commitFaderChange === 'function') {
+                                commitFaderChange(gId, data.value);
                             }
                         };
                     })(stCh, stGlobalId),
@@ -343,8 +343,8 @@ var OutsView = (function () {
                     })(stCh, stGlobalId),
                     nudge: (function (stId, gId) {
                         return function (data) {
-                            if (typeof handleNudge === 'function') {
-                                handleNudge(gId, data.direction || (data.dir === 'plus' ? 1 : -1));
+                            if (typeof nudgeFader === 'function') {
+                                nudgeFader(gId, data.direction || (data.dir === 'plus' ? 1 : -1));
                             }
                         };
                     })(stCh, stGlobalId),
@@ -422,8 +422,8 @@ var OutsView = (function () {
                 callbacks: {
                     fader_change: function (data) {
                         if (typeof masterState !== 'undefined') masterState.value = data.value;
-                        if (typeof socket !== 'undefined') {
-                            socket.emit('control', { type: 'kFader/kFaderIndex', channel: 'master', value: data.value });
+                        if (typeof commitFaderChange === 'function') {
+                            commitFaderChange('master', data.value);
                         }
                     },
                     on_toggle: function () {
@@ -439,8 +439,8 @@ var OutsView = (function () {
                         }
                     },
                     nudge: function (data) {
-                        if (typeof handleNudgeMaster === 'function') {
-                            handleNudgeMaster(data.direction || (data.dir === 'plus' ? 1 : -1));
+                        if (typeof nudgeFader === 'function') {
+                            nudgeFader('master', data.direction || (data.dir === 'plus' ? 1 : -1));
                         }
                     },
                     solo_toggle: function () {
