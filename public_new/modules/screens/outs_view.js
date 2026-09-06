@@ -90,16 +90,13 @@ var OutsView = (function () {
                             }
                         };
                     })(m, mGlobalId),
-                    on_toggle: (function (mixIdx, gId) {
+                    on_toggle: (function (gId) {
                         return function (data) {
-                            var s = typeof mixesState !== 'undefined' ? mixesState[mixIdx] : null;
-                            var newVal = data.state !== undefined ? data.state : (s ? !s.on : true);
-                            if (s) s.on = newVal;
-                            if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kChannelOn/kOn', channel: gId, value: newVal ? 1 : 0 });
+                            if (typeof toggleState === 'function') {
+                                toggleState('kAUXChannelOn/kChannelOn', gId);
                             }
                         };
-                    })(m, mGlobalId),
+                    })(mGlobalId),
                     solo_toggle: (function (mixIdx, gId) {
                         return function (data) {
                             var s = typeof mixesState !== 'undefined' ? mixesState[mixIdx] : null;
@@ -198,16 +195,13 @@ var OutsView = (function () {
                             }
                         };
                     })(b, bGlobalId),
-                    on_toggle: (function (busIdx, gId) {
+                    on_toggle: (function (gId) {
                         return function (data) {
-                            var s = typeof busesState !== 'undefined' ? busesState[busIdx] : null;
-                            var newVal = data.state !== undefined ? data.state : (s ? !s.on : true);
-                            if (s) s.on = newVal;
-                            if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kChannelOn/kOn', channel: gId, value: newVal ? 1 : 0 });
+                            if (typeof toggleState === 'function') {
+                                toggleState('kBusChannelOn/kChannelOn', gId);
                             }
                         };
-                    })(b, bGlobalId),
+                    })(bGlobalId),
                     solo_toggle: (function (busIdx, gId) {
                         return function (data) {
                             var s = typeof busesState !== 'undefined' ? busesState[busIdx] : null;
@@ -321,16 +315,13 @@ var OutsView = (function () {
                             }
                         };
                     })(stCh, stGlobalId),
-                    on_toggle: (function (stId, gId) {
+                    on_toggle: (function (gId) {
                         return function (data) {
-                            var s = typeof channelStates !== 'undefined' ? channelStates[stId] : null;
-                            var newVal = data.state !== undefined ? data.state : (s ? !s.on : true);
-                            if (s) s.on = newVal;
-                            if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kChannelOn/kOn', channel: gId, value: newVal ? 1 : 0 });
+                            if (typeof toggleState === 'function') {
+                                toggleState('kInputChannelOn/kChannelOn', gId);
                             }
                         };
-                    })(stCh, stGlobalId),
+                    })(stGlobalId),
                     solo_toggle: (function (stId, gId) {
                         return function (data) {
                             var s = typeof channelStates !== 'undefined' ? channelStates[stId] : null;
