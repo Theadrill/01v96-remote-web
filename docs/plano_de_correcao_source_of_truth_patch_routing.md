@@ -109,7 +109,7 @@ A função `syncInsertPatchesFromFxOutputs()` (patch_registry.js, linha 564) **s
 
 ## 4. Fase 1: Backend Rust (Eliminação do Estado Paralelo)
 
-### 4.1. `server_rust/src/state.rs` — Remoção de `fx_outputs`
+### 4.1. `server_rust/src/state.rs` — Remoção de `fx_outputs` + Adição de `master.insert`
 
 **Ação**: Remover o campo `fx_outputs` do struct `GlobalState` e adicionar o campo `insert` ao `MasterState`.
 
@@ -144,6 +144,14 @@ pub struct MasterState {
     pub eq: EqState,
     pub insert: InsertState,  // ✅ SSOT #5 — elemento 10 (MASTER)
 }
+```
+
+Adicionar em `GlobalState::new()` a inicialização de `master.insert`:
+```rust
+master: MasterState {
+    // ... campos existentes ...
+    insert: InsertState { on: false, position: 0.0, patch_in: 0.0 },  // ✅ SSOT #5
+},
 ```
 
 Remover do `GlobalState`:
@@ -378,16 +386,20 @@ let destinations: &[(u8, u8)] = &[
 ### 4.8. Passos de Implementação — Backend
 
 1. Adicionar `pub insert: InsertState` ao `MasterState` em `state.rs`.
-2. Inicializar `master.insert` em `GlobalState::new()`.
+2. Inicializar `master.insert` em `GlobalState::new()` com valores padrão.
 3. Remover `fx_outputs: HashMap<usize, f64>` do `GlobalState` struct.
 4. Remover `fx_outputs: HashMap::new()` da inicialização em `GlobalState::new()`.
-5. Adicionar método `get_fx_outputs()` como projeção pura (seção 4.2).
-6. Reescrever o handler `FxOutputUpdate` (seção 4.3) — escrita direta nos 5 SSOTs.
-7. Simplificar o handler `kChannelInput/kChannelIn` (seção 4.4) — apenas escreve `ch.patch`.
-8. Reescrever o handler `setFxOutput` em `socket_handlers.rs` (seção 4.5) — escrita direta nos SSOTs.
-9. Reescrever o handler `requestFxOutputs` (seção 4.6) — emitir projeção via `get_fx_outputs()`.
-10. Remover `(1, 40)` do array `destinations` em `midi_receiver.rs` (seção 4.7).
-11. `cargo check` e `cargo test`.
+5. Adicionar método `get_fx_outputs()` como projeção pura (seção 4.2) — incluindo o escaneamento de `master.insert.patch_in` para o element 10.
+6. Reescrever o handler `FxOutputUpdate` (seção 4.3) — escrita direta nos 5 SSOTs, incluindo `element == 10` → `self.master.insert.patch_in`.
+7. Adicionar handlers MIDI para parâmetros de insert do Master no `apply_midi`:
+   - `kStereoInsert/kInsertOn` → `self.master.insert.on = v > 0.5`
+   - `kStereoInsert/kInsertLocInsert` → `self.master.insert.position = v`
+   - `kStereoInsertInput/kStereoInsertIn` → `self.master.insert.patch_in = v`
+8. Simplificar o handler `kChannelInput/kChannelIn` (seção 4.4) — apenas escreve `ch.patch`.
+9. Reescrever o handler `setFxOutput` em `socket_handlers.rs` (seção 4.5) — escrita direta nos SSOTs, incluindo `element == 10` → `state.master.insert.patch_in`.
+10. Reescrever o handler `requestFxOutputs` (seção 4.6) — emitir projeção via `get_fx_outputs()`.
+11. Remover `(1, 40)` do array `destinations` em `midi_receiver.rs` (seção 4.7).
+12. `cargo check` e `cargo test`.
 
 ---
 
@@ -535,12 +547,14 @@ function setFxOutput(destKey, slotVal) {
             syncSingleInsert(36 + channel, auxData);
         }
         if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(36 + channel);
-    } else if (element === 10 && channel === 0) {
+    } else if (element === 10) {
         // SSOT #5: master.insert.patch_in
-        if (window.masterState) {
+        // Protegido: garante que window.masterState.insert existe antes de acessar
+        if (window.masterState && window.masterState.insert) {
             window.masterState.insert.patch_in = sv;
             syncSingleInsert(52, { insert: window.masterState.insert });
         }
+        if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(52);
     }
 
     // Recalcula slots de FX via projeção pura
@@ -669,7 +683,16 @@ socket.on('fxOutputsUpdate', function () {
 5. Reescrever `syncFxSlots` — ler de `getFxOutputRoutes()` em vez de `rawFxOutputs` (seção 5.3).
 6. Reescrever `getFxOutputs` — delegar para `getFxOutputRoutes()` (seção 5.4).
 7. Remover `syncInsertPatchesFromFxOutputs` e sua chamada (seção 5.5, 5.6).
-8. Validar com `node --check patch_registry.js`.
+8. Inicializar `window.masterState.insert` em `modules/core/globals.js`:
+   ```javascript
+   let masterState = {
+       value: 0, pan: 0, on: false, solo: false,
+       eq: DEFAULT_OUT_EQ(),
+       insert: { on: false, position: 0, patch_in: 0 }  // ✅ SSOT #5 — para projeção do element 10
+   };
+   ```
+9. Garantir que `syncInserts()` sincronize também o Master (`globalId = 52`).
+10. Validar com `node --check patch_registry.js`.
 
 ---
 
@@ -773,6 +796,14 @@ socket.on('fxOutputsUpdate', function () {
 | 17 | Reconexão: projeção e sync carregam o mesmo valor | Teste manual de reconexão |
 | 18 | `node --check patch_registry.js` passa | `node --check` |
 | 19 | `cargo test` — todos os testes passam | `cargo test` |
+| 20 | `masterState` em `globals.js` nasce com `insert: { on: false, position: 0, patch_in: 0 }` | `grep "insert:" public_new/modules/core/globals.js` |
+| 21 | Evento `sync` do backend inclui `"insert"` dentro de `"master"` | Inspecionar JSON de sync via network devtools |
+| 22 | `window.masterState.insert` populado corretamente após `sync` | Verificar no console: `window.masterState.insert.patch_in` |
+| 23 | Handlers MIDI `kStereoInsert/*` atualizam `self.master.insert` no Rust | Teste manual: toggle insert master, verificar patch_in |
+| 24 | `master.insert` é incluído em `get_fx_outputs()` para elemento 10 | `cargo test master_insert_in_projection` |
+| 25 | `setFxOutput` para `element === 10` atualiza `master.insert.patch_in` | `node --check` + teste manual |
+| 26 | `syncInserts()` sincroniza o Master (`globalId = 52`) | Inspecção de código + console.log |
+| 27 | Roteamento FX para Master Insert reflete na UI sem `rawFxOutputs` | Teste manual: route FX1 → Master Insert |
 
 ---
 
@@ -808,10 +839,92 @@ graph TD
 | `setFxOutput` no frontend agora retorna early para valores não-FX | Isso é o comportamento correto: valores NONE (0) ou físicos (1..120, 141..) não devem sobrescrever o patch de entrada. O `kChannelInput/kChannelIn` no sync é a fonte autoritativa para patches físicos. |
 | `getFxOutputRoutes()` varre todos os canais a cada chamada — performance | 40 canais + 32 inserts + 8 buses + 8 mixes + 1 master = 89 iterações. Em JavaScript, isso é <1ms. Em Rust, a projeção é usada apenas no request/sync — não em loop crítico. |
 | `syncInsertPatchesFromFxOutputs` removida — inserts podem não sincronizar | A função `syncInserts()` (que lê diretamente de `channelStates`, `busesState`, `mixesState`) já é chamada em `syncFromGlobalState()` e é a fonte autoritativa para inserts. `syncInsertPatchesFromFxOutputs` era um anti-pattern que sobrescrevia a SSOT. |
+| `master.insert` adicionado ao Rust mas não inicializado no frontend | Se `window.masterState.insert` for `undefined` quando `getFxOutputRoutes()` rodar antes do primeiro `sync`, acesa um `TypeError` silencioso. **Solução**: inicializar `window.masterState.insert = { on: false, position: 0, patch_in: 0 }` em `globals.js` (Passo 5.11.8). |
+| Mensagens MIDI `kStereoInsert/*` do Master não tratadas no backend | Sem handlers para `kStereoInsert/kInsertOn`, `kStereoInsert/kInsertLocInsert`, `kStereoInsertInput/kStereoInsertIn`, o estado `master.insert.on` e `master.insert.position` não refletem mudanças físicas via hardware. **Solução**: adicionar handlers no `apply_midi` (Passo 4.8.7). |
 
 ---
 
-## 10. Referências Cruzadas
+## 11. Adendo Técnico: Master Insert (Element 10) — Pipeline Completo
+
+### 11.1. Diagnóstico do Estado Atual
+
+| Camada | Estado Atual | Gap |
+|---|---|---|
+| **Protocolo MIDI (Rust)** | `FxOutputUpdate` para `element == 10` é parseado corretamente (`build_fx_output_request(10, ch)` funciona) | Handler `apply_midi` não atualiza `master.insert` — grava apenas em `fx_outputs` |
+| **Struct MasterState (Rust)** | Não possui `insert: InsertState` | Sem campo para onde escrever `patch_in` do MASTER |
+| **Re-query MIDI (Rust)** | Array `destinations` inclui `(10, 2)` (channels 0 e 1) | Precisa continuar (elemento 10 mantém o re-query) |
+| **Serialização sync (Rust)** | `serde_json::to_value(&*state)` serializa `GlobalState` inteiro | Como `MasterState` não tem `insert`, o JSON não inclui o campo — frontend nunca recebe |
+| **Inicialização masterState (JS)** | `globals.js` inicializa sem `insert` | `window.masterState.insert` é `undefined` antes do primeiro `sync` — risco de `TypeError` em `getFxOutputRoutes()` |
+| **syncInserts (JS)** | Itera canais, buses, mixes — ignora `globalId = 52` | Master insert nunca é sincronizado via `syncInserts()` |
+| **Messages MIDI Handlers (Rust)** | Não tratam `kStereoInsert/*` | `master.insert.on` e `master.insert.position` não refletem mudanças físicas via hardware |
+
+### 11.2. Passos Específicos para Element 10
+
+#### Backend (Rust)
+
+1. **`state.rs` — Struct `MasterState`**:
+   - Adicionar `pub insert: InsertState`.
+   - Inicializar em `new()`: `insert: InsertState { on: false, position: 0.0, patch_in: 0.0 }`.
+
+2. **`state.rs` — Handler `FxOutputUpdate`**:
+   - Adicionar branch `element == 10` → `self.master.insert.patch_in = *value` (se `is_fx`).
+
+3. **`state.rs` — Handler `apply_midi`** (novo):
+   - `kStereoInsert/kInsertOn` → `self.master.insert.on = v > 0.5`
+   - `kStereoInsert/kInsertLocInsert` → `self.master.insert.position = v`
+   - `kStereoInsertInput/kStereoInsertIn` → `self.master.insert.patch_in = v`
+
+4. **`state.rs` — Projeção `get_fx_outputs()`**:
+   - Escaneamento: `master.insert.patch_in` ∈ [121..140] → `routes.insert(1000, master.insert.patch_in)`.
+
+5. **`socket_handlers.rs` — Handler `setFxOutput`**:
+   - Branch `element == 10` → `state.master.insert.patch_in = fx_slot_val as f64`.
+
+#### Frontend (JS)
+
+1. **`globals.js` — Inicialização**:
+   ```javascript
+   let masterState = {
+       value: 0, pan: 0, on: false, solo: false,
+       eq: DEFAULT_OUT_EQ(),
+       insert: { on: false, position: 0, patch_in: 0 }  // ✅ protege getFxOutputRoutes()
+   };
+   ```
+
+2. **`patch_registry.js` — `setFxOutput`**:
+   - Branch para `element === 10` já está definido na seção 5.2.
+   - Proteger acesso: `if (window.masterState && window.masterState.insert)`.
+
+3. **`patch_registry.js` — `syncInserts()`**:
+   - Adicionar após o loop de buses/mixes:
+   ```javascript
+   // Master (globalId = 52)
+   if (window.masterState && window.masterState.insert) {
+       syncSingleInsert(52, { insert: window.masterState.insert });
+   }
+   ```
+
+### 11.3. Considerações de Design
+
+- **`window.syncSingleInsert(52, ...)`**: O `globalId` 52 é o ID visual do Master Insert na 01V96. Verificar que `syncSingleInsert` aceita esse ID sem problemas de indexação.
+- **Serialização do Master via `serde`**: `InsertState` já deriva `Serialize, Deserialize` — ao adicionar ao `MasterState`, o `serde` incluirá `"insert": {...}` no JSON automaticamente. Nenhum `#[serde(default)]` é necessário se o backend sempre inicializa o campo.
+- **Backward compatibility**: Se conectar a uma versão antiga do firmware (sem `insert` no master), o serde falhará. Solução: adicionar `#[serde(default)]` no campo `insert` de `MasterState` para tolerar ausência no JSON.
+
+### 11.4. Critérios de Aceite Adicionais (Element 10)
+
+| # | Critério | Verificação |
+|---|---|---|
+| 24 | `master.insert` existe no `MasterState` (Rust) | `grep "pub insert" server_rust/src/state.rs` |
+| 25 | `master.insert` é serializado no evento `sync` | Inspecionar JSON de sync via devtools |
+| 26 | `window.masterState.insert` é populado após `sync` | `console.log(window.masterState.insert.patch_in)` |
+| 27 | `getFxOutputRoutes()` inclui elemento 10 | Teste: route FX1 → Master, verificar `getFxOutputRoutes()` retorna `{1000: 121}` |
+| 28 | `setFxOutput(1000, 121)` atualiza `masterState.insert.patch_in` | `node --check` ou teste manual |
+| 29 | Mensagens `kStereoInsert/*` atualizam `master.insert` | Teste manual: toggle insert master, verificar patch_in |
+| 30 | `syncInserts()` inclui `globalId = 52` | Inspeção de código + console.log |
+
+---
+
+## 12. Referências Cruzadas
 
 - **Documento base**: `docs/plano_de_refatoracao_ROUTING_patch_registry.md` (ETAPA 1 — PatchRegistry criado)
 - **Documento dependente**: `docs/plano_de_implementacao_desktop_patch_header.md` (ETAPA 2 — Desktop patches)
@@ -826,7 +939,7 @@ graph TD
 
 ---
 
-## 11. Resumo da Reestruturação
+## 13. Resumo da Reestruturação
 
 A reescrita completa do plano arquitetural substitui a abordagem **mirrored-state** (onde `fx_outputs` e `rawFxOutputs` eram estados paralelos sincronizados via glue code if/else) pela abordagem **SSOT PURA** (Single Source of Truth).
 
@@ -856,4 +969,4 @@ A reescrita completa do plano arquitetural substitui a abordagem **mirrored-stat
 | `public_new/modules/FXS/fx_routing.js` | `getCurrentActiveId` usa `getFxDestination()` (projeção) em vez de `window.getFxOutputs()` |
 | `public_new/modules/FXS/efeitos.js` | `fxOutputsUpdate` listener chama `rerenderIfOpen()` — projeção já está consistente |
 
-**Documento**: 7 seções principais (Header/Metadados, Diagnóstico e Anti-Pattern, Fundamentação Teórica e Regras de SSOT Pura, Fase 1 Backend Rust, Fase 2 Frontend, Fase 3 Testes, Critérios de Aceite) + 3 seções complementares (Roteiro Consolidado, Riscos e Mitigações, Referências Cruzadas). Total: 11 seções. 19 critérios de aceite definidos.
+**Documento**: 7 seções principais (Header/Metadados, Diagnóstico e Anti-Pattern, Fundamentação Teórica e Regras de SSOT Pura, Fase 1 Backend Rust, Fase 2 Frontend, Fase 3 Testes, Critérios de Aceite) + 6 seções complementares (Roteiro Consolidado, Riscos e Mitigações, Referências Cruzadas, Adendo Técnico: Master Insert, Novas Referências Cruzadas, Resumo). Total: 13 seções. 30 critérios de aceite definidos (19 originais + 11 adicionais para Master Insert).
