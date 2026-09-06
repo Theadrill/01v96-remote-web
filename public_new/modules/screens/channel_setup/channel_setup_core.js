@@ -420,6 +420,8 @@ var ChannelSetupCore = (function () {
         if (typeof musicianMode !== 'undefined' && musicianMode) return;
         if (e && e.target && (e.target.closest('button') || e.target.closest('input'))) return;
 
+        var isFreshOpen = (_activeChannel === null);
+
         // Memoriza contexto anterior apenas na navegação INPUT → MIX (36-43).
         // Reabertura do mesmo canal não toca no contexto já salvo.
         if (_activeChannel !== ch) {
@@ -445,7 +447,8 @@ var ChannelSetupCore = (function () {
         // Rebuild meter cache synchronously after mini-fader render so wasmRenderLoop can see it
         if (typeof resetFaderCache === 'function') resetFaderCache();
         if (typeof buildMeterCache === 'function') buildMeterCache();
-        switchTab(defaultTab || _activeTab || 'aux');
+        var targetTab = defaultTab || (isFreshOpen ? 'aux' : _activeTab) || 'aux';
+        switchTab(targetTab);
         _highlightActiveCard(ch);
 
         if (typeof renderDock === 'function') renderDock('channelConfig');
@@ -485,6 +488,11 @@ var ChannelSetupCore = (function () {
         try { activeConfigChannel = null; } catch (e) { }
         window.activeConfigChannel = null;
 
+        // Reset da aba memorizada ao sair da tela de config (retorna para 'aux' / MIX padrão)
+        _activeTab = 'aux';
+        try { activeConfigTab = 'aux'; } catch (e) { }
+        window.activeConfigTab = 'aux';
+
         var miniFader = document.getElementById('miniFaderContext');
         if (miniFader) miniFader.innerHTML = '';
 
@@ -508,7 +516,7 @@ var ChannelSetupCore = (function () {
     // ─── API Pública & Compatibilidade Global ────────────────────
 
     // Mapeamento para funções globais legadas
-    window.openChannelConfig = function (e, ch) { open(e, ch); };
+    window.openChannelConfig = function (e, ch, defaultTab) { open(e, ch, defaultTab); };
     window.closeChannelConfig = function () { close(); };
     window.changeConfigChannel = function (delta) { changeChannel(delta); };
     window.updateConfigUIForChannel = function (ch) {

@@ -138,6 +138,8 @@ function closeChannelConfig() {
     document.getElementById('chConfigModal').style.display = 'none';
 
     activeConfigChannel = null;
+    activeConfigTab = 'aux';
+    try { window.activeConfigTab = 'aux'; } catch (e) { }
     const miniFader = document.getElementById('miniFaderContext');
     if (miniFader) miniFader.innerHTML = '';
 
