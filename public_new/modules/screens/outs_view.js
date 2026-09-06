@@ -103,7 +103,7 @@ var OutsView = (function () {
                             var newVal = data.state !== undefined ? data.state : (s ? !s.solo : true);
                             if (s) s.solo = newVal;
                             if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kSetupSoloChOn/kSoloChOn', channel: gId, value: newVal ? 1 : 0 });
+                                socket.emit('control', { type: 'kSetupSoloChOn/kSoloChOn', channel: 40 + mixIdx, value: newVal ? 1 : 0 });
                             }
                         };
                     })(m, mGlobalId),
@@ -208,7 +208,7 @@ var OutsView = (function () {
                             var newVal = data.state !== undefined ? data.state : (s ? !s.solo : true);
                             if (s) s.solo = newVal;
                             if (typeof socket !== 'undefined') {
-                                socket.emit('control', { type: 'kSetupSoloChOn/kSoloChOn', channel: gId, value: newVal ? 1 : 0 });
+                                socket.emit('control', { type: 'kSetupSoloChOn/kSoloChOn', channel: 48 + busIdx, value: newVal ? 1 : 0 });
                             }
                         };
                     })(b, bGlobalId),
