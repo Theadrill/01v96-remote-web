@@ -1240,8 +1240,13 @@ function setupMeterObserver() {
 }
 
 function buildMeterCache() {
-    faderCardsCache = document.querySelectorAll(
+    // Exclude #miniFaderContext — mini-fader meters are handled separately
+    // by the dedicated mini-fader handler in applyMetersToDOM (activeConfigChannel block).
+    const allWrappers = document.querySelectorAll(
         '#faders-container .channel-strip-wrapper, #master-container .channel-strip-wrapper, .faders-area .channel-strip-wrapper, .channel-strip-wrapper, .faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card'
+    );
+    faderCardsCache = Array.from(allWrappers).filter(
+        (el) => !el.closest('#miniFaderContext')
     );
     if (!faderCardsCache || !faderCardsCache.length) {
         meterElementsCache = null;
@@ -1259,7 +1264,7 @@ function buildMeterCache() {
             dataCh: card.getAttribute('data-ch'),
             partnerCh: card.getAttribute('data-partner-ch'),
             curtains: Array.from(card.querySelectorAll('.desk-vu-fill, .desk-meter-curtain')),
-            mobileCurtains: Array.from(card.querySelectorAll('.mobile-meter-curtain, .mobile-meter-curtain')),
+            mobileCurtains: Array.from(card.querySelectorAll('.mobile-meter-curtain')),
             peakLed: card.querySelector('.desk-peak-led.peak-l, .peak-l, .desk-peak-led, .mobile-peak-led'),
             peakLedR: card.querySelector('.desk-peak-led.peak-r, .peak-r'),
             hasMeter: card.classList.contains('has-meter') || card.classList.contains('has-paired-meter'),
@@ -1283,7 +1288,6 @@ function clearAllMeters() {
         if (cached.curtains) {
             cached.curtains.forEach(curtain => {
                 if (curtain) {
-                    curtain.style.transform = '';
                     curtain.style.clipPath = 'inset(100% 0 0 0)';
                 }
             });
@@ -1291,7 +1295,6 @@ function clearAllMeters() {
         if (cached.mobileCurtains) {
             cached.mobileCurtains.forEach(curtain => {
                 if (curtain) {
-                    curtain.style.transform = '';
                     curtain.style.clipPath = 'inset(100% 0 0 0)';
                 }
             });
@@ -1539,11 +1542,12 @@ function applyMetersToDOM(smoothedLevels, now) {
 
     // --- Suporte ao METER do Mini Fader (no modal de config) ---
     if (activeConfigChannel !== null) {
-        let miniCardId = `mini-card${activeConfigChannel}`;
-        if (activeConfigChannel === 52) miniCardId = 'mini-cardmaster';
-        else if (activeConfigChannel >= 36 && activeConfigChannel <= 43) miniCardId = `mini-cardm${activeConfigChannel - 36}`;
-        else if (activeConfigChannel >= 44 && activeConfigChannel <= 51) miniCardId = `mini-cardb${activeConfigChannel - 44}`;
-        else if (activeConfigChannel >= 60 && activeConfigChannel <= 67) miniCardId = `mini-cardst${Math.floor((activeConfigChannel - 60) / 2)}`;
+        // ID format: strip_mini_${ch} (ChannelStrip.render sets wrapper.id = `strip_${cfg.id}` where cfg.id = 'mini_' + ch)
+        let miniCardId = `strip_mini_${activeConfigChannel}`;
+        if (activeConfigChannel === 52) miniCardId = 'strip_mini_master';
+        else if (activeConfigChannel >= 36 && activeConfigChannel <= 43) miniCardId = `strip_mini_m${activeConfigChannel - 36}`;
+        else if (activeConfigChannel >= 44 && activeConfigChannel <= 51) miniCardId = `strip_mini_b${activeConfigChannel - 44}`;
+        else if (activeConfigChannel >= 60 && activeConfigChannel <= 67) miniCardId = `strip_mini_st${Math.floor((activeConfigChannel - 60) / 2)}`;
 
         const miniCard = document.getElementById(miniCardId);
         if (miniCard) {
@@ -1551,14 +1555,16 @@ function applyMetersToDOM(smoothedLevels, now) {
             const levelIdx = isMasterMini ? 32 : activeConfigChannel;
             const finalPercent = smoothedLevels[levelIdx] || 0;
 
-            const deskCurtains = miniCard.querySelectorAll('.desk-meter-curtain');
+            const deskCurtains = miniCard.querySelectorAll('.desk-vu-fill, .desk-meter-curtain');
             const mobileCurtains = miniCard.querySelectorAll('.mobile-meter-curtain');
-            const peakLed = miniCard.querySelector('.desk-peak-led') || miniCard.querySelector('.mobile-peak-led');
+            const peakLed = miniCard.querySelector('.desk-peak-led.peak-l, .desk-peak-led, .mobile-peak-led');
+            const peakLedR = miniCard.querySelector('.desk-peak-led.peak-r');
 
             let isPeaking = finalPercent >= 98;
+            let partnerPercent = 0;
 
             if (deskCurtains.length > 0) {
-                deskCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
+                _updateMeterElementLevel(deskCurtains[0], finalPercent);
 
                 if (deskCurtains.length > 1) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
@@ -1567,14 +1573,14 @@ function applyMetersToDOM(smoothedLevels, now) {
                             ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
-                        const partnerPercent = smoothedLevels[pIdx];
-                        deskCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
+                        partnerPercent = smoothedLevels[pIdx];
+                        _updateMeterElementLevel(deskCurtains[1], partnerPercent);
                         if (partnerPercent >= 98) isPeaking = true;
                     }
                 }
             } else if (mobileCurtains.length > 0) {
                 if (!miniCard.classList.contains('has-meter')) miniCard.classList.add('has-meter');
-                mobileCurtains[0].style.transform = `translateZ(0) scaleY(${1 - (finalPercent / 100)})`;
+                _updateMeterElementLevel(mobileCurtains[0], finalPercent);
 
                 if (mobileCurtains.length > 1) {
                     const s = (typeof channelStates !== 'undefined' && levelIdx < 32) ? channelStates[levelIdx] : null;
@@ -1583,8 +1589,8 @@ function applyMetersToDOM(smoothedLevels, now) {
                             ((levelIdx >= 60 && levelIdx <= 66) ? levelIdx + 1 : null));
 
                     if (pIdx !== null && pIdx < smoothedLevels.length) {
-                        const partnerPercent = smoothedLevels[pIdx];
-                        mobileCurtains[1].style.transform = `translateZ(0) scaleY(${1 - (partnerPercent / 100)})`;
+                        partnerPercent = smoothedLevels[pIdx];
+                        _updateMeterElementLevel(mobileCurtains[1], partnerPercent);
                         if (partnerPercent >= 98) isPeaking = true;
                     }
                 }
@@ -1595,9 +1601,11 @@ function applyMetersToDOM(smoothedLevels, now) {
 
             if (isPeaking) {
                 if (peakLed) peakLed.classList.add('active');
+                if (peakLedR && partnerPercent >= 98) peakLedR.classList.add('active');
                 miniCard.classList.add('peak-glow');
             } else {
                 if (peakLed) peakLed.classList.remove('active');
+                if (peakLedR) peakLedR.classList.remove('active');
                 miniCard.classList.remove('peak-glow');
             }
         }
@@ -1627,7 +1635,21 @@ function wasmRenderLoop(now) {
         }
     }
 
-    if (isCanvasMode || !meterElementsCache || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
+    if (isCanvasMode || (typeof musicianMode !== 'undefined' && musicianMode && !window.showMetersInMusicianMode)) {
+        return;
+    }
+
+    // Fail-safe: rebuild cache if DOM cards exist but cache was cleared (e.g. after modal open/close)
+    if (!meterElementsCache) {
+        const cards = document.querySelectorAll('#faders-container .channel-strip-wrapper, #master-container .channel-strip-wrapper, .faders-area .channel-strip-wrapper, .channel-strip-wrapper, .faders-area > .fader-card, .faders-area > .fader-card-desktop, #master-container .fader-card-desktop, #master-container .fader-card');
+        const visibleCards = Array.from(cards).filter(
+            (el) => !el.closest('#miniFaderContext')
+        );
+        if (visibleCards.length > 0) {
+            buildMeterCache();
+        }
+    }
+    if (!meterElementsCache) {
         return;
     }
 

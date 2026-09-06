@@ -1596,6 +1596,42 @@ class ChannelStrip {
         });
         if (this.element) this.element.dispatchEvent(customEvent);
     }
+
+    /**
+     * Cleanup method — removes DOM element, clears timers, and nullifies references.
+     * Safe to call multiple times.
+     */
+    destroy() {
+        // Clear all timers
+        if (this.peakHoldTimerL) {
+            clearTimeout(this.peakHoldTimerL);
+            this.peakHoldTimerL = null;
+        }
+        if (this.peakHoldTimerR) {
+            clearTimeout(this.peakHoldTimerR);
+            this.peakHoldTimerR = null;
+        }
+        if (this.deltaResetTimer) {
+            clearTimeout(this.deltaResetTimer);
+            this.deltaResetTimer = null;
+        }
+        if (this.nudgeInterval) {
+            clearInterval(this.nudgeInterval);
+            this.nudgeInterval = null;
+        }
+
+        // Reset interaction state
+        this.isDragging = false;
+        this._lastNudgeRaw = null;
+
+        // Remove DOM element if present
+        if (this.element && this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+        }
+
+        this.element = null;
+        this.elements = {};
+    }
 }
 
 // Expõe globalmente
@@ -1735,7 +1771,7 @@ function updateUI(ch, val, onState, soloState) {
         // Novo: Subtle yellow background for desktop layout when channel is ON
         const elCard = document.getElementById(`card${uiId}`);
         if (elCard && layoutMode === 'desktop') elCard.classList.toggle('desk-on-bg', onState);
-        const elCardMini = document.getElementById(`mini-card${uiId}`);
+        const elCardMini = document.getElementById(`strip_mini_${uiId}`);
         if (elCardMini) elCardMini.classList.toggle('desk-on-bg', onState);
 
         // Novo: Colorized Label background
@@ -2171,10 +2207,14 @@ function createMobileStrip(config) {
     return `
         <div class="fader-card ${customClass}" id="${cardId}" ${dataCh !== undefined && dataCh !== '' ? `data-ch="${dataCh}"` : ''} ${partnerId !== null ? `data-partner-ch="${partnerId}"` : ''}>
             ${isPaired ? `
-            <div class="mobile-meter-bg left"><div class="mobile-meter-curtain"></div></div>
-            <div class="mobile-meter-bg right"><div class="mobile-meter-curtain"></div></div>
+            <div class="mobile-meter-curtain-container">
+                <div class="mobile-meter-curtain vu-l"></div>
+                <div class="mobile-meter-curtain vu-r"></div>
+            </div>
             ` : `
-            <div class="mobile-meter-bg"><div class="mobile-meter-curtain"></div></div>
+            <div class="mobile-meter-curtain-container">
+                <div class="mobile-meter-curtain vu-l"></div>
+            </div>
             `}
             ${getMobileScaleHTML()}
             ${onTop ? onBtn : ''}
@@ -2409,10 +2449,14 @@ function createOutputStrip(i, type, idPrefix = "") {
     return `
         <div class="fader-card ${customClass}" id="${pfx}card${prefix}${i}" ${type === 'stIn' ? `data-ch="${configId}" data-partner-ch="${configId + 1}"` : `data-ch="${configId}"`}>
             ${type === 'stIn' ? `
-            <div class="mobile-meter-bg left"><div class="mobile-meter-curtain"></div></div>
-            <div class="mobile-meter-bg right"><div class="mobile-meter-curtain"></div></div>
+            <div class="mobile-meter-curtain-container">
+                <div class="mobile-meter-curtain vu-l"></div>
+                <div class="mobile-meter-curtain vu-r"></div>
+            </div>
             ` : `
-            <div class="mobile-meter-bg"><div class="mobile-meter-curtain"></div></div>
+            <div class="mobile-meter-curtain-container">
+                <div class="mobile-meter-curtain vu-l"></div>
+            </div>
             `}
             ${getMobileScaleHTML()}
             <div class="ch-clickable-zone top" onclick="${idPrefix ? "" : `openChannelConfig(event, ${configId})`}">
@@ -2526,6 +2570,10 @@ function initUI() {
 
     if (isMainScreen && typeof MainView !== 'undefined' && typeof MainView.render === 'function') {
         MainView.render();
+        // Rebuild meter cache synchronously after main strip render so wasmRenderLoop can see the DOM
+        if (typeof window !== 'undefined' && typeof window.buildMeterCache === 'function') {
+            window.buildMeterCache();
+        }
         // Inicializa os indicadores de Pan
         for (let i = 0; i < NUM_CHANNELS; i++) {
             if (!isValidChannelForLayer(i)) continue;
@@ -2544,6 +2592,10 @@ function initUI() {
 
     if (isOutsScreen && typeof OutsView !== 'undefined' && typeof OutsView.render === 'function') {
         OutsView.render();
+        // Rebuild meter cache synchronously after outs strip render so wasmRenderLoop can see the DOM
+        if (typeof window !== 'undefined' && typeof window.buildMeterCache === 'function') {
+            window.buildMeterCache();
+        }
         checkMasterSoloIndicator();
         return;
     }

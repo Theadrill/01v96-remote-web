@@ -442,6 +442,9 @@ var ChannelSetupCore = (function () {
 
         updateHeader(ch);
         renderMiniFader(ch);
+        // Rebuild meter cache synchronously after mini-fader render so wasmRenderLoop can see it
+        if (typeof resetFaderCache === 'function') resetFaderCache();
+        if (typeof buildMeterCache === 'function') buildMeterCache();
         switchTab(defaultTab || _activeTab || 'aux');
         _highlightActiveCard(ch);
 
@@ -488,7 +491,13 @@ var ChannelSetupCore = (function () {
         var vgSlot = document.getElementById('miniFaderVolumeGeral');
         if (vgSlot) vgSlot.remove();
 
+        // Rebuild meter cache for the main faders after modal close
+        if (typeof resetFaderCache === 'function') resetFaderCache();
         if (typeof initUI === 'function') initUI();
+        // initUI calls resetFaderCache already, but buildMeterCache needs DOM to be painted
+        requestAnimationFrame(function () {
+            if (typeof buildMeterCache === 'function') buildMeterCache();
+        });
         if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
 
         document.querySelectorAll('.fader-card, .channel-strip-wrapper').forEach(function (c) {

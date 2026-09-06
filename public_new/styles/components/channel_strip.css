@@ -229,6 +229,12 @@
 
     /* Mobile Strip */
     --strip-mobile-bg: #14161d;
+
+    /* Mobile Stereo Meter Gradient Variables */
+    --strip-mobile-meter-gradient-top: #ff0000;
+    --strip-mobile-meter-gradient-mid: #ffbb00;
+    --strip-mobile-meter-gradient-low: #166534;
+    --strip-mobile-meter-gradient-base: #064e3b;
 }
 
 /* =========================================================================
@@ -815,6 +821,7 @@
 .mobile-meter-curtain {
     flex: 1;
     height: 100%;
+    box-sizing: border-box;
     background: linear-gradient(
         180deg,
         var(--strip-mobile-meter-gradient-top, #ff0000) 0%,
@@ -824,10 +831,17 @@
     );
     clip-path: inset(100% 0 0 0);
     will-change: clip-path;
+    /* Alinha os cantos arredondados com o container pai */
+    border-top-left-radius: 9px;
+    border-bottom-left-radius: 9px;
 }
 
 .mobile-meter-curtain + .mobile-meter-curtain {
     border-left: 1px solid rgba(0, 0, 0, 0.45);
+    border-top-right-radius: 9px;
+    border-bottom-right-radius: 9px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 /* Peak Glow Mobile */
