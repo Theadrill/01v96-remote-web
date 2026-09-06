@@ -2683,7 +2683,11 @@ pub fn register_handlers(
                                         }
                                     }
                                     10 => {
-                                        state.master.insert.patch_in = 0.0;
+                                        if ch == 0 {
+                                            state.master.insert.patch_in = 0.0;
+                                        } else if ch == 1 {
+                                            state.master.insert.patch_in_r = 0.0;
+                                        }
                                     }
                                     _ => {}
                                 }
@@ -2737,7 +2741,11 @@ pub fn register_handlers(
                                 }
                             }
                             10 => {
-                                state.master.insert.patch_in = fx_slot_val as f64;
+                                if ch == 0 {
+                                    state.master.insert.patch_in = fx_slot_val as f64;
+                                } else if ch == 1 {
+                                    state.master.insert.patch_in_r = fx_slot_val as f64;
+                                }
                             }
                             _ => {}
                         }

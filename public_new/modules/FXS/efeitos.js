@@ -59,6 +59,8 @@
     function dispatchFxRequests() {
         if (typeof socket === 'undefined') return;
         socket.emit('requestFxTypes');
+        socket.emit('requestFxInputs');
+        socket.emit('requestFxOutputs');
     }
 
     // ── Socket listeners ──────────────────────────────────────────────
@@ -96,6 +98,7 @@
             } else if (!active && isOpen) {
                 hideSyncOverlay();
                 renderEffectsScreen();
+                dispatchFxRequests();
             }
         });
 

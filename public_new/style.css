@@ -3082,7 +3082,7 @@ body.layout-desktop .ch-modal-overlay {
     text-align: center;
     white-space: nowrap;
     letter-spacing: 0.5px;
-    min-width: 75px;
+    min-width: 100px;
     display: inline-block;
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;

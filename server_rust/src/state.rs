@@ -49,6 +49,8 @@ pub struct InsertState {
     pub on: bool,
     pub position: f64,
     pub patch_in: f64,
+    #[serde(default)]
+    pub patch_in_r: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -239,6 +241,7 @@ impl GlobalState {
                         on: false,
                         position: 0.0,
                         patch_in: 0.0,
+                        patch_in_r: 0.0,
                     },
                     gate: GateState {
                         on: false,
@@ -375,7 +378,7 @@ impl GlobalState {
                 paired: false,
                 paired_with: None,
                 pair_source: None,
-                insert: InsertState { on: false, position: 0.0, patch_in: 0.0 },
+                insert: InsertState { on: false, position: 0.0, patch_in: 0.0, patch_in_r: 0.0 },
                 stereo: false,
                 mode: 1,
                 global: 1,
@@ -448,6 +451,7 @@ impl GlobalState {
                     on: false,
                     position: 0.0,
                     patch_in: 0.0,
+                    patch_in_r: 0.0,
                 },
             },
             out_patches_omni: HashMap::new(),
@@ -535,11 +539,16 @@ impl GlobalState {
             }
         }
 
-        // Element 10: master.insert.patch_in
-        let master_patch_rounded = self.master.insert.patch_in.round() as u32;
-        if (121..=140).contains(&master_patch_rounded) {
+        // Element 10: master.insert (ch 0 = L, ch 1 = R)
+        let master_l_rounded = self.master.insert.patch_in.round() as u32;
+        if (121..=140).contains(&master_l_rounded) {
             let key = 10 * 100 + 0;
             routes.insert(key, self.master.insert.patch_in);
+        }
+        let master_r_rounded = self.master.insert.patch_in_r.round() as u32;
+        if (121..=140).contains(&master_r_rounded) {
+            let key = 10 * 100 + 1;
+            routes.insert(key, self.master.insert.patch_in_r);
         }
 
         routes
@@ -721,7 +730,11 @@ impl GlobalState {
                 } else if mt == "kStereoInsert/kInsertLocInsert" {
                     self.master.insert.position = v;
                 } else if mt == "kStereoInsertInput/kStereoInsertIn" {
-                    self.master.insert.patch_in = v;
+                    if *channel == 0 {
+                        self.master.insert.patch_in = v;
+                    } else if *channel == 1 {
+                        self.master.insert.patch_in_r = v;
+                    }
                 } else if mt == "kAUXType/kAUXTypeIndex" {
                     if let Some(mix) = self.mixes.get_mut(channel) {
                         mix.mode = v as u8;
@@ -1057,9 +1070,13 @@ impl GlobalState {
                         }
                     }
                 } else if *element == 10 {
-                    // SSOT #5: master.insert.patch_in
+                    // SSOT #5: master.insert (ch 0 = L, ch 1 = R)
                     if is_fx {
-                        self.master.insert.patch_in = *value;
+                        if *channel == 0 {
+                            self.master.insert.patch_in = *value;
+                        } else if *channel == 1 {
+                            self.master.insert.patch_in_r = *value;
+                        }
                     }
                 }
             }
@@ -1312,8 +1329,9 @@ mod tests {
         state.buses.get_mut(&0).unwrap().insert.patch_in = 137.0;
         // Mix 1 insert patch_in set to FX4-1 (139)
         state.mixes.get_mut(&1).unwrap().insert.patch_in = 139.0;
-        // Master insert patch_in set to FX1-2 (122)
+        // Master insert patch_in set to FX1-2 (122) on Left, FX4-2 (140) on Right
         state.master.insert.patch_in = 122.0;
+        state.master.insert.patch_in_r = 140.0;
 
         let routes = state.get_fx_outputs();
         assert_eq!(routes.get(&100), Some(&121.0)); // Element 1 (CH1)
@@ -1321,8 +1339,9 @@ mod tests {
         assert_eq!(routes.get(&204), Some(&129.0)); // Element 2 (INS CH5)
         assert_eq!(routes.get(&700), Some(&137.0)); // Element 7 (INS BUS1)
         assert_eq!(routes.get(&801), Some(&139.0)); // Element 8 (INS AUX2)
-        assert_eq!(routes.get(&1000), Some(&122.0)); // Element 10 (Master Insert)
-        assert_eq!(routes.len(), 5);
+        assert_eq!(routes.get(&1000), Some(&122.0)); // Element 10 ch 0 (Master Insert L)
+        assert_eq!(routes.get(&1001), Some(&140.0)); // Element 10 ch 1 (Master Insert R)
+        assert_eq!(routes.len(), 6);
     }
 
     #[test]
@@ -1338,6 +1357,38 @@ mod tests {
         };
         state.apply_midi(&midi);
         assert_eq!(state.channels.get(&0).unwrap().patch, 121.0);
+    }
+
+    #[test]
+    fn test_fx_output_element_10_master_insert() {
+        let mut state = GlobalState::new();
+        assert_eq!(state.master.insert.patch_in, 0.0);
+        assert_eq!(state.master.insert.patch_in_r, 0.0);
+
+        // FxOutputUpdate with element 10, channel 0, value 139.0 (FX4 OUT1 / L)
+        let midi_l = ParsedMidi::FxOutputUpdate {
+            element: 10,
+            channel: 0,
+            value: 139.0,
+        };
+        state.apply_midi(&midi_l);
+        assert_eq!(state.master.insert.patch_in, 139.0);
+
+        // FxOutputUpdate with element 10, channel 1, value 140.0 (FX4 OUT2 / R)
+        // MUST NOT overwrite channel 0!
+        let midi_r = ParsedMidi::FxOutputUpdate {
+            element: 10,
+            channel: 1,
+            value: 140.0,
+        };
+        state.apply_midi(&midi_r);
+        assert_eq!(state.master.insert.patch_in, 139.0);
+        assert_eq!(state.master.insert.patch_in_r, 140.0);
+
+        // get_fx_outputs() must project both: 1000 -> 139.0 and 1001 -> 140.0
+        let routes = state.get_fx_outputs();
+        assert_eq!(routes.get(&1000), Some(&139.0));
+        assert_eq!(routes.get(&1001), Some(&140.0));
     }
 
     #[test]
@@ -1381,6 +1432,7 @@ mod tests {
         assert!(!state.master.insert.on);
         assert_eq!(state.master.insert.position, 0.0);
         assert_eq!(state.master.insert.patch_in, 0.0);
+        assert_eq!(state.master.insert.patch_in_r, 0.0);
 
         state.apply_midi(&ParsedMidi::ControlChange {
             msg_type: "kStereoInsert/kInsertOn".to_string(),
@@ -1396,11 +1448,21 @@ mod tests {
         });
         assert_eq!(state.master.insert.position, 2.0);
 
+        // Ch 0 -> patch_in (L)
         state.apply_midi(&ParsedMidi::ControlChange {
             msg_type: "kStereoInsertInput/kStereoInsertIn".to_string(),
             channel: 0,
             value: 121.0,
         });
         assert_eq!(state.master.insert.patch_in, 121.0);
+
+        // Ch 1 -> patch_in_r (R)
+        state.apply_midi(&ParsedMidi::ControlChange {
+            msg_type: "kStereoInsertInput/kStereoInsertIn".to_string(),
+            channel: 1,
+            value: 122.0,
+        });
+        assert_eq!(state.master.insert.patch_in, 121.0);
+        assert_eq!(state.master.insert.patch_in_r, 122.0);
     }
 }

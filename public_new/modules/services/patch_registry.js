@@ -129,8 +129,8 @@
         if (val >= 13 && val <= 44) return 'INS CH ' + (val - 12);
         if (val >= 109 && val <= 116) return 'INS BUS ' + (val - 108);
         if (val >= 117 && val <= 124) return 'INS AUX ' + (val - 116);
-        if (val === 137) return 'MASTER L';
-        if (val === 138) return 'MASTER R';
+        if (val === 137) return 'INS MASTER L';
+        if (val === 138) return 'INS MASTER R';
         return '???(' + val + ')';
     }
 
@@ -152,7 +152,7 @@
         if (element === 2) return 'INS CH ' + (channel + 1);
         if (element === 7) return 'INS BUS ' + (channel + 1);
         if (element === 8) return 'INS AUX ' + (channel + 1);
-        if (element === 10) return channel === 0 ? 'MASTER L' : 'MASTER R';
+        if (element === 10) return channel === 0 ? 'INS MASTER L' : 'INS MASTER R';
         return '?el' + element + 'ch' + channel;
     }
 
@@ -610,12 +610,20 @@
                 }
             }
         }
-        // Element 10: master.insert.patch_in
+        // Element 10: master.insert (ch 0 = L, ch 1 = R)
         var mst = window.masterState || (typeof masterState !== 'undefined' ? masterState : null);
-        if (mst && mst.insert && mst.insert.patch_in !== undefined) {
-            var vmst = Math.round(mst.insert.patch_in);
-            if (vmst >= 121 && vmst <= 140) {
-                routes[10 * 100 + 0] = vmst;
+        if (mst && mst.insert) {
+            if (mst.insert.patch_in !== undefined) {
+                var vmstL = Math.round(mst.insert.patch_in);
+                if (vmstL >= 121 && vmstL <= 140) {
+                    routes[10 * 100 + 0] = vmstL;
+                }
+            }
+            if (mst.insert.patch_in_r !== undefined) {
+                var vmstR = Math.round(mst.insert.patch_in_r);
+                if (vmstR >= 121 && vmstR <= 140) {
+                    routes[10 * 100 + 1] = vmstR;
+                }
             }
         }
         return routes;
@@ -688,6 +696,7 @@
         }
         var ins = stateObj.insert;
         var patchIn = ins.patch_in || 0;
+        var patchInR = ins.patch_in_r !== undefined ? ins.patch_in_r : 0;
         var inLabel = decodeInsertInLabel(patchIn);
 
         // Calcula o INSERT OUT atual (porta física)
@@ -706,6 +715,7 @@
             on: !!ins.on,
             position: ins.position || 0,
             patch_in: patchIn,
+            patch_in_r: patchInR,
             patch_out: 0,
             inLabel: inLabel,
             outLabel: outLabel,
@@ -860,7 +870,11 @@
         else if (element === 10) {
             var mst = window.masterState || (typeof masterState !== 'undefined' ? masterState : null);
             if (mst && mst.insert) {
-                mst.insert.patch_in = sv;
+                if (channel === 0) {
+                    mst.insert.patch_in = sv;
+                } else if (channel === 1) {
+                    mst.insert.patch_in_r = sv;
+                }
                 syncSingleInsert(52, { insert: mst.insert });
             }
             if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(52);
@@ -1082,6 +1096,30 @@
                 var busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
                 var globalCh = 44 + busIdx;
                 setInsertInfo(globalCh, { on: (inserts[globalCh] || {}).on || false, position: d.value, patch_in: (inserts[globalCh] || {}).patch_in || 0 });
+            }
+            if (d.type === 'kStereoInsert/kInsertOn') {
+                setInsertInfo(52, { on: !!d.value, position: (inserts[52] || {}).position || 0, patch_in: (inserts[52] || {}).patch_in || 0, patch_in_r: (inserts[52] || {}).patch_in_r || 0 });
+            }
+            if (d.type === 'kStereoInsert/kInsertLocInsert') {
+                setInsertInfo(52, { on: (inserts[52] || {}).on || false, position: d.value, patch_in: (inserts[52] || {}).patch_in || 0, patch_in_r: (inserts[52] || {}).patch_in_r || 0 });
+            }
+            if (d.type === 'kStereoInsertInput/kStereoInsertIn') {
+                var mst = window.masterState || (typeof masterState !== 'undefined' ? masterState : null);
+                if (mst && mst.insert) {
+                    if (d.channel === 0) {
+                        mst.insert.patch_in = d.value;
+                    } else if (d.channel === 1) {
+                        mst.insert.patch_in_r = d.value;
+                    }
+                }
+                var curIns = inserts[52] || {};
+                setInsertInfo(52, {
+                    on: curIns.on || false,
+                    position: curIns.position || 0,
+                    patch_in: d.channel === 0 ? d.value : (curIns.patch_in || 0),
+                    patch_in_r: d.channel === 1 ? d.value : (curIns.patch_in_r || 0)
+                });
+                syncFxSlots();
             }
         });
 

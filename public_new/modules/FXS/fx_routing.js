@@ -31,10 +31,10 @@
             options: [1, 2, 3, 4, 5, 6, 7, 8].map(n => ({ id: 116 + n, name: 'INS AUX' + n }))
         },
         {
-            name: 'MASTER LR',
+            name: 'INS MASTER LR',
             options: [
-                { id: 137, name: 'MASTER L' },
-                { id: 138, name: 'MASTER R' }
+                { id: 137, name: 'INS MASTER L' },
+                { id: 138, name: 'INS MASTER R' }
             ]
         }
     ];
@@ -84,10 +84,10 @@
             }))
         },
         {
-            name: 'MASTER LR',
+            name: 'INS MASTER LR',
             options: [
-                { id: 4000, name: 'MASTER L', element: 10, channel: 0 },
-                { id: 4001, name: 'MASTER R', element: 10, channel: 1 }
+                { id: 4000, name: 'INS MASTER L', element: 10, channel: 0 },
+                { id: 4001, name: 'INS MASTER R', element: 10, channel: 1 }
             ]
         }
     ];
