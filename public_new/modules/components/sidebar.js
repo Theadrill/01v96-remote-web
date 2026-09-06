@@ -209,6 +209,10 @@ const savedOrientation = localStorage.getItem('mixer_orientation');
 if (savedOrientation) setOrientation(savedOrientation);
 
 function switchTab(tabId) {
+    if (typeof ChannelSetupCore !== 'undefined' && typeof ChannelSetupCore.switchTab === 'function') {
+        ChannelSetupCore.switchTab(tabId);
+        return;
+    }
     activeConfigTab = tabId;
     if (window.stopEQAnimation) stopEQAnimation();
     if (window.stopGrPolling) window.stopGrPolling();
