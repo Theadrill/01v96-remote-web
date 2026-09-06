@@ -1,6 +1,6 @@
 # Plano de Correção Arquitetural: Patch Routing — Single Source of Truth (SSOT)
 
-> **Status**: ✅ **CONCLUÍDO**
+> **Status**: ⏳ **PENDENTE** (Aguardando implementação)
 > **Prioridade**: 🔴 CRÍTICA
 > **Módulos Afetados**: `server_rust/src/state.rs`, `server_rust/src/midi_receiver.rs`, `server_rust/src/midi/protocol.rs`, `server_rust/src/socket_handlers.rs`, `public_new/modules/services/patch_registry.js`, `public_new/modules/services/socket.js`, `public_new/modules/FXS/fx_routing.js`, `public_new/modules/FXS/efeitos.js`
 
@@ -11,7 +11,7 @@
 | Campo | Valor |
 |---|---|
 | **Documento** | `docs/plano_de_correcao_source_of_truth_patch_routing.md` |
-| **Status** | ✅ CONCLUÍDO |
+| **Status** | ⏳ PENDENTE (Aguardando implementação) |
 | **Prioridade** | 🔴 CRÍTICA |
 | **Objetivo** | Estabelecer **SSOT PURA** (Single Source of Truth) para todos os patches de FX output. Eliminação total do estado paralelo (`fx_outputs` / `rawFxOutputs`). Os cinco campos de patch são a única fonte de verdade; tudo mais é projeção derivada. |
 | **Arquitetura** | Zero estado paralelo. Zero glue code if/else. Projeção pura. |

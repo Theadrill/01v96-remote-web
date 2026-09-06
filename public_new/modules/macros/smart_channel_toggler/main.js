@@ -25,13 +25,23 @@
     // Valida snapshot (TTL, scene_id, desk_name)
     function isSnapshotValid(snapshot) {
         if (!snapshot || !snapshot.active) return false;
-        if (!snapshot.timestamp || !snapshot.scene_id || !snapshot.desk_name) return false;
+        if (!snapshot.timestamp) return false;
         const now = Date.now();
         if (now - snapshot.timestamp > TTL_MS) return false;
-        // Verifica se a cena e a mesa são as mesmas
+
+        // Se os dados do socket/mesa ainda não estiverem populados no handshake inicial pós-reload,
+        // não invalidar prematuramente para evitar apagar os canais salvos no servidor
         const currentScene = window.MixerAPI.state.getCurrentScene();
         const currentDesk = window.MixerAPI.state.getDeskName();
-        return snapshot.scene_id === currentScene && snapshot.desk_name === currentDesk;
+
+        if (window.currentSceneNumber !== undefined && snapshot.scene_id !== null && snapshot.scene_id !== currentScene) {
+            return false;
+        }
+        if (window.serverName !== null && snapshot.desk_name !== null && snapshot.desk_name !== currentDesk) {
+            return false;
+        }
+
+        return true;
     }
 
     // Atualiza visual do pad
