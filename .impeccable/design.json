@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-05T21:32:00.000Z",
+  "title": "Design System: 01V96 Remote Web",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Active Channel Amber",
+        "canonical": "#ffc107",
+        "tonalRamp": ["#332700", "#664d00", "#997400", "#cc9a00", "#ffc107", "#ffcd39", "#ffd96a", "#ffe69c"]
+      },
+      "solo-active": {
+        "role": "secondary",
+        "displayName": "Solo Emerald",
+        "canonical": "#22c55e",
+        "tonalRamp": ["#052e16", "#0f5132", "#198754", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#dcfce7"]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Deck Ground",
+        "canonical": "#111111",
+        "tonalRamp": ["#000000", "#111111", "#181818", "#222222", "#333333", "#555555", "#888888", "#cccccc"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Header Sans",
+        "purpose": "Channel headers and section titles."
+      },
+      "label": {
+        "displayName": "Monospace Metric",
+        "purpose": "dB levels, gain readouts, and patch indicators."
+      }
+    },
+    "shadows": [
+      {
+        "name": "led-glow",
+        "value": "0 0 10px rgba(255, 193, 7, 0.4)",
+        "purpose": "Active LED indicator on hardware buttons."
+      }
+    ],
+    "motion": [
+      {
+        "name": "instant",
+        "value": "none",
+        "purpose": "Zero-latency audio fader response."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "768px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Channel ON Button",
+      "kind": "button",
+      "refersTo": "button-primary-active",
+      "description": "Tactile hardware button for channel mute/unmute.",
+      "html": "<button class=\"ds-btn-on active\">ON</button>",
+      "css": ".ds-btn-on { background: #333333; color: #888888; border-radius: 4px; font-family: 'Segoe UI', Tahoma, sans-serif; font-weight: 900; font-size: 10px; border: none; height: 32px; width: 44px; cursor: pointer; } .ds-btn-on.active { background: #ffc107; color: #000000; box-shadow: 0 0 10px rgba(255, 193, 7, 0.4); }"
+    },
+    {
+      "name": "Solo Button",
+      "kind": "button",
+      "refersTo": "button-solo-active",
+      "description": "Solo/Cue channel listening button.",
+      "html": "<button class=\"ds-btn-solo active\">SOLO</button>",
+      "css": ".ds-btn-solo { background: #333333; color: #888888; border-radius: 4px; font-family: 'Segoe UI', Tahoma, sans-serif; font-weight: 800; font-size: 10px; border: none; height: 26px; width: 44px; cursor: pointer; } .ds-btn-solo.active { background: #22c55e; color: #ffffff; box-shadow: 0 0 10px rgba(34, 197, 94, 0.45); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Precision Audio Deck",
+    "overview": "O 01V96 Remote Web é uma interface profissional de controle de áudio ao vivo em tempo real para o console digital Yamaha 01V96. O sistema equilibra a densidade informacional de consoles de mixagem de estúdio/turnê com a ergonomia tátil imediata necessária sob pressão em palcos e eventos ao vivo.",
+    "keyCharacteristics": [
+      "Superfícies escuras de alto contraste com feedback luminoso em LED/OLED.",
+      "Código de cores semântico rigoroso para identificação imediata de grupos.",
+      "Tipografia de precisão com monoespaçada afiada para valores em dB.",
+      "Faders e botões com áreas de toque generosas e latência zero."
+    ],
+    "rules": [
+      {
+        "name": "The Functional Glow Rule",
+        "body": "Cores saturadas nunca são decorativas. Se um elemento emite cor viva ou brilho (glow), ele representa um sinal de áudio real, um canal ativo (ON) ou um alerta de clipping.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Precision Rule",
+        "body": "Todos os valores numéricos, ganhos, frequências e patches devem utilizar exclusivamente a fonte monospace para garantir alinhamento tabular perfeito sem deslocamento visual ao atualizar.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hardware Surface Rule",
+        "body": "Sombras são reservadas exclusivamente para botões táteis pressionáveis e emissores de luz LED. O chassi e os canais repousam em camadas planas com bordas de 1px.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do manter a tipografia monospace em todas as medições de dB, frequência e patch.",
+      "Do respeitar as cores de identificação de grupo ao renderizar cabeçalhos de canal.",
+      "Do preservar as áreas de toque mínimas de faders e botões para ergonomia móvel ao vivo.",
+      "Do sincronizar visualmente os botões pareados em estéreo."
+    ],
+    "donts": [
+      "Don't utilizar fundos claros ou gradientes excessivos que prejudiquem a legibilidade em ambientes escuros de palco.",
+      "Don't aplicar animações lentas ou transições longas em faders ou medidores; o feedback deve ser instantâneo (60 FPS / latência zero).",
+      "Don't alterar a ordem semântica dos botões no channel strip (ON, SOLO, PRE, Nudge)."
+    ]
+  }
+}
