@@ -202,10 +202,18 @@
             }
             return 0;
         } else {
-            // Para OUT: busca qual destino está mapeado para o slot+lr
+            // Para OUT: busca qual destino está mapeado para o slot+lr via projeção
+            if (window.PatchRegistry && typeof window.PatchRegistry.getFxDestination === 'function') {
+                const destKey = window.PatchRegistry.getFxDestination(slot, lr);
+                if (destKey !== null) {
+                    const element = Math.floor(destKey / 100);
+                    const channel = destKey % 100;
+                    return findFxOutId(element, channel);
+                }
+                return -1;
+            }
             if (typeof window.getFxOutputs === 'function') {
                 const outputs = window.getFxOutputs();
-                // FX slot values: FX1=121/122, FX2=129/130, FX3=137/138, FX4=145/146
                 const fxSlotVals = [
                     [121, 122], // FX1 L/R
                     [129, 130], // FX2 L/R
@@ -213,13 +221,10 @@
                     [139, 140], // FX4 L/R
                 ];
                 const targetVal = fxSlotVals[slot][lr];
-                // Procura em outputs qual destKey tem esse valor
                 for (const [destKey, val] of Object.entries(outputs)) {
                     if (Math.round(val) === targetVal) {
-                        // destKey = element*100+channel
                         const element = Math.floor(destKey / 100);
                         const channel = destKey % 100;
-                        // Mapeia element+channel para o id da categoria FX_OUT
                         return findFxOutId(element, channel);
                     }
                 }

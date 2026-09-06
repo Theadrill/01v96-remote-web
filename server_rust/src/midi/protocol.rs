@@ -1033,6 +1033,16 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
             );
         }
 
+        // Master (Stereo) Insert ON / Location (element 76)
+        if element == 76 {
+            let val = *data_bytes.last().unwrap_or(&0) as f64;
+            if parameter == 0 {
+                return cc("kStereoInsert/kInsertOn", 0, val);
+            } else if parameter == 2 {
+                return cc("kStereoInsert/kInsertLocInsert", 0, val);
+            }
+        }
+
         // --- AUX SENDS (element 35) ---
         if element == 35 {
             let aux_idx = (parameter / 3) + 1;
@@ -1148,7 +1158,18 @@ pub fn parse_message(message: &[u8]) -> Option<ParsedMidi> {
                 if param_msb == 0 {
                     return cc("kOutputPatch/k2tr", param_lsb, val);
                 }
-            } else if [1, 2, 7, 8, 10].contains(&element) && param_msb == 0 {
+            } else if element == 10 {
+                if param_msb == 0 {
+                    if is_output_patch_active() {
+                        return Some(ParsedMidi::FxOutputUpdate {
+                            element: element as usize,
+                            channel: param_lsb,
+                            value: val,
+                        });
+                    }
+                    return cc("kStereoInsertInput/kStereoInsertIn", param_lsb, val);
+                }
+            } else if [1, 2, 7, 8].contains(&element) && param_msb == 0 {
                 // FX output patch: each destination has a value telling which FX output slot connects
                 return Some(ParsedMidi::FxOutputUpdate {
                     element: element as usize,

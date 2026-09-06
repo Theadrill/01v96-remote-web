@@ -172,7 +172,6 @@ pub fn start_rx_loop(
                                     tracing::info!("🔄 [FX OUT] Re-querying FX outputs...");
                                     crate::midi::protocol::set_output_patch_active(true);
                                     let destinations: &[(u8, u8)] = &[
-                                        (1, 40),
                                         (2, 32),
                                         (7, 8),
                                         (8, 8),
@@ -189,14 +188,15 @@ pub fn start_rx_loop(
                                     tokio::time::sleep(std::time::Duration::from_secs(3)).await;
                                     crate::midi::protocol::set_output_patch_active(false);
                                     let state = state_clone.read().await;
-                                    let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
+                                    let fx_out_json = serde_json::to_value(state.get_fx_outputs()).unwrap_or_default();
                                     drop(state);
                                     let _ = io_clone_requery.emit("fxOutputsUpdate", &fx_out_json).await;
 
                                     // DEBUG: log all FX output routes after re-query
                                     let state2 = state_clone.read().await;
+                                    let routes = state2.get_fx_outputs();
                                     tracing::info!("🔍 [FX OUT DEBUG] === FX Output Mapping After Re-query ===");
-                                    tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", state2.fx_outputs.len());
+                                    tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", routes.len());
                                     for fx_val in [121u64, 122, 129, 130, 137, 138, 139, 140] {
                                         let fx_name = match fx_val {
                                             121 => "FX1 Out1",
@@ -210,7 +210,7 @@ pub fn start_rx_loop(
                                             _ => "???",
                                         };
                                         let mut destinations: Vec<String> = Vec::new();
-                                        for (key, val) in state2.fx_outputs.iter() {
+                                        for (&key, &val) in routes.iter() {
                                             if val.round() as u64 == fx_val {
                                                 destinations.push(format!("{} (el={}, ch={})", key, key / 100, key % 100));
                                             }
@@ -492,7 +492,7 @@ pub fn start_rx_loop(
                                 );
                                 if conn_mgr_recv.is_fully_synced() {
                                     fx_outputs_emission = Some(
-                                        serde_json::to_value(&state.fx_outputs).unwrap_or_default(),
+                                        serde_json::to_value(state.get_fx_outputs()).unwrap_or_default(),
                                     );
                                 }
                                 // Signal the FX sync pipeline: this output slot response arrived.

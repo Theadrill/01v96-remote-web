@@ -44,7 +44,7 @@ pub struct GateState {
     pub decay: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct InsertState {
     pub on: bool,
     pub position: f64,
@@ -161,6 +161,8 @@ pub struct MasterState {
     pub name_chars: Vec<String>,
     pub comp: CompState,
     pub eq: EqState,
+    #[serde(default)]
+    pub insert: InsertState,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -201,8 +203,6 @@ pub struct GlobalState {
     pub fx_params: HashMap<usize, HashMap<usize, f64>>,
     #[serde(rename = "fxInputs")]
     pub fx_inputs: HashMap<usize, f64>,
-    #[serde(rename = "fxOutputs")]
-    pub fx_outputs: HashMap<usize, f64>,
     #[serde(rename = "tailscaleUrl")]
     pub tailscale_url: Option<String>,
     #[serde(rename = "globalMeterPosMaster")]
@@ -444,6 +444,11 @@ impl GlobalState {
                         lpf_on: Some(0.0),
                     },
                 },
+                insert: InsertState {
+                    on: false,
+                    position: 0.0,
+                    patch_in: 0.0,
+                },
             },
             out_patches_omni: HashMap::new(),
             out_patches_adat: HashMap::new(),
@@ -466,7 +471,6 @@ impl GlobalState {
                 fx
             },
             fx_inputs: HashMap::new(),
-            fx_outputs: HashMap::new(),
             fx_params: {
                 let mut map = HashMap::new();
                 for i in 0..4 {
@@ -481,6 +485,66 @@ impl GlobalState {
             fx_sync_ack_tx: None,
         }
     }
+
+    /// PROJEÇÃO PURA — não é estado. Computa FX output routes varrendo os 5 campos SSOT.
+    /// Retorna: { destKey: slotVal } onde destKey = element*100 + channel, slotVal ∈ {121..140}
+    pub fn get_fx_outputs(&self) -> std::collections::HashMap<usize, f64> {
+        let mut routes = std::collections::HashMap::new();
+
+        // Element 1: channels[0..39].patch
+        for (&ch_idx, ch_state) in &self.channels {
+            if ch_idx < 40 {
+                let patch_rounded = ch_state.patch.round() as u32;
+                if (121..=140).contains(&patch_rounded) {
+                    let key = 1 * 100 + ch_idx;
+                    routes.insert(key, ch_state.patch);
+                }
+            }
+        }
+
+        // Element 2: channels[0..31].insert.patch_in
+        for (&ch_idx, ch_state) in &self.channels {
+            if ch_idx < 32 {
+                let patch_rounded = ch_state.insert.patch_in.round() as u32;
+                if (121..=140).contains(&patch_rounded) {
+                    let key = 2 * 100 + ch_idx;
+                    routes.insert(key, ch_state.insert.patch_in);
+                }
+            }
+        }
+
+        // Element 7: buses[0..7].insert.patch_in
+        for (&bus_idx, bus_state) in &self.buses {
+            if bus_idx < 8 {
+                let patch_rounded = bus_state.insert.patch_in.round() as u32;
+                if (121..=140).contains(&patch_rounded) {
+                    let key = 7 * 100 + bus_idx;
+                    routes.insert(key, bus_state.insert.patch_in);
+                }
+            }
+        }
+
+        // Element 8: mixes[0..7].insert.patch_in
+        for (&mix_idx, mix_state) in &self.mixes {
+            if mix_idx < 8 {
+                let patch_rounded = mix_state.insert.patch_in.round() as u32;
+                if (121..=140).contains(&patch_rounded) {
+                    let key = 8 * 100 + mix_idx;
+                    routes.insert(key, mix_state.insert.patch_in);
+                }
+            }
+        }
+
+        // Element 10: master.insert.patch_in
+        let master_patch_rounded = self.master.insert.patch_in.round() as u32;
+        if (121..=140).contains(&master_patch_rounded) {
+            let key = 10 * 100 + 0;
+            routes.insert(key, self.master.insert.patch_in);
+        }
+
+        routes
+    }
+
     pub fn handle_raw_midi(&mut self, message: &[u8]) -> bool {
         self.scene_manager.handle_midi_data(message)
     }
@@ -652,6 +716,12 @@ impl GlobalState {
                     if let Some(bus) = self.buses.get_mut(&local) {
                         bus.insert.patch_in = v;
                     }
+                } else if mt == "kStereoInsert/kInsertOn" {
+                    self.master.insert.on = cv;
+                } else if mt == "kStereoInsert/kInsertLocInsert" {
+                    self.master.insert.position = v;
+                } else if mt == "kStereoInsertInput/kStereoInsertIn" {
+                    self.master.insert.patch_in = v;
                 } else if mt == "kAUXType/kAUXTypeIndex" {
                     if let Some(mix) = self.mixes.get_mut(channel) {
                         mix.mode = v as u8;
@@ -953,23 +1023,43 @@ impl GlobalState {
                 channel,
                 value,
             } => {
-                let key = element * 100 + channel;
-                self.fx_outputs.insert(key, *value);
+                // ✅ SSOT PURA: escreve diretamente nos campos autoritativos.
+                // Não existe mais self.fx_outputs para atualizar.
+                let rounded = (*value).round() as u32;
+                let is_fx = (121..=140).contains(&rounded);
+
                 if *element == 1 {
+                    // SSOT #1: channels[ch].patch
                     if let Some(ch) = self.channels.get_mut(channel) {
-                        ch.patch = *value;
+                        if is_fx {
+                            ch.patch = *value;
+                        }
                     }
                 } else if *element == 2 {
+                    // SSOT #2: channels[ch].insert.patch_in
                     if let Some(ch) = self.channels.get_mut(channel) {
-                        ch.insert.patch_in = *value;
+                        if is_fx {
+                            ch.insert.patch_in = *value;
+                        }
                     }
                 } else if *element == 7 {
+                    // SSOT #3: buses[ch].insert.patch_in
                     if let Some(bus) = self.buses.get_mut(channel) {
-                        bus.insert.patch_in = *value;
+                        if is_fx {
+                            bus.insert.patch_in = *value;
+                        }
                     }
                 } else if *element == 8 {
+                    // SSOT #4: mixes[ch].insert.patch_in
                     if let Some(aux) = self.mixes.get_mut(channel) {
-                        aux.insert.patch_in = *value;
+                        if is_fx {
+                            aux.insert.patch_in = *value;
+                        }
+                    }
+                } else if *element == 10 {
+                    // SSOT #5: master.insert.patch_in
+                    if is_fx {
+                        self.master.insert.patch_in = *value;
                     }
                 }
             }
@@ -1198,5 +1288,119 @@ fn apply_comp_fields(comp: &mut CompState, mt: &str, value: f64) {
         "kCompGain" => comp.gain = value,
         "kCompKnee" => comp.knee = value,
         _ => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::midi::protocol::ParsedMidi;
+
+    #[test]
+    fn test_get_fx_outputs_and_master_insert() {
+        let mut state = GlobalState::new();
+        // Default: no FX routes
+        assert!(state.get_fx_outputs().is_empty());
+
+        // Channel 0 patch set to FX1-1 (121)
+        state.channels.get_mut(&0).unwrap().patch = 121.0;
+        // Channel 1 patch set to physical AD 3 (3)
+        state.channels.get_mut(&1).unwrap().patch = 3.0;
+        // Channel 4 insert patch_in set to FX2-1 (129)
+        state.channels.get_mut(&4).unwrap().insert.patch_in = 129.0;
+        // Bus 0 insert patch_in set to FX3-1 (137)
+        state.buses.get_mut(&0).unwrap().insert.patch_in = 137.0;
+        // Mix 1 insert patch_in set to FX4-1 (139)
+        state.mixes.get_mut(&1).unwrap().insert.patch_in = 139.0;
+        // Master insert patch_in set to FX1-2 (122)
+        state.master.insert.patch_in = 122.0;
+
+        let routes = state.get_fx_outputs();
+        assert_eq!(routes.get(&100), Some(&121.0)); // Element 1 (CH1)
+        assert_eq!(routes.get(&101), None);         // AD 3 is not FX
+        assert_eq!(routes.get(&204), Some(&129.0)); // Element 2 (INS CH5)
+        assert_eq!(routes.get(&700), Some(&137.0)); // Element 7 (INS BUS1)
+        assert_eq!(routes.get(&801), Some(&139.0)); // Element 8 (INS AUX2)
+        assert_eq!(routes.get(&1000), Some(&122.0)); // Element 10 (Master Insert)
+        assert_eq!(routes.len(), 5);
+    }
+
+    #[test]
+    fn test_fx_output_to_channel_patch() {
+        let mut state = GlobalState::new();
+        state.channels.get_mut(&0).unwrap().patch = 1.0; // AD 1
+
+        // FxOutputUpdate with FX value (121.0) writes to channels[0].patch
+        let midi = ParsedMidi::FxOutputUpdate {
+            element: 1,
+            channel: 0,
+            value: 121.0,
+        };
+        state.apply_midi(&midi);
+        assert_eq!(state.channels.get(&0).unwrap().patch, 121.0);
+    }
+
+    #[test]
+    fn test_fx_output_non_fx_ignored() {
+        let mut state = GlobalState::new();
+        state.channels.get_mut(&0).unwrap().patch = 1.0; // AD 1
+
+        // FxOutputUpdate with non-FX value (3.0 = AD 3 or 0 = NONE) is ignored
+        let midi_none = ParsedMidi::FxOutputUpdate {
+            element: 1,
+            channel: 0,
+            value: 0.0,
+        };
+        state.apply_midi(&midi_none);
+        assert_eq!(state.channels.get(&0).unwrap().patch, 1.0);
+
+        let midi_phys = ParsedMidi::FxOutputUpdate {
+            element: 1,
+            channel: 0,
+            value: 3.0,
+        };
+        state.apply_midi(&midi_phys);
+        assert_eq!(state.channels.get(&0).unwrap().patch, 1.0);
+    }
+
+    #[test]
+    fn test_channel_input_writes_patch() {
+        let mut state = GlobalState::new();
+        let midi = ParsedMidi::ControlChange {
+            msg_type: "kChannelInput/kChannelIn".to_string(),
+            channel: 0,
+            value: 121.0,
+        };
+        state.apply_midi(&midi);
+        assert_eq!(state.channels.get(&0).unwrap().patch, 121.0);
+    }
+
+    #[test]
+    fn test_master_insert_midi_handlers() {
+        let mut state = GlobalState::new();
+        assert!(!state.master.insert.on);
+        assert_eq!(state.master.insert.position, 0.0);
+        assert_eq!(state.master.insert.patch_in, 0.0);
+
+        state.apply_midi(&ParsedMidi::ControlChange {
+            msg_type: "kStereoInsert/kInsertOn".to_string(),
+            channel: 0,
+            value: 1.0,
+        });
+        assert!(state.master.insert.on);
+
+        state.apply_midi(&ParsedMidi::ControlChange {
+            msg_type: "kStereoInsert/kInsertLocInsert".to_string(),
+            channel: 0,
+            value: 2.0,
+        });
+        assert_eq!(state.master.insert.position, 2.0);
+
+        state.apply_midi(&ParsedMidi::ControlChange {
+            msg_type: "kStereoInsertInput/kStereoInsertIn".to_string(),
+            channel: 0,
+            value: 121.0,
+        });
+        assert_eq!(state.master.insert.patch_in, 121.0);
     }
 }

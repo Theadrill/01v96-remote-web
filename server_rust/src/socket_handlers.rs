@@ -2426,7 +2426,7 @@ pub fn register_handlers(
             "requestFxOutputs",
             move |socket: SocketRef| async move {
                 let state = state_fx_out.read().await;
-                let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
+                let fx_out_json = serde_json::to_value(state.get_fx_outputs()).unwrap_or_default();
                 socket.emit("fxOutputsUpdate", &fx_out_json).ok();
             },
         );
@@ -2645,35 +2645,102 @@ pub fn register_handlers(
                 {
                     let mut state = state_set_fx_out.write().await;
                     
+                    let routes = state.get_fx_outputs();
                     // DEBUG: log all FX output routes
                     tracing::info!("🔍 [FX OUT DEBUG] === FX Output Mapping State ===");
-                    tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", state.fx_outputs.len());
-                    for (key, val) in state.fx_outputs.iter() {
+                    tracing::info!("🔍 [FX OUT DEBUG] Total fx_outputs entries: {}", routes.len());
+                    for (&key, &val) in routes.iter() {
                         let v = val.round() as u32;
                         if v > 0 { // Print any active route
                             tracing::info!("🔍 [FX OUT DEBUG] Dest el={} ch={} has source ID = {}", key / 100, key % 100, v);
                         }
                     }
 
-                    let mut keys_to_remove = Vec::new();
-                    for (&key, &val) in state.fx_outputs.iter() {
+                    for (&key, &val) in routes.iter() {
                         if val.round() as u32 == fx_slot_val {
-                            keys_to_remove.push(key);
                             let el = (key / 100) as u8;
-                            let ch = (key % 100) as u8;
-                            if let Some(clear_pkt) = crate::midi::protocol::build_fx_output_change(el, ch, 0) {
-                                clear_packets.push(clear_pkt);
+                            let ch = (key % 100) as usize;
+                            if Some(el) != element || Some(ch as u8) != dest_channel {
+                                match el {
+                                    1 => {
+                                        if let Some(c) = state.channels.get_mut(&ch) {
+                                            c.patch = 0.0;
+                                        }
+                                    }
+                                    2 => {
+                                        if let Some(c) = state.channels.get_mut(&ch) {
+                                            c.insert.patch_in = 0.0;
+                                        }
+                                    }
+                                    7 => {
+                                        if let Some(b) = state.buses.get_mut(&ch) {
+                                            b.insert.patch_in = 0.0;
+                                        }
+                                    }
+                                    8 => {
+                                        if let Some(m) = state.mixes.get_mut(&ch) {
+                                            m.insert.patch_in = 0.0;
+                                        }
+                                    }
+                                    10 => {
+                                        state.master.insert.patch_in = 0.0;
+                                    }
+                                    _ => {}
+                                }
+                                if let Some(clear_pkt) = crate::midi::protocol::build_fx_output_change(el, ch as u8, 0) {
+                                    clear_packets.push(clear_pkt);
+                                }
                             }
                         }
                     }
-                    for key in keys_to_remove {
-                        state.fx_outputs.remove(&key);
+
+                    // ✅ SSOT PURA: Validar que o valor é FX (121..140) antes de escrever.
+                    // Por construção do match (slot, lr) acima, fx_slot_val SEMPRE é
+                    // um valor FX válido. Este guard é defensivo — protege contra
+                    // refactoring futuro que possa bypassar a tabela de slots.
+                    let is_fx = (121..=140).contains(&fx_slot_val);
+                    if !is_fx {
+                        tracing::warn!("⚠️ [setFxOutput] Valor não-FX ({}) ignorado — SSOT não modificado", fx_slot_val);
+                        return;
                     }
 
                     // Step 2: Set the new destination locally (optimistic update)
-                    if let (Some(el), Some(ch)) = (element, dest_channel) {
-                        let key = (el as usize) * 100 + (ch as usize);
-                        state.fx_outputs.insert(key, fx_slot_val as f64);
+                    if let (Some(el), Some(ch_u8)) = (element, dest_channel) {
+                        let ch = ch_u8 as usize;
+                        match el {
+                            1 => {
+                                if ch < 40 {
+                                    if let Some(channel_state) = state.channels.get_mut(&ch) {
+                                        channel_state.patch = fx_slot_val as f64;
+                                    }
+                                }
+                            }
+                            2 => {
+                                if ch < 32 {
+                                    if let Some(channel_state) = state.channels.get_mut(&ch) {
+                                        channel_state.insert.patch_in = fx_slot_val as f64;
+                                    }
+                                }
+                            }
+                            7 => {
+                                if ch < 8 {
+                                    if let Some(bus_state) = state.buses.get_mut(&ch) {
+                                        bus_state.insert.patch_in = fx_slot_val as f64;
+                                    }
+                                }
+                            }
+                            8 => {
+                                if ch < 8 {
+                                    if let Some(mix_state) = state.mixes.get_mut(&ch) {
+                                        mix_state.insert.patch_in = fx_slot_val as f64;
+                                    }
+                                }
+                            }
+                            10 => {
+                                state.master.insert.patch_in = fx_slot_val as f64;
+                            }
+                            _ => {}
+                        }
                     }
                 }
 
@@ -2682,7 +2749,6 @@ pub fn register_handlers(
                     sched_set_fx_out.enqueue(clear_pkt, 0).await;
                     tokio::time::sleep(std::time::Duration::from_millis(30)).await;
                 }
-
 
                 // Send new route packet
                 if let (Some(el), Some(ch)) = (element, dest_channel) {
@@ -2698,7 +2764,7 @@ pub fn register_handlers(
 
                 // Re-emit updated state immediately to all clients to update the UI
                 let state = state_set_fx_out.read().await;
-                let fx_out_json = serde_json::to_value(&state.fx_outputs).unwrap_or_default();
+                let fx_out_json = serde_json::to_value(state.get_fx_outputs()).unwrap_or_default();
                 let _ = io_fx_out.emit("fxOutputsUpdate", &fx_out_json).await;
             },
         );

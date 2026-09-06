@@ -232,11 +232,11 @@ const DEFAULT_OUT_EQ = () => ({
 let mixesState = [];
 let busesState = [];
 for (let i = 0; i < 8; i++) {
-    mixesState.push({ value: 0, on: false, solo: false, name: `MIX ${i + 1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null, auxTypeMode: 1, auxGlobal: 1, auxSendPrePoint: 0 });
+    mixesState.push({ value: 0, on: false, solo: false, name: `MIX ${i + 1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null, insert: { on: false, position: 0, patch_in: 0 }, auxTypeMode: 1, auxGlobal: 1, auxSendPrePoint: 0 });
     busesState.push({ value: 0, on: false, solo: false, name: `BUS ${i + 1}`, eq: DEFAULT_OUT_EQ(), paired: false, pairedWith: null, pairSource: null, insert: { on: false, position: 0, patch_in: 0 }, stereo: false, auxTypeMode: 1, auxGlobal: 1, auxSendPrePoint: 0 });
 }
 
-let masterState = { value: 0, pan: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ() };
+let masterState = { value: 0, pan: 0, on: false, solo: false, eq: DEFAULT_OUT_EQ(), insert: { on: false, position: 0, patch_in: 0 } };
 channelStates[52] = masterState; // Map for canvas engine
 
 window.channelStates = channelStates;

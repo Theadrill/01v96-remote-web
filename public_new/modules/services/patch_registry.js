@@ -54,9 +54,8 @@
     // { on, position, patch_in, patch_out, inLabel, outLabel, posLabel }
     const inserts = {};
 
-    // FX raw data caches (source of truth for getFxInputs/getFxOutputs)
+    // FX raw data caches (source of truth for getFxInputs)
     const rawFxInputs = [[0, 0], [0, 0], [0, 0], [0, 0]];
-    const rawFxOutputs = {};
 
     // ═══════════════════════════════════════════════════════════════════
     // DECODIFICADORES DE VALORES → LABELS
@@ -530,57 +529,116 @@
             fxSlots[s].inLabelR = decodeFxInputLabel(inR);
         }
 
-        // FX Outputs — lê diretamente do cache raw
+        // FX Outputs — PROJEÇÃO PURA via getFxOutputRoutes()
+        // NÃO lê mais de rawFxOutputs (que foi removido).
+        var routes = getFxOutputRoutes();
         var slotVals = [
             [121, 122],
             [129, 130],
             [137, 138],
             [139, 140]
         ];
-        for (var s = 0; s < 4; s++) {
+        for (var s2 = 0; s2 < 4; s2++) {
             var outL = null;
             var outR = null;
-            for (var key in rawFxOutputs) {
-                if (Math.round(rawFxOutputs[key]) === slotVals[s][0]) {
+            for (var key in routes) {
+                if (!routes.hasOwnProperty(key)) continue;
+                var routeVal = Math.round(routes[key]);
+                if (routeVal === slotVals[s2][0]) {
                     outL = parseInt(key, 10);
                 }
-                if (Math.round(rawFxOutputs[key]) === slotVals[s][1]) {
+                if (routeVal === slotVals[s2][1]) {
                     outR = parseInt(key, 10);
                 }
             }
-            fxSlots[s].outL = outL;
-            fxSlots[s].outR = outR;
-            fxSlots[s].outLabelL = outL != null ? decodeFxOutputDest(outL) : 'OFF';
-            fxSlots[s].outLabelR = outR != null ? decodeFxOutputDest(outR) : 'OFF';
+            fxSlots[s2].outL = outL;
+            fxSlots[s2].outR = outR;
+            fxSlots[s2].outLabelL = outL != null ? decodeFxOutputDest(outL) : 'OFF';
+            fxSlots[s2].outLabelR = outR != null ? decodeFxOutputDest(outR) : 'OFF';
         }
     }
 
     /**
-     * Sincroniza os patch_in de inserts (channelStates/busesState/mixesState)
-     * a partir dos FX outputs. Quando um canal tem insert com patch_in apontando
-     * para uma porta FX, o valor do insert patch_in é derivado da rotação de FX output.
-     * Esta lógica era feita em efeitos.js (applyFxOutputs) e agora é centralizada aqui.
+     * PROJEÇÃO PURA — não é estado. Computa FX output routes varrendo
+     * channelStates[ch].patch, insert.patch_in, busesState, mixesState, master.
+     * Retorna: { destKey: slotVal }
      */
-    function syncInsertPatchesFromFxOutputs() {
-        for (var keyStr in rawFxOutputs) {
-            var key = parseInt(keyStr, 10);
-            var val = rawFxOutputs[keyStr];
-            var element = Math.floor(key / 100);
-            var channel = key % 100;
-            if (element === 2) {
-                if (window.channelStates && window.channelStates[channel] && window.channelStates[channel].insert) {
-                    window.channelStates[channel].insert.patch_in = val;
+    function getFxOutputRoutes() {
+        var routes = {};
+        var cs = window.channelStates || (typeof channelStates !== 'undefined' ? channelStates : null);
+        if (cs) {
+            // Element 1: channels[ch].patch
+            for (var ch = 0; ch < 40; ch++) {
+                if (cs[ch] && cs[ch].patch !== undefined) {
+                    var v = Math.round(cs[ch].patch);
+                    if (v >= 121 && v <= 140) {
+                        routes[1 * 100 + ch] = v;
+                    }
                 }
-            } else if (element === 7) {
-                if (window.busesState && window.busesState[channel] && window.busesState[channel].insert) {
-                    window.busesState[channel].insert.patch_in = val;
-                }
-            } else if (element === 8) {
-                if (window.mixesState && window.mixesState[channel] && window.mixesState[channel].insert) {
-                    window.mixesState[channel].insert.patch_in = val;
+            }
+            // Element 2: channels[ch].insert.patch_in
+            for (var ch2 = 0; ch2 < 32; ch2++) {
+                if (cs[ch2] && cs[ch2].insert && cs[ch2].insert.patch_in !== undefined) {
+                    var v2 = Math.round(cs[ch2].insert.patch_in);
+                    if (v2 >= 121 && v2 <= 140) {
+                        routes[2 * 100 + ch2] = v2;
+                    }
                 }
             }
         }
+        // Element 7: busesState[b].insert.patch_in
+        var bs = window.busesState || (typeof busesState !== 'undefined' ? busesState : null);
+        if (bs) {
+            for (var b = 0; b < 8; b++) {
+                if (bs[b] && bs[b].insert && bs[b].insert.patch_in !== undefined) {
+                    var vb = Math.round(bs[b].insert.patch_in);
+                    if (vb >= 121 && vb <= 140) {
+                        routes[7 * 100 + b] = vb;
+                    }
+                }
+            }
+        }
+        // Element 8: mixesState[m].insert.patch_in
+        var ms = window.mixesState || (typeof mixesState !== 'undefined' ? mixesState : null);
+        if (ms) {
+            for (var m = 0; m < 8; m++) {
+                if (ms[m] && ms[m].insert && ms[m].insert.patch_in !== undefined) {
+                    var vm = Math.round(ms[m].insert.patch_in);
+                    if (vm >= 121 && vm <= 140) {
+                        routes[8 * 100 + m] = vm;
+                    }
+                }
+            }
+        }
+        // Element 10: master.insert.patch_in
+        var mst = window.masterState || (typeof masterState !== 'undefined' ? masterState : null);
+        if (mst && mst.insert && mst.insert.patch_in !== undefined) {
+            var vmst = Math.round(mst.insert.patch_in);
+            if (vmst >= 121 && vmst <= 140) {
+                routes[10 * 100 + 0] = vmst;
+            }
+        }
+        return routes;
+    }
+
+    /**
+     * Retorna o destino FX para um slot+lr específico.
+     * Slot 0=FX1, 1=FX2, 2=FX3, 3=FX4; lr 0=L, 1=R.
+     * FX slot values: FX1=121/122, FX2=129/130, FX3=137/138, FX4=139/140
+     */
+    function getFxDestination(slot, lr) {
+        var slotVals = [
+            [121, 122], [129, 130], [137, 138], [139, 140]
+        ];
+        if (slot < 0 || slot > 3 || lr < 0 || lr > 1) return null;
+        var targetVal = slotVals[slot][lr];
+        var routes = getFxOutputRoutes();
+        for (var key in routes) {
+            if (routes.hasOwnProperty(key) && Math.round(routes[key]) === targetVal) {
+                return parseInt(key, 10);
+            }
+        }
+        return null;  // OFF — não encontrado
     }
 
     /**
@@ -604,6 +662,11 @@
             for (var i = 0; i < 8; i++) {
                 syncSingleInsert(36 + i, ms[i]);
             }
+        }
+        // Master (globalId = 52)
+        var mst = window.masterState || (typeof masterState !== 'undefined' ? masterState : null);
+        if (mst && mst.insert) {
+            syncSingleInsert(52, { insert: mst.insert });
         }
     }
 
@@ -737,15 +800,19 @@
     }
 
     /**
-     * Atualiza o cache de saída FX.
+     * ✅ SSOT PURA: setFxOutput escreve DIRETAMENTE nos campos autoritativos.
+     * NÃO existe rawFxOutputs — a projeção é computada via getFxOutputRoutes().
      */
     function setFxOutput(destKey, slotVal) {
         var sv = Math.round(slotVal);
-        // Store raw output (destKey → slotVal)
-        rawFxOutputs[destKey] = sv;
-
         var element = Math.floor(destKey / 100);
         var channel = destKey % 100;
+        var is_fx = (sv >= 121 && sv <= 140);
+
+        // Só escrevemos se o valor for um FX válido (121..140).
+        // Valores NONE (0) ou físicos são ignorados — o patch físico
+        // já vem atualizado via kChannelInput/kChannelIn no sync.
+        if (!is_fx) return;
 
         // element 1: Channel In (0..39)
         if (element === 1 && channel >= 0 && channel < 40) {
@@ -788,6 +855,15 @@
                 syncSingleInsert(auxGlobalId, { insert: { on: false, position: 0, patch_in: sv } });
             }
             if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(auxGlobalId);
+        }
+        // element 10: Master Insert (globalId = 52)
+        else if (element === 10) {
+            var mst = window.masterState || (typeof masterState !== 'undefined' ? masterState : null);
+            if (mst && mst.insert) {
+                mst.insert.patch_in = sv;
+                syncSingleInsert(52, { insert: mst.insert });
+            }
+            if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(52);
         }
 
         // Recalcula os slots de FX (garante que unassign/OFF atualize instantaneamente)
@@ -905,16 +981,10 @@
 
     /**
      * Retorna os outputs FX brutos: { destKey: slotVal, ... }
-     * Compatível com window.getFxOutputs() do efeitos.js original.
+     * Compatível com window.getFxOutputs() do efeitos.js original — agora retorna PROJEÇÃO PURA.
      */
     function getFxOutputs() {
-        var copy = {};
-        for (var k in rawFxOutputs) {
-            if (rawFxOutputs.hasOwnProperty(k)) {
-                copy[k] = rawFxOutputs[k];
-            }
-        }
-        return copy;
+        return getFxOutputRoutes();
     }
 
     /**
@@ -1035,8 +1105,6 @@
             for (var key in data) {
                 setFxOutput(parseInt(key, 10), data[key]);
             }
-            // Sincroniza patch_in de inserts (channelStates/busesState/mixesState)
-            syncInsertPatchesFromFxOutputs();
             if (typeof window.rerenderOpenInsertModal === 'function') window.rerenderOpenInsertModal(window._insertModalChannel);
             if (typeof window.renderRoutingOverview === 'function') window.renderRoutingOverview();
         });
@@ -1083,6 +1151,8 @@
         getFxInfo: getFxInfo,
         getFxInputs: getFxInputs,
         getFxOutputs: getFxOutputs,
+        getFxOutputRoutes: getFxOutputRoutes,
+        getFxDestination: getFxDestination,
         getInsertInfo: getInsertInfo,
         getAllData: getAllData,
 
