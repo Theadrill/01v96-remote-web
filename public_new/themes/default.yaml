@@ -132,6 +132,10 @@ channel_strip:
     btn_solo_active_bg: '#22c55e'
     btn_solo_active_text: '#ffffff'
     btn_solo_active_glow: rgba(34, 197, 94, 0.45)
+    btn_solo_alert_bg: '#c0000a'
+    btn_solo_alert_text: '#ffffff'
+    btn_solo_alert_border: '#ff2233'
+    btn_solo_alert_glow: 'rgba(220, 0, 10, 0.8)'
     btn_pre_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_pre_font_weight: '800'
     btn_pre_font_size: 10px
@@ -245,6 +249,7 @@ channel_strip:
     card_on_bg: rgba(255, 69, 0, 0.08)
     header_height: 26px
     patch_height: 23px
+    patch_min_width: 100px
     btn_on_height: 40px
     btn_on_radius: 4px
     btn_solo_height: 28px

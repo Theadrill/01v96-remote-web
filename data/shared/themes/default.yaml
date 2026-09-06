@@ -204,6 +204,10 @@ channel_strip:
     btn_solo_active_bg: "#22c55e"
     btn_solo_active_text: "#ffffff"
     btn_solo_active_glow: "rgba(34, 197, 94, 0.45)"
+    btn_solo_alert_bg: "#c0000a"                # Cor de fundo do botão SOLO em alerta no Master
+    btn_solo_alert_text: "#ffffff"              # Cor do texto do botão SOLO em alerta
+    btn_solo_alert_border: "#ff2233"            # Borda do botão SOLO em alerta
+    btn_solo_alert_glow: "rgba(220, 0, 10, 0.8)" # Glow do botão SOLO em alerta no Master
 
     # Botão PRE / POST (Envios Auxiliares)
     btn_pre_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
@@ -347,6 +351,7 @@ channel_strip:
     card_on_bg: "rgba(255, 69, 0, 0.08)"       # Fundo sutil de destaque quando o canal está ON
     header_height: "26px"                      # Altura do cabeçalho desktop
     patch_height: "23px"                       # Altura do rodapé de patch desktop
+    patch_min_width: "100px"                    # Largura mínima do badge de patch no desktop
 
     # Botões - Dimensões Físicas Desktop
     btn_on_height: "40px"                      # Altura do botão ON no desktop

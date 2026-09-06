@@ -162,6 +162,10 @@ var ThemeEngine = (function () {
         var btnSoloActBg = getVal(csG, 'btn_solo_active_bg'); if (btnSoloActBg) root.style.setProperty('--strip-btn-solo-active-bg', btnSoloActBg);
         var btnSoloActText = getVal(csG, 'btn_solo_active_text'); if (btnSoloActText) root.style.setProperty('--strip-btn-solo-active-text', btnSoloActText);
         var btnSoloActGlow = getVal(csG, 'btn_solo_active_glow'); if (btnSoloActGlow) root.style.setProperty('--strip-btn-solo-active-glow', btnSoloActGlow);
+        var btnSoloAlertBg = getVal(csG, 'btn_solo_alert_bg'); if (btnSoloAlertBg) root.style.setProperty('--strip-btn-solo-alert-bg', btnSoloAlertBg);
+        var btnSoloAlertText = getVal(csG, 'btn_solo_alert_text'); if (btnSoloAlertText) root.style.setProperty('--strip-btn-solo-alert-text', btnSoloAlertText);
+        var btnSoloAlertBorder = getVal(csG, 'btn_solo_alert_border'); if (btnSoloAlertBorder) root.style.setProperty('--strip-btn-solo-alert-border', btnSoloAlertBorder);
+        var btnSoloAlertGlow = getVal(csG, 'btn_solo_alert_glow'); if (btnSoloAlertGlow) root.style.setProperty('--strip-btn-solo-alert-glow', btnSoloAlertGlow);
 
         var btnPreBg = getVal(csG, 'btn_pre_bg'); if (btnPreBg) root.style.setProperty('--strip-btn-pre-bg', btnPreBg);
         var btnPreText = getVal(csG, 'btn_pre_text'); if (btnPreText) root.style.setProperty('--strip-btn-pre-text', btnPreText);
@@ -311,6 +315,7 @@ var ThemeEngine = (function () {
         var dPatchH = getVal(csD, 'patch_height'); if (dPatchH) root.style.setProperty('--strip-patch-height', dPatchH);
         var dPatchSize = getVal(csD, 'patch_font_size'); if (dPatchSize) root.style.setProperty('--strip-patch-font-size', dPatchSize);
         var dPatchFont = getVal(csD, 'patch_font_family'); if (dPatchFont) root.style.setProperty('--strip-patch-font-family', dPatchFont);
+        var dPatchMinW = getVal(csD, 'patch_min_width'); if (dPatchMinW) root.style.setProperty('--strip-patch-min-width', dPatchMinW);
 
         var dBtnOnH = getVal(csD, 'btn_on_height'); if (dBtnOnH) root.style.setProperty('--strip-btn-on-height', dBtnOnH);
         var dBtnOnRad = getVal(csD, 'btn_on_radius'); if (dBtnOnRad) root.style.setProperty('--strip-btn-on-radius', dBtnOnRad);

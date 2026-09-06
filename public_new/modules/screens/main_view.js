@@ -282,8 +282,8 @@ var MainView = (function () {
                     }
                 },
                 solo_toggle: function () {
-                    if (typeof toggleState === 'function') {
-                        toggleState('kSetupSoloChOn/kSoloChOn', 'master');
+                    if (typeof clearAllSolos === 'function') {
+                        clearAllSolos();
                     }
                 },
                 nudge: function (data) {

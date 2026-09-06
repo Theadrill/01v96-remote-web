@@ -195,6 +195,8 @@ class ChannelStrip {
             <div class="desk-top-action-zone">
                 ${cfg.prePost ? `
                     <button class="btn-pre-post ${cfg.prePost.toLowerCase()}">${cfg.prePost}</button>
+                ` : isMaster ? `
+                    <button id="master-solo-btn" class="desk-btn-solo master-solo-btn" disabled>SOLO</button>
                 ` : `
                     <button class="desk-btn-solo ${cfg.soloState ? 'active' : ''}">SOLO</button>
                 `}
@@ -415,6 +417,8 @@ class ChannelStrip {
                 <div class="mobile-top-action">
                     ${cfg.prePost ? `
                         <button class="mobile-btn-pre ${cfg.prePost.toLowerCase()}">${cfg.prePost}</button>
+                    ` : isMaster ? `
+                        <button id="master-solo-btn" class="mobile-btn-solo master-solo-btn" disabled>SOLO</button>
                     ` : `
                         <button class="mobile-btn-solo ${cfg.soloState ? 'active' : ''}">SOLO</button>
                     `}
@@ -667,6 +671,14 @@ class ChannelStrip {
         // 6. Botão SOLO
         if (els.soloBtn && !cfg.isDisabled && !cfg.isLocked) {
             els.soloBtn.addEventListener('click', () => {
+                const isMaster = this.config.isMaster || this.config.type === 'master';
+                if (isMaster) {
+                    if (typeof clearAllSolos === 'function') {
+                        clearAllSolos();
+                    }
+                    this._emitEvent('solo_toggle', { action: 'clear' });
+                    return;
+                }
                 const newState = !this.config.soloState;
                 this.setSoloState(newState);
                 this._emitEvent('solo_toggle', { state: newState });
@@ -2807,7 +2819,9 @@ async function soloReplace(type, ch) {
  * Roda no frontend puro, sem tráfego MIDI extra.
  */
 function checkMasterSoloIndicator() {
-    const hasSolo = channelStates.some(s => s && !!s.solo);
+    const hasSolo = (typeof channelStates !== 'undefined' && channelStates.some(s => s && !!s.solo)) ||
+                    (typeof mixesState !== 'undefined' && mixesState.some(s => s && !!s.solo)) ||
+                    (typeof busesState !== 'undefined' && busesState.some(s => s && !!s.solo));
     const btn = document.getElementById('master-solo-btn');
     if (!btn) return;
     if (hasSolo) {
@@ -2818,6 +2832,7 @@ function checkMasterSoloIndicator() {
         btn.disabled = true;  // Desabilita quando não há solos ativos
     }
 }
+window.checkMasterSoloIndicator = checkMasterSoloIndicator;
 
 /**
  * Desativa o solo de todos os canais que estão solados, enviando os comandos
@@ -2826,9 +2841,30 @@ function checkMasterSoloIndicator() {
  */
 async function clearAllSolos() {
     const soloedChannels = [];
-    for (let i = 0; i < NUM_CHANNELS; i++) {
-        if (channelStates[i] && !!channelStates[i].solo) {
-            soloedChannels.push(i);
+    if (typeof channelStates !== 'undefined') {
+        for (let i = 0; i < NUM_CHANNELS; i++) {
+            if (channelStates[i] && !!channelStates[i].solo) {
+                soloedChannels.push({ id: i, emitCh: i });
+            }
+        }
+        for (let i = 0; i < 8; i++) {
+            if (channelStates[32 + i] && !!channelStates[32 + i].solo) {
+                soloedChannels.push({ id: 32 + i, emitCh: 60 + i * 2 });
+            }
+        }
+    }
+    if (typeof mixesState !== 'undefined') {
+        for (let i = 0; i < 8; i++) {
+            if (mixesState[i] && !!mixesState[i].solo) {
+                soloedChannels.push({ id: 36 + i, emitCh: 40 + i });
+            }
+        }
+    }
+    if (typeof busesState !== 'undefined') {
+        for (let i = 0; i < 8; i++) {
+            if (busesState[i] && !!busesState[i].solo) {
+                soloedChannels.push({ id: 44 + i, emitCh: 48 + i });
+            }
         }
     }
     if (soloedChannels.length === 0) return;
@@ -2839,17 +2875,18 @@ async function clearAllSolos() {
     const btn = document.getElementById('master-solo-btn');
     if (btn) { btn.disabled = true; btn.classList.remove('master-solo-alert'); }
 
-    for (const ch of soloedChannels) {
+    for (const item of soloedChannels) {
         // Atualiza UI local imediatamente (sem esperar confirmação da mesa)
-        updateUI(ch, undefined, undefined, false);
+        updateUI(item.id, undefined, undefined, false);
         // Envia comando MIDI via socket
         if (appReady) {
-            socket.emit('control', { type: 'kSetupSoloChOn/kSoloChOn', channel: ch, value: 0 });
+            socket.emit('control', { type: 'kSetupSoloChOn/kSoloChOn', channel: item.emitCh, value: 0 });
         }
         // Delay entre envios para não congestionar a fila
         await new Promise(r => setTimeout(r, 30));
     }
 }
+window.clearAllSolos = clearAllSolos;
 
 /**
  * Abre o modal de configuração da posição dos medidores.
