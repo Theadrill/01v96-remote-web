@@ -1,5 +1,9 @@
 # Plano de implementação — Smart Toggler com SSOT no servidor (via Macro API)
 
+> ⛔ REGRA MAIS IMPORTANTE DESTE PROJETO: NÃO FAZER COMMITS SEM O USUÁRIO PEDIR. E quando o usuário
+> pedir um commit, fazer aquele commit e AGUARDAR ele pedir novamente para commitar de novo. Nunca
+> commitar em sequência por conta própria, nunca emendar push automático, nunca antecipar o próximo commit.
+
 ## O problema
 
 A macro Smart Toggler desliga um conjunto de canais preservando alguns canais guardiões, guarda
@@ -21,6 +25,26 @@ Que os canais desligados persistam no servidor como única fonte da verdade, e q
 conecte ao servidor enxergue o mesmo estado verdadeiro: se houver um corte ativo, ele mostra quais canais
 foram mutados; se não houver, mostra que está em repouso. Após 12 horas, o estado deixa de ser válido e
 passa a ser tratado como resetado. Tudo isso sem depender do armazenamento local do navegador.
+
+## Regras do sistema de macros (isolamento total — modelo World of Warcraft)
+
+O sistema de macros é completamente isolado do resto da aplicação, nos moldes do sistema de macros
+do World of Warcraft: a macro vive dentro de uma "caixa de areia" e não sabe que existe um servidor,
+um banco de dados, um protocolo de rede ou qualquer outro subsistema. Por questões de segurança, ela
+nunca fala diretamente com o servidor — não abre conexão, não monta requisição, não conhece endereço,
+rota ou formato de transporte. Tudo o que a macro precisa passa exclusivamente pela API de macros
+(`window.MixerAPI`): ler estado (`state`), atuar na mesa (`mixer`), mostrar coisas na tela (`ui`),
+guardar/carregar dados (`storage`) e utilidades (`utils`). Se algo não existe na API de macros, a macro
+simplesmente não tem acesso a isso — e qualquer capacidade nova que uma macro precise deve nascer como
+uma capacidade genérica da API, disponível para todas as macros, nunca como um atalho específico de uma
+macro para dentro do servidor.
+
+## Regra de escopo: não mexer na lógica da macro em si
+
+NÃO modificar nada da lógica da macro Smart Toggler em si — o corte, a restauração, os guardiões,
+as confirmações e o comportamento do pad continuam exatamente como estão. O único objeto deste plano
+é a forma como o estado MUTED ou não-MUTED é lido: de onde ele vem, quando ele é considerado válido
+e como todos os clients enxergam o mesmo valor. Nada além da leitura do estado entra no escopo.
 
 > Restrição arquitetural: macros são inconscientes do resto do app. A macro só fala com `window.MixerAPI`
 > (`storage`, `state`, `mixer`, `ui`, `utils`). Nenhum `fetch`/`socket`/`localStorage`/`window.*` direto na macro.
@@ -153,3 +177,7 @@ Arquivos: `public/modules/macros/smart_channel_toggler/main.js` +
 - `serverNow/updatedAt` agnóstico no `GET` (TTL com relógio do servidor para todas as macros).
 - `If-Match`/versão agnóstica no `POST` (CAS para qualquer macro).
 - Normalização de preset (`trim/lowercase`, validar contra `GET /api/macros/slots` + `hosts.json`).
+
+> ⛔ REGRA MAIS IMPORTANTE DESTE PROJETO (repetição): NÃO FAZER COMMITS SEM O USUÁRIO PEDIR. E quando
+> o usuário pedir um commit, fazer aquele commit e AGUARDAR ele pedir novamente para commitar de novo.
+> Nunca commitar em sequência por conta própria, nunca emendar push automático, nunca antecipar o próximo commit.
