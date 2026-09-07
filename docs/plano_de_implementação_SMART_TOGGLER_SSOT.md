@@ -6,9 +6,10 @@
 
 > Nota de paths (auditoria externa, manter): `macros.js` do core client é `public/modules/macros.js`
 > (+ espelho `public_new/modules/macros/macros.js`) — NÃO `public/modules/macros/macros.js`.
-> `core.js` é `public/modules/macros/core.js` (+ espelho `public_new/...`).
-> Macro é `public/modules/macros/smart_channel_toggler/main.js` (+ espelho `public_new/...`).
-> `save_json_atomic` vive em `server_rust/src/custom_scenes.rs:939-955` — NÃO em `src/api/`.
+> `core.js` é `public/modules/macros/core.js` (+ espelho `public_new/modules/macros/core.js` — **198 linhas cada, não 465**; a nota original dizia "465" por engano ao confundir com `main.js`).
+> Macro é `public/modules/macros/smart_channel_toggler/main.js` (+ espelho `public_new/modules/macros/smart_channel_toggler/main.js` — 465 linhas cada, **idênticas até hoje**).
+> `save_json_atomic` vive em `server_rust/src/custom_scenes.rs:939-955` como `pub fn` (não `pub(crate)`) — portanto `macros.rs` pode chamá-lo diretamente via `crate::custom_scenes::save_json_atomic`. A Fase 3 item 14c original proposta "tornar `pub(crate)` ou extrair helper" é **desnecessária**; removida essa etapa de refatoração de visibilidade.
+> Diretório de espelho é **`public_new`** (com underscore duplo), não `pub_new`.
 
 ## O problema
 
@@ -132,12 +133,17 @@ async fn save_mod_config(
 ```
 
 Regras do snippet: emit SÓ no ramo de sucesso (nunca no `else` de `:733-735`); resposta `:732` intacta;
-nada no router muda; `ts` é aditivo (não quebra clients antigos) e alimenta dedupe/backoff da Fase 1 e futuro
-CAS. Ressalvas honestas: payload ecoa `mod_id`/`preset` sem o `sanitize_file_name` que
-`custom_scene_history.rs:29-41` usa (pré-existente, agravado pelo eco); "emitir sempre" vale enquanto a leitura
-for `local-first` (`macros.rs:675-686`) — se o item 14 mudar para `shared-first`, reavaliar sino espúrio.
+nada no router muda (`Extension(io)` já é injetado via `.layer(Extension(io))` em `:182`, o que significa
+que o extractor `Extension<SocketIo>` funciona em qualquer handler sem tocar em `router()`); `ts` é aditivo
+(não quebra clients antigos) e alimenta dedupe/backoff da Fase 1 e futuro CAS. Ressalvas honestas: payload
+ecoa `mod_id`/`preset` sem o `sanitize_file_name` que `custom_scene_history.rs:29-41` usa (pré-existente,
+agravado pelo eco); "emitir sempre" vale enquanto a leitura for `local-first` (`macros.rs:675-686`) —
+se o item 14mudar para `shared-first`, reavaliar sino espúrio.
 No mesmo PR, trocar `fs::write` (`:711,:717`) por `crate::custom_scenes::save_json_atomic(&path, &body)`
-(`Value` implementa `Serialize`, encaixa direto) — elimina `GET` concorrente lendo JSON truncado.
+(`body` é `axum::Json<Value>`, que dereferencia para `&Value`; `save_json_atomic` recebe `&impl Serialize`
+e `Value: Serialize`, então passar `&*body` ou `&body.0` funciona sem conversão) — elimina `GET` concorrente
+lendo JSON truncado. **`save_json_atomic` já é `pub fn` (`custom_scenes.rs:939`) — NÃO precisa de mudança
+de visibilidade.**
 
 Efeito: evento é só o "sino" (`mudou mod X do preset Y`); o dado continua vindo pelo `GET` existente.
 1 GET por mudança real (ms), em vez de poll por intervalo. Nada no router muda. Falha de emit nunca quebra o POST
@@ -164,12 +170,17 @@ em `public_new` usar `window.apiFetch`, em `public` usar `fetch` — não copiar
    - NUNCA atrelar a `socket 'update'` por-canal (tempestade: corte de 15 canais = 15 updates em ~300ms;
      hash não evita a rede, só o callback).
    - Dedupe por hash do JSON (só chama `cb` se mudou). Coalescing: um poller por `modId::preset`, N callbacks
-     (`Map` em escopo de módulo: `key → { callbacks:Set, timer, controller, prevHash }`).
-   - Lifecycle com `unsubscribe` de verdade (padrão `connection_service.js:23-28`): `watch()` idempotente,
-     `Map` em escopo de módulo, unsubscribe em `removeMacroFromSlot`/`switchPreset`. Pausa em `hidden`
-     (coerente com `app.js:15-28`), `AbortController` por tick, backoff em erro (1→2→4→8→30s teto; reset em sucesso).
+     (`key → { callbacks:Set, timer, controller, prevHash }`).
+   - **Registry de coalescência:** `const __macroWatchRegistry = new Map()` no topo do IIFE de `core.js`
+     (ambos `public/` e `public_new/`). Chave: `modId::preset` → `{ callbacks:Set, timer, controller, prevHash }`.
+     **NÃO** expor no `window` — mantém encapsulamento.
    - Re-resolver `getPreset()` + URL a cada tick (preset muda via `switchPreset`/`saveAs` sem evento;
      re-resolver base via `window.HostManager.getHttpUrl()` se disponível).
+   - **Nota sobre `getPreset()` em load race:** `window.MixerAPI.utils.getPreset()` (`core.js:189`) depende de
+     `window.getCurrentMacroPreset()` estar definido. Como `core.js` carrega via `<script>` na `<head>` (antes
+     do host definir `window.getCurrentMacroPreset`), `getPreset()` retorna `'default'` até o host inicializar.
+     Isso é **aceitável** para o fallback inicial, mas `watch` deve tratar `preset === 'default'` como sinal
+     para re-GET forçado (usuário ainda não escolheu preset realmente).
 3. Higiene `state`: macro usa SÓ `MixerAPI.state` (`getChannel().name`, `getCurrentScene`, `getDeskName`,
    `isPaired`, `getPairPartner`). Estender `state` para `resolvedNames` ou documentar fallback.
    Formalizar exceções: DOM do próprio modal permitido; estado do mixer, proibido. Prover
@@ -178,11 +189,12 @@ em `public_new` usar `window.apiFetch`, em `public` usar `fetch` — não copiar
 ## Fase 2 — Macro smart_channel_toggler (espelhos idênticos)
 
 Arquivos: `public/modules/macros/smart_channel_toggler/main.js` +
-`public_new/modules/macros/smart_channel_toggler/main.js` (465 linhas cada; aplicar igual + diff-gate).
+`public_new/modules/macros/smart_channel_toggler/main.js` (464 linhas cada; aplicar igual + diff-gate).
 
 4. `onInit` read-only: GET → valida → `updatePadVisual`. DELETAR o `saveModConfig(reset)` (`main.js:91-98`).
    Expirado renderiza `🛡️ repouso` localmente, sem tocar no servidor. Auditar no mesmo PR `onClear:434-443`
-   e `onDelete:446-452` (reset explícito — ver item 14 para o destino do delete).
+   e **`onDelete:446-452`** (hoje POSTa `null` que vira string literal `"null"` — **PROMOVIDO de Fase 3 para
+   Fase 2**: corrigido para `POST {}` em vez de `null`/`JSON.stringify(null)`). Ver item 14d para a rota DELETE.
 5. `isSnapshotValid` unificado: mesma fonte (só `MixerAPI.state`) para gate e valor; teste simétrico `== null`
    (cobre `null+undefined`; ausência `scene_id/desk_name == null` = ausência, não invalidação);
    corrigir `main.js:40` (`undefined` hoje fura o guard). Migrar `getChannelName (L68,71)` e botões
@@ -201,9 +213,10 @@ Arquivos: `public/modules/macros/smart_channel_toggler/main.js` +
    está certa; assumir a janela do stagger (~300ms p/ 15 canais) como race documentada, não inferir estado pelo
    mixer nela. União (`A ∪ B`) SOMENTE em `CUT×CUT` de mesma base; `CUT×RESTORE` resolve por última intenção
    explícita + aviso (`ui.alert`), nunca união cega. Limitação honesta: sem CAS no server, race de ms é best-effort.
-8. `onSave`/`resetBtn` unificados: re-GET fresco → mesclar `{guardians: local, snapshot: remoto-fresco}` →
+8. `onSave`/`resetBtn`/**`onConfigure`**/ unificados: re-GET fresco → mesclar `{guardians: local, snapshot: remoto-fresco}` →
    POST. Regra explícita se snapshot remoto mudou desde `onConfigure` (`:88,:230`): avisar em vez de sobrescrever.
-   Vale para `onSave :418-431`, `resetBtn :291-302` e `onClear :434-443` (POST default cego hoje).
+   Vale para `onSave :418-431`, `resetBtn :291-302`, `onClear :434-443` (POST default cego hoje) **e `onConfigure`**
+   — abrir o modal de configuração também deve re-GET, senão mostra dados stale de outro client.
 9. Assinatura do watch em `onInit` (só após Fase 1 existir — hoje `core.js:147-163` nem expõe `watch`):
    `(latest) => updatePadVisual(slotIndex, latest)` + atualizar banner do modal se aberto (patch incremental,
    sem `innerHTML=''` full-rebuild de `:241` que destrói banner+32 botões, perde foco/scroll e gera churn;
@@ -236,11 +249,11 @@ Arquivos: `public/modules/macros/smart_channel_toggler/main.js` +
        chaves de `GET /api/macros/slots` + normalizar; se desconhecido, descartar e usar `found`. `switchPreset
        :443-459` e `savePresetAs :467-481` já persistem `macro_last_preset`; falta o descarte do stale.
        (Normalização completa `trim/lowercase` geral continua futuro — ver Fora de escopo.)
-    c. Trocar os 5 `fs::write` de `macros.rs` (`:449,455,541,711,717`) por `save_json_atomic` reusado de
-       `server_rust/src/custom_scenes.rs:939-955` (tornar `pub(crate)` ou extrair helper; `with_extension("json.tmp")`
-       por arquivo, sem colisão entre `profile_X.json` e `mod_preset.json`).
-    d. `onDelete` (`smart_channel_toggler/main.js:446-452`): remover arquivo(s) + `enqueue_git_sync`
-       (definir rota — não existe `DELETE /api/macros/config/{mod}`); paliativo até lá: `POST {}` nunca `null`.
+    c. Trocar os 5 `fs::write` de `macros.rs` (`:449,455,541,711,717`) por `crate::custom_scenes::save_json_atomic`
+       (já `pub fn` em `custom_scenes.rs:939` — **não precisa de mudança de visibilidade**). Passar `&*body`
+       (dereference `axum::Json<Value>` para `&Value`, que implementa `Serialize`). Usa
+       `with_extension("json.tmp")` por arquivo (atomic temp + rename), sem colisão entre `profile_X.json`
+       e `mod_preset.json` — cada um tem `.tmp` único por nome base.
        Pontas soltas no mesmo arquivo, corrigir junto: `delete_slots:472-490` sem `enqueue_git_sync` do `shared`;
        `swap_slots:521-544` ignora array (`:527`).
 
@@ -259,6 +272,26 @@ Arquivos: `public/modules/macros/smart_channel_toggler/main.js` +
   aceitar divergência com aviso em `CUT×RESTORE` — sem CAS é best-effort honesto.
 - Move de pad (cobre o `ReferenceError :822`); kill -9 durante POST não deixa JSON truncado (prova do atômico);
   `io.emit` com 0 clients ainda retorna `success:true`.
+
+## Changelog de auditoria externa
+
+As seguintes correções foram aplicadas nesta auditoria:
+
+- **Nota de paths (linha 9-12):** Corrigido "465 linhas" para "198 linhas" em `core.js`;
+  especificado que `save_json_atomic` já é `pub fn` (visibilidade não precisa ser alterada);
+  corrigido `pub_new` → `public_new` no nome do diretório.
+- **Fase 0 (save_json_atomic):** Removida a proposta de "tornar `pub(crate)`" — a função já é `pub fn`
+  em `custom_scenes.rs:939` e acessível diretamente.
+- **Fase 1 item 1b (getPreset race):** Adicionada nota sobre race de load: `getPreset()` retorna
+  `"default"` até `window.getCurrentMacroPreset` estar definido; `watch` deve tratar isso.
+- **Fase 1 item 2 (registry):** Especificado onde viverá o `Map` de coalescência — no topo do IIFE
+  de `core.js`, não exposto no `window`.
+- **Fase 2 item 4 (onDelete):** Promovido de Fase 3 para Fase 2 — POSTar `{}` em vez de `null`
+  é um crash de função, não "higiene".
+- **Fase 2 item 8 (onConfigure):** Incluído `onConfigure` no re-GET — não apenas `onSave`/`resetBtn`/`onClear`,
+  senão abrir o modal mostra dados stale de outro client.
+- **Fase 3 item 14c (atomic writes):** Removida referência a "tornar `pub(crate)`";
+  adicionado nota sobre passar `&*body` (dereference `axum::Json<Value>` para `&Value`).
 
 ## Fora de escopo (futuro)
 
