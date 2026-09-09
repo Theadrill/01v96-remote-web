@@ -541,6 +541,16 @@
     gap: 6px;
 }
 
+.conn-form-group--host {
+    flex: 3;
+    min-width: 0;
+}
+
+.conn-form-group--port {
+    flex: 1;
+    min-width: 0;
+}
+
 .conn-form-label {
     font-size: 11px;
     font-weight: 700;
@@ -754,16 +764,58 @@
 
 /* ── Escopo: teclado virtual só em #connFormHostVkWrap — ocupa toda a largura disponível ── */
 #connFormHostVkWrap {
-    display: flex;
-    width: 100%;
+    display: var(--name-editor-conn-vk-wrap-display, flex);
+    width: var(--name-editor-conn-vk-wrap-width, 100%);
     max-width: 100%;
     min-width: 0;
-    align-self: stretch;
-    box-sizing: border-box;
+    align-self: var(--name-editor-conn-vk-wrap-align-self, stretch);
+    box-sizing: var(--name-editor-conn-vk-wrap-box-sizing, border-box);
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     overflow: visible;
+    margin-top: var(--name-editor-conn-vk-wrap-margin-top, 8px);
+}
+#connFormHostVkWrap.is-hidden {
+    display: var(--name-editor-conn-vk-wrap-hidden-display, none);
+}
+/* ─── CONN FORM HOST — reuso de vars name-editor ────────────────────── */
+/* Linha do host (reuso de name-editor-input-row) — div:has(#connFormHost) linha 1478 */
+.conn-form-input-row {
+    display: var(--name-editor-conn-input-row-display, flex);
+    gap: var(--name-editor-conn-input-row-gap, 6px);
+    align-items: var(--name-editor-conn-input-row-align, center);
+    width: 100%;
+    box-sizing: border-box;
+}
+/* Alias: permite reutilizar .name-editor-input-row no host */
+#connFormHostVkWrap ~ .conn-form-input-row,
+div:has(#connFormHost).conn-form-input-row {
+    display: var(--name-editor-conn-input-row-display, flex);
+    gap: var(--name-editor-conn-input-row-gap, 6px);
+    align-items: var(--name-editor-conn-input-row-align, center);
+}
+/* Input host — #connFormHost linha 1479 */
+#connFormHost.conn-form-host-input {
+    flex: var(--name-editor-conn-input-flex, 1);
+    min-width: var(--name-editor-conn-input-min-width, 0);
+}
+/* VkWrap do host — #connFormHostVkWrap linha 1488 — classe estado .is-hidden */
+#connFormHostVkWrap.conn-form-vk-wrap {
+    display: var(--name-editor-conn-vk-wrap-display, flex);
+    margin-top: var(--name-editor-conn-vk-wrap-margin-top, 8px);
+    width: var(--name-editor-conn-vk-wrap-width, 100%);
+    align-self: var(--name-editor-conn-vk-wrap-align-self, stretch);
+    box-sizing: var(--name-editor-conn-vk-wrap-box-sizing, border-box);
+    flex-direction: column;
+    overflow: visible;
+}
+#connFormHostVkWrap.conn-form-vk-wrap.is-hidden {
+    display: var(--name-editor-conn-vk-wrap-hidden-display, none);
+}
+/* Modifier para .conn-form-row que tinha inline margin-top:4px linha 1489 */
+.conn-form-row.conn-form-row--spaced {
+    margin-top: var(--name-editor-conn-form-row-margin-top, 4px);
 }
 #connFormHostVkWrap .virtual-keyboard-container {
     display: flex;
@@ -808,28 +860,63 @@
     font-size: 13px;
     height: 46px;
 }
-/* ── nameEditorModal: mesma largura do form de conexão (480px), altura cresce com o teclado ── */
-#nameEditorModal #nameEditorContent.inline-style-26 {
-    max-width: 480px;
-    width: 90%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    max-height: 90vh;
-    overflow-y: auto;
+/* ─── NAME EDITOR ────────────────────────────────────────── */
+/* Modal de edição de nome do canal (4 caracteres) — input, preview e teclado virtual */
+/* Uso: #nameEditorModal > #nameEditorContent + #inputChName + #nameEditorVkWrap */
+#nameEditorModal #nameEditorContent.inline-style-26,
+#nameEditorModal #nameEditorContent.name-editor-content {
+    max-width: var(--name-editor-modal-max-width, 480px);
+    width: var(--name-editor-modal-width, 90%);
+    box-sizing: var(--name-editor-modal-box-sizing, border-box);
+    display: var(--name-editor-modal-display, flex);
+    flex-direction: var(--name-editor-modal-flex-direction, column);
+    align-items: var(--name-editor-modal-align-items, stretch);
+    max-height: var(--name-editor-modal-max-height, 90vh);
+    overflow-y: var(--name-editor-modal-overflow-y, auto);
 }
+/* Linha do Input (input + botão teclado) — wrapper da linha 555: #inputChName + #nameEditorKbBtn */
+#nameEditorModal .name-editor-input-row {
+    display: var(--name-editor-input-row-display, flex);
+    gap: var(--name-editor-input-row-gap, 6px);
+    align-items: var(--name-editor-input-row-align, center);
+    width: var(--name-editor-input-row-width, 100%);
+    box-sizing: var(--name-editor-input-row-box-sizing, border-box);
+}
+/* Input de Nome — #inputChName.styled-inputChName linha 556 */
+#nameEditorModal #inputChName.name-editor-input {
+    flex: var(--name-editor-input-flex, 1);
+    min-width: var(--name-editor-input-min-width, 0);
+    margin-bottom: var(--name-editor-input-margin-bottom, 0);
+}
+/* Wrapper do Teclado Virtual — #nameEditorVkWrap linha 559; visibilidade via .is-hidden */
+#nameEditorModal #nameEditorVkWrap.name-editor-vk-wrap {
+    display: var(--name-editor-vk-wrap-display, flex);
+    margin-top: var(--name-editor-vk-wrap-margin-top, 8px);
+    width: var(--name-editor-vk-wrap-width, 100%);
+    align-self: var(--name-editor-vk-wrap-align-self, stretch);
+    box-sizing: var(--name-editor-vk-wrap-box-sizing, border-box);
+    flex-direction: var(--name-editor-vk-wrap-flex-direction, column);
+    overflow: var(--name-editor-vk-wrap-overflow, visible);
+}
+#nameEditorModal #nameEditorVkWrap.name-editor-vk-wrap.is-hidden {
+    display: var(--name-editor-vk-wrap-hidden-display, none);
+}
+/* Compat: ID sem classe nova — mantém vars com fallback para transição */
 #nameEditorVkWrap {
-    display: flex;
-    width: 100%;
+    display: var(--name-editor-vk-wrap-display, flex);
+    width: var(--name-editor-vk-wrap-width, 100%);
     max-width: 100%;
     min-width: 0;
-    align-self: stretch;
-    box-sizing: border-box;
-    flex-direction: column;
+    align-self: var(--name-editor-vk-wrap-align-self, stretch);
+    box-sizing: var(--name-editor-vk-wrap-box-sizing, border-box);
+    flex-direction: var(--name-editor-vk-wrap-flex-direction, column);
     align-items: stretch;
     justify-content: flex-start;
-    overflow: visible;
+    overflow: var(--name-editor-vk-wrap-overflow, visible);
+    margin-top: var(--name-editor-vk-wrap-margin-top, 8px);
+}
+#nameEditorVkWrap.is-hidden {
+    display: var(--name-editor-vk-wrap-hidden-display, none);
 }
 #nameEditorVkWrap .virtual-keyboard-container {
     display: flex;

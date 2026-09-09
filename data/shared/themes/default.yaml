@@ -90,6 +90,63 @@ virtual_keyboard:
   keyboard_gap: "4px"
 
 
+# ─── NAME EDITOR ──────────────────────────────────────────
+# Modal de edição de nome do canal (4 caracteres) — input, preview e teclado virtual
+# Uso: #nameEditorModal > #nameEditorContent + #inputChName + #nameEditorVkWrap
+name_editor:
+  # ── Modal / Card ─────────────────────────────────────────
+  # Card interno #nameEditorContent — mesma largura do form de conexão (480px)
+  modal_max_width: "480px"             # max-width do card (connection_manager.css:812)
+  modal_width: "90%"                   # width fluido em telas estreitas
+  modal_max_height: "90vh"             # altura máxima com scroll interno
+  modal_display: "flex"                # display do card
+  modal_flex_direction: "column"       # direção flex
+  modal_align_items: "stretch"         # estica filhos (input-row e vk-wrap)
+  modal_box_sizing: "border-box"       # box-sizing
+  modal_overflow_y: "auto"             # scroll vertical quando teclado aberto
+
+  # ── Linha do Input (input + botão teclado) ───────────────
+  # Wrapper da linha 555: <div> contendo #inputChName + #nameEditorKbBtn
+  input_row_display: "flex"            # display da linha
+  input_row_gap: "6px"                 # gap entre input e botão ⌨️
+  input_row_align: "center"            # align-items
+  input_row_width: "100%"              # ocupa largura do card
+  input_row_box_sizing: "border-box"
+
+  # ── Input de Nome ────────────────────────────────────────
+  # #inputChName.styled-inputChName — linha 556
+  input_flex: "1"                      # flex:1 para ocupar espaço restante
+  input_min_width: "0"                 # evita overflow flex
+  input_margin_bottom: "0"             # remove margem padrão do styled-input
+
+  # ── Wrapper do Teclado Virtual ───────────────────────────
+  # #nameEditorVkWrap — linha 559; visibilidade via classe .is-hidden
+  vk_wrap_display: "flex"              # display quando visível (default do CSS)
+  vk_wrap_hidden_display: "none"       # display quando oculto (estado inicial + JS toggle)
+  vk_wrap_margin_top: "8px"            # espaço entre input-row e teclado
+  vk_wrap_width: "100%"                # largura total
+  vk_wrap_align_self: "stretch"        # estica no flex column do modal
+  vk_wrap_box_sizing: "border-box"
+  vk_wrap_flex_direction: "column"     # container coluna do teclado
+  vk_wrap_overflow: "visible"          # permite overflow do teclado
+
+  # ── Reuso — Form de Host (connFormHost) ──────────────────
+  # Mesmas vars reutilizadas em #connFormHostVkWrap e .conn-form-input-row
+  # Mantidas aqui para documentar cobertura; se divergir, criar override.
+  conn_input_row_display: "flex"       # display da linha 1478
+  conn_input_row_gap: "6px"            # gap da linha 1478
+  conn_input_row_align: "center"       # align-items da linha 1478
+  conn_input_flex: "1"                 # flex do #connFormHost linha 1479
+  conn_input_min_width: "0"            # min-width do #connFormHost
+  conn_vk_wrap_display: "flex"         # display visível #connFormHostVkWrap
+  conn_vk_wrap_hidden_display: "none"  # display oculto #connFormHostVkWrap linha 1488
+  conn_vk_wrap_margin_top: "8px"       # margin-top #connFormHostVkWrap linha 1488
+  conn_vk_wrap_width: "100%"
+  conn_vk_wrap_align_self: "stretch"
+  conn_vk_wrap_box_sizing: "border-box"
+  conn_form_row_margin_top: "4px"      # margin-top do .conn-form-row linha 1489
+
+
 # ─── FUTUROS COMPONENTES ──────────────────────────────────────
 # Adicione novas seções conforme refatorar:
 #

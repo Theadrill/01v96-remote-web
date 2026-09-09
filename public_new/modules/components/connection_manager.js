@@ -379,6 +379,8 @@
 
             const modal = document.getElementById('connectionFormModal');
             if (modal) modal.classList.add('active');
+            var _cvkA = document.getElementById('connFormHostVkWrap');
+            if (_cvkA) _cvkA.classList.add('is-hidden');
             if (hostEl) setTimeout(() => hostEl.focus(), 80);
         }
 
@@ -405,12 +407,16 @@
 
             const modal = document.getElementById('connectionFormModal');
             if (modal) modal.classList.add('active');
+            var _cvkE = document.getElementById('connFormHostVkWrap');
+            if (_cvkE) _cvkE.classList.add('is-hidden');
         }
 
         closeFormModal() {
             const modal = document.getElementById('connectionFormModal');
             if (modal) modal.classList.remove('active');
             this._editingHostId = null;
+            var _cvk = document.getElementById('connFormHostVkWrap');
+            if (_cvk) _cvk.classList.add('is-hidden');
         }
 
         saveForm() {

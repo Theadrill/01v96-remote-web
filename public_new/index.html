@@ -549,14 +549,14 @@
     </div>
     <!-- Modal de Edição de Nome do Canal -->
     <div class="modal-overlay styled-nameEditorModal" id="nameEditorModal">
-        <div class="modal-content inline-style-26" id="nameEditorContent">
+        <div class="modal-content name-editor-content" id="nameEditorContent">
             <p class="inline-style-27">
                 Editar Nome do Canal</p>
-            <div style="display:flex; gap:6px; align-items:center; width:100%; box-sizing:border-box;">
-                <input class="styled-inputChName" id="inputChName" maxlength="4" type="text" style="flex:1; min-width:0; margin-bottom:0;" />
-                <button type="button" id="nameEditorKbBtn" class="conn-form-kb-btn" title="Teclado virtual" aria-label="Teclado virtual" onclick="(function(){ var i=document.getElementById('inputChName'); if(i){i.focus(); try{i.scrollIntoView({block:'nearest'});}catch(e){}} var wrap=document.getElementById('nameEditorVkWrap'); if(!wrap) return; if(wrap.style.display!=='none' && wrap.childElementCount>0){wrap.style.display='none'; return;} wrap.style.display='flex'; if(wrap.childElementCount===0 && window.VirtualKeyboard && typeof window.VirtualKeyboard.create==='function'){ try{ var kb=window.VirtualKeyboard.create('inputChName'); wrap.appendChild(kb);}catch(e){} } })()">⌨️</button>
+            <div class="name-editor-input-row">
+                <input class="styled-inputChName name-editor-input" id="inputChName" maxlength="4" type="text" />
+                <button type="button" id="nameEditorKbBtn" class="conn-form-kb-btn" title="Teclado virtual" aria-label="Teclado virtual" onclick="(function(){ var i=document.getElementById('inputChName'); if(i){i.focus(); try{i.scrollIntoView({block:'nearest'});}catch(e){}} var wrap=document.getElementById('nameEditorVkWrap'); if(!wrap) return; if(!wrap.classList.contains('is-hidden') && wrap.childElementCount>0){wrap.classList.add('is-hidden'); return;} wrap.classList.remove('is-hidden'); if(wrap.childElementCount===0 && window.VirtualKeyboard && typeof window.VirtualKeyboard.create==='function'){ try{ var kb=window.VirtualKeyboard.create('inputChName'); wrap.appendChild(kb);}catch(e){} } })()">⌨️</button>
             </div>
-            <div id="nameEditorVkWrap" style="display:none; margin-top:8px; width:100%; align-self:stretch; box-sizing:border-box;"></div>
+            <div id="nameEditorVkWrap" class="name-editor-vk-wrap is-hidden"></div>
             <label class="styled-lblCustomName" id="lblCustomName">
                 <input id="chkCustomName" onchange="toggleCustomNameEditor()" type="checkbox" />
                 Criar nome customizado
@@ -1473,20 +1473,20 @@
                     <input type="text" id="connFormName" class="conn-form-input" placeholder="ex: Mesa Principal, PA Igreja, Retorno" maxlength="30" />
                 </div>
                 <div class="conn-form-row">
-                    <div class="conn-form-group" style="flex: 3;">
+                    <div class="conn-form-group conn-form-group--host">
                         <label class="conn-form-label" for="connFormHost">Endereço IP da Mesa</label>
-                        <div style="display:flex; gap:6px; align-items:center;">
-                            <input type="text" id="connFormHost" class="conn-form-input" placeholder="ex: 192.168.1.100 ou tailscale-node" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-vk-lowercase="true" style="flex:1; min-width:0;" />
-                            <button type="button" id="connFormHostKbBtn" class="conn-form-kb-btn" title="Abrir teclado virtual" aria-label="Abrir teclado virtual" style="flex-shrink:0; width:38px; height:38px; border-radius:6px; border:1px solid #2d3748; background:#1a202c; color:#cbd5e0; font-size:18px; line-height:1; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;" onclick="(function(){ var i=document.getElementById('connFormHost'); if(i){ i.focus(); try{ i.scrollIntoView({block:'nearest'});}catch(e){} } var wrap=document.getElementById('connFormHostVkWrap'); if(!wrap) return; if(wrap.style.display!=='none' && wrap.childElementCount>0){ wrap.style.display='none'; return; } wrap.style.display='flex'; if(wrap.childElementCount===0 && window.VirtualKeyboard && typeof window.VirtualKeyboard.create==='function'){ try{ var kb=window.VirtualKeyboard.create('connFormHost'); wrap.appendChild(kb);}catch(e){} } })()">⌨️</button>
+                        <div class="conn-form-input-row">
+                            <input type="text" id="connFormHost" class="conn-form-input conn-form-host-input" placeholder="ex: 192.168.1.100 ou tailscale-node" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-vk-lowercase="true" />
+                            <button type="button" id="connFormHostKbBtn" class="conn-form-kb-btn" title="Abrir teclado virtual" aria-label="Abrir teclado virtual" onclick="(function(){ var i=document.getElementById('connFormHost'); if(i){ i.focus(); try{ i.scrollIntoView({block:'nearest'});}catch(e){} } var wrap=document.getElementById('connFormHostVkWrap'); if(!wrap) return; if(!wrap.classList.contains('is-hidden') && wrap.childElementCount>0){ wrap.classList.add('is-hidden'); return; } wrap.classList.remove('is-hidden'); if(wrap.childElementCount===0 && window.VirtualKeyboard && typeof window.VirtualKeyboard.create==='function'){ try{ var kb=window.VirtualKeyboard.create('connFormHost'); wrap.appendChild(kb);}catch(e){} } })()">⌨️</button>
                         </div>
                     </div>
-                    <div class="conn-form-group" style="flex: 1;">
+                    <div class="conn-form-group conn-form-group--port">
                         <label class="conn-form-label" for="connFormPort">Porta</label>
                         <input type="number" id="connFormPort" class="conn-form-input" value="4000" />
                     </div>
                 </div>
-                <div id="connFormHostVkWrap" style="display:none; margin-top:8px; width:100%; align-self:stretch; box-sizing:border-box;"></div>
-                <div class="conn-form-row" style="margin-top: 4px;">
+                <div id="connFormHostVkWrap" class="conn-form-vk-wrap is-hidden"></div>
+                <div class="conn-form-row conn-form-row--spaced">
                     <label class="conn-form-checkbox-label">
                         <input type="checkbox" id="connFormAuto" checked />
                         Conectar automaticamente ao iniciar

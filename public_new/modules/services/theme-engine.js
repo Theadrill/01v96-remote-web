@@ -72,6 +72,45 @@ var ThemeEngine = (function () {
         if (vk.row_gap)             root.style.setProperty('--virtual-keyboard-row-gap', vk.row_gap);
         if (vk.keyboard_gap)        root.style.setProperty('--virtual-keyboard-gap', vk.keyboard_gap);
 
+        // Name Editor
+        var ne = theme.name_editor || {};
+        if (ne.modal_max_width)          root.style.setProperty('--name-editor-modal-max-width', ne.modal_max_width);
+        if (ne.modal_width)              root.style.setProperty('--name-editor-modal-width', ne.modal_width);
+        if (ne.modal_max_height)         root.style.setProperty('--name-editor-modal-max-height', ne.modal_max_height);
+        if (ne.modal_display)            root.style.setProperty('--name-editor-modal-display', ne.modal_display);
+        if (ne.modal_flex_direction)     root.style.setProperty('--name-editor-modal-flex-direction', ne.modal_flex_direction);
+        if (ne.modal_align_items)        root.style.setProperty('--name-editor-modal-align-items', ne.modal_align_items);
+        if (ne.modal_box_sizing)         root.style.setProperty('--name-editor-modal-box-sizing', ne.modal_box_sizing);
+        if (ne.modal_overflow_y)         root.style.setProperty('--name-editor-modal-overflow-y', ne.modal_overflow_y);
+        if (ne.input_row_display)        root.style.setProperty('--name-editor-input-row-display', ne.input_row_display);
+        if (ne.input_row_gap)            root.style.setProperty('--name-editor-input-row-gap', ne.input_row_gap);
+        if (ne.input_row_align)          root.style.setProperty('--name-editor-input-row-align', ne.input_row_align);
+        if (ne.input_row_width)          root.style.setProperty('--name-editor-input-row-width', ne.input_row_width);
+        if (ne.input_row_box_sizing)     root.style.setProperty('--name-editor-input-row-box-sizing', ne.input_row_box_sizing);
+        if (ne.input_flex)               root.style.setProperty('--name-editor-input-flex', ne.input_flex);
+        if (ne.input_min_width)          root.style.setProperty('--name-editor-input-min-width', ne.input_min_width);
+        if (ne.input_margin_bottom)      root.style.setProperty('--name-editor-input-margin-bottom', ne.input_margin_bottom);
+        if (ne.vk_wrap_display)          root.style.setProperty('--name-editor-vk-wrap-display', ne.vk_wrap_display);
+        if (ne.vk_wrap_hidden_display)   root.style.setProperty('--name-editor-vk-wrap-hidden-display', ne.vk_wrap_hidden_display);
+        if (ne.vk_wrap_margin_top)       root.style.setProperty('--name-editor-vk-wrap-margin-top', ne.vk_wrap_margin_top);
+        if (ne.vk_wrap_width)            root.style.setProperty('--name-editor-vk-wrap-width', ne.vk_wrap_width);
+        if (ne.vk_wrap_align_self)       root.style.setProperty('--name-editor-vk-wrap-align-self', ne.vk_wrap_align_self);
+        if (ne.vk_wrap_box_sizing)       root.style.setProperty('--name-editor-vk-wrap-box-sizing', ne.vk_wrap_box_sizing);
+        if (ne.vk_wrap_flex_direction)   root.style.setProperty('--name-editor-vk-wrap-flex-direction', ne.vk_wrap_flex_direction);
+        if (ne.vk_wrap_overflow)         root.style.setProperty('--name-editor-vk-wrap-overflow', ne.vk_wrap_overflow);
+        if (ne.conn_input_row_display)   root.style.setProperty('--name-editor-conn-input-row-display', ne.conn_input_row_display);
+        if (ne.conn_input_row_gap)       root.style.setProperty('--name-editor-conn-input-row-gap', ne.conn_input_row_gap);
+        if (ne.conn_input_row_align)     root.style.setProperty('--name-editor-conn-input-row-align', ne.conn_input_row_align);
+        if (ne.conn_input_flex)          root.style.setProperty('--name-editor-conn-input-flex', ne.conn_input_flex);
+        if (ne.conn_input_min_width)     root.style.setProperty('--name-editor-conn-input-min-width', ne.conn_input_min_width);
+        if (ne.conn_vk_wrap_display)     root.style.setProperty('--name-editor-conn-vk-wrap-display', ne.conn_vk_wrap_display);
+        if (ne.conn_vk_wrap_hidden_display) root.style.setProperty('--name-editor-conn-vk-wrap-hidden-display', ne.conn_vk_wrap_hidden_display);
+        if (ne.conn_vk_wrap_margin_top)  root.style.setProperty('--name-editor-conn-vk-wrap-margin-top', ne.conn_vk_wrap_margin_top);
+        if (ne.conn_vk_wrap_width)       root.style.setProperty('--name-editor-conn-vk-wrap-width', ne.conn_vk_wrap_width);
+        if (ne.conn_vk_wrap_align_self)  root.style.setProperty('--name-editor-conn-vk-wrap-align-self', ne.conn_vk_wrap_align_self);
+        if (ne.conn_vk_wrap_box_sizing)  root.style.setProperty('--name-editor-conn-vk-wrap-box-sizing', ne.conn_vk_wrap_box_sizing);
+        if (ne.conn_form_row_margin_top) root.style.setProperty('--name-editor-conn-form-row-margin-top', ne.conn_form_row_margin_top);
+
         // Bubble Modal
         var bm = theme.bubble_modal || {};
         if (bm.bg_color)               root.style.setProperty('--bm-bg', bm.bg_color);
