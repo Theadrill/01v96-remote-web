@@ -14,6 +14,10 @@ function bootstrapApp() {
     } catch (e) {
         console.error('[App Boot] Error during initUI:', e);
     }
+
+    // Pós-bootstrap: não faz socket swap automático (caminho normal é navegar).
+    // Se activeHost difere do origin, o banner em ConnectionManagerUI.render()
+    // orienta o usuário a clicar em ABRIR UI NOVA/CLÁSSICA.
 }
 
 if (document.readyState === 'loading') {

@@ -122,7 +122,7 @@
             const profile = {
                 id: profileData.id || `host_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
                 name: (profileData.name || '01V96 Console').trim(),
-                host: (profileData.host || '127.0.0.1').trim().replace(/^(https?:\/\/)/, ''),
+                host: (profileData.host || '127.0.0.1').trim().replace(/^(https?:\/\/)/, '').toLowerCase(),
                 port: parseInt(profileData.port, 10) || 4000,
                 useSsl: Boolean(profileData.useSsl),
                 autoConnect: Boolean(profileData.autoConnect),
@@ -204,6 +204,70 @@
             }
             const proto = p.useSsl ? 'https' : 'http';
             return `${proto}://${p.host}:${p.port || 4000}`;
+        }
+
+        /**
+         * Gera URL HTTP com path anexado (ex: / ou /new/).
+         * @param {object|null} profile - Perfil ou null (usa ativo)
+         * @param {string} path - Path com ou sem barra inicial (ex: '/', '/new/', 'new')
+         * @returns {string} URL completa normalizada sem barras duplas
+         */
+        getHostUrlWithPath(profile, path) {
+            const p = profile || this.getActiveHost();
+            if (!p) {
+                if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
+                    const origin = window.location.origin.replace(/\/+$/, '');
+                    if (!path) return origin + '/';
+                    let norm = String(path).trim();
+                    if (!norm.startsWith('/')) norm = '/' + norm;
+                    norm = norm.replace(/\/{2,}/g, '/');
+                    return origin + norm;
+                }
+                const fallback = 'http://127.0.0.1:4000';
+                if (!path) return fallback + '/';
+                let norm = String(path).trim();
+                if (!norm.startsWith('/')) norm = '/' + norm;
+                norm = norm.replace(/\/{2,}/g, '/');
+                return fallback + norm;
+            }
+            const proto = p.useSsl ? 'https' : 'http';
+            const base = `${proto}://${p.host}:${p.port || 4000}`;
+            if (!path) return base + '/';
+            let norm = String(path).trim();
+            if (!norm.startsWith('/')) norm = '/' + norm;
+            norm = norm.replace(/\/{2,}/g, '/');
+            return base + norm;
+        }
+
+        /**
+         * Gera URL de navegacao conforme variante da UI.
+         * @param {object|null} profile - Perfil ou null (usa ativo)
+         * @param {string} uiVariant - 'classic' -> '/', 'new' -> '/new/' ou path direto se comecar com '/'
+         * @returns {string} URL completa para navegacao
+         */
+        getNavigateUrl(profile, uiVariant) {
+            let path;
+            if (typeof uiVariant === 'string' && uiVariant.startsWith('/')) {
+                path = uiVariant;
+            } else if (uiVariant === 'new') {
+                path = '/new/';
+            } else {
+                path = '/';
+            }
+            return this.getHostUrlWithPath(profile, path);
+        }
+
+        /**
+         * Detecta variante atual da UI pela URL do navegador.
+         * @returns {'new'|'classic'} 'new' se pathname comeca com /new, senao 'classic'
+         */
+        getCurrentUiVariant() {
+            try {
+                if (typeof window !== 'undefined' && window.location && typeof window.location.pathname === 'string') {
+                    return window.location.pathname.startsWith('/new') ? 'new' : 'classic';
+                }
+            } catch (_) {}
+            return 'classic';
         }
     }
 

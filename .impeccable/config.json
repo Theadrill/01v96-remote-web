@@ -1,1 +1,45 @@
-﻿{"buildPath": "comp"}
+{
+  "buildPath": "comp",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "public_new/index.html"
+        ],
+        "createdAt": "2026-09-08T22:20:10.528Z",
+        "reason": "Sanctioned: design.json led-glow shadow — Functional Glow Rule: saturated glow represents active ON/signal"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "public_new/style.css"
+        ],
+        "createdAt": "2026-09-08T22:20:10.887Z",
+        "reason": "Sanctioned: design.json led-glow shadow — Functional Glow Rule: saturated glow represents active ON/signal"
+      },
+      {
+        "rule": "pulsing-dot",
+        "value": "*",
+        "files": [
+          "public_new/index.html"
+        ],
+        "createdAt": "2026-09-08T22:20:11.303Z",
+        "reason": "Sanctioned: live audio indicator pulse — .musician-header-title live dot is literal audio activity"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "roboto",
+        "files": [
+          "public_new/modules/FXS/fx.css"
+        ],
+        "createdAt": "2026-09-08T22:44:52.574Z",
+        "reason": "Sanctioned: FX editor DAW plugin system font stack — Roboto as Android fallback for Header Sans (Segoe UI), part of -apple-system/BlinkMacSystemFont stack, not design drift"
+      }
+    ]
+  }
+}

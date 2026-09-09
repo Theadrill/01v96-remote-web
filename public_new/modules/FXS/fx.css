@@ -12,6 +12,9 @@
     flex-direction: column;
     overflow: hidden;
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+    padding: 16px;
+    box-sizing: border-box;
+    gap: 12px;
 }
 
 .fx-ed-container {

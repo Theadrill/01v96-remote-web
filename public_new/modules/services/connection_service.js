@@ -140,6 +140,26 @@
         }
 
         /**
+         * Navega para a URL do host (delega a HostManager.getNavigateUrl).
+         * @param {string|object|null} hostId - id do perfil, objeto de perfil ou null (usa ativo)
+         * @param {string} uiVariant - 'classic'|'new'|path direto ('/new/', '/')
+         * @returns {string|null} URL de destino ou null se HostManager indisponível
+         */
+        navigateToHostUrl(hostId, uiVariant) {
+            let profile = hostId;
+            if (typeof hostId === 'string' && window.HostManager) {
+                profile = window.HostManager.getProfileById(hostId) || null;
+            }
+            // null/undefined => HostManager.getNavigateUrl usa activeHost internamente
+            if (window.HostManager && typeof window.HostManager.getNavigateUrl === 'function') {
+                const url = window.HostManager.getNavigateUrl(profile, uiVariant);
+                window.location.href = url;
+                return url;
+            }
+            return null;
+        }
+
+        /**
          * Desconecta o socket
          */
         disconnect() {

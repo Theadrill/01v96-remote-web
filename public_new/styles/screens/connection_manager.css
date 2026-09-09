@@ -135,7 +135,7 @@
     flex: 1;
 }
 
-/* Seção de Destaque / Conexão Rápida */
+/* Seção de Destaque / Conexão Rápida — comporta 2 botões empilhados sem overflow */
 .conn-quick-section {
     background: #1a202c;
     border: 1px solid #2d3748;
@@ -143,7 +143,15 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.conn-quick-section .conn-btn-primary-large,
+.conn-quick-section .conn-btn-secondary-large {
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .conn-quick-header {
@@ -635,4 +643,188 @@
 
 .conn-btn-save:hover {
     background: #00e676;
+}
+
+/* Botao secundario — ABRIR UI CLASSICA (/#connNavigateClassicBtn) */
+#connNavigateClassicBtn,
+.conn-btn-secondary-large {
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: #cbd5e0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 12px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+#connNavigateClassicBtn:hover,
+.conn-btn-secondary-large:hover {
+    background: #3a3a3a;
+    border-color: #666;
+    color: #fff;
+}
+#connNavigateClassicBtn:disabled,
+.conn-btn-secondary-large:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Link/botao terciario discreto — CONECTAR AQUI sem sair da pagina */
+#connSocketBtn,
+.conn-btn-tertiary {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 8px;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    transition: color 0.15s;
+    text-decoration: none;
+}
+#connSocketBtn:hover,
+.conn-btn-tertiary:hover {
+    color: #cbd5e0;
+    text-decoration: underline;
+}
+
+/* Teclado virtual trigger no form de host (Steam Deck) */
+.conn-form-kb-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    border: 1px solid #2d3748;
+    background: #1a202c;
+    color: #cbd5e0;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+}
+.conn-form-kb-btn:hover {
+    background: #222c3a;
+    border-color: #3a475c;
+}
+
+/* Atalhos por host na lista — .conn-host-quick-nav / .conn-host-nav-btn */
+.conn-host-quick-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 6px;
+    flex-shrink: 0;
+}
+.conn-host-nav-btn {
+    height: 28px;
+    min-width: 36px;
+    padding: 0 8px;
+    border-radius: 6px;
+    border: 1px solid #3a3a3a;
+    background: #2a2a2a;
+    color: #cbd5e0;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.conn-host-nav-btn:hover {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+}
+
+/* ── Escopo: teclado virtual só em #connFormHostVkWrap — ocupa toda a largura disponível ── */
+#connFormHostVkWrap {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    align-self: stretch;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: visible;
+}
+#connFormHostVkWrap .virtual-keyboard-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-self: stretch;
+    align-items: stretch;
+    box-sizing: border-box;
+    margin: 0;
+    gap: 6px;
+}
+#connFormHostVkWrap .virtual-keyboard-row {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    align-self: stretch;
+    align-items: stretch;
+    justify-content: stretch;
+    box-sizing: border-box;
+    gap: 6px;
+}
+#connFormHostVkWrap .virtual-keyboard-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    box-sizing: border-box;
+    height: 50px;
+    font-size: 19px;
+}
+#connFormHostVkWrap .virtual-keyboard-btn.virtual-keyboard-backspace {
+    flex: 1.5 1 0;
+}
+#connFormHostVkWrap .virtual-keyboard-space {
+    flex: 5 1 0;
+    min-width: 0;
+    max-width: none;
+    box-sizing: border-box;
+    font-size: 13px;
+    height: 46px;
+}
+/* Pais permitem stretch — sem overflow que corte, sem largura fixa */
+.conn-form-body {
+    align-items: stretch;
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+}
+.conn-form-row:has(#connFormHostVkWrap) {
+    flex-wrap: wrap;
+    align-items: stretch;
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    align-self: stretch;
+}
+.conn-form-group:has(#connFormHostVkWrap) {
+    min-width: 0;
+    box-sizing: border-box;
+    align-self: stretch;
 }

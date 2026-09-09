@@ -25,6 +25,18 @@ class SocketProxy {
         return this._rawSocket;
     }
 
+    getLastUrl() {
+        return this._lastUrl;
+    }
+
+    getLastOptions() {
+        return this._lastOptions;
+    }
+
+    get lastUrl() {
+        return this._lastUrl;
+    }
+
     on(event, fn) {
         if (typeof fn !== 'function') return this;
         if (!this._listeners.has(event)) {
@@ -182,17 +194,26 @@ window.socketProxy = socketProxy;
 // Detecção de ambiente e auto-conexão:
 // 1. Web Mode: auto-conecta ao origin atual.
 // 2. Tauri Mode: detecta ambiente desktop (tauri.localhost, tauri://, __TAURI__) e aguarda conexão via ConnectionService/HostManager.
-const isTauriEnv = typeof window !== 'undefined' && (
-    Boolean(window.__TAURI__) ||
-    Boolean(window.__TAURI_INTERNALS__) ||
-    (window.location && (
-        window.location.hostname === 'tauri.localhost' ||
-        window.location.protocol === 'tauri:' ||
-        window.location.protocol === 'asset:'
-    ))
-);
+function _isTauriEnvFn() {
+    if (typeof window === 'undefined') return false;
+    if (window.__TAURI__ || window.__TAURI_INTERNALS__) return true;
+    if (window.location) {
+        return window.location.hostname === 'tauri.localhost' ||
+            window.location.protocol === 'tauri:' ||
+            window.location.protocol === 'asset:';
+    }
+    return false;
+}
+window._isTauriEnvFn = _isTauriEnvFn;
+const isTauriEnv = _isTauriEnvFn();
 window.isTauriEnv = isTauriEnv;
+window.shouldAutoConnectOrigin = !isTauriEnv;
 
+// Auto-connect no origin atual garante que o browser sempre conecte mesmo com localStorage vazio (evita tela branca).
+// NOTA multi-host: se HostManager.activeHost apontar para host diferente do origin atual
+// (ex: origin pcmaria:4000/new mas activeHost pcfavela:4000), app.js corrigirá após carregar,
+// chamando socketProxy.changeHost(activeHostUrl) — este auto-connect inicial será substituído sem perda de listeners.
+// Tauri continua sem auto-connect (aguarda ConnectionService/HostManager).
 if (!isTauriEnv && typeof io === 'function') {
     socketProxy.connect();
 }

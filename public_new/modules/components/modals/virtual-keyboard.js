@@ -92,17 +92,24 @@ var VirtualKeyboard = (function () {
 
     function _create(targetId) {
         var keyboard = _el('div', { className: 'virtual-keyboard-container' });
+        var _targetInput = document.getElementById(targetId);
+        var _lower = Boolean(_targetInput && _targetInput.dataset && _targetInput.dataset.vkLowercase === 'true');
 
         _keyLayout.forEach(function (row) {
             var rowEl = _el('div', { className: 'virtual-keyboard-row' });
             row.forEach(function (key) {
+                var displayKey = _lower ? key.toLowerCase() : key;
+                var emitKey = displayKey;
                 var btn = _el('button', {
                     className: 'virtual-keyboard-btn',
                     type: 'button'
-                }, key);
-                btn.addEventListener('click', function () {
-                    _typeChar(targetId, key);
-                });
+                }, displayKey);
+                if (_lower) btn.dataset.vkLower = '1';
+                (function (k) {
+                    btn.addEventListener('click', function () {
+                        _typeChar(targetId, k);
+                    });
+                })(emitKey);
                 rowEl.appendChild(btn);
             });
 
