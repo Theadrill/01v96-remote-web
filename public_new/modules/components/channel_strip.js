@@ -441,7 +441,7 @@ class ChannelStrip {
                 ` : '')}
 
                 <!-- Nudge Superior (+) -->
-                <div class="mobile-nudge-container">
+                <div class="mobile-nudge-container mobile-nudge-top">
                     <button class="mobile-nudge-btn mobile-nudge-plus" title="Nudge + (Toque ou segure)">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
                     </button>
@@ -462,10 +462,13 @@ class ChannelStrip {
                     </div>
                 </div>
 
-                <!-- Nudge Inferior (-) -->
-                <div class="mobile-nudge-container">
+                <!-- Nudge Inferior (-) e Cluster Compacto -->
+                <div class="mobile-nudge-container mobile-nudge-bottom mobile-nudge-cluster">
                     <button class="mobile-nudge-btn mobile-nudge-minus" title="Nudge - (Toque ou segure)">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                    </button>
+                    <button class="mobile-nudge-btn mobile-nudge-plus mobile-nudge-plus-cluster" title="Nudge + (Toque ou segure)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
                     </button>
                 </div>
 
@@ -644,12 +647,11 @@ class ChannelStrip {
         }
 
         // 4. Nudges com Step Fino e Auto-Repeat Acelerado em Long Press
-        if (els.nudgePlus) {
-            this._setupNudgeButton(els.nudgePlus, 1);
-        }
-        if (els.nudgeMinus) {
-            this._setupNudgeButton(els.nudgeMinus, -1);
-        }
+        const plusButtons = this.element.querySelectorAll('.desk-nudge-plus, .mobile-nudge-plus, .btn-nudge-plus');
+        plusButtons.forEach(btn => this._setupNudgeButton(btn, 1));
+
+        const minusButtons = this.element.querySelectorAll('.desk-nudge-minus, .mobile-nudge-minus, .btn-nudge-minus');
+        minusButtons.forEach(btn => this._setupNudgeButton(btn, -1));
 
         // 5. Botão ON / Mute
         if (els.onBtn) {

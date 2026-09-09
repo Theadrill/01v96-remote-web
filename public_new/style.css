@@ -86,6 +86,13 @@ body:not(.layout-desktop) .faders-area {
     scrollbar-width: none;
 }
 
+@media (max-height: 720px) {
+    body:not(.layout-desktop) .faders-area {
+        padding: 6px 12px;
+        gap: 10px;
+    }
+}
+
 body.layout-horizontal .faders-area {
     flex: 1;
     padding: 10px;
