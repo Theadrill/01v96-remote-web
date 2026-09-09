@@ -464,6 +464,7 @@ var ThemeEngine = (function () {
         var mGradTop = getVal(csM, 'meter_gradient_top'); if (mGradTop) root.style.setProperty('--strip-mobile-meter-gradient-top', mGradTop);
         var mGradMid = getVal(csM, 'meter_gradient_mid'); if (mGradMid) root.style.setProperty('--strip-mobile-meter-gradient-mid', mGradMid);
         var mGradLow = getVal(csM, 'meter_gradient_low'); if (mGradLow) root.style.setProperty('--strip-mobile-meter-gradient-low', mGradLow);
+        var mGradVeryLow = getVal(csM, 'meter_gradient_very_low'); if (mGradVeryLow) root.style.setProperty('--strip-mobile-meter-gradient-very-low', mGradVeryLow);
         var mGradBase = getVal(csM, 'meter_gradient_base'); if (mGradBase) root.style.setProperty('--strip-mobile-meter-gradient-base', mGradBase);
 
         // Main View (Layout da Tela Principal)
