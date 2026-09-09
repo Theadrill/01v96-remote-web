@@ -411,6 +411,8 @@ window.removeCustomName = function () {
     if (typeof window.updateNameUI === 'function') {
         window.updateNameUI(ch, fallbackName);
     }
+    var _vkW2 = document.getElementById('nameEditorVkWrap');
+    if (_vkW2) _vkW2.style.display = 'none';
     document.getElementById('nameEditorModal').style.display = 'none';
 };
 
@@ -454,6 +456,10 @@ window.openNameEditor = function () {
         input.setAttribute('maxlength', '4');
         preview.style.display = 'none';
     }
+
+    // Steam Deck: sempre inicia com o VK recolhido (toggle via ⌨️)
+    var _vkWrap = document.getElementById('nameEditorVkWrap');
+    if (_vkWrap) _vkWrap.style.display = 'none';
 
     document.getElementById('nameEditorModal').style.display = 'flex';
     input.focus();
@@ -526,6 +532,8 @@ window.saveChannelName = function () {
         }
     }
 
+    var _vkW3 = document.getElementById('nameEditorVkWrap');
+    if (_vkW3) _vkW3.style.display = 'none';
     document.getElementById('nameEditorModal').style.display = 'none';
 };
 
@@ -539,6 +547,10 @@ updateViewportInfo();
 window.addEventListener('click', (e) => {
     let closedAny = false;
     if (e.target.classList.contains('modal-overlay')) {
+        if (e.target.id === 'nameEditorModal') {
+            var _vkWo = document.getElementById('nameEditorVkWrap');
+            if (_vkWo) _vkWo.style.display = 'none';
+        }
         if (e.target.id === 'routingOverviewModal' && typeof closeRoutingOverviewModal === 'function') {
             closeRoutingOverviewModal();
         } else if (e.target.id === 'assignSceneModal' && typeof closeAssignSceneModal === 'function') {
@@ -593,6 +605,10 @@ window.addEventListener('click', (e) => {
     }
 
     function closeTopmostModal(topmost) {
+        if (topmost.id === 'nameEditorModal') {
+            var _vkWc = document.getElementById('nameEditorVkWrap');
+            if (_vkWc) _vkWc.style.display = 'none';
+        }
         if (topmost.id === 'routingOverviewModal' && typeof closeRoutingOverviewModal === 'function') {
             closeRoutingOverviewModal();
             return;

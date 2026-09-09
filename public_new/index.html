@@ -549,10 +549,14 @@
     </div>
     <!-- Modal de Edição de Nome do Canal -->
     <div class="modal-overlay styled-nameEditorModal" id="nameEditorModal">
-        <div class="modal-content inline-style-26">
+        <div class="modal-content inline-style-26" id="nameEditorContent">
             <p class="inline-style-27">
                 Editar Nome do Canal</p>
-            <input class="styled-inputChName" id="inputChName" maxlength="4" type="text" />
+            <div style="display:flex; gap:6px; align-items:center; width:100%; box-sizing:border-box;">
+                <input class="styled-inputChName" id="inputChName" maxlength="4" type="text" style="flex:1; min-width:0; margin-bottom:0;" />
+                <button type="button" id="nameEditorKbBtn" class="conn-form-kb-btn" title="Teclado virtual" aria-label="Teclado virtual" onclick="(function(){ var i=document.getElementById('inputChName'); if(i){i.focus(); try{i.scrollIntoView({block:'nearest'});}catch(e){}} var wrap=document.getElementById('nameEditorVkWrap'); if(!wrap) return; if(wrap.style.display!=='none' && wrap.childElementCount>0){wrap.style.display='none'; return;} wrap.style.display='flex'; if(wrap.childElementCount===0 && window.VirtualKeyboard && typeof window.VirtualKeyboard.create==='function'){ try{ var kb=window.VirtualKeyboard.create('inputChName'); wrap.appendChild(kb);}catch(e){} } })()">⌨️</button>
+            </div>
+            <div id="nameEditorVkWrap" style="display:none; margin-top:8px; width:100%; align-self:stretch; box-sizing:border-box;"></div>
             <label class="styled-lblCustomName" id="lblCustomName">
                 <input id="chkCustomName" onchange="toggleCustomNameEditor()" type="checkbox" />
                 Criar nome customizado

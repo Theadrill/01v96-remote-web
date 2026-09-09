@@ -808,6 +808,73 @@
     font-size: 13px;
     height: 46px;
 }
+/* ── nameEditorModal: mesma largura do form de conexão (480px), altura cresce com o teclado ── */
+#nameEditorModal #nameEditorContent.inline-style-26 {
+    max-width: 480px;
+    width: 90%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+#nameEditorVkWrap {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    align-self: stretch;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: visible;
+}
+#nameEditorVkWrap .virtual-keyboard-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-self: stretch;
+    align-items: stretch;
+    box-sizing: border-box;
+    margin: 0;
+    gap: 6px;
+}
+#nameEditorVkWrap .virtual-keyboard-row {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    align-self: stretch;
+    align-items: stretch;
+    justify-content: stretch;
+    box-sizing: border-box;
+    gap: 6px;
+}
+#nameEditorVkWrap .virtual-keyboard-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    box-sizing: border-box;
+    height: 50px;
+    font-size: 19px;
+}
+#nameEditorVkWrap .virtual-keyboard-btn.virtual-keyboard-backspace {
+    flex: 1.5 1 0;
+}
+#nameEditorVkWrap .virtual-keyboard-space {
+    flex: 5 1 0;
+    min-width: 0;
+    max-width: none;
+    box-sizing: border-box;
+    font-size: 13px;
+    height: 46px;
+}
+
 /* Pais permitem stretch — sem overflow que corte, sem largura fixa */
 .conn-form-body {
     align-items: stretch;
