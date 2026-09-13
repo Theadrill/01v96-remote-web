@@ -116,16 +116,16 @@
       "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
     },
     {
-      "custom_name": "PGD ONLINE 360",
-      "physical_scene": "PGD ONLINE 360",
-      "physical_id": 5,
-      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
-    },
-    {
       "custom_name": "CAI GANDAIA 360",
       "physical_scene": "CAI GANDAIA 360",
       "physical_id": 17,
       "file": "custom_names_scene-CAI GANDAIA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE 360",
+      "physical_scene": "PGD ONLINE 360",
+      "physical_id": 5,
+      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     }
   ]
 }
