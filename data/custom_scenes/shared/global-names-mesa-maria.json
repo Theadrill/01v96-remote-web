@@ -1,0 +1,17 @@
+{
+  "mesa_nome": "mesa-maria",
+  "channels": {
+    "21": {
+      "name": "DJ PALCO",
+      "short": "DJPA"
+    },
+    "18": {
+      "name": "MIC DJ",
+      "short": "MICD"
+    },
+    "23": {
+      "name": "DJ 360",
+      "short": "DJ36"
+    }
+  }
+}
