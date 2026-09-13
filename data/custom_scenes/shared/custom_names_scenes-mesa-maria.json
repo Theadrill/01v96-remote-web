@@ -74,12 +74,6 @@
       "file": "custom_names_scene-BAL GERAL 360-mesa-maria.json"
     },
     {
-      "custom_name": "PGD ONLINE 360",
-      "physical_scene": "PGD ONLINE 360",
-      "physical_id": 5,
-      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
-    },
-    {
       "custom_name": "NAMORAL 360",
       "physical_scene": "NAMORAL 360",
       "physical_id": 18,
@@ -90,12 +84,6 @@
       "physical_scene": "O PGD DE VCS 3",
       "physical_id": 28,
       "file": "custom_names_scene-O PGD DE VCS 3-mesa-maria.json"
-    },
-    {
-      "custom_name": "SOMALIA 360",
-      "physical_scene": "SOMALIA 360",
-      "physical_id": 34,
-      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
     },
     {
       "custom_name": "PRETTO 360",
@@ -120,6 +108,24 @@
       "physical_scene": "SKEMA BOM 360",
       "physical_id": 11,
       "file": "custom_names_scene-SKEMA BOM 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SOMALIA 360",
+      "physical_scene": "SOMALIA 360",
+      "physical_id": 34,
+      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE 360",
+      "physical_scene": "PGD ONLINE 360",
+      "physical_id": 5,
+      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "CAI GANDAIA 360",
+      "physical_scene": "CAI GANDAIA 360",
+      "physical_id": 17,
+      "file": "custom_names_scene-CAI GANDAIA 360-mesa-maria.json"
     }
   ]
 }
