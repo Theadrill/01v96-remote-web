@@ -544,7 +544,20 @@ updateViewportInfo();
 // Usa 'click' em vez de 'pointerdown': no touch, o pointerdown fecha o overlay
 // antes do click sintético, que atravessa para o botão por baixo e o dispara.
 // Com 'click', o overlay ainda está visível no momento do clique.
+
+// Distingue "clique fora" (mousedown+mouseup no backdrop) de "arrasto que
+// começou dentro" (ex: selecionar texto no input de busca e soltar fora).
+// Sem isso, mousedown dentro + mouseup fora gera e.target=overlay e fecha.
+let _modalMousedownTarget = null;
+window.addEventListener('mousedown', (e) => { _modalMousedownTarget = e.target; }, true);
+window.addEventListener('touchstart', (e) => { _modalMousedownTarget = e.target; }, true);
+window.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') _modalMousedownTarget = e.target; }, true);
+
 window.addEventListener('click', (e) => {
+    const isBackdrop = e.target.classList.contains('modal-overlay')
+        || e.target.classList.contains('ch-modal-overlay')
+        || e.target.classList.contains('mobile-menu-modal-overlay');
+    if (isBackdrop && _modalMousedownTarget !== null && _modalMousedownTarget !== e.target) { _modalMousedownTarget = null; return; }
     let closedAny = false;
     if (e.target.classList.contains('modal-overlay')) {
         if (e.target.id === 'nameEditorModal') {
@@ -575,6 +588,7 @@ window.addEventListener('click', (e) => {
         closedAny = true;
     }
 
+    _modalMousedownTarget = null;
     if (closedAny) {
         e.stopPropagation();
         e.preventDefault();
