@@ -10,31 +10,10 @@
     23
   ],
   "snapshot": {
-    "active": true,
-    "channels_to_restore": [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      18,
-      19,
-      24,
-      25,
-      29,
-      30
-    ],
-    "desk_name": "mesa-maria",
-    "scene_id": 21,
-    "timestamp": 1789606910953
+    "active": false,
+    "channels_to_restore": [],
+    "desk_name": null,
+    "scene_id": null,
+    "timestamp": null
   }
 }
