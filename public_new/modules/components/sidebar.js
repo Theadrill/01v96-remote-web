@@ -257,6 +257,9 @@ function updateViewportInfo() {
         document.body.classList.remove('is-portrait');
     }
 
+    // Sincroniza o offset do modal com a largura real da sidebar
+    syncModalOffsetToSidebar();
+
     // Compatibilidade extra para iOS (força reflow se necessário)
     // console.log(`Viewport: ${w}x${h} (${isPortrait ? 'Retrato' : 'Paisagem'})`);
 
@@ -267,6 +270,34 @@ function updateViewportInfo() {
     }
 }
 
+/**
+ * Mede a largura real da sidebar e aplica como offset do .ch-modal-overlay.
+ * Garante que o minifader (Volume Geral Fader) grude corretamente na sidebar
+ * em todos os breakpoints, escalas de DPI e mudanças de orientação.
+ */
+function syncModalOffsetToSidebar() {
+    if (document.body.classList.contains('layout-desktop')) return;
+
+    const sidebar = document.querySelector('body:not(.layout-desktop) .sidebar');
+    if (!sidebar) return;
+
+    const rect = sidebar.getBoundingClientRect();
+    const sidebarWidth = rect.width;
+
+    document.documentElement.style.setProperty('--sidebar-real-width', `${sidebarWidth}px`);
+
+    const modals = document.querySelectorAll('.ch-modal-overlay');
+    modals.forEach(modal => {
+        if (document.body.classList.contains('is-portrait')) {
+            modal.style.right = '0px';
+        } else {
+            modal.style.right = `${sidebarWidth}px`;
+        }
+    });
+}
+
+window.syncModalOffsetToSidebar = syncModalOffsetToSidebar;
+
 // Listeners para mudança de viewport (incluindo iOS)
 window.addEventListener('resize', updateViewportInfo);
 window.addEventListener('orientationchange', () => {
@@ -274,6 +305,13 @@ window.addEventListener('orientationchange', () => {
     setTimeout(updateViewportInfo, 200);
 });
 window.addEventListener('load', updateViewportInfo);
+
+// Recalcular offset do modal quando entrar/sair do fullscreen
+document.addEventListener('fullscreenchange', () => {
+    clearTimeout(window.__syncModalTO);
+    window.__syncModalTO = setTimeout(syncModalOffsetToSidebar, 150);
+});
+
 // Alternância do texto do cabeçalho da sidebar #scn (Nome da Mesa 3s / Relógio 7s)
 window.sidebarScnDisplayMode = 'name';
 window.currentScnNameText = window.currentScnNameText || '01V96';

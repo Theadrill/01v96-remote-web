@@ -12,6 +12,7 @@ html {
     --scrollbar-thumb-bg: #3b82f6;
     --scrollbar-thumb-hover-bg: #60a5fa;
     --scrollbar-border-color: #0f141c;
+    --sidebar-real-width: 115px;  /* fallback; sincronizado dinamicamente pelo sidebar.js */
 }
 
 /* Suporte Global Firefox */
@@ -2878,7 +2879,7 @@ body.layout-desktop .ch-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    right: 115px;
+    right: var(--sidebar-real-width);  /* sincronizado dinamicamente pelo sidebar.js */
     height: 100vh;
     height: 100dvh;
     background: #111;
@@ -3316,11 +3317,7 @@ body.layout-desktop .ch-modal-overlay {
 
 
 /* Ajuste do modal para Mobile Landscape */
-@media screen and (max-height: 600px) and (orientation: landscape) {
-    .ch-modal-overlay {
-        right: 85px;
-    }
-}
+/* right agora é sincronizado dinamicamente pelo sidebar.js (syncModalOffsetToSidebar) */
 
 .eq-graph-container {
     background: #000;
@@ -5345,9 +5342,7 @@ body:not(.layout-desktop):not(.is-portrait) .sidebar-macros .btn-macros {
         min-height: 0 !important;
     }
 
-    body:not(.layout-desktop):not(.is-portrait) .ch-modal-overlay {
-        right: 170px !important;
-    }
+    /* right agora é sincronizado dinamicamente pelo sidebar.js */
 
     body:not(.layout-desktop):not(.is-portrait) .sidebar:not(.sidebar-musician) .btn-exit-macros {
         display: flex !important;

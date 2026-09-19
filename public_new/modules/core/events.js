@@ -46,6 +46,11 @@ function updateConfigUIForChannel(ch) {
 
     document.getElementById('chConfigModal').style.display = 'flex';
 
+    // Recalcular offset do modal para grudar na sidebar
+    if (typeof syncModalOffsetToSidebar === 'function') {
+        setTimeout(syncModalOffsetToSidebar, 50);
+    }
+
     if (typeof renderDock === 'function') renderDock('channelConfig');
     if (typeof updateSidebarInfo === 'function') updateSidebarInfo();
 
