@@ -5885,6 +5885,25 @@ screen and (max-height: 500px) {
     }
 }
 
+/* --- VK Toggle no Scene Grid Modal --- */
+
+/* Estado oculto: VK desaparece, espaço é recuperado pelo grid (flex:1) */
+#virtualKeyboardSearch.vk-hidden {
+    display: none !important;
+}
+
+/* Botão toggle sempre visível, estilo consistente com outros botões do VK */
+.vk-toggle-btn {
+    flex: 0 0 auto !important;
+    width: 40px;
+    min-width: 40px;
+    background: #444;
+    border-color: #666;
+    color: #ffcc00;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 @media screen and (max-width: 767px),
 screen and (max-height: 500px) {
 

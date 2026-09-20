@@ -148,6 +148,11 @@ window.showSceneGrid = (action) => {
 
     modal.style.display = 'flex';
 
+    // Restaura o estado salvo do teclado virtual (mostrar/ocultar)
+    if (typeof restoreSceneVkState === 'function') {
+        restoreSceneVkState();
+    }
+
     // Preenche automaticamente o campo de busca com o nome da cena atual ao abrir para salvar
     if (action === 'save') {
         const displayEl = document.getElementById('configSceneDisplay');

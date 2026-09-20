@@ -750,6 +750,7 @@
             <!-- Teclado Virtual para Pesquisa -->
             <div class="styled-virtualKeyboardSearch" id="virtualKeyboardSearch">
                 <div class="inline-style-51">
+                    <button class="virtual-keyboard-btn vk-toggle-btn" onclick="toggleSceneVk()" title="Mostrar/Ocultar teclado" type="button">⌨︎</button>
                     <button class="virtual-keyboard-btn" onclick="vkType('1', 'sceneSearchInput')" type="button">1</button>
                     <button class="virtual-keyboard-btn" onclick="vkType('2', 'sceneSearchInput')" type="button">2</button>
                     <button class="virtual-keyboard-btn" onclick="vkType('3', 'sceneSearchInput')" type="button">3</button>
@@ -1603,6 +1604,28 @@
                     this.focus();       // Força o foco para manter o cursor
                 }
             }, { passive: false });
+        }
+
+        // --- Alternar / esconder teclado virtual na scene grid ---
+        function toggleSceneVk(forceState) {
+            const vk = document.getElementById('virtualKeyboardSearch');
+            if (!vk) return;
+            const isCurrentlyHidden = vk.classList.contains('vk-hidden');
+            const shouldHide = forceState !== undefined ? forceState : isCurrentlyHidden;
+            if (shouldHide) {
+                vk.classList.remove('vk-hidden');
+                localStorage.setItem('sceneVkHidden', 'false');
+            } else {
+                vk.classList.add('vk-hidden');
+                localStorage.setItem('sceneVkHidden', 'true');
+            }
+        }
+
+        function restoreSceneVkState() {
+            const vk = document.getElementById('virtualKeyboardSearch');
+            if (!vk) return;
+            const wasHidden = localStorage.getItem('sceneVkHidden') === 'true';
+            vk.classList.toggle('vk-hidden', wasHidden);
         }
 
         // Lógica de digitação via teclado virtual da grade de cenas
