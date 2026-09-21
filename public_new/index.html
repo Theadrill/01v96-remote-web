@@ -750,7 +750,6 @@
             <!-- Teclado Virtual para Pesquisa -->
             <div class="styled-virtualKeyboardSearch" id="virtualKeyboardSearch">
                 <div class="inline-style-51">
-                    <button class="virtual-keyboard-btn vk-toggle-btn" onclick="toggleSceneVk()" title="Mostrar/Ocultar teclado" type="button">⌨︎</button>
                     <button class="virtual-keyboard-btn" onclick="vkType('1', 'sceneSearchInput')" type="button">1</button>
                     <button class="virtual-keyboard-btn" onclick="vkType('2', 'sceneSearchInput')" type="button">2</button>
                     <button class="virtual-keyboard-btn" onclick="vkType('3', 'sceneSearchInput')" type="button">3</button>
@@ -803,6 +802,8 @@
                         type="button">ESPAÇO</button>
                 </div>
             </div>
+            <!-- Botão toggle do teclado virtual — sempre visível, fora do VK -->
+            <button id="vkToggleBtn" class="vk-toggle-btn" onclick="toggleSceneVk()" title="Mostrar/Ocultar teclado" type="button">⌨︎</button>
             <button class="btn-close inline-style-52"
                 onclick="document.getElementById('sceneGridModal').style.display='none'">CANCELAR</button>
         </div>
