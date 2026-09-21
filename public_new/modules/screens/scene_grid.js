@@ -145,6 +145,19 @@ window.showSceneGrid = (action) => {
         wrapper.appendChild(clearBtn);
     }
 
+    // Verifica ou cria o botão de toggle do teclado virtual (⌨️), ao lado do botão ×
+    let vkToggleBtn = wrapper.querySelector('button[title="Teclado virtual"]');
+    if (!vkToggleBtn) {
+        vkToggleBtn = document.createElement('button');
+        vkToggleBtn.type = 'button';
+        vkToggleBtn.title = 'Teclado virtual';
+        vkToggleBtn.innerHTML = '⌨️';
+        vkToggleBtn.className = 'conn-form-kb-btn';
+        vkToggleBtn.addEventListener('click', () => {
+            if (typeof toggleSceneVk === 'function') toggleSceneVk();
+        });
+        wrapper.appendChild(vkToggleBtn);
+    }
 
     modal.style.display = 'flex';
 

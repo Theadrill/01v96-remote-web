@@ -5892,35 +5892,6 @@ screen and (max-height: 500px) {
     display: none !important;
 }
 
-/* Container do modal precisa de position:relative para o botão absoluto */
-#sceneGridModal .inline-style-50 {
-    position: relative;
-}
-
-/* Botão toggle — fixo no canto inferior direito do modal, sempre visível */
-#vkToggleBtn {
-    position: absolute;
-    bottom: 52px; /* acima do botão CANCELAR (~40px height + 12px gap) */
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    border: 1px solid #666;
-    background: #333;
-    color: #ffcc00;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    flex-shrink: 0;
-}
-
-#vkToggleBtn:active {
-    background: #555;
-}
-
 @media screen and (max-width: 767px),
 screen and (max-height: 500px) {
 
