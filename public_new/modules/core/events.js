@@ -41,8 +41,13 @@ function updateConfigUIForChannel(ch) {
     }
 
     const nameEl = document.getElementById(targetId);
-    const chName = nameEl ? nameEl.innerText : "";
-    document.getElementById('chSideTitle').innerText = `${displayTitle} - ${chName || `...`}`;
+    let chName = '';
+    if (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
+        chName = window.resolvedNames[ch].name;
+    } else if (nameEl) {
+        chName = nameEl.innerText;
+    }
+    document.getElementById('chSideTitle').innerText = `${displayTitle}${chName ? ` - ${chName}` : ''}`;
 
     document.getElementById('chConfigModal').style.display = 'flex';
 

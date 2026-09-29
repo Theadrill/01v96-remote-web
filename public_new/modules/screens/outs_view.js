@@ -23,7 +23,7 @@ var OutsView = (function () {
      * Retorna o nome resolvido para o barramento ou canal
      */
     function _getResolvedName(globalId, fallback) {
-        if (window.resolvedNames && window.resolvedNames[globalId] && window.resolvedNames[globalId].name) {
+        if (window.resolvedNames && window.resolvedNames[globalId] && typeof window.resolvedNames[globalId].name === 'string') {
             return window.resolvedNames[globalId].name;
         }
         return fallback;

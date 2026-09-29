@@ -65,11 +65,11 @@
 
     // Obtém nome do canal
     function getChannelName(chIndex) {
-        if (window.channelStates && window.channelStates[chIndex]) {
-            return window.channelStates[chIndex].name || `CH ${chIndex+1}`;
+        if (window.resolvedNames && window.resolvedNames[chIndex] && typeof window.resolvedNames[chIndex].name === 'string') {
+            return window.resolvedNames[chIndex].name;
         }
-        if (window.resolvedNames && window.resolvedNames[chIndex]) {
-            return window.resolvedNames[chIndex].name || `CH ${chIndex+1}`;
+        if (window.channelStates && window.channelStates[chIndex] && window.channelStates[chIndex].name) {
+            return window.channelStates[chIndex].name;
         }
         return `CH ${chIndex+1}`;
     }

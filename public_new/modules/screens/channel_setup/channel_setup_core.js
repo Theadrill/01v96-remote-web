@@ -34,7 +34,7 @@ var ChannelSetupCore = (function () {
         var isStIn = false;
 
         var state = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-        if (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) {
+        if (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
             customName = window.resolvedNames[ch].name;
         } else if (state && state.name) {
             customName = state.name;
@@ -135,7 +135,9 @@ var ChannelSetupCore = (function () {
                 isPaired = !!s.paired;
                 partnerId = isPaired ? (ch + 1) : null;
                 chTitle = isPaired ? ((ch + 1) + ' + ' + (ch + 2)) : ('' + (ch + 1));
-                chName = (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) || s.name || ('CH ' + (ch + 1));
+                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
+                    ? window.resolvedNames[ch].name
+                    : (s.name || ('CH ' + (ch + 1)));
                 chType = isPaired ? 'input_paired' : 'input';
                 chColorBand = isPaired ? 'paired_green' : (ch < 16 ? 'blue' : 'green');
                 chVal = s.value !== undefined ? s.value : (s.fader !== undefined ? s.fader : 0);
@@ -152,7 +154,9 @@ var ChannelSetupCore = (function () {
                 var mIdx = ch - 36;
                 var mData = (typeof mixesState !== 'undefined' && mixesState[mIdx]) ? mixesState[mIdx] : {};
                 chTitle = 'MIX ' + (mIdx + 1);
-                chName = (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) || mData.name || ('MIX ' + (mIdx + 1));
+                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
+                    ? window.resolvedNames[ch].name
+                    : (mData.name || ('MIX ' + (mIdx + 1)));
                 chType = 'mix';
                 chColorBand = 'amber';
                 chVal = mData.value !== undefined ? mData.value : (mData.fader !== undefined ? mData.fader : 0);
@@ -163,7 +167,9 @@ var ChannelSetupCore = (function () {
                 var bIdx = ch - 44;
                 var bData = (typeof busState !== 'undefined' && busState[bIdx]) ? busState[bIdx] : {};
                 chTitle = 'BUS ' + (bIdx + 1);
-                chName = (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) || bData.name || ('BUS ' + (bIdx + 1));
+                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
+                    ? window.resolvedNames[ch].name
+                    : (bData.name || ('BUS ' + (bIdx + 1)));
                 chType = 'bus';
                 chColorBand = 'cyan';
                 chVal = bData.value !== undefined ? bData.value : (bData.fader !== undefined ? bData.fader : 0);
@@ -183,7 +189,9 @@ var ChannelSetupCore = (function () {
                 var stIdx = (ch - 60) / 2;
                 var stData = (typeof stInState !== 'undefined' && stInState[stIdx]) ? stInState[stIdx] : {};
                 chTitle = 'ST IN ' + (stIdx + 1);
-                chName = (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) || stData.name || ('ST IN ' + (stIdx + 1));
+                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
+                    ? window.resolvedNames[ch].name
+                    : (stData.name || ('ST IN ' + (stIdx + 1)));
                 chType = 'stIn';
                 chColorBand = 'blue';
                 chVal = stData.value !== undefined ? stData.value : (stData.fader !== undefined ? stData.fader : 0);

@@ -23,8 +23,9 @@ window.isCopyPasteAllowedForView = function(viewMode) {
 function getMixDisplayName(mixNumber) {
     let name = 'MIX ' + mixNumber;
     const globalMixId = 35 + mixNumber;
-    if (window.resolvedNames && window.resolvedNames[globalMixId] && window.resolvedNames[globalMixId].name) {
-        name = 'MIX ' + mixNumber + ' (' + window.resolvedNames[globalMixId].name + ')';
+    if (window.resolvedNames && window.resolvedNames[globalMixId] && typeof window.resolvedNames[globalMixId].name === 'string') {
+        const mName = window.resolvedNames[globalMixId].name;
+        name = mName ? ('MIX ' + mixNumber + ' (' + mName + ')') : ('MIX ' + mixNumber);
     } else if (typeof mixesState !== 'undefined' && mixesState[mixNumber - 1] && mixesState[mixNumber - 1].name) {
         name = 'MIX ' + mixNumber + ' (' + mixesState[mixNumber - 1].name + ')';
     }
@@ -37,7 +38,7 @@ function getChannelDisplayName(ch) {
     }
     let name = '';
     const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-    if (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) {
+    if (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
         name = window.resolvedNames[ch].name;
     } else if (stateRef && stateRef.name) {
         name = stateRef.name;

@@ -45,7 +45,7 @@ var AuxSendsView = (function () {
      */
     function _getResolvedName(id, isMixMode, auxIdx) {
         if (isMixMode) {
-            if (window.resolvedNames && window.resolvedNames[id] && window.resolvedNames[id].name) {
+            if (window.resolvedNames && window.resolvedNames[id] && typeof window.resolvedNames[id].name === 'string') {
                 return window.resolvedNames[id].name;
             }
             var state = typeof getChannelStateById === 'function' ? getChannelStateById(id) : null;
@@ -55,7 +55,7 @@ var AuxSendsView = (function () {
             return `${id + 1}`;
         } else {
             var globalMixId = 35 + auxIdx;
-            if (window.resolvedNames && window.resolvedNames[globalMixId] && window.resolvedNames[globalMixId].name) {
+            if (window.resolvedNames && window.resolvedNames[globalMixId] && typeof window.resolvedNames[globalMixId].name === 'string') {
                 return window.resolvedNames[globalMixId].name;
             }
             return `AUX ${auxIdx}`;

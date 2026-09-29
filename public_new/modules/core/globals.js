@@ -441,7 +441,7 @@ function getSteppedRaw(currentRaw, dir, stepDb = 0.5, isMaster = false) {
 window.updateNameUI = function (channel, name) {
     // 0. Fonte da verdade: se name não foi passado explicitamente, busca nos nomes resolvidos ou estado
     if (name === undefined || name === null) {
-        if (window.resolvedNames && window.resolvedNames[channel] && window.resolvedNames[channel].name !== undefined) {
+        if (window.resolvedNames && window.resolvedNames[channel] && typeof window.resolvedNames[channel].name === 'string') {
             name = window.resolvedNames[channel].name;
         } else {
             const s = typeof getChannelStateById === 'function' ? getChannelStateById(channel) : null;

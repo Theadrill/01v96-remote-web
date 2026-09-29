@@ -54,9 +54,11 @@ window.toggleCustomNamesSetting = function(enabled) {
     for (let i = 0; i <= 67; i++) {
         if (i >= 32 && i <= 51 && i !== 44 && i !== 45 && i !== 46 && i !== 47 && i !== 48 && i !== 49 && i !== 50 && i !== 51) continue; // Pula canais não utilizados (mantém mix/bus)
         const stateObj = window.getChannelStateById ? window.getChannelStateById(i) : null;
-        if (stateObj) {
-            if (window.updateNameUI) {
-                window.updateNameUI(i, stateObj.name);
+        if (window.updateNameUI) {
+            if (enabled) {
+                window.updateNameUI(i);
+            } else {
+                window.updateNameUI(i, (stateObj && stateObj.physicalName) || '');
             }
         }
     }

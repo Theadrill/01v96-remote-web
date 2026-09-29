@@ -460,7 +460,12 @@ window.openNameEditor = function () {
 
     const resolvedObj = window.resolvedNames && window.resolvedNames[ch];
     const chState = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-    const currentName = (resolvedObj && resolvedObj.name) || (chState && chState.name) || '';
+    let currentName = '';
+    if (resolvedObj && typeof resolvedObj.name === 'string') {
+        currentName = resolvedObj.name;
+    } else if (chState && typeof chState.name === 'string') {
+        currentName = chState.name;
+    }
     const input = document.getElementById('inputChName');
     input.value = currentName === '...' ? '' : currentName;
 
@@ -470,10 +475,10 @@ window.openNameEditor = function () {
     const removeBtn = document.getElementById('btnRemoveCustomName');
 
     const customCh = window.customNamesEnabled && window.activeCustomSceneChannels && window.activeCustomSceneChannels[ch];
-    const hasCustomName = !!(customCh && typeof customCh.name === 'string');
+    const hasCustomName = !!(customCh && typeof customCh.name === 'string') || (resolvedObj && resolvedObj.source === 'custom');
 
     const globalCh = window.globalNames && window.globalNames[ch];
-    const hasGlobalName = !!(globalCh && typeof globalCh.name === 'string');
+    const hasGlobalName = !!(globalCh && typeof globalCh.name === 'string') || (resolvedObj && resolvedObj.source === 'global');
 
     checkboxCustom.checked = hasCustomName && !hasGlobalName;
     checkboxGlobal.checked = hasGlobalName;
@@ -482,12 +487,12 @@ window.openNameEditor = function () {
 
     if (hasGlobalName) {
         input.setAttribute('maxlength', '10');
-        input.value = globalCh.name;
+        input.value = (globalCh && typeof globalCh.name === 'string') ? globalCh.name : (resolvedObj ? resolvedObj.name : '');
         updateNamePreview();
         preview.style.display = 'block';
     } else if (hasCustomName) {
         input.setAttribute('maxlength', '10');
-        input.value = customCh.name;
+        input.value = (customCh && typeof customCh.name === 'string') ? customCh.name : (resolvedObj ? resolvedObj.name : '');
         updateNamePreview();
         preview.style.display = 'block';
     } else {
@@ -558,7 +563,7 @@ window.saveChannelName = function () {
         window.resolvedNames[ch] = { name: newName, short: newName.substring(0, 4).padEnd(4), source: 'custom' };
         socket.emit('saveCustomName', { channel: ch, name: newName, syncShared: window.customScenesSyncEnabled });
         if (typeof window.updateNameUI === 'function') {
-            window.updateNameUI(ch, newName.substring(0, 4));
+            window.updateNameUI(ch, newName);
         }
     } else {
         newName = newName.toUpperCase().substring(0, 4);
@@ -1306,12 +1311,18 @@ function updateSidebarInfo() {
 
         const nameEl = document.getElementById(targetId);
         const stateRef = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-        let name = (window.resolvedNames && window.resolvedNames[ch] && window.resolvedNames[ch].name) || (nameEl ? nameEl.innerText.trim() : '');
-        if (!name && stateRef && stateRef.name) name = stateRef.name;
+        let name = '';
+        if (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
+            name = window.resolvedNames[ch].name;
+        } else if (nameEl) {
+            name = nameEl.innerText.trim();
+        } else if (stateRef && stateRef.name) {
+            name = stateRef.name;
+        }
 
         if (chTitle) {
             chTitle.style.display = 'flex';
-            chTitle.innerText = `${displayTitle} - ${name || '...'}`;
+            chTitle.innerText = `${displayTitle}${name ? ` - ${name}` : ''}`;
             if (window.autoScaleTitle) window.autoScaleTitle();
         }
         if (tmTitle) tmTitle.style.display = 'none';

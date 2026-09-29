@@ -47,7 +47,7 @@ var MainView = (function () {
      * @returns {string}
      */
     function _getResolvedName(ch) {
-        if (typeof window.resolvedNames !== 'undefined' && window.resolvedNames[ch] && window.resolvedNames[ch].name) {
+        if (typeof window.resolvedNames !== 'undefined' && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
             return window.resolvedNames[ch].name;
         }
         if (typeof channelStates !== 'undefined' && channelStates[ch] && channelStates[ch].name) {

@@ -2122,7 +2122,7 @@ function createDesktopChannelStrip(i, isMaster = false, idPrefix = "") {
 
     let nameDiv = isMaster ? (s.name !== undefined ? s.name : "MASTER") : (s.name !== undefined ? s.name : "...");
     const globalId = isMaster ? 52 : i;
-    if (window.resolvedNames && window.resolvedNames[globalId]) {
+    if (window.resolvedNames && window.resolvedNames[globalId] && typeof window.resolvedNames[globalId].name === 'string') {
         nameDiv = window.resolvedNames[globalId].name;
     }
     let customClass = isMaster ? "master-card-desktop" : "";
@@ -2276,7 +2276,7 @@ function createChannelStrip(i, isMaster = false, idPrefix = "") {
 
     let nameDiv = isMaster ? "MASTER" : title;
     const globalId = isMaster ? 52 : i;
-    if (window.resolvedNames && window.resolvedNames[globalId]) {
+    if (window.resolvedNames && window.resolvedNames[globalId] && typeof window.resolvedNames[globalId].name === 'string') {
         nameDiv = window.resolvedNames[globalId].name;
     }
     let customClass = isMaster ? "master-card" : "";
@@ -2353,7 +2353,7 @@ function createDesktopOutputStrip(i, type, idPrefix = "") {
     }
 
     let nameDiv = title;
-    if (window.resolvedNames && window.resolvedNames[configId]) {
+    if (window.resolvedNames && window.resolvedNames[configId] && typeof window.resolvedNames[configId].name === 'string') {
         nameDiv = window.resolvedNames[configId].name;
     }
     if (stateRef && stateRef.paired && i % 2 === 0 && (type === 'mix' || type === 'bus')) {
@@ -2450,7 +2450,7 @@ function createOutputStrip(i, type, idPrefix = "") {
     }
 
     let nameDiv = title;
-    if (window.resolvedNames && window.resolvedNames[configId]) {
+    if (window.resolvedNames && window.resolvedNames[configId] && typeof window.resolvedNames[configId].name === 'string') {
         nameDiv = window.resolvedNames[configId].name;
     }
     if (stateRef && stateRef.paired && i % 2 === 0 && (type === 'mix' || type === 'bus')) {
@@ -2704,7 +2704,7 @@ function initUI() {
             if (nameEl) {
                 let dName = `CH ${i + 1}`;
                 const globalId = i;
-                if (window.resolvedNames && window.resolvedNames[globalId]) {
+                if (window.resolvedNames && window.resolvedNames[globalId] && typeof window.resolvedNames[globalId].name === 'string') {
                     dName = window.resolvedNames[globalId].name;
                 }
                 nameEl.innerText = dName;

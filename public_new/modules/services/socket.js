@@ -485,11 +485,17 @@ socket.on('update', (d) => {
         stateObj.nameChars[d.charIndex] = d.char;
         const newName = stateObj.nameChars.join('').trim();
 
-        // Mantém sicronia do nome
-        stateObj.name = newName;
+        // Mantém sincronia do nome físico no objeto
+        stateObj.physicalName = newName;
 
-        if (typeof window.updateNameUI === 'function') {
-            window.updateNameUI(d.channel, newName);
+        const isCustomOrGlobal = window.resolvedNames && window.resolvedNames[d.channel] &&
+            (window.resolvedNames[d.channel].source === 'custom' || window.resolvedNames[d.channel].source === 'global');
+
+        if (!isCustomOrGlobal) {
+            stateObj.name = newName;
+            if (typeof window.updateNameUI === 'function') {
+                window.updateNameUI(d.channel, newName);
+            }
         }
         return;
     }
@@ -609,15 +615,20 @@ function updateSceneDisplay() {
 socket.on('updateName', (data) => {
     if (typeof window.updateNameUI === 'function') {
         const stateObj = getChannelStateById(data.channel);
+        const isCustomOrGlobal = window.resolvedNames && window.resolvedNames[data.channel] &&
+            (window.resolvedNames[data.channel].source === 'custom' || window.resolvedNames[data.channel].source === 'global');
+
         if (stateObj) {
             stateObj.nameChars = (data.name || '').padEnd(16, ' ').substring(0, 16).split('');
-            // Se não houver nome customizado na cena ativa ou custom names desativado, atualizamos o stateObj.name normal
-            if (!window.customNamesEnabled || !window.activeCustomSceneChannels || !window.activeCustomSceneChannels[data.channel]) {
+            stateObj.physicalName = data.name;
+            if (!isCustomOrGlobal) {
                 stateObj.name = data.name;
             }
         }
 
-        window.updateNameUI(data.channel, data.name);
+        if (!isCustomOrGlobal) {
+            window.updateNameUI(data.channel, data.name);
+        }
     }
 });
 
@@ -713,6 +724,13 @@ socket.on('sync', (s) => {
 
                 const globalId = (i >= 32) ? (60 + (i - 32) * 2) : i;
 
+                // Se o canal possui nome customizado ou global resolvido, preservar em channelStates[i].name
+                // para impedir que o sync com os dados brutos da mesa física sobrescreva com o nome físico.
+                if (window.resolvedNames && window.resolvedNames[globalId] &&
+                    (window.resolvedNames[globalId].source === 'custom' || window.resolvedNames[globalId].source === 'global')) {
+                    channelStates[i].name = window.resolvedNames[globalId].name;
+                }
+
                 updateUI(globalId, v, onBool, soloBool);
                 // Nomes são atualizados via resolvedNamesUpdated (emitido antes do sync)
                 // Não chamamos updateNameUI aqui para evitar flash com nome físico.
@@ -734,6 +752,11 @@ socket.on('sync', (s) => {
             const mix = getCh(s.mixes, i);
             if (mix) {
                 Object.assign(mixesState[i], mix);
+                const globalMixId = 36 + i;
+                if (window.resolvedNames && window.resolvedNames[globalMixId] &&
+                    (window.resolvedNames[globalMixId].source === 'custom' || window.resolvedNames[globalMixId].source === 'global')) {
+                    mixesState[i].name = window.resolvedNames[globalMixId].name;
+                }
                 updateUI(`m${i}`, mix.value, !!mix.on);
             }
         }
@@ -743,12 +766,21 @@ socket.on('sync', (s) => {
             const bus = getCh(s.buses, i);
             if (bus) {
                 Object.assign(busesState[i], bus);
+                const globalBusId = 44 + i;
+                if (window.resolvedNames && window.resolvedNames[globalBusId] &&
+                    (window.resolvedNames[globalBusId].source === 'custom' || window.resolvedNames[globalBusId].source === 'global')) {
+                    busesState[i].name = window.resolvedNames[globalBusId].name;
+                }
                 updateUI(`b${i}`, bus.value, !!bus.on);
             }
         }
     }
     if (s.master) {
         Object.assign(masterState, s.master);
+        if (window.resolvedNames && window.resolvedNames[52] &&
+            (window.resolvedNames[52].source === 'custom' || window.resolvedNames[52].source === 'global')) {
+            masterState.name = window.resolvedNames[52].name;
+        }
         updateUI('master', s.master.value, !!s.master.on, undefined);
         if (layoutMode === 'desktop' && typeof window.updatePanIndicator === 'function' && s.master.pan !== undefined) {
             window.updatePanIndicator('master', s.master.pan);
