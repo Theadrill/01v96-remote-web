@@ -1,0 +1,170 @@
+{
+  "scene_name": "LVR P SONHAR 3",
+  "scene_id": 35,
+  "channels": {
+    "23": {
+      "name": "DJ36",
+      "short": "DJ36"
+    },
+    "34": {
+      "name": "CH 34",
+      "short": "CH34"
+    },
+    "master": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "6": {
+      "name": "RECO",
+      "short": "RECO"
+    },
+    "25": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "20": {
+      "name": "MICV",
+      "short": "MICV"
+    },
+    "35": {
+      "name": "CH36",
+      "short": "CH36"
+    },
+    "7": {
+      "name": "CAIX",
+      "short": "CAIX"
+    },
+    "27": {
+      "name": "",
+      "short": "    "
+    },
+    "31": {
+      "name": "TANT",
+      "short": "TANT"
+    },
+    "8": {
+      "name": "VIOL",
+      "short": "VIOL"
+    },
+    "26": {
+      "name": "TOMS",
+      "short": "TOMS"
+    },
+    "2": {
+      "name": "CHIM",
+      "short": "CHIM"
+    },
+    "18": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "36": {
+      "name": "CH 36",
+      "short": "CH36"
+    },
+    "39": {
+      "name": "CH40",
+      "short": "CH40"
+    },
+    "24": {
+      "name": "DJ36",
+      "short": "DJ36"
+    },
+    "3": {
+      "name": "SURD",
+      "short": "SURD"
+    },
+    "17": {
+      "name": "CONV",
+      "short": "CONV"
+    },
+    "30": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "33": {
+      "name": "STER",
+      "short": "STER"
+    },
+    "29": {
+      "name": "VOZE",
+      "short": "VOZE"
+    },
+    "13": {
+      "name": "MIC3",
+      "short": "MIC3"
+    },
+    "12": {
+      "name": "MIC2",
+      "short": "MIC2"
+    },
+    "5": {
+      "name": "tant",
+      "short": "TANT"
+    },
+    "32": {
+      "name": "KICK",
+      "short": "KICK"
+    },
+    "40": {
+      "name": "CH 40",
+      "short": "CH40"
+    },
+    "37": {
+      "name": "CH38",
+      "short": "CH38"
+    },
+    "1": {
+      "name": "BUMB",
+      "short": "BUMB"
+    },
+    "10": {
+      "name": "VIOL",
+      "short": "VIOL"
+    },
+    "38": {
+      "name": "CH 38",
+      "short": "CH38"
+    },
+    "9": {
+      "name": "CAVA",
+      "short": "CAVA"
+    },
+    "4": {
+      "name": "PAND",
+      "short": "PAND"
+    },
+    "14": {
+      "name": "MICA",
+      "short": "MICA"
+    },
+    "16": {
+      "name": "CEL",
+      "short": "CEL "
+    },
+    "22": {
+      "name": "DJ2",
+      "short": "DJ2 "
+    },
+    "11": {
+      "name": "MICH",
+      "short": "MICH"
+    },
+    "19": {
+      "name": "MICD",
+      "short": "MICD"
+    },
+    "21": {
+      "name": "DJPA",
+      "short": "DJPA"
+    },
+    "28": {
+      "name": "",
+      "short": "    "
+    },
+    "15": {
+      "name": "REGE",
+      "short": "REGE"
+    }
+  }
+}

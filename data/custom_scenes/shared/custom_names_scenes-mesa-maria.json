@@ -56,12 +56,6 @@
       "file": "custom_names_scene-ANDRE RIC 360-mesa-maria.json"
     },
     {
-      "custom_name": "DC JEITO 360",
-      "physical_scene": "DC JEITO 360",
-      "physical_id": 27,
-      "file": "custom_names_scene-DC JEITO 360-mesa-maria.json"
-    },
-    {
       "custom_name": "BAL GERAL 360",
       "physical_scene": "BAL GERAL 360",
       "physical_id": 42,
@@ -126,6 +120,24 @@
       "physical_scene": "KALAWE 360",
       "physical_id": 22,
       "file": "custom_names_scene-KALAWE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "REGIS C 360",
+      "physical_scene": "REGIS C 360",
+      "physical_id": 21,
+      "file": "custom_names_scene-REGIS C 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "DC JEITO 360",
+      "physical_scene": "DC JEITO 360",
+      "physical_id": 27,
+      "file": "custom_names_scene-DC JEITO 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "LVR P SONHAR 3",
+      "physical_scene": "LVR P SONHAR 3",
+      "physical_id": 35,
+      "file": "custom_names_scene-LVR P SONHAR 3-mesa-maria.json"
     }
   ]
 }
