@@ -1,6 +1,10 @@
 {
   "mesa_nome": "mesa-maria",
   "channels": {
+    "29": {
+      "name": "REVERB",
+      "short": "REVE"
+    },
     "21": {
       "name": "DJ PALCO",
       "short": "DJPA"
