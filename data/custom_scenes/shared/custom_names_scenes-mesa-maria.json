@@ -56,12 +56,6 @@
       "file": "custom_names_scene-ANDRE RIC 360-mesa-maria.json"
     },
     {
-      "custom_name": "BAL GERAL 360",
-      "physical_scene": "BAL GERAL 360",
-      "physical_id": 42,
-      "file": "custom_names_scene-BAL GERAL 360-mesa-maria.json"
-    },
-    {
       "custom_name": "NAMORAL 360",
       "physical_scene": "NAMORAL 360",
       "physical_id": 18,
@@ -138,6 +132,12 @@
       "physical_scene": "LVR P SONHAR 3",
       "physical_id": 35,
       "file": "custom_names_scene-LVR P SONHAR 3-mesa-maria.json"
+    },
+    {
+      "custom_name": "BAL GERAL 360",
+      "physical_scene": "BAL GERAL 360",
+      "physical_id": 42,
+      "file": "custom_names_scene-BAL GERAL 360-mesa-maria.json"
     }
   ]
 }
