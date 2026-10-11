@@ -5,6 +5,8 @@
 (function() {
     const MOD_ID = 'smart_channel_toggler';
     const TTL_MS = 12 * 60 * 60 * 1000; // 12 horas em milissegundos
+    // Addon-scope: persistência só local (gitignored) — nunca sobe p/ shared/ninja sync.
+    const SYNC_SHARED = false;
     let isExecuting = false;
     let currentModData = createDefaultModData();
 
@@ -91,7 +93,7 @@
         if (!isSnapshotValid(modData.snapshot)) {
             modData.snapshot = createDefaultModData().snapshot;
             try {
-                await MixerAPI.storage.saveModConfig(MOD_ID, modData, true);
+                await MixerAPI.storage.saveModConfig(MOD_ID, modData, SYNC_SHARED);
             } catch (e) {
                 console.error(`[${MOD_ID}] Erro ao salvar snapshot inválido:`, e);
             }
@@ -167,7 +169,7 @@
 
                 // Salva config
                 try {
-                    await MixerAPI.storage.saveModConfig(MOD_ID, modData, true);
+                    await MixerAPI.storage.saveModConfig(MOD_ID, modData, SYNC_SHARED);
                 } catch (e) {
                     console.error(`[${MOD_ID}] Erro ao salvar snapshot:`, e);
                 }
@@ -200,7 +202,7 @@
 
                 // Salva config
                 try {
-                    await MixerAPI.storage.saveModConfig(MOD_ID, modData, true);
+                    await MixerAPI.storage.saveModConfig(MOD_ID, modData, SYNC_SHARED);
                 } catch (e) {
                     console.error(`[${MOD_ID}] Erro ao salvar snapshot limpo:`, e);
                 }
@@ -291,7 +293,7 @@
         resetBtn.onclick = async () => {
             modData.snapshot = createDefaultModData().snapshot;
             try {
-                await MixerAPI.storage.saveModConfig(MOD_ID, modData, true);
+                await MixerAPI.storage.saveModConfig(MOD_ID, modData, SYNC_SHARED);
             } catch (e) {
                 console.error(`[${MOD_ID}] Erro ao limpar memória:`, e);
             }
@@ -418,7 +420,7 @@
     async function onSave(slotIndex) {
         // Salva guardian preservando snapshot ativo
         try {
-            await MixerAPI.storage.saveModConfig(MOD_ID, currentModData, true);
+            await MixerAPI.storage.saveModConfig(MOD_ID, currentModData, SYNC_SHARED);
         } catch (e) {
             console.error(`[${MOD_ID}] Erro ao salvar config:`, e);
         }
@@ -434,7 +436,7 @@
     async function onClear(slotIndex) {
         let modData = createDefaultModData();
         try {
-            await MixerAPI.storage.saveModConfig(MOD_ID, modData, true);
+            await MixerAPI.storage.saveModConfig(MOD_ID, modData, SYNC_SHARED);
         } catch (e) {
             console.error(`[${MOD_ID}] Erro ao limpar config:`, e);
         }
@@ -445,7 +447,7 @@
     // Deleta macro
     async function onDelete(slotIndex) {
         try {
-            await MixerAPI.storage.saveModConfig(MOD_ID, null, true);
+            await MixerAPI.storage.saveModConfig(MOD_ID, null, SYNC_SHARED);
         } catch (e) {
             console.error(`[${MOD_ID}] Erro ao deletar config:`, e);
         }
