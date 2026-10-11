@@ -7,6 +7,11 @@
     const TTL_MS = 12 * 60 * 60 * 1000; // 12 horas em milissegundos
     // Addon-scope: persistência só local (gitignored) — nunca sobe p/ shared/ninja sync.
     const SYNC_SHARED = false;
+    // Espelho entre devices do MESMO servidor (polling local, sem socket, sem cross-server).
+    const POLL_MS = 3000;
+    const activeSlots = new Set();
+    let pollTimer = null;
+    let lastSeenJson = '';
     let isExecuting = false;
     let currentModData = createDefaultModData();
 
@@ -87,21 +92,51 @@
         } catch (e) {
             console.error(`[${MOD_ID}] Erro ao carregar config:`, e);
         }
-        currentModData = modData;
-
-        // Valida snapshot
+        // Snapshot inválido/expirado: normaliza só a cópia em memória (read-only, nunca salva aqui).
         if (!isSnapshotValid(modData.snapshot)) {
             modData.snapshot = createDefaultModData().snapshot;
-            try {
-                await MixerAPI.storage.saveModConfig(MOD_ID, modData, SYNC_SHARED);
-            } catch (e) {
-                console.error(`[${MOD_ID}] Erro ao salvar snapshot inválido:`, e);
-            }
         }
+        currentModData = modData;
+        try { lastSeenJson = JSON.stringify(modData); } catch {}
 
         // Atualiza visual do pad
         updatePadVisual(slotIndex, modData);
+        activeSlots.add(slotIndex);
+        startPolling();
         return modData;
+    }
+
+    function startPolling() {
+        if (pollTimer) return;
+        pollTimer = setInterval(pollForUpdates, POLL_MS);
+    }
+
+    function stopPolling() {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    }
+
+    // Releitura periódica: espelha neste browser o que outros devices salvaram no mesmo servidor.
+    async function pollForUpdates() {
+        if (activeSlots.size === 0) return;
+        if (typeof document !== 'undefined' && document.hidden) return;
+        let fresh = createDefaultModData();
+        try {
+            const loaded = await MixerAPI.storage.getModConfig(MOD_ID);
+            if (loaded && typeof loaded === 'object') {
+                fresh = { ...fresh, ...loaded };
+            }
+        } catch {
+            return;
+        }
+        let json = '';
+        try { json = JSON.stringify(fresh); } catch { return; }
+        if (json === lastSeenJson) return;
+        lastSeenJson = json;
+        currentModData = fresh;
+        const view = isSnapshotValid(fresh.snapshot) ? fresh : { ...fresh, snapshot: createDefaultModData().snapshot };
+        for (const sIdx of activeSlots) {
+            try { updatePadVisual(sIdx, view); } catch {}
+        }
     }
 
     // Função principal de execução
@@ -446,6 +481,8 @@
 
     // Deleta macro
     async function onDelete(slotIndex) {
+        activeSlots.delete(slotIndex);
+        if (activeSlots.size === 0) stopPolling();
         try {
             await MixerAPI.storage.saveModConfig(MOD_ID, null, SYNC_SHARED);
         } catch (e) {
