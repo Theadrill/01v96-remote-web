@@ -138,6 +138,12 @@
       "physical_scene": "NAMORAL 360",
       "physical_id": 18,
       "file": "custom_names_scene-NAMORAL 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "YEL 360",
+      "physical_scene": "YEL 360",
+      "physical_id": 24,
+      "file": "custom_names_scene-YEL 360-mesa-maria.json"
     }
   ]
 }
