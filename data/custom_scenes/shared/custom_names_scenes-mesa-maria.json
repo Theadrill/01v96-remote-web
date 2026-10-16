@@ -92,12 +92,6 @@
       "file": "custom_names_scene-CAI GANDAIA 360-mesa-maria.json"
     },
     {
-      "custom_name": "PGD ONLINE 360",
-      "physical_scene": "PGD ONLINE 360",
-      "physical_id": 5,
-      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
-    },
-    {
       "custom_name": "KALAWE 360",
       "physical_scene": "KALAWE 360",
       "physical_id": 22,
@@ -144,6 +138,12 @@
       "physical_scene": "YEL 360",
       "physical_id": 24,
       "file": "custom_names_scene-YEL 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE 360",
+      "physical_scene": "PGD ONLINE 360",
+      "physical_id": 5,
+      "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
     }
   ]
 }
