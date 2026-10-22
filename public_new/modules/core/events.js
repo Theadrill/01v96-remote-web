@@ -320,7 +320,6 @@ function faderInput(e, ch) {
 }
 
 function handleWheelFader(e, ch, auxIdx) {
-    if (layoutMode !== 'desktop') return;
 
     // Interromper scroll da tela
     e.preventDefault();

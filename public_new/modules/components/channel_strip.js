@@ -623,7 +623,7 @@ class ChannelStrip {
 
         // 3. Roda do Mouse (Desktop Apenas - restrito à área do slider e thumb, exceto Macros)
         const isMacro = cfg.mode === 'macro' || (cfg.type && cfg.type.startsWith('macro'));
-        if (cfg.layout === 'desktop' && !cfg.isDisabled && !cfg.isLocked && !isMacro && els.faderArea) {
+        if (!cfg.isDisabled && !cfg.isLocked && !isMacro && els.faderArea) {
             els.faderArea.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -2247,7 +2247,7 @@ function createMobileStrip(config) {
                 <button class="btn-nudge pointer-none">+</button>
             </div>
             
-            <div class="fader-rotated-container">
+            <div class="fader-rotated-container" onwheel="handleWheelFader(event, ${typeof actionCh !== 'undefined' ? actionCh : evtCh})">
                 <input type="range" id="${fId}" min="0" max="1023" value="${val}" orient="vertical" oninput="${inputCall}" onclick="event.stopPropagation()">
             </div>
             
@@ -2486,7 +2486,7 @@ function createOutputStrip(i, type, idPrefix = "") {
                 <button class="btn-nudge pointer-none">+</button>
             </div>
             
-            <div class="fader-rotated-container">
+            <div class="fader-rotated-container" onwheel="handleWheelFader(event, ${typeof actionCh !== 'undefined' ? actionCh : evtCh})">
                 <input type="range" id="${pfx}f${prefix}${i}" min="0" max="1023" value="0" orient="vertical" oninput="faderInput(event, ${actionCh})" onclick="event.stopPropagation()">
             </div>
             
