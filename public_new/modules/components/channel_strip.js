@@ -413,6 +413,11 @@ class ChannelStrip {
                     ${cfg.name || ''}
                 </div>
 
+                <!-- Zona 5: Botão ON (Mute) -->
+                <div class="mobile-primary-action">
+                    <button class="mobile-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
+                </div>
+
                 <!-- Zona 2: Top Action / Solo / Pre -->
                 <div class="mobile-top-action">
                     ${cfg.prePost ? `
@@ -422,11 +427,6 @@ class ChannelStrip {
                     ` : `
                         <button class="mobile-btn-solo ${cfg.soloState ? 'active' : ''}">SOLO</button>
                     `}
-                </div>
-
-                <!-- Zona 5: Botão ON (Mute) -->
-                <div class="mobile-primary-action">
-                    <button class="mobile-btn-on ${cfg.onState ? 'active' : ''}">ON</button>
                 </div>
 
                 <!-- Zona 4: Middle Feature (Medidores Master ou Posição Auxiliar no Mobile) -->
@@ -2237,8 +2237,8 @@ function createMobileStrip(config) {
                 <div id="${nameId}" class="ch-name">${name}</div>
             </div>
             
-            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : config.topExtraHtml !== undefined ? config.topExtraHtml : ''}
             ${!onTop ? onBtn : ''}
+            ${hasSolo ? `<button id="${soloId}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${evtCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${evtCh})`}">Solo</button>` : isMaster ? `<button id="master-solo-btn" class="btn-state" disabled onclick="clearAllSolos()">SOLO</button>` : config.topExtraHtml !== undefined ? config.topExtraHtml : ''}
             ${isMaster ? `
             <button class="btn-state mobile-master-medidores-btn" onclick="openMeterConfigModal('master')">MEDIDORES</button>
             ` : ''}
@@ -2478,8 +2478,8 @@ function createOutputStrip(i, type, idPrefix = "") {
                 <div id="${pfx}name${prefix}${i}" class="ch-name">${nameDiv}</div>
             </div>
             
-            <button id="${pfx}solo${prefix}${i}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${actionCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${actionCh})`}">Solo</button>
             <button id="${pfx}on${prefix}${i}" class="btn-state" onclick="toggleState('${cmdPrefix}ChannelOn/kChannelOn', ${actionCh})">On</button>
+            <button id="${pfx}solo${prefix}${i}" class="btn-state" onclick="${pfx === 'mini-' ? `soloReplace('kSetupSoloChOn/kSoloChOn', ${actionCh})` : `toggleState('kSetupSoloChOn/kSoloChOn', ${actionCh})`}">Solo</button>
             ${type === 'mix' && idPrefix === 'mini-' ? `<button class="btn-state mobile-master-medidores-btn" onclick="openAuxConfigModal(${i})">POSIÇÃO</button>` : ''}
 
             <div class="nudge-zone" onpointerdown="startNudge(${actionCh}, 1)" onpointerup="stopNudge()" onpointerleave="stopNudge()" onpointercancel="stopNudge()" oncontextmenu="return false;" onclick="event.stopPropagation()">

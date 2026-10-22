@@ -1008,8 +1008,8 @@
     color: var(--strip-btn-solo-text, #888888);
     border: 1px solid #444;
     border-radius: var(--strip-mobile-btn-radius, 6px);
-    height: var(--strip-mobile-btn-solo-height, var(--strip-mobile-btn-height, 38px));
-    min-height: var(--strip-mobile-btn-solo-height, var(--strip-mobile-btn-height, 38px));
+    height: var(--strip-mobile-btn-solo-height, var(--strip-mobile-btn-height, 53px));
+    min-height: var(--strip-mobile-btn-solo-height, var(--strip-mobile-btn-height, 53px));
     width: 92%;
     margin: 0 auto;
     font-family: var(--strip-mobile-btn-solo-font-family, var(--strip-btn-solo-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
@@ -2342,8 +2342,8 @@
     color: var(--strip-btn-on-text, #888888);
     border: 1px solid #444;
     border-radius: var(--strip-mobile-btn-radius, 6px);
-    height: var(--strip-mobile-btn-on-height, var(--strip-mobile-btn-height, 38px));
-    min-height: var(--strip-mobile-btn-on-height, var(--strip-mobile-btn-height, 38px));
+    height: var(--strip-mobile-btn-on-height, var(--strip-mobile-btn-height, 44px));
+    min-height: var(--strip-mobile-btn-on-height, var(--strip-mobile-btn-height, 44px));
     width: 92%;
     margin: 0 auto;
     font-family: var(--strip-mobile-btn-on-font-family, var(--strip-btn-on-font-family, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif));
@@ -2488,14 +2488,14 @@
     }
 
     .channel-strip-wrapper.mobile-strip .mobile-btn-on {
-        height: 34px !important;
-        min-height: 34px !important;
+        height: 39px !important;
+        min-height: 39px !important;
         font-size: 11px !important;
     }
 
     .channel-strip-wrapper.mobile-strip .mobile-btn-solo {
-        height: 26px !important;
-        min-height: 26px !important;
+        height: 36px !important;
+        min-height: 36px !important;
         font-size: 9.5px !important;
     }
 

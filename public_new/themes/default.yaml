@@ -275,10 +275,10 @@ channel_strip:
     header_font_size: 13px
     header_font_weight: '800'
     header_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    btn_on_height: 38px
+    btn_on_height: 44px
     btn_on_font_size: 12px
     btn_on_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    btn_solo_height: 38px
+    btn_solo_height: 53px
     btn_solo_font_size: 11px
     btn_solo_font_family: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
     btn_pre_height: 38px
