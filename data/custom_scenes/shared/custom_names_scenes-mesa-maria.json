@@ -74,12 +74,6 @@
       "file": "custom_names_scene-SENSIBILDADE 360-mesa-maria.json"
     },
     {
-      "custom_name": "SKEMA BOM 360",
-      "physical_scene": "SKEMA BOM 360",
-      "physical_id": 11,
-      "file": "custom_names_scene-SKEMA BOM 360-mesa-maria.json"
-    },
-    {
       "custom_name": "SOMALIA 360",
       "physical_scene": "SOMALIA 360",
       "physical_id": 34,
@@ -144,6 +138,12 @@
       "physical_scene": "PGD ONLINE 360",
       "physical_id": 5,
       "file": "custom_names_scene-PGD ONLINE 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SKEMA BOM 360",
+      "physical_scene": "SKEMA BOM 360",
+      "physical_id": 11,
+      "file": "custom_names_scene-SKEMA BOM 360-mesa-maria.json"
     }
   ]
 }
