@@ -155,6 +155,18 @@
                 console.error(`[${MOD_ID}] Erro ao carregar config:`, e);
             }
 
+            // Snapshot inválido/expirado (TTL > 12h ou cena/mesa alterada): limpa e persiste antes da ação
+            if (modData.snapshot && modData.snapshot.active && !isSnapshotValid(modData.snapshot)) {
+                modData.snapshot = createDefaultModData().snapshot;
+                try {
+                    await MixerAPI.storage.saveModConfig(MOD_ID, modData, SYNC_SHARED);
+                } catch (e) {
+                    console.error(`[${MOD_ID}] Erro ao persistir limpeza de snapshot expirado:`, e);
+                }
+            }
+            currentModData = modData;
+            try { lastSeenJson = JSON.stringify(modData); } catch {}
+
             const snapshot = modData.snapshot;
 
             if (!snapshot.active) {
@@ -264,7 +276,11 @@
         } catch (e) {
             console.error(`[${MOD_ID}] Erro ao carregar config:`, e);
         }
+        if (!isSnapshotValid(modData.snapshot)) {
+            modData.snapshot = createDefaultModData().snapshot;
+        }
         currentModData = modData;
+        try { lastSeenJson = JSON.stringify(modData); } catch {}
         renderConfigurationUI(slotIndex, currentModData);
     }
 
