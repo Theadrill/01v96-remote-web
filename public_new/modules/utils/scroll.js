@@ -9,7 +9,7 @@ function enableDragScroll(el) {
     
     // Mouse Wheel (ignora se estiver sobre um fader ou pan)
     el.addEventListener('wheel', (evt) => {
-        if (evt.target.closest('.desk-fader-track-area, .desk-fader-core, .mobile-fader-thumb, .desk-pan-container, .desk-dual-pan-container, .desk-pan-track, input[type="range"]')) {
+        if (evt.target.closest('.desk-fader-track-area, .mobile-fader-track-area, .desk-fader-core, .mobile-fader-core, .desk-pan-container, .desk-dual-pan-container, .desk-pan-track, input[type="range"]')) {
             return;
         }
         if (evt.deltaY !== 0) {
