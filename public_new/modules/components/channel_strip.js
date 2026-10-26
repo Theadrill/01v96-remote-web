@@ -625,6 +625,12 @@ class ChannelStrip {
         const isMacro = cfg.mode === 'macro' || (cfg.type && cfg.type.startsWith('macro'));
         if (!cfg.isDisabled && !cfg.isLocked && !isMacro && els.faderArea) {
             els.faderArea.addEventListener('wheel', (e) => {
+                const isMobileLayout = cfg.layout === 'mobile';
+                const isOverThumb = e.target === els.faderThumb || (els.faderThumb && els.faderThumb.contains(e.target));
+                if (isMobileLayout && !isOverThumb && !e.shiftKey && !e.ctrlKey) {
+                    return; // Permite a rolagem horizontal suave da página no modo Mobile
+                }
+
                 e.preventDefault();
                 e.stopPropagation();
                 const isFine = (cfg.type === 'mix' || cfg.type === 'bus' || cfg.type === 'bus_paired' || cfg.type === 'aux_send') ? 0.50 : 0.10;

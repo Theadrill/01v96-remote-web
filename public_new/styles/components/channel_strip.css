@@ -258,7 +258,7 @@
     background: var(--strip-card-bg);
     border: var(--strip-card-border-width, 1px) solid var(--strip-card-border, #222222);
     contain: layout style paint;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: none;
 }
 
 /* =========================================================================
@@ -773,7 +773,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: none;
 }
 
 /* Identidades Cromáticas Mobile (Borda Superior de Destaque no Topo do Card) */
@@ -887,6 +887,7 @@
 .channel-strip-wrapper.mobile-strip.peak-glow {
     border-color: #ff0000 !important;
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.5) !important;
+    transition: none !important;
 }
 
 /* =========================================================================

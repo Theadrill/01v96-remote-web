@@ -9,7 +9,7 @@ function enableDragScroll(el) {
     
     // Mouse Wheel (ignora se estiver sobre um fader ou pan)
     el.addEventListener('wheel', (evt) => {
-        if (evt.target.closest('.desk-fader-track-area, .mobile-fader-track-area, .desk-fader-core, .mobile-fader-core, .desk-pan-container, .desk-dual-pan-container, .desk-pan-track, input[type="range"]')) {
+        if (evt.target.closest('.desk-fader-track-area, .desk-fader-core, .mobile-fader-thumb, .desk-pan-container, .desk-dual-pan-container, .desk-pan-track, input[type="range"]')) {
             return;
         }
         if (evt.deltaY !== 0) {
@@ -21,7 +21,7 @@ function enableDragScroll(el) {
     // Drag to scroll (ignora se o clique for em controles interativos ou faders/pans)
     el.addEventListener('mousedown', (e) => {
         if (['INPUT', 'BUTTON', 'SELECT'].includes(e.target.tagName)) return;
-        if (e.target.closest('.desk-fader-thumb, .mobile-fader-thumb, .desk-fader-rail, .desk-fader-track-area, .mobile-fader-track-area, .mobile-fader-groove, .desk-pan-track, .desk-pan-thumb, .desk-pan-container, .desk-dual-pan-container, .desk-nudge-btn, .mobile-nudge-btn, .btn-nudge-desk, .btn-nudge, .btn-state, .desk-btn-on, .mobile-btn-on, .desk-btn-solo, .mobile-btn-solo, .btn-pre-post, .mobile-btn-pre')) return;
+        if (e.target.closest('.desk-fader-thumb, .mobile-fader-thumb, .desk-fader-rail, .desk-pan-track, .desk-pan-thumb, .desk-pan-container, .desk-dual-pan-container, .desk-nudge-btn, .mobile-nudge-btn, .btn-nudge-desk, .btn-nudge, .btn-state, .desk-btn-on, .mobile-btn-on, .desk-btn-solo, .mobile-btn-solo, .btn-pre-post, .mobile-btn-pre')) return;
         isDragging = true;
         el.style.cursor = 'grabbing';
         startX = e.pageX - el.offsetLeft;

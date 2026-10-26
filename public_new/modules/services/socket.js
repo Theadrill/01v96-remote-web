@@ -1239,9 +1239,12 @@ socket.on('tailscaleUrl', (data) => {
     }
 });
 
+let cardToMeterCacheMap = new WeakMap();
+
 window.resetFaderCache = () => {
     faderCardsCache = null;
     meterElementsCache = null;
+    cardToMeterCacheMap = new WeakMap();
 };
 
 let smoothedLevels = new Array(64).fill(0);
@@ -1259,9 +1262,9 @@ function setupMeterObserver() {
 
     meterVisibilityObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (meterElementsCache) {
-                const cached = meterElementsCache.find(c => c && c.card === entry.target);
-                if (cached) cached.isVisible = entry.isIntersecting;
+            const cached = cardToMeterCacheMap.get(entry.target);
+            if (cached) {
+                cached.isVisible = entry.isIntersecting;
             }
         });
     }, {
@@ -1291,7 +1294,7 @@ function buildMeterCache() {
 
     for (let i = 0; i < faderCardsCache.length; i++) {
         const card = faderCardsCache[i];
-        meterElementsCache[i] = {
+        const cachedObj = {
             card,
             dataCh: card.getAttribute('data-ch'),
             partnerCh: card.getAttribute('data-partner-ch'),
@@ -1303,6 +1306,8 @@ function buildMeterCache() {
             isPeakActive: false,
             isVisible: true // Inicialmente true, o observer atualiza logo em seguida
         };
+        meterElementsCache[i] = cachedObj;
+        cardToMeterCacheMap.set(card, cachedObj);
 
         if (meterVisibilityObserver) meterVisibilityObserver.observe(card);
     }
