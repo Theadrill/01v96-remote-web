@@ -257,6 +257,7 @@
     -webkit-user-select: none;
     background: var(--strip-card-bg);
     border: var(--strip-card-border-width, 1px) solid var(--strip-card-border, #222222);
+    contain: layout style paint;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -844,6 +845,7 @@
 
 /* Cortina de Medidor VU de Fundo Integral no Mobile */
 .mobile-meter-curtain-container {
+    transform: translateZ(0);
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -867,6 +869,7 @@
             var(--strip-mobile-meter-gradient-base, #03251c) 100%);
     clip-path: inset(100% 0 0 0);
     will-change: clip-path;
+    transform: translateZ(0);
     /* Alinha os cantos arredondados com o container pai */
     border-top-left-radius: 9px;
     border-bottom-left-radius: 9px;
@@ -2277,6 +2280,7 @@
 
 .mobile-card-content {
     position: relative;
+    transform: translateZ(0);
     z-index: 1;
     display: flex;
     flex-direction: column;
