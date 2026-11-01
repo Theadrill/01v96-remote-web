@@ -33,12 +33,17 @@ var VirtualKeyboard = (function () {
     function _typeChar(targetId, char) {
         var input = document.getElementById(targetId);
         if (!input) return;
-        if (input.maxLength && input.maxLength > 0 && input.value.length >= input.maxLength) return;
 
-        var start = input.selectionStart || input.value.length;
-        var end = input.selectionEnd || input.value.length;
-        input.value = input.value.substring(0, start) + char + input.value.substring(end);
-        input.selectionStart = input.selectionEnd = start + 1;
+        var start = (typeof input.selectionStart === 'number') ? input.selectionStart : input.value.length;
+        var end = (typeof input.selectionEnd === 'number') ? input.selectionEnd : input.value.length;
+        var min = Math.min(start, end);
+        var max = Math.max(start, end);
+
+        var newLength = input.value.length - (max - min) + char.length;
+        if (input.maxLength && input.maxLength > 0 && newLength > input.maxLength) return;
+
+        input.value = input.value.substring(0, min) + char + input.value.substring(max);
+        input.selectionStart = input.selectionEnd = min + char.length;
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.focus();
     }
@@ -46,15 +51,18 @@ var VirtualKeyboard = (function () {
     function _backspace(targetId) {
         var input = document.getElementById(targetId);
         if (!input) return;
-        var start = input.selectionStart || input.value.length;
-        var end = input.selectionEnd || input.value.length;
 
-        if (start === end && start > 0) {
-            input.value = input.value.substring(0, start - 1) + input.value.substring(end);
-            input.selectionStart = input.selectionEnd = start - 1;
-        } else if (start !== end) {
-            input.value = input.value.substring(0, start) + input.value.substring(end);
-            input.selectionStart = input.selectionEnd = start;
+        var start = (typeof input.selectionStart === 'number') ? input.selectionStart : input.value.length;
+        var end = (typeof input.selectionEnd === 'number') ? input.selectionEnd : input.value.length;
+        var min = Math.min(start, end);
+        var max = Math.max(start, end);
+
+        if (min === max && min > 0) {
+            input.value = input.value.substring(0, min - 1) + input.value.substring(max);
+            input.selectionStart = input.selectionEnd = min - 1;
+        } else if (min !== max) {
+            input.value = input.value.substring(0, min) + input.value.substring(max);
+            input.selectionStart = input.selectionEnd = min;
         }
 
         input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -64,7 +72,7 @@ var VirtualKeyboard = (function () {
     // ─── Backspace repeat ───────────────────────────────────────
 
     function _startBackspaceRepeat(targetId, e) {
-        if (e && e.type === 'touchstart') e.preventDefault();
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
         _backspace(targetId);
 
         var timer = setTimeout(function () {
@@ -105,6 +113,9 @@ var VirtualKeyboard = (function () {
                     type: 'button'
                 }, displayKey);
                 if (_lower) btn.dataset.vkLower = '1';
+                btn.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                });
                 (function (k) {
                     btn.addEventListener('click', function () {
                         _typeChar(targetId, k);
@@ -141,6 +152,9 @@ var VirtualKeyboard = (function () {
             className: 'virtual-keyboard-btn virtual-keyboard-space',
             type: 'button'
         }, 'ESPAÇO');
+        spaceBtn.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+        });
         spaceBtn.addEventListener('click', function () {
             _typeChar(targetId, ' ');
         });

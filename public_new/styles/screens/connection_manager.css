@@ -731,6 +731,30 @@
     border-color: #3a475c;
 }
 
+/* Botão de limpar texto no modal de renomear canal (idêntico a scene_grid.js) */
+.name-editor-clear-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: rgba(220, 53, 69, 0.8);
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+.name-editor-clear-btn:hover {
+    background: rgba(220, 53, 69, 1);
+}
+
 /* Atalhos por host na lista — .conn-host-quick-nav / .conn-host-nav-btn */
 .conn-host-quick-nav {
     display: inline-flex;
