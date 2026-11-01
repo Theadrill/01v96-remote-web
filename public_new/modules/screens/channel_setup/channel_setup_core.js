@@ -300,6 +300,15 @@ var ChannelSetupCore = (function () {
             window.activeConfigTab = _activeTab;
         }
 
+        if (window.stopEQAnimation) stopEQAnimation();
+        if (window.stopGrPolling) window.stopGrPolling();
+        if (typeof window.stopMixVolumeGeralNudge === 'function') window.stopMixVolumeGeralNudge();
+        if (typeof window.stopAuxVolumeGeralNudge === 'function') window.stopAuxVolumeGeralNudge();
+
+        // O fader de AUX GERAL / VOLUME GERAL só pertence à visão de envios (aba AUX)
+        var vgSlot = document.getElementById('miniFaderVolumeGeral');
+        if (vgSlot) vgSlot.remove();
+
         // Atualizar estado ativo dos botões de abas
         var tabBtns = document.querySelectorAll('.dock-tab, .ch-setup-tab-btn');
         tabBtns.forEach(function (btn) {
