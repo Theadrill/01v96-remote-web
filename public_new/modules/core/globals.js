@@ -449,7 +449,7 @@ window.updateNameUI = function (channel, name) {
         }
     }
 
-    const limitedName = (name || '').substring(0, 16).trim();
+    const limitedName = (name || '').toUpperCase().substring(0, 16).trim();
 
     // 1. Atualiza o estado local para consistência
     const stateObj = typeof getChannelStateById === 'function' ? getChannelStateById(channel) : null;

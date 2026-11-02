@@ -151,7 +151,7 @@ class ChannelStrip {
                     <span class="desk-ch-num">${this._getHeaderTitle()}</span>
                 </div>
                 <div class="desk-ch-name-zone">
-                    <span class="desk-ch-name">${cfg.name.replace(' ', '<br>')}</span>
+                    <span class="desk-ch-name">${(cfg.name || '').toUpperCase().replace(' ', '<br>')}</span>
                 </div>
                 <div class="desk-macro-feature-zone">
                     ${hasConfig ? `<button class="macro-config-btn">CONFIG</button>` : ''}
@@ -204,7 +204,7 @@ class ChannelStrip {
 
             <!-- ZONA 3: Display OLED -->
             <div class="desk-ch-name-zone">
-                <span class="desk-ch-name">${cfg.name || ''}</span>
+                <span class="desk-ch-name">${(cfg.name || '').toUpperCase()}</span>
             </div>
 
             <!-- ZONA 4: Middle Feature (Painel de Medidores Master ou Painel de Posição do Auxiliar) -->
@@ -371,7 +371,7 @@ class ChannelStrip {
                     ${this._getHeaderTitle()}
                 </div>
                 <div class="mobile-display-name">
-                    ${cfg.name}
+                    ${(cfg.name || '').toUpperCase()}
                 </div>
                 <div class="mobile-macro-feature-zone">
                     ${hasConfig ? `<button class="macro-config-btn">CONFIG</button>` : ''}
@@ -410,7 +410,7 @@ class ChannelStrip {
 
                 <!-- Zona 3: Display do Canal -->
                 <div class="mobile-display-name">
-                    ${cfg.name || ''}
+                    ${(cfg.name || '').toUpperCase()}
                 </div>
 
                 <!-- Zona 5: Botão ON (Mute) -->
@@ -1331,10 +1331,11 @@ class ChannelStrip {
      * @param {string} name
      */
     setName(name) {
-        this.config.name = name || '';
+        const upperName = (name || '').toUpperCase();
+        this.config.name = upperName;
         if (this.elements.nameDisplay) {
-            this.elements.nameDisplay.innerText = name || '';
-            this.elements.nameDisplay.title = name || '';
+            this.elements.nameDisplay.innerText = upperName;
+            this.elements.nameDisplay.title = upperName;
         }
     }
 

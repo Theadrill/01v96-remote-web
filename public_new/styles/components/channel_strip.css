@@ -1177,6 +1177,7 @@
 
 .channel-strip-wrapper.desk-strip .desk-ch-name,
 .desk-ch-name {
+    text-transform: uppercase !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -2302,6 +2303,7 @@
 }
 
 .mobile-display-name {
+    text-transform: uppercase !important;
     background: var(--strip-name-display-bg, #000000);
     border: 1px solid #333;
     border-radius: var(--strip-name-display-radius, 4px);
