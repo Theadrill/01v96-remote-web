@@ -34,7 +34,9 @@ var ChannelSetupCore = (function () {
         var isStIn = false;
 
         var state = typeof getChannelStateById === 'function' ? getChannelStateById(ch) : null;
-        if (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
+        if (typeof ChannelStrip !== 'undefined' && typeof ChannelStrip.resolveName === 'function') {
+            customName = ChannelStrip.resolveName(ch);
+        } else if (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
             customName = window.resolvedNames[ch].name;
         } else if (state && state.name) {
             customName = state.name;
@@ -117,10 +119,7 @@ var ChannelSetupCore = (function () {
             var isSt = (ch >= 60 && ch <= 67);
             var isInput = (ch >= 0 && ch <= 31);
 
-            var chTitle = '' + (ch + 1);
-            var chName = '';
             var chType = 'input';
-            var chColorBand = 'blue';
             var chVal = 0;
             var isOn = false;
             var isSolo = false;
@@ -128,18 +127,12 @@ var ChannelSetupCore = (function () {
             var partnerId = null;
             var panL = 0;
             var panR = null;
-            var patchText = '--';
 
             if (isInput) {
                 var s = (typeof channelStates !== 'undefined' && channelStates[ch]) ? channelStates[ch] : {};
                 isPaired = !!s.paired;
                 partnerId = isPaired ? (ch + 1) : null;
-                chTitle = isPaired ? ((ch + 1) + ' + ' + (ch + 2)) : ('' + (ch + 1));
-                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
-                    ? window.resolvedNames[ch].name
-                    : (s.name || ('CH ' + (ch + 1)));
                 chType = isPaired ? 'input_paired' : 'input';
-                chColorBand = isPaired ? 'paired_green' : (ch < 16 ? 'blue' : 'green');
                 chVal = s.value !== undefined ? s.value : (s.fader !== undefined ? s.fader : 0);
                 isOn = !!s.on;
                 isSolo = !!s.solo;
@@ -147,18 +140,12 @@ var ChannelSetupCore = (function () {
                 if (isPaired && channelStates[ch + 1]) {
                     panR = channelStates[ch + 1].pan !== undefined ? channelStates[ch + 1].pan : null;
                 }
-                if (typeof ChannelStrip !== 'undefined' && typeof ChannelStrip.resolvePatch === 'function') {
-                    patchText = ChannelStrip.resolvePatch(ch, chType, isPaired, partnerId);
-                }
             } else if (isMix) {
                 var mIdx = ch - 36;
                 var mData = (typeof mixesState !== 'undefined' && mixesState[mIdx]) ? mixesState[mIdx] : {};
-                chTitle = 'MIX ' + (mIdx + 1);
-                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
-                    ? window.resolvedNames[ch].name
-                    : (mData.name || ('MIX ' + (mIdx + 1)));
-                chType = 'mix';
-                chColorBand = 'amber';
+                isPaired = !!mData.paired;
+                partnerId = isPaired ? (ch + 1) : null;
+                chType = isPaired ? 'mix_paired' : 'mix';
                 chVal = mData.value !== undefined ? mData.value : (mData.fader !== undefined ? mData.fader : 0);
                 isOn = !!mData.on;
                 isSolo = !!mData.solo;
@@ -166,57 +153,39 @@ var ChannelSetupCore = (function () {
             } else if (isBus) {
                 var bIdx = ch - 44;
                 var bData = (typeof busState !== 'undefined' && busState[bIdx]) ? busState[bIdx] : {};
-                chTitle = 'BUS ' + (bIdx + 1);
-                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
-                    ? window.resolvedNames[ch].name
-                    : (bData.name || ('BUS ' + (bIdx + 1)));
-                chType = 'bus';
-                chColorBand = 'cyan';
+                isPaired = !!bData.paired;
+                partnerId = isPaired ? (ch + 1) : null;
+                chType = isPaired ? 'bus_paired' : 'bus';
                 chVal = bData.value !== undefined ? bData.value : (bData.fader !== undefined ? bData.fader : 0);
                 isOn = !!bData.on;
                 isSolo = !!bData.solo;
                 panL = bData.pan !== undefined ? bData.pan : 0;
             } else if (isMaster) {
                 var mState = (typeof masterState !== 'undefined') ? masterState : {};
-                chTitle = 'MASTER';
-                chName = 'ST';
                 chType = 'master';
-                chColorBand = 'wine';
                 chVal = mState.value !== undefined ? mState.value : 0;
                 isOn = !!mState.on;
                 isSolo = !!mState.solo;
             } else if (isSt) {
                 var stIdx = (ch - 60) / 2;
                 var stData = (typeof stInState !== 'undefined' && stInState[stIdx]) ? stInState[stIdx] : {};
-                chTitle = 'ST IN ' + (stIdx + 1);
-                chName = (window.resolvedNames && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string')
-                    ? window.resolvedNames[ch].name
-                    : (stData.name || ('ST IN ' + (stIdx + 1)));
-                chType = 'stIn';
-                chColorBand = 'blue';
+                chType = 'st_in';
                 chVal = stData.value !== undefined ? stData.value : (stData.fader !== undefined ? stData.fader : 0);
                 isOn = !!stData.on;
                 isSolo = !!stData.solo;
                 panL = stData.pan !== undefined ? stData.pan : 0;
+                isPaired = true;
+                partnerId = ch + 1;
             }
 
             var isDesktop = document.body.classList.contains('layout-desktop');
             var chDb = typeof rawToDb === 'function' ? rawToDb(chVal, !isDesktop, isMaster) : ('' + chVal);
 
-            if (!patchText || patchText === '--') {
-                if (typeof ChannelStrip !== 'undefined' && typeof ChannelStrip.resolvePatch === 'function') {
-                    patchText = ChannelStrip.resolvePatch(ch, chType, isPaired, partnerId);
-                }
-            }
-
             var stripConfig = {
                 id: 'mini_' + ch,
                 evtCh: ch,
-                chNumber: chTitle,
-                name: chName,
                 type: chType,
                 layout: isDesktop ? 'desktop' : 'mobile',
-                colorBand: chColorBand,
                 faderValue: chVal,
                 dbValue: chDb,
                 onState: isOn,
@@ -225,7 +194,6 @@ var ChannelSetupCore = (function () {
                 partnerId: partnerId,
                 panL: panL,
                 panR: panR,
-                patch: patchText,
                 callbacks: {
                     fader_change: function (data) {
                         if (typeof commitFaderChange === 'function') {

@@ -19,15 +19,6 @@ var OutsView = (function () {
     var _strips = {};
     var _active = false;
 
-    /**
-     * Retorna o nome resolvido para o barramento ou canal
-     */
-    function _getResolvedName(globalId, fallback) {
-        if (window.resolvedNames && window.resolvedNames[globalId] && typeof window.resolvedNames[globalId].name === 'string') {
-            return window.resolvedNames[globalId].name;
-        }
-        return fallback;
-    }
 
     /**
      * Renderiza a visão completa de Barramentos de Saída
@@ -55,20 +46,14 @@ var OutsView = (function () {
             if (isMPaired && (m % 2 !== 0)) continue;
 
             var mGlobalId = 36 + m;
-            var mTitle = isMPaired ? `MIX ${m + 1} + ${m + 2}` : `MIX ${m + 1}`;
-            var mName = _getResolvedName(mGlobalId, mState.name || mTitle);
             var mVal = mState.value || 0;
             var mDb = typeof rawToDb === 'function' ? rawToDb(mVal, !isDesktop, false) : `${mVal}`;
             var mLocked = typeof ChannelLock !== 'undefined' && typeof ChannelLock.isLocked === 'function' ? ChannelLock.isLocked(mGlobalId) : false;
-            var mPatch = window.PatchRegistry ? window.PatchRegistry.getMixOutput(m) : `OMNI ${m + 1}`;
 
             var mStrip = new ChannelStrip({
                 id: `m${m}`,
                 evtCh: mGlobalId,
-                chNumber: mTitle,
-                name: mName,
-                type: isMPaired ? 'output_paired' : 'output',
-                colorBand: 'amber',
+                type: isMPaired ? 'mix_paired' : 'mix',
                 layout: layout,
                 faderValue: mVal,
                 dbValue: mDb,
@@ -78,7 +63,6 @@ var OutsView = (function () {
                 isPaired: isMPaired,
                 partnerId: isMPaired ? (mGlobalId + 1) : null,
                 hasPan: false,
-                patch: mPatch,
                 callbacks: {
                     fader_change: (function (mixIdx, gId) {
                         return function (data) {
@@ -158,20 +142,14 @@ var OutsView = (function () {
             if (isBPaired && (b % 2 !== 0)) continue;
 
             var bGlobalId = 44 + b;
-            var bTitle = isBPaired ? `BUS ${b + 1} + ${b + 2}` : `BUS ${b + 1}`;
-            var bName = _getResolvedName(bGlobalId, bState.name || bTitle);
             var bVal = bState.value || 0;
             var bDb = typeof rawToDb === 'function' ? rawToDb(bVal, !isDesktop, false) : `${bVal}`;
             var bLocked = typeof ChannelLock !== 'undefined' && typeof ChannelLock.isLocked === 'function' ? ChannelLock.isLocked(bGlobalId) : false;
-            var bPatch = window.PatchRegistry ? window.PatchRegistry.getBusOutput(b) : `BUS ${b + 1}`;
 
             var bStrip = new ChannelStrip({
                 id: `b${b}`,
                 evtCh: bGlobalId,
-                chNumber: bTitle,
-                name: bName,
                 type: isBPaired ? 'bus_paired' : 'bus',
-                colorBand: 'cyan',
                 layout: layout,
                 faderValue: bVal,
                 dbValue: bDb,
@@ -183,7 +161,6 @@ var OutsView = (function () {
                 hasPan: true,
                 panL: bState.pan !== undefined ? bState.pan : 0,
                 panR: isBPaired && busesState[b + 1] && busesState[b + 1].pan !== undefined ? busesState[b + 1].pan : null,
-                patch: bPatch,
                 callbacks: {
                     fader_change: (function (busIdx, gId) {
                         return function (data) {
@@ -274,24 +251,14 @@ var OutsView = (function () {
             var stStateL = (typeof channelStates !== 'undefined' && channelStates[stCh]) ? channelStates[stCh] : { value: 0, on: false, solo: false };
             var stStateR = (typeof channelStates !== 'undefined' && channelStates[stCh + 1]) ? channelStates[stCh + 1] : { value: 0, on: false, solo: false };
 
-            var stTitle = `ST IN ${sIdx + 1}`;
-            var stName = _getResolvedName(stGlobalId, stStateL.name || stTitle);
             var stVal = stStateL.value || 0;
             var stDb = typeof rawToDb === 'function' ? rawToDb(stVal, !isDesktop, false) : `${stVal}`;
             var stLocked = typeof ChannelLock !== 'undefined' && typeof ChannelLock.isLocked === 'function' ? ChannelLock.isLocked(stGlobalId) : false;
-            var stPatch = (window.PatchRegistry && typeof window.PatchRegistry.getStereoInInput === 'function')
-                ? window.PatchRegistry.getStereoInInput(sIdx)
-                : (window.PatchRegistry && typeof window.PatchRegistry.getPairedChannelInput === 'function'
-                    ? window.PatchRegistry.getPairedChannelInput(stCh, stCh + 1)
-                    : `ST IN ${sIdx + 1}`);
 
             var stStrip = new ChannelStrip({
                 id: `st${sIdx}`,
                 evtCh: stGlobalId,
-                chNumber: stTitle,
-                name: stName,
                 type: 'st_in',
-                colorBand: 'st',
                 layout: layout,
                 faderValue: stVal,
                 dbValue: stDb,
@@ -303,7 +270,6 @@ var OutsView = (function () {
                 hasPan: true,
                 panL: stStateL.pan !== undefined ? stStateL.pan : -32,
                 panR: stStateR.pan !== undefined ? stStateR.pan : 32,
-                patch: stPatch,
                 callbacks: {
                     fader_change: (function (stId, gId) {
                         return function (data) {
@@ -396,11 +362,8 @@ var OutsView = (function () {
             var masterStrip = new ChannelStrip({
                 id: 'master',
                 evtCh: 'master',
-                chNumber: 'STEREO',
-                name: 'MASTER',
                 type: 'master',
                 isMaster: true,
-                colorBand: 'wine',
                 layout: layout,
                 faderValue: masterVal,
                 dbValue: masterDb,

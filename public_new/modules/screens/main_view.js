@@ -20,46 +20,6 @@ var MainView = (function () {
     var _active = false;
 
     /**
-     * Obtém o texto formatado do patch de entrada do canal
-     * @param {number} ch Índice do canal (0-31)
-     * @param {boolean} isPaired Se o canal está pareado
-     * @returns {string}
-     */
-    function _getPatchText(ch, isPaired) {
-        if (typeof ChannelStrip !== 'undefined' && typeof ChannelStrip.resolvePatch === 'function') {
-            return ChannelStrip.resolvePatch(ch, isPaired ? 'input_paired' : 'input', isPaired);
-        }
-        if (typeof window.PatchRegistry !== 'undefined' && window.PatchRegistry) {
-            if (isPaired) {
-                var s = (typeof getChannelStateById === 'function') ? getChannelStateById(ch) : (window.channelStates && window.channelStates[ch]);
-                var partner = (s && s.pairedWith !== null && s.pairedWith !== undefined) ? s.pairedWith : (ch + 1);
-                return window.PatchRegistry.getPairedChannelInput(ch, partner);
-            }
-            return window.PatchRegistry.getChannelInput(ch);
-        }
-        var cs = window.channelStates || (typeof channelStates !== 'undefined' ? channelStates : null);
-        if (cs && cs[ch] && cs[ch].patch !== undefined) {
-            return (typeof decodeInputPatch === 'function') ? decodeInputPatch(cs[ch].patch) : 'ID ' + cs[ch].patch;
-        }
-        return '--';
-    }
-
-    /**
-     * Obtém o nome resolvido do canal
-     * @param {number} ch Índice do canal (0-31)
-     * @returns {string}
-     */
-    function _getResolvedName(ch) {
-        if (typeof window.resolvedNames !== 'undefined' && window.resolvedNames[ch] && typeof window.resolvedNames[ch].name === 'string') {
-            return window.resolvedNames[ch].name;
-        }
-        if (typeof channelStates !== 'undefined' && channelStates[ch] && channelStates[ch].name) {
-            return channelStates[ch].name;
-        }
-        return '';
-    }
-
-    /**
      * Renderiza a Tela Principal do Mixer no DOM
      * @returns {boolean} Sucesso da renderização
      */
@@ -102,22 +62,15 @@ var MainView = (function () {
                 fadersContainer.appendChild(mobileSep);
             }
 
-            var chTitle = isPaired ? `${i + 1} + ${i + 2}` : `${i + 1}`;
-            var chName = _getResolvedName(i);
-            var chColorBand = isPaired ? 'paired_green' : (i < 16 ? 'blue' : 'green');
             var chVal = state.value || 0;
             var chDb = typeof rawToDb === 'function' ? rawToDb(chVal, !isDesktop, false) : `${chVal}`;
             var isLocked = typeof ChannelLock !== 'undefined' && typeof ChannelLock.isLocked === 'function' ? ChannelLock.isLocked(i) : false;
-            var patchText = _getPatchText(i, isPaired);
 
             var stripConfig = {
                 id: i,
                 evtCh: i,
-                chNumber: chTitle,
-                name: chName,
                 type: isPaired ? 'input_paired' : 'input',
                 layout: layout,
-                colorBand: chColorBand,
                 faderValue: chVal,
                 dbValue: chDb,
                 onState: !!state.on,
@@ -127,7 +80,6 @@ var MainView = (function () {
                 partnerId: isPaired ? (i + 1) : null,
                 panL: state.pan !== undefined ? state.pan : 0,
                 panR: isPaired && channelStates[i + 1] && channelStates[i + 1].pan !== undefined ? channelStates[i + 1].pan : null,
-                patch: patchText,
                 callbacks: {
                     fader_change: (function (chIdx) {
                         return function (data) {

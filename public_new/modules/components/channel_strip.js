@@ -76,8 +76,27 @@ class ChannelStrip {
         const cfg = this.config;
         const isDesktop = cfg.layout === 'desktop';
 
+        const targetCh = (cfg.evtCh !== undefined && cfg.evtCh !== null) ? cfg.evtCh : cfg.id;
+
+        // Auto-resolução de Título/Número
+        if (cfg.chNumber === undefined || cfg.chNumber === null || cfg.chNumber === '') {
+            cfg.chNumber = ChannelStrip.resolveTitle(targetCh, cfg.type, cfg.isPaired, cfg.partnerId);
+        }
+
+        // Auto-resolução de Nome
+        if (!cfg.name) {
+            cfg.name = ChannelStrip.resolveName(targetCh, cfg.type);
+        } else {
+            cfg.name = cfg.name.toUpperCase();
+        }
+
+        // Auto-resolução de Faixa Cromática
+        if (!cfg.colorBand) {
+            cfg.colorBand = ChannelStrip.resolveColorBand(targetCh, cfg.type, cfg.isPaired);
+        }
+
+        // Auto-resolução de Patch
         if (!cfg.patch || cfg.patch === '--') {
-            const targetCh = (cfg.evtCh !== undefined && cfg.evtCh !== null) ? cfg.evtCh : cfg.id;
             const autoPatch = ChannelStrip.resolvePatch(targetCh, cfg.type, cfg.isPaired, cfg.partnerId);
             if (autoPatch && autoPatch !== '--') {
                 cfg.patch = autoPatch;
@@ -1668,6 +1687,212 @@ class ChannelStrip {
     }
 
     /**
+     * Resolve o nome do canal a partir da fonte da verdade (window.resolvedNames ou estados locais)
+     * @param {number|string} ch Índice ou identificador do canal
+     * @param {string} type Tipo do strip
+     * @param {string} fallback Nome padrão caso nenhum seja encontrado
+     * @returns {string} Nome em MAIÚSCULO
+     */
+    static resolveName(ch, type = 'input', fallback = '') {
+        let rawCh = ch;
+        if (typeof rawCh === 'string') {
+            if (rawCh.startsWith('mini_')) rawCh = rawCh.replace('mini_', '');
+            if (rawCh.startsWith('ch_')) rawCh = rawCh.replace('ch_', '');
+            if (!isNaN(parseInt(rawCh, 10)) && !rawCh.startsWith('m') && !rawCh.startsWith('b') && !rawCh.startsWith('st') && rawCh !== 'master') {
+                rawCh = parseInt(rawCh, 10);
+            }
+        }
+
+        // Master
+        if (type === 'master' || rawCh === 52 || rawCh === 'master') {
+            if (window.resolvedNames && window.resolvedNames[52] && typeof window.resolvedNames[52].name === 'string') {
+                return window.resolvedNames[52].name.toUpperCase();
+            }
+            if (typeof masterState !== 'undefined' && masterState.name) {
+                return masterState.name.toUpperCase();
+            }
+            return (fallback || 'ST').toUpperCase();
+        }
+
+        // ST IN (60 a 67, st0 a st3)
+        if (type === 'st_in' || type === 'stIn' || (typeof rawCh === 'number' && rawCh >= 60 && rawCh <= 67) || (typeof rawCh === 'string' && rawCh.startsWith('st'))) {
+            let sIdx = 0;
+            let logicCh = 60;
+            if (typeof rawCh === 'string' && rawCh.startsWith('st')) {
+                sIdx = parseInt(rawCh.substring(2), 10) || 0;
+                logicCh = 60 + (sIdx * 2);
+            } else if (typeof rawCh === 'number' && rawCh >= 60 && rawCh <= 67) {
+                sIdx = Math.floor((rawCh - 60) / 2);
+                logicCh = rawCh;
+            } else if (typeof rawCh === 'number') {
+                sIdx = rawCh;
+                logicCh = 60 + (sIdx * 2);
+            }
+            if (window.resolvedNames && window.resolvedNames[logicCh] && typeof window.resolvedNames[logicCh].name === 'string') {
+                return window.resolvedNames[logicCh].name.toUpperCase();
+            }
+            if (typeof stInState !== 'undefined' && stInState[sIdx] && stInState[sIdx].name) {
+                return stInState[sIdx].name.toUpperCase();
+            }
+            return (fallback || ('ST IN ' + (sIdx + 1))).toUpperCase();
+        }
+
+        // MIX (36 a 43, m0 a m7)
+        if (type === 'mix' || type === 'output' || type === 'output_paired' || (typeof rawCh === 'number' && rawCh >= 36 && rawCh <= 43) || (typeof rawCh === 'string' && rawCh.startsWith('m'))) {
+            let mIdx = 0;
+            let gId = 36;
+            if (typeof rawCh === 'string' && rawCh.startsWith('m')) {
+                mIdx = parseInt(rawCh.substring(1), 10) || 0;
+                gId = 36 + mIdx;
+            } else if (typeof rawCh === 'number' && rawCh >= 36 && rawCh <= 43) {
+                mIdx = rawCh - 36;
+                gId = rawCh;
+            } else if (typeof rawCh === 'number') {
+                mIdx = rawCh;
+                gId = 36 + mIdx;
+            }
+            if (window.resolvedNames && window.resolvedNames[gId] && typeof window.resolvedNames[gId].name === 'string') {
+                return window.resolvedNames[gId].name.toUpperCase();
+            }
+            if (typeof mixesState !== 'undefined' && mixesState[mIdx] && mixesState[mIdx].name) {
+                return mixesState[mIdx].name.toUpperCase();
+            }
+            return (fallback || ('MIX ' + (mIdx + 1))).toUpperCase();
+        }
+
+        // BUS (44 a 51, b0 a b7)
+        if (type === 'bus' || type === 'bus_paired' || (typeof rawCh === 'number' && rawCh >= 44 && rawCh <= 51) || (typeof rawCh === 'string' && rawCh.startsWith('b'))) {
+            let bIdx = 0;
+            let gId = 44;
+            if (typeof rawCh === 'string' && rawCh.startsWith('b')) {
+                bIdx = parseInt(rawCh.substring(1), 10) || 0;
+                gId = 44 + bIdx;
+            } else if (typeof rawCh === 'number' && rawCh >= 44 && rawCh <= 51) {
+                bIdx = rawCh - 44;
+                gId = rawCh;
+            } else if (typeof rawCh === 'number') {
+                bIdx = rawCh;
+                gId = 44 + bIdx;
+            }
+            if (window.resolvedNames && window.resolvedNames[gId] && typeof window.resolvedNames[gId].name === 'string') {
+                return window.resolvedNames[gId].name.toUpperCase();
+            }
+            if (typeof busesState !== 'undefined' && busesState[bIdx] && busesState[bIdx].name) {
+                return busesState[bIdx].name.toUpperCase();
+            }
+            return (fallback || ('BUS ' + (bIdx + 1))).toUpperCase();
+        }
+
+        // Inputs 0 a 31
+        const chNum = (typeof rawCh === 'number') ? rawCh : parseInt(rawCh, 10);
+        if (!isNaN(chNum)) {
+            if (window.resolvedNames && window.resolvedNames[chNum] && typeof window.resolvedNames[chNum].name === 'string') {
+                return window.resolvedNames[chNum].name.toUpperCase();
+            }
+            const cs = window.channelStates || (typeof channelStates !== 'undefined' ? channelStates : null);
+            if (cs && cs[chNum] && cs[chNum].name) {
+                return cs[chNum].name.toUpperCase();
+            }
+            return (fallback || ('CH ' + (chNum + 1))).toUpperCase();
+        }
+
+        return (fallback || '').toUpperCase();
+    }
+
+    /**
+     * Deduz a faixa de cor canônica da Yamaha com base no canal e tipo
+     * @param {number|string} ch Índice ou identificador do canal
+     * @param {string} type Tipo do strip
+     * @param {boolean} isPaired Se o canal é parte de par estéreo
+     * @returns {string} 'blue' | 'green' | 'paired_green' | 'amber' | 'cyan' | 'wine' | 'macro_silver'
+     */
+    static resolveColorBand(ch, type = 'input', isPaired = false) {
+        if (type === 'master' || ch === 52 || ch === 'master') return 'wine';
+        if (type === 'macro' || type === 'macro_aux' || type === 'macro_musician') return 'macro_silver';
+        if (type === 'mix' || type === 'output' || type === 'output_paired') return 'amber';
+        if (type === 'bus' || type === 'bus_paired') return 'cyan';
+        if (type === 'st_in' || type === 'stIn') return 'blue';
+        if (type === 'aux_send') return 'purple';
+
+        let rawCh = ch;
+        if (typeof rawCh === 'string') {
+            if (rawCh.startsWith('mini_')) rawCh = rawCh.replace('mini_', '');
+            if (rawCh.startsWith('ch_')) rawCh = rawCh.replace('ch_', '');
+            if (rawCh.startsWith('m')) return 'amber';
+            if (rawCh.startsWith('b')) return 'cyan';
+            if (rawCh.startsWith('st')) return 'blue';
+            rawCh = parseInt(rawCh, 10);
+        }
+
+        if (typeof rawCh === 'number') {
+            if (rawCh >= 36 && rawCh <= 43) return 'amber';
+            if (rawCh >= 44 && rawCh <= 51) return 'cyan';
+            if (rawCh >= 60 && rawCh <= 67) return 'blue';
+            if (rawCh === 52) return 'wine';
+            if (isPaired) return 'paired_green';
+            return rawCh < 16 ? 'blue' : 'green';
+        }
+
+        return isPaired ? 'paired_green' : 'blue';
+    }
+
+    /**
+     * Deduz o título / numeração exibido no topo do card
+     * @param {number|string} ch
+     * @param {string} type
+     * @param {boolean} isPaired
+     * @param {number|null} partnerId
+     * @returns {string}
+     */
+    static resolveTitle(ch, type = 'input', isPaired = false, partnerId = null) {
+        if (type === 'master' || ch === 52 || ch === 'master') return 'MASTER';
+        if (type === 'macro') return 'MACRO';
+        if (type === 'macro_aux') return 'AUX';
+        if (type === 'macro_musician') return 'GERAL';
+
+        let rawCh = ch;
+        if (typeof rawCh === 'string') {
+            if (rawCh.startsWith('mini_')) rawCh = rawCh.replace('mini_', '');
+            if (rawCh.startsWith('ch_')) rawCh = rawCh.replace('ch_', '');
+            if (rawCh.startsWith('m')) {
+                const idx = parseInt(rawCh.substring(1), 10);
+                return isPaired ? ('MIX ' + (idx + 1) + ' + ' + (idx + 2)) : ('MIX ' + (idx + 1));
+            }
+            if (rawCh.startsWith('b')) {
+                const idx = parseInt(rawCh.substring(1), 10);
+                return isPaired ? ('BUS ' + (idx + 1) + ' + ' + (idx + 2)) : ('BUS ' + (idx + 1));
+            }
+            if (rawCh.startsWith('st')) {
+                const idx = parseInt(rawCh.substring(2), 10);
+                return 'ST IN ' + (idx + 1);
+            }
+            rawCh = parseInt(rawCh, 10);
+        }
+
+        if (typeof rawCh === 'number') {
+            if (rawCh >= 36 && rawCh <= 43) {
+                const mIdx = rawCh - 36;
+                return isPaired ? ('MIX ' + (mIdx + 1) + ' + ' + (mIdx + 2)) : ('MIX ' + (mIdx + 1));
+            }
+            if (rawCh >= 44 && rawCh <= 51) {
+                const bIdx = rawCh - 44;
+                return isPaired ? ('BUS ' + (bIdx + 1) + ' + ' + (bIdx + 2)) : ('BUS ' + (bIdx + 1));
+            }
+            if (rawCh >= 60 && rawCh <= 67) {
+                const sIdx = Math.floor((rawCh - 60) / 2);
+                return 'ST IN ' + (sIdx + 1);
+            }
+            if (isPaired) {
+                const partner = partnerId !== null && partnerId !== undefined ? partnerId : (rawCh + 1);
+                return (rawCh + 1) + ' + ' + (partner + 1);
+            }
+            return '' + (rawCh + 1);
+        }
+
+        return String(ch);
+    }
+
+    /**
      * Resolve o texto de Patch I/O diretamente do PatchRegistry para qualquer canal da 01V96
      * @param {number|string} ch Índice ou identificador do canal
      * @param {string} type Tipo do strip ('input', 'input_paired', 'mix', 'bus', 'st_in', 'stIn', 'master')
@@ -1719,7 +1944,7 @@ class ChannelStrip {
         }
 
         // 3. MIX 1 a 8 (36 a 43, m0 a m7)
-        if (type === 'mix' || (typeof rawCh === 'number' && rawCh >= 36 && rawCh <= 43) || (typeof rawCh === 'string' && rawCh.startsWith('m'))) {
+        if (type === 'mix' || type === 'output' || type === 'output_paired' || (typeof rawCh === 'number' && rawCh >= 36 && rawCh <= 43) || (typeof rawCh === 'string' && rawCh.startsWith('m'))) {
             let mIdx = 0;
             if (typeof rawCh === 'string' && rawCh.startsWith('m')) {
                 mIdx = parseInt(rawCh.substring(1), 10) || 0;
@@ -1741,7 +1966,7 @@ class ChannelStrip {
         }
 
         // 4. BUS 1 a 8 (44 a 51, b0 a b7)
-        if (type === 'bus' || (typeof rawCh === 'number' && rawCh >= 44 && rawCh <= 51) || (typeof rawCh === 'string' && rawCh.startsWith('b'))) {
+        if (type === 'bus' || type === 'bus_paired' || (typeof rawCh === 'number' && rawCh >= 44 && rawCh <= 51) || (typeof rawCh === 'string' && rawCh.startsWith('b'))) {
             let bIdx = 0;
             if (typeof rawCh === 'string' && rawCh.startsWith('b')) {
                 bIdx = parseInt(rawCh.substring(1), 10) || 0;
