@@ -147,8 +147,8 @@ var ChannelSetupCore = (function () {
                 if (isPaired && channelStates[ch + 1]) {
                     panR = channelStates[ch + 1].pan !== undefined ? channelStates[ch + 1].pan : null;
                 }
-                if (typeof _getPatchText === 'function') {
-                    patchText = _getPatchText(ch, isPaired);
+                if (typeof ChannelStrip !== 'undefined' && typeof ChannelStrip.resolvePatch === 'function') {
+                    patchText = ChannelStrip.resolvePatch(ch, chType, isPaired, partnerId);
                 }
             } else if (isMix) {
                 var mIdx = ch - 36;
@@ -202,6 +202,12 @@ var ChannelSetupCore = (function () {
 
             var isDesktop = document.body.classList.contains('layout-desktop');
             var chDb = typeof rawToDb === 'function' ? rawToDb(chVal, !isDesktop, isMaster) : ('' + chVal);
+
+            if (!patchText || patchText === '--') {
+                if (typeof ChannelStrip !== 'undefined' && typeof ChannelStrip.resolvePatch === 'function') {
+                    patchText = ChannelStrip.resolvePatch(ch, chType, isPaired, partnerId);
+                }
+            }
 
             var stripConfig = {
                 id: 'mini_' + ch,
@@ -608,6 +614,44 @@ var ChannelSetupCore = (function () {
         }
     }
 
+    function updatePatch(ch, patchText) {
+        if (!_miniStripInstance) return;
+        var active = _activeChannel;
+        if (active === null || active === undefined) return;
+
+        // Se ch não for passado, atualiza o canal ativo do mini-fader
+        if (ch === undefined || ch === null) {
+            if (typeof _miniStripInstance.refreshPatch === 'function') {
+                _miniStripInstance.refreshPatch();
+            }
+            return;
+        }
+
+        var matches = false;
+        if (ch === 'master' || ch === 52) {
+            matches = (active === 52 || active === 'master');
+        } else if (typeof ch === 'string' && ch.startsWith('m')) {
+            matches = (active === (36 + parseInt(ch.substring(1), 10)));
+        } else if (typeof ch === 'string' && ch.startsWith('b')) {
+            matches = (active === (44 + parseInt(ch.substring(1), 10)));
+        } else if (typeof ch === 'string' && ch.startsWith('st')) {
+            var stIdx = parseInt(ch.substring(2), 10);
+            matches = (active === (60 + stIdx * 2) || active === (60 + stIdx * 2 + 1));
+        } else if (typeof ch === 'number') {
+            matches = (active === ch);
+        } else {
+            matches = (active == ch);
+        }
+
+        if (matches) {
+            if (typeof patchText === 'string') {
+                _miniStripInstance.setPatchText(patchText);
+            } else if (typeof _miniStripInstance.refreshPatch === 'function') {
+                _miniStripInstance.refreshPatch();
+            }
+        }
+    }
+
     return {
         open: open,
         close: close,
@@ -618,6 +662,7 @@ var ChannelSetupCore = (function () {
         updateName: updateName,
         updateChannel: updateChannel,
         updatePan: updatePan,
+        updatePatch: updatePatch,
         getActiveChannel: function () { return _activeChannel; },
         getActiveTab: function () { return _activeTab; }
     };

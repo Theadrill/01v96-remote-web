@@ -76,6 +76,14 @@ class ChannelStrip {
         const cfg = this.config;
         const isDesktop = cfg.layout === 'desktop';
 
+        if (!cfg.patch || cfg.patch === '--') {
+            const targetCh = (cfg.evtCh !== undefined && cfg.evtCh !== null) ? cfg.evtCh : cfg.id;
+            const autoPatch = ChannelStrip.resolvePatch(targetCh, cfg.type, cfg.isPaired, cfg.partnerId);
+            if (autoPatch && autoPatch !== '--') {
+                cfg.patch = autoPatch;
+            }
+        }
+
         const wrapper = document.createElement('div');
         wrapper.id = `strip_${cfg.id}`;
         const isMaster = cfg.isMaster || cfg.type === 'master';
@@ -1537,6 +1545,17 @@ class ChannelStrip {
     }
 
     /**
+     * Recalcula dinamicamente o patch do canal e atualiza o badge/marquee
+     * @returns {string} Novo texto de patch aplicado
+     */
+    refreshPatch() {
+        const targetCh = (this.config.evtCh !== undefined && this.config.evtCh !== null) ? this.config.evtCh : this.config.id;
+        const txt = ChannelStrip.resolvePatch(targetCh, this.config.type, this.config.isPaired, this.config.partnerId);
+        this.setPatchText(txt);
+        return txt;
+    }
+
+    /**
      * Atualiza níveis do medidor VU e dispara Peak Hold quando >= 98%
      * @param {number} levelL 0 a 100
      * @param {number} levelR 0 a 100
@@ -1647,6 +1666,122 @@ class ChannelStrip {
         this.element = null;
         this.elements = {};
     }
+
+    /**
+     * Resolve o texto de Patch I/O diretamente do PatchRegistry para qualquer canal da 01V96
+     * @param {number|string} ch Índice ou identificador do canal
+     * @param {string} type Tipo do strip ('input', 'input_paired', 'mix', 'bus', 'st_in', 'stIn', 'master')
+     * @param {boolean} isPaired Se o canal está pareado
+     * @param {number|null} partnerId Canal parceiro se pareado
+     * @returns {string} Texto formatado do Patch (ex: 'AD 1', 'AD 1/2', 'OMNI 1', 'OMNI 1/2', etc.)
+     */
+    static resolvePatch(ch, type = 'input', isPaired = false, partnerId = null) {
+        let rawCh = ch;
+        if (typeof rawCh === 'string') {
+            if (rawCh.startsWith('mini_')) rawCh = rawCh.replace('mini_', '');
+            if (rawCh.startsWith('ch_')) rawCh = rawCh.replace('ch_', '');
+            if (!isNaN(parseInt(rawCh, 10)) && !rawCh.startsWith('m') && !rawCh.startsWith('b') && !rawCh.startsWith('st') && rawCh !== 'master') {
+                rawCh = parseInt(rawCh, 10);
+            }
+        }
+
+        // 1. MASTER STEREO (52 ou 'master')
+        if (type === 'master' || rawCh === 52 || rawCh === 'master') {
+            if (window.PatchRegistry && typeof window.PatchRegistry.getStereoOutput === 'function') {
+                return window.PatchRegistry.getStereoOutput();
+            }
+            return 'OMNI 1/2';
+        }
+
+        // 2. ST IN (60 a 67, st0 a st3)
+        if (type === 'st_in' || type === 'stIn' || (typeof rawCh === 'number' && rawCh >= 60 && rawCh <= 67) || (typeof rawCh === 'string' && rawCh.startsWith('st'))) {
+            let sIdx = 0;
+            let logicCh = 60;
+            if (typeof rawCh === 'string' && rawCh.startsWith('st')) {
+                sIdx = parseInt(rawCh.substring(2), 10) || 0;
+                logicCh = 60 + (sIdx * 2);
+            } else if (typeof rawCh === 'number' && rawCh >= 60 && rawCh <= 67) {
+                sIdx = Math.floor((rawCh - 60) / 2);
+                logicCh = rawCh;
+            } else if (typeof rawCh === 'number') {
+                sIdx = rawCh;
+                logicCh = 60 + (sIdx * 2);
+            }
+            if (window.PatchRegistry) {
+                if (typeof window.PatchRegistry.getStereoInInput === 'function') {
+                    return window.PatchRegistry.getStereoInInput(sIdx);
+                }
+                if (typeof window.PatchRegistry.getPairedChannelInput === 'function') {
+                    return window.PatchRegistry.getPairedChannelInput(logicCh, logicCh + 1);
+                }
+            }
+            return 'ST IN ' + (sIdx + 1);
+        }
+
+        // 3. MIX 1 a 8 (36 a 43, m0 a m7)
+        if (type === 'mix' || (typeof rawCh === 'number' && rawCh >= 36 && rawCh <= 43) || (typeof rawCh === 'string' && rawCh.startsWith('m'))) {
+            let mIdx = 0;
+            if (typeof rawCh === 'string' && rawCh.startsWith('m')) {
+                mIdx = parseInt(rawCh.substring(1), 10) || 0;
+            } else if (typeof rawCh === 'number' && rawCh >= 36 && rawCh <= 43) {
+                mIdx = rawCh - 36;
+            } else if (typeof rawCh === 'number') {
+                mIdx = rawCh;
+            }
+            if (window.PatchRegistry && typeof window.PatchRegistry.getMixOutput === 'function') {
+                const s = (window.mixesState && window.mixesState[mIdx]);
+                if (s && s.paired && mIdx % 2 === 0) {
+                    const out1 = window.PatchRegistry.getMixOutput(mIdx);
+                    const out2 = window.PatchRegistry.getMixOutput(mIdx + 1);
+                    return (out1 === out2) ? out1 : (out1 + ' | ' + out2);
+                }
+                return window.PatchRegistry.getMixOutput(mIdx);
+            }
+            return 'OMNI ' + (mIdx + 1);
+        }
+
+        // 4. BUS 1 a 8 (44 a 51, b0 a b7)
+        if (type === 'bus' || (typeof rawCh === 'number' && rawCh >= 44 && rawCh <= 51) || (typeof rawCh === 'string' && rawCh.startsWith('b'))) {
+            let bIdx = 0;
+            if (typeof rawCh === 'string' && rawCh.startsWith('b')) {
+                bIdx = parseInt(rawCh.substring(1), 10) || 0;
+            } else if (typeof rawCh === 'number' && rawCh >= 44 && rawCh <= 51) {
+                bIdx = rawCh - 44;
+            } else if (typeof rawCh === 'number') {
+                bIdx = rawCh;
+            }
+            if (window.PatchRegistry && typeof window.PatchRegistry.getBusOutput === 'function') {
+                const s = (window.busesState && window.busesState[bIdx]);
+                if (s && s.paired && bIdx % 2 === 0) {
+                    const out1 = window.PatchRegistry.getBusOutput(bIdx);
+                    const out2 = window.PatchRegistry.getBusOutput(bIdx + 1);
+                    return (out1 === out2) ? out1 : (out1 + ' | ' + out2);
+                }
+                return window.PatchRegistry.getBusOutput(bIdx);
+            }
+            return 'BUS ' + (bIdx + 1);
+        }
+
+        // 5. ENTRADAS 1 a 32 (0 a 31)
+        const chNum = (typeof rawCh === 'number') ? rawCh : parseInt(rawCh, 10);
+        if (!isNaN(chNum)) {
+            if (window.PatchRegistry) {
+                if (isPaired) {
+                    const s = (typeof getChannelStateById === 'function') ? getChannelStateById(chNum) : (window.channelStates && window.channelStates[chNum]);
+                    const partner = partnerId !== null && partnerId !== undefined ? partnerId : ((s && s.pairedWith !== null && s.pairedWith !== undefined) ? s.pairedWith : (chNum + 1));
+                    return window.PatchRegistry.getPairedChannelInput(chNum, partner);
+                }
+                return window.PatchRegistry.getChannelInput(chNum);
+            }
+            const cs = window.channelStates || (typeof channelStates !== 'undefined' ? channelStates : null);
+            if (cs && cs[chNum] && cs[chNum].patch !== undefined) {
+                return (typeof decodeInputPatch === 'function') ? decodeInputPatch(cs[chNum].patch) : 'ID ' + cs[chNum].patch;
+            }
+        }
+
+        return '--';
+    }
+
 }
 
 // Expõe globalmente
@@ -2028,6 +2163,11 @@ function updatePanIndicator(channel, panValue) {
  */
 function updateDesktopPatchBadges() {
     if (!window.PatchRegistry) return;
+
+    // Notifica o mini-fader aberto em ChannelSetupCore (se houver)
+    if (typeof ChannelSetupCore !== 'undefined' && typeof ChannelSetupCore.updatePatch === 'function') {
+        ChannelSetupCore.updatePatch();
+    }
 
     // Se estiver usando o novo gerenciador MainView / OutsView
     if (typeof MainView !== 'undefined' && MainView.isActive && MainView.isActive()) {

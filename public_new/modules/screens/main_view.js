@@ -26,6 +26,9 @@ var MainView = (function () {
      * @returns {string}
      */
     function _getPatchText(ch, isPaired) {
+        if (typeof ChannelStrip !== 'undefined' && typeof ChannelStrip.resolvePatch === 'function') {
+            return ChannelStrip.resolvePatch(ch, isPaired ? 'input_paired' : 'input', isPaired);
+        }
         if (typeof window.PatchRegistry !== 'undefined' && window.PatchRegistry) {
             if (isPaired) {
                 var s = (typeof getChannelStateById === 'function') ? getChannelStateById(ch) : (window.channelStates && window.channelStates[ch]);
