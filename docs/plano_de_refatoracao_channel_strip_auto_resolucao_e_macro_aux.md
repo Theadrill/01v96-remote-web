@@ -45,22 +45,22 @@ Este plano estabelece as etapas para consolidar a autonomia do componente `Chann
 ## 3. Passo a Passo de Implementação
 
 ### Etapa 1: Métodos Estáticos e Auto-Resolução no `ChannelStrip` (`channel_strip.js`)
-- [ ] Adicionar método estático `ChannelStrip.resolveName(ch, type, fallback)` com leitura de `window.resolvedNames` e estados locais da 01V96, aplicando `.toUpperCase()`.
-- [ ] Adicionar método estático `ChannelStrip.resolveColorBand(ch, type, isPaired)`.
-- [ ] Adicionar método estático `ChannelStrip.resolveTitle(ch, type, isPaired, partnerId)`.
-- [ ] Integrar no ciclo de vida `constructor` / `render()` do `ChannelStrip`:
+- [x] Adicionar método estático `ChannelStrip.resolveName(ch, type, fallback)` com leitura de `window.resolvedNames` e estados locais da 01V96, aplicando `.toUpperCase()`.
+- [x] Adicionar método estático `ChannelStrip.resolveColorBand(ch, type, isPaired)`.
+- [x] Adicionar método estático `ChannelStrip.resolveTitle(ch, type, isPaired, partnerId)`.
+- [x] Integrar no ciclo de vida `constructor` / `render()` do `ChannelStrip`:
   - Se `cfg.name` não for passado, auto-resolver via `ChannelStrip.resolveName`.
   - Se `cfg.colorBand` não for passado, auto-resolver via `ChannelStrip.resolveColorBand`.
   - Se `cfg.chNumber` não for passado, auto-resolver via `ChannelStrip.resolveTitle`.
 
 ### Etapa 2: Limpeza e Simplificação nas Telas Consumidoras
-- [ ] **`screens/main_view.js`:**
+- [x] **`screens/main_view.js`:**
   - Remover a função local `_getResolvedName(ch)`.
   - Simplificar a criação dos 32 canais e do Master confiando na auto-resolução do `ChannelStrip`.
-- [ ] **`screens/outs_view.js`:**
+- [x] **`screens/outs_view.js`:**
   - Remover a função local `_getResolvedName(globalId, defaultName)`.
   - Simplificar as definições de `colorBand`, `chNumber` e `name` para MIX, BUS, ST IN e MASTER.
-- [ ] **`screens/channel_setup/channel_setup_core.js`:**
+- [x] **`screens/channel_setup/channel_setup_core.js`:**
   - Remover as leituras redundantes de `window.resolvedNames` em cada condicional de canal.
   - Delegar a inicialização do mini-fader para as resoluções do `ChannelStrip`.
 
