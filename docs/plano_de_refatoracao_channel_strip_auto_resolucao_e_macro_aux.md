@@ -2,78 +2,152 @@
 
 ## 1. Visão Geral e Contexto
 
-No processo de migração da arquitetura v1 (`public/`) para a arquitetura modular v2 (`public_new/`), diversas telas consumidoras (`main_view.js`, `outs_view.js`, `auxs_sends.js`, `channel_setup_core.js`) passaram a instanciar a classe única `ChannelStrip`. 
+No processo de migração da arquitetura legada (`public/`) para a arquitetura modular v2 (`public_new/`), diversas telas consumidoras (`main_view.js`, `outs_view.js`, `auxs_sends.js`, `channel_setup_core.js`) passaram a instanciar a classe modular única `ChannelStrip` (`public_new/modules/components/channel_strip.js`).
 
-No entanto, lógicas de apresentação cruciais — como resolução de nomes resolvidos da mesa, dedução de faixas de cores, formatação de títulos/números de canais e renderização de faders de Volume Geral de Auxiliares — continuam duplicadas de forma dispersa em cada tela ou acopladas a arquivos legados (`volume_geral.js`).
-
-Este plano estabelece as etapas para consolidar a autonomia do componente `ChannelStrip` e desacoplar o Volume Geral.
+Este plano consolida a autonomia e auto-resolução do componente `ChannelStrip` (eliminando código duplicado de nomes, cores, títulos e patch) e estabelece a rota para desacoplar e aposentar o código legado de `volume_geral.js`.
 
 ---
 
-## 2. Escopo da Refatoração
+## 2. Status Atual da Implementação
 
-### Itens Incluídos:
-1. **Auto-Resolução Central de Nomes (`ChannelStrip.resolveName`):**
-   - Eliminar a checagem repetida em `main_view.js`, `outs_view.js`, `channel_setup_core.js` e `auxs_sends.js`.
-   - O `ChannelStrip` auto-resolve seu próprio nome no `render()` ou `constructor` caso `cfg.name` venha nulo, vazio ou omitido, consultando `window.resolvedNames` ou os arrays de estado local (`channelStates`, `mixesState`, `busesState`, `stInState`, `masterState`).
-   - Forçar sempre formatação em MAIÚSCULO.
+### ✅ Etapa 1: Métodos Estáticos e Auto-Resolução no `ChannelStrip` (CONCLUÍDO)
+- [x] **`ChannelStrip.resolveName(ch, type, fallback)`**:
+  - Consulta `window.resolvedNames` ou arrays de estado locais (`channelStates`, `mixesState`, `busesState`, `stInState`, `masterState`).
+  - Suporta canais simples (`0..31`), pareados, compostos por vírgula (`"0, 1"` para aux_send), `mix` (36..43), `bus` (44..51), `st_in` (60..67) e `master` (52).
+  - Força sempre `.toUpperCase()`.
+- [x] **`ChannelStrip.resolveColorBand(ch, type, isPaired)`**:
+  - `0..15`: `blue` (Azul Yamaha)
+  - `16..31`: `green` (Verde Esmeralda)
+  - Pareados (`isPaired: true`): `paired_green` (Verde Neon com borda)
+  - MIX (36..43 ou `type: 'mix'`): `amber` (Âmbar/Amarelo Dourado)
+  - BUS (44..51 ou `type: 'bus'`): `cyan` (Ciano/Azul Claro)
+  - ST IN (60..67 ou `type: 'st_in'`): `st_in` (Azul-petróleo ST IN)
+  - MASTER (52 ou `type: 'master'`): `wine` (Vinho/Bordô)
+  - AUX SEND (`type: 'aux_send'`): `purple` (Roxo Yamaha)
+  - MACRO (`type: 'macro'` / `'macro_aux'`): `macro_silver` (Prata)
+- [x] **`ChannelStrip.resolveTitle(ch, type, isPaired, partnerId)`**:
+  - Deduz `1`, `1 + 2`, `MIX 1`, `BUS 1`, `ST IN 1`, `MASTER`, `MACRO`, `AUX 1`.
+- [x] **`ChannelStrip.resolvePatch(ch, type, isPaired, partnerId)`**:
+  - Lê de `window.PatchRegistry` com fallback para `channelStates[ch].patch`.
+- [x] **Ciclo de vida `render()`**:
+  - Se `chNumber`, `name`, `colorBand` ou `patch` forem omitidos na configuração do strip, são auto-resolvidos no momento da renderização.
+- [x] **Bugfix Crítico de Defaults do Construtor:**
+  - Corrigido `colorBand: ''` e `chNumber: ''` nos defaults de `Object.assign` da classe `ChannelStrip`. Anteriormente, `colorBand: 'blue'` fazia com que qualquer instância sem `colorBand` explícito ignorasse a auto-resolução e ficasse permanentemente azul.
 
-2. **Dedução Automática de Cores de Faixa (`ChannelStrip.resolveColorBand`):**
-   - O `ChannelStrip` deduz autonomamente a cor de banda canônica da Yamaha caso `cfg.colorBand` não seja fornecido:
-     - Canais 0 a 15 (`CH 1-16`): `blue` (Azul Yamaha)
-     - Canais 16 a 31 (`CH 17-32`): `green` (Verde Esmeralda)
-     - Pares Estéreo Linkados de Input: `paired_green` (Verde Neon com borda)
-     - MIX 1 a 8: `amber` (Amarelo Dourado)
-     - BUS 1 a 8: `cyan` (Azul Claro / Ciano)
-     - ST IN 1 a 4: `blue` (Azul Yamaha)
-     - MASTER Stereo: `wine` (Vinho / Bordô)
-     - MACROS Técnicos: `macro_silver` (Prata / Cinza Metálico)
-
-3. **Auto-Resolução de Título e Numeração (`ChannelStrip.resolveTitle`):**
-   - Eliminar concatenações manuais (`isPaired ? ((i + 1) + ' + ' + (i + 2)) : ('' + (i + 1))`) espalhadas pelas telas.
-   - O `ChannelStrip` infere o título canônico baseado em `ch`, `type` e `isPaired`.
-
-4. **Migração do Volume Geral em `auxs_sends.js` (Aposentadoria de `volume_geral.js`):**
-   - Substituir a injeção legada de HTML via string (`getMixVolumeGeralHtml()` e `getAuxVolumeGeralHtml()`) no dock do mini-fader por uma instância real de `new ChannelStrip(...)` com `type: 'macro_aux'`, `mode: 'macro_aux'`, botões de Big Nudge (+/- 0.10 dB), Delta dB e botão vermelho `[ZERAR]`.
-   - Limpar dependências de funções globais brutas.
-
-### Itens Fora de Escopo (Postergados):
-- Ponto 5 (Conversão e formatação interna de dB `rawToDb` no strip): mantido como está por enquanto, utilizando as funções globais consolidadas.
-
----
-
-## 3. Passo a Passo de Implementação
-
-### Etapa 1: Métodos Estáticos e Auto-Resolução no `ChannelStrip` (`channel_strip.js`)
-- [x] Adicionar método estático `ChannelStrip.resolveName(ch, type, fallback)` com leitura de `window.resolvedNames` e estados locais da 01V96, aplicando `.toUpperCase()`.
-- [x] Adicionar método estático `ChannelStrip.resolveColorBand(ch, type, isPaired)`.
-- [x] Adicionar método estático `ChannelStrip.resolveTitle(ch, type, isPaired, partnerId)`.
-- [x] Integrar no ciclo de vida `constructor` / `render()` do `ChannelStrip`:
-  - Se `cfg.name` não for passado, auto-resolver via `ChannelStrip.resolveName`.
-  - Se `cfg.colorBand` não for passado, auto-resolver via `ChannelStrip.resolveColorBand`.
-  - Se `cfg.chNumber` não for passado, auto-resolver via `ChannelStrip.resolveTitle`.
-
-### Etapa 2: Limpeza e Simplificação nas Telas Consumidoras
-- [x] **`screens/main_view.js`:**
-  - Remover a função local `_getResolvedName(ch)`.
-  - Simplificar a criação dos 32 canais e do Master confiando na auto-resolução do `ChannelStrip`.
-- [x] **`screens/outs_view.js`:**
-  - Remover a função local `_getResolvedName(globalId, defaultName)`.
-  - Simplificar as definições de `colorBand`, `chNumber` e `name` para MIX, BUS, ST IN e MASTER.
-- [x] **`screens/channel_setup/channel_setup_core.js`:**
-  - Remover as leituras redundantes de `window.resolvedNames` em cada condicional de canal.
-  - Delegar a inicialização do mini-fader para as resoluções do `ChannelStrip`.
-
-### Etapa 3: Migração do Volume Geral em `auxs_sends.js`
-- [ ] Refatorar a injeção do mini-fader de Volume Geral em `screens/auxs_sends.js`.
-- [ ] Utilizar a classe `ChannelStrip` com `type: 'macro_aux'`, `mode: 'macro_aux'`, vinculando os callbacks de delta nudge e zerar diretamente ao componente modular.
-- [ ] Validar compatibilidade visual e operacional com o modal de confirmação ao zerar.
+### ✅ Etapa 2: Limpeza e Simplificação nas Telas Consumidoras (CONCLUÍDO)
+- [x] **`public_new/modules/screens/main_view.js`:**
+  - Removidas as funções redundantes locais `_getPatchText` e `_getResolvedName`.
+  - Configuração dos 32 faders de entrada e do Master PA simplificada para confiar na auto-resolução.
+- [x] **`public_new/modules/screens/outs_view.js`:**
+  - Removida a função local `_getResolvedName`.
+  - Loops de MIX 1-8, BUS 1-8, ST IN 1-4 e Master PA simplificados, omitindo `chNumber`, `name`, `colorBand` e `patch`.
+- [x] **`public_new/modules/screens/channel_setup/channel_setup_core.js`:**
+  - Em `getChannelMeta(ch)`, utiliza `ChannelStrip.resolveName(ch)`.
+  - Em `renderMiniFader(ch)`, removido o bloco de mais de 70 linhas de dedução manual redundante; o strip contextual auto-resolve suas propriedades canônicas.
+- [x] **`public_new/modules/screens/auxs_sends.js`:**
+  - Ajustada a cor do modo individual de envios para a cor canônica `purple` (`band-purple`).
+- [x] **`public_new/styles/components/channel_strip.css`:**
+  - Adicionada a classe `.channel-strip-wrapper.mobile-strip.band-purple` para suporte mobile a faders de envios auxiliares.
 
 ---
 
-## 4. Critérios de Validação e Verificação
+## 3. Próximo Passo: Etapa 3 — Migração do Volume Geral em `auxs_sends.js`
 
-1. **Validação de Nomes:** Abrir as telas Principal, Saídas, Auxiliares e Channel Setup, garantindo que todos os nomes customizados e globais continuem aparecendo e em MAIÚSCULO.
-2. **Validação Cromática:** Conferir se as faixas de cores (Azul 1-16, Verde 17-32, Pareados Verde Neon, Âmbar Mix, Ciano Bus e Vinho Master) são renderizadas com precisão pixel-perfect.
-3. **Validação do Volume Geral Auxiliar:** Abrir a tela de Sends on Faders e verificar o fader de Volume Geral funcional, operando os Big Nudges e acionando o botão ZERAR com confirmação.
-4. **Verificação de Regressão:** `node -c` em todos os scripts modificados e ausência de erros no console do navegador.
+### 🎯 Objetivo:
+Substituir a injeção legada de HTML via string (`getMixVolumeGeralHtml()` e `getAuxVolumeGeralHtml()`) pelo componente oficial `new ChannelStrip(...)` com `mode: 'macro_aux'`, integrando reatividade, Big Nudges e botão [ZERAR].
+
+### 📍 Localização do Código Atual:
+Arquivo: `public_new/modules/screens/auxs_sends.js` (linhas ~266 a ~291):
+
+```javascript
+// Injeção do Volume Geral no Mini-Fader lateral se disponível
+if (ch >= 36 && ch <= 43 && typeof getMixVolumeGeralHtml === 'function') {
+    var container = document.getElementById('miniFaderContainer');
+    if (container) {
+        var oldMix = document.getElementById('miniFaderVolumeGeral');
+        if (oldMix) oldMix.remove();
+        var contextMix = document.getElementById('miniFaderContext');
+        var vgSlotMix = document.createElement('div');
+        vgSlotMix.id = 'miniFaderVolumeGeral';
+        vgSlotMix.style.cssText = 'height:100%; display:flex; align-items:stretch;';
+        vgSlotMix.innerHTML = getMixVolumeGeralHtml(); // <--- LEGADO A SER SUBSTITUÍDO
+        container.insertBefore(vgSlotMix, contextMix);
+    }
+} else if (ch <= 31 && typeof getAuxVolumeGeralHtml === 'function') {
+    var containerCh = document.getElementById('miniFaderContainer');
+    if (containerCh) {
+        var oldCh = document.getElementById('miniFaderVolumeGeral');
+        if (oldCh) oldCh.remove();
+        var contextCh = document.getElementById('miniFaderContext');
+        var vgSlotCh = document.createElement('div');
+        vgSlotCh.id = 'miniFaderVolumeGeral';
+        vgSlotCh.style.cssText = 'height:100%; display:flex; align-items:stretch;';
+        vgSlotCh.innerHTML = getAuxVolumeGeralHtml(); // <--- LEGADO A SER SUBSTITUÍDO
+        containerCh.insertBefore(vgSlotCh, contextCh);
+    }
+}
+```
+
+### 🛠️ Como o `ChannelStrip` já suporta `macro_aux`:
+A classe `ChannelStrip` (`public_new/modules/components/channel_strip.js`) **já possui estrutura nativa** para `mode: 'macro_aux'` e `type: 'macro_aux'`:
+1. **Layout Desktop (`_buildDesktopHTML`) e Mobile (`_buildMobileHTML`)**:
+   - Renderiza display de Delta dB: `<div class="macro-delta-display">${cfg.deltaDb || '--'}</div>`
+   - Renderiza botões de Big Nudge: `.btn-nudge-plus` e `.btn-nudge-minus`
+   - Renderiza botão de Reset: `.btn-zerar-sends` (desktop) e `.mobile-btn-zerar` (mobile) com texto `ZERAR`
+   - Aplica classe `.is-volume-geral` (largura otimizada de 70px)
+2. **Eventos Nativos do Componente**:
+   - Botão ZERAR dispara:
+     - Chama `window.confirmZeroSends(cfg.chNumber)` se existir, ou
+     - Emite evento `this._emitEvent('zerar_sends_click', { channel: this.config.chNumber })`
+   - Botões de Big Nudge disparam:
+     - `this._emitEvent('nudge', { direction: +1 / -1, step: ... })`
+
+### 📋 Tarefas para a Próxima Sessão / Agente:
+1. **No arquivo `public_new/modules/screens/auxs_sends.js`:**
+   - Instanciar `new ChannelStrip(...)` com:
+     ```javascript
+     var vgStrip = new ChannelStrip({
+         id: 'vg_' + ch,
+         evtCh: ch,
+         type: 'macro_aux',
+         mode: 'macro_aux',
+         chNumber: (ch >= 36 && ch <= 43) ? 'MIX' : 'AUX',
+         name: (ch >= 36 && ch <= 43) ? 'VOLUME GERAL' : 'AUX GERAL',
+         layout: layout,
+         hasResetBtn: true,
+         callbacks: {
+             nudge: function (data) {
+                 if (ch >= 36 && ch <= 43) {
+                     // Lógica de nudge do mix volume geral (+/- delta)
+                     nudgeMixVolumeGeral(ch - 35, data.direction);
+                 } else {
+                     // Lógica de nudge de todos os envios do canal (+/- delta)
+                     nudgeAuxVolumeGeral(ch, data.direction);
+                 }
+             },
+             zerar_sends_click: function () {
+                 if (ch >= 36 && ch <= 43) {
+                     showMixZeroConfirm(ch - 35);
+                 } else {
+                     showAuxZeroConfirm(ch);
+                 }
+             }
+         }
+     });
+     ```
+   - Inserir o elemento retornado por `vgStrip.render()` diretamente no slot do container (`#miniFaderContainer`).
+2. **Portar as funções de cálculo de delta/nudge para dentro de `public_new/modules/screens/auxs_sends.js` (ou módulo de serviço dedicado):**
+   - Consultar as implementações originais em `public/modules/volume_geral.js` (`nudgeAuxVolumeGeral`, `zeroAuxVolGeral`, `nudgeMixVolumeGeral`, `zeroMixVolGeral`).
+   - Integrar atualização em tempo real do display de delta dB chamando `vgStrip.setDeltaDb(deltaText)`.
+3. **Validar:**
+   - Tela de Channel Setup em um canal de entrada: aba [AUX] deve exibir o mini-fader contextual à direita e o fader de Volume Geral ao lado, operando nudges e zerar com modal de confirmação.
+   - Tela de Channel Setup em um MIX (36..43): deve exibir o Volume Geral do Mix correspondente.
+
+---
+
+## 4. Diretrizes e Regras Críticas do Repositório (AGENTS.md)
+
+1. **NUNCA fazer `git push` sem pedido explícito do usuário.** Mesmo após commits, aguardar sempre o comando expresso.
+2. **Build commands:** Usar sempre `cargo check` em vez de `cargo build --release` caso toque em código Rust.
+3. **Escopo:** Todas as alterações devem ser feitas em `public_new/` (arquitetura V2 modular) e `docs/`. O diretório `public/` é mantido como referência legada.
+4. **Ponto 5 (formatação dB via `rawToDb` interno no strip):** Mantido postergado conforme instrução expressa do usuário.
