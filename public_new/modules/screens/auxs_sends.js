@@ -188,7 +188,7 @@ var AuxSendsView = (function () {
                     name: auxNameA,
                     type: 'aux_send',
                     isAuxSend: true,
-                    colorBand: 'amber',
+                    colorBand: 'purple',
                     layout: layout,
                     faderValue: currentValA,
                     dbValue: typeof rawToDb === 'function' ? rawToDb(currentValA, !isDesktop, false) : `${currentValA}`,

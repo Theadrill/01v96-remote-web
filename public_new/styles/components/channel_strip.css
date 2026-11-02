@@ -807,6 +807,10 @@
     border-top: var(--strip-mobile-card-border-top-width, 3px) solid var(--strip-group-st-color, #4a90e2);
 }
 
+.channel-strip-wrapper.mobile-strip.band-purple {
+    border-top: var(--strip-mobile-card-border-top-width, 3px) solid var(--strip-group-aux-color, #7e22ce);
+}
+
 /* Volume Geral Mobile Mais Fino (70px) */
 .channel-strip-wrapper.mobile-strip.is-volume-geral {
     width: var(--strip-mobile-volume-geral-width, 70px) !important;

@@ -30,11 +30,11 @@ class ChannelStrip {
         this.config = Object.assign({
             id: 'ch_0',
             evtCh: 0,
-            chNumber: 1,
+            chNumber: '',
             name: '',
             type: 'input',              // 'input' | 'input_paired' | 'master' | 'mix' | 'bus' | 'macro'
             layout: 'desktop',          // 'desktop' | 'mobile'
-            colorBand: 'blue',          // 'blue' | 'green' | 'paired_green' | 'amber' | 'cyan' | 'wine' | 'macro_silver'
+            colorBand: '',          // 'blue' | 'green' | 'paired_green' | 'amber' | 'cyan' | 'wine' | 'macro_silver'
             faderValue: 0,              // 0 a 1023
             dbValue: '-∞',
             onState: false,
@@ -1698,9 +1698,28 @@ class ChannelStrip {
         if (typeof rawCh === 'string') {
             if (rawCh.startsWith('mini_')) rawCh = rawCh.replace('mini_', '');
             if (rawCh.startsWith('ch_')) rawCh = rawCh.replace('ch_', '');
+            if (rawCh.includes(',')) rawCh = rawCh.split(',')[0].trim();
             if (!isNaN(parseInt(rawCh, 10)) && !rawCh.startsWith('m') && !rawCh.startsWith('b') && !rawCh.startsWith('st') && rawCh !== 'master') {
                 rawCh = parseInt(rawCh, 10);
             }
+        }
+
+        // AUX SEND
+        if (type === 'aux_send') {
+            let aIdx = ch;
+            if (typeof aIdx === 'string' && aIdx.includes(',')) {
+                aIdx = parseInt(aIdx.split(',')[1].trim(), 10) || 1;
+            } else if (typeof aIdx === 'string') {
+                aIdx = parseInt(aIdx, 10) || 1;
+            }
+            const gId = 35 + aIdx;
+            if (window.resolvedNames && window.resolvedNames[gId] && typeof window.resolvedNames[gId].name === 'string') {
+                return window.resolvedNames[gId].name.toUpperCase();
+            }
+            if (typeof mixesState !== 'undefined' && mixesState[gId - 36] && mixesState[gId - 36].name) {
+                return mixesState[gId - 36].name.toUpperCase();
+            }
+            return (fallback || ('AUX ' + aIdx)).toUpperCase();
         }
 
         // Master
@@ -1809,9 +1828,9 @@ class ChannelStrip {
     static resolveColorBand(ch, type = 'input', isPaired = false) {
         if (type === 'master' || ch === 52 || ch === 'master') return 'wine';
         if (type === 'macro' || type === 'macro_aux' || type === 'macro_musician') return 'macro_silver';
-        if (type === 'mix' || type === 'output' || type === 'output_paired') return 'amber';
+        if (type === 'mix' || type === 'output' || type === 'output_paired' || type === 'mix_paired') return 'amber';
         if (type === 'bus' || type === 'bus_paired') return 'cyan';
-        if (type === 'st_in' || type === 'stIn') return 'blue';
+        if (type === 'st_in' || type === 'stIn') return 'st_in';
         if (type === 'aux_send') return 'purple';
 
         let rawCh = ch;
@@ -1820,14 +1839,15 @@ class ChannelStrip {
             if (rawCh.startsWith('ch_')) rawCh = rawCh.replace('ch_', '');
             if (rawCh.startsWith('m')) return 'amber';
             if (rawCh.startsWith('b')) return 'cyan';
-            if (rawCh.startsWith('st')) return 'blue';
+            if (rawCh.startsWith('st')) return 'st_in';
+            if (rawCh.includes(',')) rawCh = rawCh.split(',')[0].trim();
             rawCh = parseInt(rawCh, 10);
         }
 
-        if (typeof rawCh === 'number') {
+        if (typeof rawCh === 'number' && !isNaN(rawCh)) {
             if (rawCh >= 36 && rawCh <= 43) return 'amber';
             if (rawCh >= 44 && rawCh <= 51) return 'cyan';
-            if (rawCh >= 60 && rawCh <= 67) return 'blue';
+            if (rawCh >= 60 && rawCh <= 67) return 'st_in';
             if (rawCh === 52) return 'wine';
             if (isPaired) return 'paired_green';
             return rawCh < 16 ? 'blue' : 'green';
@@ -1849,6 +1869,11 @@ class ChannelStrip {
         if (type === 'macro') return 'MACRO';
         if (type === 'macro_aux') return 'AUX';
         if (type === 'macro_musician') return 'GERAL';
+        if (type === 'aux_send') {
+            let aIdx = ch;
+            if (typeof aIdx === 'string' && aIdx.includes(',')) aIdx = aIdx.split(',')[1].trim();
+            return 'AUX ' + aIdx;
+        }
 
         let rawCh = ch;
         if (typeof rawCh === 'string') {
@@ -1908,6 +1933,21 @@ class ChannelStrip {
             if (!isNaN(parseInt(rawCh, 10)) && !rawCh.startsWith('m') && !rawCh.startsWith('b') && !rawCh.startsWith('st') && rawCh !== 'master') {
                 rawCh = parseInt(rawCh, 10);
             }
+        }
+
+        // 0. AUX SEND
+        if (type === 'aux_send') {
+            let aIdx = ch;
+            if (typeof aIdx === 'string' && aIdx.includes(',')) {
+                aIdx = parseInt(aIdx.split(',')[1].trim(), 10) || 1;
+            } else if (typeof aIdx === 'string') {
+                aIdx = parseInt(aIdx, 10) || 1;
+            }
+            const mIdx = aIdx - 1;
+            if (window.PatchRegistry && typeof window.PatchRegistry.getMixOutput === 'function') {
+                return window.PatchRegistry.getMixOutput(mIdx);
+            }
+            return 'OMNI ' + (mIdx + 1);
         }
 
         // 1. MASTER STEREO (52 ou 'master')
