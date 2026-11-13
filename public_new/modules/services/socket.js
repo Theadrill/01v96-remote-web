@@ -180,16 +180,32 @@ socket.on('update', (d) => {
         return;
     }
 
-    if (d.type === 'kAUXFader/kFader') { updateUI(`m${d.channel}`, d.value, undefined); return; }
-    if (d.type === 'kAUXChannelOn/kChannelOn') { updateUI(`m${d.channel}`, undefined, isTrue); return; }
+    if (d.type === 'kAUXFader/kFader') {
+        const mixIdx = d.channel >= 36 ? d.channel - 36 : d.channel;
+        updateUI(`m${mixIdx}`, d.value, undefined);
+        return;
+    }
+    if (d.type === 'kAUXChannelOn/kChannelOn') {
+        const mixIdx = d.channel >= 36 ? d.channel - 36 : d.channel;
+        updateUI(`m${mixIdx}`, undefined, isTrue);
+        return;
+    }
     if (d.type === 'kAUXAttenuator/kAtt') {
         const state = getChannelStateById(d.channel < 8 ? 36 + d.channel : d.channel);
         if (state) state.att = d.value;
         if (activeConfigChannel === (36 + d.channel) && window.updateATTUI) window.updateATTUI(d.value);
         return;
     }
-    if (d.type === 'kBusFader/kFader') { updateUI(`b${d.channel}`, d.value, undefined); return; }
-    if (d.type === 'kBusChannelOn/kChannelOn') { updateUI(`b${d.channel}`, undefined, isTrue); return; }
+    if (d.type === 'kBusFader/kFader') {
+        const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
+        updateUI(`b${busIdx}`, d.value, undefined);
+        return;
+    }
+    if (d.type === 'kBusChannelOn/kChannelOn') {
+        const busIdx = d.channel >= 44 ? d.channel - 44 : d.channel;
+        updateUI(`b${busIdx}`, undefined, isTrue);
+        return;
+    }
     if (d.type === 'kBusAttenuator/kAtt') {
         const state = getChannelStateById(d.channel < 8 ? 44 + d.channel : d.channel);
         if (state) state.att = d.value;

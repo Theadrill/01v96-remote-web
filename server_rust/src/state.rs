@@ -652,19 +652,23 @@ impl GlobalState {
                 } else if mt == "kStereoChannelOn/kChannelOn" {
                     self.master.on = cv;
                 } else if mt == "kAUXFader/kFader" {
-                    if let Some(mix) = self.mixes.get_mut(channel) {
+                    let local = if (36..=43).contains(channel) { *channel - 36 } else { *channel };
+                    if let Some(mix) = self.mixes.get_mut(&local) {
                         mix.value = v;
                     }
                 } else if mt == "kAUXChannelOn/kChannelOn" {
-                    if let Some(mix) = self.mixes.get_mut(channel) {
+                    let local = if (36..=43).contains(channel) { *channel - 36 } else { *channel };
+                    if let Some(mix) = self.mixes.get_mut(&local) {
                         mix.on = cv;
                     }
                 } else if mt == "kBusFader/kFader" {
-                    if let Some(bus) = self.buses.get_mut(channel) {
+                    let local = if (44..=51).contains(channel) { *channel - 44 } else { *channel };
+                    if let Some(bus) = self.buses.get_mut(&local) {
                         bus.value = v;
                     }
                 } else if mt == "kBusChannelOn/kChannelOn" {
-                    if let Some(bus) = self.buses.get_mut(channel) {
+                    let local = if (44..=51).contains(channel) { *channel - 44 } else { *channel };
+                    if let Some(bus) = self.buses.get_mut(&local) {
                         bus.on = cv;
                     }
                 // --- Solo / Phase / Att / Patch ---
@@ -677,6 +681,14 @@ impl GlobalState {
                         }
                     } else if (48..=55).contains(&local_ch) {
                         if let Some(b) = self.buses.get_mut(&(local_ch - 48)) {
+                            b.solo = cv;
+                        }
+                    } else if (36..=43).contains(&local_ch) {
+                        if let Some(m) = self.mixes.get_mut(&(local_ch - 36)) {
+                            m.solo = cv;
+                        }
+                    } else if (44..=51).contains(&local_ch) {
+                        if let Some(b) = self.buses.get_mut(&(local_ch - 44)) {
                             b.solo = cv;
                         }
                     }

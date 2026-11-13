@@ -205,11 +205,19 @@ function toggleState(type, ch) {
     } else if (typeof ch === 'string' && (ch.startsWith('st') || ch.startsWith('CH'))) {
         // Fallback or ST IN parsing if ever passed as string
         emitCh = parseInt(ch.substring(2)) || parseInt(ch.substring(1));
-    } else if (typeof ch === 'number' && actualType === 'kSetupSoloChOn/kSoloChOn') {
-        if (ch >= 36 && ch <= 43) {
-            emitCh = 40 + (ch - 36);
+    } else if (typeof ch === 'number') {
+        if (actualType === 'kSetupSoloChOn/kSoloChOn') {
+            if (ch >= 36 && ch <= 43) {
+                emitCh = 40 + (ch - 36);
+            } else if (ch >= 44 && ch <= 51) {
+                emitCh = 48 + (ch - 44);
+            }
+        } else if (ch >= 36 && ch <= 43) {
+            emitCh = ch - 36;
         } else if (ch >= 44 && ch <= 51) {
-            emitCh = 48 + (ch - 44);
+            emitCh = ch - 44;
+        } else if (ch >= 60 && ch <= 67) {
+            emitCh = 32 + (ch - 60);
         }
     }
     socket.emit('control', { type: actualType, channel: emitCh, value: val ? 1 : 0 });
