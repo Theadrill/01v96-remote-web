@@ -2384,12 +2384,35 @@
     padding: 2px 0;
 }
 
+/* Nudge Superior (+) oculto por padrão no layout mobile */
 .mobile-nudge-top {
-    display: flex;
+    display: none !important;
 }
 
-.mobile-nudge-plus-cluster {
-    display: none;
+/* Cluster Horizontal de Nudges [-] [+] no rodapé ATIVO POR PADRÃO */
+.channel-strip-wrapper.mobile-strip .mobile-nudge-cluster {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding: 2px 2px !important;
+}
+
+.channel-strip-wrapper.mobile-strip .mobile-nudge-cluster .mobile-nudge-plus-cluster {
+    display: flex !important;
+}
+
+.channel-strip-wrapper.mobile-strip .mobile-nudge-cluster .mobile-nudge-btn {
+    flex: 0 0 47px !important;
+    width: 47px !important;
+    max-width: 47px !important;
+    min-width: 47px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    border-radius: var(--strip-mobile-btn-radius, 6px) !important;
+    margin: 0 !important;
 }
 
 .mobile-fader-track-area {
@@ -2437,42 +2460,12 @@
 }
 
 /* =========================================================================
-   MODO COMPACTO: Smartphones de altura vertical limitada (ex: iPhone SE 2, <= 720px)
+   MODO COMPACTO: Smartphones de altura vertical limitada em modo retrato
+   (ex: iPhone SE 2/3 <= 670px altura e <= 500px largura, ou landscape ultra baixo <= 420px)
    ========================================================================= */
-@media (max-height: 670px) {
+@media ((max-height: 670px) and (max-width: 500px)), (max-height: 420px) {
 
-    /* 1. Oculta Nudge Superior (+) para liberar curso ao Fader */
-    .channel-strip-wrapper.mobile-strip .mobile-nudge-top {
-        display: none !important;
-    }
-
-    /* 2. Ativa Cluster Horizontal de Nudges [-] [+] no rodapé */
-    .channel-strip-wrapper.mobile-strip .mobile-nudge-cluster {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 8px !important;
-        width: 100% !important;
-        padding: 2px 2px !important;
-    }
-
-    .channel-strip-wrapper.mobile-strip .mobile-nudge-cluster .mobile-nudge-plus-cluster {
-        display: flex !important;
-    }
-
-    .channel-strip-wrapper.mobile-strip .mobile-nudge-cluster .mobile-nudge-btn {
-        flex: 0 0 47px !important;
-        width: 47px !important;
-        max-width: 47px !important;
-        min-width: 47px !important;
-        height: 44px !important;
-        min-height: 44px !important;
-        border-radius: 6px !important;
-        margin: 0 !important;
-    }
-
-    /* 3. Oculta Patch Readout em telas compactas (economiza ~20px) */
+    /* Oculta Patch Readout apenas em telas compactas verticais (economiza ~20px) */
     .channel-strip-wrapper.mobile-strip .mobile-patch-readout {
         display: none !important;
     }
