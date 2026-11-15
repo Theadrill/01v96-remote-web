@@ -62,12 +62,6 @@
       "file": "custom_names_scene-BAT RESENH 360-mesa-maria.json"
     },
     {
-      "custom_name": "SENSIBILDADE 360",
-      "physical_scene": "SENSIBILDADE 360",
-      "physical_id": 23,
-      "file": "custom_names_scene-SENSIBILDADE 360-mesa-maria.json"
-    },
-    {
       "custom_name": "CAI GANDAIA 360",
       "physical_scene": "CAI GANDAIA 360",
       "physical_id": 17,
@@ -150,6 +144,12 @@
       "physical_scene": "NOSSA ONDA 360",
       "physical_id": 15,
       "file": "custom_names_scene-NOSSA ONDA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "SENSIBILDADE 3",
+      "physical_scene": "SENSIBILDADE 3",
+      "physical_id": 23,
+      "file": "custom_names_scene-SENSIBILDADE 3-mesa-maria.json"
     }
   ]
 }
