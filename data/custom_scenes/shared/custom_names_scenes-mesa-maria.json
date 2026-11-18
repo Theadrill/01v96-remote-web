@@ -134,12 +134,6 @@
       "file": "custom_names_scene-LVR P SONHAR 3-mesa-maria.json"
     },
     {
-      "custom_name": "SOMALIA 360",
-      "physical_scene": "SOMALIA 360",
-      "physical_id": 34,
-      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
-    },
-    {
       "custom_name": "NOSSA ONDA 360",
       "physical_scene": "NOSSA ONDA 360",
       "physical_id": 15,
@@ -150,6 +144,12 @@
       "physical_scene": "SENSIBILDADE 3",
       "physical_id": 23,
       "file": "custom_names_scene-SENSIBILDADE 3-mesa-maria.json"
+    },
+    {
+      "custom_name": "SOMALIA 360",
+      "physical_scene": "SOMALIA 360",
+      "physical_id": 34,
+      "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
     }
   ]
 }
