@@ -348,3 +348,6 @@ channel_setup:
   mini_fader_border: '#262936'
   mini_fader_width: 85px
   mobile_mini_fader_width: 118px
+# Sidebar — cores dos botões da barra lateral
+sidebar:
+  outs_btn_color: '#000000'

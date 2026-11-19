@@ -503,6 +503,10 @@ var ThemeEngine = (function () {
         if (csetup.mini_fader_border)  root.style.setProperty('--csetup-mini-fader-border', csetup.mini_fader_border);
         if (csetup.mini_fader_width)   root.style.setProperty('--csetup-mini-fader-width', csetup.mini_fader_width);
         if (csetup.mobile_mini_fader_width) root.style.setProperty('--csetup-mobile-mini-fader-width', csetup.mobile_mini_fader_width);
+
+        // Sidebar
+        var sb = theme.sidebar || {};
+        if (sb.outs_btn_color) root.style.setProperty('--sidebar-outs-btn-color', sb.outs_btn_color);
     }
 
     return {

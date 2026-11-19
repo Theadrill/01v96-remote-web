@@ -52,7 +52,7 @@ function toggleOuts() {
     const btn = document.getElementById('dockBtnOuts');
     if (btn) {
         btn.classList.toggle('active-tab', outsMode);
-        btn.innerText = outsMode ? 'SAIR' : 'MIX/BUS';
+        btn.innerText = outsMode ? 'SAIR' : 'AUXS/BUS';
         btn.style.backgroundColor = '';
         btn.style.color = '';
     }
@@ -1114,7 +1114,7 @@ function renderDock(mode) {
         case 'main': {
             buttons.push({ label: 'CONFIG', action: "document.getElementById('configModal').style.display='flex'", cls: 'dock-config' });
             const isOutsOn = typeof window.outsMode !== 'undefined' && outsMode;
-            buttons.push({ label: isOutsOn ? 'SAIR' : 'MIX/BUS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
+            buttons.push({ label: isOutsOn ? 'SAIR' : 'AUXS/BUS', action: 'toggleOuts()', id: 'dockBtnOuts', cls: 'dock-outs' });
             buttons.push({ label: 'OUVIR', action: "document.getElementById('monitoringModal').style.display='flex'; refreshMonitoringDevices()", cls: 'dock-monitoring' });
             buttons.push({ label: 'EFEITOS', action: 'openEffectsModal()', cls: 'dock-efeitos' });
             buttons.push({ label: 'ROTEAMENTO', action: 'openRoutingOverviewModal()', cls: 'dock-routing' });
@@ -1530,7 +1530,7 @@ function renderMobileMenu(mode) {
                 buttonsConfig.push({ label: 'LAYER 1-16', cls: activeLayerStart === 0 ? 'menu-btn-solid-blue' : '', action: "if(typeof setLayer === 'function') setLayer(0);" });
                 buttonsConfig.push({ label: 'LAYER 17-32', cls: activeLayerStart === 16 ? 'menu-btn-solid-blue' : '', action: "if(typeof setLayer === 'function') setLayer(16);" });
             }
-            buttonsConfig.push({ label: 'MIX / BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" });
+            buttonsConfig.push({ label: 'AUXS/BUS', cls: 'menu-btn-solid-green', action: "if(typeof toggleOuts === 'function') { toggleOuts(); }" });
             buttonsConfig.push({ label: 'EFEITOS', cls: 'menu-btn-solid-purple', action: "if(typeof openEffectsModal === 'function') { openEffectsModal(); }" });
             buttonsConfig.push({ label: 'ROTEAMENTO GERAL', cls: 'menu-btn-solid-blue', action: "if(typeof openRoutingOverviewModal === 'function') { openRoutingOverviewModal(); }" });
             buttonsConfig.push({ label: 'MEDIDORES', cls: 'menu-btn-solid-blue', action: "if(typeof openMeterConfigModal === 'function') { openMeterConfigModal('master'); }" });
