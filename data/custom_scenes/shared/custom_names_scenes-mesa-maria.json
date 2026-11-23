@@ -150,6 +150,12 @@
       "physical_scene": "SOMALIA 360",
       "physical_id": 34,
       "file": "custom_names_scene-SOMALIA 360-mesa-maria.json"
+    },
+    {
+      "custom_name": "IDENT DO SAMBA",
+      "physical_scene": "IDENT DO SAMBA",
+      "physical_id": 14,
+      "file": "custom_names_scene-IDENT DO SAMBA-mesa-maria.json"
     }
   ]
 }
