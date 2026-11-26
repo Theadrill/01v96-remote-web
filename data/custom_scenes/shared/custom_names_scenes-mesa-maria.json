@@ -156,6 +156,12 @@
       "physical_scene": "IDENT DO SAMBA",
       "physical_id": 14,
       "file": "custom_names_scene-IDENT DO SAMBA-mesa-maria.json"
+    },
+    {
+      "custom_name": "DJ",
+      "physical_scene": "DJ",
+      "physical_id": 99,
+      "file": "custom_names_scene-DJ-mesa-maria.json"
     }
   ]
 }
