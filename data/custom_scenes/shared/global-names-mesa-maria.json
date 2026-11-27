@@ -1,13 +1,9 @@
 {
   "mesa_nome": "mesa-maria",
   "channels": {
-    "23": {
-      "name": "DJ 360",
-      "short": "DJ36"
-    },
     "18": {
-      "name": "MIC DJ",
-      "short": "MICD"
+      "name": "PRETO",
+      "short": "PRET"
     },
     "25": {
       "name": "SURD BATER",
@@ -17,13 +13,17 @@
       "name": "REVERB",
       "short": "REVE"
     },
+    "26": {
+      "name": "TOMS BATER",
+      "short": "TOMS"
+    },
     "21": {
       "name": "DJ PALCO",
       "short": "DJPA"
     },
-    "26": {
-      "name": "TOMS BATER",
-      "short": "TOMS"
+    "23": {
+      "name": "DJ 360",
+      "short": "DJ36"
     }
   }
 }
