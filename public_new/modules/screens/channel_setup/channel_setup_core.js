@@ -152,7 +152,7 @@ var ChannelSetupCore = (function () {
                 panL = 0;
             } else if (isBus) {
                 var bIdx = ch - 44;
-                var bData = (typeof busState !== 'undefined' && busState[bIdx]) ? busState[bIdx] : {};
+                var bData = (typeof busesState !== 'undefined' && busesState[bIdx]) ? busesState[bIdx] : {};
                 isPaired = !!bData.paired;
                 partnerId = isPaired ? (ch + 1) : null;
                 chType = isPaired ? 'bus_paired' : 'bus';
@@ -160,6 +160,9 @@ var ChannelSetupCore = (function () {
                 isOn = !!bData.on;
                 isSolo = !!bData.solo;
                 panL = bData.pan !== undefined ? bData.pan : 0;
+                if (isPaired && typeof busesState !== 'undefined' && busesState[bIdx + 1]) {
+                    panR = busesState[bIdx + 1].pan !== undefined ? busesState[bIdx + 1].pan : null;
+                }
             } else if (isMaster) {
                 var mState = (typeof masterState !== 'undefined') ? masterState : {};
                 chType = 'master';
@@ -167,13 +170,15 @@ var ChannelSetupCore = (function () {
                 isOn = !!mState.on;
                 isSolo = !!mState.solo;
             } else if (isSt) {
-                var stIdx = (ch - 60) / 2;
-                var stData = (typeof stInState !== 'undefined' && stInState[stIdx]) ? stInState[stIdx] : {};
+                var stChIdx = 32 + (ch - 60);
+                var stData = (typeof channelStates !== 'undefined' && channelStates[stChIdx]) ? channelStates[stChIdx] : {};
+                var stDataR = (typeof channelStates !== 'undefined' && channelStates[stChIdx + 1]) ? channelStates[stChIdx + 1] : {};
                 chType = 'st_in';
                 chVal = stData.value !== undefined ? stData.value : (stData.fader !== undefined ? stData.fader : 0);
                 isOn = !!stData.on;
                 isSolo = !!stData.solo;
-                panL = stData.pan !== undefined ? stData.pan : 0;
+                panL = stData.pan !== undefined ? stData.pan : -32;
+                panR = stDataR.pan !== undefined ? stDataR.pan : 32;
                 isPaired = true;
                 partnerId = ch + 1;
             }
@@ -185,6 +190,7 @@ var ChannelSetupCore = (function () {
                 id: 'mini_' + ch,
                 evtCh: ch,
                 type: chType,
+                isMaster: isMaster,
                 layout: isDesktop ? 'desktop' : 'mobile',
                 faderValue: chVal,
                 dbValue: chDb,
@@ -205,34 +211,20 @@ var ChannelSetupCore = (function () {
                     on_toggle: function () {
                         if (isMaster) {
                             if (typeof confirmMasterOn === 'function') confirmMasterOn();
-                            else if (typeof toggleState === 'function') toggleState('kStereoOn/kChannelOn', 'master');
-                        } else if (isInput) {
+                            else if (typeof toggleState === 'function') toggleState('kStereoChannelOn/kChannelOn', 'master');
+                        } else if (isInput || isSt) {
                             if (typeof toggleState === 'function') toggleState('kInputChannelOn/kChannelOn', ch);
                         } else if (isMix) {
-                            var mIdx = ch - 36;
-                            if (typeof toggleState === 'function') toggleState('kMixMasterOn/kChannelOn', mIdx);
+                            if (typeof toggleState === 'function') toggleState('kAUXChannelOn/kChannelOn', ch);
                         } else if (isBus) {
-                            var bIdx = ch - 44;
-                            if (typeof toggleState === 'function') toggleState('kBusMasterOn/kChannelOn', bIdx);
-                        } else if (isSt) {
-                            var stIdx = (ch - 60) / 2;
-                            if (typeof toggleState === 'function') toggleState('kStInOn/kChannelOn', stIdx);
+                            if (typeof toggleState === 'function') toggleState('kBusChannelOn/kChannelOn', ch);
                         }
                     },
                     solo_toggle: function () {
                         if (isMaster) {
-                            if (typeof toggleState === 'function') toggleState('kSetupSoloChOn/kSoloChOn', 'master');
-                        } else if (isInput) {
-                            if (typeof toggleState === 'function') toggleState('kSetupSoloChOn/kSoloChOn', ch);
-                        } else if (isMix) {
-                            var mIdx = ch - 36;
-                            if (typeof toggleState === 'function') toggleState('kSetupSoloChOn/kSoloChOn', 36 + mIdx);
-                        } else if (isBus) {
-                            var bIdx = ch - 44;
-                            if (typeof toggleState === 'function') toggleState('kSetupSoloChOn/kSoloChOn', 44 + bIdx);
-                        } else if (isSt) {
-                            var stIdx = (ch - 60) / 2;
-                            if (typeof toggleState === 'function') toggleState('kSetupSoloChOn/kSoloChOn', 60 + stIdx * 2);
+                            if (typeof clearAllSolos === 'function') clearAllSolos();
+                        } else if (typeof toggleState === 'function') {
+                            toggleState('kSetupSoloChOn/kSoloChOn', ch);
                         }
                     },
                     nudge: function (data) {
