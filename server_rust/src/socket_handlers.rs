@@ -688,6 +688,10 @@ pub fn register_handlers(
                 let ch_num = ch_val.and_then(|v| v.as_u64()).unwrap_or(0) as u8;
                 let att_type = if is_master {
                     "kStereoAttenuator/kAtt"
+                } else if (36..=43).contains(&ch_num) {
+                    "kAUXAttenuator/kAtt"
+                } else if (44..=51).contains(&ch_num) {
+                    "kBusAttenuator/kAtt"
                 } else {
                     "kInputAttenuator/kAtt"
                 };

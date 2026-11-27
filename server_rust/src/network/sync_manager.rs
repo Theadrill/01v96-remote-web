@@ -577,6 +577,8 @@ async fn queue_all_params_inner(
         push_req(&mut requests, "kInputChannelOn/kChannelOn", i);
         push_req(&mut requests, "kInputAttenuator/kAtt", i);
         push_req(&mut requests, "kInputEQ/kEQOn", i);
+        push_req(&mut requests, "kInputEQ/kEQHPFOn", i);
+        push_req(&mut requests, "kInputEQ/kEQLPFOn", i);
         push_req(&mut requests, "kChannelInput/kChannelIn", i);
         for band in &["Low", "LowMid", "HiMid", "Hi"] {
             push_req(&mut requests, &format!("kInputEQ/kEQ{}F", band), i);
@@ -594,6 +596,7 @@ async fn queue_all_params_inner(
         push_req(&mut requests, "kAUXFader/kFader", i);
         push_req(&mut requests, "kAUXChannelOn/kChannelOn", i);
         push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", 40 + i);
+        push_req(&mut requests, "kAUXAttenuator/kAtt", i);
         push_req(&mut requests, "kAUXEQ/kEQOn", i);
         push_req(&mut requests, "kAUXEQ/kEQHPFOn", i);
         push_req(&mut requests, "kAUXEQ/kEQLPFOn", i);
@@ -620,6 +623,7 @@ async fn queue_all_params_inner(
         push_req(&mut requests, "kBusFader/kFader", i);
         push_req(&mut requests, "kBusChannelOn/kChannelOn", i);
         push_req(&mut requests, "kSetupSoloChOn/kSoloChOn", 48 + i);
+        push_req(&mut requests, "kBusAttenuator/kAtt", i);
         push_req(&mut requests, "kBusEQ/kEQOn", i);
         push_req(&mut requests, "kBusEQ/kEQHPFOn", i);
         push_req(&mut requests, "kBusEQ/kEQLPFOn", i);
@@ -652,6 +656,8 @@ async fn queue_all_params_inner(
     push_req(&mut requests, "kStereoChannelOn/kChannelOn", 0);
     push_req(&mut requests, "kStereoAttenuator/kAtt", 0);
     push_req(&mut requests, "kStereoEQ/kEQOn", 0);
+    push_req(&mut requests, "kStereoEQ/kEQHPFOn", 0);
+    push_req(&mut requests, "kStereoEQ/kEQLPFOn", 0);
     for band in &["Low", "LowMid", "HiMid", "Hi"] {
         push_req(&mut requests, &format!("kStereoEQ/kEQ{}F", band), 0);
         push_req(&mut requests, &format!("kStereoEQ/kEQ{}G", band), 0);

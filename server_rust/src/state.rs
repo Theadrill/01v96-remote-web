@@ -131,6 +131,7 @@ pub struct MixBusState {
     pub value: f64,
     pub on: bool,
     pub solo: bool,
+    pub att: f64,
     pub name: String,
     #[serde(rename = "nameChars")]
     pub name_chars: Vec<String>,
@@ -332,6 +333,7 @@ impl GlobalState {
                 value: 0.0,
                 on: false,
                 solo: false,
+                att: 0.0,
                 name: format!("MIX {}", i + 1),
                 name_chars: vec![" ".to_string(); 16],
                 comp: CompState {
@@ -1278,7 +1280,9 @@ impl ChannelLike for ChannelState {
 }
 
 impl ChannelLike for MixBusState {
-    fn set_att(&mut self, _v: f64) {}
+    fn set_att(&mut self, v: f64) {
+        self.att = v;
+    }
     fn set_pan(&mut self, _v: f64) {}
     fn apply_comp(&mut self, mt: &str, v: f64) {
         apply_comp_fields(&mut self.comp, mt, v);
