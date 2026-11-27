@@ -169,14 +169,18 @@ socket.on('update', (d) => {
         return;
     }
 
-    if (d.channel === 'master' || d.type.startsWith('kStereo')) {
-        if (d.type === 'kStereoFader/kFader') updateUI('master', d.value, undefined, undefined);
-        if (d.type === 'kStereoChannelOn/kChannelOn') updateUI('master', undefined, isTrue, undefined);
-        if (d.type === 'kStereoAttenuator/kAtt') {
-            if (masterState) masterState.att = d.value;
-            const activeIsMaster = activeConfigChannel === 'master' || activeConfigChannel === 52;
-            if (activeIsMaster && window.updateATTUI) window.updateATTUI(d.value);
-        }
+    if (d.type === 'kStereoFader/kFader') {
+        updateUI('master', d.value, undefined, undefined);
+        return;
+    }
+    if (d.type === 'kStereoChannelOn/kChannelOn') {
+        updateUI('master', undefined, isTrue, undefined);
+        return;
+    }
+    if (d.type === 'kStereoAttenuator/kAtt') {
+        if (masterState) masterState.att = d.value;
+        const activeIsMaster = activeConfigChannel === 'master' || activeConfigChannel === 52;
+        if (activeIsMaster && window.updateATTUI) window.updateATTUI(d.value);
         return;
     }
 
@@ -191,9 +195,10 @@ socket.on('update', (d) => {
         return;
     }
     if (d.type === 'kAUXAttenuator/kAtt') {
-        const state = getChannelStateById(d.channel < 8 ? 36 + d.channel : d.channel);
+        const globalCh = d.channel < 8 ? 36 + d.channel : d.channel;
+        const state = getChannelStateById(globalCh);
         if (state) state.att = d.value;
-        if (activeConfigChannel === (36 + d.channel) && window.updateATTUI) window.updateATTUI(d.value);
+        if (activeConfigChannel === globalCh && window.updateATTUI) window.updateATTUI(d.value);
         return;
     }
     if (d.type === 'kBusFader/kFader') {
@@ -207,9 +212,10 @@ socket.on('update', (d) => {
         return;
     }
     if (d.type === 'kBusAttenuator/kAtt') {
-        const state = getChannelStateById(d.channel < 8 ? 44 + d.channel : d.channel);
+        const globalCh = d.channel < 8 ? 44 + d.channel : d.channel;
+        const state = getChannelStateById(globalCh);
         if (state) state.att = d.value;
-        if (activeConfigChannel === (44 + d.channel) && window.updateATTUI) window.updateATTUI(d.value);
+        if (activeConfigChannel === globalCh && window.updateATTUI) window.updateATTUI(d.value);
         return;
     }
 

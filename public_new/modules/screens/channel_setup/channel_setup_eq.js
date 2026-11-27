@@ -653,8 +653,17 @@ window.updateEQParam = function(type, val, mode = null, ch = null) {
         chState.eq[bandKey][paramKey] = val;
     }
 
-    // ATUALIZAR UI APENAS SE O CANAL FOR O ATIVO E HOUVER CANVAS
-    if (targetCh !== activeConfigChannel || !eqCanvas || !eqBands.length) return;
+    // ATUALIZAR UI APENAS SE O CANAL FOR O ATIVO
+    const isTargetActive = (targetCh === activeConfigChannel) ||
+        ((targetCh === 52 || targetCh === 'master') && (activeConfigChannel === 52 || activeConfigChannel === 'master'));
+    if (!isTargetActive) return;
+
+    if (type.endsWith('kEQOn')) {
+        const sideBtnOn = document.getElementById('sideBtnEQOn');
+        if (sideBtnOn) sideBtnOn.classList.toggle('on-active', chState.eq.on);
+    }
+
+    if (!eqCanvas || !eqBands.length) return;
 
     if (mode) {
         let bIdx = -1;
