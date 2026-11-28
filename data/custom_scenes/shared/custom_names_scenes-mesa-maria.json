@@ -162,6 +162,12 @@
       "physical_scene": "DJ",
       "physical_id": 99,
       "file": "custom_names_scene-DJ-mesa-maria.json"
+    },
+    {
+      "custom_name": "PGD ONLINE PAL",
+      "physical_scene": "PGD ONLINE PAL",
+      "physical_id": 56,
+      "file": "custom_names_scene-PGD ONLINE PAL-mesa-maria.json"
     }
   ]
 }
